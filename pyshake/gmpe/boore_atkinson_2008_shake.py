@@ -18,42 +18,25 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
         '''
         C = super.COEFFS[imt]
         C_SR = super.COEFFS_SOIL_RESPONSE[imt]
+        pga4nl = super._get_pga_on_rock(rup, dists, C)
         if forward:
-            if imt == PGA():
-                pgm_corrected = np.log(pgm) + \
-                  super._get_site_amplification_linear(sites.vs30, C_SR) + \
-                  super._get_site_amplification_non_linear(sites.vs30, pgm, C_SR)
-            else:
-                #Not sure what really needs to happen here...
-                pgm_corrected = super._compute_magnitude_scaling(rup, C) + \
-                  super._compute_distance_scaling(rup, dists, C) + \
-                  super._get_site_amplification_linear(sites.vs30, C_SR) + \
-                  super._get_site_amplification_non_linear(sites.vs30, pgm, C_SR) 
+            pgm_corrected = pgm + \
+               super._get_site_amplification_linear(sites.vs30, C_SR) + \
+               super._get_site_amplification_non_linear(sites.vs30, pga4nl, C_SR)
         else:
-            if imt == PGA():
-                pgm_corrected = np.log(pgm) - \
-                  super._get_site_amplification_linear(sites.vs30, C_SR) + \
-                  super._get_site_amplification_non_linear(sites.vs30, pgm, C_SR)
-            else:
-                #Not sure what really needs to happen here...
-                pgm_corrected = super._compute_magnitude_scaling(rup, C) + \
-                  super._compute_distance_scaling(rup, dists, C) + \
-                  super._get_site_amplification_linear(sites.vs30, C_SR) + \
-                  super._get_site_amplification_non_linear(sites.vs30, pgm, C_SR) 
+            pgm_corrected = pgm - \
+               (super._get_site_amplification_linear(sites.vs30, C_SR) + \
+                super._get_site_amplification_non_linear(sites.vs30, pga4nl, C_SR))
 
         return pgm_corrected
 
-    def get_amplitudes(self,sites,rup,dists,imt):
+    def get_amplitudes(self,rup,dists,imt):
         '''
         Calculate peak ground motion on rock.
         '''
-        # compute PGA on rock conditions - needed to compute non-linear
-        # site amplification term
-        if imt == PGA:
-            pgmrock = self._get_pga_on_rock(rup, dists, C)
-        else:
-            #??
-            pass
+        C = super.COEFFS[imt]
+        pgmrock = super._compute_magnitude_scaling(rup, C) + \
+                  super._compute_distance_scaling(rup, dists, C)
 
         return pgmrock
 
