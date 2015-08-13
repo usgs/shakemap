@@ -6,6 +6,6 @@ setup(name='pyshake',
       author='Bruce Worden, Mike Hearne',
       author_email='cbworden@usgs.gov,mhearne@usgs.gov',
       url='',
-      packages=['pyshake'],
+      packages=['pyshake','pyshake.gmpe','pyshake.shakelib','pyshake.oldshakelib'],
       scripts = [],
 )
