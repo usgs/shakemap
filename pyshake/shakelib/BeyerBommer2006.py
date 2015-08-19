@@ -1,3 +1,7 @@
+"""
+Module exports class BB
+"""
+
 from openquake.hazardlib import const
 from openquake.hazardlib.imt import PGA, PGV, SA
 
@@ -45,7 +49,18 @@ class BB(object):
             const.IMC.GREATER_OF_TWO_HORIZONTAL : dict(zip(sa_col_names, [ 1.1, 1.2, 0.04, 0.07, 1.02 ])) }
 
     def ampIMCtoIMC(self, amps, imc_in, imc_out, imt):
-        """ Assumes the amps are in linear (not log) space """
+        """ 
+        Returns amps converted from one IMC to another.
+        IMPORTANT: Assumes the input amps are in linear (not log) space 
+        IMPORTANT: IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
+        Inputs:
+            amps -- a numpy array of ground motions in IMC imc_in and IMT imt
+            imc_in -- the IMC type of the input amp array
+            imc_out -- the desired IMC type of the output amps
+            imt -- the IMT of the input amps (must be one of PGA, PGV, or SA)
+        Outputs:
+            returns amps converted from imc_in to imc_out
+        """
         if imc_in == const.IMC.AVERAGE_HORIZONTAL:
             # The amps are already in the B&B "reference" type ("GM", i.e., 
             # geometric mean)
@@ -75,7 +90,18 @@ class BB(object):
         return amps * (numer / denom)
 
     def sigmaIMCtoIMC(self, sigmas, imc_in, imc_out, imt):
-        """Sigmas are assumed to be in log space."""
+        """ 
+        Returns sigmas converted from one IMC to another.
+        IMPORTANT: Assumes the input sigmas are in log space 
+        IMPORTANT: IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
+        Inputs:
+            sigmas -- a numpy array of ground motions in IMC imc_in and IMT imt
+            imc_in -- the IMC type of the input sigmas array
+            imc_out -- the desired IMC type of the output sigmas
+            imt -- the IMT of the input sigmas (must be one of PGA, PGV, or SA)
+        Outputs:
+            returns sigmas converted from imc_in to imc_out
+        """
         if imc_in == const.IMC.AVERAGE_HORIZONTAL:
             # The amps are already in the B&B "reference" type ("GM", i.e., 
             # geometric mean)
@@ -110,6 +136,7 @@ class BB(object):
         return sigma_out
 
     def _GM2other(self, imt, imc):
+        """ Helper function to extract coefficients from the parameter tables """
         if 'PGA' in imt:
             return self.pga_dict[imc]['c12']
         elif 'PGV' in imt:
@@ -132,6 +159,7 @@ class BB(object):
             raise ValueError('unknown IMT %r' % imt)
 
     def _GM2otherSigma(self, imt, imc):
+        """ Helper function to extract coefficients from the parameter tables """
         if 'PGA' in imt:
             return self.pga_dict[imc]['R'], self.pga_dict[imc]['c34']
         elif 'PGV' in imt:
