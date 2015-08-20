@@ -143,7 +143,7 @@ def __GM2other(imt, imc):
         elif pp < 0.8:
             c1 = __sa_dict[imc]['c1']
             c2 = __sa_dict[imc]['c2']
-            return c1 + (c2 - c1) * log(pp / 0.15) / log(0.8 / 0.15)
+            return c1 + (c2 - c1) * np.log(pp / 0.15) / np.log(0.8 / 0.15)
         elif pp <= 5.0:
             return __sa_dict[imc]['c2']
         else:
@@ -167,7 +167,7 @@ def __GM2otherSigma(imt, imc):
         elif pp < 0.8:
             c3 = __sa_dict[imc]['c3']
             c4 = __sa_dict[imc]['c4']
-            return R, c3 + (c4 - c3) * log(pp / 0.15) / log(0.8 / 0.15)
+            return R, c3 + (c4 - c3) * np.log(pp / 0.15) / np.log(0.8 / 0.15)
         elif pp <= 5.0:
             return R, __sa_dict[imc]['c4']
         else:
