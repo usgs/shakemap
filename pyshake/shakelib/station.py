@@ -69,7 +69,7 @@ def getPeakValues(stationdict):
         else:
             peakdict['mmi'].append(np.nan)
         peakdict['lat'].append(attributes['lat'])
-        peakdict['lon'].append(attributes['lat'])
+        peakdict['lon'].append(attributes['lon'])
         peakdict['code'].append(stationcode)
         #make sure we get the peak value from 
         for key in peakkeys:
