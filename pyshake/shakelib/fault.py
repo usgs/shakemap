@@ -7,6 +7,7 @@ import sys
 #third party imports
 import numpy as np
 from openquake.hazardlib.geo import mesh
+from ecef import latlon2ecef
 
 class Fault(object):
     """
@@ -67,6 +68,36 @@ class Fault(object):
         self._validate()
         faultfile.close()
 
+    def getRJBDistance(self,lats,lons):
+        """
+        Calculate RJB distance to numpy array of longitude/latitude points.
+        """
+        #loop over line segments in polygon
+        numnans = len(self.x[np.isnan(self.x)])
+        npoints = len(self.x) - numnans
+        dist = np.ones(lats.shape)*np.inf
+        
+        for i in range(0,numpoints-1):
+            if np.isnan(self.x[i]):
+                continue
+            v1lon = self.x[i]
+            v2lon = self.x[i+1]
+            v1lat = self.y[i]
+            v2lat = self.y[i+1]
+            v1x,v1y,tz = latlon2ecef(v1lat,v1lon,0)
+            v2x,v2y,tz = latlon2ecef(v2lat,v2lon,0)
+            px,py = latlon2ecef(lats,lons)
+            dx = v2x - v1x
+            dy = v2y - v1y
+            c = np.sqrt(dx**2+dy**2)
+            theta = np.arctan2(dy,dx)
+            R = np.array([[np.cos(theta),-1*np.sin(theta)],
+                          [np.sin(theta),np.cos(theta)]])
+            xy = np.array(px,py)
+            xyp = np.dot(R,xy)
+            #the y row is the perpendicular distance of each point to the line segment
+            
+        
     def getReference(self):
         """
         Return whatever reference information was contained in fault file.
