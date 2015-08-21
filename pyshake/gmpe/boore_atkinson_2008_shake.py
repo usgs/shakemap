@@ -48,3 +48,10 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
         stddevs = self._get_stddevs(C, stddev_types, num_sites=len(sites.vs30))
         return stddevs
         
+    def _get_fault_type_dummy_variables(self, rup):
+        """
+        Override this function to allow for undefined rupture type
+        """
+        if rup.rake is None:
+            return 1, 0, 0, 0
+        return super(BooreAtkinson2008ShakeMap, self)._get_fault_type_dummy_variables(rup)
