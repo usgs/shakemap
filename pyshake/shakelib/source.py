@@ -2,6 +2,7 @@
 
 #stdlib imports
 from xml.dom import minidom
+import sys
 
 #third party
 import pytz
@@ -9,6 +10,7 @@ import numpy as np
 from openquake.hazardlib.geo import geodetic
 from openquake.hazardlib.geo import point
 from openquake.hazardlib.geo import Mesh
+from openquake.hazardlib.geo.geodetic import distance
 from openquake.hazardlib.geo.surface import multi
 from openquake.hazardlib.geo.surface import planar
 from openquake.hazardlib.geo import utils
@@ -23,10 +25,11 @@ DEG2RAD = 180./np.pi
 def readEventFile(eventxml):
     event = {}
     root = minidom.parse(eventxml)
-    eq = root.getElementsByTagName('earthquake')
+    eq = root.getElementsByTagName('earthquake')[0]
     event['lat'] = float(eq.getAttribute('lat'))
     event['lon'] = float(eq.getAttribute('lon'))
     event['depth'] = float(eq.getAttribute('depth'))
+    event['mag'] = float(eq.getAttribute('mag'))
     year = int(eq.getAttribute('year'))
     month = int(eq.getAttribute('month'))
     day = int(eq.getAttribute('day'))
@@ -41,17 +44,17 @@ def readEventFile(eventxml):
     # 2) times < year 1900 (strftime fails) - subclass datetime, use Obspy utcdatetime
     # 3) daylight savings time (use pytz)
     
-    event['time'] = ShakeDateTime(year,month,day,hour,minute,second,microsecond)
+    event['time'] = ShakeDateTime(year,month,day,hour,minute,second,msec)
     for key in ['id','locstring','type','timezone']:
-        if event.hasAttribute(key):
-            event[key] = event.getAttribute(key)
-    if event.hasAttribute('created'):
-        event['created'] = ShakeDateTime.utcfromtimestamp(int(event.getAttribute('created')))
+        if event.has_key(key):
+            event[key] = eq.getAttribute(key)
+    if event.has_key('created'):
+        event['created'] = ShakeDateTime.utcfromtimestamp(int(eq.getAttribute('created')))
 
     root.unlink()
     return event
 
-def readFaultFile(self,faultfile):
+def readFaultFile(faultfile):
     """
     Read fault file format as defined in ShakeMap Software Guide.  
     Input: 
@@ -68,10 +71,9 @@ def readFaultFile(self,faultfile):
     y = []
     z = []
     if isinstance(faultfile,str) or isinstance(faultfile,unicode):
-        faultfile = faultfile
-        faultlines = open(faultfile,'rt').readlines()
+        faultfile = open(faultfile,'rt')
+        faultlines = faultfile.readlines()
     else:
-        faultfile = 'File-like object'
         faultlines = faultfile.readlines()
     reference = ''
     for line in faultlines:
@@ -185,18 +187,16 @@ class Source(object):
                 bottomLeft = point.Point(lonseg[endidx-1],latseg[endidx-1],depthseg[endidx-1])
                 rect = self.getPlanarRect(topLeft,topRight,bottomRight,bottomLeft)
                 surface = planar.PlanarSurface.from_corner_points(0.01,rect[0],rect[1],rect[2],rect[3])
-                surfaces.add(surface)
+                surfaces.append(surface)
                 ioff += 1
-            
             istart = iend+1
-            
+
+        self.MultiSurface = multi.MultiSurface(surfaces)
         self.lon = lon
         self.lat = lat
         self.depth = depth
-        self.__getMultiSurface()
 
     def getPlanarRect(self,topLeft,topRight,bottomRight,bottomLeft):
-        #get the strike angle
         lon1 = topLeft.longitude
         lat1 = topLeft.latitude
         dep1 = topLeft.depth
@@ -213,79 +213,36 @@ class Source(object):
         lats = np.array([lat1,lat2,lat3,lat4])
         lons = np.array([lon1,lon2,lon3,lon4])
         depths = np.array([dep1,dep2,dep3,dep4])
+        
+        points = np.vstack((lons,lats,depths)).T
+        ctrPoint,orthogonal = utils.plane_fit(points)
+        toplen = distance(lons[0],lats[0],depths[0],lons[1],lats[1],depths[1])
+        bottomlen = distance(lons[2],lats[2],depths[2],lons[3],lats[3],depths[3])
+        rightheight = distance(lons[1],lats[1],depths[1],lons[2],lats[2],depths[2])
+        leftheight = distance(lons[3],lats[3],depths[3],lons[0],lats[0],depths[0])
+        width = max(toplen,bottomlen)
+        height = max(leftheight,rightheight)
+        mlat = np.mean(lats)*DEG2RAD
+        width = np.cos(mlat) * (width / 111.191)
+        height = height / 111.191
+        dx = width/2
+        dy = height/2
+        i,j,k = orthogonal
+        a,b,c = ctrPoint
+        z1 = (-i*dx - j*dy)/k + c
+        z2 = (-i*dx - j*dy)/k + c
+        z3 = (i*dx - j*dy)/k + c
+        z4 = (i*dx - j*dy)/k + c
 
-        x,y,z = latlon2ecef(lats,lons,depths)
-        strike = np.arctan2(x[1]-x[0],y[1]-y[0])
-        pitch = np.arctan2(z[1]-z[0],x[1]-x[0])
-        dx2 = np.power(x[2]-x[1],2)
-        dy2 = np.power(y[2]-y[1],2)
-        #this is the distance between the top right vertex and the bottom right vertex
-        #this should be perpendicular to the strike direction
-        h = np.sqrt(dx2+dy2)
-        dip = np.arctan2(dy,h)
+        xplane = np.array([a-dx,a+dx,a+dx,a-dx])
+        yplane = np.array([b+dy,b+dy,b-dy,b-dy])
+        zplane = np.array([z1,z2,z3,z4])
 
-        #TODO - look up 3d rotation matrices - these are 2d!
-        Rstrike = np.array([[np.cos(-strike),-np.sin(-strike)],
-                            [np.sin(-strike),np.cos(-strike)]])
-        Rdip = np.array([[np.cos(-dip),-np.sin(-dip)],
-                            [np.sin(-dip),np.cos(-dip)]])
-        Rpitch = np.array([[np.cos(-pitch),-np.sin(-pitch)],
-                            [np.sin(-pitch),np.cos(-pitch)]])
-        R3 = np.dot(Rpitch,np.dot(Rstrike,Rdip))
-        xyz = np.zeros((3,len(x)))
-        xyz[0,:] = x
-        xyz[1,:] = y
-        xyz[2,:] = z
-
-        xyzp = np.dot(R3,xyz) #this should now be the x,y,z coordinates of a flat rectangle
-        
-        
-        
-        
-        strike = geodetic.azimuth(lon1,lat1,lon2,lat2) * DEG2RAD #angle to get us back to strike heading north
-        rstrike = strike * -1
-        #we'll use this to rotate our quad to point north
-        R1 = np.array([[np.cos(rstrike),-np.sin(rstrike)],
-                      [np.sin(rstrike),np.cos(rstrike)]])
-        #we'll use this to rotate our quad back to it's original orientation
-        R2 = np.array([[np.cos(strike),-np.sin(strike)],
-                      [np.sin(strike),np.cos(strike)]])
-        xy = np.array([[lon1,lon2,lon3,lon4],
-                       [lat1,lat2,lat3,lat4]])
-        xyp = np.dot(R1,xy)
-        xmin = np.min(xy[0,:])
-        xmax = np.max(xy[0,:])
-        ymin = np.min(xy[1,:])
-        ymax = np.max(xy[1,:])
-        xyp2 = np.array([[xmin,xmax,xmax,xmin],
-                         [ymax,ymax,ymin,ymin]])
-        newxy = np.dot(R2,xyp2)
-        UL = point.Point(newxy[0,0],newxy[1,0])
-        UR = point.Point(newxy[0,1],newxy[1,1])
-        LR = point.Point(newxy[0,2],newxy[1,2])
-        LL = point.Point(newxy[0,3],newxy[1,3])
-        rect = (UL,UR,LR,LL)
-        return rect
-        
-    def __getMultiSurface(self):
-        inan = np.isnan(self.lon)
-        surfaces = []
-        spacing = (self.lon.max() - self.lon.min())/5.0 #??
-        istart = 0
-        endpoints = list(np.where(np.isnan(self.lon))[0])
-        endpoints.append(len(self.lon))
-        for iend in endpoints:
-            p = geometry.Polygon(zip(self.lon[istart:iend],self.lat[istart:iend]))
-            bounds = p.bounds #xmin,ymin,xmax,ymax
-            topLeft = point.Point(bounds[0],bounds[3],self.depth[istart])
-            topRight = point.Point(bounds[2],bounds[3],self.depth[istart+1])
-            bottomRight = point.Point(bounds[2],bounds[3],self.depth[istart+2])
-            bottomLeft = point.Point(bounds[0],bounds[1],self.depth[istart+3])
-            surface = planar.PlanarSurface.from_corner_points(spacing,topLeft,topRight,bottomRight,bottomLeft)
-            surfaces.append(surface)
-            istart = iend + 1
-
-        self.MultiSurface = multi.MultiSurface(surfaces)
+        topLeft = point.Point(xplane[0],yplane[0],-zplane[0])
+        topRight = point.Point(xplane[1],yplane[1],-zplane[1])
+        bottomRight = point.Point(xplane[2],yplane[2],-zplane[2])
+        bottomLeft = point.Point(xplane[3],yplane[3],-zplane[3])
+        return (topLeft,topRight,bottomRight,bottomLeft)
 
     def getSurface(self):
         return self.MultiSurface
@@ -296,24 +253,24 @@ class Source(object):
                 p = point.Point(self.lon[0],self.lat[0],0.0)
                 return p.distance_to_mesh(mesh)
             else:
-                self.MultiSurface.get_joyner_boore_distance(mesh)
+                return self.MultiSurface.get_joyner_boore_distance(mesh)
         elif method == 'rrup':
             if len(self.lon) == 1:
                 p = point.Point(self.lon[0],self.lat[0],self.depths[0])
                 return p.distance_to_mesh(mesh)
             else:
-                self.MultiSurface.get_min_distance(mesh)
+                return self.MultiSurface.get_min_distance(mesh)
         elif method == 'rx':
             if len(self.lon) == 1:
                 return np.zeros(mesh.shape)
             else:
-                self.MultiSurface.get_rx_distance(mesh)
+                return self.MultiSurface.get_rx_distance(mesh)
         else:
             raise NotImplementedError('No distance measure exists for method type "%s"' % method)
         
 
 
-def test():
+def test(eventxml=None,faultfile=None):
     event = {'lat':28.230,'lon':84.731,'depth':8.2,
              'mag':7.8,'time':ShakeDateTime.utcnow()}
     xmin = event['lon'] - (2.5/2.0)
@@ -322,28 +279,36 @@ def test():
     ymax = event['lat'] + (2.5/2.0)
     xdim = 0.0083
     ydim = 0.0083
-    fxmax = 28.427
-    fxmin = 27.986
-    fymin = 84.614
-    fymax = 86.179
-    dmin = 13
-    dmax = 20
 
-    # 28.427 84.614 20 UL
-    # 27.986 86.179 20 LR
-    # 27.469 85.880 13 
-    # 27.956 84.461 13
-    # 28.427 84.614 20
-    
-    lons = [118.1,118.3,118.5,118.8,118.8,118.6,118.2,118.0,118.1]
-    lats = [32.6,32.7,32.6,32.7,32.5,32.4,32.4,32.5,32.6]
-    depths = [0.0,0.0,0.0,0.0,30.0,30.0,30.0,30.0,0.0]
+    fault = np.array([[28.427,84.614,20],
+                      [27.986,86.179,20],
+                      [27.469,85.880,13],
+                      [27.956,84.461,13],
+                      [28.427,84.614,20]])
+    lons = fault[:,1]
+    lats = fault[:,0]
+    depths = fault[:,2]
+
     reference = 'Schmidt, J.J.J 1999 Journal of GeoTectonical Science'
     source = Source(event,lon=lons,lat=lats,depth=depths,reference=reference)
     x,y = np.meshgrid(np.arange(xmin,xmax,xdim),np.arange(ymin,ymax,ydim))
     shakemap = Mesh(x,y)
-    print shakemap.shape()
+    print shakemap.shape
+    dist = source.calcDistance(shakemap,method='rjb')
+    #test reading of files
+    lon = None
+    lat = None
+    depth = None
+    
+    if eventxml is not None:
+        source = Source.readFromFile(eventxml,faultfile=faultfile)
+        dist = source.calcDistance(shakemap,method='rjb')
+        
 if __name__ == '__main__':
-    test()
+    if len(sys.argv) > 1:
+        eventfile = sys.argv[1]
+    if len(sys.argv) > 2:
+        faulttxt = sys.argv[2]
+    test(eventxml=eventfile,faultfile=faulttxt)
             
         
