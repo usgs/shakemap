@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 from openquake.hazardlib.gsim.boore_atkinson_2008 import BooreAtkinson2008
+from openquake.hazardlib import const
+
+import numpy as np
 
 class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
     '''
@@ -11,7 +14,7 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
      - get the standard deviations for the GMPE
     '''
 
-    def get_site_corrections(self,sites,rup,dists,imt,pgm,forward=True):
+    def get_site_corrections(self, sites, rup, dists, imt, pgm, forward=True):
         '''
         Calculate site corrections for sites on rock (forward=True), OR
         Remove site corrections from data on other substrates.
@@ -30,7 +33,7 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
 
         return pgm_corrected
 
-    def get_amplitudes(self,rup,dists,imt):
+    def get_amplitudes(self, rup, dists, imt):
         '''
         Calculate peak ground motion on rock.
         '''
@@ -40,14 +43,23 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
 
         return pgmrock
 
-    def get_stddevs(self,sites,stddev_types):
+    def get_stddevs(self, sites, rup, dists, imt, stddev_type):
         '''
         Get standard deviations of GMPE.
         '''
         C = self.COEFFS[imt]
-        stddevs = self._get_stddevs(C, stddev_types, num_sites=len(sites.vs30))
+
+        assert stddev_type in self.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        if stddev_type == const.StdDev.TOTAL:
+            stddevs = np.zeros_like(dists.rjb) + C['std']
+        elif stddev_type == const.StdDev.INTRA_EVENT:
+            stddevs = np.zeros_like(dists.rjb) + C['sigma']
+        elif stddev_type == const.StdDev.INTER_EVENT:
+            stddevs = np.zeros_like(dists.rjb) + C['tau']
+        else:
+            raise ValueError("Unknown type %s" % stddev_type)
         return stddevs
-        
+
     def _get_fault_type_dummy_variables(self, rup):
         """
         Override this function to allow for undefined rupture type
