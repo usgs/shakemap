@@ -9,10 +9,12 @@ import pyshake.shakelib.BeyerBommer2006 as BB
 from openquake.hazardlib.imt import PGA, PGV, SA
 from openquake.hazardlib import const
 
-def shakemapToGMPE(sm_amps, gmpe, imt):
+def ampShakeMapToGMPE(sm_amps, gmpe, imt):
 
     if not isinstance(imt, PGV):
         gmpe_amps = sm_amps / 100
+    else:
+        gmpe_amps = sm_amps.copy()
 
     gmpe_amps = BB.ampIMCtoIMC(gmpe_amps, const.IMC.GREATER_OF_TWO_HORIZONTAL, \
                                gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT, imt)
@@ -20,7 +22,7 @@ def shakemapToGMPE(sm_amps, gmpe, imt):
 
     return gmpe_amps
 
-def gmpeToShakeMap(gmpe_amps, gmpe, imt):
+def ampGmpeToShakeMap(gmpe_amps, gmpe, imt):
 
     sm_amps = gmpe.to_imt_unit_values(gmpe_amps)
     sm_amps = BB.ampIMCtoIMC(sm_amps, gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT, \
@@ -30,3 +32,20 @@ def gmpeToShakeMap(gmpe_amps, gmpe, imt):
         sm_amps *= 100
 
     return sm_amps
+
+def sigmaShakeMapToGMPE(sm_sigmas, gmpe, imt):
+
+    gmpe_sigmas = gmpe.to_distribution_values(sm_sigmas)
+    gmpe_sigmas = BB.sigmaIMCtoIMC(gmpe_sigmas, const.IMC.GREATER_OF_TWO_HORIZONTAL, \
+                                   gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT, imt)
+
+    return gmpe_sigmas
+
+def sigmaGmpeToShakeMap(gmpe_sigmas, gmpe, imt):
+
+    sm_sigmas = BB.sigmaIMCtoIMC(gmpe_sigmas, gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT, \
+                                 const.IMC.GREATER_OF_TWO_HORIZONTAL, imt)
+    sm_sigmas = gmpe.to_imt_unit_values(sm_sigmas)
+
+    return sm_sigmas
+
