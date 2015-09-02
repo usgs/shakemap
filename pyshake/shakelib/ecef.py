@@ -90,6 +90,8 @@ def latlon2ecef(lat,lon,dep):
 
     return (x,y,z)
 
+
+
 def test():
     lat = 32.1
     lon = 118.5
