@@ -14,17 +14,41 @@ from openquake.hazardlib.geo.geodetic import distance
 from openquake.hazardlib.geo.surface import multi
 from openquake.hazardlib.geo.surface import planar
 from openquake.hazardlib.geo import utils
+from openquake.hazardlib.gsim import base
+from openquake.hazardlib.const import TRT
 from shapely import geometry
 from timeutils import ShakeDateTime
 from ecef import latlon2ecef,ecef2latlon
+from openquake.hazardlib.gsim.base import GMPE
 
 REQUIRED_KEYS = ['lat','lon','depth','time','mag']
 OPTIONAL_KEYS = ['id','timezone','locstring','type','created']
 DEG2RAD = 180./np.pi
+RAKEDICT = {'SS':0.0,'NM':-90.0,'RS':90.0,'ALL':None}
+DEFAULT_STRIKE = 0.0
+DEFAULT_DIP = 90.0
+DEFAULT_WIDTH = 0.0
+DEFAULT_ZTOR = 0.0
 
 def readEventFile(eventxml):
+    """
+    Read event.xml file from disk, returning a dictionary of attributes.
+    Input XML format looks like this:
+    ******
+    <earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9" year="2008" month="05" day="12" hour="06" minute="28" second="01" timezone="GMT" depth="19.0" locstring="EASTERN SICHUAN, CHINA" created="1211173621" otime="1210573681" type="" />
+    ******
+    :param eventxml:
+        Path to event XML file OR file-like object
+    :returns:
+       Dictionary with keys as indicated above in earthquake element attributes.
+    """
     event = {}
-    root = minidom.parse(eventxml)
+    if isinstance(eventxml,str) or isinstance(eventxml,unicode):
+        root = minidom.parse(eventxml)
+    else:
+        data = eventxml.read()
+        root = minidom.parseString(data)
+        
     eq = root.getElementsByTagName('earthquake')[0]
     event['lat'] = float(eq.getAttribute('lat'))
     event['lon'] = float(eq.getAttribute('lon'))
@@ -54,221 +78,248 @@ def readEventFile(eventxml):
     root.unlink()
     return event
 
-def readFaultFile(faultfile):
+def readSource(sourcefile):
     """
-    Read fault file format as defined in ShakeMap Software Guide.  
-    Input: 
-    Fault file in GMT psxy format, where
-
-     * Fault vertices are space separated lat,lon,depth triplets on a single line.
-     * Fault segments are separated by lines containing ">"
-     * Fault segments must be closed.
-     * Fault segments must be all clockwise or all counter-clockwise.
-
-    Raises Exception when above conditions are not met.
+    Read source.txt file, which has lines like key=value.
+    :param sourcefile:
+        Path to source.txt file OR file-like object
+    :returns:
+        Dictionary containing key/value pairs from file.
     """
-    x = []
-    y = []
-    z = []
-    if isinstance(faultfile,str) or isinstance(faultfile,unicode):
-        faultfile = open(faultfile,'rt')
-        faultlines = faultfile.readlines()
+    isFile = False
+    if isinstance(sourcefile,str) or isinstance(sourcefile,unicode):
+        f = open(sourcefile,'rt')
     else:
-        faultlines = faultfile.readlines()
-    reference = ''
-    for line in faultlines:
-        sline = line.strip()
-        if sline.startswith('#'):
-            reference += sline
-            continue
-        if sline.startswith('>'):
-            if len(x): #start of new line segment
-                x.append(np.nan)
-                y.append(np.nan)
-                z.append(np.nan)
-                continue
-            else: #start of file
-                continue
-        parts = sline.split()
-        if len(parts) < 3:
-            raise Exception('Finite fault file %s has no depth values.' % faultfile)
-        y.append(float(parts[0]))
-        x.append(float(parts[1]))
-        z.append(float(parts[2]))
-    faultfile.close()
-    if np.isnan(x[-1]):
-        x = x[0:-1]
-        y = y[0:-1]
-        z = z[0:-1]
-        
-    return (x,y,z,reference)
-    
+        isFile = True
+        f = sourcefile
+    params = {}
+    for line in f.readlines:
+        parts = line.split('=')
+        key = parts[0].strip()
+        value = params[1].strip()
+        #see if this is some sort of number
+        try:
+            value = int(value)
+        except ValueError:
+            try:
+                value = float(value)
+            except ValueError:
+                pass
+        params[key] = value
+    if not isFile:
+        f.close()
+    return params
 
 class Source(object):
-    def __init__(self,event,lon=None,lat=None,depth=None,reference=None):
+    """
+    Encapsulate everything we need to know about an earthquake source.
+    """
+    def __init__(self,event,fault=None,sourcedict=None):
+        """
+        Construct a Source object.
+        :param event:
+            dictionary of values (see readEventFile())
+        :param fault:
+            a Fault object
+        :param sourcedict:
+            Dictionary containing values from source.txt file (see readSource())
+        :returns:
+            Source object.
+        """
         missing = []
         for req in REQUIRED_KEYS:
             if req not in event.keys():
                 missing.append(req)
         if len(missing):
            raise NameError('Input event dictionary is missing the following required keys: "%s"' % (','.join(missing)))
-        allNone = lon is None and lat is None and depth is None
-        noNone = lon is not None and lat is not None and depth is not None
-        if not allNone and not noNone:
-            raise ValueError('lon,lat,depth input parameters must be all valid sequence objects or all None.')
+        self.Fault = fault
         self.EventDict = event.copy()
-        self.reference = reference
-        if noNone:
-            self.setCoordinates(lon,lat,depth)
-        else:
-            self.setCoordinates([event['lon']],[event['lat']],[event['depth']])
+        self.TectonicRegion = tectonicRegion
+        if isinstance(sourcedict,dict):
+            for key,value in sourcedict.iteritems():
+                self.setEventParam(key,value)
+        
 
     @classmethod
-    def readFromFile(cls,eventxmlfile,faultfile=None):
+    def readFromFile(cls,eventxmlfile,faultfile=None,sourcefile=None):
+        """
+        Class method to create a Source object by specifying an event.xml file, a fault file, and a source.txt file.
+        :param eventxmlfile:
+            Event xml file (see readEventFile())
+        :param faultfile:
+            Fault text file (see fault.py)
+        :param sourcefile:
+            source.txt file (see readSource())
+        :returns:
+            Source object
+        """
         event = readEventFile(eventxmlfile)
         if faultfile is not None:
-            lon,lat,depth,reference = readFaultFile(faultfile)
+            fault = Fault.readFaultFile(faultfile)
         else:
-            lon = None
-            lat = None
-            depth = None
-        return cls(event,lon=lon,lat=lat,depth=depth,reference=reference)
-            
+            fault=None
+        params = None
+        if sourcefile is not None:
+            params = readSource(sourcefile)
+        return cls(event,fault=fault,sourcedict=params)
+
+    def getDistanceContext(self,gmpe,mesh):
+        """
+        Create a DistancesContext object
+        :param gmpe: 
+            Concrete subclass of GMPE (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
+        :param mesh:
+            Mesh object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
+        :returns:
+            DistancesContext object with distance grids required by input gmpe.
+        :raises TypeError:
+            if gmpe is not a subclass of GMPE
+        """
+        if not isinstance(gmpe,GMPE):
+            raise TypeError('getDistanceContext() cannot work with objects of type "%s"' % type(gmpe))
+        for method in gmpe.REQUIRES_DISTANCES:
+            context = base.DistancesContext
+            dist = self.calcDistance(mesh,method)
+            eval('context.%s = dist' % method)
+
+        return context
+
+    def getRuptureContext(self):
+        """
+        Return a GEM RuptureContext https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
+        :returns:
+            RuptureContext object with all known parameters filled in.
+        If Source does not contain a Fault, strike, dip, ztor, and width will be filled with default values.
+        Rake may not be known, or may be estimated from a focal mechanism.
+        """
+        #gmpe is a subclass of hazardlib GMPE
+        params = gmpe.REQUIRES_RUPTURE_PARAMETERS
+        #rupturecontext constructor inputs:
+        # 'mag', 'strike', 'dip', 'rake', 'ztor', 'hypo_lon', 'hypo_lat',
+        # 'hypo_depth', 'width', 'hypo_loc'
+        mag = self.getEventParam('mag')
+        if self.Fault is not None:
+            strike = self.Fault.getStrike()
+            dip = self.Fault.getDip()
+            ztor = self.Fault.getTopOfRupture()
+            width = self.Fault.getWidth()
+        else:
+            strike = DEFAULT_STRIKE
+            dip = DEFAULT_DIP
+            ztor = DEFAULT_ZTOR
+            width = DEFAULT_WIDTH
+
+        if self.EventDict.has_key('rake'):
+            rake = self.getEventParam('rake')
+        elif self.EventDict.has_key('mech'):
+            mech = self.EventDict['mech']
+            rake = RAKEDICT[mech]
+        else:
+            rake = RAKEDICT['ALL']
+        
+        region = self.TectonicRegion
+        lat = self.getEventParam('lat')
+        lon = self.getEventParam('lon')
+        depth = self.getEventParam('depth')
+        locstr = self.getEventParam('locstr')
+        rup = base.RuptureContext(mag,strike,dip,rake,ztor,lon,lat,depth,width,locstr)
+
+        return rup
+
+    def setTectonicRegion(self,region):
+        """
+        Set tectonic region.
+        :param region:
+            TRT object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/const.py)
+        """
+        if not isinstance(region,TRT):
+            raise ValueError('Input tectonic region must be of type openquake.hazardlib.const.TRT')
+        self.TectonicRegion = region
+
+    def getTectonicRegion(self):
+        """
+        Get tectonic region.
+        :returns:
+            TRT object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/const.py)
+        """
+        return self.TectonicRegion
+        
     def getEventDict(self):
-        return self.EventDict
+        """
+        Return the event dictionary.
+        :returns:
+           Copy of dictionary of event keys/values
+        """
+        return self.EventDict.copy()
 
     def setEventParam(self,key,value):
+        """
+        Set a parameter in the internal event dictionary
+        :param key:
+            string key
+        :param value:
+            value (any object type)
+        """
         self.EventDict[key] = value
 
     def getEventParam(self,key):
+        """
+        Get a parameter from the internal event dictionary
+        :param key:
+            string key
+        :returns:
+            value (any object type)
+        """
         if key not in self.EventDict.keys():
             raise NameError('Key "%s" not found in event dictionary' % key)
         return self.EventDict[key]
 
     def setFaultReference(self,reference):
-        self.reference = reference
+        """
+        Set the citeable reference for the fault
+        :param reference:
+            string citeable reference
+        """
+        self.Fault.setReference(reference)
 
     def getFaultReference(self):
-        return self.reference
-    
-    def setCoordinates(self,lon,lat,depth):
-        lon = np.array(lon)
-        lat = np.array(lat)
-        depth = np.array(depth)
-        inan = np.isnan(lon)
-        numnans = len(lon[inan])
-        numsegments = numnans + 1
-        #requirements:
-        # 1) Coordinate arrays must be same length
-        # 2) Polygons must be quadrilaterals
-        # 3) Quads must be closed
-        # 4) Quads must be planar
-        if len(lon) != len(lat) != len(depth):
-            raise IndexError('Length of input lon,lat,depth arrays must be equal')
-        
-        istart = 0
-        endpoints = list(np.where(np.isnan(lon))[0])
-        endpoints.append(len(lon))
-        surfaces = []
-        for iend in endpoints:
-            lonseg = lon[istart:iend]
-            latseg = lat[istart:iend]
-            depthseg = depth[istart:iend]
-            #each segment can have many contiguous quadrilaterals defined in it
-            #separations (nans) between segments mean that segments are not contiguous.
-            npoints = len(lonseg)
-            nquads = ((npoints - 5)/2) + 1
-            ioff = 0
-            for i in range(0,nquads):
-                endidx = ioff-1 #we have the closing vertex that we're not interested in here
-                topLeft = point.Point(lonseg[ioff],latseg[ioff],depthseg[ioff])
-                topRight = point.Point(lonseg[ioff+1],latseg[ioff+1],depthseg[ioff])
-                bottomRight = point.Point(lonseg[endidx-2],latseg[endidx-2],depthseg[endidx-2])
-                bottomLeft = point.Point(lonseg[endidx-1],latseg[endidx-1],depthseg[endidx-1])
-                rect = self.getPlanarRect(topLeft,topRight,bottomRight,bottomLeft)
-                surface = planar.PlanarSurface.from_corner_points(0.01,rect[0],rect[1],rect[2],rect[3])
-                surfaces.append(surface)
-                ioff += 1
-            istart = iend+1
+        """
+        Get the citeable reference for the fault
+        :returns:
+            string citeable reference
+        """
+        return self.Fault.getReference()
 
-        self.MultiSurface = multi.MultiSurface(surfaces)
-        self.lon = lon
-        self.lat = lat
-        self.depth = depth
-
-    def getPlanarRect(self,topLeft,topRight,bottomRight,bottomLeft):
-        lon1 = topLeft.longitude
-        lat1 = topLeft.latitude
-        dep1 = topLeft.depth
-        lon2 = topRight.longitude
-        lat2 = topRight.latitude
-        dep2 = topRight.depth
-        lon3 = bottomRight.longitude
-        lat3 = bottomRight.latitude
-        dep3 = bottomRight.depth
-        lon4 = bottomLeft.longitude
-        lat4 = bottomLeft.latitude
-        dep4 = bottomLeft.depth
-
-        lats = np.array([lat1,lat2,lat3,lat4])
-        lons = np.array([lon1,lon2,lon3,lon4])
-        depths = np.array([dep1,dep2,dep3,dep4])
-        
-        points = np.vstack((lons,lats,depths)).T
-        ctrPoint,orthogonal = utils.plane_fit(points)
-        toplen = distance(lons[0],lats[0],depths[0],lons[1],lats[1],depths[1])
-        bottomlen = distance(lons[2],lats[2],depths[2],lons[3],lats[3],depths[3])
-        rightheight = distance(lons[1],lats[1],depths[1],lons[2],lats[2],depths[2])
-        leftheight = distance(lons[3],lats[3],depths[3],lons[0],lats[0],depths[0])
-        width = max(toplen,bottomlen)
-        height = max(leftheight,rightheight)
-        mlat = np.mean(lats)*DEG2RAD
-        width = np.cos(mlat) * (width / 111.191)
-        height = height / 111.191
-        dx = width/2
-        dy = height/2
-        i,j,k = orthogonal
-        a,b,c = ctrPoint
-        z1 = (-i*dx - j*dy)/k + c
-        z2 = (-i*dx - j*dy)/k + c
-        z3 = (i*dx - j*dy)/k + c
-        z4 = (i*dx - j*dy)/k + c
-
-        xplane = np.array([a-dx,a+dx,a+dx,a-dx])
-        yplane = np.array([b+dy,b+dy,b-dy,b-dy])
-        zplane = np.array([z1,z2,z3,z4])
-
-        topLeft = point.Point(xplane[0],yplane[0],-zplane[0])
-        topRight = point.Point(xplane[1],yplane[1],-zplane[1])
-        bottomRight = point.Point(xplane[2],yplane[2],-zplane[2])
-        bottomLeft = point.Point(xplane[3],yplane[3],-zplane[3])
-        return (topLeft,topRight,bottomRight,bottomLeft)
-
-    def getSurface(self):
-        return self.MultiSurface
+    def getQuadrilaterals(self):
+        """
+        Get the list of quadrilaterals defining the fault.
+        :returns:
+            List of quadrilateral tuples (4 Point objects each)
+        """
+        return self.Fault.getQuadrilaterals()
     
     def calcDistance(self,mesh,method='rjb'):
-        if method == 'rjb':
-            if len(self.lon) == 1:
-                p = point.Point(self.lon[0],self.lat[0],0.0)
-                return p.distance_to_mesh(mesh)
-            else:
-                return self.MultiSurface.get_joyner_boore_distance(mesh)
-        elif method == 'rrup':
-            if len(self.lon) == 1:
-                p = point.Point(self.lon[0],self.lat[0],self.depths[0])
-                return p.distance_to_mesh(mesh)
-            else:
-                return self.MultiSurface.get_min_distance(mesh)
-        elif method == 'rx':
-            if len(self.lon) == 1:
-                return np.zeros(mesh.shape)
-            else:
-                return self.MultiSurface.get_rx_distance(mesh)
-        else:
-            raise NotImplementedError('No distance measure exists for method type "%s"' % method)
+        """
+        Calculate distance from the source (fault or point source)
         
-
+        """
+        if self.Fault is not None:
+            quadlist = self.Fault.getQuadrilaterals()
+        else:
+            quadlist = None
+        lat = self.getEventParam('lat')
+        lon = self.getEventParam('lon')
+        depth = self.getEventParam('depth')
+        point = point.Point(lat,lon,depth)
+        #if user has specified a distance measure dependent on a fault but we don't have a fault
+        #override their choice with the appropriate point source distance.
+        if quadlist is None and (method != 'epi' or method != 'hypo'):
+            if method in ['rjb','rx']:
+                method = 'epi'
+            else:
+                method = 'hypo'
+            
+        return distance.getDistance(method,mesh,quadlist=quadlist,point=point)
 
 def test(eventxml=None,faultfile=None):
     event = {'lat':28.230,'lon':84.731,'depth':8.2,
