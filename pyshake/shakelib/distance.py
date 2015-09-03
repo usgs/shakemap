@@ -8,6 +8,7 @@ from datetime import datetime
 from ecef import latlon2ecef
 from vector import Vector
 from openquake.hazardlib.geo import point
+from openquake.hazardlib.geo import geodetic
 import numpy as np
 import matplotlib.pyplot as plt
 from neicio.cmdoutput import getCommandOutput
@@ -57,45 +58,83 @@ def getDistance(method,mesh,quadlist=None,point=None):
        for unknown distance measures or ones not yet implemented.
     """
     if method == 'rjb':
-        raise NotImplementedError('rjb distance measure is not implemented yet')
+        if quadlist is None:
+            raise DistanceException('Cannot calculate rupture distance without a list of quadrilaterals')
+        nr,nc = mesh.lons.shape
+        newshape = (nr*nc,1)
+        mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
+        for quad in quadlist:
+            P0,P1,P2,P3 = quad
+            #so we're thinking at the moment that rjb is the same as rrup with the fault projected to the surface.
+            #here goes...
+            P0.depth = 0.0
+            P1.depth = 0.0
+            P2.depth = 0.0
+            P3.depth = 0.0
+            p0 = Vector.fromPoint(P0)
+            p1 = Vector.fromPoint(P1)
+            p2 = Vector.fromPoint(P2)
+            p3 = Vector.fromPoint(P3)
+            x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
+            nr,nc = x.shape
+            x.shape = (nr*nc,1)
+            y.shape = (nr*nc,1)
+            z.shape = (nr*nc,1)
+            points = np.hstack((x,y,z))
+            rrupdist = calcRuptureDistance(p0,p1,p2,p3,points)
+            mindist = np.minimum(mindist,rrupdist)
+        return mindist
     if method == 'rx':
         if quadlist is None:
             raise DistanceException('Cannot calculate rx distance without a list of quadrilaterals')
-        mindist = np.zeros_like(mesh.lons)
+        nr,nc = mesh.lons.shape
+        newshape = (nr*nc,1)
+        mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
         for quad in quadlist:
             P0,P1 = quad[0:2]
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
-            x,y,z = ecef.latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
-            points = np.vstack(x.flatten(),y.flatten(),z.flatten())
+            x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
+            nr,nc = x.shape
+            x.shape = (nr*nc,1)
+            y.shape = (nr*nc,1)
+            z.shape = (nr*nc,1)
+            points = np.hstack((x,y,z))
             rxdist = calcRxDistance(p0,p1,points)
             mindist = minimize(mindist,rxdist)
         return mindist
     if method == 'rrup':
         if quadlist is None:
             raise DistanceException('Cannot calculate rupture distance without a list of quadrilaterals')
-        mindist = np.zeros_like(mesh.lons)
+        nr,nc = mesh.lons.shape
+        newshape = (nr*nc,1)
+        mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
         for quad in quadlist:
             P0,P1,P2,P3 = quad
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
             p2 = Vector.fromPoint(P2)
             p3 = Vector.fromPoint(P3)
-            x,y,z = ecef.latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
-            points = np.vstack(x.flatten(),y.flatten(),z.flatten())
+            x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
+            nr,nc = x.shape
+            x.shape = (nr*nc,1)
+            y.shape = (nr*nc,1)
+            z.shape = (nr*nc,1)
+            points = np.hstack((x,y,z))
             rrupdist = calcRuptureDistance(p0,p1,p2,p3,points)
             mindist = np.minimum(mindist,rrupdist)
         return mindist
     if method == 'ry0':
-        raise NotImplementedError('ry0 distance measure is not implemented yet')
+        mindist = calcRyDistance(quadlist,mesh)
+        return mindist
     if method == 'rcdpp':
         raise NotImplementedError('rcdbp distance measure is not implemented yet')
-    if method == 'epi':
+    if method == 'repi':
         if point is None:
             raise DistanceException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(point.latitude,point.longitude,0.0)
         return newpoint.distance_to_mesh(mesh) 
-    if method == 'hypo':
+    if method == 'rhypo':
         if point is None:
             raise DistanceException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(point.latitude,point.longitude,point.depth)
@@ -196,10 +235,27 @@ def calcRuptureDistance(P0,P1,P2,P3,points):
     smin = np.minimum(np.minimum(s0,s1),np.minimum(s2,s3))
     dist[outside_idx] = smin[outside_idx]
     dist = np.sqrt(dist)/1000.0
-
+    shp = dist.shape
+    if len(shp) == 1:
+        dist.shape = (shp[0],1)
     if np.any(np.isnan(dist)):
         raise Exception,"Could not calculate some distances!"
     return dist
+
+def calcRyDistance(quadlist,mesh):
+    #get the mean strike vector
+    P0 = quadlist[0][0]
+    surfaceP0 = point.Point(P0.longitude,P0.latitude,0.0)
+    P1 = quadlist[-1][1]
+    surfaceP1 = point.Point(P1.longitude,P1.latitude,0.0)
+    strike = P0.azimuth(P1)
+    dst1 = geodetic.distance_to_arc(P0.longitude,P0.latitude,(strike + 90.) % 360,mesh.lons, mesh.lats)
+    dst2 = geodetic.distance_to_arc(P1.longitude,P1.latitude,(strike + 90.) % 360,mesh.lons, mesh.lats)
+    # Get the shortest distance from the two lines
+    idx = np.sign(dst1) == np.sign(dst2)
+    dst = np.zeros_like(dst1)
+    dst[idx] = np.fmin(np.abs(dst1[idx]), np.abs(dst2[idx]))
+    return dst
 
 def calcRxDistance(P0,P1,points):
     """
@@ -223,6 +279,9 @@ def calcRxDistance(P0,P1,points):
     r[:,0] = points[:,0] - x1
     r[:,1] = points[:,1] - y1
     dist = np.sum(vhat.getArray()[0:2]*r,axis=1)
+    shp = dist.shape
+    if len(shp) == 1:
+        dist.shape = (shp[0],1)
     return dist
 
 def getTopEdge(lat,lon,dep):

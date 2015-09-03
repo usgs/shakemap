@@ -75,7 +75,9 @@ class Vector(object):
         :raises TypeError:
            when length is not a number.
         """
-        if not isinstance(length,int) or not isinstance(length,float):
+        try:
+            length = float(length)
+        except ValueError:
             raise TypeError("Cannot multiply Vector and %s objects" % type(length))
         return Vector(self.x*length,self.y*length,self.z*length)
 
@@ -183,7 +185,7 @@ class Vector(object):
            a Point object as defined at https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py
         """
         lat,lon,dep = ecef2latlon(self.x,self.y,self.z)
-        return point.Point(lat,lon,dep)
+        return point.Point(lon,lat,dep)
     
     def __repr__(self):
         """
