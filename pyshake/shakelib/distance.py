@@ -3,6 +3,7 @@
 #stdlib imports
 import struct
 from datetime import datetime
+import copy
 
 #third party imports
 from ecef import latlon2ecef
@@ -67,6 +68,10 @@ def getDistance(method,mesh,quadlist=None,point=None):
             P0,P1,P2,P3 = quad
             #so we're thinking at the moment that rjb is the same as rrup with the fault projected to the surface.
             #here goes...
+            P0 = copy.deepcopy(P0)
+            P1 = copy.deepcopy(P1)
+            P2 = copy.deepcopy(P2)
+            P3 = copy.deepcopy(P3)
             P0.depth = 0.0
             P1.depth = 0.0
             P2.depth = 0.0
@@ -235,6 +240,7 @@ def calcRuptureDistance(P0,P1,P2,P3,points):
     smin = np.minimum(np.minimum(s0,s1),np.minimum(s2,s3))
     dist[outside_idx] = smin[outside_idx]
     dist = np.sqrt(dist)/1000.0
+    dist = np.flipud(dist)
     shp = dist.shape
     if len(shp) == 1:
         dist.shape = (shp[0],1)
@@ -255,6 +261,7 @@ def calcRyDistance(quadlist,mesh):
     idx = np.sign(dst1) == np.sign(dst2)
     dst = np.zeros_like(dst1)
     dst[idx] = np.fmin(np.abs(dst1[idx]), np.abs(dst2[idx]))
+    dst = np.flipud(dst)
     return dst
 
 def calcRxDistance(P0,P1,points):
@@ -278,7 +285,8 @@ def calcRxDistance(P0,P1,points):
     r = np.zeros_like(points[:,0:2])
     r[:,0] = points[:,0] - x1
     r[:,1] = points[:,1] - y1
-    dist = np.sum(vhat.getArray()[0:2]*r,axis=1)
+    dist = np.sum(vhat.getArray()[0:2]*r,axis=1)/1000.0
+    dist = np.flipud(dist)
     shp = dist.shape
     if len(shp) == 1:
         dist.shape = (shp[0],1)

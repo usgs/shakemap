@@ -166,6 +166,11 @@ class Fault(object):
         dipsum = 0.0
         for quad in self.Quadrilaterals:
             P0,P1,P2,P3 = quad
+
+            dist = P0.distance(P3)
+            vert_dist = P3.depth - P0.depth
+            dip = np.degrees(np.arcsin(vert_dist / dist))
+            
             d1 = P1.depth * -1
             d2 = P2.depth * -1
             dx = P2.distance(P1)
