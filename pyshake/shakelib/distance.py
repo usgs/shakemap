@@ -240,12 +240,12 @@ def calcRuptureDistance(P0,P1,P2,P3,points):
     smin = np.minimum(np.minimum(s0,s1),np.minimum(s2,s3))
     dist[outside_idx] = smin[outside_idx]
     dist = np.sqrt(dist)/1000.0
-    dist = np.flipud(dist)
     shp = dist.shape
     if len(shp) == 1:
         dist.shape = (shp[0],1)
     if np.any(np.isnan(dist)):
         raise Exception,"Could not calculate some distances!"
+    dist = np.fliplr(dist)
     return dist
 
 def calcRyDistance(quadlist,mesh):
@@ -261,7 +261,7 @@ def calcRyDistance(quadlist,mesh):
     idx = np.sign(dst1) == np.sign(dst2)
     dst = np.zeros_like(dst1)
     dst[idx] = np.fmin(np.abs(dst1[idx]), np.abs(dst2[idx]))
-    dst = np.flipud(dst)
+    dst = np.fliplr(dst)
     return dst
 
 def calcRxDistance(P0,P1,points):
@@ -286,10 +286,10 @@ def calcRxDistance(P0,P1,points):
     r[:,0] = points[:,0] - x1
     r[:,1] = points[:,1] - y1
     dist = np.sum(vhat.getArray()[0:2]*r,axis=1)/1000.0
-    dist = np.flipud(dist)
     shp = dist.shape
     if len(shp) == 1:
         dist.shape = (shp[0],1)
+    dist = np.fliplr(dist)
     return dist
 
 def getTopEdge(lat,lon,dep):
