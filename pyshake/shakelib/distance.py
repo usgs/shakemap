@@ -261,7 +261,6 @@ def calcRyDistance(quadlist,mesh):
     idx = np.sign(dst1) == np.sign(dst2)
     dst = np.zeros_like(dst1)
     dst[idx] = np.fmin(np.abs(dst1[idx]), np.abs(dst2[idx]))
-    dst = np.fliplr(dst)
     return dst
 
 def calcRxDistance(P0,P1,points):
