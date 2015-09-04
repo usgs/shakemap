@@ -108,6 +108,31 @@ class Fault(object):
 
         return cls(x,y,z,reference)
 
+    def multiplyFaultLength(self,factor):
+        for i in range(0,len(self.Quadrilaterals)):
+            quad = self.Quadrilaterals[i]
+            P0,P1,P2,P3 = quad
+            p0 = Vector.fromPoint(P0)
+            p1 = Vector.fromPoint(P1)
+            p2 = Vector.fromPoint(P2)
+            p3 = Vector.fromPoint(P3)
+            dtop = p1-p0
+            toplen = dtop.mag()
+            topnorm = dtop.norm()
+            dbottom = p2-p3
+            bottomlen = dbottom.mag()
+            bottomnorm = dbottom.norm()
+            newtoplen = toplen*factor
+            newbottomlen = bottomlen*factor
+            newp1 = p0+topnorm*newtoplen
+            newp2 = p3+bottomnorm*newbottomlen
+            newP1 = newp1.toPoint()
+            newP2 = newp2.toPoint()
+            newP1.depth = P0.depth
+            newP2.depth = P3.depth
+            self.Quadrilaterals[i][1] = newP1
+            self.Quadrilaterals[i][2] = newP2
+    
     def getQuadrilaterals(self):
         """
         Return a list of quadrilaterals.
@@ -337,7 +362,7 @@ class Fault(object):
         newP1 = p1.toPoint()
         newP2 = newp2.toPoint()
         newP3 = p3.toPoint()
-        return (newP0,newP1,newP2,newP3)
+        return [newP0,newP1,newP2,newP3]
         
     
     def setQuadrilaterals(self):
@@ -482,17 +507,15 @@ def _test_northridge():
     34.175 -118.527 20.427
     34.315 -118.421 5.000
     """
-    fault_text = """
-    32.0 177.0 0.0
-    34.0 177.0 0.0
-    34.0 175.0 20.0
-    32.0 175.0 20.0
-    32.0 177.0 0.0
-    """
     cbuf = StringIO.StringIO(fault_text)
     fault = Fault.readFaultFile(cbuf)
+    quad = fault.getQuadrilaterals()[0]
+    topdist = quad[0].distance(quad[1])
+    fault.multiplyFaultLength(2.0)    
+    quad = fault.getQuadrilaterals()[0]
+    topdist2 = quad[0].distance(quad[1])
+    x = 1
     
-            
 def _test_correct():
     #this fault should parse correctly
     fault_text = """#SOURCE: Barka, A., H. S. Akyz, E. Altunel, G. Sunal, Z. Akir, A. Dikbas, B. Yerli, R. Armijo, B. Meyer, J. B. d. Chabalier, T. Rockwell, J. R. Dolan, R. Hartleb, T. Dawson, S. Christofferson, A. Tucker, T. Fumal, R. Langridge, H. Stenner, W. Lettis, J. Bachhuber, and W. Page (2002). The Surface Rupture and Slip Distribution of the 17 August 1999 Izmit Earthquake (M 7.4), North Anatolian Fault, Bull. Seism. Soc. Am. 92, 43-60.
@@ -567,9 +590,10 @@ def _test_incorrect():
 
     cbuf = StringIO.StringIO(fault_text)
     fault = Fault.readFaultFile(cbuf)
+    
 
 if __name__ == '__main__':
     _test_northridge()
-    _test_correct()
-    _test_incorrect()
+    # _test_correct()
+    # _test_incorrect()
 

@@ -430,7 +430,7 @@ def _test_northridge():
     cbuf = StringIO.StringIO(fault_text)
     fault = Fault.readFaultFile(cbuf)
         
-If __name__ == '__main__':
+if __name__ == '__main__':
     test()
             
         
