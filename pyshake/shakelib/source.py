@@ -386,7 +386,51 @@ def test():
             print 'No value set for %s' % key
             continue
         print '%s = %s' % (key,str(value))
-if __name__ == '__main__':
+
+def _test_northridge():
+    fault_text = """
+    # Source: Wald, D. J., T. H. Heaton, and K. W. Hudnut (1996). The Slip History of the 1994 Northridge, California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling Data, Bull. Seism. Soc. Am. 86, S49-S70.
+    34.315 -118.421 5.000
+    34.401 -118.587 5.000
+    34.261 -118.693 20.427
+    34.175 -118.527 20.427
+    34.315 -118.421 5.000
+    """
+    event_text = """<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
+<earthquake id="blah" lat="34.213" lon="-118.537" mag="7.9" year="1994" month="01" day="17" hour="12" minute="30" second="55" timezone="GMT" depth="18.4" locstring="NORTHRIDGE" created="1211173621" otime="1210573681" type="" />
+    """
+    source_text = """mech=RS"""
+    ffile = StringIO.StringIO(fault_text)
+    efile = StringIO.StringIO(event_text)
+    sfile = StringIO.StringIO(source_text)
+    source = Source.readFromFile(efile,faultfile=ffile,sourcefile=sfile)
+    gmpe = abrahamson_2014.AbrahamsonEtAl2014()
+    rupture = source.getRuptureContext(gmpe)
+    mapwidth = 2.0
+    latmin = rupture.hypo_lat - mapwidth
+    latmax = rupture.hypo_lat + mapwidth
+    lonmin = rupture.hypo_lon - mapwidth
+    lonmax = rupture.hypo_lon + mapwidth
+    dim = 0.02
+    lats = np.arange(latmin,latmax,dim)
+    lons = np.arange(lonmin,lonmax,dim)
+    lon,lat = np.meshgrid(lons,lats)
+    dep = np.zeros_like(lon)
+    mesh = Mesh(lon,lat,dep)
+    distances = source.getDistanceContext(gmpe,mesh)
+    rupture = source.getRuptureContext(gmpe)
+    for key in rupture.__slots__:
+        try:
+            value = eval('rupture.%s' % key)
+        except:
+            print 'No value set for %s' % key
+            continue
+        print '%s = %s' % (key,str(value))    
+
+    cbuf = StringIO.StringIO(fault_text)
+    fault = Fault.readFaultFile(cbuf)
+        
+If __name__ == '__main__':
     test()
             
         

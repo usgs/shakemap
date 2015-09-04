@@ -3,13 +3,16 @@
 #stdlib modules
 import StringIO
 import sys
+import copy
 
 #third party imports
 import numpy as np
 from openquake.hazardlib.geo import mesh
-from openquake.hazardlib.geo import point
+from openquake.hazardlib.geo import point,utils
 from ecef import latlon2ecef
 from vector import Vector
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 #CONSTANTS
 #what is the maximum ratio of distance out of the plane defined by 3 points a 4th point can be before
@@ -247,6 +250,36 @@ class Fault(object):
         dist = numer/denom
         return dist
 
+    def isPointToRight(self,P0,P1,P2):
+        east = np.min([P0.longitude,P1.longitude,P2.longitude])
+        west = np.max([P0.longitude,P1.longitude,P2.longitude])
+        south = np.min([P0.latitude,P1.latitude,P2.latitude])
+        north = np.max([P0.latitude,P1.latitude,P2.latitude])
+        proj = utils.get_orthographic_projection(west,east,north,south)
+        p0x,p0y = proj(P0.longitude,P0.latitude)
+        p1x,p1y = proj(P1.longitude,P1.latitude)
+        p2x,p2y = proj(P2.longitude,P2.latitude)
+        dx = p1x-p0x
+        dy = p1y-p0y
+        theta = np.arctan2(dx,dy)
+        R = np.array([[np.cos(theta),-np.sin(theta)],
+                      [np.sin(theta),np.cos(theta)]])
+        xy = np.array([[p2x],[p2y]])
+        oxy = np.array([[p0x],[p0y]])
+        xp,yp = np.dot(R,xy)
+        ox,oy = np.dot(R,oxy)
+        if ox > xp:
+            return False
+        return True
+
+    def reverseQuad(self,P0,P1,P2,P3):
+        newP0 = copy.deepcopy(P1)
+        newP1 = copy.deepcopy(P0)
+        newP2 = copy.deepcopy(P3)
+        newP3 = copy.deepcopy(P2)
+        if not self.isPointToRight(newP0,newP1,newP2):
+            raise FaultException('Third vertex of quadrilateral must be to the right of the second vertex')
+        return (newP0,newP1,newP2,newP3)
     
     def validateQuad(self,P0,P1,P2,P3):
         """
@@ -276,9 +309,12 @@ class Fault(object):
         if not topDepthsEqual or not bottomDepthsEqual:
             raise FaultException('Top and bottom edges of fault quadrilateral must be parallel to the surface')
         #Is top edge defined by first two vertices?
-        #Is dip angle clockwise and btw 0-90 degrees?
         if P1.depth > P2.depth:
             raise FaultException('Top edge of a quadrilateral must be defined by the first two vertices')
+        #Is dip angle clockwise and btw 0-90 degrees?
+        if not self.isPointToRight(P0,P1,P2):
+            P0,P1,P2,P3 = self.reverseQuad(P0,P1,P2,P3)
+            print 'Reversing quad where dip not between 0 and 90 degrees.'
         #Are all 4 points (reasonably) co-planar?
         #Translate vertices to ECEF
         p0 = Vector.fromPoint(P0)
@@ -354,6 +390,24 @@ class Fault(object):
                 startidx += 1
                 endidx -= 1
             istart = iend+1
+
+    def plot(self,ax=None):
+        if ax is None:
+            fig = plt.figure()
+            ax = fig.add_subplot(111, projection='3d')
+        else:
+            if 'xlim3d' not in ax.properties.keys():
+                raise FaultException('Non-3d axes object passed to plot() method.')
+        for quad in self.Quadrilaterals:
+            P0,P1,P2,P3 = quad
+            ax.plot([P0.longitude],[P0.latitude],[-P0.depth],'B.')
+            ax.text([P0.longitude],[P0.latitude],[-P0.depth],'P0')
+            ax.plot([P1.longitude],[P1.latitude],[-P1.depth],'b.')
+            ax.text([P1.longitude],[P1.latitude],[-P1.depth],'P1')
+            ax.plot([P2.longitude],[P2.latitude],[-P2.depth],'b.')
+            ax.text([P2.longitude],[P2.latitude],[-P2.depth],'P2')
+            ax.plot([P3.longitude],[P3.latitude],[-P3.depth],'b.')
+            ax.text([P3.longitude],[P3.latitude],[-P3.depth],'P3')
             
         
     def getReference(self):
@@ -417,7 +471,28 @@ class Fault(object):
             if x1 != x2 or y1 != y2 or z1 != z2:
                 raise Exception('Unclose segments exist in fault file.')
             istart = inan[i]+1
-        
+
+def _test_northridge():
+    #this should fail!
+    fault_text = """
+    # Source: Wald, D. J., T. H. Heaton, and K. W. Hudnut (1996). The Slip History of the 1994 Northridge, California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling Data, Bull. Seism. Soc. Am. 86, S49-S70.
+    34.315 -118.421 5.000
+    34.401 -118.587 5.000
+    34.261 -118.693 20.427
+    34.175 -118.527 20.427
+    34.315 -118.421 5.000
+    """
+    fault_text = """
+    32.0 177.0 0.0
+    34.0 177.0 0.0
+    34.0 175.0 20.0
+    32.0 175.0 20.0
+    32.0 177.0 0.0
+    """
+    cbuf = StringIO.StringIO(fault_text)
+    fault = Fault.readFaultFile(cbuf)
+    
+            
 def _test_correct():
     #this fault should parse correctly
     fault_text = """#SOURCE: Barka, A., H. S. Akyz, E. Altunel, G. Sunal, Z. Akir, A. Dikbas, B. Yerli, R. Armijo, B. Meyer, J. B. d. Chabalier, T. Rockwell, J. R. Dolan, R. Hartleb, T. Dawson, S. Christofferson, A. Tucker, T. Fumal, R. Langridge, H. Stenner, W. Lettis, J. Bachhuber, and W. Page (2002). The Surface Rupture and Slip Distribution of the 17 August 1999 Izmit Earthquake (M 7.4), North Anatolian Fault, Bull. Seism. Soc. Am. 92, 43-60.
@@ -494,6 +569,7 @@ def _test_incorrect():
     fault = Fault.readFaultFile(cbuf)
 
 if __name__ == '__main__':
+    _test_northridge()
     _test_correct()
     _test_incorrect()
 
