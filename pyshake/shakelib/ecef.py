@@ -56,6 +56,7 @@ def ecef2latlon(x,y,z):
     #convert lat,lon to dd, and alt to depth positive DOWN in km
     lat = lat * RADIANS_TO_DEGREES
     lon = lon * RADIANS_TO_DEGREES
+    lon[lon > 180] = lon - 360.0
     dep = -alt/1000.0
     #if input values were scalar, give that back to them
     if inputIsScalar:

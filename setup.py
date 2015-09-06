@@ -7,5 +7,5 @@ setup(name='pyshake',
       author_email='cbworden@usgs.gov,mhearne@usgs.gov',
       url='',
       packages=['pyshake','pyshake.gmpe','pyshake.shakelib','pyshake.oldshakelib','pyshake.correlation','pyshake.gmice'],
-      scripts = [],
+      scripts = ['mkfault.py'],
 )
