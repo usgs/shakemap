@@ -16,7 +16,7 @@ from openquake.hazardlib.geo.surface.planar import PlanarSurface
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 import sys
 
-def mapCoordsWithDepth(x,y,z,widths,depths):
+def mapCoords(x,y,z,widths,d,useDepth=False):
     west = x.min()
     east = x.max()
     south = y.min()
@@ -27,7 +27,7 @@ def mapCoordsWithDepth(x,y,z,widths,depths):
         #Project the top edge coordinates
         p0x,p0y = proj(x[i],y[i])
         p1x,p1y = proj(x[i+1],y[i+1])
-
+        
         #Get the rotation angle defined by these two points 
         dx = p1x-p0x
         dy = p1y-p0y
@@ -42,10 +42,18 @@ def mapCoordsWithDepth(x,y,z,widths,depths):
         p1p = np.dot(R,p1)
 
         #Get right side coordinates in project,rotated system
-        p3xp = p0p[0] + widths[i]
-        p3yp = p0p[1]
-        p2xp = p1p[0] + widths[i]
-        p2yp = p1p[1]
+        if useDepth:
+            p3xp = p0p[0] + widths[i]
+            p3yp = p0p[1]
+            p2xp = p1p[0] + widths[i]
+            p2yp = p1p[1]
+        else:
+            dy = np.sin(d[i]) * widths[i]
+            dx = np.cos(d[i]) * widths[i]
+            p3xp = p0p[0] + dx
+            p3yp = p0p[1]
+            p2xp = p1p[0] + dx
+            p2yp = p1p[1]
 
         #Get right side coordinates in un-rotated projected system
         p3p = np.array([p3xp,p3yp])
@@ -66,12 +74,11 @@ def mapCoordsWithDepth(x,y,z,widths,depths):
         #turn these coordinates into a quad
         P0 = point.Point(x[i],y[i],z[i])
         P1 = point.Point(x[i+1],y[i+1],z[i+1])
-        P2 = point.Point(lon2,lat2,depths[i])
-        P3 = point.Point(lon3,lat3,depths[i])
+        P2 = point.Point(lon2,lat2,z[i]+dy)
+        P3 = point.Point(lon3,lat3,z[i]+dy)
         surfaces.append([P0,P1,P2,P3])
 
     return surfaces
-        
         
 def main(pargs):
     nargin = len(pargs.coords)
@@ -86,15 +93,15 @@ def main(pargs):
     if pargs.widths is None or len(pargs.widths) != nquads:
         print 'You must specify %i widths' % nquads
         sys.exit(1)
-    # if pargs.dips is not None and pargs.depths is not None:
-    #     print 'You must specify %i depths or %i dips, not both.' % (nquads,nquads)
-    #     sys.exit(1)
+    if pargs.dips is not None and pargs.depths is not None:
+        print 'You must specify %i depths or %i dips, not both.' % (nquads,nquads)
+        sys.exit(1)
     if pargs.widths is None or len(pargs.widths) != nquads:
         print 'You must specify %i widths' % nquads
         sys.exit(1)
-    # if pargs.dips is not None and len(pargs.dips) != nquads:
-    #     print 'You must specify %i dips' % nquads
-    #     sys.exit(1)
+    if pargs.dips is not None and len(pargs.dips) != nquads:
+        print 'You must specify %i dips' % nquads
+        sys.exit(1)
     if pargs.depths is not None and len(pargs.depths) != nquads:
         print 'You must specify %i depths' % nquads
         sys.exit(1)
@@ -103,10 +110,10 @@ def main(pargs):
     y = np.array(pargs.coords[0::3])
     z = np.array(pargs.coords[2::3])
 
-    # if pargs.dips:
-    #     raise NotImplementedError('Dip method not implemented yet.')
+    if pargs.dips:
+        surfaces = mapCoords(x,y,z,pargs.widths,pargs.dips,useDepth=False)
     if pargs.depths:
-        surfaces = mapCoordsWithDepth(x,y,z,pargs.widths,pargs.depths)
+        surfaces = mapCoords(x,y,z,pargs.widths,pargs.depths,useDepth=True)
 
     if pargs.plotfile:
         fig = plt.figure()
@@ -152,7 +159,7 @@ if __name__ == '__main__':
     parser.add_argument('coords', type=float, nargs='+',
                         help='Top edge coordinates')
     parser.add_argument('-w','--widths', dest='widths', type=float,nargs='+', help='specify widths (must match number of quads)')
-    #parser.add_argument('-i','--dips', dest='dips', type=float,nargs='+', help='specify dips (must match number of quads)')
+    parser.add_argument('-i','--dips', dest='dips', type=float,nargs='+', help='specify dips (must match number of quads)')
     parser.add_argument('-d','--depths', dest='depths', type=float,nargs='+', help='specify depths (must match number of quads)')
     parser.add_argument('-p','--plotfile', dest='plotfile',type=str,help='Generate a plot of the fault')
     parser.add_argument('-o','--outfile', dest='outfile', type=str, help='specify output fault text file')
