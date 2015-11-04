@@ -37,11 +37,11 @@ class Fault(object):
         """
         Constructor for Fault.
         :param lon:
-            float longitude of hypocenter.
+            sequence of fault longitude vertices.
         :param lat:
-            float latitude of hypocenter.
+            sequence of fault latitude vertices.
         :param depth:
-            float depth of hypocenter.
+            sequence of fault depth vertices.
         :param reference:
             string citeable reference for Fault.
         """
