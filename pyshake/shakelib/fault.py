@@ -9,6 +9,7 @@ import copy
 import numpy as np
 from openquake.hazardlib.geo import mesh
 from openquake.hazardlib.geo import point,utils
+from openquake.hazardlib.geo.utils import get_orthographic_projection
 from ecef import latlon2ecef
 from vector import Vector
 import matplotlib.pyplot as plt
@@ -37,11 +38,11 @@ class Fault(object):
         """
         Constructor for Fault.
         :param lon:
-            sequence of fault longitude vertices.
+            sequence of fault longitude vertices in clockwise order.
         :param lat:
-            sequence of fault latitude vertices.
+            sequence of fault latitude vertices in clockwise order.
         :param depth:
-            sequence of fault depth vertices.
+            sequence of fault depth vertices in clockwise order.
         :param reference:
             string citeable reference for Fault.
         """
@@ -51,7 +52,153 @@ class Fault(object):
         self.reference = reference
         self._validate()
         self.setQuadrilaterals()
+
+    @classmethod
+    def fromTrace(cls,xp0,yp0,xp1,yp1,zp,widths,dips,reference=None):
+        """
+        Create a fault object from a set of vertices that define the top of the fault, and an array of widths/dips.
+
+        These top of rupture points are defined by specifying the x and y coordinates of each of the two vertices, 
+        and then specifying an array of depths,widths, and dips for each rectangle.
+        :param xp0:
+          Array of longitude coordinates for the first (top of rupture) vertex of each rectangle (decimal degrees).
+        :param yp0:
+          Array of latitude coordinates for the first (top of rupture) vertex of each rectangle (decimal degrees).
+        :param xp1:
+          Array of longitude coordinates for the second (top of rupture) vertex of each rectangle (decimal degrees).
+        :param yp1:
+          Array of latitude coordinates for the second (top of rupture) vertex of each rectangle (decimal degrees).
+        :param zp:
+          Array of depths for each of the top of rupture rectangles (decimal degrees).
+        :param widths:
+          Array of widths for each of rectangle (km).
+        :param dips:
+          Array of dips for each of rectangle (degrees).
+        :param reference:
+          String explaining where the fault definition came from (publication style reference, etc.)
+        :returns:
+          Fault object, where the fault is modeled as a series of rectangles.
+        """
+        if len(xp0) == len(yp0) == len(xp1) == len(yp1) == len(zp) == len(dips) == len(widths):
+            pass
+        else:
+            raise FaultException('Number of xp0,yp0,xp1,yp1,zp,widths,dips points must be equal.')
+
+        #convert dips to radians
+        dips = np.radians(dips)
+
+        #ensure that all input sequences are numpy arrays
+        xp0 = np.array(xp0)
+        xp1 = np.array(xp1)
+        yp0 = np.array(yp0)
+        yp1 = np.array(yp1)
+        zp = np.array(zp)
+        widths = np.array(widths)
+        dips = np.array(dips)
         
+        #get a projection object
+        west = np.min((xp0.min(),xp1.min()))
+        east = np.max((xp0.max(),xp1.max()))
+        south = np.min((yp0.min(),yp1.min()))
+        north = np.max((yp0.max(),yp1.max()))
+        proj = get_orthographic_projection(west,east,north,south) #projected coordinates are in km
+        surfaces = []
+        xp2 = np.zeros_like(xp0)
+        xp3 = np.zeros_like(xp0)
+        yp2 = np.zeros_like(xp0)
+        yp3 = np.zeros_like(xp0)
+        zpdown = np.zeros_like(zp)
+        for i in range(0,len(xp0)):
+            #Project the top edge coordinates
+            p0x,p0y = proj(xp0[i],yp0[i])
+            p1x,p1y = proj(xp1[i],yp1[i])
+
+            #Get the rotation angle defined by these two points 
+            dx = p1x-p0x
+            dy = p1y-p0y
+            theta = np.arctan2(dx,dy) #theta is angle from north
+            R = np.array([[np.cos(theta),-np.sin(theta)],
+                         [np.sin(theta),np.cos(theta)]])
+
+            #Rotate the top edge points into a new coordinate system (vertical line)
+            p0 = np.array([p0x,p0y])
+            p1 = np.array([p1x,p1y])
+            p0p = np.dot(R,p0)
+            p1p = np.dot(R,p1)
+
+            #Get right side coordinates in project,rotated system
+            dz = np.sin(dips[i]) * widths[i] 
+            dx = np.cos(dips[i]) * widths[i]
+            p3xp = p0p[0] + dx
+            p3yp = p0p[1]
+            p2xp = p1p[0] + dx
+            p2yp = p1p[1]
+
+            #Get right side coordinates in un-rotated projected system
+            p3p = np.array([p3xp,p3yp])
+            p2p = np.array([p2xp,p2yp])
+            Rback = np.array([[np.cos(-theta),-np.sin(-theta)],
+                              [np.sin(-theta),np.cos(-theta)]])
+            p3 = np.dot(Rback,p3p)
+            p2 = np.dot(Rback,p2p)
+            p3x = np.array([p3[0]])
+            p3y = np.array([p3[1]])
+            p2x = np.array([p2[0]])
+            p2y = np.array([p2[1]])
+
+            #project lower edge points back to lat/lon coordinates
+            lon3,lat3 = proj(p3x,p3y,reverse=True)
+            lon2,lat2 = proj(p2x,p2y,reverse=True)
+
+            xp2[i] = lon2
+            xp3[i] = lon3
+            yp2[i] = lat2
+            yp3[i] = lat3
+            zpdown[i] = zp[i]+dz
+
+        #assemble the vertices as the Fault constructor needs them...
+        #which is: for each rectangle, there should be the four corners, the first corner repeated, and then a nan.
+        nrects = len(zp)
+        anan = np.ones_like(xp0)*np.nan
+        lon = np.array(zip(xp0,xp1,xp2,xp3,xp0,anan)).reshape((nrects,6)).flatten(order='C')
+        lat = np.array(zip(yp0,yp1,yp2,yp3,yp0,anan)).reshape((nrects,6)).flatten(order='C')
+
+        #we need an array of depths, but we need to double each zp and zpdown element we have
+        dep = []
+        for i in range(0,nrects):
+            dep += [zp[i],zp[i],zpdown[i],zpdown[i],zp[i],np.nan]
+        dep = np.array(dep)
+        
+        
+        #take the nans off the end of each array
+        lon = lon[0:-1]
+        lat = lat[0:-1]
+        dep = dep[0:-1]
+        
+        return cls(lon,lat,dep,reference)
+
+    def writeFaultFile(self,faultfile):
+        """
+        Write fault data to fault file format as defined in ShakeMap Software Guide.
+        :param faultfile:
+          Filename of output data file OR file-like object.
+        """
+        if not hasattr(faultfile,'read'):
+            f = open(faultfile,'wt')
+        else:
+            f = faultfile #just a reference to the input file-like object
+        f.write('#%s\n' % self.reference)
+        for quad in self.getQuadrilaterals():
+            P0,P1,P2,P3 = quad
+            f.write('%.4f %.4f %.4f\n' % (P0.latitude,P0.longitude,P0.depth))
+            f.write('%.4f %.4f %.4f\n' % (P1.latitude,P1.longitude,P1.depth))
+            f.write('%.4f %.4f %.4f\n' % (P2.latitude,P2.longitude,P2.depth))
+            f.write('%.4f %.4f %.4f\n' % (P3.latitude,P3.longitude,P3.depth))
+            f.write('%.4f %.4f %.4f\n' % (P0.latitude,P0.longitude,P0.depth))
+            f.write('>\n')
+        if not hasattr(faultfile,'read'):
+            f.close()
+    
     @classmethod
     def readFaultFile(cls,faultfile):
         """
@@ -494,7 +641,7 @@ class Fault(object):
             z1 = self.depth[istart]
             z2 = self.depth[iend]
             if x1 != x2 or y1 != y2 or z1 != z2:
-                raise Exception('Unclose segments exist in fault file.')
+                raise Exception('Unclosed segments exist in fault file.')
             istart = inan[i]+1
 
 def _test_northridge():
@@ -590,10 +737,20 @@ def _test_incorrect():
 
     cbuf = StringIO.StringIO(fault_text)
     fault = Fault.readFaultFile(cbuf)
-    
+
+def _test_trace():
+    xp0 = [-121.81529,-121.82298]
+    xp1 = [-121.82298,-121.83068]
+    yp0 = [37.73707,37.74233]
+    yp1 = [37.74233,37.74758]
+    zp = [10,15]
+    widths = [15.0,20.0]
+    dips = [30.0,45.0]
+    fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,widths,dips,reference='From J Smith, (personal communication)')
 
 if __name__ == '__main__':
-    _test_northridge()
-    # _test_correct()
+    _test_trace()
+    #_test_northridge()
+    #_test_correct()
     # _test_incorrect()
 
