@@ -739,6 +739,20 @@ def _test_incorrect():
     fault = Fault.readFaultFile(cbuf)
 
 def _test_trace():
+    xp0 = [0.0]
+    xp1 = [0.0]
+    yp0 = [0.0]
+    yp1 = [0.05]
+    zp = [0.0]
+    widths = [10.0]
+    dips = [45.0]
+
+    fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,widths,dips,reference='From J Smith, (personal communication)')
+    fstr = StringIO.StringIO()
+    fault.writeFaultFile(fstr)
+    print fstr.getvalue()
+    sys.exit(0)
+    
     xp0 = [-121.81529,-121.82298]
     xp1 = [-121.82298,-121.83068]
     yp0 = [37.73707,37.74233]
