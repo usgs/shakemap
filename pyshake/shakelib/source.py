@@ -105,6 +105,8 @@ def readSource(sourcefile):
         f = sourcefile
     params = {}
     for line in f.readlines():
+        if line.startswith('#'):
+            continue
         parts = line.split('=')
         key = parts[0].strip()
         value = parts[1].strip()
@@ -344,7 +346,7 @@ class Source(object):
             else:
                 method = 'rhypo'
             
-        return getDistance(method,mesh,quadlist=quadlist,point=oqpoint)
+        return getDistance(method,mesh,quadlist=quadlist,mypoint=oqpoint)
 
 def test():
     fault_text = """30.979788       103.454422      1

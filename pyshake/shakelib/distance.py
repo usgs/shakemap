@@ -40,16 +40,16 @@ def minimize(a,b):
     d[bidx] = b[bidx]
     return d
     
-def getDistance(method,mesh,quadlist=None,point=None):
+def getDistance(method,mesh,quadlist=None,mypoint=None):
     """
-    Calculate distance using any one of a number of distance measures. One of quadlist OR point must be specified.
+    Calculate distance using any one of a number of distance measures. One of quadlist OR mypoint must be specified.
     :param method:
        One of: 'rjb','rx','rrup','ry0','rcdbp','epi','hypo'
     :param mesh:
        A Mesh object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
     :param quadlist:
        optional list of quadrilaterals (see Fault.py)
-    :param point:
+    :param mypoint:
        optional Point object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py)
     :returns:
        numpy array of distances, size of mesh.lons
@@ -135,14 +135,14 @@ def getDistance(method,mesh,quadlist=None,point=None):
     if method == 'rcdpp':
         raise NotImplementedError('rcdbp distance measure is not implemented yet')
     if method == 'repi':
-        if point is None:
+        if mypoint is None:
             raise DistanceException('Cannot calculate epicentral distance without a point object')
-        newpoint = point.Point(point.latitude,point.longitude,0.0)
+        newpoint = point.Point(mypoint.longitude,mypoint.latitude,0.0)
         return newpoint.distance_to_mesh(mesh) 
     if method == 'rhypo':
-        if point is None:
+        if mypoint is None:
             raise DistanceException('Cannot calculate epicentral distance without a point object')
-        newpoint = point.Point(point.latitude,point.longitude,point.depth)
+        newpoint = point.Point(mypoint.longitude,mypoint.latitude,mypoint.depth)
         return newpoint.distance_to_mesh(mesh)
     else:
         raise NotImplementedError('"%s" distance measure is not valid or is not implemented yet' % method)
@@ -306,8 +306,8 @@ def getTopEdge(lat,lon,dep):
     p1 = None
     p2 = None
     if sum(np.diff(dep)) == 0:
-        p1 = Vector.fromPoint(point.Point(lat[0],lon[0],dep[0]))
-        p2 = Vector.fromPoint(point.Point(lat[1],lon[1],dep[1]))
+        p1 = Vector.fromPoint(point.Point(lon[0],lat[0],dep[0]))
+        p2 = Vector.fromPoint(point.Point(lon[1],lat[1],dep[1]))
     else:
         dep2 = dep[0:4]
         dd = np.diff(dep2)
@@ -315,8 +315,8 @@ def getTopEdge(lat,lon,dep):
         idx = np.append(idx,False)
         p1idx = dep2[idx].argmin()+1
         p2idx = p1idx + 1
-        p1 = Vector.fromPoint(point.Point(lat[p1idx],lon[p1idx],0.0))
-        p2 = Vector.fromPoint(point.Point(lat[p2idx],lon[p2idx],0.0))
+        p1 = Vector.fromPoint(point.Point(lon[p1idx],lat[p1idx],0.0))
+        p2 = Vector.fromPoint(point.Point(lon[p2idx],lat[p2idx],0.0))
     return (p1,p2)
 
 if __name__ == '__main__':
@@ -331,10 +331,10 @@ if __name__ == '__main__':
     # lon0,lon1,lon2,lon3 = [84.0,86.0,86.0,84.0]
     # dep0,dep1,dep2,dep3 = [10.0,10.0,10.0,10.0]
 
-    P0 = Vector.fromPoint(point.Point(lat0,lon0,dep0))
-    P1 = Vector.fromPoint(point.Point(lat1,lon1,dep1))
-    P2 = Vector.fromPoint(point.Point(lat2,lon2,dep2))
-    P3 = Vector.fromPoint(point.Point(lat3,lon3,dep3))
+    P0 = Vector.fromPoint(point.Point(lon0,lat0,dep0))
+    P1 = Vector.fromPoint(point.Point(lon1,lat1,dep1))
+    P2 = Vector.fromPoint(point.Point(lon2,lat2,dep2))
+    P3 = Vector.fromPoint(point.Point(lon3,lat3,dep3))
 
     lons = np.arange(81.5,87.5,0.0083)
     lats = np.arange(25.5,31.0,0.0083)
