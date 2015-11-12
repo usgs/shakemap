@@ -94,7 +94,7 @@ class WGRW12(object):
         mmi[idx] = c['C3'] + c['C4'] * lamps[idx]
 
         if doresid:
-            mmi += c['C5'] + c['C6'] * ldd[idx] + c['C7'] * mag
+            mmi += c['C5'] + c['C6'] * ldd + c['C7'] * mag
 
         mmi = np.clip(mmi, 1.0, 10.0)
         return mmi
@@ -117,7 +117,7 @@ class WGRW12(object):
             doresid = False
 
         if doresid:
-            mmi -= c['C5'] + c['C6'] * ldd[idx] + c['C7'] * mag
+            mmi -= c['C5'] + c['C6'] * ldd + c['C7'] * mag
 
         pgm = np.zeros_like(mmi)
 
