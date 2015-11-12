@@ -33,6 +33,25 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
 
         return pgm_corrected
 
+    def get_site_corrections_pga(self, sites, rup, dists, imt, pgm, pga4nl, forward=True):
+        '''
+        Calculate site corrections for sites on rock (forward=True), OR
+        Remove site corrections from data on other substrates.
+        '''
+        C = self.COEFFS[imt]
+        C_SR = self.COEFFS_SOIL_RESPONSE[imt]
+        if forward:
+            pgm_corrected = pgm + \
+               self._get_site_amplification_linear(sites.vs30, C_SR) + \
+               self._get_site_amplification_non_linear(sites.vs30, pga4nl, C_SR)
+        else:
+            pgm_corrected = pgm - \
+               (self._get_site_amplification_linear(sites.vs30, C_SR) + \
+                self._get_site_amplification_non_linear(sites.vs30, pga4nl, C_SR))
+
+        return pgm_corrected
+
+
     def get_amplitudes(self, rup, dists, imt):
         '''
         Calculate peak ground motion on rock.

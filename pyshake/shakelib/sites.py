@@ -37,16 +37,16 @@ def getGeodict(bounds,xdim,ydim):
         - nrows
         - ncols
     """
-    lons = np.arange(bounds[2],bounds[3]+ydim,ydim)
-    lats = np.arange(bounds[0],bounds[1]+xdim,xdim)
+    lons = np.arange(bounds[0],bounds[1]+xdim,xdim)
+    lats = np.arange(bounds[2],bounds[3]+ydim,ydim)
     geodict = {'xmin':bounds[0],
                'xmax':bounds[1],
                'ymin':bounds[2],
                'ymax':bounds[3],
                'xdim':xdim,
                'ydim':ydim,
-               'nrows':len(lons),
-               'ncols':len(lats)}
+               'nrows':len(lats),
+               'ncols':len(lons)}
     return (geodict,lons,lats)
 
 class Sites(object):
