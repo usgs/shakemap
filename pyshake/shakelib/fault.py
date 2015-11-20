@@ -54,7 +54,7 @@ class Fault(object):
         self.setQuadrilaterals()
 
     @classmethod
-    def fromTrace(cls,xp0,yp0,xp1,yp1,zp,widths,dips,reference=None):
+    def fromTrace(cls,xp0,yp0,xp1,yp1,zp,widths,dips,average_strike=None,reference=None):
         """
         Create a fault object from a set of vertices that define the top of the fault, and an array of widths/dips.
 
@@ -74,6 +74,9 @@ class Fault(object):
           Array of widths for each of rectangle (km).
         :param dips:
           Array of dips for each of rectangle (degrees).
+        :param average_strike:
+          Optional scalar strike angle (deg) to use for all segments; if unspcified strike is computed from the 
+          coordinates of the top of the rupture for each segment. 
         :param reference:
           String explaining where the fault definition came from (publication style reference, etc.)
         :returns:
@@ -112,13 +115,16 @@ class Fault(object):
             #Project the top edge coordinates
             p0x,p0y = proj(xp0[i],yp0[i])
             p1x,p1y = proj(xp1[i],yp1[i])
-
+            
             #Get the rotation angle defined by these two points 
             dx = p1x-p0x
             dy = p1y-p0y
-            theta = np.arctan2(dx,dy) #theta is angle from north
+            if average_strike is not None:
+                theta = np.radians(average_strike)
+            else:
+                theta = np.arctan2(dx,dy) #theta is angle from north
             R = np.array([[np.cos(theta),-np.sin(theta)],
-                         [np.sin(theta),np.cos(theta)]])
+                          [np.sin(theta),np.cos(theta)]])
 
             #Rotate the top edge points into a new coordinate system (vertical line)
             p0 = np.array([p0x,p0y])
@@ -133,7 +139,7 @@ class Fault(object):
             p3yp = p0p[1]
             p2xp = p1p[0] + dx
             p2yp = p1p[1]
-
+                
             #Get right side coordinates in un-rotated projected system
             p3p = np.array([p3xp,p3yp])
             p2p = np.array([p2xp,p2yp])
