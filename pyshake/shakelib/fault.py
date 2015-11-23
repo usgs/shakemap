@@ -54,7 +54,7 @@ class Fault(object):
         self.setQuadrilaterals()
 
     @classmethod
-    def fromTrace(cls,xp0,yp0,xp1,yp1,zp,widths,dips,average_strike=None,reference=None):
+    def fromTrace(cls,xp0,yp0,xp1,yp1,zp,widths,dips,strike=None,reference=None):
         """
         Create a fault object from a set of vertices that define the top of the fault, and an array of widths/dips.
 
@@ -74,9 +74,10 @@ class Fault(object):
           Array of widths for each of rectangle (km).
         :param dips:
           Array of dips for each of rectangle (degrees).
-        :param average_strike:
-          Optional scalar strike angle (deg) to use for all segments; if unspcified strike is computed from the 
-          coordinates of the top of the rupture for each segment. 
+        :param strike:
+          If None then strike is computed from verticies of top edge of each quadrilateral. If a scalar, then 
+          all quadrilaterals are constructed assuming this strike direction. If a vector with the same length as 
+          the trace coordinates then it specifies the strike for each quadrilateral. 
         :param reference:
           String explaining where the fault definition came from (publication style reference, etc.)
         :returns:
@@ -86,6 +87,10 @@ class Fault(object):
             pass
         else:
             raise FaultException('Number of xp0,yp0,xp1,yp1,zp,widths,dips points must be equal.')
+        if (len(xp0) == len(strike)) | (len(strike) == 1) | (strike is None):
+            pass
+        else:
+            raise FaultException('Strike must be None, scalar, or same length as trace coordinates.')
 
         #convert dips to radians
         dips = np.radians(dips)
@@ -119,10 +124,13 @@ class Fault(object):
             #Get the rotation angle defined by these two points 
             dx = p1x-p0x
             dy = p1y-p0y
-            if average_strike is not None:
-                theta = np.radians(average_strike)
-            else:
+            if strike is None:
                 theta = np.arctan2(dx,dy) #theta is angle from north
+            elif len(strike) == 1:
+                theta = np.radians(strike)
+            else:
+                theta = np.radians(strike[i])
+            
             R = np.array([[np.cos(theta),-np.sin(theta)],
                           [np.sin(theta),np.cos(theta)]])
 
