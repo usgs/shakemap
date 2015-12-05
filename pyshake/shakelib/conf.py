@@ -5,7 +5,14 @@ import os.path
 
 #third party libraries
 from configobj import ConfigObj
-from validate import Validator
+from validate import Validator,VdtTypeError
+
+def getCustomValidator():
+    fdict = {
+        'file_type': file_type,
+        'annotatedfloat_type':annotatedfloat_type,}
+    validator = Validator(fdict)
+    return validator
 
 def createDefaultConfig(configspec,includeComments=False):
     configfolder = os.path.join(os.path.expanduser('~'),'.shakemap')
@@ -13,10 +20,11 @@ def createDefaultConfig(configspec,includeComments=False):
         os.mkdir(configfolder)
     outfile = os.path.join(configfolder,'config.ini')
     config = ConfigObj(configspec=configspec,stringify=False)
-    validator = Validator()
+    validator = getCustomValidator()
     config.validate(validator,copy=True)
     lines = config.write()
     f = open(outfile,'wt')
+    #TODO - should we write out the docs for the parameters that have default=None?
     for line in lines:
         if line.strip().startswith('#') and not includeComments:
             continue
@@ -33,7 +41,7 @@ def createDefaultConfig(configspec,includeComments=False):
 
 def whatIs(configspec,param):
     config = ConfigObj(configspec=configspec)
-    validator = Validator()
+    validator = getCustomValidator()
     config.validate(validator,copy=True)
     comment = '%s is not a value found in %s.' % (param,configspec)
     for sectionkey in config.sections:
@@ -43,9 +51,38 @@ def whatIs(configspec,param):
                 comment = 'Section [%s] has that option:' % (sectionkey) +'\n'.join(section.comments[key])
     return comment
 
+def annotatedfloat_type(value):
+    try:
+        out = float(value)
+    except:
+        if value.find('c') < 0 and value.find('m') < 0:
+            raise VdtTypeError(value)
+    out = []
+    if value.find('c') > 0:
+        try:
+            out = float(value.replace('c',''))/3600.0
+        except:
+            raise VdtTypeError(value)
+    if value.find('m') > 0:
+        try:
+            out = float(value.replace('m',''))/60.0
+        except:
+            raise VdtTypeError(value)
+    return out
+
+def file_type(value):
+    #value="file_type('/Users/mhearne/src/python/testme.py')"
+    sidx = value.find('(')+1
+    eidx = value.find(')')
+    pat = '''['"](.*?)['"]'''
+    fname = re.findall(pat,value[sidx:eidx])[0]
+    if not os.path.isfile(fname):
+        raise VdtTypeError(fname)
+    return fname
+
 def validate(configspec,configfile):
     config = ConfigObj(configfile,configspec=configspec)
-    validator = Validator()
+    validator = getCustomValidator()
     result = config.validate(validator)
     if result == True:
         return True
