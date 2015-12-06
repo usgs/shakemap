@@ -2,15 +2,20 @@
 
 #stdlib imports
 import os.path
+import tempfile
+import textwrap
+import sys
 
 #third party libraries
 from configobj import ConfigObj
-from validate import Validator,VdtTypeError
+from validate import Validator,VdtTypeError,VdtParamError
 
 def getCustomValidator():
     fdict = {
         'file_type': file_type,
-        'annotatedfloat_type':annotatedfloat_type,}
+        'annotatedfloat_type':annotatedfloat_type,
+        'gmpe_type':gmpe_type,}
+    
     validator = Validator(fdict)
     return validator
 
@@ -70,6 +75,28 @@ def annotatedfloat_type(value):
             raise VdtTypeError(value)
     return out
 
+def gmpe_type(value,*args):
+    if len(args) != len(value):
+        raise VdtParamError('gmpe',value)
+    out = []
+    try:
+        minmag = float(value[0])
+        maxmag = float(value[1])
+        mindep = float(value[2])
+        maxdep = float(value[3])
+        if not (minmag >= 0.0 and minmag <= 9.9):
+            raise VdtTypeError(value)
+        if not (maxmag >= 0.0 and maxmag <= 9.9 and maxmag > minmag):
+            raise VdtTypeError(value)
+        if not (mindep >= 0.0 and mindep <= 10000.0):
+            raise VdtTypeError(value)
+        if not (maxdep >= 0.0 and maxdep <= 10000.0 and maxdep > mindep):
+            raise VdtTypeError(value)
+        out += [minmag,maxmag,mindep,maxdep]
+    except:
+        raise VdtParamError('gmpe',value)
+    return out
+
 def file_type(value):
     #value="file_type('/Users/mhearne/src/python/testme.py')"
     sidx = value.find('(')+1
@@ -81,15 +108,65 @@ def file_type(value):
     return fname
 
 def validate(configspec,configfile):
+    '''return a validated config object.
+    '''
     config = ConfigObj(configfile,configspec=configspec)
     validator = getCustomValidator()
     result = config.validate(validator)
     if result == True:
-        return True
+        return config
     else:
         return False
 
+def _test_validate():
+    data = '''[grind]
+    smVs30default = 686.0
+    use_gmpe_sc = False
+    basin_module = Field2000
+    x_grid_interval = 0.025
+    y_grid_interval = 0.025
+    lonspan = 2.5
+    gmroi = 10.0
+    iroi = 10.0
+    gmdecay = 0.5
+    [[gmpe]]
+         Zhao06_surface = 0.0,9.9,0,60
+         Zhao06_intraslab = 0.0,9.9,60,999
+    [[ipe]]
+         AW07_CEUS = 0.0,9.9,0,999
+    idecay = 0.5
+    outlier_deviation_level = 3
+    outlier_max_mag = 7.0
+    bias_norm = l1
+    bias_max_range = 120.0
+    bias_min_stations = 6
+    bias_max_mag = 7.0
+    bias_max_bias = 2.0
+    bias_min_bias = -2.0
+    bias_log_amp = True
+    direct_patch_size = 1000.0
+    mi2pgm = WGRW11
+    pgm2mi = WGRW11
+    '''
+    try:
+        fh,tfile = tempfile.mkstemp()
+        os.close(fh)
+        f = open(tfile,'wt')
+        f.write(textwrap.dedent(data))
+        f.close()
+        homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
+        configspec = os.path.join(homedir,'configspec.ini')
+        ret = validate(configspec,tfile)
+        print ret
+        config = ConfigObj(tfile)
+        pass
+    except Exception,e:
+        print '_test_validate() failed with error "%s"' % str(e)
+    os.remove(tfile)
+    
 if __name__ == '__main__':
+    _test_validate()
+    sys.exit(0)
     homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
     configspec = os.path.join(homedir,'configspec.ini')
     configfile = createDefaultConfig(configspec)
