@@ -87,10 +87,13 @@ class Fault(object):
             pass
         else:
             raise FaultException('Number of xp0,yp0,xp1,yp1,zp,widths,dips points must be equal.')
-        if (len(xp0) == len(strike)) | (len(strike) == 1) | (strike is None):
+        if strike is None:
             pass
         else:
-            raise FaultException('Strike must be None, scalar, or same length as trace coordinates.')
+            if (len(xp0) == len(strike)) | (len(strike) == 1):
+                pass
+            else:
+                raise FaultException('Strike must be None, scalar, or same length as trace coordinates.')                
 
         #convert dips to radians
         dips = np.radians(dips)
