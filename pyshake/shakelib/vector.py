@@ -36,7 +36,19 @@ class Vector(object):
         """
         x,y,z = latlon2ecef(oqpoint.latitude,oqpoint.longitude,oqpoint.depth)
         return Vector(x,y,z)
-
+    
+    @classmethod
+    def fromTuple(cls, a):
+        """
+        Class method which allows user to create a Vector from an x/y/z tuple.
+        :param a: 
+            an x/y/z tuple. 
+        :returns:
+            a Vector object.
+        """
+        x, y, z = a
+        return Vector(x, y, z)
+    
     def __add__(self,other):
         """
         Add another Vector object to this one (x+x,y+y,z+z)
