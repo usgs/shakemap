@@ -746,7 +746,7 @@ def getQuadMesh(q, dx):
             mesh['cpz'][i, j] = cp.z
     return mesh
 
-def rotation_matrix(axis, theta):
+def _rotation_matrix(axis, theta):
     """
     Return the rotation matrix associated with counterclockwise rotation about
     the given axis by theta radians.
@@ -764,7 +764,7 @@ def rotation_matrix(axis, theta):
                      [2*(bc-ad), aa+cc-bb-dd, 2*(cd+ab)],
                      [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc]])
 
-def UnitSlipVector(strike, dip, rake):
+def getLocalUnitSlipVector(strike, dip, rake):
     """
     Compute the components of a unit slip vector. 
     :param strike:
@@ -801,7 +801,7 @@ def getQuadSlip(q, rake):
     P0,P1,P2,P3 = q
     strike = P0.azimuth(P1)
     dip = getQuadDip(q)
-    s1_local = UnitSlipVector(strike, dip, rake)
+    s1_local = getLocalUnitSlipVector(strike, dip, rake)
     s0_local = Vector(0, 0, 0)
     qlats = [a.latitude for a in q]
     qlons = [a.longitude for a in q]
