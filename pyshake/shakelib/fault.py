@@ -99,13 +99,13 @@ class Fault(object):
         dips = np.radians(dips)
 
         #ensure that all input sequences are numpy arrays
-        xp0 = np.array(xp0)
-        xp1 = np.array(xp1)
-        yp0 = np.array(yp0)
-        yp1 = np.array(yp1)
-        zp = np.array(zp)
-        widths = np.array(widths)
-        dips = np.array(dips)
+        xp0 = np.array(xp0, dtype = 'd')
+        xp1 = np.array(xp1, dtype = 'd')
+        yp0 = np.array(yp0, dtype = 'd')
+        yp1 = np.array(yp1, dtype = 'd')
+        zp = np.array(zp, dtype = 'd')
+        widths = np.array(widths, dtype = 'd')
+        dips = np.array(dips, dtype = 'd')
         
         #get a projection object
         west = np.min((xp0.min(),xp1.min()))
@@ -125,9 +125,9 @@ class Fault(object):
             p1x,p1y = proj(xp1[i],yp1[i])
             
             #Get the rotation angle defined by these two points 
-            dx = p1x-p0x
-            dy = p1y-p0y
             if strike is None:
+                dx = p1x-p0x
+                dy = p1y-p0y
                 theta = np.arctan2(dx,dy) #theta is angle from north
             elif len(strike) == 1:
                 theta = np.radians(strike)
@@ -144,7 +144,7 @@ class Fault(object):
             p1p = np.dot(R,p1)
 
             #Get right side coordinates in project,rotated system
-            dz = np.sin(dips[i]) * widths[i] 
+            dz = np.sin(dips[i]) * widths[i]
             dx = np.cos(dips[i]) * widths[i]
             p3xp = p0p[0] + dx
             p3yp = p0p[1]
@@ -273,6 +273,7 @@ class Fault(object):
         return cls(x,y,z,reference)
 
     def multiplyFaultLength(self,factor):
+        # What does this do and why do we want to do it????
         for i in range(0,len(self.Quadrilaterals)):
             quad = self.Quadrilaterals[i]
             P0,P1,P2,P3 = quad
@@ -296,6 +297,17 @@ class Fault(object):
             newP2.depth = P3.depth
             self.Quadrilaterals[i][1] = newP1
             self.Quadrilaterals[i][2] = newP2
+    
+    def getFaultLength(self):
+        """
+        Compute lenght of fault based on top edge. 
+        :returns:
+            Length of fault. 
+        """
+        flength = 0
+        for quad in self.Quadrilaterals:
+            flength = flength + getQuadLength(quad)
+        return flength
     
     def getQuadrilaterals(self):
         """
@@ -357,18 +369,9 @@ class Fault(object):
         """
         dipsum = 0.0
         for quad in self.Quadrilaterals:
-            P0,P1,P2,P3 = quad
-
-            dist = P0.distance(P3)
-            vert_dist = P3.depth - P0.depth
-            dip = np.degrees(np.arcsin(vert_dist / dist))
-            
-            d1 = P1.depth * -1
-            d2 = P2.depth * -1
-            dx = P2.distance(P1)
-            dz = d1 - d2
-            dip = np.degrees(np.arctan2(dx,dz))
-            dipsum += dip
+            N = getQuadNormal(quad)
+            V = getVerticalVector(quad)
+            dipsum = dipsum + np.degrees(np.arccos(Vector.dot(N, V)))
         dip = dipsum/len(self.Quadrilaterals)
         return dip
     
@@ -660,6 +663,219 @@ class Fault(object):
             if x1 != x2 or y1 != y2 or z1 != z2:
                 raise Exception('Unclosed segments exist in fault file.')
             istart = inan[i]+1
+
+
+def getQuadMesh(q, dx):
+    """
+    Length of top eduge of a quadrilateral. 
+    :param q:
+        A quadrilateral. 
+    :param dx:
+        Target dx in km; used to get nx and ny of mesh, but mesh snaps
+        to edges of fault so actual dx/dy will not actually equal this
+        value in general. 
+    :returns:
+        Mesh dictionary, which includes numpy arrays: 
+           llx: lower left x coordinate in ECEF coords. 
+           lly: lower left y coordinate in ECEF coords. 
+           llz: lower left z coordinate in ECEF coords. 
+           ulx: upper left x coordinate in ECEF coords. 
+           etc. 
+    """
+    P0,P1,P2,P3 = q
+    p0 = Vector.fromPoint(P0)  # fromPoint converts to ECEF
+    p1 = Vector.fromPoint(P1)
+    p2 = Vector.fromPoint(P2)
+    p3 = Vector.fromPoint(P3)
+    # Get nx based on length of top edge, minimum allowed is 2
+    toplen_km = getQuadLength(q)
+    nx = int(np.max([round(toplen_km/dx, 0) + 1, 2]))
+    
+    # Get array of points along top and bottom edges
+    xfac = np.linspace(0, 1, nx)
+    topp = [p0 + (p1 - p0)*a for a in xfac]
+    botp = [p3 + (p2 - p3)*a for a in xfac]
+    
+    # Get ny based on mean length of vectors connecting top and bottom points
+    ylen_km = np.ones(nx)
+    for i in range(nx):
+        ylen_km[i] = (topp[i] - botp[i]).mag()/1000 
+    ny = int(np.max([round(np.mean(ylen_km)/dx, 0) + 1, 2]))
+    yfac = np.linspace(0, 1, ny)
+
+    # Build mesh: dict of ny by nx arrays (x, y, z):
+    mesh = {'x':np.zeros([ny, nx]), 'y':np.zeros([ny, nx]), 'z':np.zeros([ny, nx])}
+    for i in range(nx):
+        mpts = [topp[i] + (botp[i] - topp[i])*a for a in yfac]
+        mesh['x'][:, i] = [a.x for a in mpts]
+        mesh['y'][:, i] = [a.y for a in mpts]
+        mesh['z'][:, i] = [a.z for a in mpts]
+
+    # Make arrays of pixel corners
+    mesh['llx'] = mesh['x'][1:,0:-1]
+    mesh['lrx'] = mesh['x'][1:,1:]
+    mesh['ulx'] = mesh['x'][0:-1,0:-1]
+    mesh['urx'] = mesh['x'][0:-1,1:]
+    mesh['lly'] = mesh['y'][1:,0:-1]
+    mesh['lry'] = mesh['y'][1:,1:]
+    mesh['uly'] = mesh['y'][0:-1,0:-1]
+    mesh['ury'] = mesh['y'][0:-1,1:]
+    mesh['llz'] = mesh['z'][1:,0:-1]
+    mesh['lrz'] = mesh['z'][1:,1:]
+    mesh['ulz'] = mesh['z'][0:-1,0:-1]
+    mesh['urz'] = mesh['z'][0:-1,1:]
+    mesh['cpx'] = np.zeros_like(mesh['llx'])
+    mesh['cpy'] = np.zeros_like(mesh['llx'])
+    mesh['cpz'] = np.zeros_like(mesh['llx'])
+    
+    # i and j are indices over subfaults
+    ni, nj = mesh['llx'].shape
+    for i in range(0, ni):
+        for j in range(0, nj):
+            # Fault corner points
+            pp0 = Vector(mesh['ulx'][i, j], mesh['uly'][i, j], mesh['ulz'][i, j])
+            pp1 = Vector(mesh['urx'][i, j], mesh['ury'][i, j], mesh['urz'][i, j])
+            pp2 = Vector(mesh['lrx'][i, j], mesh['lry'][i, j], mesh['lrz'][i, j])
+            pp3 = Vector(mesh['llx'][i, j], mesh['lly'][i, j], mesh['llz'][i, j])
+            # Find center of quad
+            mp0 = pp0 + (pp1 - pp0)*0.5
+            mp1 = pp3 + (pp2 - pp3)*0.5
+            cp = mp0 + (mp1 - mp0)*0.5
+            mesh['cpx'][i, j] = cp.x
+            mesh['cpy'][i, j] = cp.y
+            mesh['cpz'][i, j] = cp.z
+    return mesh
+
+def _rotation_matrix(axis, theta):
+    """
+    Return the rotation matrix associated with counterclockwise rotation about
+    the given axis by theta radians.
+    Source: Response by 'unutbu' in this thread: 
+    http://stackoverflow.com/questions/6802577/python-rotation-of-3d-vector
+    """
+    axis = np.asarray(axis)
+    theta = np.asarray(theta)
+    axis = axis/np.sqrt(np.dot(axis, axis))
+    a = np.cos(theta/2)
+    b, c, d = -axis*np.sin(theta/2)
+    aa, bb, cc, dd = a*a, b*b, c*c, d*d
+    bc, ad, ac, ab, bd, cd = b*c, a*d, a*c, a*b, b*d, c*d
+    return np.array([[aa+bb-cc-dd, 2*(bc+ad), 2*(bd-ac)],
+                     [2*(bc-ad), aa+cc-bb-dd, 2*(cd+ab)],
+                     [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc]])
+
+def getLocalUnitSlipVector(strike, dip, rake):
+    """
+    Compute the components of a unit slip vector. 
+    :param strike:
+        Clockwise angle (deg) from north of the line at the intersection
+        of the fault plane and the horizontal plane. 
+    :param dip:
+        Angle (deg) between fault plane and the horizontal plane normal
+        to the strike (0-90 using right hand rule). 
+    :param rake:
+        Direction of motion of the hanging wall relative to the
+        foot wall, as measured by the angle (deg) from the strike vector. 
+    :returns:
+        Unit slip vector in 'local' N-S, E-W, U-D coordinates. 
+    """
+    strike = np.radians(strike)
+    dip = np.radians(dip)
+    rake = np.radians(rake)
+    sx = np.sin(rake)*np.cos(dip)*np.cos(strike) + np.cos(rake)*np.sin(strike)
+    sy = np.sin(rake)*np.cos(dip)*np.sin(strike) + np.cos(rake)*np.cos(strike)
+    sz = np.sin(rake)*np.sin(dip)
+    return Vector(sx, sy, sz)
+
+def getQuadSlip(q, rake):
+    """
+    Compute the unit slip vector in ECEF space for a quad and rake angle. 
+    :param q:
+        A quadrilateral. 
+    :param rake:
+        Direction of motion of the hanging wall relative to the
+        foot wall, as measured by the angle (deg) from the strike vector. 
+    :returns:
+        Unit slip vector in ECEF space. 
+    """
+    P0,P1,P2,P3 = q
+    strike = P0.azimuth(P1)
+    dip = getQuadDip(q)
+    s1_local = getLocalUnitSlipVector(strike, dip, rake)
+    s0_local = Vector(0, 0, 0)
+    qlats = [a.latitude for a in q]
+    qlons = [a.longitude for a in q]
+    proj = get_orthographic_projection(np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
+    s1_ll = proj(np.array([s1_local.x]), np.array([s1_local.y]), reverse = True)
+    s0_ll = proj(np.array([s0_local.x]), np.array([s0_local.y]), reverse = True)
+    s1_ecef = Vector.fromTuple(latlon2ecef(s1_ll[1], s1_ll[0], s1_local.z))
+    s0_ecef = Vector.fromTuple(latlon2ecef(s0_ll[1], s0_ll[0], s0_local.z))
+    slp_ecef = (s1_ecef - s0_ecef).norm()
+    return slp_ecef
+
+def getQuadLength(q):
+    """
+    Length of top eduge of a quadrilateral. 
+    :param q:
+        A quadrilateral. 
+    :returns:
+        Length in km. 
+    """
+    P0,P1,P2,P3 = q
+    p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
+    p1 = Vector.fromPoint(P1) 
+    qlength = (p1 - p0).mag()/1000
+    return qlength
+
+def getQuadDip(q):
+    """
+    Dip of a quadrilateral. 
+    :param q:
+        A quadrilateral. 
+    :returns:
+        Dip in degrees.
+    """
+    N = getQuadNormal(q)
+    V = getVerticalVector(q)
+    dip = np.degrees(np.arccos(Vector.dot(N, V)))
+    return dip
+    
+def getQuadNormal(q):
+    """
+    Compute the unit normal vector for a quadrilateral in 
+    ECEF coordinates. 
+    :param q:
+        A quadrilateral. 
+    :returns:
+        Normalized normal vector for the quadrilateral in ECEF coords. 
+    """
+    P0,P1,P2,P3 = q
+    p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
+    p1 = Vector.fromPoint(P1) 
+    p2 = Vector.fromPoint(P2) 
+    p3 = Vector.fromPoint(P3) 
+    v1 = p1 - p0
+    v2 = p3 - p0
+    vn = Vector.cross(v2, v1).norm()
+    return vn
+
+def getVerticalVector(q):
+    """
+    Compute the unit vertical vector for a quadrilateral 
+    in ECEF coordinates. 
+    :param q:
+        A quadrilateral. 
+    :returns:
+        Normalized vertical vector for the quadrilateral in ECEF coords. 
+    """
+    P0,P1,P2,P3 = q
+    P0_up = copy.deepcopy(P0)
+    P0_up.depth = P0_up.depth - 1.0
+    p0 = Vector.fromPoint(P0)   # fromPoint converts to ECEF
+    p1 = Vector.fromPoint(P0_up)
+    v1 = (p1 - p0).norm()
+    return v1
+
 
 def _test_northridge():
     #this should fail!
