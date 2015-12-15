@@ -5,6 +5,8 @@ import os.path
 import tempfile
 import textwrap
 import sys
+import re
+import StringIO
 
 #third party libraries
 from configobj import ConfigObj
@@ -13,6 +15,7 @@ from validate import Validator,VdtTypeError,VdtParamError
 def getCustomValidator():
     fdict = {
         'file_type': file_type,
+        'directory_type': directory_type,
         'annotatedfloat_type':annotatedfloat_type,
         'gmpe_type':gmpe_type,}
     
@@ -98,27 +101,39 @@ def gmpe_type(value,*args):
     return out
 
 def file_type(value):
-    #value="file_type('/Users/mhearne/src/python/testme.py')"
-    sidx = value.find('(')+1
-    eidx = value.find(')')
-    pat = '''['"](.*?)['"]'''
-    fname = re.findall(pat,value[sidx:eidx])[0]
-    if not os.path.isfile(fname):
-        raise VdtTypeError(fname)
-    return fname
+    if not os.path.isfile(value):
+        raise VdtTypeError(value)
+    return value
 
-def validate(configspec,configfile):
+def directory_type(value):
+    if not os.path.isdir(value):
+        raise VdtTypeError(value)
+    return value
+
+def validate(configspec,configfile,macros=None):
     '''return a validated config object.
     '''
+    #first, replace all the macros if we have the values
+    if macros is not None:
+        configstr = open(configfile,'rt').read()
+        for key,value in macros.iteritems():
+            macro = '<'+key.upper()+'>'
+            configstr = configstr.replace(macro,value)
+        configfile = StringIO.StringIO(configstr)
     config = ConfigObj(configfile,configspec=configspec)
     validator = getCustomValidator()
     result = config.validate(validator)
+    # for rkey,rvalue in result.iteritems():
+    #     if not rvalue and rkey.find('transfer') > -1:
+    #         if config[rkey]
     if result == True:
         return config
     else:
         return False
 
 def _test_validate():
+    dummydir = os.path.expanduser('~')
+    dummyfile = os.path.join(os.path.expanduser('~'),'.bash_profile') 
     data = '''[grind]
     smVs30default = 686.0
     use_gmpe_sc = False
@@ -147,7 +162,47 @@ def _test_validate():
     direct_patch_size = 1000.0
     mi2pgm = WGRW11
     pgm2mi = WGRW11
-    '''
+
+    [transfer_ftp]
+      [[dest1]]
+        category = 'webcopy'
+        files = *.jpg,
+        sendDone = false
+        username = user
+        password = thispass
+        remotehost = ftp.ftptest.org
+        remotedirectory = /pub/shakemap
+    [transfer_copy]
+      [[dest2]]
+        category = 'webcopy'
+        files = *.jpg,
+        sendDone = false
+        directory = %s
+    [transfer_rsync]
+      [[dest2]]
+        category = 'webcopy'
+        files = *.jpg,
+        sendDone = true
+        username = fred
+        password = password
+        privatekey = %s
+        remotehost = remotehost.org
+        remotedirectory = /home/user/data
+    [transfer_pdl]
+      [[dest2]]
+        category = 'webcopy'
+        files = *.jpg,
+        sendDone = true
+        java = /usr/bin/java
+        configfile = %s
+        client = %s
+        productsource = <SHAKEMAP_NETWORK>
+        producttype = shakemap
+        productcode = <EVENT_CODE>
+        eventsource = <EVENT_NETWORK>
+        eventsourcecode = <EVENT_ID>
+        privatekey = %s
+    ''' % (dummydir,dummyfile,dummyfile,dummyfile,dummyfile)
     try:
         fh,tfile = tempfile.mkstemp()
         os.close(fh)
@@ -156,7 +211,11 @@ def _test_validate():
         f.close()
         homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
         configspec = os.path.join(homedir,'configspec.ini')
-        ret = validate(configspec,tfile)
+        macros = {'shakemap_network':'us',
+                  'event_code':'2015abcd',
+                  'event_network':'us',
+                  'event_id':'us2015abcd'}
+        ret = validate(configspec,tfile,macros=macros)
         print ret
         config = ConfigObj(tfile)
         pass
