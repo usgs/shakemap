@@ -58,7 +58,7 @@ class Fault(object):
         """
         Create a fault object from a set of vertices that define the top of the fault, and an array of widths/dips.
 
-        These top of rupture points are defined by specifying the x and y coordinates of each of the two vertices, 
+       These top of rupture points are defined by specifying the x and y coordinates of each of the two vertices, 
         and then specifying an array of depths,widths, and dips for each rectangle.
         :param xp0:
           Array of longitude coordinates for the first (top of rupture) vertex of each rectangle (decimal degrees).
@@ -745,24 +745,6 @@ def getQuadMesh(q, dx):
             mesh['cpy'][i, j] = cp.y
             mesh['cpz'][i, j] = cp.z
     return mesh
-
-def _rotation_matrix(axis, theta):
-    """
-    Return the rotation matrix associated with counterclockwise rotation about
-    the given axis by theta radians.
-    Source: Response by 'unutbu' in this thread: 
-    http://stackoverflow.com/questions/6802577/python-rotation-of-3d-vector
-    """
-    axis = np.asarray(axis)
-    theta = np.asarray(theta)
-    axis = axis/np.sqrt(np.dot(axis, axis))
-    a = np.cos(theta/2)
-    b, c, d = -axis*np.sin(theta/2)
-    aa, bb, cc, dd = a*a, b*b, c*c, d*d
-    bc, ad, ac, ab, bd, cd = b*c, a*d, a*c, a*b, b*d, c*d
-    return np.array([[aa+bb-cc-dd, 2*(bc+ad), 2*(bd-ac)],
-                     [2*(bc-ad), aa+cc-bb-dd, 2*(cd+ab)],
-                     [2*(bd+ac), 2*(cd-ab), aa+dd-bb-cc]])
 
 def getLocalUnitSlipVector(strike, dip, rake):
     """
