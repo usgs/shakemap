@@ -7,6 +7,6 @@ setup(name='pyshake',
       author_email='cbworden@usgs.gov,mhearne@usgs.gov',
       url='',
       package_data = {'pyshake':['shakelib/configspec.ini']},
-      packages=['pyshake','pyshake.gmpe','pyshake.shakelib','pyshake.oldshakelib','pyshake.correlation','pyshake.gmice'],
+      packages=['pyshake','pyshake.gmpe','pyshake.shakelib','pyshake.oldshakelib','pyshake.correlation','pyshake.gmice','pyshake.directivity'],
       scripts = ['mkfault.py'],
 )
