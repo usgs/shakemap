@@ -16,7 +16,6 @@ Implements the Rowshandel (2013) directivity model.
 To do: 
     * Add checks on function arguments (e.g., mtype) for valid values. 
     * Add a validation function. 
-    * Vectorize loops
     * Use np.clip for applying the minimum of zero to s-dot-q and p-dot-q
     * Optimize with numba?
 """
@@ -161,16 +160,13 @@ class rowshandel2013(object):
         site_ecef_y = np.ones_like(slat)
         site_ecef_z = np.ones_like(slat)
         
-        ni,nj = site_ecef_x.shape
-        for i in range(ni): 
-            for j in range(nj):
-                site_ecef_x[i, j], site_ecef_y[i, j], site_ecef_z[i, j] = ecef.latlon2ecef(slat[i, j], slon[i, j], 0)
+        # Make a 3x(#number of sites) matrix of site locations (rows are x, y, z) in ECEF
+        site_ecef_x, site_ecef_y, site_ecef_z = ecef.latlon2ecef(slat, slon, np.zeros(slon.shape) )
+        site_mat = np.array([np.reshape(site_ecef_x, (-1,)),
+                             np.reshape(site_ecef_y, (-1,)),
+                             np.reshape(site_ecef_z, (-1,))])
         
-        pdotq = np.zeros_like(slat)
-        sdotq = np.zeros_like(slat)
-        xi_s_prime = np.zeros_like(slat)
-        xi_p_prime = np.zeros_like(slat)
-        nm,nn = slat.shape
+        xi_prime_unnormalized = np.zeros_like(slat)        
         
         # Normalize by total number of subfaults, can't know till loop is finished
         n_sub_faults = 0
@@ -187,55 +183,42 @@ class rowshandel2013(object):
             
             # Unit slip vector (ECEF coords)
             slpv = fault.getQuadSlip(q, self.rake)
+            scol = np.array([[slpv.x], [slpv.y], [slpv.z]]) # column vector
             
-            #-----------------------------------
-            # i and j are indices over subfaults
-            #-----------------------------------
+            # Make 3x(i*j) matrix of cp
             ni, nj = mesh['llx'].shape
-            n_sub_faults = ni*nj + n_sub_faults
-            for i in range(0, ni):
-                for j in range(0, nj):
-                    #-----------------------------------
-                    # m and n are idices over sites
-                    #-----------------------------------
-                    for m in range(nm): 
-                        for n in range(nn):
-                            # Center point of subfault (in ECEF coords)
-                            cp = Vector(mesh['cpx'][i, j], mesh['cpy'][i, j], mesh['cpz'][i, j])
-                            
-                            # Vector from hypo to cp
-                            p1 = (cp - hypo_ecef).norm()
-                            # project p1 onto the rupture plane 
-                            # Note: this is a proposed simplification for multi-segment ruptures
-                            #       Does not matter for planar ruptures (event multi-segment).
-                            p = p1 - rpnv * rpnv.dot(p1)
+            
+            cp_mat = np.array([np.reshape(mesh['cpx'], (-1,)),
+                               np.reshape(mesh['cpy'],(-1,)),
+                               np.reshape(mesh['cpz'], (-1,))])
+            
+            # Compute matrix of p vectors
+            hypcol = np.array([[hypo_ecef.x], [hypo_ecef.y], [hypo_ecef.z]])
+            pmat = cp_mat - hypcol
+            mag = np.sqrt(np.sum(pmat*pmat, axis = 0))
+            pmatnorm = pmat/mag
+            
+            xi_prime = np.zeros([site_mat.shape[1]])
+            n_sub_faults = n_sub_faults + cp_mat.shape[1]
+            
+            # Loop over sites
+            for i in range(site_mat.shape[1]):
+                sitecol = np.array([[site_mat[0, i]], [site_mat[1, i]], [site_mat[2, i]]])
+                qmat = sitecol - cp_mat  # 3x(ni*nj)
+                mag = np.sqrt(np.sum(qmat*qmat, axis = 0))
+                qmatnorm = qmat/mag
+                # Dot products
+                if mtype == 1:
+                    pdotq = np.sum(pmatnorm * qmatnorm, axis = 0).clip(min = 0)
+                    sdotq = np.abs(np.sum(scol * qmatnorm, axis = 0))
+                elif mtype == 2:
+                    pdotq = np.sum(pmatnorm * qmatnorm, axis = 0)
+                    sdotq = np.abs(np.sum(scol * qmatnorm, axis = 0))
+                xi_prime[i] =a_weight*np.sum(sdotq) + (1-a_weight)*np.sum(pdotq)
+            
+            # Reshape xi_prime array and add it to the initialized version (one for every quad)
+            xi_prime_unnormalized = xi_prime_unnormalized + np.reshape(xi_prime, site_ecef_x.shape)
 
-                            # Site in ECEF coords
-                            site_ecef = Vector(site_ecef_x[m, n], site_ecef_y[m, n], site_ecef_z[m, n])
-                            
-                            # Vector from cp to site
-                            q = (site_ecef - cp).norm()
-#                             q = (cp - site_ecef).norm()
-
-                            # Compute dot products
-                            pdotq[m, n] = Vector.dot(p, q)
-#                            sdotq[m, n] = Vector.dot(slpv, q)
-                            sdotq[m, n] = np.abs(Vector.dot(slpv, q))
-                            # absolute value of s-dot-q??? 
-                            
-                            # Two possible model types
-                            if mtype == 1:
-                                # Equation 3.2 and 3.4 in Spudich et al. (2013)
-                                xi_p_prime[m, n] = xi_p_prime[m, n] + np.max([pdotq[m, n], 0])
-                                xi_s_prime[m, n] = xi_s_prime[m, n] + np.max([sdotq[m, n], 0])
-                            elif mtype == 2:
-                                xi_p_prime[m, n] = xi_p_prime[m, n] + pdotq[m, n]
-                                xi_s_prime[m, n] = xi_s_prime[m, n] + sdotq[m, n] 
-
-
-        # Combine x_p_prime and xi_s_prime                    
-        xi_prime_unnormalized = a_weight*xi_s_prime + (1-a_weight)*xi_p_prime
-        
         # Normalize
         xi_prime_unscaled = xi_prime_unnormalized / n_sub_faults
         
