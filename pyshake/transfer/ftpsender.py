@@ -87,7 +87,7 @@ class FTPSender(Sender):
     def send(self):
         '''Send any files or folders that have been passed to constructor.
         :returns:
-          NUmber of files sent to remote FTP server.
+          Number of files sent to remote SSH server.
         '''
         if 'host' not in self.properties.keys():
             raise NameError('"host" keyword must be supplied to send via FTP')
