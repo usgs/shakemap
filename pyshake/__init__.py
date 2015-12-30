@@ -1,1 +1,2 @@
-__all__ = ["correlation", "gmice", "gmpe","shakelib","transfer"]
+__all__ = ["correlation", "gmice", "gmpe","shakelib","directivity","transfer"]
+
