@@ -328,7 +328,11 @@ class Source(object):
     def calcDistance(self,mesh,method='rjb'):
         """
         Calculate distance from the source (fault or point source)
-        
+        :param mesh:
+          Instance of an openquake.hazardlib.geo.Mesh object.
+        :param method:
+          One of: 'rjb','rx','rrup','ry0','rcdbp','epi','hypo'. NB - If no fault is provided, 'rjb' and 'rx' => 'repi',
+          anything else => 'rhypo'.
         """
         if self.Fault is not None:
             quadlist = self.Fault.getQuadrilaterals()
