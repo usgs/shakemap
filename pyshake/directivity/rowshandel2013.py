@@ -45,7 +45,7 @@ class rowshandel2013(object):
     def __init__(self, flt, hyp, sites, rake, dx, M, T, simpleDT = False):
         """
         Constructor for rowshandel2013.
-        :param fault:
+        :param flt:
             pyhsake fault object.
         :param hyp:
             hypocenter; list of three elements: lon, lat, depth (km). 
@@ -212,8 +212,8 @@ class rowshandel2013(object):
                     pdotq = np.sum(pmatnorm * qmatnorm, axis = 0).clip(min = 0)
                     sdotq = np.abs(np.sum(scol * qmatnorm, axis = 0))
                 elif mtype == 2:
-                    pdotq = np.sum(pmatnorm * qmatnorm, axis = 0)
-                    sdotq = np.abs(np.sum(scol * qmatnorm, axis = 0))
+                    pdotq = np.sum(pmatnorm * qmatnorm, axis = 0)       # xi_p_prime
+                    sdotq = np.abs(np.sum(scol * qmatnorm, axis = 0))   # xi_s_prime
                 xi_prime[i] =a_weight*np.sum(sdotq) + (1-a_weight)*np.sum(pdotq)
             
             # Reshape xi_prime array and add it to the initialized version (one for every quad)

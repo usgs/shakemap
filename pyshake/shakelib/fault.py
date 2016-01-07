@@ -391,6 +391,39 @@ class Fault(object):
         mwidth = (wsum/len(self.Quadrilaterals))/1000.0
         return mwidth
     
+    def getIndividualWidths(self):
+        """
+        Return an array of fault widths (km), one for each quadrilateral defined for the fault.
+        :returns:
+            Array of quad widths in km of all fault quadrilaterals.
+        """
+        nquad = self.getNumQuads()
+        widths = np.zeros(nquad)
+        for i in range(nquad):
+            P0,P1,P2,P3 = self.Quadrilaterals[i]
+            p0 = Vector.fromPoint(P0)
+            p1 = Vector.fromPoint(P1)
+            p3 = Vector.fromPoint(P3)
+            widths[i] = self.getQuadWidth(p0,p1,p3)/1000.0
+        return widths
+    
+    def getIndividualTopLengths(self):
+        """
+        Return an array of fault lengths along top edge (km), 
+        one for each quadrilateral defined for the fault.
+        :returns:
+            Array of lengths in km of top edge of quadrilaterals.
+        """
+        nquad = self.getNumQuads()
+        lengths = np.zeros(nquad)
+        for i in range(nquad):
+            P0,P1,P2,P3 = self.Quadrilaterals[i]
+            p0 = Vector.fromPoint(P0)
+            p1 = Vector.fromPoint(P1)
+            lengths[i] = (p1 - p0).mag()/1000.0
+        return lengths
+    
+    
     def getTrapMeanLength(self,p0,p1,p2,p3):
         """
         Return the sqrt of the area of a quadrilateral (used for QA of fault plane).
@@ -611,12 +644,23 @@ class Fault(object):
         return self.reference
         
     def getNumSegments(self):
+        #### Note: This doesn't look like it will work for mutiple quad faults.
+        ####       Also tested with a single quad with a single segment and it
+        ####       does not work. 
         """
         Return a count of the number of fault segments.
         :returns:
             number of fault segments
         """
         return len(np.where(np.isnan(self.x))[0]) + 1
+
+    def getNumQuads(self):
+        """
+        Return a count of the number of fault quadrilaterals.
+        :returns:
+            number of fault quadrilaterals. 
+        """
+        return len(self.Quadrilaterals)
 
     def getFaultAsArrays(self):
         """
@@ -664,7 +708,7 @@ class Fault(object):
                 raise Exception('Unclosed segments exist in fault file.')
             istart = inan[i]+1
 
-
+    
 def getQuadMesh(q, dx):
     """
     Length of top eduge of a quadrilateral. 
