@@ -391,6 +391,39 @@ class Fault(object):
         mwidth = (wsum/len(self.Quadrilaterals))/1000.0
         return mwidth
     
+    def getIndividualWidths(self):
+        """
+        Return an array of fault widths (km), one for each quadrilateral defined for the fault.
+        :returns:
+            Array of quad widths in km of all fault quadrilaterals.
+        """
+        nquad = self.getNumQuads()
+        widths = np.zeros(nquad)
+        for i in range(nquad):
+            P0,P1,P2,P3 = self.Quadrilaterals[i]
+            p0 = Vector.fromPoint(P0)
+            p1 = Vector.fromPoint(P1)
+            p3 = Vector.fromPoint(P3)
+            widths[i] = self.getQuadWidth(p0,p1,p3)/1000.0
+        return widths
+    
+    def getIndividualTopLengths(self):
+        """
+        Return an array of fault lengths along top edge (km), 
+        one for each quadrilateral defined for the fault.
+        :returns:
+            Array of lengths in km of top edge of quadrilaterals.
+        """
+        nquad = self.getNumQuads()
+        lengths = np.zeros(nquad)
+        for i in range(nquad):
+            P0,P1,P2,P3 = self.Quadrilaterals[i]
+            p0 = Vector.fromPoint(P0)
+            p1 = Vector.fromPoint(P1)
+            lengths[i] = (p1 - p0).mag()/1000.0
+        return lengths
+    
+    
     def getTrapMeanLength(self,p0,p1,p2,p3):
         """
         Return the sqrt of the area of a quadrilateral (used for QA of fault plane).
@@ -611,12 +644,23 @@ class Fault(object):
         return self.reference
         
     def getNumSegments(self):
+        #### Note: This doesn't look like it will work for mutiple quad faults.
+        ####       Also tested with a single quad with a single segment and it
+        ####       does not work. 
         """
         Return a count of the number of fault segments.
         :returns:
             number of fault segments
         """
         return len(np.where(np.isnan(self.x))[0]) + 1
+
+    def getNumQuads(self):
+        """
+        Return a count of the number of fault quadrilaterals.
+        :returns:
+            number of fault quadrilaterals. 
+        """
+        return len(self.Quadrilaterals)
 
     def getFaultAsArrays(self):
         """
@@ -664,7 +708,7 @@ class Fault(object):
                 raise Exception('Unclosed segments exist in fault file.')
             istart = inan[i]+1
 
-
+    
 def getQuadMesh(q, dx):
     """
     Length of top eduge of a quadrilateral. 
@@ -769,6 +813,52 @@ def getLocalUnitSlipVector(strike, dip, rake):
     sz = np.sin(rake)*np.sin(dip)
     return Vector(sx, sy, sz)
 
+def getLocalUnitSlipVector_DS(strike, dip, rake):
+    """
+    Compute the DIP SLIP components of a unit slip vector. 
+    :param strike:
+        Clockwise angle (deg) from north of the line at the intersection
+        of the fault plane and the horizontal plane. 
+    :param dip:
+        Angle (deg) between fault plane and the horizontal plane normal
+        to the strike (0-90 using right hand rule). 
+    :param rake:
+        Direction of motion of the hanging wall relative to the
+        foot wall, as measured by the angle (deg) from the strike vector. 
+    :returns:
+        Unit slip vector in 'local' N-S, E-W, U-D coordinates. 
+    """
+    strike = np.radians(strike)
+    dip = np.radians(dip)
+    rake = np.radians(rake)
+    sx = np.sin(rake)*np.cos(dip)*np.cos(strike)
+    sy = np.sin(rake)*np.cos(dip)*np.sin(strike)
+    sz = np.sin(rake)*np.sin(dip)
+    return Vector(sx, sy, sz)
+
+def getLocalUnitSlipVector_SS(strike, dip, rake):
+    """
+    Compute the STRIKE SLIP components of a unit slip vector. 
+    :param strike:
+        Clockwise angle (deg) from north of the line at the intersection
+        of the fault plane and the horizontal plane. 
+    :param dip:
+        Angle (deg) between fault plane and the horizontal plane normal
+        to the strike (0-90 using right hand rule). 
+    :param rake:
+        Direction of motion of the hanging wall relative to the
+        foot wall, as measured by the angle (deg) from the strike vector. 
+    :returns:
+        Unit slip vector in 'local' N-S, E-W, U-D coordinates. 
+    """
+    strike = np.radians(strike)
+    dip = np.radians(dip)
+    rake = np.radians(rake)
+    sx = np.cos(rake)*np.sin(strike)
+    sy = np.cos(rake)*np.cos(strike)
+    sz = 0.0
+    return Vector(sx, sy, sz)
+
 def getQuadSlip(q, rake):
     """
     Compute the unit slip vector in ECEF space for a quad and rake angle. 
@@ -794,6 +884,59 @@ def getQuadSlip(q, rake):
     s0_ecef = Vector.fromTuple(latlon2ecef(s0_ll[1], s0_ll[0], s0_local.z))
     slp_ecef = (s1_ecef - s0_ecef).norm()
     return slp_ecef
+
+def getQuadSlip_DS(q, rake):
+    """
+    Compute the DIP SLIP components of the unit slip vector in ECEF space for a quad and rake angle. 
+    :param q:
+        A quadrilateral. 
+    :param rake:
+        Direction of motion of the hanging wall relative to the
+        foot wall, as measured by the angle (deg) from the strike vector. 
+    :returns:
+        Dip splip component of the unit slip vector in ECEF space. 
+    """
+    P0,P1,P2,P3 = q
+    strike = P0.azimuth(P1)
+    dip = getQuadDip(q)
+    s1_local = getLocalUnitSlipVector_DS(strike, dip, rake)
+    s0_local = Vector(0, 0, 0)
+    qlats = [a.latitude for a in q]
+    qlons = [a.longitude for a in q]
+    proj = get_orthographic_projection(np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
+    s1_ll = proj(np.array([s1_local.x]), np.array([s1_local.y]), reverse = True)
+    s0_ll = proj(np.array([s0_local.x]), np.array([s0_local.y]), reverse = True)
+    s1_ecef = Vector.fromTuple(latlon2ecef(s1_ll[1], s1_ll[0], s1_local.z))
+    s0_ecef = Vector.fromTuple(latlon2ecef(s0_ll[1], s0_ll[0], s0_local.z))
+    slp_ecef = (s1_ecef - s0_ecef)
+    return slp_ecef
+
+def getQuadSlip_SS(q, rake):
+    """
+    Compute the STRIKE SLIP components of the unit slip vector in ECEF space for a quad and rake angle. 
+    :param q:
+        A quadrilateral. 
+    :param rake:
+        Direction of motion of the hanging wall relative to the
+        foot wall, as measured by the angle (deg) from the strike vector. 
+    :returns:
+        Strike slip component of the unit slip vector in ECEF space. 
+    """
+    P0,P1,P2,P3 = q
+    strike = P0.azimuth(P1)
+    dip = getQuadDip(q)
+    s1_local = getLocalUnitSlipVector_SS(strike, dip, rake)
+    s0_local = Vector(0, 0, 0)
+    qlats = [a.latitude for a in q]
+    qlons = [a.longitude for a in q]
+    proj = get_orthographic_projection(np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
+    s1_ll = proj(np.array([s1_local.x]), np.array([s1_local.y]), reverse = True)
+    s0_ll = proj(np.array([s0_local.x]), np.array([s0_local.y]), reverse = True)
+    s1_ecef = Vector.fromTuple(latlon2ecef(s1_ll[1], s1_ll[0], s1_local.z))
+    s0_ecef = Vector.fromTuple(latlon2ecef(s0_ll[1], s0_ll[0], s0_local.z))
+    slp_ecef = (s1_ecef - s0_ecef)
+    return slp_ecef
+
 
 def getQuadLength(q):
     """
@@ -834,12 +977,41 @@ def getQuadNormal(q):
     P0,P1,P2,P3 = q
     p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
     p1 = Vector.fromPoint(P1) 
-    p2 = Vector.fromPoint(P2) 
     p3 = Vector.fromPoint(P3) 
     v1 = p1 - p0
     v2 = p3 - p0
     vn = Vector.cross(v2, v1).norm()
     return vn
+
+def getQuadStrikeVector(q):
+    """
+    Compute the unit pointing in the direction of strike for a quadrilateral in 
+    ECEF coordinates. 
+    :param q:
+        A quadrilateral. 
+    :returns:
+        The unit vector pointing in strike direction in ECEF coords. 
+    """
+    P0,P1,P2,P3 = q
+    p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
+    p1 = Vector.fromPoint(P1) 
+    v1 = (p1 - p0).norm()
+    return v1
+
+def getQuadDownDipVector(q):
+    """
+    Compute the unit pointing down dip for a quadrilateral in 
+    ECEF coordinates. 
+    :param q:
+        A quadrilateral. 
+    :returns:
+        The unit vector pointing down dip in ECEF coords. 
+    """
+    P0,P1,P2,P3 = q
+    p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
+    p3 = Vector.fromPoint(P3) 
+    v1 = (p3 - p0).norm()
+    return v1
 
 def getVerticalVector(q):
     """
