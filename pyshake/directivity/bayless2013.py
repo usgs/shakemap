@@ -113,7 +113,7 @@ class bayless2013(object):
         site_mat = np.array([np.reshape(site_ecef_x, (-1,)),
                              np.reshape(site_ecef_y, (-1,))])
         
-        hyp_ecef = Vector.fromPoint(geo.point.Point(self.hyp[0], self.hyp[1]), self.hyp[2]))
+        hyp_ecef = Vector.fromPoint(geo.point.Point(self.hyp[0], self.hyp[1]), self.hyp[2])
         epi_ecef_col = np.array([[hyp_ecef[0]],[hyp_ecef[1]]])
         
         nquad = len(self.flt.Quadrilaterals)
