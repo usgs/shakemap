@@ -1,0 +1,607 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>References &amp; Bibliography &mdash; ShakeMap Manual 2.0 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ShakeMap Manual 2.0 documentation" href="index.html"/>
+        <link rel="next" title="Glossary" href="glossary.html"/>
+        <link rel="prev" title="Acknowledgments" href="acknowledgments.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> ShakeMap Manual</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technical_guide.html">Technical Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#shakemap-software-overview">ShakeMap Software Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#philosophy-of-estimating-and-interpolating-ground-motions">Philosophy of Estimating and Interpolating Ground Motions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#recorded-ground-motion-parameters">Recorded Ground-motion Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#ground-motion-and-intensity-predictions">Ground Motion and Intensity Predictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#shakemap-processing">ShakeMap Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#representing-macroseismic-intensity-on-maps">Representing Macroseismic Intensity on Maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#discussion-of-chosen-map-parameters-intensity-measures">Discussion of Chosen Map Parameters (Intensity Measures)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="users_guide.html">User&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="background.html">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="products.html">Products and Formats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakemap_archives.html">ShakeMap Archives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakemap_applications.html">Applications of ShakeMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="related_systems.html">Related Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="disclaimers.html">Disclaimers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="software_guide.html">Software &amp; Implementation Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#implementation-considerations">Implementation Considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#shakemap-implementation-checklist">ShakeMap Implementation Checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#software-availability-software-guide">Software Availability &amp; Software Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="regionals.html">Regional Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="future_directions.html">Future Directions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="future_directions.html#research-development">Research &amp; Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="future_directions.html#software-shakemap-4-0-python">Software: ShakeMap 4.0 (Python)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">References &amp; Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">ShakeMap Manual</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>References &amp; Bibliography</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/references.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="references-bibliography">
+<span id="references"></span><h1>References &amp; Bibliography<a class="headerlink" href="#references-bibliography" title="Permalink to this headline">¶</a></h1>
+<p id="abrahamson2008">Abrahamson, N.A. and W.J. Silva (2008). Summary of the Abrahamson &amp; Silva NGA ground motion
+relations, <em>Earthquake Spectra</em> 24, 67-97.</p>
+<p>Abrahamson, N., G. Atkinson, D. Boore, Y. Bozorgnia, K. Campbell, B. Chiou, B., I.M. Idriss, W. Silva,
+and R. Youngs (2008).  Comparisons of the NGA ground-motion relations, <em>Earthquake Spectra</em> 24(1), 45-66.</p>
+<p id="abrahamson2014">Abrahamson, N.A., W.J. Silva, and R. Kamai (2014). Summary of the ASK14 Ground Motion Relation
+for Active Crustal Regions, <em>Earthquake Spectra</em> 30(3), 1025-1055.</p>
+<p>Akkar, S. and J.J. Bommer (2010). Empirical equations for the prediction of PGA, PGV and spectral
+accelerations in Europe, the Mediterranean region and the Middle East, <em>Seis. Res. Lett.</em> 81(2), 195-
+206.</p>
+<p id="akkar2014">Akkar, S., M.A. Sandikkaya, and J.J. Bommer (2014). Empirical ground-motion models for point
+and extended-source crustal earathquake scenarios in Europe and the Middle East, <em>Bull.
+Earthquake Eng.</em> 12, 359-387.</p>
+<p id="allen2006">Allen, R.M. (2006). Probabilistic Warning Times for Earthquake Ground Shaking in the San Francisco
+Bay Area, <em>Seis. Res. Lett.</em> 77(3), 371-376.</p>
+<p id="allen2008">Allen, T.I., D.J. Wald, A.J. Hotovec, K.W. Lin, P.S. Earle, and K.D. Marano (2008). An
+Atlas of ShakeMaps for selected global earthquakes, <em>U.S. Geological Survey Open-File Report 2008-1236</em>, 35pp.</p>
+<p id="allen2009a">Allen, T.I., D.J. Wald, P.S. Earle, K.D. Marano, A.J. Hotovec, K.W. Lin, and M.J. Hearne (2009a). An
+Atlas of ShakeMaps and population exposure catalog for earthquake loss modeling, <em>Bull.
+Earthquake Eng.</em> 7, 701-718.</p>
+<p id="allen2009b">Allen, T. and D.J. Wald (2009b). On the use of high-resolution topographic data as a proxy for seismic
+site conditions (VS30), <em>Bull. Seism. Soc. Am.</em> 99(2A), 935-943.</p>
+<p>Allen, T.I., K.D. Marano, P.S. Earle, and D.J. Wald (2009c). PAGER-CAT: a composite earthquake
+catalogue for calibrating global fatality models, <em>Seis. Res. Lett.</em> 80(1), 57-62.
+DOI: 10.1785/gssrl.80.1.57.</p>
+<p id="allen2012">Allen, T.I., D.J. Wald, and C.B. Worden (2012). Intensity attenuation for active crustal regions, <em>J.
+Seismol.</em> 16, 409-433.</p>
+<p>Anderson, J.G. (2013). Surface Motions on Near-Distance Rock Sites in the 2011 Tohoku-Oki Earthquake,
+<em>Earthquake Spectra</em> 29(S1), S23-S35</p>
+<p>Atkinson, G.M. (2008). Ground-motion prediction equations for eastern North America from a referenced
+empirical approach: Implications for epistemic uncertainty, <em>Bull. Seism. Soc. Am.</em> 98(3), 1304-1318.</p>
+<p>Atkinson, G.M. (2010). Ground-motion prediction equations for Hawaii from a referenced empirical
+approach, <em>Bull. Seism. Soc. Am.</em> 100(2), 751-761.</p>
+<p>Atkinson, G.M. and D.M. Boore (2003). Empirical ground-motion relations for subduction zone
+earthquakes and their application to Cascadia and other regions, <em>Bull. Seism. Soc. Am.</em> 93(4), 1703-
+1729.</p>
+<p>Atkinson, G.M. and D.M. Boore (2006). Earthquake ground-motion prediction equations for Eastern North
+America, <em>Bull. Seism. Soc. Am.</em> 96(6), 2181-2205.</p>
+<p>Atkinson, G.M. and D.M. Boore (2008). Erratum: Empirical ground-motion relations for subduction zone
+earthquakes and their application to Cascadia and other regions, <em>Bull. Seism. Soc. Am.</em> 98(5), 2567-2569.</p>
+<p>Atkinson, G.M. and D.M. Boore (2011). Modifications to existing ground-motion prediction equations in
+light of new data, <em>Bull. Seism. Soc. Am.</em> 101(3), 1121-1135.</p>
+<p id="atkinson2007">Atkinson, G.M. and S.I. Kaka (2007). Relationships between Felt Intensity and Instrumental Ground
+Motion in the Central United States and California, <em>Bull. Seism. Soc. Am.</em> 97, 497-510.</p>
+<p>Atkinson, G.M. and M. Macias (2009). Predicted ground motions for great interface earthquakes in the
+Cascadia subduction zone, <em>Bull. Seism. Soc. Am.</em> 99(3), 1552-1578.</p>
+<p id="atkinson-wald2007">Atkinson, G.M. and D.J. Wald (2007). &#8220;Did You Feel It?&#8221; Intensity Data: A surprisingly good measure
+of earthquake ground motion, <em>Seis. Res. Lett.</em> 78, 362-368.</p>
+<p>Atkinson, G.M. and D.M. Boore (2003). Empirical ground-motion relations for subduction regions and
+their application to Cascadia and other regions, <em>Bull. Seism. Soc. Am</em> 93, 1703-1729.</p>
+<p>Atkinson, G.M. and D. M. Boore (1997). Some comparisons between Recent ground-motion relations,
+<em>Seis. Res. Lett.</em> 68, 24-40.</p>
+<p>Atkinson, G.M. and D.M. Boore (1995). Ground motion relations for eastern North America, <em>Bull. Seism. Soc. Am.</em> 85, 17-30.</p>
+<p id="atc2002">Applied Technology Council (2002). ATC-54: Guidelines for using strong-motion data and ShakeMaps in
+Post-Earthquake Response, Redwood City, California, 224pp.</p>
+<p>Boatwright, J., H. Bundock, J. Luetgert, L. Seekins, L. Gee, and P. Lombard (2003). The dependence of
+sPGA and PGV on distance and magnitude inferred from Northern California ShakeMap data, <em>Bull.
+Seism. Soc. Am.</em> 93(5), 2043-2055.</p>
+<p>Boatwright, J., K. Thywissen, and L. Seekins (2001). Correlation of ground-motion and intensity for the
+January 17, 1994, Northridge, California earthquake, <em>Bull. Seism. Soc. Am.</em> 91, 739-752.</p>
+<p id="beyer2006">Beyer, K. and J. Bommer (2006). Relationships between Median Values and between Aleatory
+Variabilities for Different Definitions of the Horizontal Component of Motion, <em>Bull. Seism. Soc. Am.</em> 96(4A), 1512-1522.</p>
+<p id="biasi2016">Biasi, G., M.S. Mohammed, and D.H. Sanders (2016). Earthquake Damage
+Estimations: ShakeCast Case Study on Nevada Bridges, <em>Earthquake
+Spectra</em>, submitted.</p>
+<p id="bommer2012">Bommer, J.J. and S. Akkar (2012). Consistent source-to-site distance metrics in ground-motion prediction
+equations and seismic source models for PSHA, <em>Earthquake Spectra</em> 28, 1-15.</p>
+<p id="ba2008">Boore, D.M. and G.M. Atkinson (2008). Ground-Motion Prediction Equations for the Average
+Horizontal Component of PGA, PGV, and 5%-Damped PSA at Spectral Periods between 0.01 s and
+10.0 s, <em>Earthquake Spectra</em> 24(1), 99-138.</p>
+<p>Boore, D.M., J.F. Gibbs, W.B. Joyner, J.C. Tinsley, and D.J. Ponti (2003). Estimated Ground Motion
+From the 1994 Northridge, California, Earthquake at the Site of the Interstate 10 and La Cienega
+Boulevard Bridge Collapse, West Los Angeles, California, <em>Bull. Seism. Soc. Am.</em> 93, 2737-2751.</p>
+<p>Boore, D.M., W.B. Joyner, and T.E. Fumal (1997). Equations for Estimating Horizontal Response Spectra
+and Peak Accelerations from Western North American Earthquakes: A Summary of Recent Work,
+<em>Seis. Res. Lett.</em> 68, 128-153.</p>
+<p>Boore, D.M., W.B. Joyner, and T.E. Fumal (1994). Estimation of response spectra and peak accelerations
+from Western North America Earthquakes: An Interim Report, Part 2, <em>U. S. Geological Survey Open-
+File Report 94-127</em>, 40pp.</p>
+<p>Boore, D.M., W.B. Joyner, and T.E. Fumal (1997). Equations for estimating horizontal response spectral
+and peak acceleration from western North American earthquakes: A summary of recent work, <em>Seis.
+Res. Lett.</em> 68, 128-153.</p>
+<p>Boore, D.M. and W.B. Joyner (1991). Estimation of ground motion at deep-soil sites in eastern North
+America, <em>Bull. Seism. Soc. Am.</em> 81(6), 2167-2185.</p>
+<p id="boore2010">Boore, D.M. (2010). Orientation-Independent, Nongeometric-Mean Measures of Seismic Intensity
+from Two Horizontal Components of Motion, <em>Bull. Seism. Soc. Am.</em> 100(4), 1830–1835.</p>
+<p id="borcherdt1994">Borcherdt, R.D. (1994). Estimates of site-dependent response spectra for design (methodology and
+justification), <em>Earthquake Spectra</em> 10, 617-654.</p>
+<p>Brackman, T. (2005). ShakeMap Implementation for the Upper Mississippi Embayment, Thesis, University
+of Memphis, Department of Earth Sciences.</p>
+<p>Campbell, K.W. (2002). Prediction of strong ground motion using the hybrid empirical method: example
+application to eastern North America, <em>Bull. Seism. Soc. Am.</em>, submitted.</p>
+<p>Campbell, K.W. (1997). Empirical near-source attenuation relationships for horizontal and vertical
+components of peak ground acceleration, peak ground velocity, and pseudoabsolute acceleration
+response spectra, <em>Seis. Res. Lett.</em> 68, 154-179.</p>
+<p>Campbell, K.W. (2003). Prediction of strong ground motion using the hybrid empirical method and its use
+in the development of ground-motion (attenuation) relations in eastern North America, <em>Bull. Seism. Soc.
+Am.</em> 93(3), 1012-1033.</p>
+<p>Campbell, K.W. and Y. Bozorgnia (2007). Campbell-Bozorgnia NGA ground motion relations for the
+geometric mean horizontal component of peak and spectral ground motion parameters, <em>PEER Report
+No. 2007/02</em>, Pacific Earthquake Engineering Research Center, University of California, Berkeley.</p>
+<p>Campbell, K.W., and Y. Bozorgnia (2008). NGA ground motion model for the geometric mean horizontal
+component of PGA, PGV, PGD and 5% damped linear elastic response spectra for periods ranging from
+0:01 to 10 s., <em>Earthquake Spectra</em> 24(1), 139-171.</p>
+<p id="caprio2015">Caprio, M., B. Tarigan, C.B. Worden, D.J. Wald, and S. Wiemer (2015). Ground Motion to Intensity
+Conversion Equations (GMICEs): A Global Relationship and Evaluation of Regional Dependency,
+<em>Bull. Seism. Soc. Am.</em> 105(3).</p>
+<p id="celsi2005">Celsi, R., M. Wolfinbarger, and D.J. Wald (2005). The Effects of Magnitude Anchoring, Earthquake Attenuation Estimation, Measure Complexity, Hubris, and Experience Inflation on Individuals’ Perceptions of Felt Earthquake Experience and Perceptions of Earthquake Risk, <em>Earthquake Spectra</em> 21(4), 987-1008.</p>
+<p>Chiou, B.S.J. and R.R. Youngs (2008a). An NGA model for the average horizontal component of peak
+ground motion and response spectra, <em>Earthquake Spectra</em> 24(1), 173-215.</p>
+<p>Chiou, B.S.J. and R.R. Youngs (2008b). Chiou and Youngs PEER-NGA empirical ground motion model
+for the average horizontal component of peak acceleration, peak velocity, and pseudo-spectral
+acceleration for spectral periods of 0.01 to 10 seconds, Final Report submitted to PEER.</p>
+<p>Choi, Y. and J.P. Stewart (2005). Nonlinear Site Amplification as Function of 30 m Shear
+Wave Velocity, <em>Earthquake Spectra</em> 21(1), 1-30.</p>
+<p id="converse1992">Converse, A. and A.G. Brady (1992). BAP basic strong-motion accelerogram processing software
+version 1.0, <em>U.S. Geological Survey Open-File Report 92-296</em>.</p>
+<p id="convertito2011">Convertito, V., M. Caccavale, R. De Matteis, A. Emolo, D.J. Wald, and A. Zollo (2011). Fault extent
+estimation for near-real time ground shaking map computation purposes, <em>Bull. Seism. Soc. Am.</em> 102(2), 661-679.</p>
+<p>Cua, G. and D.J. Wald (2008). Calibrating PAGER (&#8220;Prompt Assessment of Global Earthquakes for
+Response&#8221;) ground shaking and human impact estimation using worldwide earthquake datasets:
+collaborative research with USGS and the Swiss Seismological Service, NEHRP Final Report (Award
+number: 06HQGR0062).</p>
+<p>Cua, G., D.J. Wald, T.I. Allen, D. Garcia, C.B. Worden, M. Gerstenberger, K. Lin, and K. Marano
+(2010).  &#8220;Best Practices&#8221; for Using Macroseismic Intensity and Ground Motion to Intensity
+Conversion Equations for Hazard and Loss Models, <em>GEM Technical Report 2010-4</em>, Report Series,
+69 pp., <a class="reference external" href="http://www.globalquakemodel.org/node/747">http://www.globalquakemodel.org/node/747</a>.</p>
+<p id="dai2010">Dai, F.C., C. Xu, X. Yao, L. Xu, X.B. Tu, and Q.M. Gong (2010). Spatial distribution of
+landslides triggered by the 2008 MS 8.0 Wenchuan earthquake, China, <em>J. Asian Earth Sci.</em> 40,
+883-895.</p>
+<p id="dengler1998">Dengler, L.A. and J.W. Dewey (1998). An Intensity Survey of Households Affected by the
+Northridge, California, Earthquake of 17 January 1994, <em>Bull. Seism. Soc. Am.</em> 88(2), 441-462.</p>
+<p id="dewey1995">Dewey, J.W., B.G. Reagor, L. Dengler, and K. Moley (1995). Intensity distribution and
+isoseismal maps for the Northridge, California, earthquake of January 17, 1994, <em>U.S.
+Geological Survey Open-File Report 95-92</em>, 35pp.</p>
+<p id="dewey2000">Dewey, J., D.J. Wald, and L. Dengler (2000). Relating conventional USGS Modified Mercalli
+Intensities to intensities assigned with data collected via the Internet <em>Seis. Res. Lett.</em> 71, 264.</p>
+<p id="ebel2003">Ebel, J. and D.J. Wald (2003). Bayesian Estimations of Peak Ground Acceleration and 5% Damped
+Spectral Acceleration from Modified Mercalli Intensity Data, <em>Earthquake Spectra</em> 19(3), 511-529.</p>
+<p>Eguchi, R.T., J.D. Goltz, H.A. Seligson, P.J. Flores, N.C. Blais, T.H. Heaton, and
+E. Bortugno (1997).  The Early Post-Earthquake Damage Assessment Tool (EPEDAT), <em>Earthquake
+Spectra</em> 13(4), 815-832.</p>
+<p id="epri1991">EPRI (1991). Standardization of cumulative absolute velocity, <em>EPRI TR100082 (Tier 1)</em>, Palo Alto,
+California, Electric Power Research Institute, prepared by Yankee Atomic Electric Company.</p>
+<p id="epri2003">EPRI (2003). CEUS Ground Motion Project: Model Development and Results, <em>EPRI Report 1008910</em>, Palo Alto, CA, 105pp.</p>
+<p id="erdik2014">Erdik, M., K. Sesetyan, M.B. Demircioglu, C. Zulfikar, U. Hancılar, C. Tuzun, and E. Harmandar
+(2014). Rapid earthquake loss assessment after damaging earthquakes,
+in A. Ansal (ed.), Perspectives on European Earthquake Engineering and Seismology,
+Geotechnical, <em>Geological and Earthquake Engineering</em> 34. DOI: 10.1007/978-3-319-07118-3_2.</p>
+<p id="erdik2011">Erdik, M., K. Sesetyan, M.B. Demircioglu, U. Hancılar, and C. Zulfikar
+(2011). Rapid earthquake loss assessment after damaging earthquakes Soil Dynamics and Earthquake Engineering 31, 247–266.</p>
+<p id="faenza2010">Faenza, L. and A. Michilini (2010). Regression analysis of MCS intensity and ground motion
+parameters in Italy and its application in ShakeMap, <em>Geophys. J. Int.</em> 180, 1138–1152.</p>
+<p id="fema2006">Federal Emergency Management Agency (2006). HAZUS-MH MR2 Technical Manual: Washington, D.C.,
+Federal Emergency Management Agency. <a class="reference external" href="http://www.fema.gov/plan/prevent/hazus/hz_manuals.shtm">http://www.fema.gov/plan/prevent/hazus/hz_manuals.shtm</a>.</p>
+<p id="field2000">Field, E.H. (2000). A modified ground-motion attenuation relationship for southern California that
+accounts for detailed site classification and a basin-depth effect, <em>Bull. Seism. Soc. Am.</em> 90, S209-S221.</p>
+<p id="franco2015">Franco, G. (2015). Earthquake Mitigation Strategies Through Insurance,
+<em>Encyclopedia of Earthquake Engineering</em>. DOI: 10.1007/978-3-642-36197-5_401-1.</p>
+<p>Frankel, A.D., M.D. Petersen, C.S. Mueller, K.M. Haller, R.L. Wheeler, E.V. Leyendecker,
+R.L.  Wesson, S.C. Harmsen, C.H. Cramer, D.M. Perkins, and K.S. Rukstales (2002).
+Documentation for the 2002 Update of the National Seismic Hazard Maps U.S.,
+<em>U.S. Geological Survey Open-File Report: 02-420</em>. <a class="reference external" href="http://pubs.usgs.gov/of/2002/ofr-02-420/OFR-02-420.pdf">http://pubs.usgs.gov/of/2002/ofr-02-420/OFR-02-420.pdf</a>.</p>
+<p>Garcia, D., S.K. Singh, M. Herraiz, M. Ordaz, and J.F. Pacheco (2005). Inslab earthquakes of central
+Mexico: Peak ground-motion parameters and response spectra, <em>Bull. Seism. Soc. Am</em> 95(6), 2272-2282.</p>
+<p id="garcia2012a">Garcia, D., R.T. Mah, K.L. Johnson, M.G. Hearne, K.D. Marano, K.W. Lin, D.J. Wald, C.B. Worden, and E.
+So (2012a). ShakeMap Atlas 2.0: An Improved Suite of Recent Historical Earthquake
+ShakeMaps for Global Hazard Analyses and Loss Models, <em>Proc. 15th World Conf. on Eq. Eng.</em>,
+Lisbon, 10pp.</p>
+<p id="garcia2012b">Garcia, D., D.J. Wald, and M.G. Hearne (2012b). A Global Earthquake Discrimination Scheme to
+Optimize Ground-Motion Prediction Equation Selection, <em>Bull. Seism. Soc. Am.</em> 102, 185-203.</p>
+<p id="godt2008">Godt, J., B. Wener, K. Verdin, D.J. Wald, P. Earle, E. Harp, and R. Jibson (2008). Rapid assessment of
+earthquake-induced landsliding, <em>Proc. of the 1st World Landslide Forum</em>, Tokyo, Japan, Parallel
+Sessions Volume, International Program on Landslides.</p>
+<p id="gomberg2013">Gomberg, J. and A. Jakobitz (2013). A collaborative user-producer
+assessment of earthquake-response products, <em>U.S. Geological Survey
+Open-File Report 2013–1103</em>, 13pp. <a class="reference external" href="http://pubs.usgs.gov/of/2013/1103/">http://pubs.usgs.gov/of/2013/1103/</a>.</p>
+<p id="grunthal1998">Grünthal, G., ed. (1998). European Macroseismic Scale 1998 (EMS-98), <em>Cahiers du Centre Européen
+de Géodynamique et de Séismologie</em> 15, 101pp.</p>
+<p>Hauksson, E., L.M. Jones, and K. Hutton (2002). The 1999 Mw 7.1 Hector Mine, California,
+Earthquake Sequence: Complex Conjugate Strike-Slip Faulting, <em>Bull. Seism. Soc. Am.</em>
+92(4), 1154–1170.</p>
+<p id="ioc2012">Intergovernmental Oceanographic Commission (IOC) (2012). Exercise
+Caribe Wave/Lantex 13. A Caribbean Tsunami Warning Exercise, 20
+March 2013. Volume 1: Participant Handbook. IOC Technical Series No. 101. Paris, UNESCO, 2012.</p>
+<p id="jaiswal2010">Jaiswal, K.S. and D.J. Wald (2010). An Empirical Model for Global Earthquake Fatality Estimation,
+<em>Earthquake Spectra</em> 26(4), 1017-1037.</p>
+<p id="jaiswal2012">Jaiswal, K.S. and D.J. Wald (2012). Estimating Economic Loss from Earthquakes Using an Empirical
+Approach, <em>Earthquake Spectra</em> 29(1), 309-324.</p>
+<p id="jma1996">Japan Meteorological Agency (1996). Note on the JMA seismic intensity, <em>JMA report</em> 1996, Gyosei (in
+Japanese).</p>
+<p id="jones2011">Jones, L. and M. Benthien (2011). Preparing for a “Big One”—The great
+southern California ShakeOut, <em>Earthquake Spectra</em> 27, 575–595.</p>
+<p>Joyner, W.B. and D.M. Boore (1988). Measurement, characterization, and prediction of
+strong ground-motions, in <em>Proc. Conf. on Earthq. Eng. &amp; Soil Dyn. II</em>, Am. Soc. Civil Eng., Park City, Utah, 43-102.</p>
+<p>Joyner, W.B. and D.M. Boore (1981). Peak horizontal accelerations and velocity from
+strong-motion records including records from the 1979 Imperial Valley, California,
+earthquake, <em>Bull. Seism. Soc. Am.</em> 71, 2011-2038.</p>
+<p>Kaka, S.I. and G.M. Atkinson (2004). Relationships between instrumental intensity and
+ground motion parameters in eastern North America, <em>Bull. Seism. Soc. Am.</em> 94, 1728-1736.</p>
+<p>Kaka, S.I. and G.M. Atkinson (2005). Empirical ground-motion relations for ShakeMap
+applications in southeastern Canada &amp; the northeastern United States,
+<em>Seis. Res. Lett.</em> 76(2), 274-282.</p>
+<p id="kanamori1999">Kanamori, H., P. Maechling, and E. Hauksson (1999). Continuous Monitoring of Ground-Motion
+Parameters, <em>Bull. Seism. Soc. Am.</em> 89(1), 311-316.</p>
+<p>Kanno, T., A. Narita, N. Morikawa, H. Fujiwara, and Y. Fukushima (2006). A new attenuation relation for
+strong ground motion in Japan based on recorded data, <em>Bull. Seism. Soc. Am</em> 96(3), 879-897.</p>
+<p id="knudsen2011">Knudsen, K.L., and J.D.J. Bott (2011). Geologic and geomorphic evaluation of liquefaction
+case histories- toward rapid hazard mapping, <em>Seis. Res. Lett.</em> 82(2), 334-335.</p>
+<p>Lin, K.W. and D.J. Wald (2008). ShakeCast Manual, <em>U.S. Geological Survey Open File Report</em>
+2008-1158, 90 pp.</p>
+<p>Lin, K.W., D.J. Wald,  C.B. Worden, and A.F. Shakal (2005). Quantifying CISN ShakeMap Uncertainty,
+<em>Proc. of the California Strong Motion Instrumentation Program User&#8217;s Workshop</em>, Los Angeles, 37-
+49.</p>
+<p>Lin, K.W. and D.J. Wald (2012). Developing Statistical Fragility Analysis Framework for the USGS
+ShakeCast System for Rapid Post-Earthquake Assessment, <em>Proc. 15th World Conf. on Eq. Eng.</em>,
+Lisbon, 10pp.</p>
+<p>Marano, K.D., D.J. Wald, and T.I. Allen (2009). Global earthquake casualties due to
+secondary effects: a quantitative analysis for improving rapid loss analyses. <em>Natural
+Hazards</em> 52, 319-328.</p>
+<p>Mori, J., H. Kanamori, J. Davis, E. Hauksson, R. Clayton, T. Heaton, L. Jones, and A. Shakal (1998).
+Major improvements in progress for southern California earthquake monitoring, <em>Bull. Seism. Soc. Am.</em> 79, 217-221.</p>
+<p id="matsuoka2015">Matsuoka, M., K. Wakamatsu, M. Hashimoto, S. Senna, and S. Midorikawa (2015). Evaluation of
+Liquefaction Potential for Large Areas Based on Geomorphologic Classification, <em>Earthquake Spectra</em>,
+in press.</p>
+<p id="musson2010">Musson, R.M.W., G. Grunthal, and M. Stucchi (2010). The comparison of macroseismic intensity scales,
+<em>Journal of Seismology</em> 14, 413-428.</p>
+<p id="nibs1997">National Institute of Building Sciences (NIBS) (1997). Earthquake Loss Estimation Methodology:
+HAZUS97 Technical Manual, <em>Report prepared for the Federal Emergency Management Agency</em>,
+Washington, D.C.</p>
+<p>NIBS (1999), HAZUS Technical Manual, SR2 edition, Vols. I, II, and III, prepared by the National
+Institute of Building Sciences for the Federal Emergency Management Agency, Washington, D.C.</p>
+<p id="nrc2006">National Research Council (NRC) (2006). Improved Seismic Monitoring -
+Improved Decision-Making: Assessing the Value of Reduced Uncertainty,
+Couverture Committee on Seismology and Geodynamics, Committee on the
+Economic Benefits of Improved Seismic Monitoring, Board on Earth
+Sciences and Resources, Division on Earth and Life Studies, National Research Council
+<em>National Academies Press</em> 2006, 196pp. DOI: 10.17226/11327.</p>
+<p id="newmark1982">Newmark, N.M. and W.J. Hall (1982). Earthquake spectra and design, <em>Geotechnique</em> 25, no. 2, 139-160.</p>
+<p>Newmark, N.M. and W.J. Hall (1982). Earthquake Spectra and Design, <em>Engineering Monographs on
+Earthquake Criteria, Structural Design, and Strong Motion Records</em>, Vol. 3, Earthquake Engineering
+Research Institute, University of California, Berkeley, CA.</p>
+<p id="nowicki2014">Nowicki, M.A., D.J. Wald, M.W. Hamburger, M. Hearne, and E.M. Thompson (2014). Development of
+a Globally Applicable Model for Near Real-Time Prediction of Seismically Induced Landslides,
+<em>Engineering Geology</em>, submitted.</p>
+<p>Pankow, K.L and J.C. Pechmann (2003). Addedum to SEA99: A new PGV and revised PGA and
+pseudovelocity  predictive relationship for extensional tectonic regimes, <em>Bull. Seism. Soc. Am.</em>, 364.</p>
+<p id="petersen2014">Petersen, M.D., M.P. Moschetti, P.M. Powers, C.S. Mueller, K.M. Haller, A.D. Frankel, Y.
+Zeng, S. Rezaeian, S.C. Harmsen, O.S. Boyd, N. Field, R. Chen, K.S. Rukstales, N.
+Luco, R.L. Wheeler, R.A. Williams, and A.H. Olsen (2014). Documentation for the 2014
+update of the United States national seismic hazard maps, <em>U.S. Geological Survey Open-File
+Report</em> 2014–1091, 243pp. <a class="reference external" href="http://dx.doi.org/10.3133/ofr20141091">http://dx.doi.org/10.3133/ofr20141091</a>.</p>
+<p id="pomonis2011">Pomonis, A. and E. So (2011). Guidelines for the Collection of Consequence Data, <em>Global Earthquake
+Consequences Database Global Component Project</em>, 71pp.
+<a class="reference external" href="http://www.nexus.globalquakemodel.org/gemecd/">http://www.nexus.globalquakemodel.org/gemecd/</a>.</p>
+<p id="powers2008">Powers, M., B. Chiou, N. Abrahamson, Y. Bozorgnia, T. Shantz, and C. Roblee (2008). An Overview of
+the NGA Project, <em>Earthquake Spectra</em> 24(1), 3-21.</p>
+<p id="rowshandel2010">Rowshandel, B. (2010). Directivity Correction for the Next Generation Attenuation (NGA)
+Relations, <em>Earthquake Spectra</em> 26(2), 525–559.</p>
+<p>Scrivner, C.W., C.B. Worden, and D.J. Wald (2000). Use of TriNet ShakeMap to Manage Earthquake
+Risk, <em>Proc. of the Sixth International Conference on Seismic Zonation</em>, Palm Springs.</p>
+<p id="seyhan2014">Seyhan, E. and J.P. Stewart (2014). Semi-Empirical Nonlinear Site Amplification from NGA-West2 Data and Simulations, <em>Earthquake
+Spectra</em> 30(3), 1241-1256.</p>
+<p id="shakal1998">Shakal, A., C. Peterson, and V. Grazier (1998). Near-real-time strong motion data recovery and automated
+processing for post-earthquake utilization, <em>Proc. 6th Nat&#8217;l Conf. on Eq. Eng.</em>, Seattle.</p>
+<p>Shimuzu, Y. and F. Yamasaki (1998). Real-time City Gas Network Damage Estimation System-SIGNAL,
+<em>Proc. 11th European Conf. on Eq. Eng.</em>, A.A. Balkema, Rotterdam.</p>
+<p>Smith, W.H.F. and P. Wessel (1990). Gridding with continuous curvature splines in tension, <em>Geophysics</em>
+55, 293-305.</p>
+<p id="so2014">So, E. (2014). Introduction to the GEM Earthquake Consequences Database (GEMECD), <em>GEM
+Technical Report</em> 1.0.0, 158 pp., GEM Foundation, Pavia, Italy.
+DOI: 10.13117/GEM.VULN-MOD.TR2014.14. <a class="reference external" href="http://www.globalquakemodel.org/resources/publications/technical-reports/introduction-gem-earthquake-consequences-database-/">http://www.globalquakemodel.org/resources/publications/technical-reports/introduction-gem-earthquake-consequences-database-/</a>.</p>
+<p>Sokolov, V.Y. and Y.K. Chernov (1998). On the correlation of Seismic Intensity with Fourier Amplitude
+Spectra, <em>Earthquake Spectra</em> (14), 679-694.</p>
+<p>Spudich, P., W.B. Joyner, A.G. Lindh, D.M. Boore, B.M. Margaris, and J.B. Fletcher (1999). SEA99 - A
+revised ground-motion prediction relation for use in extensional tectonic regimes, <em>Bull. Seism. Soc. Am.</em>
+89, 1156-1170.</p>
+<p id="thompson2012">Thompson, E.M. and D.J. Wald (2012). Developing Vs30 Site-Condition Maps By Combining Observations
+With Geologic And Topographic Constraints, <em>Proc. 15th World Conf. on Eq. Eng.</em>, Lisbon, 9 pp.</p>
+<p id="thompson2014">Thompson, E.M., D.J. Wald, and C.B. Worden (2014).  A VS30 map for California with geologic and
+topographic constraints, <em>Bull. Seism. Soc. Am.</em> 104(5), 2313-2321.</p>
+<p id="thompson2016">Thompson, E.M., D.J. Wald, and C.B. Worden (2016).  ShakeMap Scenario
+Strategy, <em>U.S. Geological Survey Open File Report</em>, in progress.</p>
+<p id="turner2014">Turner, L. (2014). Performance of the Caltrans ShakeCast System in the
+2014 Napa M6.0 Earthquake”, <em>Caltrans Report</em>, Division of Research,
+Innovation, and System Information, September 2014, 14pp.</p>
+<p id="turner2010">Turner, L., D.J. Wald, and K.W. Lin (2010). ShakeCast - Developing a Tool for Rapid
+Post-Earthquake Response, <em>Final Report</em> CA09-0734, 325pp.</p>
+<p id="usgs1999">USGS (1999). An assessment of Seismic Monitoring in the United States: Requirements for an Advance
+National Seismic System, <em>U.S. Geological Survey Circular</em> 1188.</p>
+<p id="verros2016">Verros, S., M. Ganesh, M. Hearne, C.B. Worden, and D.J. Wald (2016).
+Computing Spatial Correlation of Ground Motion Intensities for ShakeMap, manuscript in prep.</p>
+<p id="wald1996">Wald, D.J., T.H. Heaton, and K.W. Hudnut (1996). The Slip History of the 1994 Northridge,
+California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling
+Data, <em>Bull. Seism. Soc. Am.</em> 86(1B), S49-S70.</p>
+<p>Wald, D.J., T.H. Heaton, H. Kanamori, P. Maechling, and V. Quitoriano (1997). Research and
+Development of TriNet &#8220;Shake&#8221; Maps, <em>EOS</em> 78(46), F45.</p>
+<p>Wald, D.J. (1999).  Gathering of Earthquake Shaking and Damage Information in California,
+<em>Proc. 3rd US-JAPAN High Level Policy Forum</em>, Yokohama, Japan.</p>
+<p id="wald1999a">Wald, D.J., V. Quitoriano, T.H. Heaton, H. Kanamori, C.W. Scrivner, and C.B. Worden (1999a).
+TriNet &#8220;ShakeMaps&#8221;: Rapid Generation of Peak Ground-motion and Intensity Maps for Earthquakes in
+Southern California, <em>Earthquake Spectra</em> 15(3), 537-556.</p>
+<p id="wald1999b">Wald, D.J., V. Quitoriano, T.H. Heaton, and H. Kanamori (1999b). Relationships between peak ground
+acceleration, peak ground velocity, and modified Mercalli intensity in California, <em>Earthquake
+Spectra</em> 15, 557-564.</p>
+<p>Wald, D.J., V. Quitoriano, L. Dengler, and J.W. Dewey (1999c). Utilization of the Internet
+for Rapid Community Intensity Maps, <em>Seis. Res. Letters</em> 70, 680-697.</p>
+<p>Wald, D.J., L. Wald, J. Goltz, C.B. Worden, and C.W. Scrivner (2000). &#8220;ShakeMaps&#8221;: Instant Maps of
+Earthquake Shaking, <em>U.S. Geological Survey Fact Sheet</em> 103-00.</p>
+<p>Wald, D.J. and J. Goltz (2001). ShakeMap: A new Tool for Emergency Management and Public
+Information, <em>Proc. Los Angeles/Yokohama Disaster Prevention Workshop</em>, Yokohama,
+Japan, November, 2001.</p>
+<p>Wald, D.J., L. Wald, J. Dewey, V. Quitoriano, and E. Adams (2001). Did You Feel It? Community-Made
+Earthquake Shaking Maps, <em>U.S. Geological Survey Fact Sheet</em> 030-01.</p>
+<p>Wald, D.J., L. Wald, C.B. Worden, and J. Goltz (2003). ShakeMap: A Tool for Earthquake Response, <em>U.S.
+Geological Survey Fact Sheet</em> 087-03.</p>
+<p>Wald, D.J., P.A. Naecker, C. Roblee, and L. Turner (2003). Development of a ShakeMap-based,
+earthquake response system within Caltrans, in <em>Advancing Mitigation Technologies and Disaster
+Response for Lifeline Systems</em>, J. Beavers, ed., Technical Council on Lifeline Earthquake Engineering,
+Monograph No. 25, August 2003, ASCE.</p>
+<p id="wald2005">Wald, D.J., C.B. Worden, K.W. Lin, and K. Pankow (2005). ShakeMap
+manual: technical manual, user&#8217;s guide, and software guide,
+U. S. Geological Survey, <em>Techniques and Methods 12-A1</em>, 132 pp.
+<a class="reference external" href="http://pubs.usgs.gov/tm/2005/12A01/">http://pubs.usgs.gov/tm/2005/12A01/</a></p>
+<p>Wald, D.J., P.S. Earle, K.W. Lin, V. Quitoriano, and C.B. Worden (2006a). Challenges in Rapid Ground
+Motion Estimation for the Prompt Assessment of Global Urban Earthquakes, <em>Bull. Earthq. Res. Inst.</em>,
+Tokyo, 81, 273-282.</p>
+<p id="wald2007">Wald, D.J. and T.I. Allen (2007). Topographic slope as a proxy for seismic site conditions and
+amplification, <em>Bull. Seism. Soc. Am.</em> 97(5), 1379-1395.</p>
+<p>Wald, D.J., K.W. Lin, and V. Quitoriano (2008). Quantifying and Qualifying USGS ShakeMap
+Uncertainty, <em>U.S. Geological Survey Open File Report</em> 2008-1238, 26pp.</p>
+<p id="wald2008">Wald, D.J., P.S. Earle, T.I. Allen, K.S. Jaiswal, K.A. Porter, and M.J. Hearne (2008). Development of
+the U.S. Geological Survey&#8217;s PAGER system (Prompt Assessment of Global Earthquakes for
+Response), in World Conference on Earthquake Engineering, 14th, Beijing, China, October 2008,
+<em>Proc. World Conf. on Eq. Eng.</em> Beijing, China, Paper No. 10-0008.</p>
+<p id="wald2011a">Wald, D.J., L. McWhirter, E. Thompson, and A. Hering (2011a). A New Strategy for Developing Vs30
+Maps, <em>Proc. of the 4th International Effects of Surface Geology on Seismic Motion Symp.</em>, Santa
+Barbara, 12pp.</p>
+<p id="wald2011b">Wald, D.J., K.S. Jaiswal, K.D. Marano, and D. Bausch (2011b). An Earthquake Impact Scale: Natural
+Hazards Review, posted ahead of print. <a class="reference external" href="http://dx.doi.org/10.1061/(ASCE)NH.1527-6996.0000040">http://dx.doi.org/10.1061/(ASCE)NH.1527-6996.0000040</a>.</p>
+<p id="wald2011c">Wald, D.J., V. Quitoriano, C.B. Worden, M. Hopper, and J.W. Dewey (2011c). USGS &#8220;Did You
+Feel It?&#8221; internet-based macroseismic intensity maps. <em>Annals of Geophysics</em> 54(6), 688-709.</p>
+<p id="wald2016">Wald, D.J. and G. Franco (2016). Applications of Near-Real time,
+Post-earthquake Financial Decision-Making, <em>Proc. 16th World Conf. on Eq. Eng.</em>, Santiago, Chile.</p>
+<p id="gmt-ref">Wessel, P., and W.H.F. Smith (1995). New Version of the Generic Mapping Tools Released,
+<em>EOS Trans.</em>, AGU, 76, 329.</p>
+<p id="wgcep2003">Working Group on California Earthquake Probabilities (WGCEP) (2003). Earthquake Probabilities
+in the San Francisco Bay Region: 2003 to 2031, <em>U.S. Geological Survey Open-File Report</em> 03-214.</p>
+<p id="wells1994">Wells, D.L. and K.J. Coppersmith (1994). New Empirical Relationships among Magnitude,
+Rupture Length, Rupture Width, Rupture Area, and Surface Displacement, <em>Bull. Seism. Soc.
+Am.</em> 84(4), 974-1002.</p>
+<p id="wills2000">Wills, C.J., M.D. Petersen, W.A. Bryant, M.S. Reichle, G.J. Saucedo, S.S. Tan,
+G.C. Taylor, and J.A. Treiman (2000). A site-conditions map for California based on
+geology and shear wave velocity, <em>Bull. Seism. Soc. Am.</em> 90, S187-S208.</p>
+<p>Wills, C.J. and K.B. Clahan (2006). Developing a map of geologically defined site- condition
+categories for California, <em>Bull. Seism. Soc. Am.</em> 96, 1483-1501.</p>
+<p>Wills, C.J. and C. Gutierrez (2008). Investigation of geographic rules for im- proving
+site-conditions mapping, <em>Calif. Geo. Sur. Final Tech. Rept.</em>, 20 pp. (Award No. 07HQGR0061).</p>
+<p>Wood, H.O. and F. Neumann (1931). Modified Mercalli intensity scale of 1931, <em>Bull. Seism.
+Soc. Am.</em> 21, 277-283.</p>
+<p id="worden2010">Worden, C.B., D.J. Wald, T.I. Allen, K.W. Lin, D. Garcia, and G. Cua (2010). A revised
+ground-motion and intensity interpolation scheme for ShakeMap, <em>Bull. Seism. Soc. Am.</em>
+100(6), 3083-3096.</p>
+<p id="worden2011">(See Worden et al, 2012, the actual publication date. Software was
+written prior to publication.)</p>
+<p id="worden2012">Worden, C.B., M.C. Gerstenberger, D.A. Rhoades, D.J. and Wald (2012). Probabilistic
+relationships between ground-motion parameters and Modified Mercalli intensity in
+California <em>Bull. Seism. Soc. Am.</em> 102(1), 204-221. DOI: 10.1785/0120110156.</p>
+<p id="worden2015">Worden, C.B., D.J. Wald, and E.M. Thompson (2015). Development of an Open-Source Hybrid
+Global Vs30 Model, SSA Annual Meeting, Pasadena, CA. <em>Seis. Res. Lett.</em> 86(2B), 713. <a class="reference external" href="https://github.com/cbworden/earthquake-global_vs30">https://github.com/cbworden/earthquake-global_vs30</a>.</p>
+<p id="worden2016">C.B. Worden, M. Hearne, D.J. Wald, and M. Pagani (2016). Complimentary Components of OpenQuake and ShakeMap, <em>Proc. 16th World Conf. on Eq. Eng.</em>, Santiago.</p>
+<p id="worden2016b">Worden, C.B. and D.J. Wald (2016). ShakeMap Manual Online: technical manual, user&#8217;s guide, and software guide,
+U. S. Geological Survey. usgs.github.com/shakemap-docs/. DOI: 10.1234/012345678.</p>
+<p id="yamakawa1998">Yamakawa, K. (1998). The Prime Minister and the earthquake: Emergency Management Leadership of
+Prime Minister Marayama on the occasion of the Great Hanshin-Awaji earthquake disaster, <em>Kansai
+Univ. Rev. Law and Politics</em> 19, 13-55.</p>
+<p>Wu, Y.M., W.H.K. Lee, C.C. Chen, T.C. Shin, T.L. Teng, and Y.B. Tsai (2000). Performance of the
+Taiwain Rapid Earthquake Information Release System (RTD) during the 1999 Chi-Chi (Taiwan)
+earthquake, <em>Seis. Res. Lett.</em> 71, 338-343.</p>
+<p>Wu, Y.M., T.C. Shin, and C.H. Chang (2001). Near real-time mapping of peak ground acceleration and
+peak ground velocity following a strong earthquake, <em>Bull. Seism. Soc. Am.</em> 91, 1218-1228.</p>
+<p id="wu2003">Wu, Y.M., T.L. Teng, T.C. Shin, and N.C. Hsiao (2003). Relationship between peak ground
+acceleration, peak ground velocity and Intensity in Taiwan, <em>Bull. Seism. Soc. Am.</em> 93, 386-396.</p>
+<p id="yeats2004">Yeats, R. (2004). Living with Earthquakes in the Pacific Northwest A
+Survivor&#8217;s Guide, Second Edition, 400 pp. ISBN 978-0-87071-024-7.</p>
+<p>Yong, A., S.E. Hough, J. Iwahashi, and A. Braverman (2012). A Terrain-Based Site-Conditions Map of
+California with Implications for the Contiguous United States, <em>Bull. Seism. Soc. Am.</em> 102, 114-128.</p>
+<p>Yong, A., A. Martin, K. Stokoe, and J. Diehl (2013). ARRA-funded VS30 measurements using multi-
+technique approach at California and central-eastern United States strong motion stations, <em>U.S. Geological Survey Open-
+File Report</em> 2013-1102.</p>
+<p id="yong2015">Yong, A., E.M. Thompson, D.J. Wald, K.L. Knudsen, J.K. Odum, W.J. Stephenson, and S. Haefner
+(2015). A Compilation of VS30 in the United States, SSA Annual Meeting, Pasadena, CA, <em>Seis. Res. Lett.</em> 86(2B), 713.</p>
+<p>Youngs, R.R., S.J. Chiou, W.J. Silva, and J.R. Humphrey (1997). Strong ground-motion
+relationships for subduction zones, <em>Seis. Res. Lett.</em> 68(1), 58-73.</p>
+<p>Zhao, J.X. (2010). Geometric spreading functions and modeling of volcanic zones for strong-motion
+attenuation models derived from records in Japan, <em>Bull. Seism. Soc. Am.</em> 100(2), 712-732.</p>
+<p>Zhao, J.X., J. Zhang, A. Asano, Y. Ohno, T. Oouchi, T. Takahashi, H. Ogawa, K. Irikura, H.K. Thio, P.G.
+Somerville, Y. Fukushima, and Y. Fukushima (2006). Attenuation relations of strong ground motion in
+Japan using site classification based on predominant period, <em>Bull. Seism. Soc. Am.</em> 96(3), 898-913.</p>
+<p id="zhu2014">Zhu, J., L.G. Baise, E.M. Thompson, D.J. Wald, and K.L. Knudsen (2014). A Geospatial Liquefaction
+Model for Rapid Response and Loss Estimation, <em>Earthquake Spectra</em>, in press.</p>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="glossary.html" class="btn btn-neutral float-right" title="Glossary">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="acknowledgments.html" class="btn btn-neutral" title="Acknowledgments"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
