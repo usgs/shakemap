@@ -10,7 +10,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
-from pyshake.shakelib.fault import Fault
+from shakemap.shakelib.fault import Fault
 from openquake.hazardlib.geo import point
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 import sys
