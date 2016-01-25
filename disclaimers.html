@@ -1,0 +1,298 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Disclaimers &mdash; ShakeMap Manual 2.0 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ShakeMap Manual 2.0 documentation" href="index.html"/>
+        <link rel="up" title="User’s Guide" href="users_guide.html"/>
+        <link rel="next" title="Software &amp; Implementation Guide" href="software_guide.html"/>
+        <link rel="prev" title="Related Systems" href="related_systems.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> ShakeMap Manual</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technical_guide.html">Technical Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#shakemap-software-overview">ShakeMap Software Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#philosophy-of-estimating-and-interpolating-ground-motions">Philosophy of Estimating and Interpolating Ground Motions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#recorded-ground-motion-parameters">Recorded Ground-motion Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#ground-motion-and-intensity-predictions">Ground Motion and Intensity Predictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#shakemap-processing">ShakeMap Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#representing-macroseismic-intensity-on-maps">Representing Macroseismic Intensity on Maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#discussion-of-chosen-map-parameters-intensity-measures">Discussion of Chosen Map Parameters (Intensity Measures)</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="users_guide.html">User&#8217;s Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="background.html">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="products.html">Products and Formats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakemap_archives.html">ShakeMap Archives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakemap_applications.html">Applications of ShakeMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="related_systems.html">Related Systems</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Disclaimers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="software_guide.html">Software &amp; Implementation Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#implementation-considerations">Implementation Considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#shakemap-implementation-checklist">ShakeMap Implementation Checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#software-availability-software-guide">Software Availability &amp; Software Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="regionals.html">Regional Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="future_directions.html">Future Directions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="future_directions.html#research-development">Research &amp; Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="future_directions.html#software-shakemap-4-0-python">Software: ShakeMap 4.0 (Python)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References &amp; Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">ShakeMap Manual</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="users_guide.html">User&#8217;s Guide</a> &raquo;</li>
+      
+    <li>Disclaimers</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/disclaimers.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="disclaimers">
+<span id="sec-disclaimers"></span><h1>Disclaimers<a class="headerlink" href="#disclaimers" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="general-disclaimer">
+<h2>General Disclaimer<a class="headerlink" href="#general-disclaimer" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Some USGS information accessed through this page may be preliminary in nature and presented prior to final review and approval by the Director of the USGS. This information is provided with the understanding that it is not guaranteed to be correct or complete, and conclusions drawn from such information are the sole responsibility of the user. In addition, ShakeMaps are automatic, computer-generated maps and have not necessarily been checked by human oversight, so they may contain errors. Further, the input data is raw and unchecked, and may contain errors.</p>
+</div>
+<ul class="simple">
+<li>Contours can be misleading, since data gaps may exist. Caution should be used
+in deciding which features in the contour patterns are required by the data.
+Ground motions and intensities can vary greatly over small distances, so these
+maps are only approximate.</li>
+<li>Locations within the same intensity area will not necessarily experience the
+same level of damage, since damage depends heavily on the type of structure,
+the nature of the construction, and the details of the ground motion at that
+site. For these reasons, more or less damage than described in the intensity
+scale may occur. The ground motion levels and descriptions associated with
+each intensity value are based on recent damaging earthquakes. There may be
+revisions in these parameters as more data become available or due to further
+improvements in methodologies.</li>
+<li>Large earthquakes can generate very long-period ground motions that can cause
+damage at great distances from the epicenter; although the intensity estimated
+from the ground motions may be small, significant effects to large structures
+(e.g., bridges, tall buildings, storage tanks) may be notable.</li>
+</ul>
+</div>
+<div class="section" id="shakemap-update-policy">
+<h2>ShakeMap Update Policy<a class="headerlink" href="#shakemap-update-policy" title="Permalink to this headline">¶</a></h2>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">ShakeMaps are preliminary in nature and will be updated as data arrives from a variety of distributed sources. Our practice is to improve the maps as soon as possible, but there are factors beyond our control that can result in delayed updates.</p>
+</div>
+<ul class="simple">
+<li>For regions around the world, where there are insufficient near&#8211;real-time
+strong-motion seismic stations to generate an adequate strong-ground-motion
+data-controlled ShakeMap, we can still provide a very useful estimate of the
+shaking distribution using the ShakeMap software. Site amplification is
+approximated from a relationship developed between topographic gradient and
+shear-wave velocity. Additional constraints for these predictive maps come
+primarily from  additional earthquake source information, particularly fault
+rupture dimensions, observed macroseismic intensities (including via the USGS
+&#8220;Did You Feel It?&#8221; system), and observed strong ground motions, when and where
+available.</li>
+<li>There is no formal “final” version of any ShakeMap. Version Control is up to
+users. ShakeMap version numbers and timestamps are provided on the maps,
+webpages, grid files, and metadata.</li>
+<li>Our strategy is to update ShakeMaps as warranted from a scientific
+perspective. We reserve the option to update ShakeMaps as needed to add data
+or to improve scientific merit and/or presentation of the maps in any way
+beneficial. This most typical update is after new data arrive, finite-fault
+models get established or revised, magnitude gets revised, or as improved site
+amplification maps, ground motion prediction equations, or even interpolation
+or other procedures become available.</li>
+</ul>
+<div class="sidebar">
+<p class="first sidebar-title">Recent ShakeMap update examples:</p>
+<ul class="last simple">
+<li>For the very deadly 2008 Wenchuan, China, earthquake, the Chinese strong-motion data were not made available for several months.</li>
+<li>For the 2011 Tohoku, Japan earthquake, the magnitude was updated from 7.9 to 8.9 over the course of the first hour after origin time. The Japanese strong-motion data processing center was impacted by the earthquake, yet they provided data for nearly a thousand seismic stations within several days after the earthquake. These vital data were added to the ShakeMap as soon as they became available.</li>
+<li>Due to telemetry limitations, some important seismic station data for the 2014 American Canyon, California, earthquake came in minutes, hours, and as late as four days after the event. The data were added to the ShakeMap soon after they were received and processed. The magnitude also changed from an initial M5.7 to M6.0, and this, too, affected the ShakeMap. Lastly, the causative fault location was added by the Northern California ShakeMap operators several days after the earthquake.</li>
+</ul>
+</div>
+<p><strong>Updates to Online Maps</strong></p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>Real-time ShakeMap Updates</strong>. Changes can be tracked with the ShakeMap
+version numbers and timestamps found in the metadata, the <em>info.xml</em> and
+<em>grid.xml</em> files, and on the maps themselves (time generated). The <em>info.xml</em>
+file contains timestamps, number of stations used, GMPE information, and
+many other attributes that could have changed from version to version.
+Often a text statement is provided that notes significant changes for a
+particular version.</li>
+<li><strong>ShakeMap Atlas Updates</strong>. The ShakeMap Atlas uses version numbers
+for each Atlas event; the overall Atlas collections is also Versioned.
+Currently ShakeMap Atlas Version 2.0 is online in the ComCat database, and
+the older Atlas (Version 1.0) can be found online on the <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/shakemap/">legacy ShakeMap
+Archives pages</a>.</li>
+<li><strong>Scenario Revisions</strong>. ShakeMap Scenario collections uses version
+numbers for each event; the overall scenario collections is named
+according to their source. Currently
+ShakeMap Atlas Version 2.0 is online in the USGS <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/search/">Comprehensive Catalogue
+(ComCat) Earthquake database</a>. Some older
+scenarios are online on the <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/shakemap/">legacy ShakeMap Archives pages</a>. Scenario ShakeMaps
+will be revised when the underlying probabilistic seismic map fault
+segmentation or other particulars (like GMPE selection) change. Older
+versions will be archived in <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/search/">ComCat</a>.</li>
+</ul>
+</div></blockquote>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="software_guide.html" class="btn btn-neutral float-right" title="Software &amp; Implementation Guide">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="related_systems.html" class="btn btn-neutral" title="Related Systems"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

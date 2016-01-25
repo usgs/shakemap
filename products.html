@@ -1,0 +1,965 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Products and Formats &mdash; ShakeMap Manual 2.0 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ShakeMap Manual 2.0 documentation" href="index.html"/>
+        <link rel="up" title="User’s Guide" href="users_guide.html"/>
+        <link rel="next" title="ShakeMap Archives" href="shakemap_archives.html"/>
+        <link rel="prev" title="Background" href="background.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> ShakeMap Manual</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technical_guide.html">Technical Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#shakemap-software-overview">ShakeMap Software Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#philosophy-of-estimating-and-interpolating-ground-motions">Philosophy of Estimating and Interpolating Ground Motions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#recorded-ground-motion-parameters">Recorded Ground-motion Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#ground-motion-and-intensity-predictions">Ground Motion and Intensity Predictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#shakemap-processing">ShakeMap Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#representing-macroseismic-intensity-on-maps">Representing Macroseismic Intensity on Maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#discussion-of-chosen-map-parameters-intensity-measures">Discussion of Chosen Map Parameters (Intensity Measures)</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="users_guide.html">User&#8217;s Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="background.html">Background</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Products and Formats</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakemap_archives.html">ShakeMap Archives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakemap_applications.html">Applications of ShakeMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="related_systems.html">Related Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="disclaimers.html">Disclaimers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="software_guide.html">Software &amp; Implementation Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#implementation-considerations">Implementation Considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#shakemap-implementation-checklist">ShakeMap Implementation Checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#software-availability-software-guide">Software Availability &amp; Software Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="regionals.html">Regional Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="future_directions.html">Future Directions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="future_directions.html#research-development">Research &amp; Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="future_directions.html#software-shakemap-4-0-python">Software: ShakeMap 4.0 (Python)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References &amp; Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">ShakeMap Manual</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="users_guide.html">User&#8217;s Guide</a> &raquo;</li>
+      
+    <li>Products and Formats</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/products.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="products-and-formats">
+<span id="sec-products"></span><h1>Products and Formats<a class="headerlink" href="#products-and-formats" title="Permalink to this headline">¶</a></h1>
+<p>ShakeMap is fundamentally a geographic product, providing a spatial representation of
+the potentially very complex shaking field associated with an earthquake. Because of
+its complicated nature, we are required to generate numerous maps that portray
+various aspects of the shaking that are customized for specific uses or
+audiences.  For some uses, it is not the maps themselves but the components that make up
+the ShakeMaps that are of interest in order to re-create or further customize the
+maps or user-specific products. In this section, we further describe
+these ShakeMap component products and the variety of maps and formats.</p>
+<p>For each earthquake, all maps and associated products for that event are available
+via the “Downloads” link on each earthquake-specific ShakeMap webpage.</p>
+<div class="section" id="input-files">
+<span id="sec-input-files"></span><h2>Input Files<a class="headerlink" href="#input-files" title="Permalink to this headline">¶</a></h2>
+<p>The downloadable products include sufficient information to reproduce the
+ShakeMap. In particular, <em>stationlist.xml</em> and the <em>*_fault.txt</em> file(s) provide the
+input files, <em>grid.xml</em> provides the Vs30 grid (see above), and <em>info.xml</em>
+provides the important configuration and processing parameters, including the
+name(s) of the fault file(s).</p>
+<p><strong>Station Lists</strong>. The file <em>stationlist.xml</em> contains the combined input data from
+all of the original processing center’s input files in a ShakeMap-readable
+format. The file may contain seismic station data, intensity data, or a
+combination of both. The file also contains an event tag with the earthquake
+source specifications.
+See the ShakeMap <a class="reference internal" href="software_guide.html#software-guide"><span>Software &amp; Implementation Guide</span></a> for a complete specification of
+the ShakeMap-input XML formats.</p>
+<p>For reasons of backward compatibility, we also provide <em>stationlist.txt</em>. As with
+<em>grid.xyz</em>, the use of this file is deprecated and it may disappear in a future
+release.</p>
+<p><strong>Fault Files</strong>. Fault files are named <em>&lt;something&gt;_fault.txt</em> and are listed in
+<em>info.xml</em>. Zero or more fault files may be present in the ShakeMap input
+directory. See the ShakeMap <a class="reference internal" href="software_guide.html#software-guide"><span>Software &amp; Implementation Guide</span></a> for a complete specification
+of the fault file format. For the purposes of reproducing the ShakeMap for an
+earthquake, it is sufficient to copy the specified file(s) into the event’s
+input directory.</p>
+</div>
+<div class="section" id="output-files-and-products">
+<h2>Output Files and Products<a class="headerlink" href="#output-files-and-products" title="Permalink to this headline">¶</a></h2>
+<p>The available ShakeMap products include (and each is described in more detail in the sections
+that follow):</p>
+<ul>
+<li><dl class="first docutils">
+<dt><strong>Metadata and runtime information</strong></dt>
+<dd><ul class="first last simple">
+<li>FGDC-compliant metadata</li>
+<li>XML file of processing and constraints parameters, input data, output paramaters, timestamps, and versioning.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>Static maps and plots (images)</strong></dt>
+<dd><ul class="first last simple">
+<li>Macroseismic Intensity</li>
+<li>Peak Ground Acceleration (PGA), Peak Ground Velocity (PGV), and Pseudo-Spectral Acceleration (PSA) (when appropriate)</li>
+<li>Uncertainty maps</li>
+<li>Regression (GMPE) plots</li>
+<li>Station lists</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first"><strong>Interactive maps</strong></p>
+</li>
+<li><dl class="first docutils">
+<dt><strong>Grids of interpolated ground shaking</strong></dt>
+<dd><ul class="first last simple">
+<li>XML grid of ground motions</li>
+<li>XML grid of ground motions on “rock”</li>
+<li>XML grid of ground-motion uncertainty</li>
+<li>Text grid of ground motions (deprecated)</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt><strong>GIS files</strong></dt>
+<dd><ul class="first last simple">
+<li>GIS Shapefiles</li>
+<li><a class="reference external" href="http://www.fema.gov/hazus/">HAZUS-MH®</a> Shapefiles</li>
+<li><a class="reference external" href="http://www.esri.com">ESRI</a> Raster Grid Files</li>
+<li><a class="reference external" href="http://earth.google.com">Google Earth</a> KML files</li>
+<li>Contour Files</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+<div class="section" id="metadata-and-runtime-information">
+<h3>Metadata and Runtime Information<a class="headerlink" href="#metadata-and-runtime-information" title="Permalink to this headline">¶</a></h3>
+<p><strong>Metadata</strong>. FGDC-compliant geospatial metadata files are distributed via the
+earthquake-specific ShakeMap webpage for each earthquake under the “Downloads”
+page. The metadata are provided in text, HTML, and XML formats in the files
+<em>metadata.txt</em>, <em>metadata.html</em>, and <em>metadata.xml</em>, respectively.</p>
+<p>Because the ShakeMap output grid is the fundamental derived product from the ShakeMap
+processing, it is fully described in an accompanying metadata file following
+Federal Geographic Data Committee (<a class="reference external" href="https://www.fgdc.gov/">FGDC</a>) standards
+for geospatial information.  As described below, station amplitudes are provided
+in separate ShakeMap station files; however, the complete metadata for the parametric data are
+archived by the regional seismic networks and contributing strong-motion data
+sources.</p>
+<p><strong>Supplemental Information</strong>. A second aggregation of important
+earthquake-specific ShakeMap information is provided online in the file
+<em>info.xml</em>. This supplemental information provides a machine-readable (XML)
+rundown of many important ShakeMap processing parameters. It includes
+information about the data and fault input files; the source mechanism; the
+GMPE, IPE, and GMICE selected; the type and source of the site amplifications;
+the map boundaries; and important output information, including the bias and
+maximum amplitude for each parameter. The <em>info.xml</em> is critical for
+understanding or replicating any particular ShakeMap.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Timestamps, versions of the ShakeMap software employed, event-specific parameters, and the version of the specific ShakeMap run are documented in the supplemental information provided in the <em>info.xml</em> file.</p>
+</div>
+</div>
+<div class="section" id="static-maps-and-plots-images">
+<h3>Static Maps and Plots (Images)<a class="headerlink" href="#static-maps-and-plots-images" title="Permalink to this headline">¶</a></h3>
+<p>ShakeMap generates a number of static ground-motion maps and plots for various
+parameters (intensity measures, or IMs). Most of these maps are available in
+JPEG format, as well as zipped PostScript files that&#8212;as vector-based
+images&#8212;are suitable for PDF conversion or editing. These maps are typically
+generated automatically, limiting the format, extent, and features that can be
+depicted. Nonetheless, these static maps are ShakeMap’s &#8220;signature products&#8221; and
+serve as maps of record and for other purposes, as described below. Static maps
+can be accessed and selected using tabs along the top of the USGS earthquake event
+page, as shown in the example in <a class="pageref" href="#napa-event-page">Figure  1</a>.</p>
+<div class="figure align-left" id="id3">
+<span id="napa-event-page"></span><a class="reference internal image-reference" href="_images/Napa.Event.Page.png"><img alt="_images/Napa.Event.Page.png" src="_images/Napa.Event.Page.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 1: Event page ShakeMap view for the 2014 M6.0 American Canyon (Napa Valley), CA
+earthquake. The static instrumental intensity map is shown. Tabs above the map allow access and
+comparison of different intensity measures (IMs), as well as the uncertainty map
+and station list.</span></p>
+</div>
+<p><strong>Intensity Maps</strong>. Intensity images&#8212;typically of Modified Mercalli Intensity
+(MMI), but potentially other intensity measures&#8212;are the most familiar ShakeMap
+products. The main intensity map consists of a colored overlay of intensity with
+the epicenter (and the causative fault, if supplied) prominently marked,
+(usually) overlain upon the region’s topography, with other cultural and
+geologic features (cities, roads, and active faults) plotted, depending on the
+configuration of the ShakeMap system. A detailed scale of intensity is also
+provided as described in detail in the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><strong>ShakeMap Symbology</strong>. It is a recent ShakeMap convention to depict seismic stations as <strong>triangles</strong> and intensity observations as <strong>circles</strong> (for cities) or <strong>squares</strong> (for geocoded boxes). On intensity maps, symbols are unfilled so that the underlying intensity values are visible. On peak ground motion maps, observations are (optionally) color coded to their amplitude according to the legend shown below each map. The epicenter is indicated with a <strong>star</strong>, and for larger earthquakes, the surface projection of the causative fault is shown with <strong>black lines</strong>.</p>
+</div>
+<p>Strong motion and intensity data symbols default to &#8220;see-through” (unfilled) mode for the
+intensity map shown in <a class="pageref" href="#napa-shakemap-cover">Figure  2</a> and are color-filled
+for peak ground motion maps (<a class="pageref" href="#napa-pga">Figure  3</a>). ShakeMap operators may
+chose to modify these defaults using alternative mapping configurations.</p>
+<div class="figure align-left" id="id4">
+<span id="napa-shakemap-cover"></span><a class="reference internal image-reference" href="_images/Napa.ShakeMap.cover.png"><img alt="_images/Napa.ShakeMap.cover.png" src="_images/Napa.ShakeMap.cover.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 2: Intensity ShakeMap from the 2014 M6.0 American Canyon (Napa Valley), CA earthquake. Strong-motion data
+(triangles) and intensity data (circles) default to &#8220;see-through” mode for the intensity map. The
+north-south black line indicates the fault location, and the epicenter is a red star. The intensity
+color-coding either as observed (for macroseismic data) or as converted is derived from the conversion equations of <a class="reference internal" href="references.html#wald1999b"><span>Wald et al. (1999b)</span></a> as shown in the legend. Note: Map Version Number reflects separate offline processing for this Manual.</span></p>
+</div>
+<div class="figure align-left" id="id5">
+<span id="napa-pga"></span><a class="reference internal image-reference" href="_images/Figure_1_2.png"><img alt="_images/Figure_1_2.png" src="_images/Figure_1_2.png" style="width: 666.0px; height: 675.0px;" /></a>
+<p class="caption"><span class="caption-text">Figure 3: Peak acceleration ShakeMap from the 2014 M6.0 American Canyon (Napa Valley), CA
+earthquake. Strong-motion data (triangles) and intensity data (circles) are color-coded according to their intensity
+value, either as observed (for macroseismic data) or as converted by
+<a class="reference internal" href="references.html#wald1999b"><span>Wald et al. (1999b)</span></a> as shown in the
+legend. The north-south black line indicates the fault location, which nucleated near the epicenter (red star). Note:
+Map Version Number reflects separate offline processing for this Manual.</span></p>
+</div>
+<p><strong>Peak Ground Motion Maps.</strong> ShakeMap generates static maps for PGA, PGV, and
+Intensity, and optionally, three separate maps for PSA
+(at 0.3, 1.0, and 3.0 sec). The PGM maps are distinct from the
+intensity maps: shaking values on the former are colored image overlays; the latter are
+PGM contours. On PGM maps, stations&#8217; fill colors
+indicate the ground motion of the station converted to intensity or, optionally,
+the identity of the seismic network data source. When the color indicates peak
+ground motion, the values are converted to the intensity color scheme via the
+selected ground-motion&#8211;intensity conversion equation (GMICE), and the
+corresponding color scale bar is provided at the bottom of the map (see example
+in <a class="pageref" href="#napa-pga">Figure  3</a>).</p>
+</div>
+<div class="section" id="interactive-maps">
+<h3>Interactive Maps<a class="headerlink" href="#interactive-maps" title="Permalink to this headline">¶</a></h3>
+<p>Although the static ShakeMaps are useful, many of these products are more suitably
+served as interactive maps which can be dynamically scaled (zoomed) and layered upon
+with user-selected background and other overlays. The layers are provided via
+GeoJSON, KML, GIS, Raster, and other formats. The USGS Earthquake Program Web
+pages employ <a class="reference external" href="http://leafletjs.com/">Leaflet</a>, an open-source JavaScript
+library that is suitable for mobile-friendly interactive maps (see, for example,
+<a class="pageref" href="#napa-contours">Figure  4</a>). Many of the
+interactive features are geared towards balancing the experience for both
+desktop and mobile visitors (<a class="pageref" href="#napa-mobile">Figure  5</a>). Since
+the interactive maps are zoomable, it is convenient to select
+individual stations to query station
+information and amplitudes (see the example in <a class="pageref" href="#napa-stationpopup">Figure  6</a>).
+The interactive map also allows users to select and show/hide specific layers,
+including seismic stations and DYFI geocoded intensity
+stations (<a class="pageref" href="#napa-dyfi">Figure  7</a>).</p>
+<div class="figure align-left" id="id6">
+<span id="napa-contours"></span><a class="reference internal image-reference" href="_images/Napa_contours.station.png"><img alt="_images/Napa_contours.station.png" src="_images/Napa_contours.station.png" style="width: 650.4000000000001px; height: 537.6px;" /></a>
+<p class="caption"><span class="caption-text">Figure 4: Interactive ShakeMap for the 2014 M6.0 American Canyon, CA
+earthquake. Contours indicate intensities; strong motion data (triangles) and intensity data (circles) are
+color-coded according to their intensity value, either as observed (for macroseismic data) or as converted
+by <a class="reference internal" href="references.html#worden2012"><span>Worden et al. (2012)</span></a>.</span></p>
+</div>
+<div class="figure align-right" id="id7">
+<span id="napa-mobile"></span><a class="reference internal image-reference" href="_images/Napa.mobile.shakemap.png"><img alt="_images/Napa.mobile.shakemap.png" src="_images/Napa.mobile.shakemap.png" style="width: 288.0px; height: 511.2px;" /></a>
+<p class="caption"><span class="caption-text">Figure 5: Mobile view of the interactive ShakeMap for the 2014 M6.0 American Canyon, CA
+earthquake. Contours indicate intensities; strong motion data (triangles) are color-coded according to their intensity
+value.</span></p>
+</div>
+<div class="figure align-left" id="id8">
+<span id="napa-stationpopup"></span><a class="reference internal image-reference" href="_images/Napa_contours.station.popup.png"><img alt="_images/Napa_contours.station.popup.png" src="_images/Napa_contours.station.popup.png" style="width: 653.6px; height: 537.6px;" /></a>
+<p class="caption"><span class="caption-text">Figure 6: Interactive ShakeMap for the 2014 M6.0 American Canyon, CA
+earthquake showing station information pop-up.</span></p>
+</div>
+<div class="figure align-left" id="id9">
+<span id="napa-dyfi"></span><a class="reference internal image-reference" href="_images/Napa_contours-stas-dyfi.png"><img alt="_images/Napa_contours-stas-dyfi.png" src="_images/Napa_contours-stas-dyfi.png" style="width: 648.8000000000001px; height: 538.4px;" /></a>
+<p class="caption"><span class="caption-text">Figure 7: Interactive ShakeMap for the 2014 M6.0 American Canyon, CA
+earthquake. On the interactive map, reported (DYFI) intensities are geocoded and represented with
+<strong>squares</strong> depicting the 1km grid area they occupy. Reported Intensities are color-coded according to their intensity
+value, either as observed or as converted by <a class="reference internal" href="references.html#wald1999b"><span>Wald et al. (1999b)</span></a>.</span></p>
+</div>
+<p>The interactive maps may be accessed by clicking on the static ShakeMaps on the
+USGS event pages (e.g., <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/eventpage/us10003zgz#impact_shakemap">http://earthquake.usgs.gov/earthquakes/eventpage/us10003zgz#impact_shakemap</a>).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Currently, interactive maps only portray contours of intensity. Other contours can be downloaded for users&#8217; programs, or overlain with the GIS or KML formats provided with each ShakeMap.</p>
+</div>
+<p><strong>Uncertainty Maps</strong>. As discussed in detail in the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>,
+gridded uncertainty is available for all ground motion parameters. The ratio of
+the ShakeMap PGA uncertainty to the GMPE’s uncertainty is also available (see
+the section on <a class="reference internal" href="technical_guide.html#sec-interpolation"><span>Interpolation</span></a>).</p>
+<p>We utilize the uncertainty ratio to produce a graded map of uncertainty. Where
+the ratio is 1.0 (meaning the ShakeMap is purely predictive), the map is colored
+white. Where the ratio is greater than 1.0 (meaning that the ShakeMap
+uncertainty is high because of unknown fault geometry), the map shades toward
+dark red, and where the uncertainty is less than 1.0 (because the presence of
+data decreases the uncertainty), the map shades toward dark blue. These maps
+provide a quick visual summary of the quality of ground-motion estimates over
+the area of interest.</p>
+<p>ShakeMaps are also given a letter grade based on the mean uncertainty ratio
+within the area of the MMI-VI contour (on the theory that this is the area most
+important to accurately represent). A ratio of 1.0 is given a grade of “C”; maps
+with mean ratios greater than 1.0 get grades of “D” or “F”; ratios less than 1.0
+earn grades of “B” or “A”. If the map does not contain areas of MMI ≥ VI, no
+grade is assigned. See <a class="pageref" href="#napa-urat">Figure  8</a> for an example uncertainty map.</p>
+<div class="figure align-left" id="id10">
+<span id="napa-urat"></span><a class="reference internal image-reference" href="_images/Napa.urat_pga.jpg"><img alt="_images/Napa.urat_pga.jpg" src="_images/Napa.urat_pga.jpg" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 8: ShakeMap uncertainty maps for the 2014 M6.0 American Canyon, CA
+earthquake. Color-coded legend shows uncertainty ratio, where “1.0”
+indicates 1.0 times the GMPE’s sigma. The average uncertainty is
+computed by averaging uncertainty at grid points that lie
+within the MMI-VI contour (bold contour line). For more details, see
+<a class="reference internal" href="references.html#wald2008"><span>Wald et al. (2008)</span></a>,
+<a class="reference internal" href="references.html#worden2010"><span>Worden et al. (2010)</span></a>, and the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>.</span></p>
+</div>
+<p><strong>Regression (GMPE and Distance Attenuation) Plots.</strong></p>
+<p>ShakeMap can also (optionally) produce graphs of the observational data plotted with the biased
+and unbiased GMPE. For example, <a class="pageref" href="#northridge-mi-regr-w-dyfi">Figure  9</a> shows
+the 1994 M6.7 Northridge earthquake MMI data, and <a class="pageref" href="#northridge-pga-regr-w-dyfi">Figure  10</a> shows the
+PGA data and GMPE.</p>
+<div class="figure align-left" id="id11">
+<span id="northridge-mi-regr-w-dyfi"></span><a class="reference internal image-reference" href="_images/northridge_mi_regr_w_dyfi.png"><img alt="_images/northridge_mi_regr_w_dyfi.png" src="_images/northridge_mi_regr_w_dyfi.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 9: Plot showing the 1994 M6.7 Northridge, CA earthquake MMI data (seismic stations are yellow triangles;
+DYFI observations are blue circles) plotted with the unbiased (red line) and biased
+(green line) IPE. The dashed green lines show the biased IPE ±3 standard deviations.</span></p>
+</div>
+<div class="figure align-left" id="id12">
+<span id="northridge-pga-regr-w-dyfi"></span><a class="reference internal image-reference" href="_images/northridge_pga_regr_w_dyfi.png"><img alt="_images/northridge_pga_regr_w_dyfi.png" src="_images/northridge_pga_regr_w_dyfi.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 10: Plot showing the 1994 M6.7 Northridge, CA earthquake PGA data (seismic stations are yellow triangles;
+DYFI observations are blue circles) plotted with the unbiased (red line) and biased
+(green line) GMPE. The dashed green lines show the biased GMPE ±3 standard deviations.</span></p>
+</div>
+</div>
+<div class="section" id="interpolated-ground-motion-grids">
+<span id="sec-interpolated-grid-file"></span><h3>Interpolated Ground Motion Grids<a class="headerlink" href="#interpolated-ground-motion-grids" title="Permalink to this headline">¶</a></h3>
+<p>As described in the Technical Manual, the fundamental output product of the
+ShakeMap processing system is a finely-sampled grid (nominally 1km
+spacing) of latitude and longitude
+pairs with associated amplitude values of shaking parameters at each point.
+These amplitude values are derived by interpolation of a combination of the
+recorded ground shaking observations and estimated amplitudes, with consideration
+of site amplification at all interpolated points.  The resulting grid of
+amplitude values provides the basis for generating color-coded intensity contour
+maps, for further interpolation to infer shaking at selected locations, and for
+generating GIS-formatted files for further analyses.</p>
+<p><strong>XML Grid</strong>. The ShakeMap XML grid file is the basis for nearly all ShakeMap
+products, as well as for computerized post-processing in systems such as
+ShakeCast and PAGER [see <a class="reference internal" href="related_systems.html#sec-related-systems"><span>Related Systems</span></a>]. The XML grid is available
+as both plain text (<em>grid.xml</em>) and compressed as a zip file
+(<em>grid.xml.zip</em>). As XML, the grid is meant to be self-describing; however, we describe the format
+here for the sake of completeness.</p>
+<p>After the XML header, the first line is the <em>shakemap_grid</em> tag:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>&lt;shakemap_grid xsi:schemaLocation=&quot;http://earthquake.usgs.gov
+http://earthquake.usgs.gov/eqcenter/shakemap/xml/schemas/shakemap.xsd&quot; event_id=&quot;19940117123055&quot;
+shakemap_id=&quot;19940117123055&quot; shakemap_version=&quot;2&quot; code_version=&quot;3.5.1446&quot; process_timestamp=
+&quot;2015-10-30T20:38:19Z&quot; shakemap_originator=&quot;us&quot; map_status=&quot;RELEASED&quot; shakemap_event_type=
+&quot;ACTUAL&quot;&gt;
+</pre></div>
+</div>
+</div></blockquote>
+<p>Aside from schema information, the <em>shakemap_grid</em> tag provides the following attributes:</p>
+<ul class="simple">
+<li><em>event_id</em>: Typically this will a string of numbers and/or letters with or without a network
+ID prefix (e.g., “us100003ywp”), though in the case of major historic earthquakes, scenarios, or
+other special cases it may be a descriptive string, as above (“Northridge”).</li>
+<li><em>shakemap_id</em>: Currently the same as <em>event_id</em>, above.</li>
+<li><em>shakemap_version</em>: The version of this map, incremented each time a map is revised or reprocessed
+and transferred.</li>
+<li><em>code_version</em>: The version of the ShakeMap software used to make the map.</li>
+<li><em>process_timestamp</em>: The date and time the event was processed.</li>
+<li><em>shakemap_originator</em>: The network code of the center that produced the map.</li>
+<li><em>map_status</em>: Currently always the string “RELEASED”, but other strings may be used in the future.</li>
+<li><em>shakemap_event_type</em>: Either “ACTUAL” (for real earthquakes) or “SCENARIO” (for scenarios).</li>
+</ul>
+<p>The next tag describes the earthquake source:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>&lt;event event_id=&quot;Northridge&quot; magnitude=&quot;6.7&quot; depth=&quot;18&quot; lat=&quot;34.213000&quot; lon=&quot;-118.535700&quot;
+ event_timestamp=&quot;1994-01-17T12:30:55GMT&quot; event_network=&quot;ci&quot; event_description=&quot;Northridge&quot; /&gt;
+</pre></div>
+</div>
+</div></blockquote>
+<p>Most of the attributes are self-explanatory:</p>
+<ul class="simple">
+<li><em>event_id</em>: See above.</li>
+<li><em>magnitude</em>: The earthquake magnitude.</li>
+<li><em>depth</em>: The depth (in km) of the earthquake hypocenter.</li>
+<li><em>lat/lon</em>: The latitude and longitude of the earthquake epicenter.</li>
+<li><em>event_timestamp</em>: The date and time of the earthquake.</li>
+<li><em>event_network</em>: The authoritative seismic network in which the earthquake occurred.</li>
+<li><em>event_description</em>: A string containing the earthquake name or a location string (e.g., “13 km SW of Newhall, CA”).</li>
+</ul>
+<p>Following the event tag is the grid_specification tag:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>&lt;grid_specification lon_min=&quot;-119.785700&quot; lat_min=&quot;33.379666&quot; lon_max=&quot;-117.285700&quot;
+lat_max=&quot;35.046334&quot; nominal_lon_spacing=&quot;0.008333&quot; nominal_lat_spacing=&quot;0.008333&quot; nlon=&quot;301&quot;
+nlat=&quot;201&quot; /&gt;
+</pre></div>
+</div>
+</div></blockquote>
+<p>The attributes are:</p>
+<ul class="simple">
+<li><em>lon_min/lon_max</em>: The boundaries of the grid in longitude.</li>
+<li><em>lat_min/lat_max</em>: The boundaries of the grid in latitude.</li>
+<li><em>nominal_lon_spacing</em>: The expected grid interval in longitude within the resolution of the
+numeric format of the output.</li>
+<li><em>nominal_lat_spacing</em>: The expected grid interval in latitude within the resolution of the
+numeric format of the output.</li>
+<li><em>nlon/nlat</em>: The number of grid points in longitude and latitude. The grid data table will
+contain nlon times nlat rows.</li>
+</ul>
+<p>Following the <em>grid_specification</em> tag will be a set of event-specific uncertainty tags:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>&lt;event_specific_uncertainty name=&quot;pga&quot; value=&quot;0.466260&quot; numsta=&quot;598&quot; /&gt;
+&lt;event_specific_uncertainty name=&quot;pgv&quot; value=&quot;0.464209&quot; numsta=&quot;595&quot; /&gt;
+&lt;event_specific_uncertainty name=&quot;mi&quot; value=&quot;0.624327&quot; numsta=&quot;598&quot; /&gt;
+&lt;event_specific_uncertainty name=&quot;psa03&quot; value=&quot;0.436803&quot; numsta=&quot;594&quot; /&gt;
+&lt;event_specific_uncertainty name=&quot;psa10&quot; value=&quot;0.534212&quot; numsta=&quot;595&quot; /&gt;
+&lt;event_specific_uncertainty name=&quot;psa30&quot; value=&quot;0.577897&quot; numsta=&quot;594&quot; /&gt;
+</pre></div>
+</div>
+</div></blockquote>
+<p>These tags provide the uncertainty for the ground motion parameters (natural log units
+for all but intensity, which is in linear units) computed as a misfit from the
+biased GMPE (IPE). This is equivalent to the intra-event uncertainty. The number of
+stations contributing to each uncertainty is also provided. If the number of stations
+falls below the minimum required to compute the bias, the uncertainty value will be
+set to -1.</p>
+<p>These lines are followed by a number of grid_field tags:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>&lt;grid_field index=&quot;1&quot; name=&quot;LON&quot; units=&quot;dd&quot; /&gt;
+&lt;grid_field index=&quot;2&quot; name=&quot;LAT&quot; units=&quot;dd&quot; /&gt;
+&lt;grid_field index=&quot;3&quot; name=&quot;PGA&quot; units=&quot;pctg&quot; /&gt;
+&lt;grid_field index=&quot;4&quot; name=&quot;PGV&quot; units=&quot;cms&quot; /&gt;
+&lt;grid_field index=&quot;5&quot; name=&quot;MMI&quot; units=&quot;intensity&quot; /&gt;
+&lt;grid_field index=&quot;6&quot; name=&quot;PSA03&quot; units=&quot;pctg&quot; /&gt;
+&lt;grid_field index=&quot;7&quot; name=&quot;PSA10&quot; units=&quot;pctg&quot; /&gt;
+&lt;grid_field index=&quot;8&quot; name=&quot;PSA30&quot; units=&quot;pctg&quot; /&gt;
+&lt;grid_field index=&quot;9&quot; name=&quot;STDPGA&quot; units=&quot;ln(pctg)&quot; /&gt;
+&lt;grid_field index=&quot;10&quot; name=&quot;URAT&quot; units=&quot;&quot; /&gt;
+&lt;grid_field index=&quot;11&quot; name=&quot;SVEL&quot; units=&quot;ms&quot; /&gt;
+</pre></div>
+</div>
+</div></blockquote>
+<p>Each tag specifies a column in the grid table that follows.</p>
+<ul class="simple">
+<li><em>index</em>:  The column number where the specified parameter may be found. The first column is column “1.”</li>
+<li><em>name</em>:   Description of the parameter in the given column.</li>
+<li><em>LON</em>:    Longitude of the grid location (the “site”).</li>
+<li><em>LAT</em>:    Latitude of the site.</li>
+<li><em>PGA</em>:    Peak ground acceleration at the site.</li>
+<li><em>PGV</em>:    Peak ground velocity.</li>
+<li><em>MMI</em>:    Seismic intensity.</li>
+<li><em>PSA03</em>:  0.3 sec pseudo-spectral acceleration.</li>
+<li><em>PSA10</em>:  1.0 sec pseudo-spectral acceleration.</li>
+<li><em>PSA30</em>:  3.0 sec pseudo-spectral acceleration.</li>
+<li><em>STDPGA</em>: The standard error of PGA at the site (in natural log units).</li>
+<li><em>URAT</em>:   The uncertainty ratio. The ratio STDPGA to the nominal standard error of the GMPE at the site (no units).</li>
+<li><em>SVEL</em>:   The 30-meter shear wave velocity (Vs30) at the site.</li>
+</ul>
+<p>The measurement units:</p>
+<ul class="simple">
+<li><em>dd</em>:         Decimal degrees.</li>
+<li><em>pctg</em>:       Percent-g (i.e., nominal Earth gravity).</li>
+<li><em>cms</em>:        Centimeters per second.</li>
+<li><em>intensity</em>:  Generally Modified Mercalli Intensity, but potentially other intensity measures.</li>
+<li><em>ms</em>:         Meters per second.</li>
+<li><em>ln(pctg)</em>:   Natural log of percent-g.</li>
+<li><em>ln(cms)</em>:    Natural log of centimeters per second.</li>
+</ul>
+<p>The number of <em>grid_field</em> tags will vary: smaller-magnitude earthquakes may not
+have the pseudo-spectral acceleration values; scenarios will not have STDPGA or
+URAT; and maps that have not been site corrected will not have SVEL.</p>
+<p>The <em>grid_field</em> tags are followed by the <em>grid_data</em> tag, the gridded data, and the closing tags:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>&lt;grid_data&gt;
+-119.7857 35.0463 4.3 4.21 5.26 5.76 5.76 1.09 0.5 1 800
+-119.7774 35.0463 4.34 4.23 5.27 5.8 5.78 1.1 0.5 1 800
+-119.7690 35.0463 4.37 4.25 5.27 5.84 5.81 1.1 0.5 1 800
+…
+&lt;/grid_data&gt;
+&lt;/shakemap_grid&gt;
+</pre></div>
+</div>
+</div></blockquote>
+<p>The fast index for the coordinates is longitude, the slow index is latitude.
+Dimensions are from upper left to lower right (i.e., from longitude
+minimum/latitude maximum to longitude maximum/latitude minimum). The GMT program
+<em>xyz2grd</em> (coupled with <em>gmtconvert</em>) is particularly useful for converting the
+<em>grid.xml</em> data into a usable grid file.</p>
+<p><strong>Rock Grid XML</strong>. The file <em>rock_grid.xml.zip</em> is a zipped XML file containing
+the interpolated grid without site amplifications applied. The rock grid has the
+same structure as <em>grid.xml</em>, but Vs30 values and PGA uncertainty values are not
+supplied. <a class="reference internal" href="technical_guide.html#amplify-ground-motions"><span>Amplify Ground Motions</span></a> in the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>.</p>
+<p><strong>Uncertainty Grid XML</strong>. The file <em>uncertainty.xml.zip</em> is a zipped XML file
+containing the standard errors for each of the ground-motion parameters at each
+point in the output grid. It has the same structure as <em>grid.xml</em>, with the
+additional <em>grid_field</em> names:</p>
+<ul class="simple">
+<li><em>STDPGA</em>:     Standard error of peak ground acceleration.</li>
+<li><em>STDPGV</em>:     Standard error of peak ground velocity.</li>
+<li><em>STDMMI</em>:     Standard error of seismic intensity.</li>
+<li><em>STDPSA03</em>:   Standard error of 0.3 sec pseudo-spectral acceleration.</li>
+<li><em>STDPSA10</em>:   Standard error of 1.0 sec pseudo-spectral acceleration.</li>
+<li><em>STDPSA30</em>:   Standard error of 3.0 sec pseudo-spectral acceleration.</li>
+</ul>
+<p>The standard errors are given in natural log units, except for intensity (linear
+units). The PSA entries will be available only if the PSA ground motion
+parameters were mapped (typically only for earthquakes of M ≥ 5.0). No
+ground motion data or Vs30 values are available in
+<em>uncertainty.xml.zip</em>; for those, use <em>grid.xml.zip</em>.</p>
+<p><strong>Grid XYZ</strong>. <em>grid.xyz</em> is a plain-text comma-separated file of gridded ground motions.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The use of <em>grid.xyz</em> is deprecated. It is difficult to maintain and have it remain backward-compatible. All users are urged to use the XML grids instead, and to switch to the XML grids if they are using <em>grid.xyz</em>. <em>grid.xyz</em> will disappear in a future ShakeMap release.</p>
+</div>
+</div>
+<div class="section" id="station-lists">
+<h3>Station Lists<a class="headerlink" href="#station-lists" title="Permalink to this headline">¶</a></h3>
+<p>As discussed in the section <a class="reference internal" href="#sec-input-files"><span>Input Files</span></a>, ShakeMap produces station lists of input data
+in XML and text format. We also produce a version in GeoJSON format, which is available for
+download, and is used by the website to plot the stations on the interactive maps. The station
+data is available for viewing online by selecting the “Station List” tab on an event&#8217;s ShakeMap
+page. See <a class="pageref" href="#napa-station-table">Figure  11</a> for an example.</p>
+<div class="figure align-left" id="id13">
+<span id="napa-station-table"></span><a class="reference internal image-reference" href="_images/Napa.station.table.png"><img alt="_images/Napa.station.table.png" src="_images/Napa.station.table.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 11: Station table view from ShakeMap event-specific webpages. Link is at right of tabs above the map (see <a class="pageref" href="#napa-event-page">Figure  1</a>).</span></p>
+</div>
+</div>
+<div class="section" id="gis-products">
+<h3>GIS Products<a class="headerlink" href="#gis-products" title="Permalink to this headline">¶</a></h3>
+<p>The GIS Files (zipped) are a collection of shapefiles of contours of the
+ShakeMap model outputs for each shaking metric: MMI, PGA, PGV, and PSA at three
+periods (0.3, 1.0, and 3.0 sec).  These vectors should be easily importable into a GIS. The ESRI Raster
+Files (also zipped) are a collection of ESRI-formatted binary files.  It should
+be relatively easy to convert these to (for example) ArcGIS grids using the
+standard tools provided with the software. The contours are useful primarily for
+overlaying with other data for visualization purposes.  If you plan to do
+analysis, where you need to know the MMI value at particular points, then we
+would suggest using the ERSRI raster data (see below).</p>
+<p>ShakeMap processing does not occur in a Geographic Information System (GIS), but
+we post-process the grid files (described above) into raster and shape files for direct
+import into GIS. The file base names in each archive are abbreviations of the
+type of ground-motion parameter:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>*mi*    =  macroseismic intensity (usually, but not necessarily, mmi)
+*pga*   =  peak ground acceleration
+*pgv*   =  peak ground velocity
+*psa03* =  0.3 s pseudo-spectral acceleration
+*psa10* =  1.0 s pseudo-spectral acceleration
+*psa30* =  3.0 s pseudo-spectral acceleration
+</pre></div>
+</div>
+</div></blockquote>
+<p>The sub-sections that follow describe available file and product types.</p>
+<div class="section" id="shapefiles">
+<h4>Shapefiles<a class="headerlink" href="#shapefiles" title="Permalink to this headline">¶</a></h4>
+<p>GIS shapefiles are comprised of four or five standard associated GIS files:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>*.dbf* = A DataBase file with layer attributes
+*.shp* = The file with geographic coordinates
+*.shx* = An index file
+*.prj* = A file containing projection information
+*.lyr* = A file containing presentation properties (only available for PGA, PGV, and MMI)
+</pre></div>
+</div>
+</div></blockquote>
+<p>In this application, the shapefiles are contour polygons of the peak
+ground-motion amplitudes in ArcView shapefiles. These contour polygons are
+actually equal-valued donut-like polygons that sample the contour map at fine
+enough intervals to accurately represent the surface function. We generate the
+shapefiles independent of a GIS using a shareware package (<em>shapelib.c</em>).
+Contouring, as well as polygon formation and nesting, is performed by a program
+written in the <em>C</em> programming language by Bruce Worden, and is included in the ShakeMap
+software distribution.</p>
+<p><strong>GIS Shapefiles</strong>. Contour polygons for the PGM parameters are
+available as shapefiles intended for use with any GIS software that can
+read ArcView shapefiles.  Note, however, that the peak ground velocity (PGV)
+contours are in cm/s, and are therefore <strong>not</strong> suitable for HAZUS input.</p>
+<p>The contour intervals are 0.04g for PGA and the three
+PSA parameters, and 2cm/s for PGV. The file also includes MMI
+contour polygons in intervals of 0.2 intensity units.  These shapefiles have
+the same units as the online ShakeMaps. The archive of files is
+compressed in zip format and called <em>shape.zip</em>.  The <em>shape.zip</em> file is
+available for all events, but the spectral values are generally only included
+for earthquakes of magnitude 4.0 and larger.</p>
+<p><strong>HAZUS’99 Shapefiles and HAZUS-MH Geodatabases</strong>. We generate shapefiles that
+are designed with contour polygons intervals that are appropriate for use with
+the Federal Emergency Management Agency’s (FEMA) <a class="reference external" href="http://www.fema.gov/hazus/">HAZUS-MH®</a> software, though they may be imported into any
+GIS package that can read ArcView shapefiles. Because HAZUS software requires
+PGV in inches/sec, this file is not suitable for all
+applications. The contour intervals are 0.04g for PGA and the two PSA
+parameters (HAZUS only uses 0.3 and 1.0 sec periods), and 4
+inches/sec for PGV.</p>
+<p>HAZUS’99 users can use the <em>hazus.zip</em> shapefiles (see below) directly.  However,
+the 2004 release of HAZUS-MH uses geodatabases, not shapefiles.  As of this
+writing, FEMA has a temporary fix in the form of Visual Basic script that
+imports ShakeMap shape files and exports geodatabases.  FEMA has plans to
+incorporate such a tool directly into HAZUS-MH in the next official release (D.
+Baush, FEMA, Region VIII, oral commun., 2015).</p>
+<p>HAZUS traditionally used the epicenter and magnitude of an earthquake as
+reported, and used empirical relationships to estimate ground motions over the
+affected area.  These simplified ground-motion estimates would drive the computation of
+losses to structures and infrastructure, estimates of casualties and displaced
+households (for more details, see <a class="reference internal" href="references.html#nibs1997"><span>NIBS, 1997</span></a>).  With the
+improvements to seismic systems nationally, particularly in digital
+strong-motion data acquisition, and the advent of ShakeMap, HAZUS can now
+directly import a much more accurate description of ground shaking.  The
+improved accuracy of the input to loss-estimation routines can dramatically
+reduce the uncertainty in loss estimation due to poorly constrained shaking
+approximations.</p>
+<p>The HAZUS GIS files are only generated for events that are larger than
+(typically) magnitude 4.5.  The set of shapefiles for these parameters is an
+archive of files compressed in
+zip format (<em>hazus.zip</em>) to facilitate file transfer.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">An important note on the values of the parameters in the HAZUS shape files is that they are empirically corrected from the standard ShakeMap <strong>peak ground motion values</strong> to approximate the <strong>geometric mean</strong> values used for HAZUS loss estimation.  HAZUS was calibrated to work with mean ground motion values (FEMA, 1997). Peak amplitudes are corrected by scaling values down by 15 percent (Campbell, 1997; Joyner, oral commun., 2000). As of this writing, FEMA is considering switching to peak ground motions as presented by ShakeMap rather than employing the geometric mean component.</p>
+</div>
+</div>
+<div class="section" id="esri-raster-files-fit-files">
+<h4>ESRI Raster Files (<em>.fit</em> files)<a class="headerlink" href="#esri-raster-files-fit-files" title="Permalink to this headline">¶</a></h4>
+<p>ESRI raster grids of the ground-motion
+parameters and their uncertainties are also available. The files are found in a
+zipped archive called <em>raster.zip</em>. Each archive contains four files per
+parameter: <em>&lt;param&gt;.fit</em> and <em>&lt;param&gt;.hdr</em>, which contain the ground-motion
+data, and <em>&lt;param&gt;_std.fit</em> and <em>&lt;param&gt;_std.hdr</em>, which contain the
+uncertainties for the ground motions. See <em>grid.xml</em> for information on units.
+As with the other GIS files, PGA, PGV, and MMI are available for all events,
+while the PSA parameters are usually only included for earthquakes
+M4.5 and larger.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Loading ESRI Raster Grid ShakeMaps into ArcGIS</p>
+<ol class="last arabic simple">
+<li>Open the ArcToolbox in ArcMap</li>
+<li>Select Multidimension Tools -&gt; Make NetCDF Raster Layer</li>
+<li>In the dialog that appears, select the input <em>.grd</em> file you downloaded and unzipped, and name the layer    appropriately (&#8220;vs30&#8221;, etc.)</li>
+<li>The new layer should appear in your list of layers.</li>
+<li>Note: This layer is ephemeral&#8212;if you want to keep the raster version of the data, you&#8217;ll have to save the layer to a file.</li>
+</ol>
+</div>
+</div>
+<div class="section" id="google-earth-overlay">
+<h4>Google Earth Overlay<a class="headerlink" href="#google-earth-overlay" title="Permalink to this headline">¶</a></h4>
+<p>The file <em>&lt;event_id&gt;.kmz</em> enables the user to view the
+ShakeMap in Google Earth (or other KML-compliant applications). A
+color-scaled intensity overlay is provided along with a complete station list,
+contours and polygons of intensity and peak ground motion, a fault representation (if
+provided), epicenter indicator, intensity scale, and the USGS logo. The
+transparency of the intensity overlay is adjustable by the user, as is the
+appearance of seismic stations. The KMZ file embeds several
+other files that may be found in the event’s download directory:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>epicenter.kmz
+fault.kmz
+overlay.kmz (links to ii_overlay.png)
+stations.kmz
+contours.kmz
+</pre></div>
+</div>
+</div></blockquote>
+<p>Note that the KMZ file is static and will not automatically update when we update the ShakeMap
+for an event, so periodic checks for updated maps and reloading of the KMZ is
+recommended.</p>
+<p>In addition to the ShakeMap-produced KMZ file, the USGS produces a KML file
+(linked near the top of the page in the event-centric pages with the title
+“Google Earth KML”) which contains not only ShakeMap data, but also data from
+PAGER, DYFI, and other sources. This file should be the preferred
+source, as it will have the most-up-to-date links, though it does not have all of
+the layers available in the ShakeMap KMZ file.</p>
+</div>
+<div class="section" id="contour-files">
+<h4>Contour Files<a class="headerlink" href="#contour-files" title="Permalink to this headline">¶</a></h4>
+<p>As mentioned above in the ShakeMap Output GIS format section,
+contour files are available for general GIS, HAZUS, and KML formats. We also
+provide GeoJSON format contours, all under the ShakeMap event-specific
+&#8220;Downloads&#8221; tab.</p>
+</div>
+</div>
+</div>
+<div class="section" id="real-time-product-distribution-automatic-access-and-feeds">
+<h2>Real-Time Product Distribution, Automatic Access, and Feeds<a class="headerlink" href="#real-time-product-distribution-automatic-access-and-feeds" title="Permalink to this headline">¶</a></h2>
+<p>ShakeMap products are distributed by a number of means immediately after they
+are produced. The intent of these products is to help responders and
+other responsible parties effectively manage their post-earthquake
+activities, so we make it as easy as possible for users with a variety of
+technological sophistication and infrastructure to access them. The general
+distribution methods are
+interactive Web downloads, RSS feeds, GeoJSON feeds, ShakeCast, the Product
+Distribution Layer (PDL) client, and GIS web mapping services.</p>
+<div class="section" id="interactive-web-downloads">
+<h3>Interactive Web Downloads<a class="headerlink" href="#interactive-web-downloads" title="Permalink to this headline">¶</a></h3>
+<p>The easiest way to obtain ShakeMap products immediately following an earthquake
+is from the <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/shakemap/">ShakeMap</a> or
+<a class="reference external" href="http://earthquake.usgs.gov/">USGS Earthquake Program</a> webpages. The event
+page for any given earthquake has a download link where all of the products for
+that event may be found. The ShakeMap page for an event also has a download link
+that lists just the ShakeMap products. The variety
+of formats for ShakeMap are described in the previous section.</p>
+</div>
+<div class="section" id="rss-feeds">
+<h3>RSS Feeds<a class="headerlink" href="#rss-feeds" title="Permalink to this headline">¶</a></h3>
+<p>USGS Earthquake Program earthquake information <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/feed/v1.0/">Feeds</a> currently include Really
+Simple Syndication (RSS) feeds. However, the RSS feeds are deprecated; they will be
+decommissioned in 2016.</p>
+</div>
+<div class="section" id="geojson-feeds">
+<h3>GeoJSON Feeds<a class="headerlink" href="#geojson-feeds" title="Permalink to this headline">¶</a></h3>
+<p><strong>Automatically Retrieving Earthquake Data and ShakeMap Files</strong>. The USGS
+Earthquake Program GeoJSON feed provides USGS ShakeMap, along with most other USGS
+real-time earthquake products. <a class="reference external" href="http://geojson.org/">GeoJSON</a> is an extension
+of the JavaScript Object Notation (JSON) standard and allows for a
+variety of geospatial data structures.  There are JSON parsers in most modern
+languages, including Python, Perl, Matlab, and R.</p>
+<p>In order to automatically ingest the above data, use the automated
+<a class="reference external" href="http://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php">GeoJSON feeds</a>.
+Mike Hearne (USGS), provides <a class="reference external" href="https://gist.github.com/mhearne-usgs/6b040c0b423b7d03f4b9">an example python script</a> for querying the USGS
+Magnitude 2.5+ thirty-day GeoJSON feed, and downloading the most recent version of
+the event products desired by the user. In addition, the USGS Haz-Dev group provides
+<a class="reference external" href="https://github.com/usgs/devcorner">other scripts</a> in various programming languages
+that allow access to the GeoJSON feeds. Modifications to these scripts allow
+access to any ShakeMap (or other) products automatically, GIS flavors included.</p>
+<p><strong>Example</strong>. <em>How can I use your API to get ShakeMap files download for specific events (that shook Guatemala)?</em></p>
+<p>The following GeoJSON summary query includes events between 2015-01-01
+and 2016-01-01 in the bounding box lat. 10 to 20, long. -95 to -85,
+in case an event outside Guatemala results in shaking inside
+Guatemala; and includes a ShakeMap product:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&amp;starttime=2015-01-01T00:00:00
+&amp;maxlatitude=20&amp;minlatitude=10&amp;maxlongitude=-85&amp;minlongitude=-95&amp;endtime=2016-01-01T00:00:00&amp;
+producttype=shakemap
+</pre></div>
+</div>
+</div></blockquote>
+<p>The results include an array of features with summary information for
+each event.  The <em>detail</em> property is a URL for the GeoJSON detail
+feed that includes URLs for ShakeMap files. For example, for the
+<em>us100044xh</em> event, the GeoJSON detailed feed URL is:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>HTTP://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us100044xh&amp;format=geojson
+</pre></div>
+</div>
+</div></blockquote>
+<p>The URLs for the ShakeMap files can be found inside the feed:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">FEED</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">shakemap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="s">&#39;download/grid.xml.zip&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span>
+<span class="n">FEED</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">shakemap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="s">&#39;download/shape.zip&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>In this case, these are the specific URLs are for the <em>grid.xml</em> file
+and for the <em>shape.zip</em> files, respectively:</p>
+<blockquote>
+<div><div class="highlight-python"><div class="highlight"><pre>http://earthquake.usgs.gov/archive/product/shakemap/us100044xh/us/1450404175265/
+download/grid.xml.zip
+http://earthquake.usgs.gov/archive/product/shakemap/us100044xh/us/1450404175265/
+ download/shape.zip
+</pre></div>
+</div>
+</div></blockquote>
+</div>
+<div class="section" id="additional-feeds">
+<h3>Additional Feeds<a class="headerlink" href="#additional-feeds" title="Permalink to this headline">¶</a></h3>
+<p>More information about USGS earthquake data feeds is available at our <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/feed/v1.0/index.php">Feeds &amp;
+Notifications page</a>.</p>
+</div>
+<div class="section" id="shakecast-system">
+<h3>ShakeCast System<a class="headerlink" href="#shakecast-system" title="Permalink to this headline">¶</a></h3>
+<p>ShakeCast delivers user-specified ShakeMap products to the user’s
+local or virtual system(s), and runs fragility-based damage (or
+inspection priority) calculations for specific portfolios. More advanced
+features of ShakeCast include a complete suite of damage
+estimation and mapping tools, coupled with sophisticated tools to notify
+responsible parties within an organization on a per-facility basis. See
+<a class="reference internal" href="related_systems.html#sec-related-systems"><span>Related Systems</span></a> for more details. Complete background on ShakeCast
+can be found on the ShakeCast <a class="reference external" href="http://earthquake.usgs.gov/research/software/shakecast/">homepage</a> and <a class="reference external" href="https://my.usgs.gov/confluence/display/ShakeCast/Home">Wiki</a> and the documentation provided therein.</p>
+</div>
+<div class="section" id="product-delivery-layer-pdl-client">
+<h3>Product Delivery Layer (PDL) Client<a class="headerlink" href="#product-delivery-layer-pdl-client" title="Permalink to this headline">¶</a></h3>
+<p>Finally, for academic and government users, ShakeMap products (and other
+earthquake products) are communicated through the USGS’s <a class="reference external" href="http://earthquake.usgs.gov/research/software/#PDL">Product Distribution
+Layer (PDL)</a>.</p>
+</div>
+<div class="section" id="web-mapping-gis-services">
+<span id="gis-services"></span><h3>Web Mapping (GIS) Services<a class="headerlink" href="#web-mapping-gis-services" title="Permalink to this headline">¶</a></h3>
+<p>In addition to the downloadable GIS-formatted ShakeMaps (including shapefiles) that are
+readily available for each ShakeMap event, USGS also hosts a real-time <a class="reference external" href="http://geohazards.usgs.gov/arcgis/rest/services/ShakeMap/ShakeMap/MapServer">30-day
+*Signficant* `Earthquake GIS ShakeMap Feed</a>.
+<a class="reference external" href="http://www.esri.com">ESRI</a> provides a separate <a class="reference external" href="http://www.esri.com/">Disaster Response ArcGIS service</a>, providing <a class="reference external" href="https://tmservices1.esri.com/arcgis/rest/services/LiveFeeds/USGS_Seismic_Data/MapServer">live feeds</a>
+to several USGS post-earthquake products.</p>
+<div class="sidebar">
+<p class="first sidebar-title">Related GIS Service Interactions</p>
+<p class="last">Users can access the ShakeMap data behind the GIS service in a variety of ways via the ArcGIS Server “REST API”. Some examples of commonly used data-access options are detailed below.</p>
+</div>
+<ul class="simple">
+<li><a class="reference external" href="http://resources.arcgis.com/en/help/rest/apiref/export.html">Export Map Image</a>: Download a static image of the map to include in their work.</li>
+<li><a class="reference external" href="http://resources.arcgis.com/en/help/rest/apiref/identify.html">Identify</a>: Retrieve service data for given geographic location. (Point, Line, Polygon or Envelop)</li>
+<li><a class="reference external" href="http://resources.arcgis.com/en/help/rest/apiref/find.html">Find</a>: Query service data that contains certain attributes. (ex. ShakeMap data for distinct event id)</li>
+<li><a class="reference external" href="http://resources.arcgis.com/en/help/rest/apiref/query.html">Query</a>: Query a specific layer in a service and return a detailed featureset.</li>
+</ul>
+<p>Along with the common GIS service interactions listed above, there are many
+other calls that GIS developers can make through the <a class="reference external" href="http://resources.arcgis.com/en/help/rest/apiref/">REST API</a>.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><strong>Earthquake Significance</strong>. The NEIC associates a <a class="reference external" href="https://github.com/usgs/earthquake-event-ws/blob/master/src/lib/sql/fdsnws/getEventSummary.sql#L157">*significance*</a> number with each earthquake event. Larger numbers indicate more significance. This value is determined by a number of factors, including magnitude, maximum MMI, felt reports, and estimated impact.  The significance number ranges from 0 to 1000.  The &#8220;30 day significant earthquake feed&#8221; that determines which events are included in the ShakeMap GIS feed uses events with a significance of 600 and greater.</p>
+</div>
+<p><strong>Accessing ShakeMap GIS Files:</strong> While this GIS service only provides access to
+significant earthquakes that have occurred within the last thirty days, users can
+download GIS files for <a class="reference external" href="https://tmservices1.esri.com/arcgis/rest/services/LiveFeeds/USGS_Seismic_Data/MapServer">significant events</a>
+on our website after the thirty-day period.  The significant earthquake archive has
+a list of large events with links to each event’s webpage.  From the event
+page, users can click on the ShakeMap tab and navigate to the “Downloads”
+section to get a zipped bundle of shapefiles.</p>
+<p><strong>Acknowledgement</strong>: USGS appreciates guidance from the Esri Aggregated Live Feed
+team, specifically Derrick Burke and Paul Dodd.  Their willingness to share
+best practices for robust real-time sharing of GIS data enabled this project to
+be completed.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="shakemap_archives.html" class="btn btn-neutral float-right" title="ShakeMap Archives">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="background.html" class="btn btn-neutral" title="Background"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
