@@ -3,11 +3,11 @@
 
 import numpy as np
 import openquake.hazardlib.geo as geo
-import pyshake.shakelib.ecef as ecef
-import pyshake.shakelib.fault as fault
-from pyshake.shakelib.vector import Vector
-from pyshake.shakelib.distance import calcRuptureDistance
-from pyshake.shakelib.distance import getDistance
+import shakemap.shakelib.ecef as ecef
+import shakemap.shakelib.fault as fault
+from shakemap.shakelib.vector import Vector
+from shakemap.shakelib.distance import calcRuptureDistance
+from shakemap.shakelib.distance import getDistance
 #from numba import jit
 
 """
