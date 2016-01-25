@@ -1,0 +1,543 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ShakeMap Archives &mdash; ShakeMap Manual 2.0 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ShakeMap Manual 2.0 documentation" href="index.html"/>
+        <link rel="up" title="User’s Guide" href="users_guide.html"/>
+        <link rel="next" title="Applications of ShakeMap" href="shakemap_applications.html"/>
+        <link rel="prev" title="Products and Formats" href="products.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> ShakeMap Manual</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technical_guide.html">Technical Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#shakemap-software-overview">ShakeMap Software Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#philosophy-of-estimating-and-interpolating-ground-motions">Philosophy of Estimating and Interpolating Ground Motions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#recorded-ground-motion-parameters">Recorded Ground-motion Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#ground-motion-and-intensity-predictions">Ground Motion and Intensity Predictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#shakemap-processing">ShakeMap Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#representing-macroseismic-intensity-on-maps">Representing Macroseismic Intensity on Maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#discussion-of-chosen-map-parameters-intensity-measures">Discussion of Chosen Map Parameters (Intensity Measures)</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="users_guide.html">User&#8217;s Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="background.html">Background</a></li>
+<li class="toctree-l2"><a class="reference internal" href="products.html">Products and Formats</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">ShakeMap Archives</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakemap_applications.html">Applications of ShakeMap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="related_systems.html">Related Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="disclaimers.html">Disclaimers</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="software_guide.html">Software &amp; Implementation Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#implementation-considerations">Implementation Considerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#shakemap-implementation-checklist">ShakeMap Implementation Checklist</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html#software-availability-software-guide">Software Availability &amp; Software Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="regionals.html">Regional Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="future_directions.html">Future Directions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="future_directions.html#research-development">Research &amp; Development</a></li>
+<li class="toctree-l2"><a class="reference internal" href="future_directions.html#software-shakemap-4-0-python">Software: ShakeMap 4.0 (Python)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">References &amp; Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">ShakeMap Manual</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="users_guide.html">User&#8217;s Guide</a> &raquo;</li>
+      
+    <li>ShakeMap Archives</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/shakemap_archives.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="shakemap-archives">
+<span id="sec-shakemap-archives"></span><h1>ShakeMap Archives<a class="headerlink" href="#shakemap-archives" title="Permalink to this headline">¶</a></h1>
+<p>All ShakeMaps are available for viewing and download online. The ShakeMap
+Archives consist of three primary repositories: <strong>Recent ShakeMaps</strong>, the
+<strong>ShakeMap Atlas</strong> for historic earthquakes (primarily 1970-2012), and a
+collection of hypothetical earthquake <strong>ShakeMap Scenarios</strong>. For example,
+scenario earthquakes compiled for Northern and Southern California represent
+over 200 different earthquake ruptures studied for California, as detailed
+below. Formats for all ShakeMaps, whether near&#8211;real-time, historic, or
+future scenarios, are uniform.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Some older archival ShakeMaps
+online were generated with earlier versions of the ShakeMap
+software; hence, they do not contain up-to-date formats and all
+products. This will be remedied as older events are rerun and
+updated. One can tell from the <em>processed time</em> on the bottom of
+any ShakeMap when it was run.</p>
+</div>
+<div class="section" id="real-time-shakemaps">
+<h2>Real-time ShakeMaps<a class="headerlink" href="#real-time-shakemaps" title="Permalink to this headline">¶</a></h2>
+<p><strong>In the U.S.</strong>, ShakeMaps are generated via independent systems running at ANSS
+Regional Seismic Systems (RSNs) in Northern California, Southern California, the
+Pacific Northwest, Utah, Nevada, and Alaska. For the rest of the U.S., the
+ShakeMap group at the USGS National Earthquake Information Center (NEIC) in Golden, Colorado
+produces maps for the regional networks operating in Hawaii, New England, and
+the Central and Eastern U.S. on a system referred to as Global ShakeMap (GSM).
+The input, metadata, and output files produced by all these instances are
+aggregated by the USGS via the Earthquake Hazards Program web system. GSM also provides
+backup capabilities for the RSNs, but with degraded capabilities; not all data
+are flowing from the RSNs to GSM automatically.</p>
+<p>Separate independent systems running in Puerto Rico and New England generate
+ShakeMaps, but these instances do not deliver them through the USGS Earthquake Hazards
+Program webpages (at the time of this writing). GSM covers these regions but
+does not yet access the full set of data available to these regional
+systems. For more information on the ANSS regional and the national
+ShakeMap system implementations and operations, see the section on <a class="reference internal" href="regionals.html#sec-regionals"><span>Regional Operations</span></a>.</p>
+<p><strong>Internationally</strong>, USGS ShakeMap is installed and operational in Italy,
+France, Portugal, Switzerland, New Zealand, Romania, Indonesia, Iran, Iceland,
+Panama, and several other nations (see <a class="pageref" href="#international-shakemaps">Figure  1</a>).
+Several instances of ShakeMap are in testing
+or operational mode in the Middle East (including Oman, Morocco, and the U.A.E.; M.
+Franke, written comm., 2015). In addition, other ShakeMap installations are in
+testing in Latin America and the Caribbean (Chile, Costa Rica, Colombia, Mexico,
+Costa Rica), and in Southeast Asia (Malaysia and Korea). Discussions have taken
+place with several other interested countries.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Very impressive systems analogous to ShakeMap operate in
+Japan (JMA), Taiwan, China, New Zealand, Turkey, and several other countries.</p>
+</div>
+<div class="figure align-left" id="id4">
+<span id="international-shakemaps"></span><a class="reference internal image-reference" href="_images/International_shakemaps.png"><img alt="International ShakeMap Systems" src="_images/International_shakemaps.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 1: International ShakeMap Systems</span></p>
+</div>
+</div>
+<div class="section" id="shakemap-atlas">
+<h2>ShakeMap Atlas<a class="headerlink" href="#shakemap-atlas" title="Permalink to this headline">¶</a></h2>
+<p>ShakeMap was designed with near&#8211;real-time earthquake response purposes in mind.
+However, many of the strategies for mapping the patterns of peak ground motions for
+real-time applications described above prove useful for re-creating the shaking from
+historic earthquakes.</p>
+<p>The ShakeMap Atlas (<a class="reference internal" href="references.html#allen2008"><span>Allen et al., 2008</span></a>, <a class="reference internal" href="references.html#allen2009a"><span>2009a</span></a>) is a self-consistent, well-calibrated
+collection of historic earthquakes for which ShakeMaps were systematically generated.
+The Atlas constitutes an invaluable online resource for investigating near-source strong
+ground motion, as well as for seismic hazard, scenario, risk, and loss-model
+development.</p>
+<div class="sidebar">
+<p class="first sidebar-title"><strong>Finding Atlas ShakeMaps Online</strong></p>
+<ul class="last simple">
+<li><strong>Atlas Version 1.0</strong> (<a class="reference internal" href="references.html#allen2008"><span>Allen et al., 2008</span></a>) ShakeMaps are available online on the
+<a class="reference external" href="http://earthquake.usgs.gov/earthquakes/shakemap/">ShakeMap homepage</a>, which consists of all the standardized ShakeMap products and formats. Output grids for the entire dataset can also
+be obtained at that site.</li>
+<li><strong>Atlas Version 2.0</strong> (<a class="reference internal" href="references.html#garcia2012a"><span>Garcia et al. (2012a)</span></a>
+ShakeMaps are available by searching the USGS <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/search/">Comprehensive Catalogue
+(ComCat) Earthquake database</a>. Be sure to select “ShakeMap Atlas” as the “Contributor” from
+the “Advanced Options” dropdown menu.</li>
+</ul>
+</div>
+<p>The original (2009) Atlas is a compilation of nearly 5,000 ShakeMaps for the most
+significant global earthquakes between 1973 and 2007 (<a class="reference internal" href="references.html#allen2008"><span>Allen et al., 2008</span></a>).
+<a class="reference internal" href="references.html#garcia2012a"><span>Garcia et al. (2012a)</span></a> introduced an update of the Atlas, which extends the time period through 2012,
+with a total of 6,100 events. The revised Atlas 2.0 includes: a new version of the
+ShakeMap software (V3.5) which improves interpolation and uncertainty estimations;
+an updated earthquake source catalogue that includes regional locations and finite fault
+models; a refined strategy to select prediction and conversion equations based on a
+new seismotectonic regionalization scheme (<a class="reference internal" href="references.html#garcia2012b"><span>Garcia et al., 2012b</span></a>); and vastly more
+macroseismic-intensity and ground-motion data from international agencies.</p>
+<p>In order to best replicate shaking that occurred during historic and recent earthquakes, we
+employ many of the ShakeMap tools described in the previous sections. For many older
+events, the important constraints (in addition to the usual site condition map) are the
+fault rupture geometry, macroseismic intensity, and peak ground motion data. As
+previously described, combining peak ground motions and macroseismic data was accomplished seamlessly
+and rigorously with the new interpolation scheme developed by
+<a class="reference internal" href="references.html#worden2010"><span>Worden et al. (2010)</span></a>. This strategy was in part aimed at most accurately representing
+historic earthquake shaking maps, which are often constrained predominantly by key
+macroseismic observations, and is essential for the Atlas.</p>
+<div class="figure align-left" id="id5">
+<span id="figure1-14"></span><a class="reference internal image-reference" href="_images/Figure_1_14.png"><img alt="_images/Figure_1_14.png" src="_images/Figure_1_14.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 2: Example of the macroseismic intensity ShakeMaps for one ShakeMap Atlas event:
+the 1999 M6.0 Athens, Greece earthquake. (A) overview map; and (B) zoomed map. The black
+rectangle delineates the surface projection of the finite fault (a normal fault dipping southwest).
+Circles represent native MMI data; triangles show PGM data converted to MMI values via the <a class="reference internal" href="references.html#worden2012"><span>Worden et al.
+(2012)</span></a> GMICE, the choice of which automatically redefines the legend scale.
+After <a class="reference internal" href="references.html#garcia2012a"><span>Garcia et al. (2012a)</span></a>.</span></p>
+</div>
+<p>The Atlas provides a hazard base layer for an number of systems that require estimates of the shaking values where losses occurred.
+To this end, the Atlas is used for the Earthquake Consequences Database within the Global Earthquake
+Model initiative (GEMECD; <a class="reference internal" href="references.html#so2014"><span>So, 2014</span></a>).
+The &#8220;GEMECD subset&#8221; is a collection of approximately 100 events which constitute
+the most important and damaging
+events since about 1973. The purpose of the GEMECD subset is to provide the
+Global
+Earthquake Model (GEM) Foundation&#8212;and hence the wider earthquake hazard and
+loss community&#8212;a common-denominator hazard layer
+for calibrating and testing earthquake damage and loss models. The Atlas is also
+the calibration hazard layer for the USGS
+<a class="reference external" href="http://earthquake.usgs.gov/research/pager/">PAGER</a> system  (e.g., <a class="reference internal" href="references.html#wald2008"><span>Wald et
+al., 2008</span></a>; <a class="reference internal" href="references.html#jaiswal2010"><span>Jaiswal and Wald, 2010</span></a>; <a class="reference internal" href="references.html#pomonis2011"><span>Pomonis and So, 2011</span></a>).</p>
+<p>A subset of the Atlas was also employed by <a class="reference internal" href="references.html#zhu2014"><span>Zhu et al. (2014)</span></a>
+for the calibration of near&#8211;real-time
+liquefaction probability maps, and by <a class="reference internal" href="references.html#nowicki2014"><span>Nowicki et al. (2014)</span></a> for near&#8211;real-time
+landslide mapping. As with earlier studies (including <a class="reference internal" href="references.html#godt2008"><span>Godt et al., 2008</span></a>; <a class="reference internal" href="references.html#jaiswal2010"><span>Jaiswal et al.,
+2010</span></a>, <a class="reference internal" href="references.html#jaiswal2012"><span>2012</span></a>; <a class="reference internal" href="references.html#knudsen2011"><span>Knudsen and Bott, 2011</span></a>; <a class="reference internal" href="references.html#matsuoka2015"><span>Matsuoka et al, 2015</span></a>), these authors recognized the
+importance of calibrating empirical ground failure and loss models against a
+standardized
+set of uniformly-produced shaking hazard maps so as to allow comparison of
+models
+based on consistent hazard inputs. <a class="pageref" href="#figure1-15">Figure  3</a> shows an example of
+the possibility of
+constraining shaking at landslide sites using ShakeMap layers for the 2008 M7.9
+Wenchuan, China earthquake, employing shaking constraints provided by strong-motion
+and intensity data as well as detailed fault geometry.</p>
+<div class="figure align-left" id="id6">
+<span id="figure1-15"></span><a class="reference internal image-reference" href="_images/Figure_1_15.png"><img alt="_images/Figure_1_15.png" src="_images/Figure_1_15.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 3: Example of the ShakeMaps for the 2008 M 7.9 Wenchuan, China earthquake for (A)
+Intensity and (B) PGA. Green polygons show areas of landsliding mapped out by <a class="reference internal" href="references.html#dai2010"><span>Dai et al.
+(2010)</span></a>. Black rectangles delineate the surface projection of the different fault segments involved
+in the rupture. Triangles indicate native strong motion stations; circles represent MMI data converted to GM
+values via a GMICE (here <a class="reference internal" href="references.html#worden2012"><span>Worden et al., (2012)</span></a>, the choice of which automatically redefines the
+legend scale.</span></p>
+</div>
+</div>
+<div class="section" id="shakemap-scenarios">
+<span id="sec-scenarios"></span><h2>ShakeMap Scenarios<a class="headerlink" href="#shakemap-scenarios" title="Permalink to this headline">¶</a></h2>
+<p>In addition to historical and near&#8211;real-time applications, ShakeMap has become widely
+used for earthquake mitigation and planning exercises through earthquake scenarios.
+A scenario represents one realization of a potential future earthquake by assuming a
+particular magnitude, location, and fault-rupture geometry and estimating shaking using a
+variety of strategies (including ShakeMap with GMPEs).
+Some of the technical issues related to scenario generation are discussed in the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>.
+Here we cover the many uses for earthquake scenarios from the users&#8217; perspective.</p>
+<p>In planning and coordinating emergency response, utilities, local government, and other
+organizations are best served by conducting training exercises based on realistic
+earthquake situations&#8212;ones similar to those they are most likely to face. ShakeMap
+Scenario earthquakes can fill this role. They can also be used to examine
+exposure of structures, lifelines, utilities, and transportation corridors to specified
+potential earthquakes.</p>
+<p>The September, 2015, <a class="reference external" href="http://nehrp.gov/pdf/2015ACEHRReportFinal.pdf">Report to NEHRP Agencies from the Advisory Committee on
+Earthquake Hazards Reduction (ACEHR)</a>,
+notes:</p>
+<blockquote>
+<div><em>USGS Recommendation 4 - ACEHR recommends the USGS expand earthquake scenario
+development in conjunction with stakeholder engagement in order to examine
+consequences of earthquakes in high-risk urban areas.</em></div></blockquote>
+<p>To this end, USGS ShakeMap webpages now display many earthquake scenarios, and
+we are working to develop a comprehensive suite of scenarios for all at-risk
+regions of the United States (see <a class="reference internal" href="references.html#thompson2016"><span>Thompson et al., 2016</span></a>).</p>
+<blockquote>
+<div><em>USGS Recommendation 5 - ACEHR recommends the USGS work with operators of
+critical infrastructure and lifeline systems to define and integrate
+near real-time earthquake data and other seismic information into
+system monitoring so that operators can quickly assess system
+impacts from earthquake movements
+and take appropriate actions.  This development should be linked
+with the EEW program.</em></div></blockquote>
+<p>A ShakeMap earthquake scenario is simply a ShakeMap with an assumed magnitude and
+location, and, optionally, specified fault geometry. For example, <a class="pageref" href="#figure1-13u">Figure  4</a> shows
+ShakeMap scenario intensity (top) and peak velocity (bottom) maps for a hypothetical
+earthquake of M7.05 on the Hayward Fault in the eastern San Francisco Bay area. Due to
+the proximity to populated regions of Oakland, Berkeley, and surrounding cities, this
+scenario represents one of the most destructive earthquakes that could impact the region.
+Different renditions of this particular scenario have been widely used for evaluating the
+region&#8217;s capacity to respond to such a disaster among federal, state, utility, business, and
+local emergency response organizations.</p>
+<div class="figure align-left" id="id7">
+<span id="figure1-13u"></span><a class="reference internal image-reference" href="_images/Figure_1_13.png"><img alt="_images/Figure_1_13.png" src="_images/Figure_1_13.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 4: ShakeMap scenario intensity (top) and peak velocity (bottom) maps for a M7.05
+Hayward Fault, CA, earthquake: A) intensity; no directivity, B) intensity; directivity added, C)
+peak velocity; no directivity, and D) peak velocity; directivity added.</span></p>
+</div>
+<p>The USGS and ANSS partners receive numerous requests for ShakeMap scenarios
+annually. The NEIC Global ShakeMap (GSM) operators have also generated scores
+of scenarios for colleagues, partners, other federal agencies, non-profit organizations,
+and governments around the globe. These and other scenarios are available online
+on the ShakeMap webpages. They are formatted the same as other ShakeMaps, so they
+can be easily used in response planning and loss estimation as well as for educational
+purposes.</p>
+<p>ShakeMap earthquake scenarios can be an integral part of earthquake emergency
+response planning.
+Primary users include city, county, state and
+federal government agencies (e.g., the California EMA, FEMA); and
+emergency-response planners and managers for utilities, businesses, and other
+large organizations.
+ShakeMap scenarios are particularly useful in planning and
+exercises when combined with loss-estimation systems such as PAGER, HAZUS, and
+ShakeCast, which provide ShakeMap-based estimates of overall social and economic
+impact, detailed loss estimates, and inspection priorities, respectively. Since
+ShakeMap’s inception, operators have generated hundreds of earthquake
+scenarios that have been used in formal earthquake response exercises around the
+world.</p>
+<div class="sidebar">
+<p class="first sidebar-title"><strong>Finding ShakeMap Scenarios Online</strong></p>
+<ul class="last simple">
+<li><strong>Scenarios 1.0</strong>. ShakeMaps are available online on the
+<a class="reference external" href="http://earthquake.usgs.gov/earthquakes/shakemap/">ShakeMap homepage</a>, which
+consists of all the standardized ShakeMap products and formats.
+Output grids for the entire dataset can also be obtained at that site.</li>
+<li><strong>Scenarios 2.0</strong>. The Next Generation Scenarios (NGS) will be available by
+searching the USGS <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/search/">Comprehensive Catalogue
+(ComCat) Earthquake database</a>. Be sure
+to select “ShakeMap Scenarios”
+as the “Contributor” in the “Advanced Options” dropdown menu. The
+available catalogues of scenarios will change over time.</li>
+</ul>
+</div>
+<div class="section" id="generating-earthquake-scenarios">
+<h3>Generating Earthquake Scenarios<a class="headerlink" href="#generating-earthquake-scenarios" title="Permalink to this headline">¶</a></h3>
+<p>Given a selected event, we have developed tools to make it relatively easy to generate a
+ShakeMap earthquake scenario. All that is required is to assume a particular fault or fault
+segment will (or did) rupture over a certain length and with a chosen magnitude, and to
+generate a file describing the fault geometry and another describing the magnitude and
+hypocenter of the ostensible earthquake (see the <a class="reference internal" href="software_guide.html#software-guide"><span>Software &amp; Implementation Guide</span></a> for details). ShakeMap
+can then estimate the ground shaking at all locations over a chosen area surrounding the
+fault and produce a full suite of data products just as if the event were a real earthquake.
+Ground motions are usually estimated using GMPEs to compute peak ground motions on
+rock conditions; however, the operator may also supply ground-motion estimates from
+external programs in the form of GMT grid files. As described in <a class="reference internal" href="technical_guide.html#amplify-ground-motions"><span>Amplify Ground Motions</span></a>,
+ShakeMap corrects the amplitudes based on the local site soil conditions unless
+configured otherwise.</p>
+<p>At present, ground motions are estimated using empirical attenuation
+relationships (though we can use gridded ground-motion estimates from other
+sources for those who wish to provide them). We then correct the amplitudes
+based on the local site soil conditions (Vs30) as we do in the general ShakeMap
+interpolation scheme.  Fault finiteness is included explicitly, basin depth can
+be incorporated where appropriate, and source directivity is included via the
+relationships developed by <a class="reference internal" href="references.html#rowshandel2010"><span>Rowshandel (2010)</span></a>.  Depending on the level of
+complexity needed for the scenario, event-specific factors, such as variable
+slip distribution, could also be incorporated in the amplitude estimates fed to
+ShakeMap.</p>
+<p>In most cases, we do not consider the direction of rupture, nor do we modify the peak
+motions by a directivity term. Fault geometries are specified with a fault file that
+represents the fault planar segments. With this approach, the location of
+the earthquake hypocenter does not have any effect on the resulting ground-motions; only
+the location and dimensions of the fault matter. If we were to add directivity to the
+calculations, then different choices of hypocentral location could result in significantly
+different motions for the same magnitude earthquake and fault segment.</p>
+<p>Rather, our approach is to generally show the average effect because it is difficult to justify a
+particular choice of hypocenter or to show the results for every possible hypocentral
+location. Our empirical predictive approach also only gives median peak&#8211;ground-motion
+values, so it does not account for all the expected variability in motions, only the
+aforementioned site amplification variations. Actual ground motions show significant
+variability for a given distance, magnitude, and site condition and, hence, the scenario
+ground-motions are more uniform than would be expected for a real earthquake.
+2D and 3D wave propagation, path effects (such as
+basin edge amplification and focusing), differences in motions among earthquakes of the
+same magnitude, and complex site effects are not accounted for with our methodology.
+For scenarios in which we wish to explore directivity explicitly, ShakeMap includes a
+tool based on <a class="reference internal" href="references.html#rowshandel2010"><span>Rowshandel (2010)</span></a> as shown in
+<a class="pageref" href="#figure1-13u">Figure  4</a> and described in <a class="reference internal" href="technical_guide.html#sec-directivity"><span>Directivity</span></a>. We
+are also exploring delivery of scenarios with multiple realizations of
+spatial variability (see <a class="reference internal" href="future_directions.html#future-directions"><span>Future Directions</span></a> and <a class="reference internal" href="references.html#verros2016"><span>Verros et al. (2016)</span></a>.</p>
+<p>In terms of generating scenarios with the ShakeMap system, a number of specific
+considerations and a number of configuration changes are made for scenario events as
+opposed to actual events triggered by the network.  For example, after generating a
+scenario for a major but hypothetical event, obviously one does not want to automatically
+deliver the files to customers who are expecting real events.  To avoid these sorts of
+errors, the <em>Event ID*s for all scenarios are tagged with the suffix *_se</em>. Such events are
+recognized by the processing and delivery software, which is configured to handle the
+scenarios as special cases. Scenarios are also given their own separate space on the
+webpages. The scenario earthquake ground-motion maps are identical to those made for real earthquakes, with one exception: ShakeMap scenarios are labeled with the word “SCENARIO” prominently displayed to avoid potential confusion with real earthquake occurrences.</p>
+<p>See the <a class="reference internal" href="software_guide.html#software-guide"><span>Software &amp; Implementation Guide</span></a> for additional information on generating earthquake scenarios.</p>
+</div>
+<div class="section" id="standardizing-earthquake-scenarios">
+<h3>Standardizing Earthquake Scenarios<a class="headerlink" href="#standardizing-earthquake-scenarios" title="Permalink to this headline">¶</a></h3>
+<p>The USGS has evaluated the probabilistic hazard from active faults in
+the U.S. for the <a class="reference external" href="http://earthquake.usgs.gov/hazards/">National Seismic Hazard Mapping Project</a>.
+From these maps it is
+possible to prioritize the best scenario earthquakes to be used in planning exercises by
+considering the most likely candidate earthquake fault first, followed by the next likely,
+and so on. Such an analysis is easily accomplished by hazard disaggregation, in which the
+contributions of individual earthquakes to the total seismic hazard, their probability of
+occurrence, and the severity of the ground-motions are ranked.  Using the individual
+disaggregated components of these hazard maps, a user can select the appropriate
+scenarios given their location, regional extent, and specific planning requirements.</p>
+<p>ShakeMap operators are in the process (early 2016; see <a class="reference internal" href="references.html#thompson2016"><span>Thompson et al., 2016</span></a>) of developing a full suite of
+scenario ShakeMaps from the disaggregated U.S. National Seismic Hazard Map event
+catalog produced by <a class="reference internal" href="references.html#petersen2014"><span>Petersen et al. (2014)</span></a>. By disaggregating these hazard maps, we will
+be able to produce scenarios for a substantial number of the potential significant earthquakes
+in the United States. It is hoped that these scenarios will satisfy most of
+the requests that ShakeMap operators typically receive, and the need for ad
+hoc scenarios will be minimized. Each regional seismic network will be ultimately
+responsible for producing the scenarios for their region using their local ShakeMap
+configuration and the fault and magnitude information provided from the hazard maps.
+For areas outside of the regional networks, we will use the Global ShakeMap system to
+produce the scenarios. International ShakeMap operators may be able to follow a similar
+disaggregation of their own seismic hazard maps to generate a suite of scenarios.</p>
+<p>After a suite of standardized ShakeMap scenarios is developed for a region or
+a state, the ShakeMaps can be processed through HAZUS-MH, FEMA&#8217;s loss and risk estimation software, to
+develop associated damage estimates and other loss information products.
+Both Utah and Washington State officials have worked with USGS, FEMA,
+and other collaborators to produce online collections for scenario exercises and mitigation efforts,
+shown in <a class="pageref" href="#shakemap-hazus-utah">Figure  5</a> and <a class="pageref" href="#shakemap-hazus-washington">Figure  6</a>, respectively.</p>
+<div class="figure align-left" id="id8">
+<span id="shakemap-hazus-utah"></span><a class="reference internal image-reference" href="_images/ShakeMap-HAZUS.Utah.png"><img alt="Utah State Scenario Collection." src="_images/ShakeMap-HAZUS.Utah.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 5: State of Utah using ShakeMap-based earthquake scenario collection. More details can be found online
+at the <a class="reference external" href="https://www.fema.gov/media-library/assets/documents/16125">FEMA</a>
+and <a class="reference external" href="http://www.shakeout.org/utah/scenarios/">ShakeOut.org</a> Web sites.</span></p>
+</div>
+<div class="figure align-left" id="id9">
+<span id="shakemap-hazus-washington"></span><a class="reference internal image-reference" href="_images/ShakeMap-HAZUS.Washington.png"><img alt="State of Washington Scenario Collection." src="_images/ShakeMap-HAZUS.Washington.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 6: Washington State ShakeMap-based earthquake scenario collection. More details can be found online
+at the <a class="reference external" href="https://fortress.wa.gov/dnr/seismicscenarios/">Washington State (DNR)</a> Web site.</span></p>
+</div>
+<div class="figure align-left" id="id10">
+<span id="shakemap-hazus-railways"></span><a class="reference internal image-reference" href="_images/ShakeMap-Washington.railways.png"><img alt="Washington Scenario with Railway impact." src="_images/ShakeMap-Washington.railways.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 7: Washington State ShakeMap-based earthquake scenario collection.
+The selected layer (left) shows railways.</span></p>
+</div>
+<p><a class="pageref" href="#shakemap-hazus-railways">Figure  7</a> provides an example Washington
+State ShakeMap-based M9.0 Cascadia earthquake scenario.
+More details can be found online at the
+<a class="reference external" href="https://fortress.wa.gov/dnr/seismicscenarios/">Washington State (DNR)</a> Web site.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="shakemap_applications.html" class="btn btn-neutral float-right" title="Applications of ShakeMap">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="products.html" class="btn btn-neutral" title="Products and Formats"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
