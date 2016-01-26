@@ -4,20 +4,45 @@
 Introduction
 ####################
 
-This online ShakeMap Manual (cite: :ref:`Worden and Wald, 2016 <worden2016b>`), a significant update of the
-original (:ref:`Wald et al., 2005 <wald2005>`) ShakeMap Manual. The
-Manual is now dynamic and served online. We employ Python document generator `Sphinx <http://sphinx-doc.org/>`_,
-under `GitHub <http://github.com/>`_ version control. The web pages
-here are HTML rendered with the `sphinx_rtd_theme <http://github.com/snide/sphinx_rtd_theme>`_.
-A PDF version is available by [TBS].
+.. only:: html
 
-.. figure::  _static/Napa.ShakeMap.cover.*
-   :scale: 50%
-   :alt: ShakeMap Napa
-   :align: right
-   :target: Napa ShakeMap Example (URI or reference name)
+   This online ShakeMap Manual (:ref:`Worden and Wald, 2016 <worden2016b>`), is a 
+   significant update of the
+   original (:ref:`Wald et al., 2005 <wald2005>`) ShakeMap Manual. The
+   Manual is now dynamic and served online. We employ Python document 
+   generator `Sphinx <http://sphinx-doc.org/>`_, with the source
+   under `GitHub <http://github.com/>`_ version control. The web pages
+   here rendered with the `Sphinx RTD theme <http://github.com/snide/sphinx_rtd_theme>`_.
+   A PDF version is available `here <_static/ShakeMapManual.pdf>`_.
 
-   2014 M6.0 Napa, CA, earthquake intensity ShakeMap.
+.. only:: latex
+
+   This ShakeMap Manual (:ref:`Worden and Wald, 2016 <worden2016b>`), is a 
+   significant update of the
+   original (:ref:`Wald et al., 2005 <wald2005>`) ShakeMap Manual.  We employ Python document 
+   generator `Sphinx <http://sphinx-doc.org/>`_, with the source
+   under `GitHub <http://github.com/>`_ version control.
+   The online version of the manual version is available `here <http://usgs.github.io/shakemap>`_.
+
+.. only:: html
+
+   .. figure::  _static/Napa_ShakeMap_cover.*
+      :scale: 50%
+      :alt: ShakeMap Napa
+      :align: right
+      :target: Napa ShakeMap Example (URI or reference name)
+
+      2014 M6.0 Napa, CA, earthquake intensity ShakeMap.
+
+.. only:: latex
+
+   .. figure::  _static/Napa_ShakeMap_cover.*
+      :alt: ShakeMap Napa
+      :scale: 70%
+      :align: left
+      :target: Napa ShakeMap Example (URI or reference name)
+
+      2014 M6.0 Napa, CA, earthquake intensity ShakeMap.
 
 `ShakeMap® <http://earthquake.usgs.gov/shakemap/>`_, 
 developed by the U.S. Geological Survey (USGS), facilitates communication of 

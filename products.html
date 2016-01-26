@@ -5,6 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
   <meta charset="utf-8">
+  
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Products and Formats &mdash; ShakeMap Manual 2.0 documentation</title>
@@ -14,7 +15,6 @@
   
 
   
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
 
   
   
@@ -36,7 +36,7 @@
         <link rel="prev" title="Background" href="background.html"/> 
 
   
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+  <script src="_static/js/modernizr.min.js"></script>
 
 </head>
 
@@ -46,11 +46,27 @@
 
     
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
-      <div class="wy-side-nav-search">
-        
-          <a href="index.html" class="fa fa-home"> ShakeMap Manual</a>
-        
-        
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ShakeMap Manual
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -58,55 +74,60 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-      </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-        
           
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
-              <ul class="current">
+            
+            
+                <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="technical_guide.html">Technical Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#introduction">Introduction</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#shakemap-software-overview">ShakeMap Software Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#philosophy-of-estimating-and-interpolating-ground-motions">Philosophy of Estimating and Interpolating Ground Motions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#recorded-ground-motion-parameters">Recorded Ground-motion Parameters</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#ground-motion-and-intensity-predictions">Ground Motion and Intensity Predictions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#shakemap-processing">ShakeMap Processing</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#representing-macroseismic-intensity-on-maps">Representing Macroseismic Intensity on Maps</a></li>
-<li class="toctree-l2"><a class="reference internal" href="technical_guide.html#discussion-of-chosen-map-parameters-intensity-measures">Discussion of Chosen Map Parameters (Intensity Measures)</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="technical_guide.html">Technical Guide</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="users_guide.html">User&#8217;s Guide</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="background.html">Background</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">Products and Formats</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">Products and Formats</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#input-files">Input Files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#output-files-and-products">Output Files and Products</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#metadata-and-runtime-information">Metadata and Runtime Information</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#static-maps-and-plots-images">Static Maps and Plots (Images)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#interactive-maps">Interactive Maps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#interpolated-ground-motion-grids">Interpolated Ground Motion Grids</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#station-lists">Station Lists</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#gis-products">GIS Products</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#real-time-product-distribution-automatic-access-and-feeds">Real-Time Product Distribution, Automatic Access, and Feeds</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#interactive-web-downloads">Interactive Web Downloads</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#rss-feeds">RSS Feeds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#geojson-feeds">GeoJSON Feeds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#additional-feeds">Additional Feeds</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#shakecast-system">ShakeCast System</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#product-delivery-layer-pdl-client">Product Delivery Layer (PDL) Client</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#web-mapping-gis-services">Web Mapping (GIS) Services</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="shakemap_archives.html">ShakeMap Archives</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shakemap_applications.html">Applications of ShakeMap</a></li>
 <li class="toctree-l2"><a class="reference internal" href="related_systems.html">Related Systems</a></li>
 <li class="toctree-l2"><a class="reference internal" href="disclaimers.html">Disclaimers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="software_guide.html">Software &amp; Implementation Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="software_guide.html#implementation-considerations">Implementation Considerations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="software_guide.html#shakemap-implementation-checklist">ShakeMap Implementation Checklist</a></li>
-<li class="toctree-l2"><a class="reference internal" href="software_guide.html#software-availability-software-guide">Software Availability &amp; Software Guide</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="software_guide.html">Software &amp; Implementation Guide</a></li>
 <li class="toctree-l1"><a class="reference internal" href="regionals.html">Regional Operations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="future_directions.html">Future Directions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="future_directions.html#research-development">Research &amp; Development</a></li>
-<li class="toctree-l2"><a class="reference internal" href="future_directions.html#software-shakemap-4-0-python">Software: ShakeMap 4.0 (Python)</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="future_directions.html">Future Directions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
 <li class="toctree-l1"><a class="reference internal" href="references.html">References &amp; Bibliography</a></li>
 <li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
 </ul>
 
+            
           
-        
+        </div>
       </div>
-      &nbsp;
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
@@ -121,7 +142,13 @@
       
       <div class="wy-nav-content">
         <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
@@ -130,13 +157,16 @@
     <li>Products and Formats</li>
       <li class="wy-breadcrumbs-aside">
         
-          <a href="_sources/products.txt" rel="nofollow"> View page source</a>
+          
+            <a href="_sources/products.txt" rel="nofollow"> View page source</a>
+          
         
       </li>
   </ul>
   <hr/>
 </div>
-          <div role="main" class="document">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
             
   <div class="section" id="products-and-formats">
 <span id="sec-products"></span><h1>Products and Formats<a class="headerlink" href="#products-and-formats" title="Permalink to this headline">¶</a></h1>
@@ -265,7 +295,7 @@ serve as maps of record and for other purposes, as described below. Static maps
 can be accessed and selected using tabs along the top of the USGS earthquake event
 page, as shown in the example in <a class="pageref" href="#napa-event-page">Figure  1</a>.</p>
 <div class="figure align-left" id="id3">
-<span id="napa-event-page"></span><a class="reference internal image-reference" href="_images/Napa.Event.Page.png"><img alt="_images/Napa.Event.Page.png" src="_images/Napa.Event.Page.png" style="width: 650px;" /></a>
+<span id="napa-event-page"></span><a class="reference internal image-reference" href="_images/Napa_Event_Page.png"><img alt="_images/Napa_Event_Page.png" src="_images/Napa_Event_Page.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 1: Event page ShakeMap view for the 2014 M6.0 American Canyon (Napa Valley), CA
 earthquake. The static instrumental intensity map is shown. Tabs above the map allow access and
 comparison of different intensity measures (IMs), as well as the uncertainty map
@@ -288,7 +318,7 @@ intensity map shown in <a class="pageref" href="#napa-shakemap-cover">Figure  2<
 for peak ground motion maps (<a class="pageref" href="#napa-pga">Figure  3</a>). ShakeMap operators may
 chose to modify these defaults using alternative mapping configurations.</p>
 <div class="figure align-left" id="id4">
-<span id="napa-shakemap-cover"></span><a class="reference internal image-reference" href="_images/Napa.ShakeMap.cover.png"><img alt="_images/Napa.ShakeMap.cover.png" src="_images/Napa.ShakeMap.cover.png" style="width: 650px;" /></a>
+<span id="napa-shakemap-cover"></span><a class="reference internal image-reference" href="_images/Napa_ShakeMap_cover.png"><img alt="_images/Napa_ShakeMap_cover.png" src="_images/Napa_ShakeMap_cover.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 2: Intensity ShakeMap from the 2014 M6.0 American Canyon (Napa Valley), CA earthquake. Strong-motion data
 (triangles) and intensity data (circles) default to &#8220;see-through” mode for the intensity map. The
 north-south black line indicates the fault location, and the epicenter is a red star. The intensity
@@ -333,20 +363,20 @@ The interactive map also allows users to select and show/hide specific layers,
 including seismic stations and DYFI geocoded intensity
 stations (<a class="pageref" href="#napa-dyfi">Figure  7</a>).</p>
 <div class="figure align-left" id="id6">
-<span id="napa-contours"></span><a class="reference internal image-reference" href="_images/Napa_contours.station.png"><img alt="_images/Napa_contours.station.png" src="_images/Napa_contours.station.png" style="width: 650.4000000000001px; height: 537.6px;" /></a>
+<span id="napa-contours"></span><a class="reference internal image-reference" href="_images/Napa_contours_station.png"><img alt="_images/Napa_contours_station.png" src="_images/Napa_contours_station.png" style="width: 650.4000000000001px; height: 537.6px;" /></a>
 <p class="caption"><span class="caption-text">Figure 4: Interactive ShakeMap for the 2014 M6.0 American Canyon, CA
 earthquake. Contours indicate intensities; strong motion data (triangles) and intensity data (circles) are
 color-coded according to their intensity value, either as observed (for macroseismic data) or as converted
 by <a class="reference internal" href="references.html#worden2012"><span>Worden et al. (2012)</span></a>.</span></p>
 </div>
 <div class="figure align-right" id="id7">
-<span id="napa-mobile"></span><a class="reference internal image-reference" href="_images/Napa.mobile.shakemap.png"><img alt="_images/Napa.mobile.shakemap.png" src="_images/Napa.mobile.shakemap.png" style="width: 288.0px; height: 511.2px;" /></a>
+<span id="napa-mobile"></span><a class="reference internal image-reference" href="_images/Napa_mobile_shakemap.png"><img alt="_images/Napa_mobile_shakemap.png" src="_images/Napa_mobile_shakemap.png" style="width: 288.0px; height: 511.2px;" /></a>
 <p class="caption"><span class="caption-text">Figure 5: Mobile view of the interactive ShakeMap for the 2014 M6.0 American Canyon, CA
 earthquake. Contours indicate intensities; strong motion data (triangles) are color-coded according to their intensity
 value.</span></p>
 </div>
 <div class="figure align-left" id="id8">
-<span id="napa-stationpopup"></span><a class="reference internal image-reference" href="_images/Napa_contours.station.popup.png"><img alt="_images/Napa_contours.station.popup.png" src="_images/Napa_contours.station.popup.png" style="width: 653.6px; height: 537.6px;" /></a>
+<span id="napa-stationpopup"></span><a class="reference internal image-reference" href="_images/Napa_contours_station_popup.png"><img alt="_images/Napa_contours_station_popup.png" src="_images/Napa_contours_station_popup.png" style="width: 653.6px; height: 537.6px;" /></a>
 <p class="caption"><span class="caption-text">Figure 6: Interactive ShakeMap for the 2014 M6.0 American Canyon, CA
 earthquake showing station information pop-up.</span></p>
 </div>
@@ -379,10 +409,10 @@ the area of interest.</p>
 within the area of the MMI-VI contour (on the theory that this is the area most
 important to accurately represent). A ratio of 1.0 is given a grade of “C”; maps
 with mean ratios greater than 1.0 get grades of “D” or “F”; ratios less than 1.0
-earn grades of “B” or “A”. If the map does not contain areas of MMI ≥ VI, no
+earn grades of “B” or “A”. If the map does not contain areas of MMI &gt;= VI, no
 grade is assigned. See <a class="pageref" href="#napa-urat">Figure  8</a> for an example uncertainty map.</p>
 <div class="figure align-left" id="id10">
-<span id="napa-urat"></span><a class="reference internal image-reference" href="_images/Napa.urat_pga.jpg"><img alt="_images/Napa.urat_pga.jpg" src="_images/Napa.urat_pga.jpg" style="width: 650px;" /></a>
+<span id="napa-urat"></span><a class="reference internal image-reference" href="_images/Napa_urat_pga.jpg"><img alt="_images/Napa_urat_pga.jpg" src="_images/Napa_urat_pga.jpg" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 8: ShakeMap uncertainty maps for the 2014 M6.0 American Canyon, CA
 earthquake. Color-coded legend shows uncertainty ratio, where “1.0”
 indicates 1.0 times the GMPE’s sigma. The average uncertainty is
@@ -584,7 +614,7 @@ additional <em>grid_field</em> names:</p>
 </ul>
 <p>The standard errors are given in natural log units, except for intensity (linear
 units). The PSA entries will be available only if the PSA ground motion
-parameters were mapped (typically only for earthquakes of M ≥ 5.0). No
+parameters were mapped (typically only for earthquakes of M &gt;= 5.0). No
 ground motion data or Vs30 values are available in
 <em>uncertainty.xml.zip</em>; for those, use <em>grid.xml.zip</em>.</p>
 <p><strong>Grid XYZ</strong>. <em>grid.xyz</em> is a plain-text comma-separated file of gridded ground motions.</p>
@@ -601,7 +631,7 @@ download, and is used by the website to plot the stations on the interactive map
 data is available for viewing online by selecting the “Station List” tab on an event&#8217;s ShakeMap
 page. See <a class="pageref" href="#napa-station-table">Figure  11</a> for an example.</p>
 <div class="figure align-left" id="id13">
-<span id="napa-station-table"></span><a class="reference internal image-reference" href="_images/Napa.station.table.png"><img alt="_images/Napa.station.table.png" src="_images/Napa.station.table.png" style="width: 650px;" /></a>
+<span id="napa-station-table"></span><a class="reference internal image-reference" href="_images/Napa_station_table.png"><img alt="_images/Napa_station_table.png" src="_images/Napa_station_table.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 11: Station table view from ShakeMap event-specific webpages. Link is at right of tabs above the map (see <a class="pageref" href="#napa-event-page">Figure  1</a>).</span></p>
 </div>
 </div>
@@ -821,8 +851,8 @@ feed that includes URLs for ShakeMap files. For example, for the
 </div></blockquote>
 <p>The URLs for the ShakeMap files can be found inside the feed:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span class="n">FEED</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">shakemap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="s">&#39;download/grid.xml.zip&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span>
-<span class="n">FEED</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">shakemap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="s">&#39;download/shape.zip&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span>
+<div><div class="highlight-python"><div class="highlight"><pre><span class="n">FEED</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">shakemap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="s1">&#39;download/grid.xml.zip&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span>
+<span class="n">FEED</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">shakemap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="s1">&#39;download/shape.zip&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -898,15 +928,16 @@ be completed.</p>
 </div>
 
 
+           </div>
           </div>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="shakemap_archives.html" class="btn btn-neutral float-right" title="ShakeMap Archives">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="shakemap_archives.html" class="btn btn-neutral float-right" title="ShakeMap Archives" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="background.html" class="btn btn-neutral" title="Background"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="background.html" class="btn btn-neutral" title="Background" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
@@ -915,12 +946,13 @@ be completed.</p>
 
   <div role="contentinfo">
     <p>
+
     </p>
   </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
-  
 </footer>
+
         </div>
       </div>
 
