@@ -26,7 +26,7 @@ community, it is increasingly being incorporated into value-added products that
 help in the assessment of earthquake impacts for response management and
 government officials.
 
-.. figure::  _static/SMap.SCast.DYFI.PAGER.png
+.. figure::  _static/SMap_SCast_DYFI_PAGER.png
    :width: 650px
    :alt: Related Systems
    :align: center
@@ -60,7 +60,7 @@ responders.
 .. sidebar:: USE CASE #2
 	     
  The `California Department of Transportation
- <http://www.earthquakeauthority.com/‎>`_ (Caltrans) employs ShakeMap
+ <http://www.earthquakeauthority.com/>`_ (Caltrans) employs ShakeMap
  for post-earthquake overpass and bridge assessments for significant
  California earthquakes:
 
@@ -85,7 +85,7 @@ must go beyond just looking at ShakeMap, and understand the likely extent and
 severity of impact on the facilities for which they are responsible. To this
 end, the USGS has developed ShakeCast.
 
-.. figure::  _static/Caltrans.Napa.Report.*
+.. figure::  _static/Caltrans_Napa_Report.*
    :width: 350px 
    :alt: Caltrans
    :align: center
@@ -133,7 +133,7 @@ fatalities and economic losses.
 
 PAGER alerts are based on the “Earthquake Impact Scale” developed by :ref:`Wald et al. \(2011\) <wald2011b>`.
 
-.. figure::  _static/Nepal.M7.8.onepager.V5.*
+.. figure::  _static/Nepal_M7_8_onepager_V5.*
    :width: 350px
    :alt: Nepal onePAGER 
    :align: right

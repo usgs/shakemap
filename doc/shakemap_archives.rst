@@ -388,7 +388,7 @@ shown in :num:`Figure #shakemap-hazus-utah` and :num:`Figure #shakemap-hazus-was
 
 .. _shakemap-hazus-utah:
 
-.. figure:: _static/ShakeMap-HAZUS.Utah.*
+.. figure:: _static/ShakeMap-HAZUS_Utah.*
    :width: 650px
    :alt: Utah State Scenario Collection.
    :align: left
@@ -399,7 +399,7 @@ shown in :num:`Figure #shakemap-hazus-utah` and :num:`Figure #shakemap-hazus-was
 
 .. _shakemap-hazus-washington:
 
-.. figure:: _static/ShakeMap-HAZUS.Washington.*
+.. figure:: _static/ShakeMap-HAZUS_Washington.*
    :width: 650px
    :alt: State of Washington Scenario Collection.
    :align: left
@@ -409,7 +409,7 @@ shown in :num:`Figure #shakemap-hazus-utah` and :num:`Figure #shakemap-hazus-was
 
 .. _shakemap-hazus-railways:
 
-.. figure:: _static/ShakeMap-Washington.railways.*
+.. figure:: _static/ShakeMap-Washington_railways.*
    :width: 650px
    :alt: Washington Scenario with Railway impact.
    :align: left
