@@ -209,7 +209,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'ShakeMapManual.tex', u'ShakeMap Manual Documentation',
+  ('index', 'ShakeMapManual.tex', u'ShakeMap Manual',
    u'C. Bruce Worden, David Wald', 'manual'),
 ]
 
@@ -239,7 +239,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'shakemapmanual', u'ShakeMap Manual Documentation',
+    ('index', 'shakemapmanual', u'ShakeMap Manual',
      [u'C. Bruce Worden, David Wald'], 1)
 ]
 
@@ -253,7 +253,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'ShakeMapManual', u'ShakeMap Manual Documentation',
+  ('index', 'ShakeMapManual', u'ShakeMap Manual',
    u'C. Bruce Worden, David Wald', 'ShakeMapManual', 'One line description of project.',
    'Miscellaneous'),
 ]

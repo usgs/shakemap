@@ -117,7 +117,7 @@ page, as shown in the example in :num:`Figure #napa-event-page`.
 
 .. _napa-event-page:
 
-.. figure:: _static/Napa.Event.Page.png  
+.. figure:: _static/Napa_Event_Page.png  
    :width: 650px	
    :align: left 
 
@@ -143,7 +143,7 @@ for peak ground motion maps (:num:`Figure #napa-pga`). ShakeMap operators may
 chose to modify these defaults using alternative mapping configurations.
 
 .. _napa-shakemap-cover:
-.. figure:: _static/Napa.ShakeMap.cover.*
+.. figure:: _static/Napa_ShakeMap_cover.*
    :width: 650px
    :align: left
 
@@ -198,7 +198,7 @@ stations (:num:`Figure #napa-dyfi`).
 
 .. _napa-contours:
 
-.. figure:: _static/Napa_contours.station.png
+.. figure:: _static/Napa_contours_station.png
    :scale: 40%
    :align: left
 
@@ -210,7 +210,7 @@ stations (:num:`Figure #napa-dyfi`).
 
 .. _napa-mobile:
 
-.. figure:: _static/Napa.mobile.shakemap.png
+.. figure:: _static/Napa_mobile_shakemap.png
    :scale: 45%
    :align: right
 
@@ -221,7 +221,7 @@ stations (:num:`Figure #napa-dyfi`).
 
 .. _napa-stationpopup:
 
-.. figure:: _static/Napa_contours.station.popup.*
+.. figure:: _static/Napa_contours_station_popup.*
    :scale: 40%
    :align: left 
 
@@ -264,11 +264,11 @@ ShakeMaps are also given a letter grade based on the mean uncertainty ratio
 within the area of the MMI-VI contour (on the theory that this is the area most
 important to accurately represent). A ratio of 1.0 is given a grade of “C”; maps
 with mean ratios greater than 1.0 get grades of “D” or “F”; ratios less than 1.0
-earn grades of “B” or “A”. If the map does not contain areas of MMI ≥ VI, no
+earn grades of “B” or “A”. If the map does not contain areas of MMI >= VI, no
 grade is assigned. See :num:`Figure #napa-urat` for an example uncertainty map.
 
 .. _napa-urat:
-.. figure:: _static/Napa.urat_pga.jpg
+.. figure:: _static/Napa_urat_pga.*
    :width: 650px
    :align: left 
 
@@ -491,7 +491,7 @@ additional *grid_field* names:
 
 The standard errors are given in natural log units, except for intensity (linear
 units). The PSA entries will be available only if the PSA ground motion
-parameters were mapped (typically only for earthquakes of M ≥ 5.0). No
+parameters were mapped (typically only for earthquakes of M >= 5.0). No
 ground motion data or Vs30 values are available in
 *uncertainty.xml.zip*; for those, use *grid.xml.zip*.
 
@@ -508,7 +508,7 @@ data is available for viewing online by selecting the “Station List” tab on 
 page. See :num:`Figure #napa-station-table` for an example.
 
 .. _napa-station-table:
-.. figure:: _static/Napa.station.table.png
+.. figure:: _static/Napa_station_table.png
    :width: 650px
    :align: left
 

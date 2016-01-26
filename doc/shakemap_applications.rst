@@ -42,7 +42,7 @@ in :num:`Figure #hector-mine-shakemap`).
 
 .. _nrc-committee-report:
 
-.. figure:: _static/NRC.11327-450.jpg 
+.. figure:: _static/NRC_11327-450.jpg 
    :align: right
    :scale: 50%
    :alt: NRC Report
@@ -73,7 +73,7 @@ in :num:`Figure #hector-mine-shakemap`).
 
 .. _hector-mine-shakemap:
 
-.. figure:: _static/Hector.Mine.ShakeMap.png
+.. figure:: _static/Hector_Mine_ShakeMap.png
    :align: left
    :width: 650px
  
@@ -127,7 +127,7 @@ tools.
 
 Loss Estimation
 ----------------------------------------------------------
-The `Federal Emergency Management Agency <http://www.fema.org/‎>`_ (FEMA) employs ShakeMap for
+The `Federal Emergency Management Agency <http://www.fema.gov/>`_ (FEMA) employs ShakeMap for
 post-earthquake damage assessments.
 USGS generates customized, formatted ESRI shapefiles for direct input into
 FEMA’s Hazards U.S. (`HAZUS-MH <http://www.fema.gov/hazus>`_ ; :ref:`FEMA
@@ -157,7 +157,7 @@ mutual aid assignments, emergency management, damage and safety assessment,
 utility and lifeline restoration,
 and emergency public information.
 
-.. figure::  _static/parkfield.hazus.*
+.. figure::  _static/parkfield_hazus.*
    :width: 650px
    :alt: Parkfield 2004 ShakeMap and HAZUS Losses
    :align: left
@@ -283,7 +283,7 @@ with magnitude descriptions of earthquakes (e.g., :ref:`Celsi et al., 2005
 <celsi2005>`). 
 
     *Earthquake education also occurs through the media. The anchoring effect we
-    report may be lessened signiﬁcantly if the press consistently used the Mercalli
+    report may be lessened significantly if the press consistently used the Mercalli
     scale and helped to educate the public about the scale. Research should be
     conducted to better understand if and how news organizations can successfully
     utilize the Mercalli scale in communicating earthquake information. Alternative
@@ -331,7 +331,7 @@ Research Council <NRC2006>`.
 
 .. _northridge-nisqually:
 
-.. figure:: _static/Northridge.Nisqually.*
+.. figure:: _static/Northridge_Nisqually.*
    :align: left
    :width: 650px
  
@@ -379,7 +379,7 @@ same ShakeMap input in order for DOD to focus on defense support to civilian aut
 
 .. _caribewave-nle:
 
-.. figure:: _static/caribewave.onepager.*
+.. figure:: _static/caribewave_onepager.*
    :align: center
    :width: 650px
    :alt: Caribe Wave OnePAGER

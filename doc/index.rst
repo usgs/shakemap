@@ -9,13 +9,13 @@ Welcome to the ShakeMap Manual
 .. This is a work in progress. Please ignore it until this message
    is removed.
 
-.. figure::  _static/Napa.ShakeMap.cover.*
-   :scale: 40 %
-   :alt: ShakeMap Napa
-   :align: right
-   :target: Napa ShakeMap Example (URI or reference name)
+.. only:: html
 
-   2014 M6.0 Napa, CA intensity ShakeMap 
+   .. image::  _static/Napa_ShakeMap_cover.*
+      :scale: 40 %
+      :alt: ShakeMap Napa
+      :align: right
+      :target: Napa ShakeMap Example (URI or reference name)
 
 .. toctree::
    :maxdepth: 2

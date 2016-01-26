@@ -235,23 +235,36 @@ currently following this convention at the time of this writing.
    fault location, which nucleated near the epicenter (red star). Note: Map Version Number reflects 
    separate offline processing for this Manual. 
 
-:num:`Figure #figure1-3` shows a different representation of the intensity map  on the newer, 
-interactive maps on the USGS web site.
+:num:`Figure #figure_hawaii_interactive` shows a different representation of the 
+intensity map  on the newer, interactive maps on the USGS web site.
 
-.. image:: _static/Figure_1_3_top.*
-   :width: 650px
- 
-.. _figure1-3:
+.. only:: html
 
-.. figure:: _static/Figure_1_3_bottom.*
-   :align: left
-   :width: 650px
+   .. _figure_hawaii_interactive:
+
+   .. figure:: _static/Hawaii_interactive.*
+      :align: left
+      :width: 650px
   
-   Intensity ShakeMap from the 2006 M6.7 Kahola Bay, HI earthquake. 
-   Contours indicate intensities; strong motion data (triangles) and intensity data (circles) are color-
-   coded according to their intensity value, either as observed (for macroseismic data) or as 
-   converted by :ref:`Worden et al. \(2012\) <worden2012>`. Inset on lower map shows 
-   pop-up station information. 
+      Intensity ShakeMap from the 2006 M6.7 Kahola Bay, HI earthquake. 
+      Contours indicate intensities; strong motion data (triangles) and intensity data (circles) are color-
+      coded according to their intensity value, either as observed (for macroseismic data) or as 
+      converted by :ref:`Worden et al. \(2012\) <worden2012>`. Inset on lower map shows 
+      pop-up station information. 
+
+.. only:: latex
+
+   .. _figure_hawaii_interactive:
+
+   .. figure:: _static/Hawaii_interactive.*
+      :align: left
+      :scale: 90 %
+  
+      Intensity ShakeMap from the 2006 M6.7 Kahola Bay, HI earthquake. 
+      Contours indicate intensities; strong motion data (triangles) and intensity data (circles) are color-
+      coded according to their intensity value, either as observed (for macroseismic data) or as 
+      converted by :ref:`Worden et al. \(2012\) <worden2012>`. Inset on lower map shows 
+      pop-up station information. 
 
 ****************************************
 Ground Motion and Intensity Predictions
