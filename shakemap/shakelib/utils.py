@@ -147,7 +147,7 @@ class Vector(object):
 
 if __name__ == '__main__':
     v1 = Vector(1,1,1)
-    print v1
-    print v1.norm()
-    print v1.normalize()
+    print(v1)
+    print(v1.norm())
+    print(v1.normalize())
 

@@ -4,7 +4,7 @@
 from ftplib import FTP
 import os.path
 import sys
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 
 #local
 from sender import Sender,SenderError
@@ -18,20 +18,20 @@ class FTPSender(Sender):
         :returns:
           Instance of the ftplib.FTP class.
         """
-        if 'host' not in self.properties.keys():
+        if 'host' not in list(self.properties.keys()):
             raise NameError('"host" keyword must be supplied to send via FTP')
-        if 'directory' not in self.properties.keys():
+        if 'directory' not in list(self.properties.keys()):
             raise NameError('"directory" keyword must be supplied to send via FTP')
         host = self.properties['host']
         folder = self.properties['directory']
         try:
             dirparts = folder.strip().split('/')
             ftp = FTP(host)
-            if self.properties.has_key('user'):
+            if 'user' in self.properties:
                 user = self.properties['user']
             else:
                 user = ''
-            if self.properties.has_key('password'):
+            if 'password' in self.properties:
                 password = self.properties['password']
             else:
                 password = ''
@@ -44,9 +44,9 @@ class FTPSender(Sender):
                     continue
                 try:
                     ftp.cwd(d)
-                except ftplib.error_perm,msg:
+                except ftplib.error_perm as msg:
                     raise SenderError('Could not login to host "%s" and navigate to directory "%s"' % (host,folder))
-        except Exception,obj:
+        except Exception as obj:
             raise SenderError('Could not send to %s.  Error "%s"' % (host,str(obj)))
         return ftp
 
@@ -71,7 +71,7 @@ class FTPSender(Sender):
                     mpath = path.replace(root,'').lstrip(os.sep) #mpath is the relative path on the ftp server
                     allfiles = ftp.nlst()
                     if mpath not in allfiles:
-                        print 'Could not find directory %s on ftp server.' % mpath
+                        print('Could not find directory %s on ftp server.' % mpath)
                         continue
                     ftpfolder = os.path.join(folder,mpath) #full path to the folder on ftp server
                     ftp.cwd(ftpfolder)
@@ -89,9 +89,9 @@ class FTPSender(Sender):
         :returns:
           Number of files sent to remote SSH server.
         '''
-        if 'host' not in self.properties.keys():
+        if 'host' not in list(self.properties.keys()):
             raise NameError('"host" keyword must be supplied to send via FTP')
-        if 'directory' not in self.properties.keys():
+        if 'directory' not in list(self.properties.keys()):
             raise NameError('"directory" keyword must be supplied to send via FTP')
         try:
             host = self.properties['host']
@@ -123,7 +123,7 @@ class FTPSender(Sender):
             ftp.quit()
             return nfiles
                     
-        except Exception,obj:
+        except Exception as obj:
             raise SenderError('Could not send to %s.  Error "%s"' % (host,str(obj)))
 
     def __sendfile(self,filename,ftp):
@@ -144,10 +144,10 @@ def _testSendFile(properties):
         sender = FTPSender(properties=properties,files=[thisfile])
         sender.send()
         url = 'ftp://%s%s%s' % (properties['host'],properties['directory'],thisfilename)
-        fh = urllib2.urlopen(url)
+        fh = urllib.request.urlopen(url)
         fh.close()
         sender.delete()
-    except Exception,obj:
+    except Exception as obj:
         fmt = 'Test failed - you may have a file called %s on host %s and directory %s'
         tpl = (thisfile,properties['host'],['directory'])
         raise SenderError(fmt % tpl)
@@ -159,10 +159,10 @@ def _testSendFolder(properties):
         sender = FTPSender(properties=properties,directory=thispath)
         sender.send()
         url = 'ftp://%s%s' % (properties['host'],properties['directory'])
-        fh = urllib2.urlopen(url)
+        fh = urllib.request.urlopen(url)
         fh.close()
         sender.delete()
-    except Exception,obj:
+    except Exception as obj:
         fmt = 'Test failed - you may have a file called %s on host %s and directory %s'
         tpl = (thisfile,properties['host'],['directory'])
         raise SenderError(fmt % tpl)

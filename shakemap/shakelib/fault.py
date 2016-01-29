@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 #stdlib modules
-import StringIO
+import io
 import sys
 import copy
 
@@ -10,8 +10,8 @@ import numpy as np
 from openquake.hazardlib.geo import mesh
 from openquake.hazardlib.geo import point,utils
 from openquake.hazardlib.geo.utils import get_orthographic_projection
-from ecef import latlon2ecef
-from vector import Vector
+from .ecef import latlon2ecef
+from .vector import Vector
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
@@ -177,8 +177,8 @@ class Fault(object):
         #which is: for each rectangle, there should be the four corners, the first corner repeated, and then a nan.
         nrects = len(zp)
         anan = np.ones_like(xp0)*np.nan
-        lon = np.array(zip(xp0,xp1,xp2,xp3,xp0,anan)).reshape((nrects,6)).flatten(order='C')
-        lat = np.array(zip(yp0,yp1,yp2,yp3,yp0,anan)).reshape((nrects,6)).flatten(order='C')
+        lon = np.array(list(zip(xp0,xp1,xp2,xp3,xp0,anan))).reshape((nrects,6)).flatten(order='C')
+        lat = np.array(list(zip(yp0,yp1,yp2,yp3,yp0,anan))).reshape((nrects,6)).flatten(order='C')
 
         #we need an array of depths, but we need to double each zp and zpdown element we have
         dep = []
@@ -235,7 +235,7 @@ class Fault(object):
         y = []
         z = []
         isFile = False
-        if isinstance(faultfile,str) or isinstance(faultfile,unicode):
+        if isinstance(faultfile,str):
             isFile = True
             faultfile = open(faultfile,'rt')
             faultlines = faultfile.readlines()
@@ -539,7 +539,7 @@ class Fault(object):
         #Is dip angle clockwise and btw 0-90 degrees?
         if not self.isPointToRight(P0,P1,P2):
             P0,P1,P2,P3 = self.reverseQuad(P0,P1,P2,P3)
-            print 'Reversing quad where dip not between 0 and 90 degrees.'
+            print('Reversing quad where dip not between 0 and 90 degrees.')
         #Are all 4 points (reasonably) co-planar?
         #Translate vertices to ECEF
         p0 = Vector.fromPoint(P0)
@@ -621,7 +621,7 @@ class Fault(object):
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
         else:
-            if 'xlim3d' not in ax.properties.keys():
+            if 'xlim3d' not in list(ax.properties.keys()):
                 raise FaultException('Non-3d axes object passed to plot() method.')
         for quad in self.Quadrilaterals:
             P0,P1,P2,P3 = quad
@@ -1041,7 +1041,7 @@ def _test_northridge():
     34.175 -118.527 20.427
     34.315 -118.421 5.000
     """
-    cbuf = StringIO.StringIO(fault_text)
+    cbuf = io.StringIO(fault_text)
     fault = Fault.readFaultFile(cbuf)
     quad = fault.getQuadrilaterals()[0]
     topdist = quad[0].distance(quad[1])
@@ -1099,7 +1099,7 @@ def _test_correct():
     40.80399 30.94688 20
     40.80199 30.94688 0"""
 
-    cbuf = StringIO.StringIO(fault_text)
+    cbuf = io.StringIO(fault_text)
     fault = Fault.readFaultFile(cbuf)
 
 def _test_incorrect():
@@ -1122,7 +1122,7 @@ def _test_incorrect():
     23.40240 120.78900	17
     23.60400 120.97200	17"""
 
-    cbuf = StringIO.StringIO(fault_text)
+    cbuf = io.StringIO(fault_text)
     fault = Fault.readFaultFile(cbuf)
 
 def _test_trace():
@@ -1135,9 +1135,9 @@ def _test_trace():
     dips = [45.0]
 
     fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,widths,dips,reference='From J Smith, (personal communication)')
-    fstr = StringIO.StringIO()
+    fstr = io.StringIO()
     fault.writeFaultFile(fstr)
-    print fstr.getvalue()
+    print(fstr.getvalue())
     sys.exit(0)
     
     xp0 = [-121.81529,-121.82298]

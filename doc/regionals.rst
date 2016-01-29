@@ -26,9 +26,9 @@ Hazards Program webpages (at the time of this writing). GSM covers these regions
 does not yet access the full set of data available to these regional
 systems. 
 
-In this section, we describe customizations employed for ShakeMap systems running or
+In this section, we describe customizations employed by ShakeMap systems running 
 throughout the Advanced National Seismic System (ANSS) regions
-nationwide as well as the Global ShakeMap (GSM) systems running at the NEIC in
+nationwide as well as the Global ShakeMap (GSM) system running at the NEIC in
 Golden, Colorado.
 
 .. note::

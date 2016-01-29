@@ -2,7 +2,7 @@
 
 #stdlib imports
 from xml.dom import minidom
-import StringIO
+import io
 import sys
 
 #third party
@@ -17,11 +17,11 @@ from openquake.hazardlib.geo import utils
 from openquake.hazardlib.gsim import base,abrahamson_2014
 from openquake.hazardlib.const import TRT
 from shapely import geometry
-from timeutils import ShakeDateTime
-from ecef import latlon2ecef,ecef2latlon
+from .timeutils import ShakeDateTime
+from .ecef import latlon2ecef,ecef2latlon
 from openquake.hazardlib.gsim.base import GMPE
-from fault import Fault
-from distance import getDistance
+from .fault import Fault
+from .distance import getDistance
 
 REQUIRED_KEYS = ['lat','lon','depth','time','mag']
 OPTIONAL_KEYS = ['id','timezone','locstring','type','created']
@@ -54,7 +54,7 @@ def readEventFile(eventxml):
        Dictionary with keys as indicated above in earthquake element attributes.
     """
     event = {}
-    if isinstance(eventxml,str) or isinstance(eventxml,unicode):
+    if isinstance(eventxml,str):
         root = minidom.parse(eventxml)
     else:
         data = eventxml.read()
@@ -83,7 +83,7 @@ def readEventFile(eventxml):
     for key in ['id','locstring','type','timezone']:
         if eq.hasAttribute(key):
             event[key] = eq.getAttribute(key)
-    if event.has_key('created'):
+    if 'created' in event:
         event['created'] = ShakeDateTime.utcfromtimestamp(int(eq.getAttribute('created')))
 
     root.unlink()
@@ -98,7 +98,7 @@ def readSource(sourcefile):
         Dictionary containing key/value pairs from file.
     """
     isFile = False
-    if isinstance(sourcefile,str) or isinstance(sourcefile,unicode):
+    if isinstance(sourcefile,str):
         f = open(sourcefile,'rt')
     else:
         isFile = True
@@ -141,14 +141,14 @@ class Source(object):
         """
         missing = []
         for req in REQUIRED_KEYS:
-            if req not in event.keys():
+            if req not in list(event.keys()):
                 missing.append(req)
         if len(missing):
            raise NameError('Input event dictionary is missing the following required keys: "%s"' % (','.join(missing)))
         self.Fault = fault
         self.EventDict = event.copy()
         if isinstance(sourcedict,dict):
-            for key,value in sourcedict.iteritems():
+            for key,value in sourcedict.items():
                 self.setEventParam(key,value)
         
 
@@ -191,7 +191,7 @@ class Source(object):
             raise TypeError('getDistanceContext() cannot work with objects of type "%s"' % type(gmpe))
         context = base.DistancesContext()
         for method in gmpe.REQUIRES_DISTANCES:
-            print 'Calculating method %s' % method
+            print('Calculating method %s' % method)
             dist = self.calcDistance(mesh,method)
             #can't figure out how to dynamically assign dist to a property on context
             #this doesn't work:
@@ -240,9 +240,9 @@ class Source(object):
             rup.ztor = DEFAULT_ZTOR
             rup.width = DEFAULT_WIDTH
 
-        if self.EventDict.has_key('rake'):
+        if 'rake' in self.EventDict:
             rup.rake = self.getEventParam('rake')
-        elif self.EventDict.has_key('mech'):
+        elif 'mech' in self.EventDict:
             mech = self.EventDict['mech']
             rup.rake = RAKEDICT[mech]
         else:
@@ -297,7 +297,7 @@ class Source(object):
         :returns:
             value (any object type)
         """
-        if key not in self.EventDict.keys():
+        if key not in list(self.EventDict.keys()):
             raise NameError('Key "%s" not found in event dictionary' % key)
         return self.EventDict[key]
 
@@ -366,9 +366,9 @@ def test():
 <earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9" year="2008" month="05" day="12" hour="06" minute="28" second="01" timezone="GMT" depth="19.0" locstring="EASTERN SICHUAN, CHINA" created="1211173621" otime="1210573681" type="" />
     """
     source_text = """mech=RS"""
-    ffile = StringIO.StringIO(fault_text)
-    efile = StringIO.StringIO(event_text)
-    sfile = StringIO.StringIO(source_text)
+    ffile = io.StringIO(fault_text)
+    efile = io.StringIO(event_text)
+    sfile = io.StringIO(source_text)
     source = Source.readFromFile(efile,faultfile=ffile,sourcefile=sfile)
     gmpe = abrahamson_2014.AbrahamsonEtAl2014()
     rupture = source.getRuptureContext(gmpe)
@@ -389,9 +389,9 @@ def test():
         try:
             value = eval('rupture.%s' % key)
         except:
-            print 'No value set for %s' % key
+            print('No value set for %s' % key)
             continue
-        print '%s = %s' % (key,str(value))
+        print('%s = %s' % (key,str(value)))
 
 def _test_northridge():
     fault_text = """
@@ -406,9 +406,9 @@ def _test_northridge():
 <earthquake id="blah" lat="34.213" lon="-118.537" mag="7.9" year="1994" month="01" day="17" hour="12" minute="30" second="55" timezone="GMT" depth="18.4" locstring="NORTHRIDGE" created="1211173621" otime="1210573681" type="" />
     """
     source_text = """mech=RS"""
-    ffile = StringIO.StringIO(fault_text)
-    efile = StringIO.StringIO(event_text)
-    sfile = StringIO.StringIO(source_text)
+    ffile = io.StringIO(fault_text)
+    efile = io.StringIO(event_text)
+    sfile = io.StringIO(source_text)
     source = Source.readFromFile(efile,faultfile=ffile,sourcefile=sfile)
     gmpe = abrahamson_2014.AbrahamsonEtAl2014()
     rupture = source.getRuptureContext(gmpe)
@@ -429,11 +429,11 @@ def _test_northridge():
         try:
             value = eval('rupture.%s' % key)
         except:
-            print 'No value set for %s' % key
+            print('No value set for %s' % key)
             continue
-        print '%s = %s' % (key,str(value))    
+        print('%s = %s' % (key,str(value)))    
 
-    cbuf = StringIO.StringIO(fault_text)
+    cbuf = io.StringIO(fault_text)
     fault = Fault.readFaultFile(cbuf)
         
 if __name__ == '__main__':

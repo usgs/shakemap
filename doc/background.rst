@@ -8,7 +8,7 @@ Until the development of ShakeMap, the most common information available
 immediately following a significant earthquake was typically its magnitude and
 epicenter.  However, the damage pattern is not a simple function of these two
 parameters alone, and more-detailed information must be provided to properly
-assess the situation.  For example, for the 1971 M6.7 San Fernando,
+assess the hazard.  For example, for the 1971 M6.7 San Fernando,
 California earthquake, the northern San Fernando Valley was the region with the
 most damage, even though it was more than 15km from the epicenter.  Likewise,
 areas strongly affected by the 1989 M6.9 Loma Prieta and 1994 M6.7 Northridge, California,

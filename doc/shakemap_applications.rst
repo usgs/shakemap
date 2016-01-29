@@ -16,8 +16,8 @@ potentially be used for mutual aid.
 
 Though initially developed primarily for emergency management, ShakeMaps have been
 shown to be highly beneficial for other user sectors. These other uses include
-improved loss estimation; public information and education through the media and
-webpages; financial decision making; and engineering and seismological
+improved loss estimation, public information and education through the media and
+webpages, financial decision making, and engineering and seismological
 research. Some specific examples are provided below for these use cases. 
 
 As a side benefit, an intensity-based depiction of shaking hazards through
@@ -167,7 +167,7 @@ and emergency public information.
    infrastructure (circles) examined. Figure courtesy of D. Bausch, FEMA.
 
 As of 2015, the HAZUS-MH software is run interactively, not automatically, so
-qualified FEMA personnell must be on hand to initiate HAZUS calculations and post
+qualified FEMA personnel must be on hand to initiate HAZUS calculations and post
 the results. In addition, for heavily populated areas (such as major cities in
 California), HAZUS software can take a few hours to
 compute losses. Thus, initial HAZUS-based losses are well behind initial

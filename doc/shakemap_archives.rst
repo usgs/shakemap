@@ -41,7 +41,7 @@ systems. For more information on the ANSS regional and the national
 ShakeMap system implementations and operations, see the section on :ref:`sec_regionals`.
 
 **Internationally**, USGS ShakeMap is installed and operational in Italy,
-France, Portugal, Switzerland, New Zealand, Romania, Indonesia, Iran, Iceland,
+France, Portugal, Switzerland, Romania, Indonesia, Iran, Iceland,
 Panama, and several other nations (see :num:`Figure #international-shakemaps`).
 Several instances of ShakeMap are in testing
 or operational mode in the Middle East (including Oman, Morocco, and the U.A.E.; M.

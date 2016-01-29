@@ -25,23 +25,23 @@ VERTICAL                    ---
 __pga_pgv_col_names = [ 'c12', 'c34', 'R' ]
 __sa_col_names = [ 'c1', 'c2', 'c3', 'c4', 'R' ]
 __pga_dict = { \
-    const.IMC.MEDIAN_HORIZONTAL         : dict(zip(__pga_pgv_col_names, [ 1.0, 0.01, 1.00 ])), \
-    const.IMC.GMRotI50                  : dict(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ])), \
-    const.IMC.RotD50                    : dict(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ])), \
-    const.IMC.RANDOM_HORIZONTAL         : dict(zip(__pga_pgv_col_names, [ 1.0, 0.07, 1.03 ])), \
-    const.IMC.GREATER_OF_TWO_HORIZONTAL : dict(zip(__pga_pgv_col_names, [ 1.1, 0.05, 1.02 ])) }
+    const.IMC.MEDIAN_HORIZONTAL         : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.01, 1.00 ]))), \
+    const.IMC.GMRotI50                  : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ]))), \
+    const.IMC.RotD50                    : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ]))), \
+    const.IMC.RANDOM_HORIZONTAL         : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.07, 1.03 ]))), \
+    const.IMC.GREATER_OF_TWO_HORIZONTAL : dict(list(zip(__pga_pgv_col_names, [ 1.1, 0.05, 1.02 ]))) }
 __pgv_dict = { \
-    const.IMC.MEDIAN_HORIZONTAL         : dict(zip(__pga_pgv_col_names, [ 1.0, 0.01, 1.00 ])), \
-    const.IMC.GMRotI50                  : dict(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ])), \
-    const.IMC.RotD50                    : dict(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ])), \
-    const.IMC.RANDOM_HORIZONTAL         : dict(zip(__pga_pgv_col_names, [ 1.0, 0.07, 1.03 ])), \
-    const.IMC.GREATER_OF_TWO_HORIZONTAL : dict(zip(__pga_pgv_col_names, [ 1.1, 0.05, 1.02 ])) }
+    const.IMC.MEDIAN_HORIZONTAL         : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.01, 1.00 ]))), \
+    const.IMC.GMRotI50                  : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ]))), \
+    const.IMC.RotD50                    : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ]))), \
+    const.IMC.RANDOM_HORIZONTAL         : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.07, 1.03 ]))), \
+    const.IMC.GREATER_OF_TWO_HORIZONTAL : dict(list(zip(__pga_pgv_col_names, [ 1.1, 0.05, 1.02 ]))) }
 __sa_dict  = { \
-    const.IMC.MEDIAN_HORIZONTAL         : dict(zip(__sa_col_names, [ 1.0, 1.0, 0.01, 0.02, 1.00 ])), \
-    const.IMC.GMRotI50                  : dict(zip(__sa_col_names, [ 1.0, 1.0, 0.03, 0.04, 1.00 ])), \
-    const.IMC.RotD50                    : dict(zip(__sa_col_names, [ 1.0, 1.0, 0.02, 0.03, 1.00 ])), \
-    const.IMC.RANDOM_HORIZONTAL         : dict(zip(__sa_col_names, [ 1.0, 1.0, 0.07, 0.11, 1.05 ])), \
-    const.IMC.GREATER_OF_TWO_HORIZONTAL : dict(zip(__sa_col_names, [ 1.1, 1.2, 0.04, 0.07, 1.02 ])) }
+    const.IMC.MEDIAN_HORIZONTAL         : dict(list(zip(__sa_col_names, [ 1.0, 1.0, 0.01, 0.02, 1.00 ]))), \
+    const.IMC.GMRotI50                  : dict(list(zip(__sa_col_names, [ 1.0, 1.0, 0.03, 0.04, 1.00 ]))), \
+    const.IMC.RotD50                    : dict(list(zip(__sa_col_names, [ 1.0, 1.0, 0.02, 0.03, 1.00 ]))), \
+    const.IMC.RANDOM_HORIZONTAL         : dict(list(zip(__sa_col_names, [ 1.0, 1.0, 0.07, 0.11, 1.05 ]))), \
+    const.IMC.GREATER_OF_TWO_HORIZONTAL : dict(list(zip(__sa_col_names, [ 1.1, 1.2, 0.04, 0.07, 1.02 ]))) }
 
 def ampIMCtoIMC(amps, imc_in, imc_out, imt):
     """ 

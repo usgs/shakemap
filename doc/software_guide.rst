@@ -63,7 +63,7 @@ components.
 
 At a minimum, the network must produce PGA and PGV for the ShakeMap stations, but 
 PSA (at 0.3, 1.0, and 3.0 sec) is also desirable. The algorithms 
-used to compute the parametric data should be should be verified against known standards. 
+used to compute the parametric data should be verified against known standards. 
 ShakeMap can be quite helpful in 
 highlighting grossly mis-calibrated stations, but it is best to find these (and more subtle) 
 errors before a large earthquake strikes.
@@ -362,9 +362,10 @@ with them is advantageous. You will need to assemble the basic GMT-formatted bas
 road, city data files, etc., but such data may already be available for your area.
 
 The ShakeMap software is freely available, open-source, and distributed under a Public
-Domain License. It runs on Solaris, FreeBSD, Mac OS X, (U)nix, and numerous versions of Linux (including Red Hat and Debian). It 
-does not run on Windows. See the Software Guide for more information. The software is available as a `SubVersion 
-<http://subversion.apache.org/>`_ checkout from:
+Domain License. It runs on Solaris, FreeBSD, Mac OS X, (U)nix, and numerous versions 
+of Linux (including Red Hat and Debian). It 
+does not run on Windows. See the Software Guide for more information. The software 
+is available as a `SubVersion <http://subversion.apache.org/>`_ checkout from:
 
 https://vault.gps.caltech.edu/repos/products/shakemap/tags/release-3.5/
 
@@ -374,7 +375,7 @@ https://vault.gps.caltech.edu/repos/products/shakemap/tags/release-3.5/
 
 The Software Guide included in the *doc* directory of the distribution will always be the 
 most up-to-date and should be consulted when installing and configuring ShakeMap. The 
-Software Guide may also be obtained by `download <_static/SoftwareGuideV3_5.pdf>`_.
+Software Guide may also be obtained by `download <http://usgs.github.io/shakemap/_static/SoftwareGuideV3_5.pdf>`_.
 This version of Guide is not guaranteed to be the most up-to-date, however. It should be 
 used only to familiarize oneself with the general requirements of installing and operating 
 ShakeMap. When installing the software, the Guide in the *doc* directory of the software

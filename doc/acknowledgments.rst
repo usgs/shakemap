@@ -29,7 +29,7 @@ needed for automatic ShakeMap downloads.
 Craig Scrivner, then at the CA Department of Mines & Geology (CDMG),
 contributed greatly to the initial ShakeMap software development. Pete
 Lombard (U.C. Berkeley) contributed to several important aspects
-of ShakeMap code development and Q&A, including developing *plot_reg*.
+of ShakeMap code development and Q&A, including developing *plot_regr*.
 
 .. sidebar:: ANSS National ShakeMap Coordinators:
 
@@ -37,7 +37,8 @@ of ShakeMap code development and Q&A, including developing *plot_reg*.
    * David Wald: USGS, Golden, Colorado, wald@usgs.gov
 
 Global ShakeMap (GSM) is run out of NEIC, Golden, CO, and is operated
-primarily by Kuo-Wan Lin, Kristin Marano, Vince Quitoriano, Eric Thompson, David Wald, and Bruce Worden.
+primarily by Kuo-Wan Lin, Kristin Marano, Vince Quitoriano, Eric Thompson, 
+David Wald, and Bruce Worden.
 
 At regional network centers, Kris Pankow (University of Utah), Steve Malone
 (University of Washington), Kuo-Wan Lin (formerly CGS, now USGS, Golden),
@@ -49,10 +50,8 @@ feedback, and improving the ShakeMap system. In addition, a number of other
 people assisted the above colleagues in the regional ShakeMap implementation and
 operation.
 
-.. sidebar:: ANSS Regional ShakeMap Coordinators:
-
    +---------------------------------------------------------------------+
-   |**ShakeMap Regional Coordinators**                                   |
+   |**ShakeMap ANSS Regional Coordinators**                              |
    +---------------------+-----------------------------------------------+
    |Southern California: | Robert Graves, rgraves@caltech.edu            |
    |                     +-----------------------------------------------+
@@ -116,6 +115,8 @@ Kristin Marano of the PAGER team have also provided support for ShakeMap. Eric T
 has contributed greatly to the development of scenarios and advancing ShakeMap
 science. Kishor Jaiswal, Ned Field, Nico Luco, Mark Petersen have all been very helpful
 in software calibration and validation and overall advice.
+
+Eric Thompson (USGS, Golden) and Em Wald provided helpful rewivews of this Manual.
 
 Lastly, we are also extremely grateful for the recognition of the
 importance of ShakeMap and the ongoing internal and external support for its

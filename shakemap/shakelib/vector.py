@@ -2,7 +2,7 @@
 
 import numpy as np
 from openquake.hazardlib.geo import point
-from ecef import latlon2ecef,ecef2latlon
+from .ecef import latlon2ecef,ecef2latlon
 
 class Vector(object):
     """

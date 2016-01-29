@@ -138,7 +138,7 @@ def translate(configfile,jsonfile):
     programs = {'grind':GRIND}
     program = None
     pkey = None
-    for key in programs.keys():
+    for key in list(programs.keys()):
         if configfile.find(key) > -1:
             program = programs[key]
             pkey = key
@@ -166,29 +166,29 @@ def translate(configfile,jsonfile):
         configkey,tvalue = line.split(':')
         configkey = configkey.strip()
         tvalue = tvalue.strip()
-        if configkey not in program.keys():
-            print 'Key %s not found in program %s' % (configkey,pkey)
+        if configkey not in list(program.keys()):
+            print('Key %s not found in program %s' % (configkey,pkey))
             continue
         
         ctype = program[configkey]['ctype']
         if ctype == 'dict':
             value = getValue(ctype,tvalue)
             if value is None:
-                print 'Could not parse value %s from line %s in %s' % (tvalue,line,configfile)
+                print('Could not parse value %s from line %s in %s' % (tvalue,line,configfile))
                 continue
-            if dicts.has_key(configkey):
+            if configkey in dicts:
                 dicts[configkey][value[0]] = value[1]
             else:
                 dicts[configkey] = OrderedDict([(value[0],value[1])])
         elif ctype == 'list':
-            if lists.has_key(configkey):
+            if configkey in lists:
                 lists[configkey].append(value)
             else:
                 lists[configkey] = [value]
         else:
             value = getValue(ctype,tvalue)
             if value is None:
-                print 'Could not parse value %s from line %s in %s' % (tvalue,line,configfile)
+                print('Could not parse value %s from line %s in %s' % (tvalue,line,configfile))
                 continue
             cdict = program[configkey].copy()
             cdict['value'] = value
@@ -196,11 +196,11 @@ def translate(configfile,jsonfile):
         
             
     f.close()
-    for configkey,value in dicts.iteritems():
+    for configkey,value in dicts.items():
         cdict = program[configkey]
         cdict['value'] = value
         configs[configkey] = cdict
-    for configkey,value in lists.iteritems():
+    for configkey,value in lists.items():
         cdict = program[configkey]
         cdict['value'] = value
         configs[configkey] = cdict
@@ -218,14 +218,14 @@ def validateType(ctype,value):
         raise TypeError('Value of "%s" must be an integer' % (str(value)))
     if ctype == 'float' and (not isinstance(value,(int,float))):
         raise TypeError('Value of "%s" must be a number' % (str(value)))
-    if ctype == 'string' and (not isinstance(value,(str,unicode))):
+    if ctype == 'string' and (not isinstance(value,str)):
         raise TypeError('Value of "%s" must be unicode or ASCII string.' % (str(value)))
     if ctype == 'list' and not isinstance(value,list):
         raise TypeError('Value of "%s" must be a list.' % (str(value)))
     if ctype == 'dict' and not isinstance(value,dict):
         raise TypeError('Value of "%s" must be a dictionary.' % (str(value)))
     if ctype == 'file':
-        if not isinstance(value,str) and not isinstance(value,unicode):
+        if not isinstance(value,str):
             raise TypeError('Value of "%s" is not a file.' % (str(value)))
         isfile = os.path.isfile(value)
         if not isfile:
@@ -249,23 +249,23 @@ class ConfigItem(object):
         self.crange = crange
         try:
             validateType(ctype,value)
-        except TypeError,exc:
+        except TypeError as exc:
             raise exc
         if crange is not None:
             try:
                 validateRange(self.crange,value)
-            except ValueError,exc:
+            except ValueError as exc:
                 raise exc
         self.value = value
         if default is not None:
             try:
                 validateType(ctype,default)
-            except TypeError,exc:
+            except TypeError as exc:
                 raise exc
             if crange is not None:
                 try:
                     validateRange(self.crange,default)
-                except ValueError,exc:
+                except ValueError as exc:
                     raise exc
             self.default = default
         else:
@@ -291,12 +291,12 @@ class ConfigItem(object):
         return self.ctype
 
     def printItem(self,ntab=0):
-        print '  '*ntab + 'Config Option: %s' % self.name
-        print '  '*(ntab+1) + 'Description: %s' % self.caption
-        print '  '*(ntab+1) + 'Value: %s' % str(self.value)
-        print '  '*(ntab+1) + 'Type: %s' % self.ctype
-        print '  '*(ntab+1) + 'Default: %s' % self.default
-        print '  '*(ntab+1) + 'Range: %s' % self.crange
+        print('  '*ntab + 'Config Option: %s' % self.name)
+        print('  '*(ntab+1) + 'Description: %s' % self.caption)
+        print('  '*(ntab+1) + 'Value: %s' % str(self.value))
+        print('  '*(ntab+1) + 'Type: %s' % self.ctype)
+        print('  '*(ntab+1) + 'Default: %s' % self.default)
+        print('  '*(ntab+1) + 'Range: %s' % self.crange)
 
     def configure(self):
         if self.ctype == 'string':
@@ -332,26 +332,26 @@ class ConfigItem(object):
         niter = 0
         while niter < MAXITER:
             niter += 1
-            answer = raw_input(prompt)
+            answer = input(prompt)
             if answer.strip() == '':
                 answer = self.default
             if self.ctype == 'int':
                 try:
                     answer = int(answer)
                 except:
-                    print 'Expecting an integer value: Try again.'
+                    print('Expecting an integer value: Try again.')
                     continue
             if self.ctype == 'float':
                 try:
                     answer = float(answer)
                 except:
-                    print 'Expecting a floating point value: Try again.'
+                    print('Expecting a floating point value: Try again.')
                     continue
             try:
                 validateType(self.ctype,answer)
-            except TypeError,obj:
-                print 'Expecting a value of type %s.  Try again.' % self.ctype
-            print resfmt % (self.name,answer)
+            except TypeError as obj:
+                print('Expecting a value of type %s.  Try again.' % self.ctype)
+            print(resfmt % (self.name,answer))
             self.value = answer
             break
         return
@@ -361,21 +361,21 @@ class ConfigSection(object):
         if not isinstance(configdict,dict):
             raise TypeError('Input to contructor is not a dictionary object')
         self.configdict = {}
-        for name,item in configdict.iteritems():
+        for name,item in configdict.items():
             if not isinstance(item,dict):
                 raise TypeError('Item %s in input list is not a dictionary' % name)
-            if not item.has_key('caption') or not item.has_key('value'):
+            if 'caption' not in item or 'value' not in item:
                 raise TypeError('Item %s in input list is missing a required field ("caption" or "value")' % name)
             caption = item['caption']
             value = item['value']
             ctype = 'string'
-            if item.has_key('ctype'):
+            if 'ctype' in item:
                 ctype = item['ctype']
             crange = None
-            if item.has_key('crange'):
+            if 'crange' in item:
                 crange = item['crange']
             default = None
-            if item.has_key('default'):
+            if 'default' in item:
                 default = item['default']
             configitem = ConfigItem(name,caption,value,ctype=ctype,crange=crange,default=default)
             self.configdict[name] = configitem
@@ -383,27 +383,27 @@ class ConfigSection(object):
 
     def printSection(self,parameter=None,ntab=0):
         if parameter is not None:
-            if parameter not in self.configdict.keys():
+            if parameter not in list(self.configdict.keys()):
                 raise KeyError('Parameter "%s" not found in config' % parameter)
             self.configdict[parameter].printItem(ntab=ntab+1)
-            print
+            print()
             return
 
-        for name in self.configdict.keys():
+        for name in list(self.configdict.keys()):
             self.configdict[name].printItem(ntab=ntab+1)
-            print
+            print()
 
     def getParamNames(self):
-        return self.configdict.keys()
+        return list(self.configdict.keys())
 
     def getConfigItem(self,param):
-        if not self.configdict.has_key(param):
+        if param not in self.configdict:
             raise KeyError('ConfigSection does not have a parameter called %s' % param)
         return self.configdict[param]
             
     def configure(self,parameter=None):
         if parameter is not None:
-            if parameter not in self.configdict.keys():
+            if parameter not in list(self.configdict.keys()):
                 raise KeyError('Parameter "%s" not found in config' % parameter)
             self.configdict[parameter].configure()
             
@@ -412,37 +412,37 @@ class Config(object):
     def __init__(self,configdict=None):
         if configdict is not None:
             self.configdict = {}
-            for section,configsection in configdict.iteritems():
+            for section,configsection in configdict.items():
                 self.configdict[section] = ConfigSection(configsection)
 
     def getSectionNames(self):
-        return self.configdict.keys()
+        return list(self.configdict.keys())
 
     def getSection(self,section):
-        if not self.configdict.has_key(section):
+        if section not in self.configdict:
             raise KeyError('Config does not have a section called %s' % param)
         return self.configdict[section]
                 
     def printConfig(self,section=None,parameter=None):
         if section is not None:
-            if section not in self.configdict.keys():
+            if section not in list(self.configdict.keys()):
                 raise KeyError('Section "%s" not found in config file.' % section)
             configsection = self.configdict[section]
             configsection.printSection(parameter=parameter,ntab=0)
         else:
-            for section,configsection in self.configdict.iteritems():
-                print 'Section %s:' % section
+            for section,configsection in self.configdict.items():
+                print('Section %s:' % section)
                 configsection.printSection(ntab=1)
 
     def configure(self,section=None,parameter=None,configfile=None):
         if section is not None:
-            if section not in self.configdict.keys():
+            if section not in list(self.configdict.keys()):
                 raise KeyError('Section "%s" not found in config file.' % section)
             configsection = self.configdict[section]
             configsection.configure(parameter=parameter)
         else:
-            for section,configsection in self.configdict.iteritems():
-                print 'Configuring %s:' % section
+            for section,configsection in self.configdict.items():
+                print('Configuring %s:' % section)
                 configsection.configure(parameter=parameter)
         if configfile is not None:
             self.save(configfile)
@@ -450,10 +450,10 @@ class Config(object):
     def save(self,configfile):
         #reconstruct the dictionary
         cdict = {}
-        for section in self.configdict.keys():
+        for section in list(self.configdict.keys()):
             configsection = self.configdict[section]
             sectiondict = {}
-            for name,configitem in configsection.configdict.iteritems():
+            for name,configitem in configsection.configdict.items():
                 value = configitem.getValue()
                 name = configitem.getName()
                 caption = configitem.getCaption()
@@ -470,7 +470,7 @@ class Config(object):
         f = open(configfile,'wt')
         json.dump(cdict,f)
         f.close()
-        print 'Saved configuration to %s' % configfile
+        print('Saved configuration to %s' % configfile)
 
 class ConfigCommand(cmd.Cmd):
     
@@ -495,7 +495,7 @@ class ConfigCommand(cmd.Cmd):
         nrows = len(paramlist)/ncols
         if len(paramlist) % ncols:
             nrows += 1
-        print
+        print()
         for i in range(0,nrows):
             row = []
             if len(paramlist) >= ncols:
@@ -508,12 +508,12 @@ class ConfigCommand(cmd.Cmd):
             fstr = '%-' + '%is' % maxlen
             fmt = fstr*tcols
             rowstr = fmt % tuple(row)
-            print rowstr
-        print
+            print(rowstr)
+        print()
 
     def do_info(self,param):
         """List parameter information"""
-        print
+        print()
         self.section.printSection(parameter=param)
 
     def do_config(self,param):
@@ -522,7 +522,7 @@ class ConfigCommand(cmd.Cmd):
         if ci.getType() not in ['dict','list']:
             ci.configure()
         else:
-            print 'Configuration of dictionaries and lists not yet supported.'
+            print('Configuration of dictionaries and lists not yet supported.')
 
     def complete_config(self,text,line,begidx,endidx):
         params = self.section.getParamNames()
@@ -548,15 +548,15 @@ def main(args):
     if args.validate:
         try:
             configdict = json.load(open(args.file,'rt'))
-        except Exception,obj:
-            print 'Failed to load JSON format config file into data structure: "%s"' % obj.message
+        except Exception as obj:
+            print('Failed to load JSON format config file into data structure: "%s"' % obj.message)
             sys.exit(1)
         try:
             config = Config(configdict)
-        except Exception,obj:
-            print 'Error validating configuration data: "%s"' % obj.message
+        except Exception as obj:
+            print('Error validating configuration data: "%s"' % obj.message)
             sys.exit(1)
-        print '%s is a valid ShakeMap config file.' % args.file
+        print('%s is a valid ShakeMap config file.' % args.file)
         sys.exit(0)
 
     
@@ -566,7 +566,7 @@ def main(args):
     mycmd = ConfigCommand()
     mycmd.setConfig(config.getSection('grind'))
     mycmd.cmdloop('? to get help, Ctrl-D to quit')
-    print
+    print()
     sys.exit(0)
     
     section = None
