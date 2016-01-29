@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Introduction &mdash; ShakeMap Manual 2.0 documentation</title>
+  <title>1. Introduction &mdash; ShakeMap Manual 2.0 documentation</title>
   
 
   
@@ -31,7 +31,7 @@
 
   
     <link rel="top" title="ShakeMap Manual 2.0 documentation" href="index.html"/>
-        <link rel="next" title="Technical Guide" href="technical_guide.html"/>
+        <link rel="next" title="2. Technical Guide" href="technical_guide.html"/>
         <link rel="prev" title="Welcome to the ShakeMap Manual" href="index.html"/> 
 
   
@@ -82,15 +82,15 @@
             
             
                 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">Introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="technical_guide.html">Technical Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="users_guide.html">User&#8217;s Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="software_guide.html">Software &amp; Implementation Guide</a></li>
-<li class="toctree-l1"><a class="reference internal" href="regionals.html">Regional Operations</a></li>
-<li class="toctree-l1"><a class="reference internal" href="future_directions.html">Future Directions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">Acknowledgments</a></li>
-<li class="toctree-l1"><a class="reference internal" href="references.html">References &amp; Bibliography</a></li>
-<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">1. Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="software_guide.html">4. Software &amp; Implementation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regionals.html">5. Regional Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="future_directions.html">6. Future Directions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">7. Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">8. References &amp; Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 
             
@@ -121,7 +121,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>Introduction</li>
+    <li>1. Introduction</li>
       <li class="wy-breadcrumbs-aside">
         
           
@@ -136,24 +136,24 @@
            <div itemprop="articleBody">
             
   <div class="section" id="introduction">
-<span id="id1"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<span id="id1"></span><h1>1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
 <p>This online ShakeMap Manual (<a class="reference internal" href="references.html#worden2016b"><span>Worden and Wald, 2016</span></a>), is a
 significant update of the
 original (<a class="reference internal" href="references.html#wald2005"><span>Wald et al., 2005</span></a>) ShakeMap Manual. The
 Manual is now dynamic and served online. We employ Python document
 generator <a class="reference external" href="http://sphinx-doc.org/">Sphinx</a>, with the source
-under <a class="reference external" href="http://github.com/">GitHub</a> version control. The web pages
-here rendered with the <a class="reference external" href="http://github.com/snide/sphinx_rtd_theme">Sphinx RTD theme</a>.
-A PDF version is available <a class="reference external" href="_static/ShakeMapManual.pdf">here</a>.</p>
-<div class="figure align-right" id="id5">
+under <a class="reference external" href="http://github.com/">GitHub</a> version control. These web pages
+are rendered with the <a class="reference external" href="http://github.com/snide/sphinx_rtd_theme">Sphinx RTD theme</a>.
+A PDF version of this manual is available <a class="reference external" href="_static/ShakeMapManual.pdf">here</a>.</p>
+<div class="figure align-right" id="id4">
 <a class="reference external image-reference" href="NapaShakeMapExample(URIorreferencename)"><img alt="ShakeMap Napa" src="_images/Napa_ShakeMap_cover.png" style="width: 403.0px; height: 439.5px;" /></a>
 <p class="caption"><span class="caption-text">Figure 1: 2014 M6.0 Napa, CA, earthquake intensity ShakeMap.</span></p>
 </div>
 <p><a class="reference external" href="http://earthquake.usgs.gov/shakemap/">ShakeMap®</a>,
 developed by the U.S. Geological Survey (USGS), facilitates communication of
 earthquake information beyond just magnitude and location. By rapidly mapping out
-earthquake ground motions, ShakeMap portrays the distribution and severity of shaking,
-information critical for gauging the extent of the areas affected, determining which areas
+earthquake ground motions, ShakeMap portrays the distribution and severity of shaking.
+This information is critical for gauging the extent of the areas affected, determining which areas
 are potentially hardest hit, and allowing for rapid estimation of losses. Key to
 ShakeMap&#8217;s success, algorithms were developed that take advantage of any high-quality
 recorded ground motions&#8212;and any available macroseismic intensity data&#8212;to provide
@@ -162,14 +162,15 @@ for both interpolating recordings and&#8212;critically&#8212;providing
 event-specific estimates of shaking in areas where observations are sparse or nonexistent. Thus, ShakeMap portrays
 the best possible description of shaking by employing a combination of recorded and
 estimated shaking values.</p>
-<p>This Manual provides background on technical aspects of ShakeMap; describes
-the wide range of products and formats ShakeMap produces, as well as their uses; and provides guidance for
+<p>This Manual provides background on technical aspects of ShakeMap including: 1) information on
+the wide range of products and formats ShakeMap produces, 2) the uses of these products,
+and 3) guidance for
 ShakeMap developers and operators. Readers interested in understanding how
-ShakeMaps works can navigate (left sidebar) to the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a> section. Those who want to use
+ShakeMaps works can navigate to the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>. Those who want to use
 ShakeMap products and understand their varied forms can jump to the <a class="reference internal" href="users_guide.html#users-guide"><span>User&#8217;s Guide</span></a>.
 If your goal is to install and operate ShakeMap, see the <a class="reference internal" href="software_guide.html#software-guide"><span>Software &amp; Implementation Guide</span></a>. The
-<a class="reference internal" href="software_guide.html#software-guide"><span>Software &amp; Implementation Guide</span></a> also points users to the ShakeMap software distribution and Software
-Guide.</p>
+<a class="reference internal" href="software_guide.html#software-guide"><span>Software &amp; Implementation Guide</span></a> also points users to the ShakeMap software distribution and
+<a class="reference external" href="http://usgs.github.io/shakemap/_static/SoftwareGuideV3_5.pdf">Software Guide</a>.</p>
 </div>
 
 
@@ -179,7 +180,7 @@ Guide.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="technical_guide.html" class="btn btn-neutral float-right" title="Technical Guide" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="technical_guide.html" class="btn btn-neutral float-right" title="2. Technical Guide" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral" title="Welcome to the ShakeMap Manual" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>

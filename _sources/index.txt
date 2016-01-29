@@ -18,6 +18,7 @@ Welcome to the ShakeMap Manual
       :target: Napa ShakeMap Example (URI or reference name)
 
 .. toctree::
+   :numbered:
    :maxdepth: 2
 
    introduction.rst

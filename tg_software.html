@@ -1,0 +1,250 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>2.1. ShakeMap Software Overview &mdash; ShakeMap Manual 2.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ShakeMap Manual 2.0 documentation" href="index.html"/>
+        <link rel="up" title="2. Technical Guide" href="technical_guide.html"/>
+        <link rel="next" title="2.2. Philosophy of Estimating and Interpolating Ground Motions" href="tg_philosophy.html"/>
+        <link rel="prev" title="2. Technical Guide" href="technical_guide.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ShakeMap Manual
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="">2.1. ShakeMap Software Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_philosophy.html">2.2. Philosophy of Estimating and Interpolating Ground Motions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_parameters.html">2.3. Recorded Ground-motion Parameters</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_predictions.html">2.4. Ground Motion and Intensity Predictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_processing.html">2.5. ShakeMap Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_intensity.html">2.6. Representing Macroseismic Intensity on Maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_choice_of_parameters.html">2.7. Discussion of Chosen Map Parameters (Intensity Measures)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="software_guide.html">4. Software &amp; Implementation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regionals.html">5. Regional Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="future_directions.html">6. Future Directions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">7. Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">8. References &amp; Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">ShakeMap Manual</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="technical_guide.html">2. Technical Guide</a> &raquo;</li>
+      
+    <li>2.1. ShakeMap Software Overview</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/tg_software.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="shakemap-software-overview">
+<span id="sec-software-overview"></span><h1>2.1. ShakeMap Software Overview<a class="headerlink" href="#shakemap-software-overview" title="Permalink to this headline">¶</a></h1>
+<p>ShakeMap is a collection of modules written in PERL and C.  PERL is a powerful, freely
+available scripting language that runs on all computer platforms.  The collection of PERL
+modules allows the processing to flow in discrete steps that can be run collectively or
+individually.  Within the PERL scripts, other software packages are called, specifically
+packages that enable the graphics and much of the heavy grid-based computation.  For
+instance, maps are made using the Generic Mapping Tool (GMT; <a class="reference internal" href="references.html#gmt-ref"><span>Wessel and Smith,
+1991)</span></a>, and the Postscript output from GMT is converted to JPEG format using
+<a class="reference external" href="http://www.imagemagick.org/script/index.php">ImageMagick</a> or
+<a class="reference external" href="http://www.graphicsmagick.org/">GraphicsMagick</a>.  In the design of ShakeMap,
+all components are built
+from freely available, open-source packages.</p>
+<p>While the PERL language is not the fastest possible way to implement ShakeMap, we
+note that much of the heavy computational load is handled by highly optimized programs
+(usually written in C) that are called from within the PERL programs. Even for networks
+with hundreds of stations over large regions, ShakeMap takes only a minute or so to run
+on a modern computer (and much of that time is spent in product generation, e.g.,
+converting PostScript images to JPEG&#8212;something that would be very difficult to
+optimize further).</p>
+<p>To enable customization for specific earthquakes or for different regions, each ShakeMap
+module has an accompanying collection of configuration files.  For example, in these
+files, one assigns the regional geographic boundaries and mapping characteristics to be
+used by GMT, which ground motion prediction equation (GMPE) to use, where and how
+to transfer the maps, email recipient lists, and so on.  Specific details about the software
+and configuration files are described in detail in the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span>Software Guide</span></a>.</p>
+<p>With standardization in GIS and web application interfaces (API), several aspects of the
+ShakeMap system could be accomplished within GIS applications, but the open-source,
+freely available nature of GMT combined with PERL scripting tools allows for a flexible
+and readily available ShakeMap software package.  Nonetheless, we do generate a
+number of GIS product formats for that widespread user group as described in the <a class="reference internal" href="users_guide.html#users-guide"><span>User&#8217;s Guide</span></a>.</p>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tg_philosophy.html" class="btn btn-neutral float-right" title="2.2. Philosophy of Estimating and Interpolating Ground Motions" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="technical_guide.html" class="btn btn-neutral" title="2. Technical Guide" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

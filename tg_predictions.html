@@ -1,0 +1,234 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>2.4. Ground Motion and Intensity Predictions &mdash; ShakeMap Manual 2.0 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ShakeMap Manual 2.0 documentation" href="index.html"/>
+        <link rel="up" title="2. Technical Guide" href="technical_guide.html"/>
+        <link rel="next" title="2.5. ShakeMap Processing" href="tg_processing.html"/>
+        <link rel="prev" title="2.3. Recorded Ground-motion Parameters" href="tg_parameters.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> ShakeMap Manual
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="tg_software.html">2.1. ShakeMap Software Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_philosophy.html">2.2. Philosophy of Estimating and Interpolating Ground Motions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_parameters.html">2.3. Recorded Ground-motion Parameters</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="">2.4. Ground Motion and Intensity Predictions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_processing.html">2.5. ShakeMap Processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_intensity.html">2.6. Representing Macroseismic Intensity on Maps</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_choice_of_parameters.html">2.7. Discussion of Chosen Map Parameters (Intensity Measures)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="software_guide.html">4. Software &amp; Implementation Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="regionals.html">5. Regional Operations</a></li>
+<li class="toctree-l1"><a class="reference internal" href="future_directions.html">6. Future Directions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="acknowledgments.html">7. Acknowledgments</a></li>
+<li class="toctree-l1"><a class="reference internal" href="references.html">8. References &amp; Bibliography</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">ShakeMap Manual</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="technical_guide.html">2. Technical Guide</a> &raquo;</li>
+      
+    <li>2.4. Ground Motion and Intensity Predictions</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="_sources/tg_predictions.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="ground-motion-and-intensity-predictions">
+<span id="sec-tg-predictions"></span><h1>2.4. Ground Motion and Intensity Predictions<a class="headerlink" href="#ground-motion-and-intensity-predictions" title="Permalink to this headline">¶</a></h1>
+<p>In areas distant from the control of seismic instrumentation or reported intensity, ground
+motions must be estimated using the available earthquake source parameters and GMPEs
+or Intensity Prediction Equations (IPEs). GMPEs are available for a wide range of magnitudes, source mechanisms,
+and tectonic settings. IPEs are still comparatively uncommon, with only a handful of
+published relations, focused on active tectonic and stable shield (cratonic) environments
+(e.g., <a class="reference internal" href="references.html#atkinson-wald2007"><span>Atkinson and Wald, 2007</span></a>; <a class="reference internal" href="references.html#allen2012"><span>Allen et al., 2012</span></a>). To supplement the available IPEs, we
+have developed a &#8220;virtual IPE&#8221; which is a combination of the operator&#8217;s selected GMPE
+and Ground Motion/Intensity Conversion Equation (GMICE), which work together to
+present the same interface and behaviors as a direct IPE, while being available for a
+wider range of regional and tectonic environments.</p>
+<p>We describe the way ShakeMap employs ground-motion and intensity predictions in
+<a class="reference internal" href="tg_processing.html#sec-shakemap-processing"><span>ShakeMap Processing</span></a>. An up-to-date list of the GMPEs and IPEs available for ShakeMap can be
+found in the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span>Software Guide</span></a>.</p>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="tg_processing.html" class="btn btn-neutral float-right" title="2.5. ShakeMap Processing" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="tg_parameters.html" class="btn btn-neutral" title="2.3. Recorded Ground-motion Parameters" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'2.0',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -145,7 +145,7 @@ chose to modify these defaults using alternative mapping configurations.
 .. _napa-shakemap-cover:
 .. figure:: _static/Napa_ShakeMap_cover.*
    :width: 650px
-   :align: left
+   :align: center
 
    Intensity ShakeMap from the 2014 M6.0 American Canyon (Napa Valley), CA earthquake. Strong-motion data
    (triangles) and intensity data (circles) default to "see-through” mode for the intensity map. The
@@ -155,8 +155,8 @@ chose to modify these defaults using alternative mapping configurations.
 
 .. _napa-pga:
 .. figure:: _static/Figure_1_2.*
-   :scale: 75%
-   :align: left
+   :width: 650px
+   :align: center
 
    Peak acceleration ShakeMap from the 2014 M6.0 American Canyon (Napa Valley), CA
    earthquake. Strong-motion data (triangles) and intensity data (circles) are color-coded according to their intensity
@@ -199,7 +199,7 @@ stations (:num:`Figure #napa-dyfi`).
 .. _napa-contours:
 
 .. figure:: _static/Napa_contours_station.png
-   :scale: 40%
+   :width: 650px
    :align: left
 
    Interactive ShakeMap for the 2014 M6.0 American Canyon, CA
@@ -211,8 +211,8 @@ stations (:num:`Figure #napa-dyfi`).
 .. _napa-mobile:
 
 .. figure:: _static/Napa_mobile_shakemap.png
-   :scale: 45%
-   :align: right
+   :scale: 40 %
+   :align: center
 
    Mobile view of the interactive ShakeMap for the 2014 M6.0 American Canyon, CA
    earthquake. Contours indicate intensities; strong motion data (triangles) are color-coded according to their intensity
@@ -222,7 +222,7 @@ stations (:num:`Figure #napa-dyfi`).
 .. _napa-stationpopup:
 
 .. figure:: _static/Napa_contours_station_popup.*
-   :scale: 40%
+   :width: 650px
    :align: left 
 
    Interactive ShakeMap for the 2014 M6.0 American Canyon, CA
@@ -232,7 +232,7 @@ stations (:num:`Figure #napa-dyfi`).
 .. _napa-dyfi:
 
 .. figure:: _static/Napa_contours-stas-dyfi.png
-   :scale: 40%
+   :width: 650px
    :align: left 
 
    Interactive ShakeMap for the 2014 M6.0 American Canyon, CA
@@ -272,7 +272,7 @@ grade is assigned. See :num:`Figure #napa-urat` for an example uncertainty map.
    :width: 650px
    :align: left 
 
-   ShakeMap uncertainty maps for the 2014 M6.0 American Canyon, CA
+   ShakeMap uncertainty map for the 2014 M6.0 American Canyon, CA
    earthquake. Color-coded legend shows uncertainty ratio, where “1.0”
    indicates 1.0 times the GMPE’s sigma. The average uncertainty is
    computed by averaging uncertainty at grid points that lie
@@ -310,7 +310,7 @@ PGA data and GMPE.
 Interpolated Ground Motion Grids
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
      
-As described in the Technical Manual, the fundamental output product of the
+As described in the :ref:`Technical Guide <technical-guide>`, the fundamental output product of the
 ShakeMap processing system is a finely-sampled grid (nominally 1km
 spacing) of latitude and longitude
 pairs with associated amplitude values of shaking parameters at each point.
@@ -333,17 +333,18 @@ After the XML header, the first line is the *shakemap_grid* tag:
  ::
 
    <shakemap_grid xsi:schemaLocation="http://earthquake.usgs.gov
-   http://earthquake.usgs.gov/eqcenter/shakemap/xml/schemas/shakemap.xsd" event_id="19940117123055" 
-   shakemap_id="19940117123055" shakemap_version="2" code_version="3.5.1446" process_timestamp=
-   "2015-10-30T20:38:19Z" shakemap_originator="us" map_status="RELEASED" shakemap_event_type=
-   "ACTUAL">
+    http://earthquake.usgs.gov/eqcenter/shakemap/xml/schemas/shakemap.xsd" 
+    event_id="19940117123055" shakemap_id="19940117123055" shakemap_version="2" 
+    code_version="3.5.1446" process_timestamp="2015-10-30T20:38:19Z" 
+    shakemap_originator="us" map_status="RELEASED" shakemap_event_type="ACTUAL">
    
 Aside from schema information, the *shakemap_grid* tag provides the following attributes:
 
 
--  *event_id*: Typically this will a string of numbers and/or letters with or without a network
+-  *event_id*: Typically this is a string of numbers and/or letters with or without a network
    ID prefix (e.g., “us100003ywp”), though in the case of major historic earthquakes, scenarios, or
-   other special cases it may be a descriptive string, as above (“Northridge”).
+   other special cases it may be a descriptive string (for example, we have previously used the 1994 
+   Northridge earthquake as an example, and its event_id is “Northridge”).
 -  *shakemap_id*: Currently the same as *event_id*, above.
 -  *shakemap_version*: The version of this map, incremented each time a map is revised or reprocessed 
    and transferred.
@@ -357,8 +358,9 @@ The next tag describes the earthquake source:
 
  ::
 
-  <event event_id="Northridge" magnitude="6.7" depth="18" lat="34.213000" lon="-118.535700"
-   event_timestamp="1994-01-17T12:30:55GMT" event_network="ci" event_description="Northridge" />
+  <event event_id="Northridge" magnitude="6.7" depth="18" lat="34.213000" 
+   lon="-118.535700" event_timestamp="1994-01-17T12:30:55GMT" event_network="ci" 
+   event_description="Northridge" />
 
 Most of the attributes are self-explanatory:
 
@@ -376,8 +378,8 @@ Following the event tag is the grid_specification tag:
  ::
 
    <grid_specification lon_min="-119.785700" lat_min="33.379666" lon_max="-117.285700" 
-   lat_max="35.046334" nominal_lon_spacing="0.008333" nominal_lat_spacing="0.008333" nlon="301"
-   nlat="201" />
+    lat_max="35.046334" nominal_lon_spacing="0.008333" nominal_lat_spacing="0.008333" 
+    nlon="301" nlat="201" />
 
 The attributes are:
 
@@ -518,29 +520,26 @@ page. See :num:`Figure #napa-station-table` for an example.
 GIS Products
 ^^^^^^^^^^^^^^^^^^^^
 
-The GIS Files (zipped) are a collection of shapefiles of contours of the
+ShakeMap GIS Files (zipped) are a collection of shapefiles of polygons of the
 ShakeMap model outputs for each shaking metric: MMI, PGA, PGV, and PSA at three
-periods (0.3, 1.0, and 3.0 sec).  These vectors should be easily importable into a GIS. The ESRI Raster
+periods (0.3, 1.0, and 3.0 sec).  These file should be easily importable into a GIS
+system. The ESRI Raster
 Files (also zipped) are a collection of ESRI-formatted binary files.  It should
 be relatively easy to convert these to (for example) ArcGIS grids using the
 standard tools provided with the software. The contours are useful primarily for
-overlaying with other data for visualization purposes.  If you plan to do
-analysis, where you need to know the MMI value at particular points, then we
-would suggest using the ERSRI raster data (see below).
+overlaying with other data for visualization purposes.
 
-ShakeMap processing does not occur in a Geographic Information System (GIS), but
-we post-process the grid files (described above) into raster and shape files for direct
-import into GIS. The file base names in each archive are abbreviations of the
+The file base names in each archive are abbreviations of the
 type of ground-motion parameter:
 
- ::
-
-	*mi*    =  macroseismic intensity (usually, but not necessarily, mmi)
-	*pga*   =  peak ground acceleration
-	*pgv*   =  peak ground velocity
-	*psa03* =  0.3 s pseudo-spectral acceleration
-	*psa10* =  1.0 s pseudo-spectral acceleration
-	*psa30* =  3.0 s pseudo-spectral acceleration
+  =======    ===========================================================
+  *mi*       macroseismic intensity (usually, but not necessarily, mmi)
+  *pga*      peak ground acceleration
+  *pgv*      peak ground velocity
+  *psa03*    0.3 s pseudo-spectral acceleration
+  *psa10*    1.0 s pseudo-spectral acceleration
+  *psa30*    3.0 s pseudo-spectral acceleration
+  =======    ===========================================================
 
 The sub-sections that follow describe available file and product types.
 
@@ -549,13 +548,13 @@ Shapefiles
 
 GIS shapefiles are comprised of four or five standard associated GIS files:
 
- :: 
-
-  *.dbf* = A DataBase file with layer attributes
-  *.shp* = The file with geographic coordinates
-  *.shx* = An index file 
-  *.prj* = A file containing projection information 
-  *.lyr* = A file containing presentation properties (only available for PGA, PGV, and MMI)
+  =======  ===========================================================
+  *.dbf*   database file with layer attributes
+  *.shp*   the file with geographic coordinates
+  *.shx*   an index file 
+  *.prj*   contains projection information 
+  *.lyr*   contains presentation properties (only available for PGA, PGV, and MMI)
+  =======  ===========================================================
 
 In this application, the shapefiles are contour polygons of the peak
 ground-motion amplitudes in ArcView shapefiles. These contour polygons are
@@ -615,7 +614,7 @@ The HAZUS GIS files are only generated for events that are larger than
 archive of files compressed in
 zip format (*hazus.zip*) to facilitate file transfer.
 
-.. note:: An important note on the values of the parameters in the HAZUS shape files is that they are empirically corrected from the standard ShakeMap **peak ground motion values** to approximate the **geometric mean** values used for HAZUS loss estimation.  HAZUS was calibrated to work with mean ground motion values (FEMA, 1997). Peak amplitudes are corrected by scaling values down by 15 percent (Campbell, 1997; Joyner, oral commun., 2000). As of this writing, FEMA is considering switching to peak ground motions as presented by ShakeMap rather than employing the geometric mean component. 
+.. note:: An important note on the values of the parameters in the HAZUS shape files is that they are empirically corrected from the standard ShakeMap **peak ground motion values** to approximate the **geometric mean** values used for HAZUS loss estimation.  HAZUS was calibrated to work with mean ground motion values (FEMA, 1997). Peak amplitudes are corrected by scaling values down by 15 percent (Campbell, 1997; Joyner, oral commun., 2000). While more recent work by :ref:`Beyer and Bommer (2006) <beyer2006>` suggests different conversion factors, for the HAZUS shape files we continue to use 15 percent to maintain consistency in HAZUS results. As of this writing, FEMA is considering switching to peak ground motions as presented by ShakeMap rather than employing the geometric mean component. 
 
 ESRI Raster Files (*.fit* files)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -733,9 +732,9 @@ Guatemala; and includes a ShakeMap product:
 
  ::
 
-    http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&starttime=2015-01-01T00:00:00
-    &maxlatitude=20&minlatitude=10&maxlongitude=-85&minlongitude=-95&endtime=2016-01-01T00:00:00&
-    producttype=shakemap
+    http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&
+    starttime=2015-01-01T00:00:00&maxlatitude=20&minlatitude=10&maxlongitude=-85&
+    minlongitude=-95&endtime=2016-01-01T00:00:00&producttype=shakemap
 
 The results include an array of features with summary information for
 each event.  The *detail* property is a URL for the GeoJSON detail
