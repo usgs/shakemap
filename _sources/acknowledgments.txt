@@ -116,7 +116,7 @@ has contributed greatly to the development of scenarios and advancing ShakeMap
 science. Kishor Jaiswal, Ned Field, Nico Luco, Mark Petersen have all been very helpful
 in software calibration and validation and overall advice.
 
-Eric Thompson (USGS, Golden) and Em Wald provided helpful rewivews of this Manual.
+Eric Thompson (USGS, Golden) and Emmette Wald provided helpful rewivews of this Manual.
 
 Lastly, we are also extremely grateful for the recognition of the
 importance of ShakeMap and the ongoing internal and external support for its
