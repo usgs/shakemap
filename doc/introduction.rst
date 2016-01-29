@@ -13,7 +13,7 @@ Introduction
    generator `Sphinx <http://sphinx-doc.org/>`_, with the source
    under `GitHub <http://github.com/>`_ version control. These web pages
    are rendered with the `Sphinx RTD theme <http://github.com/snide/sphinx_rtd_theme>`_.
-   A PDF version of this manual is available `here <_static/ShakeMapManual.pdf>`_.
+   A `PDF version <_static/ShakeMapManual.pdf>`_ of this manual is available.
 
 .. only:: latex
 
