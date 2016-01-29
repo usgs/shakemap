@@ -560,7 +560,7 @@ Smith, W.H.F. and P. Wessel (1990). Gridding with continuous curvature splines i
 
 So, E. (2014). Introduction to the GEM Earthquake Consequences Database (GEMECD), *GEM 
 Technical Report* 1.0.0, 158 pp., GEM Foundation, Pavia, Italy.
-DOI: 10.13117/GEM.VULN-MOD.TR2014.14. http://www.globalquakemodel.org/resources/publications/technical-reports/introduction-gem-earthquake-consequences-database-/.
+DOI: 10.13117/GEM.VULN-MOD.TR2014.14. `Available online. <http://www.globalquakemodel.org/resources/publications/technical-reports/introduction-gem-earthquake-consequences-database-/>`_
 
 Sokolov, V.Y. and Y.K. Chernov (1998). On the correlation of Seismic Intensity with Fourier Amplitude 
 Spectra, *Earthquake Spectra* (14), 679-694. 
@@ -584,8 +584,9 @@ topographic constraints, *Bull. Seism. Soc. Am.* 104(5), 2313-2321.
 
 .. _thompson2016:
 
-Thompson, E.M., D.J. Wald, and C.B. Worden (2016).  ShakeMap Scenario
-Strategy, *U.S. Geological Survey Open File Report*, in progress. 
+Thompson, E.M., D.J. Wald, C.B. Worden, N. Field, N. Luco, M. D. Peterson, P. M. Powers, 
+and B. Rowshandel (2016).  ShakeMap Scenario Strategy, *U.S. Geological Survey Open File Report*, 
+in progress. 
 \
 
 .. _turner2014:

@@ -6,7 +6,7 @@ import tempfile
 import textwrap
 import sys
 import re
-import StringIO
+import io
 
 #third party libraries
 from configobj import ConfigObj
@@ -54,7 +54,7 @@ def whatIs(configspec,param):
     comment = '%s is not a value found in %s.' % (param,configspec)
     for sectionkey in config.sections:
         section = config[sectionkey]
-        for key in section.keys():
+        for key in list(section.keys()):
             if param.lower() == key.lower():
                 comment = 'Section [%s] has that option:' % (sectionkey) +'\n'.join(section.comments[key])
     return comment
@@ -116,10 +116,10 @@ def validate(configspec,configfile,macros=None):
     #first, replace all the macros if we have the values
     if macros is not None:
         configstr = open(configfile,'rt').read()
-        for key,value in macros.iteritems():
+        for key,value in macros.items():
             macro = '<'+key.upper()+'>'
             configstr = configstr.replace(macro,value)
-        configfile = StringIO.StringIO(configstr)
+        configfile = io.StringIO(configstr)
     config = ConfigObj(configfile,configspec=configspec)
     validator = getCustomValidator()
     result = config.validate(validator)
@@ -216,11 +216,11 @@ def _test_validate():
                   'event_network':'us',
                   'event_id':'us2015abcd'}
         ret = validate(configspec,tfile,macros=macros)
-        print ret
+        print(ret)
         config = ConfigObj(tfile)
         pass
-    except Exception,e:
-        print '_test_validate() failed with error "%s"' % str(e)
+    except Exception as e:
+        print('_test_validate() failed with error "%s"' % str(e))
     os.remove(tfile)
     
 if __name__ == '__main__':
@@ -230,6 +230,6 @@ if __name__ == '__main__':
     configspec = os.path.join(homedir,'configspec.ini')
     configfile = createDefaultConfig(configspec)
 
-    print whatIs(configspec,'pgm2mi')
+    print(whatIs(configspec,'pgm2mi'))
 
-    print validate(configspec,configfile)
+    print(validate(configspec,configfile))

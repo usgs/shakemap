@@ -6,7 +6,7 @@ import os.path
 from xml.dom import minidom
 import copy
 import pprint
-import StringIO
+import io
 
 #third party modules
 import numpy as np
@@ -19,7 +19,7 @@ def _getStationAttributes(station):
     Get a dictionary of the station attributes
     """
     attrdict = {}
-    for attr in station.attributes.items():
+    for attr in list(station.attributes.items()):
         key = attr[0]
         value = attr[1]
         #is this value a float or str?
@@ -54,17 +54,17 @@ def getPeakValues(stationdict):
                 'code':[]
                 }
     peakkeys = ['pga','pgv','psa03','psa10','psa30']
-    for stationcode,stationtuple in stationdict.iteritems():
+    for stationcode,stationtuple in stationdict.items():
         attributes,compdict = stationtuple
         #we need to check the components to see if the two horizontal channels are distinguishable from the vertical channel
         channelsum = 0
-        channels = compdict.keys()
-        for channel in compdict.keys():
+        channels = list(compdict.keys())
+        for channel in list(compdict.keys()):
             if channel.endswith('1') or channel.endswith('2') or channel.endswith('3'):
                 channelsum += 1
         if channelsum == 3:
             continue
-        if attributes.has_key('intensity'):
+        if 'intensity' in attributes:
             peakdict['mmi'].append(attributes['intensity'])
         else:
             peakdict['mmi'].append(np.nan)
@@ -74,15 +74,15 @@ def getPeakValues(stationdict):
         #make sure we get the peak value from 
         for key in peakkeys:
             value = -1
-            for channel,pgmdict in compdict.iteritems():
+            for channel,pgmdict in compdict.items():
                 if channel.lower().endswith('z'): #is vertical channel guaranteed to end with 'Z'????
                     continue
-                if pgmdict.has_key(key) and pgmdict[key]['value'] > value and pgmdict[key]['flag'] == '0':
+                if key in pgmdict and pgmdict[key]['value'] > value and pgmdict[key]['flag'] == '0':
                     value = pgmdict[key]['value']
             if value == -1:
                 value = np.nan
             peakdict[key].append(value)
-    for key in peakdict.keys():
+    for key in list(peakdict.keys()):
         peakdict[key] = np.array(peakdict[key])
     return peakdict
             
@@ -96,12 +96,12 @@ def writeStations(stationdict):
      * XML string suitable for writing to a file
     """
     earthquakeTag = Tag('earthquake-data') #top level
-    for stationcode,stationtuple in stationdict.iteritems():
+    for stationcode,stationtuple in stationdict.items():
         attributes,compdict = stationtuple
         stationTag = Tag('station',attributes=attributes)
-        for compname,pgmdict in compdict.iteritems():
+        for compname,pgmdict in compdict.items():
             compTag = Tag('comp',attributes={'name':compname})
-            for pgm,pgmvaldict in pgmdict.iteritems():
+            for pgm,pgmvaldict in pgmdict.items():
                 pgmTag = Tag(pgm,attributes=pgmvaldict)
                 compTag.addChild(pgmTag)
             stationTag.addChild(compTag)
@@ -235,14 +235,14 @@ def filterStation(xmlfile):
         code = station.getAttribute('code')
         attributes = _getStationAttributes(station)
         comps = station.getElementsByTagName('comp')
-        if code in stationdict.keys():
+        if code in list(stationdict.keys()):
             compdict = stationdict[code]
         else:
             compdict = {}
         for comp in comps:
             compname = comp.getAttribute('name')
             tpgmdict = _getGroundMotions(comp)
-            if compname in compdict.keys():
+            if compname in list(compdict.keys()):
                 pgmdict = compdict[compname]
             else:
                 pgmdict = {}
@@ -259,7 +259,7 @@ def _main(xmlfiles):
     printer = pprint.PrettyPrinter(indent=2)
     printer.pprint(stationdict)
     xmlstr = writeStations(stationdict)
-    print xmlstr
+    print(xmlstr)
 
 def _test():
     xmlstr = """<shakemap-data code_version="3.5" map_version="4">
@@ -290,33 +290,33 @@ def _test():
           </station>
         </stationlist>
       </shakemap-data>"""
-    cmpdict = { u'IU.PMG': ( { u'code': u'IU.PMG',
-                 u'commtype': u'UNK',
-                 u'dist': 731.845032,
-                 u'insttype': u'UNK',
-                 u'intensity': 1.5,
-                 u'lat': -9.4047,
-                 u'loc': u'',
-                 u'lon': 147.1597,
-                 u'name': u'Port Moresby, New Guinea',
-                 u'netid': u'IU',
-                 u'source': u'NEIC'},
-               { u'HN1': { u'pga': { 'flag': True, 'value': 0.0227},
-                           u'pgv': { 'flag': True, 'value': 0.0385},
-                           u'psa03': { 'flag': True, 'value': 0.0399},
-                           u'psa10': { 'flag': True, 'value': 0.0506},
-                           u'psa30': { 'flag': True, 'value': 0.0162}},
-                 u'HN2': { u'pga': { 'flag': True, 'value': 0.0218},
-                           u'pgv': { 'flag': True, 'value': 0.0565},
-                           u'psa03': { 'flag': True, 'value': 0.0321},
-                           u'psa10': { 'flag': True, 'value': 0.0472},
-                           u'psa30': { 'flag': True, 'value': 0.0179}},
-                 u'HNZ': { u'pga': { 'flag': True, 'value': 0.0207},
-                           u'pgv': { 'flag': True, 'value': 0.0397},
-                           u'psa03': { 'flag': True, 'value': 0.042},
-                           u'psa10': { 'flag': True, 'value': 0.0327},
-                           u'psa30': { 'flag': True, 'value': 0.0132}}})}
-    xmlfile = StringIO.StringIO(xmlstr)
+    cmpdict = { 'IU.PMG': ( { 'code': 'IU.PMG',
+                 'commtype': 'UNK',
+                 'dist': 731.845032,
+                 'insttype': 'UNK',
+                 'intensity': 1.5,
+                 'lat': -9.4047,
+                 'loc': '',
+                 'lon': 147.1597,
+                 'name': 'Port Moresby, New Guinea',
+                 'netid': 'IU',
+                 'source': 'NEIC'},
+               { 'HN1': { 'pga': { 'flag': True, 'value': 0.0227},
+                           'pgv': { 'flag': True, 'value': 0.0385},
+                           'psa03': { 'flag': True, 'value': 0.0399},
+                           'psa10': { 'flag': True, 'value': 0.0506},
+                           'psa30': { 'flag': True, 'value': 0.0162}},
+                 'HN2': { 'pga': { 'flag': True, 'value': 0.0218},
+                           'pgv': { 'flag': True, 'value': 0.0565},
+                           'psa03': { 'flag': True, 'value': 0.0321},
+                           'psa10': { 'flag': True, 'value': 0.0472},
+                           'psa30': { 'flag': True, 'value': 0.0179}},
+                 'HNZ': { 'pga': { 'flag': True, 'value': 0.0207},
+                           'pgv': { 'flag': True, 'value': 0.0397},
+                           'psa03': { 'flag': True, 'value': 0.042},
+                           'psa10': { 'flag': True, 'value': 0.0327},
+                           'psa30': { 'flag': True, 'value': 0.0132}}})}
+    xmlfile = io.StringIO(xmlstr)
     stationdict = filterStation(xmlfile)
     assert _compareDictionaries(stationdict,cmpdict)
     #printer = pprint.PrettyPrinter(indent=2)

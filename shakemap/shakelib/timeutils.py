@@ -49,8 +49,8 @@ class ShakeDateTime(datetime):
 
 if __name__=="__main__":
     t1 = ShakeDateTime(1900,1,1,1,1,1)
-    print t1.strftime('%Y-%m-%d %H:%M:%S')
+    print(t1.strftime('%Y-%m-%d %H:%M:%S'))
     t2 = ShakeDateTime(1899,7,13,12,16,41)
-    print t2.strftime('%Y-%m-%d %H:%M:%S')
+    print(t2.strftime('%Y-%m-%d %H:%M:%S'))
     t3 = ShakeDateTime.strptime('1899-01-01','%Y-%m-%d')
-    print t3.strftime('%Y-%m-%d')
+    print(t3.strftime('%Y-%m-%d'))

@@ -9,7 +9,7 @@ def gmtColormap(fileName,GMTPath = None):
     try:
         f = open(filePath)
     except:
-        print "file ",filePath, "not found"
+        print("file ",filePath, "not found")
         return None
                                                                                                              
     lines = f.readlines()

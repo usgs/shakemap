@@ -17,7 +17,7 @@ class CopySender(Sender):
           Number of files sent to local directory.
         '''
         nfiles = 0
-        if not self.properties.has_key('directory'):
+        if 'directory' not in self.properties:
             raise SenderError('Property "directory" not specified.')
         
         if not os.path.isdir(self.properties['directory']):
@@ -39,7 +39,7 @@ class CopySender(Sender):
         :returns:
           The number of files deleted from local directory.
         '''
-        if not self.properties.has_key('directory'):
+        if 'directory' not in self.properties:
             raise SenderError('Property "directory" not specified.')
         
         if not os.path.isdir(self.properties['directory']):
@@ -63,7 +63,7 @@ def _test():
         cpsender = CopySender(properties={'directory':tempdir},files=[thisfile])
         nfiles = cpsender.send()
         nfiles = cpsender.delete()
-    except Exception,obj:
+    except Exception as obj:
         raise SenderError('Failed to copy or delete a file.')
     shutil.rmtree(tempdir)
 

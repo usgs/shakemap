@@ -6,8 +6,8 @@ from datetime import datetime
 import copy
 
 #third party imports
-from ecef import latlon2ecef
-from vector import Vector
+from .ecef import latlon2ecef
+from .vector import Vector
 from openquake.hazardlib.geo import point
 from openquake.hazardlib.geo import geodetic
 import numpy as np
@@ -244,7 +244,7 @@ def calcRuptureDistance(P0,P1,P2,P3,points):
     if len(shp) == 1:
         dist.shape = (shp[0],1)
     if np.any(np.isnan(dist)):
-        raise Exception,"Could not calculate some distances!"
+        raise Exception("Could not calculate some distances!")
     dist = np.fliplr(dist)
     return dist
 
@@ -362,14 +362,14 @@ if __name__ == '__main__':
     dt = t2-t1
     sec = dt.seconds + float(dt.microseconds)/1e6
     npoints = nr*nc
-    print 'RRupt: %.4f seconds for %i point grid' % (sec,npoints)
+    print('RRupt: %.4f seconds for %i point grid' % (sec,npoints))
     dist.shape = (nr,nc)
     if nr > 1 and nc > 1:
         plt.imshow(dist,interpolation='nearest')
         plt.colorbar()
         plt.savefig('dist.png')
     else:
-        print dist
+        print(dist)
 
     #test this against Bruce's C program
     nr2,nc2 = points.shape
@@ -412,7 +412,7 @@ if __name__ == '__main__':
         plt.colorbar()
         plt.savefig('dist_c.png')
     else:
-        print dist
+        print(dist)
     
     P0,P1 = getTopEdge(flat,flon,fdep)
     rxdist = calcRxDistance(P0,P1,points)
@@ -423,7 +423,7 @@ if __name__ == '__main__':
         plt.colorbar()
         plt.savefig('distrx.png')
     else:
-        print rxdist
+        print(rxdist)
 
     #test against Bruce's C implementation
     f = open('points.txt','wt')
@@ -444,4 +444,4 @@ if __name__ == '__main__':
         plt.colorbar()
         plt.savefig('distrx_c.png')
     else:
-        print rxdist2
+        print(rxdist2)

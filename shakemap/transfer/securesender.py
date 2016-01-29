@@ -23,12 +23,12 @@ class SecureSender(Sender):
         """
         usePrivateKey = True
         for prop in self.required_props1:
-            if prop not in self.properties.keys():
+            if prop not in list(self.properties.keys()):
                 usePrivateKey = False
                 break
         usePassword = True
         for prop in self.required_props2:
-            if prop not in self.properties.keys():
+            if prop not in list(self.properties.keys()):
                 usePassword = False
                 break
         if not usePrivateKey and not usePassword:
@@ -41,14 +41,14 @@ class SecureSender(Sender):
             try:
                 ssh.connect(self.properties['remotehost'],
                             key_filename=self.properties['privatekey'],compress=True)
-            except Exception,obj:
+            except Exception as obj:
                 raise SenderError('Could not connect with private key file %s' % self.properties['privatekey'])
         else:
             try:
                 ssh.connect(self.properties['remotehost'],
                             username=self.properties['username'],password=self.properties['password'],
                             compress=True)
-            except Exception,obj:
+            except Exception as obj:
                 raise SenderError('Could not connect with private key file %s' % self.properties['privatekey'])
         return ssh
 
@@ -66,7 +66,7 @@ class SecureSender(Sender):
                 scp.put(self.files, remote_path=self.properties['remotedirectory'])
             if len(self.directories):
                 scp.put(self.directories, remote_path=self.properties['remotedirectory'],recursive=True)
-        except Exception,obj:
+        except Exception as obj:
             pass
         nfiles += len(self.files)
         for folder in self.directories:

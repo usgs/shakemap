@@ -26,19 +26,20 @@ community, it is increasingly being incorporated into value-added products that
 help in the assessment of earthquake impacts for response management and
 government officials.
 
-.. figure::  _static/SMap_SCast_DYFI_PAGER.png
+.. _figure-related-systems:
+
+.. figure:: _static/SMap_SCast_DYFI_PAGER.png
    :width: 650px
    :alt: Related Systems
    :align: center
-   :target: Related Systems
 
    Interplay between ShakeMap, DYFI, ShakeCast, and PAGER.	    
 
 As discussed in detail the :ref:`technical-guide`, ShakeMap is augmented by
 DYFI input for constraining intensities, and from those, estimates of peak 
-ground motions (in some cases, and for some regions), as shown in Figure
-#related-systems. DYFI and ShakeMap in conjunction then represent the shaking
-hazard 
+ground motions (in some cases, and for some regions), as shown 
+in :num:`Figure #figure-related-systems`.  DYFI and ShakeMap in conjunction then represent 
+the shaking hazard 
 input for two other primary systems that estimated losses: ShakeCast and PAGER.
 ShakeCast is intended for specific users to prioritize response for specific 
 user-centric portfolios of facilities; PAGER is for more general societal-impact

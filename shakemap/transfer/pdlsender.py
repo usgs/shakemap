@@ -5,10 +5,10 @@ import os.path
 import tempfile
 import subprocess
 import sys
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import zipfile
 import shutil
-import StringIO
+import io
 from distutils import spawn
 import textwrap
 
@@ -45,7 +45,7 @@ class PDLSender(Sender):
                            'eventsource','eventsourcecode']
     def delete(self):
         for prop in self.required_properties:
-            if prop not in self.properties.keys():
+            if prop not in list(self.properties.keys()):
                 raise SenderError('"%s" property must be supplied to send via PDL')
 
         #build pdl command line from properties
@@ -53,7 +53,7 @@ class PDLSender(Sender):
         self.properties['files'] = ''
         self.properties['directories'] = ''
         cmd = self.pdlcmd
-        for propkey,propvalue in self.properties.iteritems():
+        for propkey,propvalue in self.properties.items():
             cmd = cmd.replace('['+propkey.upper()+']',propvalue)
         
         retcode,stdout,stderr = getCommandOutput(cmd)
@@ -72,7 +72,7 @@ class PDLSender(Sender):
 
         #make sure we have all the required properties
         for prop in self.required_properties:
-            if prop not in self.properties.keys():
+            if prop not in list(self.properties.keys()):
                 raise SenderError('"%s" property must be supplied to send via PDL')
 
         
@@ -88,7 +88,7 @@ class PDLSender(Sender):
         else:
             self.properties['directory'] = ''
         cmd = self.pdlcmd
-        for propkey,propvalue in self.properties.iteritems():
+        for propkey,propvalue in self.properties.items():
             cmd = cmd.replace('['+propkey.upper()+']',propvalue)
 
         #call PDL on the command line
@@ -125,10 +125,10 @@ def _test_send(internalhub):
     tempdir = None
     try:
         tempdir = tempfile.mkdtemp()
-        fh = urllib2.urlopen(PDLURL)
+        fh = urllib.request.urlopen(PDLURL)
         zipdata = fh.read()
         fh.close()
-        zipf = StringIO.StringIO(zipdata)
+        zipf = io.StringIO(zipdata)
         myzip = zipfile.ZipFile(zipf,'r')
         jarfile = myzip.extract('ProductClient/ProductClient.jar',tempdir)
         myzip.close()
@@ -157,7 +157,7 @@ def _test_send(internalhub):
         pdl = PDLSender(properties=props,files=[thisfile])
         pdl.send()
         pdl.delete()
-    except Exception,obj:
+    except Exception as obj:
         pass
     #remove temporary pdl folder with jarfile, config, and keyfile in it
     if tempdir is not None:
