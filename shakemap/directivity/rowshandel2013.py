@@ -8,7 +8,6 @@ import shakemap.shakelib.fault as fault
 from shakemap.shakelib.vector import Vector
 from shakemap.shakelib.distance import calcRuptureDistance
 from shakemap.shakelib.distance import getDistance
-#from numba import jit
 
 """
 Implements the Rowshandel (2013) directivity model. 
@@ -42,7 +41,7 @@ class rowshandel2013(object):
             'T': np.array([1, 2, 3, 4, 5, 7.5, 10])}
     __c2['mean'] = (__c2['as'] + __c2['ba'] + __c2['cb'] + __c2['cy'] + __c2['id'])/5
 
-    def __init__(self, flt, hyp, sites, rake, dx, M, T, a_weight = 0.5, simpleDT = False):
+    def __init__(self, flt, hyp, sites, rake, dx, M, T, a_weight = 0.5, mtype = 1, simpleDT = False):
         """
         Constructor for rowshandel2013.
         :param flt:
@@ -69,6 +68,9 @@ class rowshandel2013(object):
         :param a_weight:
             Weighting factor for how p-dot-q and s-dot-q are averaged; 0 for only 
             p-dot-q and 1 for only s-dot-q. 
+        :param mtype:
+            Integer, either 1 or 2; 1 for adding only positive components of dot products, 
+            2 for adding all components of dot products. 
         :param simpleDT:
             Boolean; should the simpler DT equation be used? Usually False. 
         """
@@ -80,6 +82,7 @@ class rowshandel2013(object):
         self.M = M
         self.T = T
         self.a_weight = a_weight
+        self.mtype = mtype
         self.simpleDT = simpleDT
         
         self.computeWrup()
@@ -142,12 +145,9 @@ class rowshandel2013(object):
         self.Wrup = Vector.dot(p3p0n, hp0)/1000
 
     
-    def computeXiPrime(self, mtype = 1):
+    def computeXiPrime(self):
         """
         Computes the xi' value. 
-        :param mtype:
-            Integer, either 1 or 2; 1 for adding only positive components of dot products, 
-            2 for adding all components of dot products. 
         """
         hypo_ecef = Vector.fromPoint(geo.point.Point(self.hyp[0], self.hyp[1], self.hyp[2]))
         epi_ll = Vector(self.hyp[0], self.hyp[1], 0)
@@ -222,8 +222,8 @@ class rowshandel2013(object):
             # varies with subfault location. 
             ss_col = np.array([[slpv_SS.x], [slpv_SS.y], [slpv_SS.z]])
             ds_col = np.array([[slpv_DS.x], [slpv_DS.y], [slpv_DS.z]])
-            smat = ss_col * (-front_positive) + ds_col * (above_positive)
-#            smat = ss_col + ds_col
+            smat = ss_col  + ds_col 
+#            smat = ss_col * (front_positive) + ds_col 
             mag = np.sqrt(np.sum(smat*smat, axis = 0))
             smatnorm = smat/mag
             
@@ -237,11 +237,11 @@ class rowshandel2013(object):
                 mag = np.sqrt(np.sum(qmat*qmat, axis = 0))
                 qmatnorm = qmat/mag
                 # Dot products
-                if mtype == 1:
+                if self.mtype == 1:
                     pdotq = np.sum(pmatnorm * qmatnorm, axis = 0).clip(min = 0)
 #                    sdotq = np.abs(np.sum(smatnorm * qmatnorm, axis = 0))
                     sdotq = np.sum(smatnorm * qmatnorm, axis = 0).clip(min = 0)
-                elif mtype == 2:
+                elif self.mtype == 2:
                     pdotq = np.sum(pmatnorm * qmatnorm, axis = 0)           # xi_p_prime
 #                    sdotq = np.abs(np.sum(smatnorm * qmatnorm, axis = 0))   # xi_s_prime
                     sdotq = np.sum(smatnorm * qmatnorm, axis = 0)   # xi_s_prime
@@ -254,9 +254,9 @@ class rowshandel2013(object):
         xi_prime_unscaled = xi_prime_unnormalized / n_sub_faults
         
         # Scale so that xi_prime has range (0, 1)
-        if mtype == 1: 
+        if self.mtype == 1: 
             xi_prime = xi_prime_unscaled
-        elif mtype == 2:
+        elif self.mtype == 2:
             xi_prime = 0.5*(xi_prime_unscaled + 1)
         
         self.xi_prime = xi_prime
