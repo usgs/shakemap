@@ -80,13 +80,10 @@ class bayless2013(object):
         self.rake = rake
         self.M = M
         self.T = T
-        self.setPredictors()
-    
-        
-    def setPredictors(self):
-        """
-        Set the input/predictor variables Fgeom, Tcd, Tmw, Taz. 
-        """
+        self.mesh = geo.mesh.Mesh(self.sites[0], self.sites[1], np.zeros_like(self.sites[1]))
+        self.Rrup = np.reshape(getDistance('rrup', self.mesh, self.flt.Quadrilaterals), self.sites[0].shape)
+        self.Rx = np.reshape(getDistance('rx', self.mesh, self.flt.Quadrilaterals), self.sites[0].shape)
+        self.Ry = np.reshape(getDistance('ry0', self.mesh, self.flt.Quadrilaterals), self.sites[0].shape)
         self.W = self.flt.getIndividualWidths()
         self.L = self.flt.getIndividualTopLengths()
         self.getSlipCategory()
@@ -95,15 +92,7 @@ class bayless2013(object):
         # s is the length of striking fault rupturing toward site; max[(X*L),exp(1)]
         # theta (see Figure 5 in SSGA97)
         self.computeThetaAndS()
-#        
-#        
-#        Rx
-#        W
-#        Rrup
-#        Az # Source-to-site azumuth (as defined in NGA)
-
-        mesh = geo.mesh.Mesh(self.sites[0], self.sites[1], np.zeros_like(self.sites[1]))
-        Rrup = np.reshape(getDistance('rrup', mesh, self.flt.Quadrilaterals), (-1,))
+        self.computeAz()
         
         # Magnitude taper (does not depend on mechanism)
         if self.M <= 5: 
@@ -120,44 +109,52 @@ class bayless2013(object):
             f_geom = np.log(self.s[0]) * (0.5 * np.cos(2*self.theta[0]) + 0.5)
             
             # Distance taper
-            T_CD = np.reshape(np.ones_like(self.sites[0]), (-1,))
-            ix = [(Rrup/self.L > 0.5) & (Rrup/self.L < 1)]
-            T_CD[ix] = 1 - (Rrup[ix]/self.L - 0.5)/0.5
-#            T_CD[Rrup/self.L >= 1.0 ] = 0
+            T_CD = np.ones_like(self.sites[0])
+            ix = [(self.Rrup/self.L > 0.5) & (self.Rrup/self.L < 1)]
+            T_CD[ix] = 1 - (self.Rrup[ix]/self.L - 0.5)/0.5
+            T_CD[self.Rrup/self.L >= 1.0 ] = 0
 
             # Azimuth taper
             T_Az = 1.0
             
             # Select Coefficients
-            ix = [self.T == sefl.__T]
+            ix = [self.T == self.__T]
             C0 = self.__C0ss[ix]
             C1 = self.__C1ss[ix]
             
         elif self.SlipCategory == 'DS':
             # need to add loop over quads, for now assuming one quad
             
-            # Geometric directivity predictor:
-            
-            Rx = np.reshape(getDistance('rx', mesh, self.flt.Quadrilaterals), (-1,))
-            f_geom = np.log(self.d[0]) * np.cos(Rx/self.W[0])
+            # Geometric directivity predictor:            
+            f_geom = np.log(self.d[0]) * np.cos(self.Rx/self.W[0])
             
             # Distance taper
             T_CD = np.ones_like(self.sites[0])
-            ix = [(Rrup/self.W > 1.5) & (Rrup/self.W < 2)]
-            T_CD[ix] = 1 - (Rrup[ix]/self.W - 1.5)/0.5
-            T_CD[Rrup/self.W >= 2.0 ] = 0
+            ix = [(self.Rrup/self.W > 1.5) & (self.Rrup/self.W < 2)]
+            T_CD[ix] = 1 - (self.Rrup[ix]/self.W - 1.5)/0.5
+            T_CD[self.Rrup/self.W >= 2.0 ] = 0
             
             # Azimuth taper
             T_Az = np.sin(np.abs(self.Az))**2
             
             # Select Coefficients
-            ix = [self.T == sefl.__T]
+            ix = [self.T == self.__T]
             C0 = self.__C0ds[ix]
             C1 = self.__C1ds[ix]
             
 #        else:
-        self.fd = (C0 + C1*f_geom) * T_CD * T_Mw * T_Az
 
+        self.fd = (C0 + C1*f_geom) * T_CD * T_Mw * T_Az
+        
+
+    
+    def computeAz(self):
+        Az = np.ones_like(self.Rx) * np.pi/2.0
+        Az = Az * np.sign(self.Rx)
+        ix = [self.Ry > 0]
+        Az[ix] = np.arctan(self.Rx[ix]/self.Ry[ix])
+        self.Az = Az
+        
 
     def computeD(self):
         """
@@ -240,7 +237,7 @@ class bayless2013(object):
             # theta is defined to be between 0 and 90 deg
             sintheta = np.abs(np.sin(theta))
             costheta = np.abs(np.cos(theta))
-            self.theta[h] = np.arctan(sintheta/costheta)
+            self.theta[h] = np.arctan2(costheta, sintheta)
     
     def getSlipCategory(self):
         """
@@ -253,7 +250,6 @@ class bayless2013(object):
             self.SlipCategory = 'SS'
         if (arake >= 60) & (arake <= 120):
             self.SlipCategory = 'DS'
-        
 
 def _rotation_matrix(axis, theta):
     """
