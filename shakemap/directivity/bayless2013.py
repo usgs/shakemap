@@ -22,14 +22,12 @@ SS: (abs(rake) >  0 & abs(rake) < 30) | (abs(rake) > 150 & abs(rake) < 180)
 DS:  abs(rake) > 60 & abs(rake) < 120
 
 Notes from Somerville et al. (1997): 
- * d is the same as Wrup in Rowshandel (2013)
+ * d = length of dipping fault rupturing towards site
  * Y = d/W
- * s is the same as Ls in Rowshandel (2013), except it should be computed for
-     each quadrilateral separately. 
+ * s = length of striking fault rupturing towards site
  * X = s/L
 
-Multi-segment ruptures need to be treated somewhat differently than in Rowshandel (2013). 
-Bayless and Somerville explicitly state that each quadrilateral should have a pseudo-
+Bayless and Somerville state that each quadrilateral should have a pseudo-
 hypocenter: 
     'Define the pseudo-hypocenter for rupture of successive segments as the point on the 
      side edge of the fault segment that is closest to the side edge of the previous segment, 
@@ -80,72 +78,94 @@ class bayless2013(object):
         self.rake = rake
         self.M = M
         self.T = T
-        self.mesh = geo.mesh.Mesh(self.sites[0], self.sites[1], np.zeros_like(self.sites[1]))
-        self.Rrup = np.reshape(getDistance('rrup', self.mesh, self.flt.Quadrilaterals), self.sites[0].shape)
-        self.Rx = np.reshape(getDistance('rx', self.mesh, self.flt.Quadrilaterals), self.sites[0].shape)
-        self.Ry = np.reshape(getDistance('ry0', self.mesh, self.flt.Quadrilaterals), self.sites[0].shape)
+        
+        # Lists of widths and lengths for each quad in the fault
         self.W = self.flt.getIndividualWidths()
         self.L = self.flt.getIndividualTopLengths()
+        
         self.getSlipCategory()
-        # d is the length of dipping fault rupturing toward site; max[(Y*W),exp(0)]
-        self.computeD()
-        # s is the length of striking fault rupturing toward site; max[(X*L),exp(1)]
-        # theta (see Figure 5 in SSGA97)
-        self.computeThetaAndS()
-        self.computeAz()
         
-        # Magnitude taper (does not depend on mechanism)
-        if self.M <= 5: 
-            T_Mw = 0.0
-        elif self.M > 5 and self.M < 6.5:
-            T_Mw = 1 - (6.5 - M)/1.5
+        # Mesh object of sites
+        self.mesh = geo.mesh.Mesh(self.sites[0], self.sites[1], np.zeros_like(self.sites[1]))
+        
+        self.nq = len(self.W)
+        # *** need to add pseudo-hypocenters for each quad ***
+        # *** need to add quad weight, w ~ seismic moment  ***
+        i = 0
+            
+        # Only applicable for ranges of rake that give SS and DS categories
+        if (self.SlipCategory == 'SS') or (self.SlipCategory == 'DS'):
+            qlist = [self.flt.Quadrilaterals[i]]
+            self.Rrup = np.reshape(getDistance('rrup', self.mesh, qlist), self.sites[0].shape)
+            self.Rx = np.reshape(getDistance('rx', self.mesh, qlist), self.sites[0].shape)
+            self.Ry = np.reshape(getDistance('ry0', self.mesh, qlist), self.sites[0].shape)
+            # NOTE: use Rx and Ry to compute Az in 'computeAz'. It is probably possible to make this a lot faster
+            #       by avoiding the calculation of these distances each time.
+            
+            # Az is the NGA definition of source-to-site azimuth for a finite fault.
+            # See Kaklamanos et al. (2011) Figure 2 for illustration. 
+            self.computeAz() # uses Rx and Ry, which are for the i-th quad. 
+            
+            # Magnitude taper (does not depend on mechanism)
+            if self.M <= 5: 
+                T_Mw = 0.0
+            elif self.M > 5 and self.M < 6.5:
+                T_Mw = 1 - (6.5 - self.M)/1.5
+            else:
+                T_Mw = 1.0
+                
+            
+            if self.SlipCategory == 'SS':
+                # s is the length of striking fault rupturing toward site; max[(X*L),exp(1)]
+                # theta (see Figure 5 in SSGA97)
+                self.computeThetaAndS2(i)
+                
+                # need to add loop over quads, for now assuming one quad
+                
+                # Geometric directivity predictor:
+                f_geom = np.log(self.s) * (0.5 * np.cos(2*self.theta) + 0.5)
+                
+                # Distance taper
+                T_CD = np.ones_like(self.sites[0])
+                ix = [(self.Rrup/self.L[i] > 0.5) & (self.Rrup/self.L[i] < 1)]
+                T_CD[ix] = 1 - (self.Rrup[ix]/self.L[i] - 0.5)/0.5
+                T_CD[self.Rrup/self.L[i] >= 1.0 ] = 0
+                
+                # Azimuth taper
+                T_Az = 1.0
+                
+                # Select Coefficients
+                ix = [self.T == self.__T]
+                C0 = self.__C0ss[ix]
+                C1 = self.__C1ss[ix]
+                
+            elif self.SlipCategory == 'DS':
+                # d is the length of dipping fault rupturing toward site; max[(Y*W),exp(0)]
+                self.computeD(i)
+                
+                # need to add loop over quads, for now assuming one quad
+                
+                # Geometric directivity predictor:
+                RxoverW = (self.Rx / self.W[i]).clip(min = -np.pi/2, max = 2*np.pi/3)
+                f_geom = np.log(self.d) * np.cos(RxoverW)
+                
+                # Distance taper
+                T_CD = np.ones_like(self.sites[0])
+                ix = [(self.Rrup/self.W[i] > 1.5) & (self.Rrup/self.W[i] < 2.0)]
+                T_CD[ix] = 1.0 - (self.Rrup[ix]/self.W[i] - 1.5)/0.5
+                T_CD[self.Rrup/self.W[i] >= 2.0 ] = 0.0
+                
+                # Azimuth taper
+                T_Az = np.sin(np.abs(self.Az))**2
+                
+                # Select Coefficients
+                ix = [self.T == self.__T]
+                C0 = self.__C0ds[ix]
+                C1 = self.__C1ds[ix]
+            
+            self.fd = (C0 + C1*f_geom) * T_CD * T_Mw * T_Az
         else:
-            T_Mw = 1.0
-        
-        if self.SlipCategory == 'SS':
-            # need to add loop over quads, for now assuming one quad
-            
-            # Geometric directivity predictor:
-            f_geom = np.log(self.s[0]) * (0.5 * np.cos(2*self.theta[0]) + 0.5)
-            
-            # Distance taper
-            T_CD = np.ones_like(self.sites[0])
-            ix = [(self.Rrup/self.L > 0.5) & (self.Rrup/self.L < 1)]
-            T_CD[ix] = 1 - (self.Rrup[ix]/self.L - 0.5)/0.5
-            T_CD[self.Rrup/self.L >= 1.0 ] = 0
-
-            # Azimuth taper
-            T_Az = 1.0
-            
-            # Select Coefficients
-            ix = [self.T == self.__T]
-            C0 = self.__C0ss[ix]
-            C1 = self.__C1ss[ix]
-            
-        elif self.SlipCategory == 'DS':
-            # need to add loop over quads, for now assuming one quad
-            
-            # Geometric directivity predictor:            
-            f_geom = np.log(self.d[0]) * np.cos(self.Rx/self.W[0])
-            
-            # Distance taper
-            T_CD = np.ones_like(self.sites[0])
-            ix = [(self.Rrup/self.W > 1.5) & (self.Rrup/self.W < 2)]
-            T_CD[ix] = 1 - (self.Rrup[ix]/self.W - 1.5)/0.5
-            T_CD[self.Rrup/self.W >= 2.0 ] = 0
-            
-            # Azimuth taper
-            T_Az = np.sin(np.abs(self.Az))**2
-            
-            # Select Coefficients
-            ix = [self.T == self.__T]
-            C0 = self.__C0ds[ix]
-            C1 = self.__C1ds[ix]
-            
-#        else:
-
-        self.fd = (C0 + C1*f_geom) * T_CD * T_Mw * T_Az
-        
+            self.fd = np.zeros_like(self.sites[0])
 
     
     def computeAz(self):
@@ -156,26 +176,112 @@ class bayless2013(object):
         self.Az = Az
         
 
-    def computeD(self):
+    def computeD(self, i):
         """
+        :param i:
+            Compute d for the i-th quad/segment. 
         Y = d/W, where d is the portion (in km) of the width of the fault which 
         ruptures up-dip from the hypocenter to the top of the fault.
-
-        Unlike Rowshandel's Wrup, this is computed for each quad. 
         """
+        # *** Need to make this a function of quad pseudo-hypocenter ***
         hyp_ecef = Vector.fromPoint(geo.point.Point(self.hyp[0], self.hyp[1], self.hyp[2]))
-        nquad = len(self.flt.Quadrilaterals)
-        d = np.zeros(nquad)
-        for i in range(0, nquad):
-            P0,P1,P2,P3 = self.flt.Quadrilaterals[i]
-            p0 = Vector.fromPoint(P0) # convert to ECEF
-            p3 = Vector.fromPoint(P3)
-            hp0 = p0 - hyp_ecef
-            p3p0n = (p0 - p3).norm()
-            d[i] = Vector.dot(p3p0n, hp0)/1000
-        self.d = d.clip(min = 0)
-    
-    def computeThetaAndS(self):
+        hyp_col = np.array([[hyp_ecef.x],[hyp_ecef.y],[hyp_ecef.z]])
+        
+        # First compute "updip" vector
+        P0,P1,P2,P3 = self.flt.Quadrilaterals[i]
+        p1 = Vector.fromPoint(P1) # convert to ECEF
+        p2 = Vector.fromPoint(P2)
+        e12 = p1 - p2
+        e12norm = e12.norm()
+        hp1 = p1 - hyp_ecef
+        udip_len = Vector.dot(hp1, e12norm)/1000 # conver to km (max to be applied later)
+        udip_col = np.array([[e12norm.x],[e12norm.y],[e12norm.z]]) # ECEF coords
+        
+        # Sites
+        slat = self.sites[1]
+        slon = self.sites[0]
+        
+        # Convert sites to ECEF:
+        site_ecef_x = np.ones_like(slat)
+        site_ecef_y = np.ones_like(slat)
+        site_ecef_z = np.ones_like(slat)
+        
+        # Make a 3x(#number of sites) matrix of site locations (rows are x, y, z) in ECEF
+        site_ecef_x, site_ecef_y, site_ecef_z = ecef.latlon2ecef(slat, slon, np.zeros(slon.shape) )
+        site_mat = np.array([np.reshape(site_ecef_x, (-1,)),
+                             np.reshape(site_ecef_y, (-1,)),
+                             np.reshape(site_ecef_z, (-1,))])
+        
+        # Hypocenter-to-site matrix
+        h2s_mat = site_mat - hyp_col # in ECEF
+        
+        # Dot hypocenter-to-site with updip vector
+        d_raw = np.sum(h2s_mat * udip_col, axis = 0)/1000 # convert to km
+        d_raw = np.reshape(d_raw, self.sites[0].shape)
+        self.d = d_raw.clip(min = 1.0, max = udip_len)
+
+    def computeThetaAndS2(self, i):
+        """
+        Faster way to compute theta and s. Doesn't yet seem to agree as well as other method below yet. 
+        :param i:
+            Compute d for the i-th quad/segment. 
+        """
+        # *** Need to make this a function of quad pseudo-hypocenter ***
+        hyp_ecef = Vector.fromPoint(geo.point.Point(self.hyp[0], self.hyp[1], self.hyp[2]))
+        hyp_col = np.array([[hyp_ecef.x],[hyp_ecef.y],[hyp_ecef.z]])
+        
+        # First compute along strike vector
+        P0,P1,P2,P3 = self.flt.Quadrilaterals[i]
+        p0 = Vector.fromPoint(P0) # convert to ECEF
+        p1 = Vector.fromPoint(P1)
+        e01 = p1 - p0
+        e01norm = e01.norm()
+        hp0 = p0 - hyp_ecef
+        hp1 = p1 - hyp_ecef
+        strike_min = Vector.dot(hp0, e01norm)/1000 # convert to km
+        strike_max = Vector.dot(hp1, e01norm)/1000 # convert to km 
+        strike_col = np.array([[e01norm.x],[e01norm.y],[e01norm.z]]) # ECEF coords
+        
+        # Sites
+        slat = self.sites[1]
+        slon = self.sites[0]
+        
+        # Convert sites to ECEF:
+        site_ecef_x = np.ones_like(slat)
+        site_ecef_y = np.ones_like(slat)
+        site_ecef_z = np.ones_like(slat)
+        
+        # Make a 3x(#number of sites) matrix of site locations (rows are x, y, z) in ECEF
+        site_ecef_x, site_ecef_y, site_ecef_z = ecef.latlon2ecef(slat, slon, np.zeros(slon.shape) )
+        site_mat = np.array([np.reshape(site_ecef_x, (-1,)),
+                             np.reshape(site_ecef_y, (-1,)),
+                             np.reshape(site_ecef_z, (-1,))])
+        
+        # Hypocenter-to-site matrix
+        h2s_mat = site_mat - hyp_col # in ECEF
+        mag = np.sqrt(np.sum(h2s_mat*h2s_mat, axis = 0))
+        h2s_norm = h2s_mat/mag
+        
+        # Dot hypocenter-to-site with updip vector
+        s_raw = np.sum(h2s_mat * strike_col, axis = 0)/1000 # conver to km
+        s_raw = np.reshape(s_raw, self.sites[0].shape)
+        self.s = np.abs(s_raw.clip(min = strike_min, max = strike_max)).clip(min = np.exp(1))
+        sdots = np.sum(h2s_norm * strike_col, axis = 0)
+        theta_raw = np.arccos(sdots)
+        
+        # theta is defined to be the reference angle
+        # (i.e., the equivalent angle between 0 and 90 deg)
+        sintheta = np.abs(np.sin(theta_raw))
+        costheta = np.abs(np.cos(theta_raw))
+        theta = np.arctan2(sintheta, costheta)
+        self.theta = np.reshape(theta, self.sites[0].shape)
+
+
+    def computeThetaAndS(self, i):
+        """
+        :param i:
+            Compute theta and s for the i-th quad/segment. 
+        """
         # Use an orthographic projection
         latmin = self.sites[1].min()
         latmax = self.sites[1].max()
@@ -187,57 +293,51 @@ class bayless2013(object):
         epi_x,epi_y = proj(self.hyp[0], self.hyp[1])
         
         # Get the lines for the top edge of the fault
-        qds = self.flt.Quadrilaterals
-        nq = len(qds)
-        top_lat = np.array([[]])
-        top_lon = np.array([[]])
-        top_dep = np.array([[]])
-        for j in range(0, nq):
-            top_lat = np.append(top_lat, qds[j][0].latitude)
-            top_lat = np.append(top_lat, qds[j][1].latitude)
-            top_lon = np.append(top_lon, qds[j][0].longitude)
-            top_lon = np.append(top_lon, qds[j][1].longitude)
-            top_dep = np.append(top_dep, qds[j][0].depth)
-            top_dep = np.append(top_dep, qds[j][1].depth)
+        qds = self.flt.Quadrilaterals[i]
+        top_lat = np.append(qds[0].latitude, qds[1].latitude)
+        top_lon = np.append(qds[0].longitude, qds[1].longitude)
+        top_dep = np.append(qds[0].depth, qds[1].depth)
+        
         top_x,top_y = proj(top_lon, top_lat)
         
         slat = self.sites[1]
         slon = self.sites[0]
-        nquad = len(self.flt.Quadrilaterals)
-        self.s = [None]*nquad
-        self.theta = [None]*nquad
         ni, nj = slon.shape
-        for h in range(nquad):
-            s = np.zeros_like(slat)
-            theta = np.zeros_like(slat)
-            for i in range(ni): 
-                for j in range(nj):
-                    # Convert to local orthographic
-                    site_x,site_y = proj(slon[i, j], slat[i, j])
-                    
-                    # Shift so center is at epicenter
-                    site_x2 = site_x - epi_x
-                    site_y2 = site_y - epi_y
-                    top_x2 = top_x - epi_x
-                    top_y2 = top_y - epi_y
-                    
-                    # Angle to rotate to put site on x-axis
-                    alpha = np.arctan2(site_y2, site_x2) # "theta" in Bayless and Somerville notation
-                    axis = [0, 0, 1]
-                    rmat = _rotation_matrix(axis, -alpha)
-                    llr = [None] * len(top_lat)
-                    
-                    # Apply rotation to each point on trace
-                    for k in range(len(top_lat)):
-                        llr[k] = np.dot(rmat, [top_x2[k], top_y2[k], 0])
-                    site3 = np.dot(rmat, [site_x2, site_y2, 0])
-                    s[i, j] = np.min([np.max([a[0] for a in llr]), site3[0]])
-                    theta[i, j] = alpha
-            self.s[h] = s.clip(min = np.exp(1))
-            # theta is defined to be between 0 and 90 deg
-            sintheta = np.abs(np.sin(theta))
-            costheta = np.abs(np.cos(theta))
-            self.theta[h] = np.arctan2(costheta, sintheta)
+
+        s = np.zeros_like(slat)
+        theta = np.zeros_like(slat)
+        for i in range(ni): 
+            for j in range(nj):
+                # Convert to local orthographic
+                site_x,site_y = proj(slon[i, j], slat[i, j])
+                
+                # Shift so center is at epicenter
+                site_x2 = site_x - epi_x
+                site_y2 = site_y - epi_y
+                top_x2 = top_x - epi_x
+                top_y2 = top_y - epi_y
+                
+                # Angle to rotate to put site on x-axis
+                alpha = np.arctan2(site_y2, site_x2) # "theta" in Bayless and Somerville notation
+                axis = [0, 0, 1]
+                rmat = _rotation_matrix(axis, -alpha)
+                llr = [None] * len(top_lat)
+                
+                # Apply rotation to each point on trace
+                for k in range(len(top_lat)):
+                    llr[k] = np.dot(rmat, [top_x2[k], top_y2[k], 0])
+                site3 = np.dot(rmat, [site_x2, site_y2, 0])
+                s[i, j] = np.min([np.max([a[0] for a in llr]), site3[0]])
+                theta[i, j] = alpha
+        
+        # Need to give s a minimum value
+        self.s = s.clip(min = np.exp(1))
+        
+        # theta is defined to be the reference angle
+        # (i.e., the equivalent angle between 0 and 90 deg)
+        sintheta = np.abs(np.sin(theta))
+        costheta = np.abs(np.cos(theta))
+        self.theta = np.arctan2(costheta, sintheta)
     
     def getSlipCategory(self):
         """
