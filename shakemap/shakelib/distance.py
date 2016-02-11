@@ -147,7 +147,7 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
     else:
         raise NotImplementedError('"%s" distance measure is not valid or is not implemented yet' % method)
 
-def dist2segment(p0, p1):
+def dist2_to_segment(p0, p1):
     """
     Calculate the distance^2 from the origin to a segment defined by two vectors
     :param p0: numpy array Nx3 (ECEF)
@@ -232,10 +232,10 @@ def calcRuptureDistance(P0,P1,P2,P3,points):
     dist[inside_idx] = np.power(np.abs(np.sum(p0d[inside_idx,:] * normalVector.getArray(),axis=1)),2)
 
     outside_idx = np.logical_not(inside_idx)
-    s0 = dist2segment(p0d,p1d)
-    s1 = dist2segment(p1d,p2d)
-    s2 = dist2segment(p2d,p3d)
-    s3 = dist2segment(p3d,p0d)
+    s0 = dist2_to_segment(p0d, p1d)
+    s1 = dist2_to_segment(p1d, p2d)
+    s2 = dist2_to_segment(p2d, p3d)
+    s3 = dist2_to_segment(p3d, p0d)
 
     smin = np.minimum(np.minimum(s0,s1),np.minimum(s2,s3))
     dist[outside_idx] = smin[outside_idx]
