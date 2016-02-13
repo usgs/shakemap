@@ -23,9 +23,9 @@ class rowshandel2013(object):
     """
     Class for Rowshandel (2013) directvity model. 
     """
-    #-----------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     # C1 adn C2 are GMPE-specific coefficients. Also, these are for Model-I option. 
-    #-----------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     __c1 = {'as': np.array([0.375,0.561,0.833,0.873,1.019,1.387,1.551]), 
             'ba': np.array([0.257,0.699,0.824,0.834,0.986,1.378,1.588]),
             'cb': np.array([0.149,0.377,0.570,0.596,0.772,1.152,np.nan]), 
@@ -41,7 +41,8 @@ class rowshandel2013(object):
             'T': np.array([1, 2, 3, 4, 5, 7.5, 10])}
     __c2['mean'] = (__c2['as'] + __c2['ba'] + __c2['cb'] + __c2['cy'] + __c2['id'])/5
 
-    def __init__(self, flt, hyp, sites, rake, dx, M, T, a_weight = 0.5, mtype = 1, simpleDT = False):
+    def __init__(self, flt, hyp, sites, rake, dx, M, T, a_weight = 0.5,
+                 mtype = 1, simpleDT = False):
         """
         Constructor for rowshandel2013.
         :param flt:
@@ -69,8 +70,8 @@ class rowshandel2013(object):
             Weighting factor for how p-dot-q and s-dot-q are averaged; 0 for only 
             p-dot-q and 1 for only s-dot-q. 
         :param mtype:
-            Integer, either 1 or 2; 1 for adding only positive components of dot products, 
-            2 for adding all components of dot products. 
+            Integer, either 1 or 2; 1 for adding only positive components of dot 
+            products, 2 for adding all components of dot products. 
         :param simpleDT:
             Boolean; should the simpler DT equation be used? Usually False. 
         """
@@ -96,7 +97,8 @@ class rowshandel2013(object):
     
     def computeFd(self):
         """
-        Fd is the term that modifies the GMPE output as an additive term (in log space). 
+        Fd is the term that modifies the GMPE output as an additive term 
+        (in log space). 
         ln(Y) = f(M, R, ...) + Fd
         """
         c1sel = self.__c1['mean'][self.__c1['T'] == self.T]
@@ -130,16 +132,20 @@ class rowshandel2013(object):
             p2 = Vector.fromPoint(P2)
             p3 = Vector.fromPoint(P3)
             qdist[i] = calcRuptureDistance(p0, p1, p2, p3, hyp_ecef)
-        ind = int(np.where(qdist == np.min(qdist))[0])  ## check that this doesn't break with more than one quad
+        ind = int(np.where(qdist == np.min(qdist))[0])
+        # *** check that this doesn't break with more than one quad
         q = self.flt.Quadrilaterals[ind]
         
-        #-------------------------------------------
+        #--------------------------
         # Compute Wrup on that quad
-        #-------------------------------------------
+        #--------------------------
         
-        pp0 = Vector.fromPoint(geo.point.Point(q[0].longitude, q[0].latitude, q[0].depth) )
-        pp3 = Vector.fromPoint(geo.point.Point(q[3].longitude, q[3].latitude, q[3].depth) )
-        hyp_ecef = Vector.fromPoint(geo.point.Point(self.hyp[0], self.hyp[1], self.hyp[2]))
+        pp0 = Vector.fromPoint(geo.point.Point(
+            q[0].longitude, q[0].latitude, q[0].depth) )
+        pp3 = Vector.fromPoint(geo.point.Point(
+            q[3].longitude, q[3].latitude, q[3].depth) )
+        hyp_ecef = Vector.fromPoint(geo.point.Point(
+            self.hyp[0], self.hyp[1], self.hyp[2]))
         hp0 = pp0 - hyp_ecef
         p3p0n = (pp0 - pp3).norm()
         self.Wrup = Vector.dot(p3p0n, hp0)/1000
@@ -149,9 +155,11 @@ class rowshandel2013(object):
         """
         Computes the xi' value. 
         """
-        hypo_ecef = Vector.fromPoint(geo.point.Point(self.hyp[0], self.hyp[1], self.hyp[2]))
+        hypo_ecef = Vector.fromPoint(geo.point.Point(
+            self.hyp[0], self.hyp[1], self.hyp[2]))
         epi_ll = Vector(self.hyp[0], self.hyp[1], 0)
-        epi_ecef = Vector.fromPoint(geo.point.Point(epi_ll.x, epi_ll.y, 0))
+        epi_ecef = Vector.fromPoint(geo.point.Point(
+            epi_ll.x, epi_ll.y, 0))
         
         slat = self.sites[1]
         slon = self.sites[0]
@@ -161,17 +169,25 @@ class rowshandel2013(object):
         site_ecef_y = np.ones_like(slat)
         site_ecef_z = np.ones_like(slat)
         
-        # Make a 3x(#number of sites) matrix of site locations (rows are x, y, z) in ECEF
-        site_ecef_x, site_ecef_y, site_ecef_z = ecef.latlon2ecef(slat, slon, np.zeros(slon.shape) )
+        # Make a 3x(#number of sites) matrix of site locations
+        # (rows are x, y, z) in ECEF
+        site_ecef_x, site_ecef_y, site_ecef_z = ecef.latlon2ecef(
+            slat, slon, np.zeros(slon.shape) )
         site_mat = np.array([np.reshape(site_ecef_x, (-1,)),
                              np.reshape(site_ecef_y, (-1,)),
                              np.reshape(site_ecef_z, (-1,))])
         
-        xi_prime_unnormalized = np.zeros_like(slat)        
+        xi_prime_unscaled = np.zeros_like(slat)        
         
-        # Normalize by total number of subfaults, can't know till loop is finished
-        n_sub_faults = 0
+        # Normalize by total number of subfaults. For mtype == 1, the number
+        # of subfaults will vary with site and be different for xi_s and
+        # xi_p, so keep two variables and sum them for each quad. 
+        nsubs = np.zeros(np.product(slat.shape))
+        nsubp = np.zeros(np.product(slat.shape))
         
+        xi_prime_s = np.zeros(np.product(slat.shape))
+        xi_prime_p = np.zeros(np.product(slat.shape))
+            
         for k in range(len(self.flt.Quadrilaterals)):
             # Select a quad
             q = self.flt.Quadrilaterals[k]
@@ -184,11 +200,15 @@ class rowshandel2013(object):
             
             # Strike vector (ECEF coords)
             strike_vec = fault.getQuadStrikeVector(q)
-            strike_vec_col = np.array([[strike_vec.x], [strike_vec.y], [strike_vec.z]]) # convert to column vector
+            strike_vec_col = np.array([[strike_vec.x],
+                                       [strike_vec.y],
+                                       [strike_vec.z]]) # convert to column vector
             
             # Down dip vector (ECEF coords)
             ddip_vec = fault.getQuadDownDipVector(q)
-            ddip_vec_col = np.array([[ddip_vec.x], [ddip_vec.y], [ddip_vec.z]]) # convert to column vector
+            ddip_vec_col = np.array([[ddip_vec.x],
+                                     [ddip_vec.y],
+                                     [ddip_vec.z]]) # convert to column vector
             
             # Strike slip and dip slip components of unit slip vector (ECEF coords)
 #            slpv = fault.getQuadSlip(q, self.rake)
@@ -203,56 +223,89 @@ class rowshandel2013(object):
                                np.reshape(mesh['cpz'], (-1,))])
             
             # Compute matrix of p vectors
-            hypcol = np.array([[hypo_ecef.x], [hypo_ecef.y], [hypo_ecef.z]])
-            pmat = cp_mat - hypcol
+            hypcol = np.array([[hypo_ecef.x],
+                               [hypo_ecef.y],
+                               [hypo_ecef.z]])
+            pmat = cp_mat - hypcol 
             mag = np.sqrt(np.sum(pmat*pmat, axis = 0))
-            pmatnorm = pmat/mag
+            pmatnorm = pmat/mag # like r1
             
             # Is subfault 'in front' of hypocenter?
-            pdotstrike = np.sum(pmatnorm * strike_vec_col, axis = 0)
+            pdotstrike = np.sum(pmatnorm*strike_vec_col, axis = 0)
             front_positive = np.sign(pdotstrike)
-            print(np.mean(front_positive))
             
             # Is subfault 'above' hypocenter?
-            pdotddip = np.sum(pmatnorm * ddip_vec_col, axis = 0)
+            pdotddip = np.sum(pmatnorm*ddip_vec_col, axis = 0)
             above_positive = -np.sign(pdotddip)
-            print(np.mean(above_positive))
             
-            # Construct matrix of slip vectors where sign of SS and DS components
-            # varies with subfault location. 
-            ss_col = np.array([[slpv_SS.x], [slpv_SS.y], [slpv_SS.z]])
-            ds_col = np.array([[slpv_DS.x], [slpv_DS.y], [slpv_DS.z]])
-            smat = ss_col  + ds_col 
-#            smat = ss_col * (front_positive) + ds_col 
+            # Construct matrix of slip vectors where sign of SS and DS 
+            # components varies with subfault location. 
+            ss_col = np.array([[slpv_SS.x],
+                               [slpv_SS.y],
+                               [slpv_SS.z]])
+            ds_col = np.array([[slpv_DS.x],
+                               [slpv_DS.y],
+                               [slpv_DS.z]])
+            smat = ss_col*front_positive + ds_col
             mag = np.sqrt(np.sum(smat*smat, axis = 0))
             smatnorm = smat/mag
             
-            xi_prime = np.zeros([site_mat.shape[1]])
-            n_sub_faults = n_sub_faults + cp_mat.shape[1]
-            
             # Loop over sites
             for i in range(site_mat.shape[1]):
-                sitecol = np.array([[site_mat[0, i]], [site_mat[1, i]], [site_mat[2, i]]])
-                qmat = sitecol - cp_mat  # 3x(ni*nj)
+                sitecol = np.array([[site_mat[0, i]],
+                                    [site_mat[1, i]],
+                                    [site_mat[2, i]]])
+                qmat = sitecol - cp_mat  # 3x(ni*nj), like r2
                 mag = np.sqrt(np.sum(qmat*qmat, axis = 0))
                 qmatnorm = qmat/mag
-                # Dot products
+                
+                # Propagation dot product
+                pdotqraw = np.sum(pmatnorm * qmatnorm, axis = 0)
+                
+                # Slip vector dot product
+                sdotqraw = np.sum(smatnorm*qmatnorm, axis = 0)
+                
                 if self.mtype == 1:
-                    pdotq = np.sum(pmatnorm * qmatnorm, axis = 0).clip(min = 0)
-#                    sdotq = np.abs(np.sum(smatnorm * qmatnorm, axis = 0))
-                    sdotq = np.sum(smatnorm * qmatnorm, axis = 0).clip(min = 0)
+                    # Only sum over (+) directivity effect subfaults
+                    
+                    # xi_p_prime
+                    pdotq = pdotqraw.clip(min = 0)
+                    nsubp[i] = nsubp[i] + np.sum(pdotq > 0)
+                    
+                    # xi_s_prime
+                    sdotq = sdotqraw.clip(min = 0)
+                    nsubs[i] = nsubs[i] + np.sum(sdotq > 0)
+                    
                 elif self.mtype == 2:
-                    pdotq = np.sum(pmatnorm * qmatnorm, axis = 0)           # xi_p_prime
-#                    sdotq = np.abs(np.sum(smatnorm * qmatnorm, axis = 0))   # xi_s_prime
-                    sdotq = np.sum(smatnorm * qmatnorm, axis = 0)   # xi_s_prime
-                xi_prime[i] =self.a_weight*np.sum(sdotq) + (1-self.a_weight)*np.sum(pdotq)
-            
-            # Reshape xi_prime array and add it to the initialized version (one for every quad)
-            xi_prime_unnormalized = xi_prime_unnormalized + np.reshape(xi_prime, site_ecef_x.shape)
-
-        # Normalize
-        xi_prime_unscaled = xi_prime_unnormalized / n_sub_faults
+                    # Sum over all subfaults
+                    
+                    # xi_p_prime
+                    pdotq = pdotqraw
+                    nsubp[i] = nsubp[i] + cp_mat.shape[1]
+                    
+                    # xi_s_prime
+                    sdotq = sdotqraw
+                    nsubs[i] = nsubs[i] + cp_mat.shape[1]
+                
+                # Normalize by n sub faults later
+                xi_prime_s[i] = np.sum(sdotq)
+                xi_prime_p[i] = np.sum(pdotq)
         
+        # Apply a water level to nsubp and nsubs to avoid division by
+        # zero. This should only occur when the thing it is dividing
+        # is also zero and the resulting value should be zero.
+        nsubs = np.maximum(nsubs, 1)
+        nsubp = np.maximum(nsubp, 1)
+        
+        # We are outside the 'k' loop over nquads. 
+        # o Normalize xi_prime_s and xi_prime_p
+        # o Reshape them
+        # o Add them together with the 'a' weights
+        xi_prime_tmp = (self.a_weight) * (xi_prime_s/nsubs) + \
+                       (1-self.a_weight) * (xi_prime_p/nsubp)
+        xi_prime_unscaled = xi_prime_unscaled + \
+                            np.reshape(xi_prime_tmp, slat.shape)
+
         # Scale so that xi_prime has range (0, 1)
         if self.mtype == 1: 
             xi_prime = xi_prime_unscaled
