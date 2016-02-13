@@ -37,7 +37,6 @@ hypocenter:
      All geometric parameters are computed relative to the pseudo-hypocenter.'
 
 TODO: 
- - Accomodate multi-segment ruptures
  - Interpolate for arbitrary periods
 
 """
