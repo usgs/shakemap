@@ -41,7 +41,7 @@ TODO:
 
 """
 
-class bayless2013(object):
+class Bayless2013(object):
     """
     Class for Bayless and Somerville (2013) directvity model. 
     """

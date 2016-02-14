@@ -3,8 +3,11 @@
 
 import numpy as np
 import openquake.hazardlib.geo as geo
+from openquake.hazardlib.geo.utils import get_orthographic_projection
 import shakemap.shakelib.ecef as ecef
 import shakemap.shakelib.fault as fault
+from shakemap.shakelib.ecef import latlon2ecef
+from shakemap.shakelib.ecef import ecef2latlon
 from shakemap.shakelib.vector import Vector
 from shakemap.shakelib.distance import calcRuptureDistance
 from shakemap.shakelib.distance import getDistance
@@ -15,11 +18,18 @@ Implements the Rowshandel (2013) directivity model.
 To do: 
     * Add checks on function arguments (e.g., mtype) for valid values. 
     * Add a validation function. 
-    * Use np.clip for applying the minimum of zero to s-dot-q and p-dot-q
-    * Optimize with numba?
 """
 
-class rowshandel2013(object):
+class RowshandelException(Exception):
+    """
+    Class to represent errors in the Rowshandel2013 class.
+    """
+    def __init__(self, value):
+        self.value = value
+    def __str__(self):
+        return repr(self.value)
+    
+class Rowshandel2013(object):
     """
     Class for Rowshandel (2013) directvity model. 
     """
@@ -40,7 +50,7 @@ class rowshandel2013(object):
             'id': np.array([-0.019,-0.082,-0.228,-0.255,-0.312,-0.358,-0.369]),
             'T': np.array([1, 2, 3, 4, 5, 7.5, 10])}
     __c2['mean'] = (__c2['as'] + __c2['ba'] + __c2['cb'] + __c2['cy'] + __c2['id'])/5
-
+    
     def __init__(self, flt, hyp, sites, rake, dx, M, T, a_weight = 0.5,
                  mtype = 1, simpleDT = False):
         """
@@ -67,10 +77,10 @@ class rowshandel2013(object):
             Period; Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5
              ** TODO: interpolate for other periods. 
         :param a_weight:
-            Weighting factor for how p-dot-q and s-dot-q are averaged; 0 for only 
-            p-dot-q and 1 for only s-dot-q. 
+            Weighting factor for how p-dot-q and s-dot-q are averaged; 0 for 
+            only p-dot-q and 1 for only s-dot-q. 
         :param mtype:
-            Integer, either 1 or 2; 1 for adding only positive components of dot 
+            Integer, either 1 or 2; 1 for adding only positive components of dot
             products, 2 for adding all components of dot products. 
         :param simpleDT:
             Boolean; should the simpler DT equation be used? Usually False. 
@@ -81,8 +91,14 @@ class rowshandel2013(object):
         self.rake = rake
         self.dx = dx
         self.M = M
+        if np.all(T != np.array([1, 2, 3, 4, 5, 7.5])):
+            raise RowshandelException('Invalid T value. Interpolation not yet supported.')
         self.T = T
+        if (a_weight > 1.0) or (a_weight < 0):
+            raise RowshandelException('a_weight must be between 0 and 1.')
         self.a_weight = a_weight
+        if (mtype != 1) and (mtype != 2):
+            raise RowshandelException('mtype can onlty be 1 or 2.')
         self.mtype = mtype
         self.simpleDT = simpleDT
         
@@ -93,7 +109,7 @@ class rowshandel2013(object):
         self.computeWP()
         self.computeXiPrime()
         self.computeFd()
-
+    
     
     def computeFd(self):
         """
@@ -122,11 +138,11 @@ class rowshandel2013(object):
         # First find which quad the hypocenter is on
         #-------------------------------------------
         
-        x,y,z = ecef.latlon2ecef(self.hyp[1],self.hyp[0],self.hyp[2])
+        x, y, z = ecef.latlon2ecef(self.hyp[1], self.hyp[0], self.hyp[2])
         hyp_ecef = np.array([[x, y, z]])
         qdist = np.zeros_like([nquad])
         for i in range(0, nquad):
-            P0,P1,P2,P3 = self.flt.Quadrilaterals[i]
+            P0, P1, P2, P3 = self.flt.Quadrilaterals[i]
             p0 = Vector.fromPoint(P0) # convert to ECEF
             p1 = Vector.fromPoint(P1)
             p2 = Vector.fromPoint(P2)
@@ -149,7 +165,6 @@ class rowshandel2013(object):
         hp0 = pp0 - hyp_ecef
         p3p0n = (pp0 - pp3).norm()
         self.Wrup = Vector.dot(p3p0n, hp0)/1000
-
     
     def computeXiPrime(self):
         """
@@ -187,7 +202,7 @@ class rowshandel2013(object):
         
         xi_prime_s = np.zeros(np.product(slat.shape))
         xi_prime_p = np.zeros(np.product(slat.shape))
-            
+        
         for k in range(len(self.flt.Quadrilaterals)):
             # Select a quad
             q = self.flt.Quadrilaterals[k]
@@ -210,11 +225,6 @@ class rowshandel2013(object):
                                      [ddip_vec.y],
                                      [ddip_vec.z]]) # convert to column vector
             
-            # Strike slip and dip slip components of unit slip vector (ECEF coords)
-#            slpv = fault.getQuadSlip(q, self.rake)
-            slpv_SS = fault.getQuadSlip_SS(q, self.rake)
-            slpv_DS = fault.getQuadSlip_DS(q, self.rake)
-            
             # Make 3x(i*j) matrix of cp
             ni, nj = mesh['llx'].shape
             
@@ -230,31 +240,32 @@ class rowshandel2013(object):
             mag = np.sqrt(np.sum(pmat*pmat, axis = 0))
             pmatnorm = pmat/mag # like r1
             
-            # Is subfault 'in front' of hypocenter?
-            pdotstrike = np.sum(pmatnorm*strike_vec_col, axis = 0)
-            front_positive = np.sign(pdotstrike)
+            # According to Rowshandel:
+            #   "The choice of the +/- sign in the above equations
+            #    depends on the (along-the-strike and across-the-dip)
+            #    location of the rupturing sub-fault relative to the
+            #    location of the hypocenter."
+            # and:
+            #   "for the along the strike component of the slip unit
+            #    vector, the choice of the sign should result in the
+            #    slip unit vector (s) being exactly the same as  the
+            #    rupture unit vector (p) for a pure strike-slip case"
             
-            # Is subfault 'above' hypocenter?
-            pdotddip = np.sum(pmatnorm*ddip_vec_col, axis = 0)
-            above_positive = -np.sign(pdotddip)
+            # Strike slip and dip slip components of unit slip vector
+            # (ECEF coords)
+            ds_mat, ss_mat = _get_quad_slip_ds_ss(
+                q, self.rake, cp_mat, pmatnorm)
             
-            # Construct matrix of slip vectors where sign of SS and DS 
-            # components varies with subfault location. 
-            ss_col = np.array([[slpv_SS.x],
-                               [slpv_SS.y],
-                               [slpv_SS.z]])
-            ds_col = np.array([[slpv_DS.x],
-                               [slpv_DS.y],
-                               [slpv_DS.z]])
-            smat = ss_col*front_positive + ds_col
-            mag = np.sqrt(np.sum(smat*smat, axis = 0))
-            smatnorm = smat/mag
+            slpmat = (ds_mat + ss_mat)
+            mag = np.sqrt(np.sum(slpmat*slpmat, axis = 0))
+            slpmatnorm = slpmat/mag
             
             # Loop over sites
             for i in range(site_mat.shape[1]):
                 sitecol = np.array([[site_mat[0, i]],
                                     [site_mat[1, i]],
                                     [site_mat[2, i]]])
+                
                 qmat = sitecol - cp_mat  # 3x(ni*nj), like r2
                 mag = np.sqrt(np.sum(qmat*qmat, axis = 0))
                 qmatnorm = qmat/mag
@@ -263,7 +274,7 @@ class rowshandel2013(object):
                 pdotqraw = np.sum(pmatnorm * qmatnorm, axis = 0)
                 
                 # Slip vector dot product
-                sdotqraw = np.sum(smatnorm*qmatnorm, axis = 0)
+                sdotqraw = np.sum(slpmatnorm*qmatnorm, axis = 0)
                 
                 if self.mtype == 1:
                     # Only sum over (+) directivity effect subfaults
@@ -327,7 +338,7 @@ class rowshandel2013(object):
         proj = geo.utils.get_orthographic_projection(lonmin, lonmax, latmax, latmin)
         
         # Get epi projection
-        epi_x,epi_y = proj(self.hyp[0], self.hyp[1])
+        epi_x, epi_y = proj(self.hyp[0], self.hyp[1])
         
         # Get the lines for the top edge of the fault
         qds = self.flt.Quadrilaterals
@@ -342,7 +353,7 @@ class rowshandel2013(object):
             top_lon = np.append(top_lon, qds[j][1].longitude)
             top_dep = np.append(top_dep, qds[j][0].depth)
             top_dep = np.append(top_dep, qds[j][1].depth)
-        top_x,top_y = proj(top_lon, top_lat)
+        top_x, top_y = proj(top_lon, top_lat)
     
         Lrup_max = 400
         slat = self.sites[1]
@@ -357,7 +368,7 @@ class rowshandel2013(object):
                 # Compute Ls
                 #-----------------------
                 # Convert to local orthographic
-                site_x,site_y = proj(slon[i, j], slat[i, j])
+                site_x, site_y = proj(slon[i, j], slat[i, j])
                 
                 # Shift so center is at epicenter
                 site_x2 = site_x - epi_x
@@ -396,7 +407,8 @@ class rowshandel2013(object):
         slon = self.sites[0]
         site_z = np.zeros_like(slat)
         mesh = geo.mesh.Mesh(slon, slat, site_z)
-        Rrup = np.reshape(getDistance('rrup', mesh, self.flt.Quadrilaterals), (-1,))
+        Rrup = np.reshape(getDistance(
+            'rrup', mesh, self.flt.Quadrilaterals), (-1, ))
         nsite = len(Rrup)
         
         if self.simpleDT == True:   # eqn 3.10
@@ -415,7 +427,8 @@ class rowshandel2013(object):
             DT = np.ones(nsite)
 #            DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/(20 + 10 * np.log(self.T))
             DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/R1
-            # Not clear if the above modification is correct but it gives results that make more sense
+            # Not clear if the above modification is 'correct' but it gives results
+            # that make more sense
             DT[Rrup >= R2] = 0
         DT = np.reshape(DT, slat.shape)
         self.DT = DT
@@ -429,6 +442,91 @@ class rowshandel2013(object):
         Tp = np.exp(1.27*self.M - 7.28)
         self.WP = np.exp(-(np.log10(self.T/Tp)*np.log10(self.T/Tp))/(2*sig*sig))
 
+def _get_quad_slip_ds_ss(q, rake, cp, p):
+    """
+    Compute the DIP SLIP and STRIKE SLIP components of the unit slip vector in 
+    ECEF coords for a quad and rake angle. 
+    :param q:
+        A quadrilateral. 
+    :param rake:
+        Direction of motion of the hanging wall relative to the
+        foot wall, as measured by the angle (deg) from the strike vector.
+    :param cp:
+        A 3x(n sub fault) array giving center points of each sub fault
+        in ECEF coords. 
+    :param p:
+        A 3x(n sub fault) array giving the unit vectors of the propagation
+        vector on each sub fault in ECEF coords. 
+    :returns:
+        List of dip slip and strike slip components (each is a matrix)
+        of the unit slip vector in ECEF space. 
+    """
+    # Get quad vertices, strike, dip
+    P0, P1, P2, P3 = q
+    strike = P0.azimuth(P1)
+    dip = fault.getQuadDip(q)
+    
+    # Slip unit vectors in 'local' (i.e., z-up, x-east) coordinates
+    d1_local = fault.getLocalUnitSlipVector_DS(strike, dip, rake)
+    s1_local = fault.getLocalUnitSlipVector_SS(strike, dip, rake)
+    
+    # Convert to a column array
+    d1_col = np.array([[d1_local.x],
+                       [d1_local.y],
+                       [d1_local.z]])
+    s1_col = np.array([[s1_local.x],
+                       [s1_local.y],
+                       [s1_local.z]])
+    
+    # Define 'local' coordinate system
+    qlats = [a.latitude for a in q]
+    qlons = [a.longitude for a in q]
+    proj = get_orthographic_projection(
+        np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
+    
+    # Convert p and cp to geographic coords
+    p0lat, p0lon, p0z = ecef2latlon(cp[0, ], cp[1, ], cp[2, ])
+    p1lat, p1lon, p1z = ecef2latlon(cp[0, ] + p[0, ],
+                                    cp[1, ] + p[1, ],
+                                    cp[2, ] + p[2, ])
+    
+    # Convert p to 'local' coords
+    p0x, p0y = proj(p0lon, p0lat)
+    p1x, p1y = proj(p1lon, p1lat)
+    px = p1x - p0x
+    py = p1y - p0y
+    pz = p1z - p0z
+    
+    # Apply sign changes in 'local' coords
+    d1mat = np.array([[np.abs(d1_col[0])*np.sign(px)],
+                      [np.abs(d1_col[1])*np.sign(py)],
+                      [np.abs(d1_col[2])*np.sign(pz)]])
+    s1mat = np.array([[np.abs(s1_col[0])*np.sign(px)],
+                      [np.abs(s1_col[1])*np.sign(py)],
+                      [np.abs(s1_col[2])*np.sign(pz)]])
+    
+    # Need to track 'origin'
+    s0 = np.array([[0], [0], [0]])
+    
+    # Convert from 'local' to geographic coords
+    s1_ll = proj(s1mat[0, ], s1mat[1, ], reverse = True)
+    d1_ll = proj(d1mat[0, ], d1mat[1, ], reverse = True)
+    s0_ll = proj(s0[0], s0[1], reverse = True)
+    
+    # And then back to ECEF:
+    s1_ecef = latlon2ecef(s1_ll[1], s1_ll[0], s1mat[2,])
+    d1_ecef = latlon2ecef(d1_ll[1], d1_ll[0], d1mat[2,])
+    s0_ecef = latlon2ecef(s0_ll[1], s0_ll[0], s0[2])
+    s00 = s0_ecef[0].reshape(-1)
+    s01 = s0_ecef[1].reshape(-1)
+    s02 = s0_ecef[2].reshape(-1)
+    d_mat = np.array([d1_ecef[0].reshape(-1) - s00,
+                      d1_ecef[1].reshape(-1) - s01,
+                      d1_ecef[2].reshape(-1) - s02])
+    s_mat = np.array([s1_ecef[0].reshape(-1) - s00,
+                      s1_ecef[1].reshape(-1) - s01,
+                      s1_ecef[2].reshape(-1) - s02])
+    return d_mat, s_mat
 
 def _rotation_matrix(axis, theta):
     """

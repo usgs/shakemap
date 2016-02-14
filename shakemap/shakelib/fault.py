@@ -870,14 +870,15 @@ def getQuadSlip(q, rake):
     :returns:
         Unit slip vector in ECEF space. 
     """
-    P0,P1,P2,P3 = q
+    P0, P1, P2, P3 = q
     strike = P0.azimuth(P1)
     dip = getQuadDip(q)
     s1_local = getLocalUnitSlipVector(strike, dip, rake)
     s0_local = Vector(0, 0, 0)
     qlats = [a.latitude for a in q]
     qlons = [a.longitude for a in q]
-    proj = get_orthographic_projection(np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
+    proj = get_orthographic_projection(
+        np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
     s1_ll = proj(np.array([s1_local.x]), np.array([s1_local.y]), reverse = True)
     s0_ll = proj(np.array([s0_local.x]), np.array([s0_local.y]), reverse = True)
     s1_ecef = Vector.fromTuple(latlon2ecef(s1_ll[1], s1_ll[0], s1_local.z))
@@ -885,57 +886,6 @@ def getQuadSlip(q, rake):
     slp_ecef = (s1_ecef - s0_ecef).norm()
     return slp_ecef
 
-def getQuadSlip_DS(q, rake):
-    """
-    Compute the DIP SLIP components of the unit slip vector in ECEF space for a quad and rake angle. 
-    :param q:
-        A quadrilateral. 
-    :param rake:
-        Direction of motion of the hanging wall relative to the
-        foot wall, as measured by the angle (deg) from the strike vector. 
-    :returns:
-        Dip splip component of the unit slip vector in ECEF space. 
-    """
-    P0,P1,P2,P3 = q
-    strike = P0.azimuth(P1)
-    dip = getQuadDip(q)
-    s1_local = getLocalUnitSlipVector_DS(strike, dip, rake)
-    s0_local = Vector(0, 0, 0)
-    qlats = [a.latitude for a in q]
-    qlons = [a.longitude for a in q]
-    proj = get_orthographic_projection(np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
-    s1_ll = proj(np.array([s1_local.x]), np.array([s1_local.y]), reverse = True)
-    s0_ll = proj(np.array([s0_local.x]), np.array([s0_local.y]), reverse = True)
-    s1_ecef = Vector.fromTuple(latlon2ecef(s1_ll[1], s1_ll[0], s1_local.z))
-    s0_ecef = Vector.fromTuple(latlon2ecef(s0_ll[1], s0_ll[0], s0_local.z))
-    slp_ecef = (s1_ecef - s0_ecef)
-    return slp_ecef
-
-def getQuadSlip_SS(q, rake):
-    """
-    Compute the STRIKE SLIP components of the unit slip vector in ECEF space for a quad and rake angle. 
-    :param q:
-        A quadrilateral. 
-    :param rake:
-        Direction of motion of the hanging wall relative to the
-        foot wall, as measured by the angle (deg) from the strike vector. 
-    :returns:
-        Strike slip component of the unit slip vector in ECEF space. 
-    """
-    P0,P1,P2,P3 = q
-    strike = P0.azimuth(P1)
-    dip = getQuadDip(q)
-    s1_local = getLocalUnitSlipVector_SS(strike, dip, rake)
-    s0_local = Vector(0, 0, 0)
-    qlats = [a.latitude for a in q]
-    qlons = [a.longitude for a in q]
-    proj = get_orthographic_projection(np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
-    s1_ll = proj(np.array([s1_local.x]), np.array([s1_local.y]), reverse = True)
-    s0_ll = proj(np.array([s0_local.x]), np.array([s0_local.y]), reverse = True)
-    s1_ecef = Vector.fromTuple(latlon2ecef(s1_ll[1], s1_ll[0], s1_local.z))
-    s0_ecef = Vector.fromTuple(latlon2ecef(s0_ll[1], s0_ll[0], s0_local.z))
-    slp_ecef = (s1_ecef - s0_ecef)
-    return slp_ecef
 
 
 def getQuadLength(q):
