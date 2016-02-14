@@ -251,17 +251,18 @@ class Rowshandel2013(object):
             #    slip unit vector (s) being exactly the same as  the
             #    rupture unit vector (p) for a pure strike-slip case"
             
-            # Is subfault 'in front' of hypocenter?
-            pdotstrike = np.sum(pmatnorm*strike_vec_col, axis = 0)
-            front_positive = np.sign(pdotstrike)
+#            # Is subfault 'in front' of hypocenter?
+#            pdotstrike = np.sum(pmatnorm*strike_vec_col, axis = 0)
+#            front_positive = np.sign(pdotstrike)
             
-            # Is subfault 'above' hypocenter?
-            pdotddip = np.sum(pmatnorm*ddip_vec_col, axis = 0)
-            above_positive = -np.sign(pdotddip)
+#            # Is subfault 'above' hypocenter?
+#            pdotddip = np.sum(pmatnorm*ddip_vec_col, axis = 0)
+#            above_positive = -np.sign(pdotddip)
             
             # Strike slip and dip slip components of unit slip vector
             # (ECEF coords)
-            ds_mat, ss_mat = _get_quad_slip_ds_ss(q, self.rake, cp_mat, pmatnorm)
+            ds_mat, ss_mat = _get_quad_slip_ds_ss(
+                q, self.rake, cp_mat, pmatnorm)
             
             slpmat = (ds_mat + ss_mat)
             mag = np.sqrt(np.sum(slpmat*slpmat, axis = 0))
@@ -505,14 +506,12 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
     pz = p1z - p0z
     
     # Apply sign changes in 'local' coords
-    d1mat = np.array([[d1_col[0]*np.sign(px)],
-                      [d1_col[1]*np.sign(py)],
-#                      [d1_col[2]*np.sign(pz)]])
-                      [d1_col[2]]*np.ones_like(pz)])
-    s1mat = np.array([[s1_col[0]*np.sign(px)],
-                      [s1_col[1]*np.sign(py)],
-#                      [s1_col[2]*np.sign(pz)]])
-                      [s1_col[2]*np.ones_like(pz)]])
+    d1mat = np.array([[np.abs(d1_col[0])*np.sign(px)],
+                      [np.abs(d1_col[1])*np.sign(py)],
+                      [np.abs(d1_col[2])*np.sign(pz)]])
+    s1mat = np.array([[np.abs(s1_col[0])*np.sign(px)],
+                      [np.abs(s1_col[1])*np.sign(py)],
+                      [np.abs(s1_col[2])*np.sign(pz)]])
     
     # Need to track 'origin'
     s0 = np.array([[0], [0], [0]])
