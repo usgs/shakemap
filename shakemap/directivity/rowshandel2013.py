@@ -251,14 +251,6 @@ class Rowshandel2013(object):
             #    slip unit vector (s) being exactly the same as  the
             #    rupture unit vector (p) for a pure strike-slip case"
             
-#            # Is subfault 'in front' of hypocenter?
-#            pdotstrike = np.sum(pmatnorm*strike_vec_col, axis = 0)
-#            front_positive = np.sign(pdotstrike)
-            
-#            # Is subfault 'above' hypocenter?
-#            pdotddip = np.sum(pmatnorm*ddip_vec_col, axis = 0)
-#            above_positive = -np.sign(pdotddip)
-            
             # Strike slip and dip slip components of unit slip vector
             # (ECEF coords)
             ds_mat, ss_mat = _get_quad_slip_ds_ss(
