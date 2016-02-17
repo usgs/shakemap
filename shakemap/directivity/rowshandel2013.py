@@ -56,7 +56,7 @@ class Rowshandel2013(object):
         """
         Constructor for rowshandel2013.
         :param flt:
-            pyhsake fault object.
+            fault object.
         :param hyp:
             hypocenter; list of three elements: lon, lat, depth (km). 
         :param sites:
@@ -64,21 +64,22 @@ class Rowshandel2013(object):
             second element is a 2d array of latitudes. 
              ** TODO: change so that this argument is a SitesContext
         :param rake:
-            Float (scalar) for direction of slip on fault; motion of hangingwall
+            Float for direction of slip on fault; motion of hangingwall
             relative to footwall; clockwise from strike vector. 
              ** Potentially allow for variable rake with subfault. 
         :param dx:
-            Float (scalar) for target mesh spacing for subfaults in km. The mesh
+            Float for target mesh spacing for subfaults in km. The mesh
             snaps to the edges of the quadrilaterals so the actual mesh spacing 
-            will not equal this exactly, and will also be variable. 
+            will not equal this exactly; spacing in x and y will not be equal. 
         :param M:
-            Float (scalar) for moment magnitude. 
+            Float for moment magnitude. 
         :param T:
             Period; Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5
-             ** TODO: interpolate for other periods. 
+             ** TODO: interpolate intermediate periods. 
         :param a_weight:
             Weighting factor for how p-dot-q and s-dot-q are averaged; 0 for 
-            only p-dot-q and 1 for only s-dot-q. 
+            only p-dot-q (propagation factor) and 1 for only s-dot-q (slip 
+            factor). 
         :param mtype:
             Integer, either 1 or 2; 1 for adding only positive components of dot
             products, 2 for adding all components of dot products. 
@@ -120,7 +121,7 @@ class Rowshandel2013(object):
         c1sel = self.__c1['mean'][self.__c1['T'] == self.T]
         c2sel = self.__c2['mean'][self.__c2['T'] == self.T]
         # Eqn 3.13
-        self.Fd = (c1sel*self.xi_prime + c2sel) * self.LD * self.DT * self.WP
+        self.fd = (c1sel*self.xi_prime + c2sel) * self.LD * self.DT * self.WP
 
 
     def computeWrup(self):
@@ -335,7 +336,8 @@ class Rowshandel2013(object):
         latmax = self.sites[1].max()
         lonmin = self.sites[0].min()
         lonmax = self.sites[0].max()
-        proj = geo.utils.get_orthographic_projection(lonmin, lonmax, latmax, latmin)
+        proj = geo.utils.get_orthographic_projection(
+            lonmin, lonmax, latmax, latmin)
         
         # Get epi projection
         epi_x, epi_y = proj(self.hyp[0], self.hyp[1])
@@ -415,7 +417,8 @@ class Rowshandel2013(object):
             R1 = 35
             R2 = 70
             DT = np.ones(nsite)
-            DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/R1
+            ix = [(Rrup > R1) & (Rrup < R2)]
+            DT[ix] = 2 - Rrup[ix]/R1
             DT[Rrup >= R2] = 0
         else:                  # eqn 3.9
             if self.T >= 1:
@@ -498,12 +501,19 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
     pz = p1z - p0z
     
     # Apply sign changes in 'local' coords
-    d1mat = np.array([[np.abs(d1_col[0])*np.sign(px)],
-                      [np.abs(d1_col[1])*np.sign(py)],
-                      [np.abs(d1_col[2])*np.sign(pz)]])
     s1mat = np.array([[np.abs(s1_col[0])*np.sign(px)],
                       [np.abs(s1_col[1])*np.sign(py)],
-                      [np.abs(s1_col[2])*np.sign(pz)]])
+#                      [np.abs(s1_col[2])*np.sign(pz)]])
+                      [np.abs(s1_col[2])*np.ones_like(pz)]])
+
+    dipsign = np.sign(np.sin(np.radians(rake)))
+#    d1mat = np.array([[-d1_col[0]*np.ones_like(px)*dipsign],
+#                      [ d1_col[1]*np.ones_like(py)*dipsign],
+#                      [ d1_col[2]*np.ones_like(pz)*dipsign]])
+    d1mat = np.array([[ d1_col[0]*np.ones_like(px)],
+                      [ d1_col[1]*np.ones_like(py)],
+                      [ d1_col[2]*np.ones_like(pz)]])
+
     
     # Need to track 'origin'
     s0 = np.array([[0], [0], [0]])
