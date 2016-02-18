@@ -936,7 +936,7 @@ def getQuadNormal(q):
 def getQuadStrikeVector(q):
     """
     Compute the unit pointing in the direction of strike for a quadrilateral in 
-    ECEF coordinates. 
+    ECEF coordinates. Top edge assumed to be horizontal. 
     :param q:
         A quadrilateral. 
     :returns:
@@ -950,7 +950,7 @@ def getQuadStrikeVector(q):
 
 def getQuadDownDipVector(q):
     """
-    Compute the unit pointing down dip for a quadrilateral in 
+    Compute the unit vector pointing down dip for a quadrilateral in 
     ECEF coordinates. 
     :param q:
         A quadrilateral. 
@@ -959,9 +959,11 @@ def getQuadDownDipVector(q):
     """
     P0,P1,P2,P3 = q
     p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
-    p3 = Vector.fromPoint(P3) 
-    v1 = (p3 - p0).norm()
-    return v1
+    p1 = Vector.fromPoint(P1)
+    p0p1 = p1 - p0
+    qnv = getQuadNormal(q)
+    ddv = Vector.cross(p0p1, qnv).norm()
+    return ddv
 
 def getVerticalVector(q):
     """
