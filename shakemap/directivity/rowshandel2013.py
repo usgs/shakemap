@@ -159,13 +159,11 @@ class Rowshandel2013(object):
         
         pp0 = Vector.fromPoint(geo.point.Point(
             q[0].longitude, q[0].latitude, q[0].depth) )
-        pp3 = Vector.fromPoint(geo.point.Point(
-            q[3].longitude, q[3].latitude, q[3].depth) )
         hyp_ecef = Vector.fromPoint(geo.point.Point(
             self.hyp[0], self.hyp[1], self.hyp[2]))
-        hp0 = pp0 - hyp_ecef
-        p3p0n = (pp0 - pp3).norm()
-        self.Wrup = Vector.dot(p3p0n, hp0)/1000
+        hp0 = hyp_ecef - pp0
+        ddv = fault.getQuadDownDipVector(q)
+        self.Wrup = Vector.dot(ddv, hp0)/1000
     
     def computeXiPrime(self):
         """

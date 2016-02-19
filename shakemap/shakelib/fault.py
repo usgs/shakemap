@@ -11,6 +11,7 @@ from openquake.hazardlib.geo import mesh
 from openquake.hazardlib.geo import point,utils
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from .ecef import latlon2ecef
+from .ecef import ecef2latlon
 from .vector import Vector
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -476,26 +477,22 @@ class Fault(object):
         return dist
 
     def isPointToRight(self,P0,P1,P2):
-        east = np.min([P0.longitude,P1.longitude,P2.longitude])
-        west = np.max([P0.longitude,P1.longitude,P2.longitude])
-        south = np.min([P0.latitude,P1.latitude,P2.latitude])
-        north = np.max([P0.latitude,P1.latitude,P2.latitude])
-        proj = utils.get_orthographic_projection(west,east,north,south)
-        p0x,p0y = proj(P0.longitude,P0.latitude)
-        p1x,p1y = proj(P1.longitude,P1.latitude)
-        p2x,p2y = proj(P2.longitude,P2.latitude)
-        dx = p1x-p0x
-        dy = p1y-p0y
-        theta = np.arctan2(dx,dy)
-        R = np.array([[np.cos(theta),-np.sin(theta)],
-                      [np.sin(theta),np.cos(theta)]])
-        xy = np.array([[p2x],[p2y]])
-        oxy = np.array([[p0x],[p0y]])
-        xp,yp = np.dot(R,xy)
-        ox,oy = np.dot(R,oxy)
-        if ox > xp:
-            return False
-        return True
+        eps = 1e-6
+        p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
+        p1 = Vector.fromPoint(P1) 
+        p2 = Vector.fromPoint(P2)
+        p1p0 = p1 - p0
+        p2p0 = p2 - p0
+        qnv = Vector.cross(p2p0, p1p0).norm()
+        tmp = p0 + qnv
+        tmplat, tmplon, tmpz = ecef2latlon(tmp.x, tmp.y, tmp.z)
+        print('tmplat = %.16f' %tmplat)
+        print('tmplon = %.16f' %tmplon)
+        print('tmpz = %.16f' %tmpz)
+        print('P0.depth = %.16f' %P0.depth)
+        if tmpz - P0.depth > -eps:
+            return True
+        return False
 
     def reverseQuad(self,P0,P1,P2,P3):
         newP0 = copy.deepcopy(P1)
@@ -726,7 +723,7 @@ def getQuadMesh(q, dx):
            ulx: upper left x coordinate in ECEF coords. 
            etc. 
     """
-    P0,P1,P2,P3 = q
+    P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0)  # fromPoint converts to ECEF
     p1 = Vector.fromPoint(P1)
     p2 = Vector.fromPoint(P2)
@@ -756,18 +753,18 @@ def getQuadMesh(q, dx):
         mesh['z'][:, i] = [a.z for a in mpts]
 
     # Make arrays of pixel corners
-    mesh['llx'] = mesh['x'][1:,0:-1]
-    mesh['lrx'] = mesh['x'][1:,1:]
-    mesh['ulx'] = mesh['x'][0:-1,0:-1]
-    mesh['urx'] = mesh['x'][0:-1,1:]
-    mesh['lly'] = mesh['y'][1:,0:-1]
-    mesh['lry'] = mesh['y'][1:,1:]
-    mesh['uly'] = mesh['y'][0:-1,0:-1]
-    mesh['ury'] = mesh['y'][0:-1,1:]
-    mesh['llz'] = mesh['z'][1:,0:-1]
-    mesh['lrz'] = mesh['z'][1:,1:]
-    mesh['ulz'] = mesh['z'][0:-1,0:-1]
-    mesh['urz'] = mesh['z'][0:-1,1:]
+    mesh['llx'] = mesh['x'][1:, 0:-1]
+    mesh['lrx'] = mesh['x'][1:, 1:]
+    mesh['ulx'] = mesh['x'][0:-1, 0:-1]
+    mesh['urx'] = mesh['x'][0:-1, 1:]
+    mesh['lly'] = mesh['y'][1:, 0:-1]
+    mesh['lry'] = mesh['y'][1:, 1:]
+    mesh['uly'] = mesh['y'][0:-1, 0:-1]
+    mesh['ury'] = mesh['y'][0:-1, 1:]
+    mesh['llz'] = mesh['z'][1:, 0:-1]
+    mesh['lrz'] = mesh['z'][1:, 1:]
+    mesh['ulz'] = mesh['z'][0:-1, 0:-1]
+    mesh['urz'] = mesh['z'][0:-1, 1:]
     mesh['cpx'] = np.zeros_like(mesh['llx'])
     mesh['cpy'] = np.zeros_like(mesh['llx'])
     mesh['cpz'] = np.zeros_like(mesh['llx'])
@@ -896,7 +893,7 @@ def getQuadLength(q):
     :returns:
         Length in km. 
     """
-    P0,P1,P2,P3 = q
+    P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
     p1 = Vector.fromPoint(P1) 
     qlength = (p1 - p0).mag()/1000
@@ -924,7 +921,7 @@ def getQuadNormal(q):
     :returns:
         Normalized normal vector for the quadrilateral in ECEF coords. 
     """
-    P0,P1,P2,P3 = q
+    P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
     p1 = Vector.fromPoint(P1) 
     p3 = Vector.fromPoint(P3) 
@@ -935,14 +932,14 @@ def getQuadNormal(q):
 
 def getQuadStrikeVector(q):
     """
-    Compute the unit pointing in the direction of strike for a quadrilateral in 
-    ECEF coordinates. Top edge assumed to be horizontal. 
+    Compute the unit vector pointing in the direction of strike for a 
+    quadrilateral in ECEF coordinates. Top edge assumed to be horizontal. 
     :param q:
         A quadrilateral. 
     :returns:
         The unit vector pointing in strike direction in ECEF coords. 
     """
-    P0,P1,P2,P3 = q
+    P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
     p1 = Vector.fromPoint(P1) 
     v1 = (p1 - p0).norm()
@@ -957,7 +954,7 @@ def getQuadDownDipVector(q):
     :returns:
         The unit vector pointing down dip in ECEF coords. 
     """
-    P0,P1,P2,P3 = q
+    P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
     p1 = Vector.fromPoint(P1)
     p0p1 = p1 - p0
@@ -967,14 +964,14 @@ def getQuadDownDipVector(q):
 
 def getVerticalVector(q):
     """
-    Compute the unit vertical vector for a quadrilateral 
+    Compute the vertical unit vector for a quadrilateral 
     in ECEF coordinates. 
     :param q:
         A quadrilateral. 
     :returns:
         Normalized vertical vector for the quadrilateral in ECEF coords. 
     """
-    P0,P1,P2,P3 = q
+    P0, P1, P2, P3 = q
     P0_up = copy.deepcopy(P0)
     P0_up.depth = P0_up.depth - 1.0
     p0 = Vector.fromPoint(P0)   # fromPoint converts to ECEF
