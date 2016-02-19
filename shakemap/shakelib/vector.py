@@ -93,6 +93,22 @@ class Vector(object):
             raise TypeError("Cannot multiply Vector and %s objects" % type(length))
         return Vector(self.x*length,self.y*length,self.z*length)
 
+    def __rmul__(self,length):
+        """
+        Multiply the Vector by a scalar, changing it's length.
+        :param length:
+           A scalar number
+        :returns:
+           A Vector object.
+        :raises TypeError:
+           when length is not a number.
+        """
+        try:
+            length = float(length)
+        except ValueError:
+            raise TypeError("Cannot multiply Vector and %s objects" % type(length))
+        return Vector(self.x*length,self.y*length,self.z*length)
+    
     def __eq__(self,other):
         """
         Check equality between this Vector and another.
