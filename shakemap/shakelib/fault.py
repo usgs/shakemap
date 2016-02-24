@@ -486,10 +486,6 @@ class Fault(object):
         qnv = Vector.cross(p2p0, p1p0).norm()
         tmp = p0 + qnv
         tmplat, tmplon, tmpz = ecef2latlon(tmp.x, tmp.y, tmp.z)
-        print('tmplat = %.16f' %tmplat)
-        print('tmplon = %.16f' %tmplon)
-        print('tmpz = %.16f' %tmpz)
-        print('P0.depth = %.16f' %P0.depth)
         if tmpz - P0.depth > -eps:
             return True
         return False
@@ -599,7 +595,7 @@ class Fault(object):
             #each segment can have many contiguous quadrilaterals defined in it
             #separations (nans) between segments mean that segments are not contiguous.
             npoints = len(lonseg)
-            nquads = ((npoints - 4)/2) + 1
+            nquads = int((npoints - 4)/2) + 1
             startidx = 0
             endidx = -1
             for i in range(0,nquads):
