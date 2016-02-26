@@ -19,23 +19,6 @@ class SitesException(Exception):
     def __str__(self):
         return repr(self.value)
 
-def getGeodict(bounds,xdim,ydim):
-    """Return a geodict dictionary as defined here: https://github.com/usgs/neicio/blob/master/neicio/grid.py
-    :param bounds:
-        Tuple of floats containing (lonmin,lonmax,latmin,latmax)
-    :param xdim:
-        Float width of desired cells in decimal degrees.
-    :param ydim:
-        Float height of desired cells in decimal degrees.
-    :returns:
-       GeoDict object.
-    """
-    geodict = GeoDict.createDictFromBox(bounds[0],bounds[1],bounds[2],bounds[3],xdim,ydim)
-    lons = np.arange(gd.xmin,gd.xmax,gd.dx)
-    lats = np.arange(gd.ymin,gd.ymax,gd.dy)
-
-    return (geodict,lons,lats)
-
 def calculateZ1P0(vs30)
     c1 = 6.745
     c2 = 1.35
