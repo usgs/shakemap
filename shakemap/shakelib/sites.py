@@ -4,7 +4,8 @@
 import sys
 
 #third party imports
-from neicio.gmt import GMTGrid
+from mapio.gmt import GMTGrid
+from mapio.geodict import GeoDict
 from openquake.hazardlib.gsim.base import SitesContext
 import numpy as np
 
@@ -27,94 +28,147 @@ def getGeodict(bounds,xdim,ydim):
     :param ydim:
         Float height of desired cells in decimal degrees.
     :returns:
-       Dictionary containing fields as referenced above:
-        - xmin
-        - xmax
-        - ymin
-        - ymax
-        - xdim
-        - ydim
-        - nrows
-        - ncols
+       GeoDict object.
     """
-    lons = np.arange(bounds[0],bounds[1]+xdim,xdim)
-    lats = np.arange(bounds[2],bounds[3]+ydim,ydim)
-    geodict = {'xmin':bounds[0],
-               'xmax':bounds[1],
-               'ymin':bounds[2],
-               'ymax':bounds[3],
-               'xdim':xdim,
-               'ydim':ydim,
-               'nrows':len(lats),
-               'ncols':len(lons)}
+    geodict = GeoDict.createDictFromBox(bounds[0],bounds[1],bounds[2],bounds[3],xdim,ydim)
+    lons = np.arange(gd.xmin,gd.xmax,gd.dx)
+    lats = np.arange(gd.ymin,gd.ymax,gd.dy)
+
     return (geodict,lons,lats)
+
+def calculateZ1P0(vs30)
+    c1 = 6.745
+    c2 = 1.35
+    c3 = 5.394
+    c4 = 4.48
+    Z1Pt0 = np.zeros_like(vs30)
+    Z1Pt0[vs30 < 180] = np.exp(c1)
+    idx = (vs30 >= 180) & (vs30 <= 500)
+    Z1Pt0[idx] = np.exp(c1 - c2*np.log(vs30[idx]/180.0))
+    idx = vs30 > 500
+    Z1Pt0[idx] = np.exp(c3 -  c4 * np.log(vs30[idx]/500.0))
+    return Z1Pt0
+
+def calculateZ2P5(z1pt0):
+    c1 = 519
+    c2 = 3.595
+    Z2Pt5 = c1 + z1pt0*c2
+    return Z2Pt5
 
 class Sites(object):
     """An object to encapsulate information used to generate a GEM SitesContext.
     (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
     """
-    def __init__(self,bounds,xdim,ydim,vs30File=None,defaultVs30=686,vs30measured=False,backarc=False):
+    def __init__(self,vs30grid,vs30measured=False,backarc=false):
         """
         Construct a Sites object.
-        :param bounds:
-            Tuple of floats containing (lonmin,lonmax,latmin,latmax)
-        :param xdim:
-            Float width of desired cells in decimal degrees.
-        :param ydim:
-            Float height of desired cells in decimal degrees.
-        :param vs30File:
-            Path to NetCDF file containing Vs30 values (m/s).
-        :param defaultVs30:
-            Default Vs30 value.
+        :param vs30grid:
+            MapIO Grid2D object containing Vs30 values.
         :param vs30measured:
             Boolean indicating whether Vs30 values were measured or derived (i.e., from slope)
         :param backarc:
             Boolean indicating whether event is on the backarc as defined here: 
             http://earthquake.usgs.gov/learn/glossary/?term=backarc
         """
-        self.GeoDict,lons,lats = getGeodict(bounds,xdim,ydim)
-        if vs30File is not None:
-            bigbounds = (bounds[0]-xdim*4,bounds[1]+xdim*4,bounds[2]-ydim*4,bounds[3]+ydim*4)
-            vsgrid = GMTGrid(grdfile=vs30File,bounds=bigbounds)
-            vsgrid.interpolateToGrid(self.GeoDict)
-            self.Vs30 = vsgrid.griddata
-        else:
-            self.Vs30 = np.ones((self.GeoDict['nrows'],self.GeoDict['ncols']))*defaultVs30
-        self._calculateZ1P0()
-        self._calculateZ2P5()
+        self.Vs30 = vs30grid
+        self.GeoDict = vs30grid.getGeoDict().copy()
+        lons = np.arange(self.GeoDict.xmin,self.GeoDict.xmax,self.GeoDict.dx)
+        lats = np.arange(self.GeoDict.ymin,self.GeoDict.ymax,self.GeoDict.dy)
+        self.Z1Pt0 = calculateZ1P0(self.Vs30)
+        self.Z2Pt5 = calculateZ2P5(self.Z1Pt0)
         self.SitesContext = SitesContext()
-        self.SitesContext.vs30 = self.Vs30
+        self.SitesContext.vs30 = self.Vs30.getData().copy()
         self.SitesContext.z1pt0 = self.Z1Pt0
         self.SitesContext.z2pt5 = self.Z2Pt5
         self.SitesContext.backarc = backarc #zoneconfig might have this info
         self.SitesContext.vs30measured = vs30measured #no idea where this might ever come from
         self.SitesContext.lons = lons
         self.SitesContext.lats = lats
+
+    @classmethod
+    def createFromCenter(cls,cx,cy,dx,dy,xspan,yspan,defaultVs30=686.0,vs30File=None,vs30measured=False,backarc=False):
+        """Create a Sites object by defining a center point, resolution, extent, and Vs30 values.
+
+        :param cx:
+          X coordinate of desired center point.
+        :param cy:
+          X coordinate of desired center point.
+        :param dx:
+          Resolution of desired grid in X direction.
+        :param dy:
+          Resolution of desired grid in Y direction.
+        :param xspan:
+          Width of desired grid.
+        :param yspan:
+          Height of desired grid.
+        :param defaultVs30:
+          Default Vs30 value to use if vs30File not specified.
+        :param vs30File:
+          Name of GMT or GDAL format grid file containing Vs30 values.
+        :param vs30measured:
+          Boolean indicating whether Vs30 values were measured or derived (i.e., from slope)
+        :param backarc:
+            Boolean indicating whether event is on the backarc as defined here: 
+            http://earthquake.usgs.gov/learn/glossary/?term=backarc
+        """
+        geodict = GeoDict.createDictFromCenter(cx,cy,dx,dy,xspan,yspan)
+        if vs30File is not None:
+            try:
+                vs30grid = GMTGrid.load(vs30File,samplegeodict=geodict,resample=True,method='linear')
+            except Exception as msg1:
+                try:
+                    vs30grid = GDALGrid.load(vs30File,samplegeodict=geodict,resample=True,method='linear')
+                except Exception as msg2:
+                    msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (vs30File,str(msg1),str(msg2))
+                    raise SitesException(msg)
+        else:
+            griddata = np.ones((geodict.ny,geodict.nx))*defaultVs30
+            vs30grid = Grid2D(griddata,geodict)
+        return cls(vs30grid,vs30measured=vs30measured,backarc=backarc)
+
+    def sampleFromSites(lats,lons):
+        """Create a SitesContext object by sampling the current Sites object.
+
+        :param lats:
+          Sequence of latitudes.
+        :param lons:
+          Sequence of longitudes.
+        :returns:
+          SitesContext object where data are sampled from the current Sites object.
+        :raises SitesException:
+           When lat/lon input sequences do not share dimensionality.
+        """
+        lats = np.array(lats)
+        lons = np.array(lons)
+        latshape = lats.shape
+        lonshape = lons.shape
+        if latshape != lonshape:
+            msg = 'Input lat/lon arrays must have the same dimensions'
+            raise SitesException(msg)
         
+        site = SitesContext()
+        site.vs30 = self.Vs30.getValue(lats,lons)
+        site.lats = lats
+        site.lons = lons
+        site.z1pt0 = calculateZ1P0(site.vs30)
+        site.z2pt5 = calculateZ2P5(site.z1pt0)
+        site.vs30measured = self.SitesContext.vs30measured
+        site.backarc = self.SitesContext.backarc
+
+        return site
+
+    def getVs30Grid(self):
+        """
+        Return the Grid2D object containing Vs30 values for this Sites object.
+        """
+        return self.Vs30
+    
     def getSitesContext(self):
         """Return a SitesContext object appropriate for GMPE use.
         :returns:
            SitesContext object.
         """
         return self.SitesContext
-
-    def _calculateZ1P0(self):
-        c1 = 6.745
-        c2 = 1.35
-        c3 = 5.394
-        c4 = 4.48
-        self.Z1Pt0 = np.zeros_like(self.Vs30)
-        self.Z1Pt0[self.Vs30 < 180] = np.exp(c1)
-        idx = (self.Vs30 >= 180) & (self.Vs30 <= 500)
-        self.Z1Pt0[idx] = np.exp(c1 - c2*np.log(self.Vs30[idx]/180.0))
-        idx = self.Vs30 > 500
-        self.Z1Pt0[idx] = np.exp(c3 -  c4 * np.log(self.Vs30[idx]/500.0))
-
-    def _calculateZ2P5(self):
-        c1 = 519
-        c2 = 3.595
-        self.Z2Pt5 = c1 + self.Z1Pt0*c2
-            
         
 def _test(vs30file=None):
     hypo = {'lat':34.1,'lon':-118.2,'depth':23.5}
