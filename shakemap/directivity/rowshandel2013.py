@@ -4,13 +4,13 @@
 import numpy as np
 import openquake.hazardlib.geo as geo
 from openquake.hazardlib.geo.utils import get_orthographic_projection
-import shakemap.shakelib.ecef as ecef
-import shakemap.shakelib.fault as fault
-from shakemap.shakelib.ecef import latlon2ecef
-from shakemap.shakelib.ecef import ecef2latlon
-from shakemap.shakelib.vector import Vector
-from shakemap.shakelib.distance import calcRuptureDistance
-from shakemap.shakelib.distance import getDistance
+import shakemap.grind.ecef as ecef
+import shakemap.grind.fault as fault
+from shakemap.grind.ecef import latlon2ecef
+from shakemap.grind.ecef import ecef2latlon
+from shakemap.grind.vector import Vector
+from shakemap.grind.distance import calcRuptureDistance
+from shakemap.grind.distance import getDistance
 
 """
 Implements the Rowshandel (2013) directivity model. 

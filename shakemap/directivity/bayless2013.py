@@ -3,11 +3,11 @@
 import numpy as np
 import openquake.hazardlib.geo as geo
 
-import shakemap.shakelib.fault as fault
-import shakemap.shakelib.ecef as ecef
-from shakemap.shakelib.vector import Vector
-from shakemap.shakelib.distance import getDistance
-from shakemap.shakelib.distance import dist2_to_segment
+import shakemap.grind.fault as fault
+import shakemap.grind.ecef as ecef
+from shakemap.grind.vector import Vector
+from shakemap.grind.distance import getDistance
+from shakemap.grind.distance import dist2_to_segment
 
 
 """
