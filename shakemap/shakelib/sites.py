@@ -213,7 +213,7 @@ class Sites(object):
             raise SitesException(msg)
         
         site = SitesContext()
-        site.vs30 = self.Vs30.getValue(lats,lons) #use default vs30 if outside grid
+        site.vs30 = self.Vs30.getValue(lats,lons,default=self.defaultVs30) #use default vs30 if outside grid
         site.lats = lats
         site.lons = lons
         site.z1pt0 = calculateZ1P0(site.vs30)
