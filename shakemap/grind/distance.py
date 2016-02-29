@@ -14,14 +14,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from neicio.cmdoutput import getCommandOutput
 
-class DistanceException(Exception):
-    """
-    Used to indicate errors specific to the various methods in this distance.py.
-    """
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
+#local imports
+from shakemap.utils.exception import ShakeMapException
 
 def minimize(a,b):
     """
@@ -53,7 +47,7 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
        optional Point object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py)
     :returns:
        numpy array of distances, size of mesh.lons
-    :raises DistanceException:
+    :raises ShakeMapException:
        if a fault distance method is called without quadlist
     :raises NotImplementedError:
        for unknown distance measures or ones not yet implemented.
@@ -65,7 +59,7 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
         newshape = (oldshape[0],1)
     if (method == 'rjb') or (method == 'rx') or (method == 'rrup'):
         if quadlist is None:
-            raise DistanceException('Cannot calculate %s distance without a list of quadrilaterals' % (method))
+            raise ShakeMapException('Cannot calculate rupture distance %s without a list of quadrilaterals' % method)
         mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
         x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
         x.shape = newshape
@@ -122,14 +116,14 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
         raise NotImplementedError('rcdbp distance measure is not implemented yet')
     elif method == 'repi':
         if mypoint is None:
-            raise DistanceException('Cannot calculate epicentral distance without a point object')
+            raise ShakeMapException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(mypoint.longitude,mypoint.latitude,0.0)
         mindist = newpoint.distance_to_mesh(mesh)
         mindist = mindist.reshape(oldshape)
         return mindist
     elif method == 'rhypo':
         if mypoint is None:
-            raise DistanceException('Cannot calculate epicentral distance without a point object')
+            raise ShakeMapException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(mypoint.longitude,mypoint.latitude,mypoint.depth)
         mindist = newpoint.distance_to_mesh(mesh)
         mindist = mindist.reshape(oldshape)
@@ -234,7 +228,7 @@ def calcRuptureDistance(P0,P1,P2,P3,points):
     if len(shp) == 1:
         dist.shape = (shp[0],1)
     if np.any(np.isnan(dist)):
-        raise Exception("Could not calculate some distances!")
+        raise ShakeMapException("Could not calculate some distances!")
     dist = np.fliplr(dist)
     return dist
 

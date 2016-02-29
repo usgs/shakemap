@@ -23,6 +23,9 @@ from openquake.hazardlib.gsim.base import GMPE
 from .fault import Fault
 from .distance import getDistance
 
+#local imports
+from shakemap.utils.exception import ShakeMapException
+
 REQUIRED_KEYS = ['lat','lon','depth','time','mag']
 OPTIONAL_KEYS = ['id','timezone','locstring','type','created']
 DEG2RAD = 180./np.pi
@@ -32,14 +35,6 @@ DEFAULT_DIP = 90.0
 DEFAULT_WIDTH = 0.0
 DEFAULT_ZTOR = 0.0
 
-class SourceException(Exception):
-    """
-    Class to represent errors in the Source class.
-    """
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
 
 def readEventFile(eventxml):
     """
@@ -226,7 +221,7 @@ class Source(object):
         # 'hypo_depth', 'width', 'hypo_loc'
         reqset = gmpe.REQUIRES_RUPTURE_PARAMETERS
         if 'hypo_loc' in reqset:
-            raise SourceException('Rupture parameter "hypo_loc" is not supported!')
+            raise ShakeMapException('Rupture parameter "hypo_loc" is not supported!')
         rup = base.RuptureContext()
         rup.mag = self.getEventParam('mag')
         if self.Fault is not None:

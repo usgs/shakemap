@@ -10,9 +10,10 @@ import io
 
 #third party modules
 import numpy as np
-
-#local modules
 from neicio.tag import Tag
+
+#local imports
+from shakemap.utils.exception import ShakeMapException
 
 def _getStationAttributes(station):
     """
@@ -209,7 +210,7 @@ def filterStations(xmlfiles):
     stationdict = {}
     for xmlfile in xmlfiles:
         if not os.path.isfile(xmlfile):
-            raise Exception('Input xml file "%s" does not exist.' % xmlfile)
+            raise ShakeMapException('Input xml file "%s" does not exist.' % xmlfile)
         tstationdict = filterStation(xmlfile)
         stationdict.update(tstationdict)        
     return stationdict

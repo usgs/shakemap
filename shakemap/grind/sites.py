@@ -11,15 +11,8 @@ from mapio.geodict import GeoDict
 from openquake.hazardlib.gsim.base import SitesContext
 import numpy as np
 
-
-class SitesException(Exception):
-    """
-    Class to represent errors in the Sites class.
-    """
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
+#local imports
+from shakemap.utils.exception import ShakeMapException
 
 def _load(vs30File,samplegeodict=None,resample=False,method='linear',doPadding=False,padValue=np.nan):
     try:
@@ -31,7 +24,7 @@ def _load(vs30File,samplegeodict=None,resample=False,method='linear',doPadding=F
                                      method=method,doPadding=doPadding,padValue=padValue)
         except Exception as msg2:
             msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (vs30File,str(msg1),str(msg2))
-            raise SitesException(msg)
+            raise ShakeMapException(msg)
     return vs30grid
 
 def _getFileGeoDict(fname):
@@ -43,7 +36,7 @@ def _getFileGeoDict(fname):
             geodict = GDALGrid.getFileGeoDict(fname)
         except Exception as msg2:
             msg = 'File geodict failure with %s - error messages: "%s"\n "%s"' % (fname,str(msg1),str(msg2))
-            raise SitesException(msg)
+            raise ShakeMapException(msg)
     return geodict
     
 def calculateZ1P0(vs30):
@@ -201,7 +194,7 @@ class Sites(object):
           Sequence of longitudes.
         :returns:
           SitesContext object where data are sampled from the current Sites object.
-        :raises SitesException:
+        :raises ShakeMapException:
            When lat/lon input sequences do not share dimensionality.
         """
         lats = np.array(lats)
@@ -210,7 +203,7 @@ class Sites(object):
         lonshape = lons.shape
         if latshape != lonshape:
             msg = 'Input lat/lon arrays must have the same dimensions'
-            raise SitesException(msg)
+            raise ShakeMapException(msg)
         
         site = SitesContext()
         site.vs30 = self.Vs30.getValue(lats,lons,default=self.defaultVs30) #use default vs30 if outside grid

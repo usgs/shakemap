@@ -20,14 +20,6 @@ To do:
     * Add a validation function. 
 """
 
-class RowshandelException(Exception):
-    """
-    Class to represent errors in the Rowshandel2013 class.
-    """
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
     
 class Rowshandel2013(object):
     """
@@ -95,13 +87,13 @@ class Rowshandel2013(object):
         self.dx = dx
         self.M = M
         if np.all(T != np.array([1, 2, 3, 4, 5, 7.5])):
-            raise RowshandelException('Invalid T value. Interpolation not yet supported.')
+            raise IndexError('Invalid T value. Interpolation not yet supported.')
         self.T = T
         if (a_weight > 1.0) or (a_weight < 0):
-            raise RowshandelException('a_weight must be between 0 and 1.')
+            raise ValueError('a_weight must be between 0 and 1.')
         self.a_weight = a_weight
         if (mtype != 1) and (mtype != 2):
-            raise RowshandelException('mtype can onlty be 1 or 2.')
+            raise ValueError('mtype can onlty be 1 or 2.')
         self.mtype = mtype
         self.simpleDT = simpleDT
         self.simpleCentering = simpleCentering

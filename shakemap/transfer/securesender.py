@@ -8,7 +8,10 @@ import os.path
 #pip install git+git://github.com/jbardin/scp.py.git
 from paramiko import SSHClient
 from scp import SCPClient
-from sender import Sender,SenderError
+from sender import Sender
+
+#local imports
+from shakemap.utils.exception import ShakeMapException
 
 class SecureSender(Sender):
     '''Class for sending and deleting files and directories via SSH.
@@ -32,7 +35,7 @@ class SecureSender(Sender):
                 usePassword = False
                 break
         if not usePrivateKey and not usePassword:
-            raise SenderError('Either username/password must be specified, or the name of an SSH private key file.')
+            raise ShakeMapException('Either username/password must be specified, or the name of an SSH private key file.')
         
         ssh = SSHClient()
         #load hosts found in ~/.ssh/known_hosts
@@ -42,14 +45,14 @@ class SecureSender(Sender):
                 ssh.connect(self.properties['remotehost'],
                             key_filename=self.properties['privatekey'],compress=True)
             except Exception as obj:
-                raise SenderError('Could not connect with private key file %s' % self.properties['privatekey'])
+                raise ShakeMapException('Could not connect with private key file %s' % self.properties['privatekey'])
         else:
             try:
                 ssh.connect(self.properties['remotehost'],
                             username=self.properties['username'],password=self.properties['password'],
                             compress=True)
             except Exception as obj:
-                raise SenderError('Could not connect with private key file %s' % self.properties['privatekey'])
+                raise ShakeMapException('Could not connect with private key file %s' % self.properties['privatekey'])
         return ssh
 
     def send(self):

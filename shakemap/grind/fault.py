@@ -16,20 +16,13 @@ from .vector import Vector
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
+#local imports
+from shakemap.utils.exception import ShakeMapException
+
 #CONSTANTS
 #what is the maximum ratio of distance out of the plane defined by 3 points a 4th point can be before
 #being considered non-co-planar?
 OFFPLANE_TOLERANCE = 0.05
-
-class FaultException(Exception):
-    """
-    Class to represent errors in the Fault class.
-    """
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
-    
 
 class Fault(object):
     """
@@ -87,14 +80,14 @@ class Fault(object):
         if len(xp0) == len(yp0) == len(xp1) == len(yp1) == len(zp) == len(dips) == len(widths):
             pass
         else:
-            raise FaultException('Number of xp0,yp0,xp1,yp1,zp,widths,dips points must be equal.')
+            raise ShakeMapException('Number of xp0,yp0,xp1,yp1,zp,widths,dips points must be equal.')
         if strike is None:
             pass
         else:
             if (len(xp0) == len(strike)) | (len(strike) == 1):
                 pass
             else:
-                raise FaultException('Strike must be None, scalar, or same length as trace coordinates.')                
+                raise ShakeMapException('Strike must be None, scalar, or same length as trace coordinates.')                
 
         #convert dips to radians
         dips = np.radians(dips)
@@ -229,7 +222,7 @@ class Fault(object):
              * Fault segments must be all clockwise or all counter-clockwise.
         :returns:
            Fault object.
-        :raises Exception:
+        :raises ShakeMapException:
             when any of above conditions are not met.
         """
         x = []
@@ -260,7 +253,7 @@ class Fault(object):
                 continue
             parts = sline.split()
             if len(parts) < 3:
-                raise Exception('Finite fault file %s has no depth values.' % faultfile)
+                raise ShakeMapException('Finite fault file %s has no depth values.' % faultfile)
             y.append(float(parts[0]))
             x.append(float(parts[1]))
             z.append(float(parts[2]))
@@ -496,7 +489,7 @@ class Fault(object):
         newP2 = copy.deepcopy(P3)
         newP3 = copy.deepcopy(P2)
         if not self.isPointToRight(newP0,newP1,newP2):
-            raise FaultException('Third vertex of quadrilateral must be to the right of the second vertex')
+            raise ShakeMapException('Third vertex of quadrilateral must be to the right of the second vertex')
         return (newP0,newP1,newP2,newP3)
     
     def validateQuad(self,P0,P1,P2,P3):
@@ -513,7 +506,7 @@ class Fault(object):
             Fourth vertex https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py
         :returns:
            Tuple of (potentially) modified vertices.
-        :raises FaultException:
+        :raises ShakeMapException:
            * if top and bottom edges are not parallel to surface
            * if dip angle is not dipping to the right relative to strike (defined by first two vertices)
            * if all 4 points are not reasonably co-planar (P2 is more than 5% of mean length of trapezoid out of plane)
@@ -525,10 +518,10 @@ class Fault(object):
         topDepthsEqual = P0.depth == P1.depth
         bottomDepthsEqual = P2.depth == P3.depth
         if not topDepthsEqual or not bottomDepthsEqual:
-            raise FaultException('Top and bottom edges of fault quadrilateral must be parallel to the surface')
+            raise ShakeMapException('Top and bottom edges of fault quadrilateral must be parallel to the surface')
         #Is top edge defined by first two vertices?
         if P1.depth > P2.depth:
-            raise FaultException('Top edge of a quadrilateral must be defined by the first two vertices')
+            raise ShakeMapException('Top edge of a quadrilateral must be defined by the first two vertices')
         #Is dip angle clockwise and btw 0-90 degrees?
         if not self.isPointToRight(P0,P1,P2):
             P0,P1,P2,P3 = self.reverseQuad(P0,P1,P2,P3)
@@ -550,7 +543,7 @@ class Fault(object):
         dnormal = self.getDistanceToPlane(planepoints,p2)
         geometricMean = self.getTrapMeanLength(p0,p1,newp2,p3)
         if dnormal/geometricMean > OFFPLANE_TOLERANCE:
-            raise FaultException('Points in quadrilateral are not co-planar')
+            raise ShakeMapException('Points in quadrilateral are not co-planar')
         newP0 = p0.toPoint()
         newP1 = p1.toPoint()
         newP2 = newp2.toPoint()
@@ -615,7 +608,7 @@ class Fault(object):
             ax = fig.add_subplot(111, projection='3d')
         else:
             if 'xlim3d' not in list(ax.properties.keys()):
-                raise FaultException('Non-3d axes object passed to plot() method.')
+                raise ShakeMapException('Non-3d axes object passed to plot() method.')
         for quad in self.Quadrilaterals:
             P0,P1,P2,P3 = quad
             ax.plot([P0.longitude],[P0.latitude],[-P0.depth],'B.')
@@ -676,13 +669,13 @@ class Fault(object):
     def _validate(self):
         """
         Ensure that all segments are closed.
-        :raises Exception:
+        :raises ShakeMapException:
             if unclosed segments exist.
         """
         #TODO - implement ccw algorithm...
         #http://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
         if len(self.lon) != len(self.lat) or len(self.lon) != len(self.depth):
-            raise Exception("Fault coordinates don't match")
+            raise ShakeMapException("Fault coordinates don't match")
         inan = np.where(np.isnan(self.lon))[0]
         if not len(inan):
             return
@@ -698,7 +691,7 @@ class Fault(object):
             z1 = self.depth[istart]
             z2 = self.depth[iend]
             if x1 != x2 or y1 != y2 or z1 != z2:
-                raise Exception('Unclosed segments exist in fault file.')
+                raise ShakeMapException('Unclosed segments exist in fault file.')
             istart = inan[i]+1
 
     

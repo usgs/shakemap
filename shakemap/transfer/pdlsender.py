@@ -14,29 +14,13 @@ import textwrap
 
 #third party
 from Crypto.PublicKey import RSA
+from neicio.cmdoutput import getCommandOutput
 
 #local
-from sender import Sender,SenderError
+from sender import Sender
 
-def getCommandOutput(cmd):
-    """
-    Internal method for calling external command.
-    @param cmd: String command ('ls -l', etc.)
-    @return: Three-element tuple containing a boolean indicating success or failure, 
-    the stdout from running the command, and stderr.
-    """
-    proc = subprocess.Popen(cmd,
-                            shell=True,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE
-                            )
-    stdout,stderr = proc.communicate()
-    retcode = proc.returncode
-    if retcode == 0:
-        retcode = True
-    else:
-        retcode = False
-    return (retcode,stdout,stderr)
+#local imports
+from shakemap.utils.exception import ShakeMapException
 
 class PDLSender(Sender):
     pdlcmd = '[JAVA] -jar [JARFILE] --send --status=[STATUS] --source=[PRODUCTSOURCE] --type=[PRODUCTTYPE] --code=[PRODUCTCODE] --eventsource=[EVENTSOURCE] --eventsourcecode=[EVENTSOURCECODE] --privateKey=[KEYFILE]  --configFile=[CONFIGFILE] [FILE] [DIRECTORY]'
@@ -46,7 +30,7 @@ class PDLSender(Sender):
     def delete(self):
         for prop in self.required_properties:
             if prop not in list(self.properties.keys()):
-                raise SenderError('"%s" property must be supplied to send via PDL')
+                raise ShakeMapException('"%s" property must be supplied to send via PDL')
 
         #build pdl command line from properties
         self.properties['status'] = 'DELETE'
@@ -60,20 +44,20 @@ class PDLSender(Sender):
         if not retcode:
             fmt = 'Could not delete product "%s" due to error "%s"'
             tpl = (code,stdout+stderr)
-            raise SenderError(fmt % tpl)
+            raise ShakeMapException(fmt % tpl)
         
     def send(self):
         #we can really only support sending of one file and/or one directory, so error out
         #if someone has specified more than one of either.
         if len(self.files) > 1:
-            raise SenderError('For PDL, you may only send one file at a time.')
+            raise ShakeMapException('For PDL, you may only send one file at a time.')
         if len(self.directories) > 1:
-            raise SenderError('For PDL, you may only send one directory at a time.')
+            raise ShakeMapException('For PDL, you may only send one directory at a time.')
 
         #make sure we have all the required properties
         for prop in self.required_properties:
             if prop not in list(self.properties.keys()):
-                raise SenderError('"%s" property must be supplied to send via PDL')
+                raise ShakeMapException('"%s" property must be supplied to send via PDL')
 
         
         #build pdl command line from properties
@@ -96,7 +80,7 @@ class PDLSender(Sender):
         if not retcode:
             fmt = 'Could not send product "%s" due to error "%s"'
             tpl = (code,stdout+stderr)
-            raise SenderError(fmt % tpl)
+            raise ShakeMapException(fmt % tpl)
 
         #return the number of files we just sent
         nfiles = 0
