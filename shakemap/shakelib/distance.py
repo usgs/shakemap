@@ -88,6 +88,7 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
             points = np.hstack((x,y,z))
             rrupdist = calcRuptureDistance(p0,p1,p2,p3,points)
             mindist = np.minimum(mindist,rrupdist)
+        mindist = mindist.reshape(nr,nc)
         return mindist
     if method == 'rx':
         if quadlist is None:
@@ -107,6 +108,7 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
             points = np.hstack((x,y,z))
             rxdist = calcRxDistance(p0,p1,points)
             mindist = minimize(mindist,rxdist)
+        mindist = mindist.reshape(nr,nc)
         return mindist
     if method == 'rrup':
         if quadlist is None:
@@ -128,9 +130,11 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
             points = np.hstack((x,y,z))
             rrupdist = calcRuptureDistance(p0,p1,p2,p3,points)
             mindist = np.minimum(mindist,rrupdist)
+        mindist = mindist.reshape(nr,nc)
         return mindist
     if method == 'ry0':
         mindist = calcRyDistance(quadlist,mesh)
+        mindist = mindist.reshape(nr,nc)
         return mindist
     if method == 'rcdpp':
         raise NotImplementedError('rcdbp distance measure is not implemented yet')
@@ -138,12 +142,16 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
         if mypoint is None:
             raise DistanceException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(mypoint.longitude,mypoint.latitude,0.0)
-        return newpoint.distance_to_mesh(mesh) 
+        mindist = newpoint.distance_to_mesh(mesh)
+        mindist = mindist.reshape(nr,nc)
+        return mindist
     if method == 'rhypo':
         if mypoint is None:
             raise DistanceException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(mypoint.longitude,mypoint.latitude,mypoint.depth)
-        return newpoint.distance_to_mesh(mesh)
+        mindist = newpoint.distance_to_mesh(mesh)
+        mindist = mindist.reshape(nr,nc)
+        return mindist
     else:
         raise NotImplementedError('"%s" distance measure is not valid or is not implemented yet' % method)
 
