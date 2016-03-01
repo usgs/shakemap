@@ -11,7 +11,7 @@ WGS84_E = 8.1819190842622e-2  #eccentricity
 asq = np.power(WGS84_A,2)
 esq = np.power(WGS84_E,2)
 
-#adapted from Matlab code: https://gist.github.com/klucar/1536054
+#adapted from Matlab code: https://gist.github.com/klucar/1536056
 def ecef2latlon(x,y,z):
     """
     Convert Earth-Centered-Earth-Fixed (ECEF) cartesian coordinates to lat,lon,depth.
