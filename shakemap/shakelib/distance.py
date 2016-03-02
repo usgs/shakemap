@@ -62,7 +62,10 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
         if quadlist is None:
             raise DistanceException('Cannot calculate rupture distance without a list of quadrilaterals')
         oldshape = mesh.lons.shape
-        newshape = (nr*nc,1)
+        if len(oldshape) == 2:
+            newshape = (nr*nc,1)
+        else:
+            newshape = (oldshape[0],1)
         mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
         for quad in quadlist:
             P0,P1,P2,P3 = quad
