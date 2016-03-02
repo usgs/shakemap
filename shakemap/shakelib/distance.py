@@ -61,8 +61,11 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
     if method == 'rjb':
         if quadlist is None:
             raise DistanceException('Cannot calculate rupture distance without a list of quadrilaterals')
-        nr,nc = mesh.lons.shape
-        newshape = (nr*nc,1)
+        oldshape = mesh.lons.shape
+        if len(oldshape) == 2:
+            newshape = (nr*nc,1)
+        else:
+            newshape = (oldshape[0],1)
         mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
         for quad in quadlist:
             P0,P1,P2,P3 = quad
@@ -88,7 +91,7 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
             points = np.hstack((x,y,z))
             rrupdist = calcRuptureDistance(p0,p1,p2,p3,points)
             mindist = np.minimum(mindist,rrupdist)
-        mindist = mindist.reshape(nr,nc)
+        mindist = mindist.reshape(oldshape)
         return mindist
     if method == 'rx':
         if quadlist is None:
@@ -108,7 +111,7 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
             points = np.hstack((x,y,z))
             rxdist = calcRxDistance(p0,p1,points)
             mindist = minimize(mindist,rxdist)
-        mindist = mindist.reshape(nr,nc)
+        mindist = mindist.reshape(oldshape)
         return mindist
     if method == 'rrup':
         if quadlist is None:
@@ -130,11 +133,11 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
             points = np.hstack((x,y,z))
             rrupdist = calcRuptureDistance(p0,p1,p2,p3,points)
             mindist = np.minimum(mindist,rrupdist)
-        mindist = mindist.reshape(nr,nc)
+        mindist = mindist.reshape(oldshape)
         return mindist
     if method == 'ry0':
         mindist = calcRyDistance(quadlist,mesh)
-        mindist = mindist.reshape(nr,nc)
+        mindist = mindist.reshape(oldshape)
         return mindist
     if method == 'rcdpp':
         raise NotImplementedError('rcdbp distance measure is not implemented yet')
@@ -143,14 +146,14 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
             raise DistanceException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(mypoint.longitude,mypoint.latitude,0.0)
         mindist = newpoint.distance_to_mesh(mesh)
-        mindist = mindist.reshape(nr,nc)
+        mindist = mindist.reshape(oldshape)
         return mindist
     if method == 'rhypo':
         if mypoint is None:
             raise DistanceException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(mypoint.longitude,mypoint.latitude,mypoint.depth)
         mindist = newpoint.distance_to_mesh(mesh)
-        mindist = mindist.reshape(nr,nc)
+        mindist = mindist.reshape(oldshape)
         return mindist
     else:
         raise NotImplementedError('"%s" distance measure is not valid or is not implemented yet' % method)
