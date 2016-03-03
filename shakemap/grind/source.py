@@ -21,7 +21,7 @@ from .timeutils import ShakeDateTime
 from .ecef import latlon2ecef,ecef2latlon
 from openquake.hazardlib.gsim.base import GMPE
 from .fault import Fault
-from .distance import getDistance
+from .distance import get_distance
 
 #local imports
 from shakemap.utils.exception import ShakeMapException
@@ -36,7 +36,7 @@ DEFAULT_WIDTH = 0.0
 DEFAULT_ZTOR = 0.0
 
 
-def readEventFile(eventxml):
+def read_event_file(eventxml):
     """
     Read event.xml file from disk, returning a dictionary of attributes.
     Input XML format looks like this:
@@ -84,7 +84,7 @@ def readEventFile(eventxml):
     root.unlink()
     return event
 
-def readSource(sourcefile):
+def read_source(sourcefile):
     """
     Read source.txt file, which has lines like key=value.
     :param sourcefile:
@@ -126,11 +126,11 @@ class Source(object):
         """
         Construct a Source object.
         :param event:
-            dictionary of values (see readEventFile())
+            dictionary of values (see read_event_file())
         :param fault:
             a Fault object
         :param sourcedict:
-            Dictionary containing values from source.txt file (see readSource())
+            Dictionary containing values from source.txt file (see read_source())
         :returns:
             Source object.
         """
@@ -152,22 +152,22 @@ class Source(object):
         """
         Class method to create a Source object by specifying an event.xml file, a fault file, and a source.txt file.
         :param eventxmlfile:
-            Event xml file (see readEventFile())
+            Event xml file (see read_event_file())
         :param faultfile:
             Fault text file (see fault.py)
         :param sourcefile:
-            source.txt file (see readSource())
+            source.txt file (see read_source())
         :returns:
             Source object
         """
-        event = readEventFile(eventxmlfile)
+        event = read_event_file(eventxmlfile)
         if faultfile is not None:
             fault = Fault.readFaultFile(faultfile)
         else:
             fault=None
         params = None
         if sourcefile is not None:
-            params = readSource(sourcefile)
+            params = read_source(sourcefile)
         return cls(event,fault=fault,sourcedict=params)
 
     def getDistanceContext(self,gmpe,mesh):
@@ -345,93 +345,7 @@ class Source(object):
             else:
                 method = 'rhypo'
             
-        return getDistance(method,mesh,quadlist=quadlist,mypoint=oqpoint)
+        return get_distance(method,mesh,quadlist=quadlist,mypoint=oqpoint)
 
-def test():
-    fault_text = """30.979788       103.454422      1
-31.691615       104.419160      1
-31.723569       104.374760      1
-32.532213       105.220821      1
-32.641450       105.135050      20
-31.846790       104.246202      20
-31.942158       104.205286      20
-31.290105       103.284388      20
-30.979788       103.454422      1"""
-    event_text = """<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
-<earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9" year="2008" month="05" day="12" hour="06" minute="28" second="01" timezone="GMT" depth="19.0" locstring="EASTERN SICHUAN, CHINA" created="1211173621" otime="1210573681" type="" />
-    """
-    source_text = """mech=RS"""
-    ffile = io.StringIO(fault_text)
-    efile = io.StringIO(event_text)
-    sfile = io.StringIO(source_text)
-    source = Source.readFromFile(efile,faultfile=ffile,sourcefile=sfile)
-    gmpe = abrahamson_2014.AbrahamsonEtAl2014()
-    rupture = source.getRuptureContext(gmpe)
-    mapwidth = 2.0
-    latmin = rupture.hypo_lat - mapwidth
-    latmax = rupture.hypo_lat + mapwidth
-    lonmin = rupture.hypo_lon - mapwidth
-    lonmax = rupture.hypo_lon + mapwidth
-    dim = 0.02
-    lats = np.arange(latmin,latmax,dim)
-    lons = np.arange(lonmin,lonmax,dim)
-    lon,lat = np.meshgrid(lons,lats)
-    dep = np.zeros_like(lon)
-    mesh = Mesh(lon,lat,dep)
-    distances = source.getDistanceContext(gmpe,mesh)
-    rupture = source.getRuptureContext(gmpe)
-    for key in rupture.__slots__:
-        try:
-            value = eval('rupture.%s' % key)
-        except:
-            print('No value set for %s' % key)
-            continue
-        print('%s = %s' % (key,str(value)))
-
-def _test_northridge():
-    fault_text = """
-    # Source: Wald, D. J., T. H. Heaton, and K. W. Hudnut (1996). The Slip History of the 1994 Northridge, California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling Data, Bull. Seism. Soc. Am. 86, S49-S70.
-    34.315 -118.421 5.000
-    34.401 -118.587 5.000
-    34.261 -118.693 20.427
-    34.175 -118.527 20.427
-    34.315 -118.421 5.000
-    """
-    event_text = """<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
-<earthquake id="blah" lat="34.213" lon="-118.537" mag="7.9" year="1994" month="01" day="17" hour="12" minute="30" second="55" timezone="GMT" depth="18.4" locstring="NORTHRIDGE" created="1211173621" otime="1210573681" type="" />
-    """
-    source_text = """mech=RS"""
-    ffile = io.StringIO(fault_text)
-    efile = io.StringIO(event_text)
-    sfile = io.StringIO(source_text)
-    source = Source.readFromFile(efile,faultfile=ffile,sourcefile=sfile)
-    gmpe = abrahamson_2014.AbrahamsonEtAl2014()
-    rupture = source.getRuptureContext(gmpe)
-    mapwidth = 2.0
-    latmin = rupture.hypo_lat - mapwidth
-    latmax = rupture.hypo_lat + mapwidth
-    lonmin = rupture.hypo_lon - mapwidth
-    lonmax = rupture.hypo_lon + mapwidth
-    dim = 0.02
-    lats = np.arange(latmin,latmax,dim)
-    lons = np.arange(lonmin,lonmax,dim)
-    lon,lat = np.meshgrid(lons,lats)
-    dep = np.zeros_like(lon)
-    mesh = Mesh(lon,lat,dep)
-    distances = source.getDistanceContext(gmpe,mesh)
-    rupture = source.getRuptureContext(gmpe)
-    for key in rupture.__slots__:
-        try:
-            value = eval('rupture.%s' % key)
-        except:
-            print('No value set for %s' % key)
-            continue
-        print('%s = %s' % (key,str(value)))    
-
-    cbuf = io.StringIO(fault_text)
-    fault = Fault.readFaultFile(cbuf)
-        
-if __name__ == '__main__':
-    test()
             
         

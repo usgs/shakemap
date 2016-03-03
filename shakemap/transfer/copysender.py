@@ -6,7 +6,7 @@ import os.path
 import tempfile
 
 #local imports
-from sender import Sender
+from .sender import Sender
 
 #local imports
 from shakemap.utils.exception import ShakeMapException
@@ -58,20 +58,6 @@ class CopySender(Sender):
             dfolder = os.path.join(self.properties['directory'],dirname)
             shutil.rmtree(dfolder)
 
-
-def _test():
-    thisfile = os.path.abspath(__file__)
-    tempdir = tempfile.mkdtemp()
-    try:
-        cpsender = CopySender(properties={'directory':tempdir},files=[thisfile])
-        nfiles = cpsender.send()
-        nfiles = cpsender.delete()
-    except Exception as obj:
-        raise ShakeMapException('Failed to copy or delete a file.')
-    shutil.rmtree(tempdir)
-
-if __name__ == '__main__':
-    _test()
         
         
     

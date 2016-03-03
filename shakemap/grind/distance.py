@@ -34,7 +34,7 @@ def minimize(a,b):
     d[bidx] = b[bidx]
     return d
     
-def getDistance(method,mesh,quadlist=None,mypoint=None):
+def get_distance(method,mesh,quadlist=None,mypoint=None):
     """
     Calculate distance using any one of a number of distance measures. One of quadlist OR mypoint must be specified.
     :param method:
@@ -131,7 +131,7 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
     else:
         raise NotImplementedError('"%s" distance measure is not valid or is not implemented yet' % method)
 
-def dist2_to_segment(p0, p1):
+def distance_sq_to_segment(p0, p1):
     """
     Calculate the distance^2 from the origin to a segment defined by two vectors
     :param p0: numpy array Nx3 (ECEF)
@@ -180,7 +180,7 @@ def dist2_to_segment(p0, p1):
     return dist
 
 #call this once per quad
-def calcRuptureDistance(P0,P1,P2,P3,points):
+def calc_rupture_distance(P0,P1,P2,P3,points):
     """
     Calculate the shortest distance from a set of points to a rupture surface.
     :param P0: Vector object (in ECEF coordinates) defining the first vertex of a fault plane.
@@ -232,7 +232,7 @@ def calcRuptureDistance(P0,P1,P2,P3,points):
     dist = np.fliplr(dist)
     return dist
 
-def calcRyDistance(quadlist,mesh):
+def calc_ry_distance(quadlist,mesh):
     #get the mean strike vector
     P0 = quadlist[0][0]
     surfaceP0 = point.Point(P0.longitude,P0.latitude,0.0)
@@ -247,7 +247,7 @@ def calcRyDistance(quadlist,mesh):
     dst[idx] = np.fmin(np.abs(dst1[idx]), np.abs(dst2[idx]))
     return dst
 
-def calcRxDistance(P0,P1,points):
+def calc_rx_distance(P0,P1,points):
     """
     The shortest horizontal distance from a set of points to a line defined by
     extending the fault trace (or the top edge of the rupture) to
@@ -275,7 +275,7 @@ def calcRxDistance(P0,P1,points):
     dist = np.fliplr(dist)
     return dist
 
-def getTopEdge(lat,lon,dep):
+def get_top_edge(lat,lon,dep):
     """
     Determine which edge of a quadrilateral rupture surface is the top.
     :param lat: Sequence of 4 or 5 latitudes defining vertices of rupture surface.

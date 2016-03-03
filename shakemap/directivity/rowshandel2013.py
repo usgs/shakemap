@@ -164,7 +164,7 @@ class Rowshandel2013(object):
         hyp_ecef = Vector.fromPoint(geo.point.Point(
             self.hyp[0], self.hyp[1], self.hyp[2]))
         hp0 = hyp_ecef - pp0
-        ddv = fault.getQuadDownDipVector(q)
+        ddv = fault.get_quad_down_dip_vector(q)
         self.Wrup = Vector.dot(ddv, hp0)/1000
     
     def computeXiPrime(self):
@@ -209,19 +209,19 @@ class Rowshandel2013(object):
             q = self.flt.Quadrilaterals[k]
             
             # Quad mesh (ECEF coords)
-            mesh = fault.getQuadMesh(q, self.dx)
+            mesh = fault.get_quad_mesh(q, self.dx)
             
             # Rupture plane normal vector (ECEF coords)
-            rpnv = fault.getQuadNormal(q)
+            rpnv = fault.get_quad_normal(q)
             
             # Strike vector (ECEF coords)
-            strike_vec = fault.getQuadStrikeVector(q)
+            strike_vec = fault.get_quad_strike_vector(q)
             strike_vec_col = np.array([[strike_vec.x],
                                        [strike_vec.y],
                                        [strike_vec.z]]) # convert to column vector
             
             # Down dip vector (ECEF coords)
-            ddip_vec = fault.getQuadDownDipVector(q)
+            ddip_vec = fault.get_quad_down_dip_vector(q)
             ddip_vec_col = np.array([[ddip_vec.x],
                                      [ddip_vec.y],
                                      [ddip_vec.z]]) # convert to column vector
@@ -472,11 +472,11 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
     # Get quad vertices, strike, dip
     P0, P1, P2, P3 = q
     strike = P0.azimuth(P1)
-    dip = fault.getQuadDip(q)
+    dip = fault.get_quad_dip(q)
     
     # Slip unit vectors in 'local' (i.e., z-up, x-east) coordinates
-    d1_local = fault.getLocalUnitSlipVector_DS(strike, dip, rake)
-    s1_local = fault.getLocalUnitSlipVector_SS(strike, dip, rake)
+    d1_local = fault.get_local_unit_slip_vector_DS(strike, dip, rake)
+    s1_local = fault.get_local_unit_slip_vector_SS(strike, dip, rake)
     
     # Convert to a column array
     d1_col = np.array([[d1_local.x],

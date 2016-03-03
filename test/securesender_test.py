@@ -8,10 +8,7 @@ import os.path
 #pip install git+git://github.com/jbardin/scp.py.git
 from paramiko import SSHClient
 from scp import SCPClient
-from sender import Sender
-
-#local imports
-from shakemap.utils.exception import ShakeMapException
+from sender import Sender,SenderError
 
 class SecureSender(Sender):
     '''Class for sending and deleting files and directories via SSH.
@@ -35,7 +32,7 @@ class SecureSender(Sender):
                 usePassword = False
                 break
         if not usePrivateKey and not usePassword:
-            raise ShakeMapException('Either username/password must be specified, or the name of an SSH private key file.')
+            raise SenderError('Either username/password must be specified, or the name of an SSH private key file.')
         
         ssh = SSHClient()
         #load hosts found in ~/.ssh/known_hosts
@@ -45,14 +42,14 @@ class SecureSender(Sender):
                 ssh.connect(self.properties['remotehost'],
                             key_filename=self.properties['privatekey'],compress=True)
             except Exception as obj:
-                raise ShakeMapException('Could not connect with private key file %s' % self.properties['privatekey'])
+                raise SenderError('Could not connect with private key file %s' % self.properties['privatekey'])
         else:
             try:
                 ssh.connect(self.properties['remotehost'],
                             username=self.properties['username'],password=self.properties['password'],
                             compress=True)
             except Exception as obj:
-                raise ShakeMapException('Could not connect with private key file %s' % self.properties['privatekey'])
+                raise SenderError('Could not connect with private key file %s' % self.properties['privatekey'])
         return ssh
 
     def send(self):
@@ -95,6 +92,37 @@ class SecureSender(Sender):
         ssh.close()
 
 
+def _testPassword(remotehost,remotefolder,username,password):
+    props = {'remotehost':remotehost,
+             'remotedirectory':remotefolder,
+             'username':username,
+             'password':password}
+    thisfile = os.path.abspath(__file__)
+    securesend = SecureSender(properties=props,files=[thisfile])
+    securesend.send()
+    securesend.delete()
+
+def _testKey(remotehost,remotefolder,privatekey):
+    props = {'remotehost':remotehost,
+             'remotedirectory':remotefolder,
+             'privatekey':privatekey}
+    thisfile = os.path.abspath(__file__)
+    securesend = SecureSender(properties=props,files=[thisfile])
+    securesend.send()
+    securesend.delete()
+    
+if __name__ == '__main__':
+    if len(sys.argv) == 5:
+        remotehost = sys.argv[1]
+        remotefolder = sys.argv[2]
+        username = sys.argv[3]
+        password = sys.argv[4]
+        _testPassword(remotehost,remotefolder,username,password)
+    else:
+        remotehost = sys.argv[1]
+        remotefolder = sys.argv[2]
+        privatekey = sys.argv[3]
+        _testKey(remotehost,remotefolder,privatekey)
     
     
     

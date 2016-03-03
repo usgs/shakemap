@@ -221,21 +221,3 @@ class Vector(object):
         """
         return '<x=%.4f,y=%.4f,z=%.4f>' % (self.x,self.y,self.z)
 
-def test():
-    a = Vector(1,1,1)
-    b = Vector(2,2,2)
-    c = Vector(1,1,1)
-    assert a.getArray() == np.array([1,1,1])
-    assert a == c
-    alen = a.mag()
-    np.assert_almost_equal(alen,1.73205,decimal=5)
-    anorm = a.norm()
-    bnorm = b.norm()
-    np.assert_almost_equal(anorm,bnorm)
-    acrossb = a.cross(b)
-    np.assert_almost_equal(acrossb,np.array([0,0,0]))
-    adotb = a.dot(b)
-    assert adotb == 6
-    aplusb = a + b
-    
-    
