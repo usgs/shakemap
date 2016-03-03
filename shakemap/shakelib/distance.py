@@ -58,15 +58,22 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
     :raises NotImplementedError:
        for unknown distance measures or ones not yet implemented.
     """
-    if method == 'rjb':
+    oldshape = mesh.lons.shape
+    if len(oldshape) == 2:
+        newshape = (oldshape[0]*oldshape[1],1)
+    else:
+        newshape = (oldshape[0],1)
+    if (method == 'rjb') or (method == 'rx') or (method == 'rrup'):
         if quadlist is None:
-            raise DistanceException('Cannot calculate rupture distance without a list of quadrilaterals')
-        oldshape = mesh.lons.shape
-        if len(oldshape) == 2:
-            newshape = (nr*nc,1)
-        else:
-            newshape = (oldshape[0],1)
+            raise DistanceException('Cannot calculate %s distance without a list of quadrilaterals' % (method))
         mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
+        x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
+        x.shape = newshape
+        y.shape = newshape
+        z.shape = newshape
+        points = np.hstack((x,y,z))
+
+    if method == 'rjb':
         for quad in quadlist:
             P0,P1,P2,P3 = quad
             #so we're thinking at the moment that rjb is the same as rrup with the fault projected to the surface.
@@ -83,72 +90,44 @@ def getDistance(method,mesh,quadlist=None,mypoint=None):
             p1 = Vector.fromPoint(P1)
             p2 = Vector.fromPoint(P2)
             p3 = Vector.fromPoint(P3)
-            x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
-            nr,nc = x.shape
-            x.shape = (nr*nc,1)
-            y.shape = (nr*nc,1)
-            z.shape = (nr*nc,1)
-            points = np.hstack((x,y,z))
-            rrupdist = calcRuptureDistance(p0,p1,p2,p3,points)
-            mindist = np.minimum(mindist,rrupdist)
+            rjbdist = calcRuptureDistance(p0,p1,p2,p3,points)
+            mindist = np.minimum(mindist,rjbdist)
         mindist = mindist.reshape(oldshape)
         return mindist
-    if method == 'rx':
-        if quadlist is None:
-            raise DistanceException('Cannot calculate rx distance without a list of quadrilaterals')
-        nr,nc = mesh.lons.shape
-        newshape = (nr*nc,1)
-        mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
+    elif method == 'rx':
         for quad in quadlist:
             P0,P1 = quad[0:2]
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
-            x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
-            nr,nc = x.shape
-            x.shape = (nr*nc,1)
-            y.shape = (nr*nc,1)
-            z.shape = (nr*nc,1)
-            points = np.hstack((x,y,z))
             rxdist = calcRxDistance(p0,p1,points)
             mindist = minimize(mindist,rxdist)
         mindist = mindist.reshape(oldshape)
         return mindist
-    if method == 'rrup':
-        if quadlist is None:
-            raise DistanceException('Cannot calculate rupture distance without a list of quadrilaterals')
-        nr,nc = mesh.lons.shape
-        newshape = (nr*nc,1)
-        mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
+    elif method == 'rrup':
         for quad in quadlist:
             P0,P1,P2,P3 = quad
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
             p2 = Vector.fromPoint(P2)
             p3 = Vector.fromPoint(P3)
-            x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
-            nr,nc = x.shape
-            x.shape = (nr*nc,1)
-            y.shape = (nr*nc,1)
-            z.shape = (nr*nc,1)
-            points = np.hstack((x,y,z))
             rrupdist = calcRuptureDistance(p0,p1,p2,p3,points)
             mindist = np.minimum(mindist,rrupdist)
         mindist = mindist.reshape(oldshape)
         return mindist
-    if method == 'ry0':
+    elif method == 'ry0':
         mindist = calcRyDistance(quadlist,mesh)
         mindist = mindist.reshape(oldshape)
         return mindist
-    if method == 'rcdpp':
+    elif method == 'rcdpp':
         raise NotImplementedError('rcdbp distance measure is not implemented yet')
-    if method == 'repi':
+    elif method == 'repi':
         if mypoint is None:
             raise DistanceException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(mypoint.longitude,mypoint.latitude,0.0)
         mindist = newpoint.distance_to_mesh(mesh)
         mindist = mindist.reshape(oldshape)
         return mindist
-    if method == 'rhypo':
+    elif method == 'rhypo':
         if mypoint is None:
             raise DistanceException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(mypoint.longitude,mypoint.latitude,mypoint.depth)

@@ -85,8 +85,8 @@ class Sites(object):
         self.Vs30 = vs30grid
         self.defaultVs30 = defaultVs30
         self.GeoDict = vs30grid.getGeoDict().copy()
-        lons = np.arange(self.GeoDict.xmin,self.GeoDict.xmax,self.GeoDict.dx)
-        lats = np.arange(self.GeoDict.ymin,self.GeoDict.ymax,self.GeoDict.dy)
+        lons = np.linspace(self.GeoDict.xmin,self.GeoDict.xmax,self.GeoDict.nx)
+        lats = np.linspace(self.GeoDict.ymin,self.GeoDict.ymax,self.GeoDict.ny)
         self.Z1Pt0 = calculateZ1P0(self.Vs30.getData())
         self.Z2Pt5 = calculateZ2P5(self.Z1Pt0)
         self.SitesContext = SitesContext()
