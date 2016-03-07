@@ -22,6 +22,8 @@ from openquake.hazardlib.geo.mesh import Mesh
 from openquake.hazardlib.geo.point import Point
 
 def test_dist():
+    #TODO - revisit the way we're constructing the fault object - 
+    #it appears there may be something wrong with that...
     L = 24.0 # length, km
     W = 18.0 # width, km
     strike = 122.0
