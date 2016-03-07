@@ -14,9 +14,10 @@ import textwrap
 
 #third party
 from Crypto.PublicKey import RSA
+from neicio.cmdoutput import getCommandOutput
 
 #local
-from .sender import Sender,getCommandOutput
+from .sender import Sender
 
 #local imports
 from shakemap.utils.exception import ShakeMapException

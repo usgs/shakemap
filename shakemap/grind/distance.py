@@ -12,7 +12,6 @@ from openquake.hazardlib.geo import point
 from openquake.hazardlib.geo import geodetic
 import numpy as np
 import matplotlib.pyplot as plt
-from neicio.cmdoutput import getCommandOutput
 
 #local imports
 from shakemap.utils.exception import ShakeMapException
@@ -38,7 +37,7 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
     """
     Calculate distance using any one of a number of distance measures. One of quadlist OR mypoint must be specified.
     :param method:
-       One of: 'rjb','rx','rrup','ry0','rcdbp','epi','hypo'
+       One of: 'rjb','rx','rrup','ry0','rcdbp','repi','rhypo'
     :param mesh:
        A Mesh object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
     :param quadlist:
@@ -84,7 +83,7 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
             p1 = Vector.fromPoint(P1)
             p2 = Vector.fromPoint(P2)
             p3 = Vector.fromPoint(P3)
-            rjbdist = calcRuptureDistance(p0,p1,p2,p3,points)
+            rjbdist = calc_rupture_distance(p0,p1,p2,p3,points)
             mindist = np.minimum(mindist,rjbdist)
         mindist = mindist.reshape(oldshape)
         return mindist
@@ -93,7 +92,7 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
             P0,P1 = quad[0:2]
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
-            rxdist = calcRxDistance(p0,p1,points)
+            rxdist = calc_rx_distance(p0,p1,points)
             mindist = minimize(mindist,rxdist)
         mindist = mindist.reshape(oldshape)
         return mindist
@@ -104,15 +103,15 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
             p1 = Vector.fromPoint(P1)
             p2 = Vector.fromPoint(P2)
             p3 = Vector.fromPoint(P3)
-            rrupdist = calcRuptureDistance(p0,p1,p2,p3,points)
+            rrupdist = calc_rupture_distance(p0,p1,p2,p3,points)
             mindist = np.minimum(mindist,rrupdist)
         mindist = mindist.reshape(oldshape)
         return mindist
     elif method == 'ry0':
-        mindist = calcRyDistance(quadlist,mesh)
+        mindist = calc_ry_distance(quadlist,mesh)
         mindist = mindist.reshape(oldshape)
         return mindist
-    elif method == 'rcdpp':
+    elif method == 'rcdbp':
         raise NotImplementedError('rcdbp distance measure is not implemented yet')
     elif method == 'repi':
         if mypoint is None:
@@ -216,10 +215,10 @@ def calc_rupture_distance(P0,P1,P2,P3,points):
     dist[inside_idx] = np.power(np.abs(np.sum(p0d[inside_idx,:] * normalVector.getArray(),axis=1)),2)
 
     outside_idx = np.logical_not(inside_idx)
-    s0 = dist2_to_segment(p0d, p1d)
-    s1 = dist2_to_segment(p1d, p2d)
-    s2 = dist2_to_segment(p2d, p3d)
-    s3 = dist2_to_segment(p3d, p0d)
+    s0 = distance_sq_to_segment(p0d, p1d)
+    s1 = distance_sq_to_segment(p1d, p2d)
+    s2 = distance_sq_to_segment(p2d, p3d)
+    s3 = distance_sq_to_segment(p3d, p0d)
 
     smin = np.minimum(np.minimum(s0,s1),np.minimum(s2,s3))
     dist[outside_idx] = smin[outside_idx]
@@ -303,129 +302,3 @@ def get_top_edge(lat,lon,dep):
         p2 = Vector.fromPoint(point.Point(lon[p2idx],lat[p2idx],0.0))
     return (p1,p2)
 
-if __name__ == '__main__':
-    flat = [28.427,27.986,27.469,27.956]
-    flon = [84.614,86.179,85.880,84.461]
-    fdep = [20.0,20.0,13.0,13.0]
-    lat0,lat1,lat2,lat3 = flat
-    lon0,lon1,lon2,lon3 = flon
-    dep0,dep1,dep2,dep3 = fdep
-    
-    # lat0,lat1,lat2,lat3 = [28.0,28.0,26.0,26.0]
-    # lon0,lon1,lon2,lon3 = [84.0,86.0,86.0,84.0]
-    # dep0,dep1,dep2,dep3 = [10.0,10.0,10.0,10.0]
-
-    P0 = Vector.fromPoint(point.Point(lon0,lat0,dep0))
-    P1 = Vector.fromPoint(point.Point(lon1,lat1,dep1))
-    P2 = Vector.fromPoint(point.Point(lon2,lat2,dep2))
-    P3 = Vector.fromPoint(point.Point(lon3,lat3,dep3))
-
-    lons = np.arange(81.5,87.5,0.0083)
-    lats = np.arange(25.5,31.0,0.0083)
-    lonmat,latmat = np.meshgrid(lons,lats)
-    depmat = np.zeros_like(lonmat)
-
-    # lons = np.arange(83.0,88.0,1.0)
-    # lats = np.arange(25.0,30.0,1.0)
-    # lonmat,latmat = np.meshgrid(lons,lats)
-    # depmat = np.zeros_like(lonmat)
-
-    # lonmat = np.array([[25.0]])
-    # latmat = np.array([[85.0]])
-    # depmat = np.array([[0.0]])
-    
-    x,y,z = latlon2ecef(lonmat,latmat,depmat)
-    nr,nc = x.shape
-    x.shape = (nr*nc,1)
-    y.shape = (nr*nc,1)
-    z.shape = (nr*nc,1)
-    points = np.hstack((x,y,z))
-    t1 = datetime.now()
-    dist = calcRuptureDistance(P0,P1,P2,P3,points)
-    t2 = datetime.now()
-    dt = t2-t1
-    sec = dt.seconds + float(dt.microseconds)/1e6
-    npoints = nr*nc
-    print('RRupt: %.4f seconds for %i point grid' % (sec,npoints))
-    dist.shape = (nr,nc)
-    if nr > 1 and nc > 1:
-        plt.imshow(dist,interpolation='nearest')
-        plt.colorbar()
-        plt.savefig('dist.png')
-    else:
-        print(dist)
-
-    #test this against Bruce's C program
-    nr2,nc2 = points.shape
-    f = open('points.bin','wb')
-    for i in range(0,nr2):
-        xt,yt,zt = points[i,:]
-        xb = struct.pack('d',xt)
-        yb = struct.pack('d',yt)
-        zb = struct.pack('d',zt)
-        f.write(xb)
-        f.write(yb)
-        f.write(zb)
-    f.close()
-
-    #now write out the quads
-    f = open('fault.txt','wt')
-    f.write('5\n')
-    f.write('%.11f %.11f %.11f\n' % tuple(P0.getArray()))
-    f.write('%.11f %.11f %.11f\n' % tuple(P1.getArray()))
-    f.write('%.11f %.11f %.11f\n' % tuple(P2.getArray()))
-    f.write('%.11f %.11f %.11f\n' % tuple(P3.getArray()))
-    f.write('%.11f %.11f %.11f\n' % tuple(P0.getArray()))
-    f.close()
-
-    cmd = '/Users/mhearne/src/python/ShakeMap/src/contour/dist_rrupt fault.txt < points.bin > outpoints.bin'
-    res,stdout,stderr = getCommandOutput(cmd)
-    f = open('outpoints.bin','rb')
-    dlist = []
-    buf = f.read(8)
-    while buf:
-        d = struct.unpack('d',buf)
-        dlist.append(d[0])
-        buf = f.read(8)
-    f.close()
-    d2 = np.array(dlist)
-    d2.shape = (nr,nc)
-    if nr > 1 and nc > 1:
-        plt.close()
-        plt.imshow(d2,interpolation='nearest')
-        plt.colorbar()
-        plt.savefig('dist_c.png')
-    else:
-        print(dist)
-    
-    P0,P1 = getTopEdge(flat,flon,fdep)
-    rxdist = calcRxDistance(P0,P1,points)
-    rxdist.shape = (nr,nc)
-    if nr > 1 and nc > 1:
-        plt.close()
-        plt.imshow(rxdist,interpolation='nearest')
-        plt.colorbar()
-        plt.savefig('distrx.png')
-    else:
-        print(rxdist)
-
-    #test against Bruce's C implementation
-    f = open('points.txt','wt')
-    for i in range(0,nr2):
-        xt,yt = (points[i,0],points[i,1])
-        f.write('%.11f %.11f\n' %(xt,yt))
-    f.close()
-    cmd = '/Users/mhearne/src/python/ShakeMap/src/contour/dist_rx %.11f %.11f %.11f %.11f < points.txt > outpoints.txt' % (P0.x,P0.y,P1.x,P1.y)
-    res,stdout,stderr = getCommandOutput(cmd)
-    rxdist2 = []
-    for line in open('outpoints.txt','rt').readlines():
-        rxdist2.append(float(line.strip()))
-    rxdist2 = np.array(rxdist2)
-    rxdist2.shape = (nr,nc)
-    if nr > 1 and nc > 1:
-        plt.close()
-        plt.imshow(rxdist2,interpolation='nearest')
-        plt.colorbar()
-        plt.savefig('distrx_c.png')
-    else:
-        print(rxdist2)

@@ -3,6 +3,7 @@
 #stdlib imports
 import os.path
 import sys
+from collections import OrderedDict
 
 #third party
 import numpy as np
@@ -14,8 +15,59 @@ sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring 
 
 from shakemap.grind.distance import *
 from shakemap.grind.vector import Vector
+from shakemap.grind.fault import Fault
+
+from openquake.hazardlib.geo.geodetic import npoints_towards
+from openquake.hazardlib.geo.mesh import Mesh
+from openquake.hazardlib.geo.point import Point
+
+def test_dist():
+    L = 24.0 # length, km
+    W = 18.0 # width, km
+    strike = 122.0
+    dip = 40.0
+    lat_ulc = 34.387    # latitude of upper left corner
+    lon_ulc = -118.598
+    depth_ulc = 5.0
+    P0 = Vector.fromPoint(Point(lon_ulc,lat_ulc,depth_ulc))
+    p1lon,p1lat,p1dep = npoints_towards(lon_ulc,lat_ulc,depth_ulc,strike,L,0,2)
+    P1 = Vector.fromPoint(Point(p1lon[1],p1lat[1],p1dep[1]))
+
+    station_lat = 34.0160
+    station_lon = -119.3620
+    station_depth = 0
+
+    hypolat = 34.2057
+    hypolon = -118.5539
+    hypodep = 17.5
+
+    mypoint = Point(hypolon,hypolat,hypodep)
+
+    outputs = OrderedDict([('repi',77.39),
+                           ('rhypo',79.34),
+                           ('rrup',36.77),
+                           ('rjb',65.84),
+                           ('rx',72.11),
+                           ('ry0',-47.055479)])
+
+    xp0 = np.array([lon_ulc])
+    yp0 = np.array([lat_ulc])
+    zp = np.array([depth_ulc])
+    xp1 = np.array([p1lon[1]])
+    yp1 = np.array([p1lat[1]])
+    fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,np.array([W]),np.array([dip]))
+    quads = fault.getQuadrilaterals()
+    mesh = Mesh(np.array([station_lon]),np.array([station_lat]),np.array([station_depth]))
+
+    for method in outputs.keys():
+        d = get_distance(method,mesh,quadlist=quads,mypoint=mypoint)
+        print('Method %s: %.2f output, %.2f groundtruth' % (method,d,outputs[method]))
+    
 
 if __name__ == '__main__':
+    test_dist()
+    sys.exit(0)
+    
     flat = [28.427,27.986,27.469,27.956]
     flon = [84.614,86.179,85.880,84.461]
     fdep = [20.0,20.0,13.0,13.0]
