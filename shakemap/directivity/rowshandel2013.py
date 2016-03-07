@@ -52,7 +52,7 @@ class Rowshandel2013(object):
     __c2['mean'] = (__c2['as'] + __c2['ba'] + __c2['cb'] + __c2['cy'] + __c2['id'])/5
     
     def __init__(self, flt, hyp, sites, rake, dx, M, T, a_weight = 0.5,
-                 mtype = 1, simpleDT = False):
+                 mtype = 1, simpleDT = False, simpleCentering = True):
         """
         Constructor for rowshandel2013.
         :param flt:
@@ -85,6 +85,8 @@ class Rowshandel2013(object):
             products, 2 for adding all components of dot products. 
         :param simpleDT:
             Boolean; should the simpler DT equation be used? Usually False. 
+        :param simpleCentering:
+            Boolean; should the simple centering method be used. 
         """
         self.flt = flt
         self.hyp = hyp
@@ -102,6 +104,7 @@ class Rowshandel2013(object):
             raise RowshandelException('mtype can onlty be 1 or 2.')
         self.mtype = mtype
         self.simpleDT = simpleDT
+        self.simpleCentering = simpleCentering
         
         self.computeWrup()
         self.computeLD()
@@ -120,8 +123,15 @@ class Rowshandel2013(object):
         """
         c1sel = self.__c1['mean'][self.__c1['T'] == self.T]
         c2sel = self.__c2['mean'][self.__c2['T'] == self.T]
-        # Eqn 3.13
-        self.fd = (c1sel*self.xi_prime + c2sel) * self.LD * self.DT * self.WP
+        if self.simpleCentering:
+            # Eqn 3.14
+            xi = self.xi_prime * self.LD
+            xi_c = 0.18  # for all events
+            # ** could adjust xi_c based on mechanism
+            self.fd = c1sel*(self.xi_prime - xi_c) * self.DT * self.WP
+        else:
+            # Eqn 3.13
+            self.fd = (c1sel*self.xi_prime + c2sel) * self.LD * self.DT * self.WP
 
 
     def computeWrup(self):
@@ -287,7 +297,7 @@ class Rowshandel2013(object):
                     nsubs[i] = nsubs[i] + np.sum(sdotq > 0)
                     
                 elif self.mtype == 2:
-                    # Sum over all subfaults
+                    # Sum over contributing subfaults
                     
                     # xi_p_prime
                     pdotq = pdotqraw
@@ -302,8 +312,8 @@ class Rowshandel2013(object):
                 xi_prime_p[i] = np.sum(pdotq)
         
         # Apply a water level to nsubp and nsubs to avoid division by
-        # zero. This should only occur when the thing it is dividing
-        # is also zero and the resulting value should be zero.
+        # zero. This should only occur when the numerator is also zero
+        # and so the resulting value should be zero.
         nsubs = np.maximum(nsubs, 1)
         nsubp = np.maximum(nsubp, 1)
         
@@ -426,10 +436,12 @@ class Rowshandel2013(object):
                 R1 = 20
                 R2 = 40
             DT = np.ones(nsite)
-#            DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/(20 + 10 * np.log(self.T))
+            # As written in report:
+            # DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/(20 + 10 * np.log(self.T))
+            # Modification:
             DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/R1
-            # Not clear if the above modification is 'correct' but it gives results
-            # that make more sense
+            # Note: it is not clear if the above modification is 'correct' but it gives
+            #       results that make more sense
             DT[Rrup >= R2] = 0
         DT = np.reshape(DT, slat.shape)
         self.DT = DT
@@ -440,7 +452,10 @@ class Rowshandel2013(object):
         Computes WP -- the narrow-band multiplier. 
         """
         sig = 0.6
-        Tp = np.exp(1.27*self.M - 7.28)
+        # As written in report:
+        # Tp = np.exp(1.27*self.M - 7.28)
+        # Update (Rowshandel, personal communication)
+        Tp = np.exp(1.04*self.M - 6.0)
         self.WP = np.exp(-(np.log10(self.T/Tp)*np.log10(self.T/Tp))/(2*sig*sig))
 
 def _get_quad_slip_ds_ss(q, rake, cp, p):
@@ -501,17 +516,13 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
     # Apply sign changes in 'local' coords
     s1mat = np.array([[np.abs(s1_col[0])*np.sign(px)],
                       [np.abs(s1_col[1])*np.sign(py)],
-#                      [np.abs(s1_col[2])*np.sign(pz)]])
-                      [np.abs(s1_col[2])*np.ones_like(pz)]])
+                      [np.abs(s1_col[2])*np.sign(pz)]])
+#                      [np.abs(s1_col[2])*np.ones_like(pz)]])
 
-    dipsign = np.sign(np.sin(np.radians(rake)))
-#    d1mat = np.array([[-d1_col[0]*np.ones_like(px)*dipsign],
-#                      [ d1_col[1]*np.ones_like(py)*dipsign],
-#                      [ d1_col[2]*np.ones_like(pz)*dipsign]])
-    d1mat = np.array([[ d1_col[0]*np.ones_like(px)],
-                      [ d1_col[1]*np.ones_like(py)],
-                      [ d1_col[2]*np.ones_like(pz)]])
-
+    dipsign = -np.sign(np.sin(np.radians(rake)))
+    d1mat = np.array([[d1_col[0]*np.ones_like(px)*dipsign],
+                      [d1_col[1]*np.ones_like(py)*dipsign],
+                      [d1_col[2]*np.ones_like(pz)*dipsign]])
     
     # Need to track 'origin'
     s0 = np.array([[0], [0], [0]])
