@@ -363,8 +363,8 @@ class Fault(object):
         """
         dipsum = 0.0
         for quad in self.Quadrilaterals:
-            N = getQuadNormal(quad)
-            V = getVerticalVector(quad)
+            N = get_quad_normal(quad)
+            V = get_vertical_vector(quad)
             dipsum = dipsum + np.degrees(np.arccos(Vector.dot(N, V)))
         dip = dipsum/len(self.Quadrilaterals)
         return dip
@@ -896,8 +896,8 @@ def get_quad_dip(q):
     :returns:
         Dip in degrees.
     """
-    N = getQuadNormal(q)
-    V = getVerticalVector(q)
+    N = get_quad_normal(q)
+    V = get_vertical_vector(q)
     dip = np.degrees(np.arccos(Vector.dot(N, V)))
     return dip
     
@@ -947,7 +947,7 @@ def get_quad_down_dip_vector(q):
     p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
     p1 = Vector.fromPoint(P1)
     p0p1 = p1 - p0
-    qnv = getQuadNormal(q)
+    qnv = get_quad_normal(q)
     ddv = Vector.cross(p0p1, qnv).norm()
     return ddv
 
