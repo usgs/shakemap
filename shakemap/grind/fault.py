@@ -198,14 +198,14 @@ class Fault(object):
             f = open(faultfile,'wt')
         else:
             f = faultfile #just a reference to the input file-like object
-        f.write('#%s\n' % unicode(self.reference))
+        f.write('#%s\n' % self.reference)
         for quad in self.getQuadrilaterals():
             P0,P1,P2,P3 = quad
-            f.write(unicode('%.4f %.4f %.4f\n' % (P0.latitude,P0.longitude,P0.depth)))
-            f.write(unicode('%.4f %.4f %.4f\n' % (P1.latitude,P1.longitude,P1.depth)))
-            f.write(unicode('%.4f %.4f %.4f\n' % (P2.latitude,P2.longitude,P2.depth)))
-            f.write(unicode('%.4f %.4f %.4f\n' % (P3.latitude,P3.longitude,P3.depth)))
-            f.write(unicode('%.4f %.4f %.4f\n' % (P0.latitude,P0.longitude,P0.depth)))
+            f.write('%.4f %.4f %.4f\n' % (P0.latitude,P0.longitude,P0.depth))
+            f.write('%.4f %.4f %.4f\n' % (P1.latitude,P1.longitude,P1.depth))
+            f.write('%.4f %.4f %.4f\n' % (P2.latitude,P2.longitude,P2.depth))
+            f.write('%.4f %.4f %.4f\n' % (P3.latitude,P3.longitude,P3.depth))
+            f.write('%.4f %.4f %.4f\n' % (P0.latitude,P0.longitude,P0.depth))
             f.write(u'>\n')
         if not hasattr(faultfile,'read'):
             f.close()

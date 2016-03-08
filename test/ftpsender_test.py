@@ -32,6 +32,8 @@ def _testSendFile(properties):
     print('Passed sending single file.')
 
 def _testSendFolder(properties):
+    #modify this to create a temporary folder and send that - I think __pycache__ is screwing up the deletes...
+    #although maybe I should test deleting directories with directories in them...
     print('Testing sending folder...')
     thisfile = os.path.abspath(__file__)
     thispath,thisfilename = os.path.split(thisfile)
@@ -45,7 +47,7 @@ def _testSendFolder(properties):
     except Exception as obj:
         fmt = 'Test failed - you may have a file called %s on host %s and directory %s'
         tpl = (thisfile,properties['host'],['directory'])
-        raise SenderError(fmt % tpl)
+        raise ShakeMapException(fmt % tpl)
     print('Passed sending folder.')
     
 if __name__ == '__main__':
