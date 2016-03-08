@@ -7,8 +7,11 @@ import sys
 import urllib.request, urllib.error, urllib.parse
 
 #local
-from sender import Sender,SenderError
-    
+from .sender import Sender
+
+#local imports
+from shakemap.utils.exception import ShakeMapException
+
 class FTPSender(Sender):
     '''Class for sending and deleting files and directories via FTP.
     '''
@@ -45,9 +48,9 @@ class FTPSender(Sender):
                 try:
                     ftp.cwd(d)
                 except ftplib.error_perm as msg:
-                    raise SenderError('Could not login to host "%s" and navigate to directory "%s"' % (host,folder))
+                    raise ShakeMapException('Could not login to host "%s" and navigate to directory "%s"' % (host,folder))
         except Exception as obj:
-            raise SenderError('Could not send to %s.  Error "%s"' % (host,str(obj)))
+            raise ShakeMapException('Could not send to %s.  Error "%s"' % (host,str(obj)))
         return ftp
 
     def delete(self):
@@ -124,7 +127,7 @@ class FTPSender(Sender):
             return nfiles
                     
         except Exception as obj:
-            raise SenderError('Could not send to %s.  Error "%s"' % (host,str(obj)))
+            raise ShakeMapException('Could not send to %s.  Error "%s"' % (host,str(obj)))
 
     def __sendfile(self,filename,ftp):
         '''Internal function used to send a file using an FTP object.
@@ -137,45 +140,3 @@ class FTPSender(Sender):
         cmd = "STOR " + fpath #we don't tell the ftp server about the local path to the file
         ftp.storbinary(cmd,open(filename,"rb"),1024) #actually send the file
 
-def _testSendFile(properties):
-    thisfile = os.path.abspath(__file__)
-    thispath,thisfilename = os.path.split(thisfile)
-    try:
-        sender = FTPSender(properties=properties,files=[thisfile])
-        sender.send()
-        url = 'ftp://%s%s%s' % (properties['host'],properties['directory'],thisfilename)
-        fh = urllib.request.urlopen(url)
-        fh.close()
-        sender.delete()
-    except Exception as obj:
-        fmt = 'Test failed - you may have a file called %s on host %s and directory %s'
-        tpl = (thisfile,properties['host'],['directory'])
-        raise SenderError(fmt % tpl)
-
-def _testSendFolder(properties):
-    thisfile = os.path.abspath(__file__)
-    thispath,thisfilename = os.path.split(thisfile)
-    try:
-        sender = FTPSender(properties=properties,directory=thispath)
-        sender.send()
-        url = 'ftp://%s%s' % (properties['host'],properties['directory'])
-        fh = urllib.request.urlopen(url)
-        fh.close()
-        sender.delete()
-    except Exception as obj:
-        fmt = 'Test failed - you may have a file called %s on host %s and directory %s'
-        tpl = (thisfile,properties['host'],['directory'])
-        raise SenderError(fmt % tpl)
-
-if __name__ == '__main__':
-    #try logging into an FTP server that supports anonymous login
-    host = sys.argv[1]
-    folder = sys.argv[2]
-    user = ''
-    password = 'user@anonymous.org'
-    props = {'host':host,
-             'directory':folder,
-             'user':user,
-             'password':password}
-    _testSendFile(props)
-    _testSendFolder(props)

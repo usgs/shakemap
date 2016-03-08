@@ -10,9 +10,10 @@ import io
 
 #third party modules
 import numpy as np
-
-#local modules
 from neicio.tag import Tag
+
+#local imports
+from shakemap.utils.exception import ShakeMapException
 
 def _getStationAttributes(station):
     """
@@ -30,11 +31,11 @@ def _getStationAttributes(station):
         attrdict[key] = value
     return attrdict
 
-def getPeakValues(stationdict):
+def get_peak_values(stationdict):
     """Return the peak ground motion values (horizontal channels), intensity, station code, and coordinates of station data.
     Inputs:
     
-     * stationdict Dictionary returned by filterStations()
+     * stationdict Dictionary returned by filter_stations()
      
     Output:
     
@@ -86,11 +87,11 @@ def getPeakValues(stationdict):
         peakdict[key] = np.array(peakdict[key])
     return peakdict
             
-def writeStations(stationdict):
+def write_stations(stationdict):
     """Write station dictionary structure to an XML string.
     Inputs:
 
-     * stationdict Dictionary structure as returned by filterStations
+     * stationdict Dictionary structure as returned by filter_stations
 
     Outputs:
      * XML string suitable for writing to a file
@@ -132,7 +133,7 @@ def _getGroundMotions(comp):
         pgmdict[key] = {'value':value,'flag':flag}
     return pgmdict
 
-def filterStations(xmlfiles):
+def filter_stations(xmlfiles):
     """Read in N station data files in XML format and condense them into one data structure.
     Input:
     
@@ -209,12 +210,12 @@ def filterStations(xmlfiles):
     stationdict = {}
     for xmlfile in xmlfiles:
         if not os.path.isfile(xmlfile):
-            raise Exception('Input xml file "%s" does not exist.' % xmlfile)
-        tstationdict = filterStation(xmlfile)
+            raise ShakeMapException('Input xml file "%s" does not exist.' % xmlfile)
+        tstationdict = filter_station(xmlfile)
         stationdict.update(tstationdict)        
     return stationdict
 
-def filterStation(xmlfile):
+def filter_station(xmlfile):
     """
     Filter individual xmlfile into a stationdict data structure.
     Inputs:
@@ -223,7 +224,7 @@ def filterStation(xmlfile):
 
     Outputs:
 
-     * stationdict Data structure as returned by filterStations()
+     * stationdict Data structure as returned by filter_stations()
     """
     stationdict = {}
     dom = minidom.parse(xmlfile)
@@ -253,92 +254,5 @@ def filterStation(xmlfile):
     dom.unlink()
     return stationdict
 
-def _main(xmlfiles):
-    stationdict = filterStations(txmlfiles)
-    peakdict = getPeakValues(stationdict)
-    printer = pprint.PrettyPrinter(indent=2)
-    printer.pprint(stationdict)
-    xmlstr = writeStations(stationdict)
-    print(xmlstr)
-
-def _test():
-    xmlstr = """<shakemap-data code_version="3.5" map_version="4">
-      <earthquake id="us10001rvu" lat="-4.7599" lon="152.5556" mag="7.5" year="2015" month="3" day="29" hour="23" minute="48" second="31" timezone="GMT" depth="40" network="us" locstring="NEW BRITAIN REGION, PAPUA NEW GUINEA" created="1427728491" />
-        <stationlist created="1427728491">
-          <station code="IU.PMG" name="Port Moresby, New Guinea" insttype="UNK" lat="-9.4047" lon="147.1597" dist="731.845032" source="NEIC" netid="IU" commtype="UNK" loc="" intensity="1.5">
-            <comp name="HNZ">
-              <pga value="0.0207" flag="0" />
-              <pgv value="0.0397" flag="0" />
-              <psa03 value="0.0420" flag="0" />
-              <psa10 value="0.0327" flag="0" />
-              <psa30 value="0.0132" flag="0" />
-            </comp>
-            <comp name="HN2">
-              <pga value="0.0218" flag="0" />
-              <pgv value="0.0565" flag="0" />
-              <psa03 value="0.0321" flag="0" />
-              <psa10 value="0.0472" flag="0" />
-              <psa30 value="0.0179" flag="0" />
-            </comp>
-            <comp name="HN1">
-              <pga value="0.0227" flag="0" />
-              <pgv value="0.0385" flag="0" />
-              <psa03 value="0.0399" flag="0" />
-              <psa10 value="0.0506" flag="0" />
-              <psa30 value="0.0162" flag="0" />
-            </comp>
-          </station>
-        </stationlist>
-      </shakemap-data>"""
-    cmpdict = { 'IU.PMG': ( { 'code': 'IU.PMG',
-                 'commtype': 'UNK',
-                 'dist': 731.845032,
-                 'insttype': 'UNK',
-                 'intensity': 1.5,
-                 'lat': -9.4047,
-                 'loc': '',
-                 'lon': 147.1597,
-                 'name': 'Port Moresby, New Guinea',
-                 'netid': 'IU',
-                 'source': 'NEIC'},
-               { 'HN1': { 'pga': { 'flag': True, 'value': 0.0227},
-                           'pgv': { 'flag': True, 'value': 0.0385},
-                           'psa03': { 'flag': True, 'value': 0.0399},
-                           'psa10': { 'flag': True, 'value': 0.0506},
-                           'psa30': { 'flag': True, 'value': 0.0162}},
-                 'HN2': { 'pga': { 'flag': True, 'value': 0.0218},
-                           'pgv': { 'flag': True, 'value': 0.0565},
-                           'psa03': { 'flag': True, 'value': 0.0321},
-                           'psa10': { 'flag': True, 'value': 0.0472},
-                           'psa30': { 'flag': True, 'value': 0.0179}},
-                 'HNZ': { 'pga': { 'flag': True, 'value': 0.0207},
-                           'pgv': { 'flag': True, 'value': 0.0397},
-                           'psa03': { 'flag': True, 'value': 0.042},
-                           'psa10': { 'flag': True, 'value': 0.0327},
-                           'psa30': { 'flag': True, 'value': 0.0132}}})}
-    xmlfile = io.StringIO(xmlstr)
-    stationdict = filterStation(xmlfile)
-    assert _compareDictionaries(stationdict,cmpdict)
-    #printer = pprint.PrettyPrinter(indent=2)
-    #printer.pprint(stationdict)
-
-def _compareDictionaries(dict1,dict2):
-    """Compare two stationdict dictionaries at each level testing for equality.
-    """
-    #TODO: MAKE THIS MORE COMPLETE!!!!
-    d1keys = set(dict1.keys())
-    d2keys = set(dict2.keys())
-    if len(d1keys.difference(d2keys)):
-        return False
-    return True
-    
-    
-if __name__ == '__main__':
-    if len(sys.argv) < 2:
-        _test()
-        sys.exit(0)
-    else:
-        txmlfiles = sys.argv[1:]
-        _main(txmlfiles)
     
     

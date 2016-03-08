@@ -4,13 +4,13 @@
 import numpy as np
 import openquake.hazardlib.geo as geo
 from openquake.hazardlib.geo.utils import get_orthographic_projection
-import shakemap.shakelib.ecef as ecef
-import shakemap.shakelib.fault as fault
-from shakemap.shakelib.ecef import latlon2ecef
-from shakemap.shakelib.ecef import ecef2latlon
-from shakemap.shakelib.vector import Vector
-from shakemap.shakelib.distance import calcRuptureDistance
-from shakemap.shakelib.distance import getDistance
+import shakemap.grind.ecef as ecef
+import shakemap.grind.fault as fault
+from shakemap.grind.ecef import latlon2ecef
+from shakemap.grind.ecef import ecef2latlon
+from shakemap.grind.vector import Vector
+from shakemap.grind.distance import calcRuptureDistance
+from shakemap.grind.distance import getDistance
 
 """
 Implements the Rowshandel (2013) directivity model. 
@@ -20,14 +20,6 @@ To do:
     * Add a validation function. 
 """
 
-class RowshandelException(Exception):
-    """
-    Class to represent errors in the Rowshandel2013 class.
-    """
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
     
 class Rowshandel2013(object):
     """
@@ -95,13 +87,13 @@ class Rowshandel2013(object):
         self.dx = dx
         self.M = M
         if np.all(T != np.array([1, 2, 3, 4, 5, 7.5])):
-            raise RowshandelException('Invalid T value. Interpolation not yet supported.')
+            raise IndexError('Invalid T value. Interpolation not yet supported.')
         self.T = T
         if (a_weight > 1.0) or (a_weight < 0):
-            raise RowshandelException('a_weight must be between 0 and 1.')
+            raise ValueError('a_weight must be between 0 and 1.')
         self.a_weight = a_weight
         if (mtype != 1) and (mtype != 2):
-            raise RowshandelException('mtype can onlty be 1 or 2.')
+            raise ValueError('mtype can onlty be 1 or 2.')
         self.mtype = mtype
         self.simpleDT = simpleDT
         self.simpleCentering = simpleCentering
@@ -172,7 +164,7 @@ class Rowshandel2013(object):
         hyp_ecef = Vector.fromPoint(geo.point.Point(
             self.hyp[0], self.hyp[1], self.hyp[2]))
         hp0 = hyp_ecef - pp0
-        ddv = fault.getQuadDownDipVector(q)
+        ddv = fault.get_quad_down_dip_vector(q)
         self.Wrup = Vector.dot(ddv, hp0)/1000
     
     def computeXiPrime(self):
@@ -217,19 +209,19 @@ class Rowshandel2013(object):
             q = self.flt.Quadrilaterals[k]
             
             # Quad mesh (ECEF coords)
-            mesh = fault.getQuadMesh(q, self.dx)
+            mesh = fault.get_quad_mesh(q, self.dx)
             
             # Rupture plane normal vector (ECEF coords)
-            rpnv = fault.getQuadNormal(q)
+            rpnv = fault.get_quad_normal(q)
             
             # Strike vector (ECEF coords)
-            strike_vec = fault.getQuadStrikeVector(q)
+            strike_vec = fault.get_quad_strike_vector(q)
             strike_vec_col = np.array([[strike_vec.x],
                                        [strike_vec.y],
                                        [strike_vec.z]]) # convert to column vector
             
             # Down dip vector (ECEF coords)
-            ddip_vec = fault.getQuadDownDipVector(q)
+            ddip_vec = fault.get_quad_down_dip_vector(q)
             ddip_vec_col = np.array([[ddip_vec.x],
                                      [ddip_vec.y],
                                      [ddip_vec.z]]) # convert to column vector
@@ -480,11 +472,11 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
     # Get quad vertices, strike, dip
     P0, P1, P2, P3 = q
     strike = P0.azimuth(P1)
-    dip = fault.getQuadDip(q)
+    dip = fault.get_quad_dip(q)
     
     # Slip unit vectors in 'local' (i.e., z-up, x-east) coordinates
-    d1_local = fault.getLocalUnitSlipVector_DS(strike, dip, rake)
-    s1_local = fault.getLocalUnitSlipVector_SS(strike, dip, rake)
+    d1_local = fault.get_local_unit_slip_vector_DS(strike, dip, rake)
+    s1_local = fault.get_local_unit_slip_vector_SS(strike, dip, rake)
     
     # Convert to a column array
     d1_col = np.array([[d1_local.x],

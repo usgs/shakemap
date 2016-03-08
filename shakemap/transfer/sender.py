@@ -4,17 +4,8 @@
 import os.path
 import tempfile
 
-# TODO 
-# - Add delete method
-# - Add CopySender,SecureCopySender subclasses 
-# - Write documentation, cleaner tests
-# - Class factory function in this module somewhere?
-
-class SenderError(Exception):
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
+#local imports
+from shakemap.utils.exception import ShakeMapException
 
 class Sender(object):
     '''Base class for concrete subclasses that wrap around different methods of transmitting files.
@@ -23,13 +14,13 @@ class Sender(object):
         self.properties = properties
         if files is not None:
             if not isinstance(files,list):
-                raise SenderError('Input files must be a list')
+                raise ShakeMapException('Input files must be a list')
             for f in files:
                 if not os.path.isfile(f):
-                    raise SenderError('Input file %s could not be found' % f)
+                    raise ShakeMapException('Input file %s could not be found' % f)
         if directory is not None:
             if not os.path.isdir(directory):
-                raise SenderError('Input directory %s could not be found' % directory)
+                raise ShakeMapException('Input directory %s could not be found' % directory)
         if files is not None:
             self.files = files
         else:
@@ -45,12 +36,12 @@ class Sender(object):
     def addFiles(self,files):
         for f in files:
             if not os.path.isfile(f):
-                raise SenderError('Input file %s could not be found' % f)
+                raise ShakeMapException('Input file %s could not be found' % f)
         self.files += files
 
     def addDirectory(self,directory):
         if not os.path.isdir(directory):
-            raise SenderError('Input directory %s could not be found' % directory)
+            raise ShakeMapException('Input directory %s could not be found' % directory)
         self.directories += directory
 
     #this is implemented in the subclasses

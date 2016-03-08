@@ -11,15 +11,8 @@ from mapio.geodict import GeoDict
 from openquake.hazardlib.gsim.base import SitesContext
 import numpy as np
 
-
-class SitesException(Exception):
-    """
-    Class to represent errors in the Sites class.
-    """
-    def __init__(self, value):
-        self.value = value
-    def __str__(self):
-        return repr(self.value)
+#local imports
+from shakemap.utils.exception import ShakeMapException
 
 def _load(vs30File,samplegeodict=None,resample=False,method='linear',doPadding=False,padValue=np.nan):
     try:
@@ -31,7 +24,7 @@ def _load(vs30File,samplegeodict=None,resample=False,method='linear',doPadding=F
                                      method=method,doPadding=doPadding,padValue=padValue)
         except Exception as msg2:
             msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (vs30File,str(msg1),str(msg2))
-            raise SitesException(msg)
+            raise ShakeMapException(msg)
     return vs30grid
 
 def _getFileGeoDict(fname):
@@ -43,10 +36,10 @@ def _getFileGeoDict(fname):
             geodict = GDALGrid.getFileGeoDict(fname)
         except Exception as msg2:
             msg = 'File geodict failure with %s - error messages: "%s"\n "%s"' % (fname,str(msg1),str(msg2))
-            raise SitesException(msg)
+            raise ShakeMapException(msg)
     return geodict
     
-def calculateZ1P0(vs30):
+def calculate_z1p0(vs30):
     c1 = 6.745
     c2 = 1.35
     c3 = 5.394
@@ -59,7 +52,7 @@ def calculateZ1P0(vs30):
     Z1Pt0[idx] = np.exp(c3 -  c4 * np.log(vs30[idx]/500.0))
     return Z1Pt0
 
-def calculateZ2P5(z1pt0):
+def calculate_z2p5(z1pt0):
     c1 = 519
     c2 = 3.595
     Z2Pt5 = c1 + z1pt0*c2
@@ -87,8 +80,8 @@ class Sites(object):
         self.GeoDict = vs30grid.getGeoDict().copy()
         lons = np.linspace(self.GeoDict.xmin,self.GeoDict.xmax,self.GeoDict.nx)
         lats = np.linspace(self.GeoDict.ymin,self.GeoDict.ymax,self.GeoDict.ny)
-        self.Z1Pt0 = calculateZ1P0(self.Vs30.getData())
-        self.Z2Pt5 = calculateZ2P5(self.Z1Pt0)
+        self.Z1Pt0 = calculate_z1p0(self.Vs30.getData())
+        self.Z2Pt5 = calculate_z2p5(self.Z1Pt0)
         self.SitesContext = SitesContext()
         self.SitesContext.vs30 = self.Vs30.getData().copy()
         self.SitesContext.z1pt0 = self.Z1Pt0
@@ -201,7 +194,7 @@ class Sites(object):
           Sequence of longitudes.
         :returns:
           SitesContext object where data are sampled from the current Sites object.
-        :raises SitesException:
+        :raises ShakeMapException:
            When lat/lon input sequences do not share dimensionality.
         """
         lats = np.array(lats)
@@ -210,14 +203,14 @@ class Sites(object):
         lonshape = lons.shape
         if latshape != lonshape:
             msg = 'Input lat/lon arrays must have the same dimensions'
-            raise SitesException(msg)
+            raise ShakeMapException(msg)
         
         site = SitesContext()
         site.vs30 = self.Vs30.getValue(lats,lons,default=self.defaultVs30) #use default vs30 if outside grid
         site.lats = lats
         site.lons = lons
-        site.z1pt0 = calculateZ1P0(site.vs30)
-        site.z2pt5 = calculateZ2P5(site.z1pt0)
+        site.z1pt0 = calculate_z1p0(site.vs30)
+        site.z2pt5 = calculate_z2p5(site.z1pt0)
         site.vs30measured = self.SitesContext.vs30measured
         site.backarc = self.SitesContext.backarc
 
