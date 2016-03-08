@@ -4,7 +4,7 @@ GMPE amps are in ln(g), in an IMC of their choosing
 ShakeMap amps are %g and max horizontal
 """
 
-import BeyerBommer2006 as BB
+from . import BeyerBommer2006 as BB
 
 from openquake.hazardlib.imt import PGA, PGV, SA
 from openquake.hazardlib import const
