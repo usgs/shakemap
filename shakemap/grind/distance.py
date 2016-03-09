@@ -10,6 +10,7 @@ from .ecef import latlon2ecef
 from .vector import Vector
 from openquake.hazardlib.geo import point
 from openquake.hazardlib.geo import geodetic
+from openquake.hazardlib.geo.utils import get_orthographic_projection
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -56,7 +57,7 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
         newshape = (oldshape[0]*oldshape[1],1)
     else:
         newshape = (oldshape[0],1)
-    if (method == 'rjb') or (method == 'rx') or (method == 'rrup'):
+    if (method == 'rjb') or (method == 'rrup'):
         if quadlist is None:
             raise ShakeMapException('Cannot calculate rupture distance %s without a list of quadrilaterals' % method)
         mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
@@ -88,11 +89,24 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
         mindist = mindist.reshape(oldshape)
         return mindist
     elif method == 'rx':
+        mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
         for quad in quadlist:
             P0,P1 = quad[0:2]
-            p0 = Vector.fromPoint(P0)
-            p1 = Vector.fromPoint(P1)
-            rxdist = calc_rx_distance(p0,p1,points)
+            #project these two points into a Cartesian space
+            west = min(P0.x,P1.x)
+            east = max(P0.x,P1.x)
+            south = min(P0.y,P1.y)
+            north = max(P0.y,P1.y)
+            proj = get_orthographic_projection(west,east,north,south) #projected coordinates are in km
+            p0x,p0y = proj(P0.x,P0.y)
+            p1x,p1y = proj(P1.x,P1.y)
+            P0 = Vector(p0x*1000,p0y*1000,0.0)
+            P1 = Vector(p1x*1000,p1y*1000,0.0)
+            ppointx,ppointy = proj(mesh.lons.flatten(),mesh.lats.flatten())
+            points = np.zeros((len(ppointx),3))
+            points[:,0] = ppointx*1000 #convert coordinates to meters and put in numpy array
+            points[:,1] = ppointy*1000
+            rxdist = calc_rx_distance(P0,P1,points)
             mindist = minimize(mindist,rxdist)
         mindist = mindist.reshape(oldshape)
         return mindist

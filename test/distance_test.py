@@ -20,6 +20,53 @@ from shakemap.grind.fault import Fault
 from openquake.hazardlib.geo.geodetic import npoints_towards
 from openquake.hazardlib.geo.mesh import Mesh
 from openquake.hazardlib.geo.point import Point
+from openquake.hazardlib.geo.utils import get_orthographic_projection
+
+def test_rx():
+    print('Testing low level calc_rx() method...')
+    #this is the coordinate of a station used in Northridge
+    slat = 34.0700
+    slon = -118.1500
+    sdep = 0.0
+
+    #this is the starting point of the top edge of rupture for the Northridge fault
+    p0lon = -118.598000
+    p0lat = 34.387000
+
+    #this is the ending point of the top edge of rupture for the Northridge fault
+    p1lon = -118.431819
+    p1lat = 34.301105
+
+    west = min(p0lon,p1lon)
+    east = max(p0lon,p1lon)
+    south = min(p0lat,p1lat)
+    north = max(p0lat,p1lat)
+    proj = get_orthographic_projection(west,east,north,south) #projected coordinates are in km
+    p0x,p0y = proj(p0lon,p0lat)
+    p1x,p1y = proj(p1lon,p1lat)
+    P0 = Vector(p0x*1000,p0y*1000,0.0)
+    P1 = Vector(p1x*1000,p1y*1000,0.0)
+
+    sx,sy = proj(slon,slat)
+    station = np.array([sx*1000,sy*1000,0.0]).reshape(1,3)
+    rx = calc_rx_distance(P0,P1,station)[0][0]
+
+    output = 7.98
+    np.testing.assert_almost_equal(rx,output,decimal=1)
+    print('Passed low level calc_rx() method...')
+
+    print('Testing high level get_distance() method with Rx...')
+    mesh = Mesh(np.array([slon]),np.array([slat]),np.array([0.0]))
+    quadlist = []
+    P0 = Point(p0lon,p0lat,0.0)
+    P1 = Point(p1lon,p1lat,0.0)
+    P2 = Point(0,0,0) #it doesn't matter for Rx, as it only uses the top edge
+    P3 = Point(0,0,0) #it doesn't matter for Rx, as it only uses the top edge
+    quad = (P0,P1,P2,P3)
+    quadlist.append(quad)
+    rxd = get_distance('rx',mesh,quadlist=quadlist)[0]
+    np.testing.assert_almost_equal(rxd,output,decimal=1)
+    print('Passed high level get_distance() method with Rx...')
 
 def test_dist():
     #TODO - revisit the way we're constructing the fault object - 
@@ -58,6 +105,7 @@ def test_dist():
     xp1 = np.array([p1lon[1]])
     yp1 = np.array([p1lat[1]])
     fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,np.array([W]),np.array([dip]))
+    
     quads = fault.getQuadrilaterals()
     mesh = Mesh(np.array([station_lon]),np.array([station_lat]),np.array([station_depth]))
 
@@ -67,6 +115,8 @@ def test_dist():
     
 
 if __name__ == '__main__':
+    test_rx()
+    sys.exit(0)
     test_dist()
     sys.exit(0)
     
