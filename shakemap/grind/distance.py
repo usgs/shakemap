@@ -122,7 +122,7 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
         mindist = mindist.reshape(oldshape)
         return mindist
     elif method == 'ry0':
-        mindist = calc_ry_distance(quadlist,mesh)
+        mindist = calc_ry_distance(quadlist[0][0],quadlist[0][1],mesh)
         mindist = mindist.reshape(oldshape)
         return mindist
     elif method == 'rcdbp':
@@ -245,11 +245,22 @@ def calc_rupture_distance(P0,P1,P2,P3,points):
     dist = np.fliplr(dist)
     return dist
 
-def calc_ry_distance(quadlist,mesh):
+def calc_ry_distance(P0,P1,mesh):
+    """Calculate Ry0 distance.
+
+    Compute the minimum distance between each point of a mesh and the great
+    circle arcs perpendicular to the average strike direction of the
+    fault trace and passing through the end-points of the trace.
+    
+    :param P0:
+      Point object, representing the first top-edge vertex of a fault quadrilateral.
+    :param P1:
+      Point object, representing the second top-edge vertex of a fault quadrilateral.
+    :returns:
+      Array of size mesh.lons of distances (in km) from input points to rupture surface.
+    """
     #get the mean strike vector
-    P0 = quadlist[0][0]
     surfaceP0 = point.Point(P0.longitude,P0.latitude,0.0)
-    P1 = quadlist[-1][1]
     surfaceP1 = point.Point(P1.longitude,P1.latitude,0.0)
     strike = P0.azimuth(P1)
     dst1 = geodetic.distance_to_arc(P0.longitude,P0.latitude,(strike + 90.) % 360,mesh.lons, mesh.lats)
