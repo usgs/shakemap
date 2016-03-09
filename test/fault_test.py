@@ -134,6 +134,15 @@ def _test_trace():
     fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,widths,dips,reference='From J Smith, (personal communication)')
 
 if __name__ == '__main__':
+    xp0 = np.array([-118.0])
+    xp1 = np.array([-118.0])
+    yp0 = np.array([34.0])
+    yp1 = np.array([34.5])
+    zp = np.array([5.0])
+    widths = np.array([10.0])
+    dips = np.array([45.0])
+    fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,widths,dips)
+    
     _test_trace()
     #_test_northridge()
     #_test_correct()

@@ -479,7 +479,7 @@ class Fault(object):
         qnv = Vector.cross(p2p0, p1p0).norm()
         tmp = p0 + qnv
         tmplat, tmplon, tmpz = ecef2latlon(tmp.x, tmp.y, tmp.z)
-        if tmpz - P0.depth > -eps:
+        if tmpz - P0.depth < -eps:
             return True
         return False
 
