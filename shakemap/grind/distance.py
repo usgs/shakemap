@@ -57,7 +57,7 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
         newshape = (oldshape[0]*oldshape[1],1)
     else:
         newshape = (oldshape[0],1)
-    if (method == 'rjb') or (method == 'rrup'):
+    if (method == 'rjb') or (method == 'rrup') or (method == 'rx'):
         if quadlist is None:
             raise ShakeMapException('Cannot calculate rupture distance %s without a list of quadrilaterals' % method)
         mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
@@ -89,27 +89,58 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
         mindist = mindist.reshape(oldshape)
         return mindist
     elif method == 'rx':
-        mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
+        meanrxdist = np.zeros(newshape, dtype=mesh.lons.dtype)
+        totweight = np.zeros(newshape, dtype=mesh.lons.dtype)
         for quad in quadlist:
-            P0,P1 = quad[0:2]
-            #project these two points into a Cartesian space
-            west = min(P0.x,P1.x)
-            east = max(P0.x,P1.x)
-            south = min(P0.y,P1.y)
-            north = max(P0.y,P1.y)
-            proj = get_orthographic_projection(west,east,north,south) #projected coordinates are in km
-            p0x,p0y = proj(P0.x,P0.y)
-            p1x,p1y = proj(P1.x,P1.y)
-            P0 = Vector(p0x*1000,p0y*1000,0.0)
-            P1 = Vector(p1x*1000,p1y*1000,0.0)
-            ppointx,ppointy = proj(mesh.lons.flatten(),mesh.lats.flatten())
-            points = np.zeros((len(ppointx),3))
-            points[:,0] = ppointx*1000 #convert coordinates to meters and put in numpy array
-            points[:,1] = ppointy*1000
-            rxdist = calc_rx_distance(P0,P1,points)
-            mindist = minimize(mindist,rxdist)
-        mindist = mindist.reshape(oldshape)
-        return mindist
+            # Points on top edge of quad
+            P0, P1, P2, P3 = quad
+            
+            # Project these two points into a Cartesian space
+            west = min(P0.x, P1.x)
+            east = max(P0.x, P1.x)
+            south = min(P0.y, P1.y)
+            north = max(P0.y, P1.y)
+            proj = get_orthographic_projection(west, east, north, south) #projected coordinates are in km
+            p0x, p0y = proj(P0.x, P0.y)
+            p1x, p1y = proj(P1.x, P1.y)
+            
+            # Convert from m to km
+            PP0 = Vector(p0x*1000, p0y*1000, 0.0)
+            PP1 = Vector(p1x*1000, p1y*1000, 0.0)
+            
+            # Project sites
+            ppointx, ppointy = proj(mesh.lons.flatten(), mesh.lats.flatten())
+            ppoints = np.zeros((len(ppointx), 3))
+            
+            # Convert coordinates to meters and put in numpy array
+            ppoints[:, 0] = ppointx*1000 
+            ppoints[:, 1] = ppointy*1000
+            
+            # Compute distance to "segment"
+            # Hacky... use Rjb function and put bottom points below top trace.
+            S0 = copy.deepcopy(P0)
+            S1 = copy.deepcopy(P1)
+            S2 = copy.deepcopy(P1)
+            S3 = copy.deepcopy(P0)
+            S0.depth = 0.0
+            S1.depth = 0.0
+            S2.depth = 1.0
+            S3.depth = 1.0
+            s0 = Vector.fromPoint(S0)
+            s1 = Vector.fromPoint(S1)
+            s2 = Vector.fromPoint(S2)
+            s3 = Vector.fromPoint(S3)
+            topdist = calc_rupture_distance(s0, s1, s2, s3, points)
+            
+            # Weight of Rx is inverse squared distance
+            dweight = 1.0/(topdist**2)
+            totweight = totweight + dweight
+            rxdist = calc_rx_distance(PP0, PP1, ppoints)
+            meanrxdist = meanrxdist + rxdist*dweight
+        meanrxdist = meanrxdist/totweight
+        meanrxdist = meanrxdist.reshape(oldshape)
+        return meanrxdist
+    
     elif method == 'rrup':
         for quad in quadlist:
             P0,P1,P2,P3 = quad
