@@ -21,7 +21,7 @@ from ..utils.timeutils import ShakeDateTime
 from .ecef import latlon2ecef,ecef2latlon
 from openquake.hazardlib.gsim.base import GMPE
 from .fault import Fault
-from .distance import get_distance
+from .distance import get_distance2
 
 #local imports
 from shakemap.utils.exception import ShakeMapException
@@ -345,7 +345,7 @@ class Source(object):
             else:
                 method = 'rhypo'
             
-        return get_distance(method,mesh,quadlist=quadlist,mypoint=oqpoint)
+        return get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
 
             
         
