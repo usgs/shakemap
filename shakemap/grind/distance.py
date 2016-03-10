@@ -223,24 +223,41 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
     
     if quadlist is None:
         raise ShakeMapException('Cannot calculate rupture distance %s without a list of quadrilaterals' % method)
-    mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
-    x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
-    x.shape = newshape
-    y.shape = newshape
-    z.shape = newshape
-    points = np.hstack((x,y,z))
+    
+    if any([a == 'rrup' for a in methods]) or \
+       any([a == 'rx' for a in methods]) or \
+       any([a == 'rjb' for a in methods]):
+       x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
+       x.shape = newshape
+       y.shape = newshape
+       z.shape = newshape
+       points = np.hstack((x,y,z))
+    
     
     # --------------------------------------------------------
     # Loop over quadlist for those distances that require loop    
     # --------------------------------------------------------
+    if any([a == 'rrup' for a in methods]):
+        minrrup = np.ones(newshape, dtype = mesh.lons.dtype)*1e16
+    if any([a == 'rjb' for a in methods]):
+        minrjb = np.ones(newshape, dtype=mesh.lons.dtype)*1e16
+    if any([a == 'rx' for a in methods]):
+        totweight = np.zeros(newshape, dtype=mesh.lons.dtype)
+        meanrxdist = np.zeros(newshape, dtype=mesh.lons.dtype)
+    
+    
     for quad in quadlist:
+        P0, P1, P2, P3 = quad
+        
+        if any([a == 'rrup' for a in methods]):
+            p0 = Vector.fromPoint(P0)
+            p1 = Vector.fromPoint(P1)
+            p2 = Vector.fromPoint(P2)
+            p3 = Vector.fromPoint(P3)
+            rrupdist = calc_rupture_distance(p0, p1, p2, p3, points)
+            minrrup = np.minimum(minrrup, rrupdist)
+        
         if any([a == 'rjb' for a in methods]):
-            minrjb = np.ones(newshape, dtype=mesh.lons.dtype)*1e16
-            P0,P1,P2,P3 = quad
-            P0 = copy.deepcopy(P0)
-            P1 = copy.deepcopy(P1)
-            P2 = copy.deepcopy(P2)
-            P3 = copy.deepcopy(P3)
             P0.depth = 0.0
             P1.depth = 0.0
             P2.depth = 0.0
@@ -259,12 +276,8 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
             # Paul Spudich's generalized coordinate system). Rx appears to be
             # defined the same as T in GC2, but gives slightly different values
             # in the NGA W2 flatfile. 
-            meanrxdist = np.zeros(newshape, dtype=mesh.lons.dtype)
-            totweight = np.zeros(newshape, dtype=mesh.lons.dtype)
-            # Points on top edge of quad
-            P0, P1, P2, P3 = quad
             
-            # Project these two points into a Cartesian space
+            # Project top two points into a Cartesian space
             west = min(P0.x, P1.x)
             east = max(P0.x, P1.x)
             south = min(P0.y, P1.y)
@@ -307,17 +320,7 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
             totweight = totweight + dweight
             rxdist = calc_rx_distance(PP0, PP1, ppoints)
             meanrxdist = meanrxdist + rxdist*dweight
-            
-        if any([a == 'rrup' for a in methods]):
-            minrrup = np.ones(newshape, dtype = mesh.lons.dtype)*1e16
-            P0,P1,P2,P3 = quad
-            p0 = Vector.fromPoint(P0)
-            p1 = Vector.fromPoint(P1)
-            p2 = Vector.fromPoint(P2)
-            p3 = Vector.fromPoint(P3)
-            rrupdist = calc_rupture_distance(p0, p1, p2, p3, points)
-            minrrup = np.minimum(minrrup, rrupdist)
-    
+                
     # Collect distances from loop into a dict
     distdict = dict()
     if any([a == 'rjb' for a in methods]):
@@ -357,7 +360,7 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
         if mypoint is None:
             raise ShakeMapException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(mypoint.longitude, mypoint.latitude, 0.0)
-        mindist = newpoint.distance_to_mesh(mesh)
+        repidist = newpoint.distance_to_mesh(mesh)
         repidist = repidist.reshape(oldshape)
         distdict['repi'] = repidist
     
