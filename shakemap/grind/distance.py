@@ -19,7 +19,8 @@ from shakemap.utils.exception import ShakeMapException
 
 def minimize(a,b):
     """
-    Get minimum values from two numpy arrays, ignoring sign in comparison but preserving sign in result.
+    Get minimum values from two numpy arrays, ignoring sign in comparison 
+    but preserving sign in result.
     :param a:
       Numpy array
     :param b:
@@ -36,7 +37,8 @@ def minimize(a,b):
     
 def get_distance(method,mesh,quadlist=None,mypoint=None):
     """
-    Calculate distance using any one of a number of distance measures. One of quadlist OR mypoint must be specified.
+    Calculate distance using any one of a number of distance measures. 
+    One of quadlist OR mypoint must be specified.
     :param method:
        One of: 'rjb','rx','rrup','ry0','rcdbp','repi','rhypo'
     :param mesh:
@@ -57,7 +59,7 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
         newshape = (oldshape[0]*oldshape[1],1)
     else:
         newshape = (oldshape[0],1)
-    if (method == 'rjb') or (method == 'rrup') or (method == 'rx'):
+    if (method == 'rjb') or (method == 'rrup') or (method == 'rx') or (method == 'ry0'):
         if quadlist is None:
             raise ShakeMapException('Cannot calculate rupture distance %s without a list of quadrilaterals' % method)
         mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
@@ -70,8 +72,6 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
     if method == 'rjb':
         for quad in quadlist:
             P0,P1,P2,P3 = quad
-            #so we're thinking at the moment that rjb is the same as rrup with the fault projected to the surface.
-            #here goes...
             P0 = copy.deepcopy(P0)
             P1 = copy.deepcopy(P1)
             P2 = copy.deepcopy(P2)
@@ -89,6 +89,12 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
         mindist = mindist.reshape(oldshape)
         return mindist
     elif method == 'rx':
+        # This is currently just a bandaid to get resonable and 'graceful'
+        # results for multiple segment ruptures. The 'correct' wayt to do
+        # this is to use the unpublished equations for GC2 (2nd version of
+        # Paul Spudich's generalized coordinate system). Rx appears to be
+        # defined the same as T in GC2, but gives slightly different values
+        # in the NGA W2 flatfile. 
         meanrxdist = np.zeros(newshape, dtype=mesh.lons.dtype)
         totweight = np.zeros(newshape, dtype=mesh.lons.dtype)
         for quad in quadlist:
@@ -100,7 +106,8 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
             east = max(P0.x, P1.x)
             south = min(P0.y, P1.y)
             north = max(P0.y, P1.y)
-            proj = get_orthographic_projection(west, east, north, south) #projected coordinates are in km
+            proj = get_orthographic_projection(west, east, north, south)
+            # projected coordinates are in km
             p0x, p0y = proj(P0.x, P0.y)
             p1x, p1y = proj(P1.x, P1.y)
             
@@ -153,9 +160,20 @@ def get_distance(method,mesh,quadlist=None,mypoint=None):
         mindist = mindist.reshape(oldshape)
         return mindist
     elif method == 'ry0':
-        mindist = calc_ry_distance(quadlist[0][0],quadlist[0][1],mesh)
-        mindist = mindist.reshape(oldshape)
-        return mindist
+        # This is just a bandaid on ry0 to get reasonably sensible results
+        # for multiple segments ruptures. The 'correct' way to do this is to
+        # compare the source-to-site azimuth and use Ry0 = Rx/abs(azimuth)
+        # as given in Abrahamson et al. (2014).
+        # Note that Ry0 is not the same as:
+        #    Ry (in the database summary paper), or
+        #    Ry2 that is given in the NGA W2 flatfile, or
+        #    U in the GC2 coordinate system.
+        # Note: this assumes that the quadrilaters are sorted in order along
+        #       strike.
+        FP0, FP1, FP2, FP3 = quadlist[0]
+        LP0, LP1, LP2, LP3 = quadlist[-1]
+        ry0dist = calc_ry0_distance(FP0, LP1, mesh)
+        return ry0dist
     elif method == 'rcdbp':
         raise NotImplementedError('rcdbp distance measure is not implemented yet')
     elif method == 'repi':
@@ -276,7 +294,7 @@ def calc_rupture_distance(P0,P1,P2,P3,points):
     dist = np.fliplr(dist)
     return dist
 
-def calc_ry_distance(P0,P1,mesh):
+def calc_ry0_distance(P0,P1,mesh):
     """Calculate Ry0 distance.
 
     Compute the minimum distance between each point of a mesh and the great
