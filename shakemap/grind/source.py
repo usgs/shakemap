@@ -344,8 +344,24 @@ class Source(object):
                 method = 'repi'
             else:
                 method = 'rhypo'
-            
-        return get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
+        if method == 'repi':
+            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
+            return ddict['repi'] 
+        if method == 'rhypo':
+            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
+            return ddict['rhypo'] 
+        if method == 'rjb':
+            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
+            return ddict['rjb'] 
+        if method == 'rrup':
+            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
+            return ddict['rrup'] 
+        if method == 'rx':
+            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
+            return ddict['rx'] 
+        if method == 'ry0':
+            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
+            return ddict['ry0'] 
 
             
         
