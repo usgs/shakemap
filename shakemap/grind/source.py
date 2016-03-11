@@ -21,7 +21,7 @@ from ..utils.timeutils import ShakeDateTime
 from .ecef import latlon2ecef,ecef2latlon
 from openquake.hazardlib.gsim.base import GMPE
 from .fault import Fault
-from .distance import get_distance2
+from .distance import get_distance,get_distance2
 
 #local imports
 from shakemap.utils.exception import ShakeMapException
@@ -208,6 +208,52 @@ class Source(object):
 
         return context
 
+    def getDistanceContext2(self, gmpe, mesh):
+        """
+        Create a DistancesContext object
+        :param gmpe: 
+            Concrete subclass of GMPE (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
+        :param mesh:
+            Mesh object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
+        :returns:
+            DistancesContext object with distance grids required by input gmpe.
+        :raises TypeError:
+            if gmpe is not a subclass of GMPE
+        """
+        if not isinstance(gmpe,GMPE):
+            raise TypeError('getDistanceContext() cannot work with objects of type "%s"' % type(gmpe))
+        
+        if self.Fault is not None:
+            quadlist = self.Fault.getQuadrilaterals()
+        else:
+            quadlist = None
+        
+        lat = self.getEventParam('lat')
+        lon = self.getEventParam('lon')
+        depth = self.getEventParam('depth')
+        oqpoint = point.Point(lon, lat, depth)
+        
+        context = base.DistancesContext()
+        
+        ddict = get_distance2(list(gmpe.REQUIRES_DISTANCES), mesh, quadlist = quadlist, mypoint = oqpoint)
+        # need to worry about overwriting rjb with repi and rrup with rhyp
+        
+        for method in gmpe.REQUIRES_DISTANCES:
+            if method == 'rx':
+                context.rx = ddict['rx']
+            if method == 'rrup':
+                context.rrup = ddict['rrup']
+            if method == 'rjb':
+                context.rjb = ddict['rjb']
+            if method == 'ry0':
+                context.ry0 = ddict['ry0']
+            if method == 'repi':
+                context.repi = ddict['repi']
+            if method == 'rhypo':
+                context.rhypo = ddict['rhypo']
+
+        return context
+    
     def getRuptureContext(self,gmpe):
         """
         Return a GEM RuptureContext https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
@@ -344,24 +390,7 @@ class Source(object):
                 method = 'repi'
             else:
                 method = 'rhypo'
-        if method == 'repi':
-            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
-            return ddict['repi'] 
-        if method == 'rhypo':
-            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
-            return ddict['rhypo'] 
-        if method == 'rjb':
-            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
-            return ddict['rjb'] 
-        if method == 'rrup':
-            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
-            return ddict['rrup'] 
-        if method == 'rx':
-            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
-            return ddict['rx'] 
-        if method == 'ry0':
-            ddict = get_distance2(method, mesh, quadlist = quadlist, mypoint = oqpoint)
-            return ddict['ry0'] 
+        return get_distance(method, mesh, quadlist = quadlist, mypoint = oqpoint)
 
             
         
