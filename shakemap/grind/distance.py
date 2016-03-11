@@ -248,6 +248,10 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
     
     for quad in quadlist:
         P0, P1, P2, P3 = quad
+        P0 = copy.deepcopy(P0)
+        P1 = copy.deepcopy(P1)
+        P2 = copy.deepcopy(P2)
+        P3 = copy.deepcopy(P3)
         
         if any([a == 'rrup' for a in methods]):
             p0 = Vector.fromPoint(P0)
