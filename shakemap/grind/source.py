@@ -188,23 +188,7 @@ class Source(object):
         for method in gmpe.REQUIRES_DISTANCES:
             print('Calculating method %s' % method)
             dist = self.calcDistance(mesh,method)
-            #can't figure out how to dynamically assign dist to a property on context
-            #this doesn't work:
-            #context.__dict__[method] = dist
-            if method == 'rx':
-                context.rx = dist.reshape(mesh.lons.shape)
-            if method == 'rrup':
-                context.rrup = dist.reshape(mesh.lons.shape)
-            if method == 'rjb':
-                context.rjb = dist.reshape(mesh.lons.shape)
-            if method == 'ry0':
-                context.ry0 = dist.reshape(mesh.lons.shape)
-            if method == 'rcdpp':
-                context.rcdpp = dist.reshape(mesh.lons.shape)
-            if method == 'repi':
-                context.repi = dist.reshape(mesh.lons.shape)
-            if method == 'rhypo':
-                context.rhypo = dist.reshape(mesh.lons.shape)
+            (context.__dict__)[method] = dist.reshape(mesh.lons.shape)
 
         return context
 
@@ -239,18 +223,7 @@ class Source(object):
         # need to worry about overwriting rjb with repi and rrup with rhyp
         
         for method in gmpe.REQUIRES_DISTANCES:
-            if method == 'rx':
-                context.rx = ddict['rx']
-            if method == 'rrup':
-                context.rrup = ddict['rrup']
-            if method == 'rjb':
-                context.rjb = ddict['rjb']
-            if method == 'ry0':
-                context.ry0 = ddict['ry0']
-            if method == 'repi':
-                context.repi = ddict['repi']
-            if method == 'rhypo':
-                context.rhypo = ddict['rhypo']
+            (context.__dict__)[method] = ddict[method]
 
         return context
     

@@ -224,36 +224,31 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
     if quadlist is None:
         raise ShakeMapException('Cannot calculate rupture distance %s without a list of quadrilaterals' % method)
     
-    if any([a == 'rrup' for a in methods]) or \
-       any([a == 'rx' for a in methods]) or \
-       any([a == 'rjb' for a in methods]):
-       x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
-       x.shape = newshape
-       y.shape = newshape
-       z.shape = newshape
-       points = np.hstack((x,y,z))
-    
+    if ('rrup' in methods) or \
+       ('rx' in methods) or \
+       ('rjb' in methods):
+        x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
+        x.shape = newshape
+        y.shape = newshape
+        z.shape = newshape
+        points = np.hstack((x,y,z))
     
     # --------------------------------------------------------
     # Loop over quadlist for those distances that require loop    
     # --------------------------------------------------------
-    if any([a == 'rrup' for a in methods]):
+    if 'rrup' in methods:
         minrrup = np.ones(newshape, dtype = mesh.lons.dtype)*1e16
-    if any([a == 'rjb' for a in methods]):
+    if 'rjb' in methods:
         minrjb = np.ones(newshape, dtype=mesh.lons.dtype)*1e16
-    if any([a == 'rx' for a in methods]):
+    if 'rx' in methods:
         totweight = np.zeros(newshape, dtype=mesh.lons.dtype)
         meanrxdist = np.zeros(newshape, dtype=mesh.lons.dtype)
     
     
     for quad in quadlist:
         P0, P1, P2, P3 = quad
-        P0 = copy.deepcopy(P0)
-        P1 = copy.deepcopy(P1)
-        P2 = copy.deepcopy(P2)
-        P3 = copy.deepcopy(P3)
         
-        if any([a == 'rrup' for a in methods]):
+        if 'rrup' in methods:
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
             p2 = Vector.fromPoint(P2)
@@ -261,19 +256,23 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
             rrupdist = calc_rupture_distance(p0, p1, p2, p3, points)
             minrrup = np.minimum(minrrup, rrupdist)
         
-        if any([a == 'rjb' for a in methods]):
-            P0.depth = 0.0
-            P1.depth = 0.0
-            P2.depth = 0.0
-            P3.depth = 0.0
-            p0 = Vector.fromPoint(P0)
-            p1 = Vector.fromPoint(P1)
-            p2 = Vector.fromPoint(P2)
-            p3 = Vector.fromPoint(P3)
+        if 'rjb' in methods:
+            S0 = copy.deepcopy(P0)
+            S1 = copy.deepcopy(P1)
+            S2 = copy.deepcopy(P2)
+            S3 = copy.deepcopy(P3)
+            S0.depth = 0.0
+            S1.depth = 0.0
+            S2.depth = 0.0
+            S3.depth = 0.0
+            p0 = Vector.fromPoint(S0)
+            p1 = Vector.fromPoint(S1)
+            p2 = Vector.fromPoint(S2)
+            p3 = Vector.fromPoint(S3)
             rjbdist = calc_rupture_distance(p0, p1, p2, p3, points)
             minrjb = np.minimum(minrjb, rjbdist)
         
-        if any([a == 'rx' for a in methods]):
+        if 'rx' in methods:
             # This is currently just a bandaid to get resonable and 'graceful'
             # results for multiple segment ruptures. The 'correct' wayt to do
             # this is to use the unpublished equations for GC2 (2nd version of
@@ -327,24 +326,24 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
                 
     # Collect distances from loop into a dict
     distdict = dict()
-    if any([a == 'rjb' for a in methods]):
+    if 'rjb' in methods:
         minrjb = minrjb.reshape(oldshape)
         distdict['rjb'] = minrjb
     
-    if any([a == 'rx' for a in methods]):
+    if 'rx' in methods:
         # normalize by sum of quad weights
         meanrxdist = meanrxdist/totweight
         meanrxdist = meanrxdist.reshape(oldshape)
         distdict['rx'] = meanrxdist
     
-    if any([a == 'rrup' for a in methods]):
+    if 'rrup' in methods:
         minrrup = minrrup.reshape(oldshape)
         distdict['rrup'] = minrrup
     
     # -------------------------------------------------------
     # Remaining distances that do not require loop over quads
     # -------------------------------------------------------
-    if any([a == 'ry0' for a in methods]):
+    if 'ry0' in methods:
         # This is just a bandaid on ry0 to get reasonably sensible results
         # for multiple segments ruptures. The 'correct' way to do this is to
         # compare the source-to-site azimuth and use Ry0 = Rx/abs(azimuth)
@@ -360,7 +359,7 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
         ry0dist = calc_ry0_distance(FP0, LP1, mesh)
         distdict['ry0'] = ry0dist
     
-    if any([a == 'repi' for a in methods]):
+    if 'repi' in methods:
         if mypoint is None:
             raise ShakeMapException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(mypoint.longitude, mypoint.latitude, 0.0)
@@ -368,7 +367,7 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
         repidist = repidist.reshape(oldshape)
         distdict['repi'] = repidist
     
-    if any([a == 'rhypo' for a in methods]):
+    if 'rhypo' in methods:
         if mypoint is None:
             raise ShakeMapException('Cannot calculate epicentral distance without a point object')
         newpoint = point.Point(mypoint.longitude, mypoint.latitude, mypoint.depth)
