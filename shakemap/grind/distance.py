@@ -213,12 +213,16 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
     :raises NotImplementedError:
        for unknown distance measures or ones not yet implemented.
     """
+    
+    # Dictionary for holding the distances
+    distdict = dict()
+    
     if not isinstance(methods, list):
         methods = [methods]
     
     methods_available = set(['rjb', 'rx', 'rrup', 'ry0', 'repi', 'rhypo'])
     if not set(methods).issubset(methods_available):
-        raise NotImplementedError('One or more requested distance method is not'\
+        raise NotImplementedError('One or more requested distance method is not '\
                                   'valid or is not implemented yet')
     
     oldshape = mesh.lons.shape
@@ -227,9 +231,6 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
     else:
         newshape = (oldshape[0],1)
     
-    methods_fault = set(['rjb', 'rrup', 'rx', 'ry0'])
-    if (quadlist is None) and (len(set(methods).intersection(methods_fault)) > 0):
-        raise ShakeMapException('Cannot calculate fault distances without a list of quadrilaterals')
     # Need to integrate ps2ff...
     
     if ('rrup' in methods) or \
@@ -245,20 +246,26 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
     # Distances that do not require loop over quads
     # ---------------------------------------------
     
-    if 'repi' in methods:
+    if ('repi' in methods) or \
+       (('rjb' in methods) and (quadlist is None)) or \
+       (('ry0' in methods) and (quadlist is None)) or \
+       (('rx' in methods) and (quadlist is None)):
         if mypoint is None:
-            raise ShakeMapException('Cannot calculate epicentral distance without a point object')
+            raise ShakeMapException('Cannot calculate epicentral distance '\
+                                    'without a point object')
         newpoint = point.Point(mypoint.longitude, mypoint.latitude, 0.0)
         repidist = newpoint.distance_to_mesh(mesh)
         repidist = repidist.reshape(oldshape)
         distdict['repi'] = repidist
     
-    if 'rhypo' in methods:
+    if ('rhypo' in methods) or \
+       (('rrup' in methods) and (quadlist is None)):
         if mypoint is None:
-            raise ShakeMapException('Cannot calculate epicentral distance without a point object')
+            raise ShakeMapException('Cannot calculate epicentral distance '\
+                                    'without a point object')
         newpoint = point.Point(mypoint.longitude, mypoint.latitude, mypoint.depth)
         rhypodist = newpoint.distance_to_mesh(mesh)
-        rhypodist = rhypdist.reshape(oldshape)
+        rhypodist = rhypodist.reshape(oldshape)
         distdict['rhypo'] = rhypodist
 
     # ry0 does not require a loop, but it does require quads exist
@@ -373,8 +380,7 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
                 rxdist = calc_rx_distance(PP0, PP1, ppoints)
                 meanrxdist = meanrxdist + rxdist*dweight
                 
-        # Collect distances from loop into a dict
-        distdict = dict()
+        # Collect distances from loop into the distance dict
         if 'rjb' in methods:
             minrjb = minrjb.reshape(oldshape)
             distdict['rjb'] = minrjb
