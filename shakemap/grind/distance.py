@@ -4,6 +4,7 @@
 import struct
 from datetime import datetime
 import copy
+import warnings
 
 #third party imports
 from .ecef import latlon2ecef
@@ -212,8 +213,17 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
     :raises NotImplementedError:
        for unknown distance measures or ones not yet implemented.
     """
+    
+    # Dictionary for holding the distances
+    distdict = dict()
+    
     if not isinstance(methods, list):
         methods = [methods]
+    
+    methods_available = set(['rjb', 'rx', 'rrup', 'ry0', 'repi', 'rhypo'])
+    if not set(methods).issubset(methods_available):
+        raise NotImplementedError('One or more requested distance method is not '\
+                                  'valid or is not implemented yet')
     
     oldshape = mesh.lons.shape
     if len(oldshape) == 2:
@@ -221,8 +231,7 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
     else:
         newshape = (oldshape[0],1)
     
-    if quadlist is None:
-        raise ShakeMapException('Cannot calculate rupture distance %s without a list of quadrilaterals' % method)
+    # Need to integrate ps2ff...
     
     if ('rrup' in methods) or \
        ('rx' in methods) or \
@@ -232,6 +241,53 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
         y.shape = newshape
         z.shape = newshape
         points = np.hstack((x,y,z))
+        
+    # ---------------------------------------------
+    # Distances that do not require loop over quads
+    # ---------------------------------------------
+    
+    if ('repi' in methods) or \
+       (('rjb' in methods) and (quadlist is None)) or \
+       (('ry0' in methods) and (quadlist is None)) or \
+       (('rx' in methods) and (quadlist is None)):
+        if mypoint is None:
+            raise ShakeMapException('Cannot calculate epicentral distance '\
+                                    'without a point object')
+        newpoint = point.Point(mypoint.longitude, mypoint.latitude, 0.0)
+        repidist = newpoint.distance_to_mesh(mesh)
+        repidist = repidist.reshape(oldshape)
+        distdict['repi'] = repidist
+    
+    if ('rhypo' in methods) or \
+       (('rrup' in methods) and (quadlist is None)):
+        if mypoint is None:
+            raise ShakeMapException('Cannot calculate epicentral distance '\
+                                    'without a point object')
+        newpoint = point.Point(mypoint.longitude, mypoint.latitude, mypoint.depth)
+        rhypodist = newpoint.distance_to_mesh(mesh)
+        rhypodist = rhypodist.reshape(oldshape)
+        distdict['rhypo'] = rhypodist
+
+    # ry0 does not require a loop, but it does require quads exist
+    if 'ry0' in methods:
+        if quadlist is not None:
+            # This is just a bandaid on ry0 to get reasonably sensible results
+            # for multiple segments ruptures. The 'correct' way to do this is to
+            # compare the source-to-site azimuth and use Ry0 = Rx/abs(azimuth)
+            # as given in Abrahamson et al. (2014).
+            # Note that Ry0 is not the same as:
+            #    Ry (in the database summary paper), or
+            #    Ry2 that is given in the NGA W2 flatfile, or
+            #    U in the GC2 coordinate system.
+            # Note: this assumes that the quadrilaters are sorted in order along
+            #       strike.
+            FP0, FP1, FP2, FP3 = quadlist[0]
+            LP0, LP1, LP2, LP3 = quadlist[-1]
+            ry0dist = calc_ry0_distance(FP0, LP1, mesh)
+            distdict['ry0'] = ry0dist
+        else:
+            warnings.warn('No fault; Replacing ry0 with repi')
+            distdict['ry0'] = distdict['repi']
     
     # --------------------------------------------------------
     # Loop over quadlist for those distances that require loop    
@@ -244,139 +300,112 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
         totweight = np.zeros(newshape, dtype=mesh.lons.dtype)
         meanrxdist = np.zeros(newshape, dtype=mesh.lons.dtype)
     
-    
-    for quad in quadlist:
-        P0, P1, P2, P3 = quad
+    if quadlist is not None: 
+        for quad in quadlist:
+            P0, P1, P2, P3 = quad
         
-        if 'rrup' in methods:
-            p0 = Vector.fromPoint(P0)
-            p1 = Vector.fromPoint(P1)
-            p2 = Vector.fromPoint(P2)
-            p3 = Vector.fromPoint(P3)
-            rrupdist = calc_rupture_distance(p0, p1, p2, p3, points)
-            minrrup = np.minimum(minrrup, rrupdist)
-        
+            if 'rrup' in methods:
+                p0 = Vector.fromPoint(P0)
+                p1 = Vector.fromPoint(P1)
+                p2 = Vector.fromPoint(P2)
+                p3 = Vector.fromPoint(P3)
+                rrupdist = calc_rupture_distance(p0, p1, p2, p3, points)
+                minrrup = np.minimum(minrrup, rrupdist)
+            
+            if 'rjb' in methods:
+                S0 = copy.deepcopy(P0)
+                S1 = copy.deepcopy(P1)
+                S2 = copy.deepcopy(P2)
+                S3 = copy.deepcopy(P3)
+                S0.depth = 0.0
+                S1.depth = 0.0
+                S2.depth = 0.0
+                S3.depth = 0.0
+                p0 = Vector.fromPoint(S0)
+                p1 = Vector.fromPoint(S1)
+                p2 = Vector.fromPoint(S2)
+                p3 = Vector.fromPoint(S3)
+                rjbdist = calc_rupture_distance(p0, p1, p2, p3, points)
+                minrjb = np.minimum(minrjb, rjbdist)
+            
+            if 'rx' in methods:
+                # This is currently just a bandaid to get resonable and 'graceful'
+                # results for multiple segment ruptures. The 'correct' wayt to do
+                # this is to use the unpublished equations for GC2 (2nd version of
+                # Paul Spudich's generalized coordinate system). Rx appears to be
+                # defined the same as T in GC2, but gives slightly different values
+                # in the NGA W2 flatfile. 
+                
+                # Project top two points into a Cartesian space
+                west = min(P0.x, P1.x)
+                east = max(P0.x, P1.x)
+                south = min(P0.y, P1.y)
+                north = max(P0.y, P1.y)
+                proj = get_orthographic_projection(west, east, north, south)
+                # projected coordinates are in km
+                p0x, p0y = proj(P0.x, P0.y)
+                p1x, p1y = proj(P1.x, P1.y)
+                
+                # Convert from m to km
+                PP0 = Vector(p0x*1000, p0y*1000, 0.0)
+                PP1 = Vector(p1x*1000, p1y*1000, 0.0)
+                
+                # Project sites
+                ppointx, ppointy = proj(mesh.lons.flatten(), mesh.lats.flatten())
+                ppoints = np.zeros((len(ppointx), 3))
+                
+                # Convert coordinates to meters and put in numpy array
+                ppoints[:, 0] = ppointx*1000 
+                ppoints[:, 1] = ppointy*1000
+                
+                # Compute distance to "segment"
+                # Hacky... use Rjb function and put bottom points below top trace.
+                S0 = copy.deepcopy(P0)
+                S1 = copy.deepcopy(P1)
+                S2 = copy.deepcopy(P1)
+                S3 = copy.deepcopy(P0)
+                S0.depth = 0.0
+                S1.depth = 0.0
+                S2.depth = 1.0
+                S3.depth = 1.0
+                s0 = Vector.fromPoint(S0)
+                s1 = Vector.fromPoint(S1)
+                s2 = Vector.fromPoint(S2)
+                s3 = Vector.fromPoint(S3)
+                topdist = calc_rupture_distance(s0, s1, s2, s3, points)
+                
+                # Weight of Rx is inverse squared distance
+                dweight = 1.0/(topdist**2)
+                totweight = totweight + dweight
+                rxdist = calc_rx_distance(PP0, PP1, ppoints)
+                meanrxdist = meanrxdist + rxdist*dweight
+                
+        # Collect distances from loop into the distance dict
         if 'rjb' in methods:
-            S0 = copy.deepcopy(P0)
-            S1 = copy.deepcopy(P1)
-            S2 = copy.deepcopy(P2)
-            S3 = copy.deepcopy(P3)
-            S0.depth = 0.0
-            S1.depth = 0.0
-            S2.depth = 0.0
-            S3.depth = 0.0
-            p0 = Vector.fromPoint(S0)
-            p1 = Vector.fromPoint(S1)
-            p2 = Vector.fromPoint(S2)
-            p3 = Vector.fromPoint(S3)
-            rjbdist = calc_rupture_distance(p0, p1, p2, p3, points)
-            minrjb = np.minimum(minrjb, rjbdist)
+            minrjb = minrjb.reshape(oldshape)
+            distdict['rjb'] = minrjb
         
         if 'rx' in methods:
-            # This is currently just a bandaid to get resonable and 'graceful'
-            # results for multiple segment ruptures. The 'correct' wayt to do
-            # this is to use the unpublished equations for GC2 (2nd version of
-            # Paul Spudich's generalized coordinate system). Rx appears to be
-            # defined the same as T in GC2, but gives slightly different values
-            # in the NGA W2 flatfile. 
+            # normalize by sum of quad weights
+            meanrxdist = meanrxdist/totweight
+            meanrxdist = meanrxdist.reshape(oldshape)
+            distdict['rx'] = meanrxdist
             
-            # Project top two points into a Cartesian space
-            west = min(P0.x, P1.x)
-            east = max(P0.x, P1.x)
-            south = min(P0.y, P1.y)
-            north = max(P0.y, P1.y)
-            proj = get_orthographic_projection(west, east, north, south)
-            # projected coordinates are in km
-            p0x, p0y = proj(P0.x, P0.y)
-            p1x, p1y = proj(P1.x, P1.y)
-            
-            # Convert from m to km
-            PP0 = Vector(p0x*1000, p0y*1000, 0.0)
-            PP1 = Vector(p1x*1000, p1y*1000, 0.0)
-            
-            # Project sites
-            ppointx, ppointy = proj(mesh.lons.flatten(), mesh.lats.flatten())
-            ppoints = np.zeros((len(ppointx), 3))
-            
-            # Convert coordinates to meters and put in numpy array
-            ppoints[:, 0] = ppointx*1000 
-            ppoints[:, 1] = ppointy*1000
-            
-            # Compute distance to "segment"
-            # Hacky... use Rjb function and put bottom points below top trace.
-            S0 = copy.deepcopy(P0)
-            S1 = copy.deepcopy(P1)
-            S2 = copy.deepcopy(P1)
-            S3 = copy.deepcopy(P0)
-            S0.depth = 0.0
-            S1.depth = 0.0
-            S2.depth = 1.0
-            S3.depth = 1.0
-            s0 = Vector.fromPoint(S0)
-            s1 = Vector.fromPoint(S1)
-            s2 = Vector.fromPoint(S2)
-            s3 = Vector.fromPoint(S3)
-            topdist = calc_rupture_distance(s0, s1, s2, s3, points)
-            
-            # Weight of Rx is inverse squared distance
-            dweight = 1.0/(topdist**2)
-            totweight = totweight + dweight
-            rxdist = calc_rx_distance(PP0, PP1, ppoints)
-            meanrxdist = meanrxdist + rxdist*dweight
-                
-    # Collect distances from loop into a dict
-    distdict = dict()
-    if 'rjb' in methods:
-        minrjb = minrjb.reshape(oldshape)
-        distdict['rjb'] = minrjb
+        if 'rrup' in methods:
+            minrrup = minrrup.reshape(oldshape)
+            distdict['rrup'] = minrrup
     
-    if 'rx' in methods:
-        # normalize by sum of quad weights
-        meanrxdist = meanrxdist/totweight
-        meanrxdist = meanrxdist.reshape(oldshape)
-        distdict['rx'] = meanrxdist
+    else:
+        if 'rjb' in methods:
+            warnings.warn('No fault; Replacing rjb with repi')
+            distdict['rjb'] = distdict['repi']
+        if 'rrup' in methods:
+            warnings.warn('No fault; Replacing rrup with rhypo')
+            distdict['rrup'] = distdict['rhypo']
+        if 'rx' in methods:
+            warnings.warn('No fault; Replacing rx with repi')
+            distdict['rx'] = distdict['repi']
     
-    if 'rrup' in methods:
-        minrrup = minrrup.reshape(oldshape)
-        distdict['rrup'] = minrrup
-    
-    # -------------------------------------------------------
-    # Remaining distances that do not require loop over quads
-    # -------------------------------------------------------
-    if 'ry0' in methods:
-        # This is just a bandaid on ry0 to get reasonably sensible results
-        # for multiple segments ruptures. The 'correct' way to do this is to
-        # compare the source-to-site azimuth and use Ry0 = Rx/abs(azimuth)
-        # as given in Abrahamson et al. (2014).
-        # Note that Ry0 is not the same as:
-        #    Ry (in the database summary paper), or
-        #    Ry2 that is given in the NGA W2 flatfile, or
-        #    U in the GC2 coordinate system.
-        # Note: this assumes that the quadrilaters are sorted in order along
-        #       strike.
-        FP0, FP1, FP2, FP3 = quadlist[0]
-        LP0, LP1, LP2, LP3 = quadlist[-1]
-        ry0dist = calc_ry0_distance(FP0, LP1, mesh)
-        distdict['ry0'] = ry0dist
-    
-    if 'repi' in methods:
-        if mypoint is None:
-            raise ShakeMapException('Cannot calculate epicentral distance without a point object')
-        newpoint = point.Point(mypoint.longitude, mypoint.latitude, 0.0)
-        repidist = newpoint.distance_to_mesh(mesh)
-        repidist = repidist.reshape(oldshape)
-        distdict['repi'] = repidist
-    
-    if 'rhypo' in methods:
-        if mypoint is None:
-            raise ShakeMapException('Cannot calculate epicentral distance without a point object')
-        newpoint = point.Point(mypoint.longitude, mypoint.latitude, mypoint.depth)
-        rhypodist = newpoint.distance_to_mesh(mesh)
-        rhypodist = rhypdist.reshape(oldshape)
-        distdict['rhypo'] = rhypodist
-
-#    if 
-#        raise NotImplementedError('"%s" distance measure is not valid or is not implemented yet' % method)
     return distdict
 
 def distance_sq_to_segment(p0, p1):
