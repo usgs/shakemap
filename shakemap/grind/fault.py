@@ -50,30 +50,38 @@ class Fault(object):
     @classmethod
     def fromTrace(cls,xp0,yp0,xp1,yp1,zp,widths,dips,strike=None,reference=None):
         """
-        Create a fault object from a set of vertices that define the top of the fault, and an array of widths/dips.
+        Create a fault object from a set of vertices that define the top of the 
+        fault, and an array of widths/dips.
 
-       These top of rupture points are defined by specifying the x and y coordinates of each of the two vertices, 
-        and then specifying an array of depths,widths, and dips for each rectangle.
+        These top of rupture points are defined by specifying the x and y 
+        coordinates of each of the two vertices, and then specifying an array of 
+        depths,widths, and dips for each rectangle.
         :param xp0:
-          Array of longitude coordinates for the first (top of rupture) vertex of each rectangle (decimal degrees).
+          Array of longitude coordinates for the first (top of rupture) vertex of 
+          each rectangle (decimal degrees).
         :param yp0:
-          Array of latitude coordinates for the first (top of rupture) vertex of each rectangle (decimal degrees).
+          Array of latitude coordinates for the first (top of rupture) vertex of 
+          each rectangle (decimal degrees).
         :param xp1:
-          Array of longitude coordinates for the second (top of rupture) vertex of each rectangle (decimal degrees).
+          Array of longitude coordinates for the second (top of rupture) vertex of 
+          each rectangle (decimal degrees).
         :param yp1:
-          Array of latitude coordinates for the second (top of rupture) vertex of each rectangle (decimal degrees).
+          Array of latitude coordinates for the second (top of rupture) vertex of 
+          each rectangle (decimal degrees).
         :param zp:
-          Array of depths for each of the top of rupture rectangles (decimal degrees).
+          Array of depths for each of the top of rupture rectangles (km).
         :param widths:
           Array of widths for each of rectangle (km).
         :param dips:
           Array of dips for each of rectangle (degrees).
         :param strike:
-          If None then strike is computed from verticies of top edge of each quadrilateral. If a scalar, then 
-          all quadrilaterals are constructed assuming this strike direction. If a vector with the same length as 
-          the trace coordinates then it specifies the strike for each quadrilateral. 
+          If None then strike is computed from verticies of top edge of each 
+          quadrilateral. If a scalar, then all quadrilaterals are constructed 
+          assuming this strike direction. If a vector with the same length as 
+          the trace coordinates then it specifies the strike for each quadrilateral.
         :param reference:
-          String explaining where the fault definition came from (publication style reference, etc.)
+          String explaining where the fault definition came from (publication style 
+          reference, etc.)
         :returns:
           Fault object, where the fault is modeled as a series of rectangles.
         """
@@ -167,14 +175,15 @@ class Fault(object):
             yp3[i] = lat3
             zpdown[i] = zp[i]+dz
 
-        #assemble the vertices as the Fault constructor needs them...
-        #which is: for each rectangle, there should be the four corners, the first corner repeated, and then a nan.
+        # assemble the vertices as the Fault constructor needs them...
+        # which is: for each rectangle, there should be the four corners, the
+        # first corner repeated, and then a nan.
         nrects = len(zp)
         anan = np.ones_like(xp0)*np.nan
         lon = np.array(list(zip(xp0,xp1,xp2,xp3,xp0,anan))).reshape((nrects,6)).flatten(order='C')
         lat = np.array(list(zip(yp0,yp1,yp2,yp3,yp0,anan))).reshape((nrects,6)).flatten(order='C')
 
-        #we need an array of depths, but we need to double each zp and zpdown element we have
+        # we need an array of depths, but we need to double each zp and zpdown element we have
         dep = []
         for i in range(0,nrects):
             dep += [zp[i],zp[i],zpdown[i],zpdown[i],zp[i],np.nan]
@@ -266,6 +275,86 @@ class Fault(object):
 
         return cls(x,y,z,reference)
 
+    @classmethod
+    def fromVertices(cls, 
+                     xp0, yp0, zp0, xp1, yp1, zp1,
+                     xp2, yp2, zp2, xp3, yp3, zp3,
+                     reference = None):
+        """
+        Create a fault object from the vector of vertices that fully define the
+        quadrilaterals. The points p0, ..., p3 are labeled below for a trapezoid: 
+
+        p0--------p1
+        |          \
+        |           \
+        p3----------p2
+        
+        All of the following vector arguments must have the same length. 
+        :param xp0:
+          Vector of longitudes of p0. 
+        :param yp0:
+          Vector of latitudes of p0. 
+        :param zp0:
+          Vector of depths of p0 (positive down). 
+        :param xp1:
+          Vector of longitudes of p1. 
+        :param yp1:
+          Vector of latitudes of p1. 
+        :param zp1:
+          Vector of depths of p1 (positive down). 
+        :param xp2:
+          Vector of longitudes of p2. 
+        :param yp2:
+          Vector of latitudes of p2. 
+        :param zp2:
+          Vector of depths of p2 (positive down). 
+        :param xp3:
+          Vector of longitudes of p3. 
+        :param yp3:
+          Vector of latitudes of p3. 
+        :param zp3:
+          Vector of depths of p3 (positive down).
+        :param reference:
+          String explaining where the fault definition came from (publication style 
+          reference, etc.)
+        :returns:
+          Fault object, where the fault is modeled as a series of trapezoids.
+        """
+        if len(xp0) == len(yp0) == len(zp0) == len(xp1) == len(yp1) == len(zp1) == \
+           len(xp2) == len(yp2) == len(zp2) == len(xp3) == len(yp3) == len(zp3):
+            pass
+        else:
+            raise ShakeMapException('All vectors specifying quadrilateral '\
+                                    'vertices must have the same length.')
+        
+        nq = len(xp0)
+        
+        xp0 = np.array(xp0, dtype = 'd')
+        yp0 = np.array(yp0, dtype = 'd')
+        zp0 = np.array(zp0, dtype = 'd')
+        xp1 = np.array(xp1, dtype = 'd')
+        yp1 = np.array(yp1, dtype = 'd')
+        zp1 = np.array(zp1, dtype = 'd')
+        xp2 = np.array(xp2, dtype = 'd')
+        yp2 = np.array(yp2, dtype = 'd')
+        zp2 = np.array(zp2, dtype = 'd')
+        xp3 = np.array(xp3, dtype = 'd')
+        yp3 = np.array(yp3, dtype = 'd')
+        zp3 = np.array(zp3, dtype = 'd')
+        
+        # assemble the vertices as the Fault constructor needs them...
+        # which is: for each rectangle, there should be the four corners, the
+        # first corner repeated, and then a nan.
+        anan = np.ones_like(xp0)*np.nan
+        lon = np.array(list(zip(xp0, xp1, xp2, xp3, xp0, anan))
+          ).reshape((nq, 6)).flatten(order = 'C')
+        lat = np.array(list(zip(yp0, yp1, yp2, yp3, yp0, anan))
+          ).reshape((nq, 6)).flatten(order = 'C')
+        dep = np.array(list(zip(zp0, zp1, zp2, zp3, zp0, anan))
+          ).reshape((nq, 6)).flatten(order = 'C')
+        
+        return cls(lon, lat, dep, reference)
+    
     def multiplyFaultLength(self,factor):
         # What does this do and why do we want to do it????
         for i in range(0,len(self.Quadrilaterals)):
