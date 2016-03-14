@@ -215,14 +215,22 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
     if not isinstance(methods, list):
         methods = [methods]
     
+    methods_available = set(['rjb', 'rx', 'rrup', 'ry0', 'repi', 'rhypo'])
+    if not set(methods).issubset(methods_available):
+        raise NotImplementedError('One or more requested distance method is not'\
+                                  'valid or is not implemented yet')
+    
+    
     oldshape = mesh.lons.shape
     if len(oldshape) == 2:
         newshape = (oldshape[0]*oldshape[1],1)
     else:
         newshape = (oldshape[0],1)
     
-    if quadlist is None:
-        raise ShakeMapException('Cannot calculate rupture distance %s without a list of quadrilaterals' % method)
+    methods_fault = set(['rjb', 'rrup', 'rx', 'ry0'])
+    if (quadlist is None) and (len(set(methods).intersection(methods_fault)) > 0):
+        raise ShakeMapException('Cannot calculate fault distances without a list of quadrilaterals')
+    # Need to integrate ps2ff...
     
     if ('rrup' in methods) or \
        ('rx' in methods) or \
@@ -375,8 +383,6 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
         rhypodist = rhypdist.reshape(oldshape)
         distdict['rhypo'] = rhypodist
 
-#    if 
-#        raise NotImplementedError('"%s" distance measure is not valid or is not implemented yet' % method)
     return distdict
 
 def distance_sq_to_segment(p0, p1):

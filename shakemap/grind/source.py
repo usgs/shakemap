@@ -221,6 +221,18 @@ class Source(object):
         
         ddict = get_distance2(list(gmpe.REQUIRES_DISTANCES), mesh, quadlist = quadlist, mypoint = oqpoint)
         # need to worry about overwriting rjb with repi and rrup with rhyp
+#        #if user has specified a distance measure dependent on a fault but we don't have a fault
+#        #override their choice with the appropriate point source distance.
+#        if quadlist is None and (method != 'repi' or method != 'rhypo'):
+#            if method in ['rjb','rx']:
+#                method = 'repi'
+#            else:
+#                method = 'rhypo'
+        # Check for whether or not we have a fualt
+        if self.Fault is not None:
+            quadlist = self.Fault.getQuadrilaterals()
+        else:
+            quadlist = None
         
         for method in gmpe.REQUIRES_DISTANCES:
             (context.__dict__)[method] = ddict[method]
