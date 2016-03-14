@@ -229,10 +229,6 @@ class Source(object):
 #            else:
 #                method = 'rhypo'
         # Check for whether or not we have a fualt
-        if self.Fault is not None:
-            quadlist = self.Fault.getQuadrilaterals()
-        else:
-            quadlist = None
         
         for method in gmpe.REQUIRES_DISTANCES:
             (context.__dict__)[method] = ddict[method]
