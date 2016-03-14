@@ -9,6 +9,7 @@ import warnings
 #third party imports
 from .ecef import latlon2ecef
 from .vector import Vector
+from .fault import get_quad_length
 from openquake.hazardlib.geo import point
 from openquake.hazardlib.geo import geodetic
 from openquake.hazardlib.geo.utils import get_orthographic_projection
@@ -359,23 +360,12 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
                 ppoints[:, 1] = ppointy*1000
                 
                 # Compute distance to "segment"
-                # Hacky... use Rjb function and put bottom points below top trace.
-                S0 = copy.deepcopy(P0)
-                S1 = copy.deepcopy(P1)
-                S2 = copy.deepcopy(P1)
-                S3 = copy.deepcopy(P0)
-                S0.depth = 0.0
-                S1.depth = 0.0
-                S2.depth = 1.0
-                S3.depth = 1.0
-                s0 = Vector.fromPoint(S0)
-                s1 = Vector.fromPoint(S1)
-                s2 = Vector.fromPoint(S2)
-                s3 = Vector.fromPoint(S3)
-                topdist = calc_rupture_distance(s0, s1, s2, s3, points)
-                
-                # Weight of Rx is inverse squared distance
-                dweight = 1.0/(topdist**2)
+                point0 = point.Point(P0.longitude, P0.latitude, 0.0)
+                point1 = point.Point(P1.longitude, P1.latitude, 0.0)
+                r0 = point0.distance_to_mesh(mesh)
+                r1 = point1.distance_to_mesh(mesh)
+                li = get_quad_length(quad)
+                dweight = (0.5*(1.0/(r0**2) + 1.0/(r1**2)) * li).reshape(newshape)
                 totweight = totweight + dweight
                 rxdist = calc_rx_distance(PP0, PP1, ppoints)
                 meanrxdist = meanrxdist + rxdist*dweight

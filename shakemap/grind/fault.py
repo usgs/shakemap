@@ -389,7 +389,7 @@ class Fault(object):
         """
         flength = 0
         for quad in self.Quadrilaterals:
-            flength = flength + getQuadLength(quad)
+            flength = flength + get_quad_length(quad)
         return flength
     
     def getQuadrilaterals(self):
