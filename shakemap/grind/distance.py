@@ -359,7 +359,9 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
                 ppoints[:, 0] = ppointx*1000 
                 ppoints[:, 1] = ppointy*1000
                 
-                # Compute distance to "segment"
+                # Compute u_i and t_i for this segment
+                t_i = calc_rx_distance(PP0, PP1, ppoints)
+                u_i = calc_u_i()
                 point0 = point.Point(P0.longitude, P0.latitude, 0.0)
                 point1 = point.Point(P1.longitude, P1.latitude, 0.0)
                 r0 = point0.distance_to_mesh(mesh)
@@ -367,7 +369,7 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
                 li = get_quad_length(quad)
                 dweight = (0.5*(1.0/(r0**2) + 1.0/(r1**2)) * li).reshape(newshape)
                 totweight = totweight + dweight
-                rxdist = calc_rx_distance(PP0, PP1, ppoints)
+                rxdist = t_i
                 meanrxdist = meanrxdist + rxdist*dweight
                 
         # Collect distances from loop into the distance dict
@@ -524,6 +526,18 @@ def calc_ry0_distance(P0,P1,mesh):
     dst = np.zeros_like(dst1)
     dst[idx] = np.fmin(np.abs(dst1[idx]), np.abs(dst2[idx]))
     return dst
+
+def calc_u_i(P0, P1, mesh):
+    """Calculate u_i distance. See Spudich and Chiou OFR 2015-1028. 
+    
+    :param P0:
+      Point object, representing the first top-edge vertex of a fault quadrilateral.
+    :param P1:
+      Point object, representing the second top-edge vertex of a fault quadrilateral.
+    :returns:
+      Array of size mesh.lons of distances (in km) from input points to rupture surface.
+    """
+    pass
 
 def calc_rx_distance(P0,P1,points):
     """
