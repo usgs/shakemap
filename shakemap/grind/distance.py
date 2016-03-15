@@ -10,192 +10,100 @@ import warnings
 from .ecef import latlon2ecef
 from .vector import Vector
 from .fault import get_quad_length
-from openquake.hazardlib.geo import point
-from openquake.hazardlib.geo import geodetic
+from openquake.hazardlib.geo import point, geodetic
+from openquake.hazardlib.geo.mesh import Mesh
 from openquake.hazardlib.geo.utils import get_orthographic_projection
+from openquake.hazardlib.gsim.base import GMPE
+from openquake.hazardlib.gsim import base
 import numpy as np
 import matplotlib.pyplot as plt
 
 #local imports
 from shakemap.utils.exception import ShakeMapException
 
-def minimize(a,b):
-    """
-    Get minimum values from two numpy arrays, ignoring sign in comparison 
-    but preserving sign in result.
-    :param a:
-      Numpy array
-    :param b:
-      Numpy array
-    :returns:
-      Numpy array
-    """
-    d = np.empty_like(a)
-    aidx = np.abs(a) < np.abs(b)
-    bidx = np.logical_not(aidx)
-    d[aidx] = a[aidx]
-    d[bidx] = b[bidx]
-    return d
-    
-def get_distance(method,mesh,quadlist=None,mypoint=None):
-    """
-    Calculate distance using any one of a number of distance measures. 
-    One of quadlist OR mypoint must be specified.
-    :param method:
-       One of: 'rjb','rx','rrup','ry0','rcdbp','repi','rhypo'
-    :param mesh:
-       A Mesh object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
-    :param quadlist:
-       optional list of quadrilaterals (see Fault.py)
-    :param mypoint:
-       optional Point object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py)
-    :returns:
-       numpy array of distances, size of mesh.lons
-    :raises ShakeMapException:
-       if a fault distance method is called without quadlist
-    :raises NotImplementedError:
-       for unknown distance measures or ones not yet implemented.
-    """
-    oldshape = mesh.lons.shape
-    if len(oldshape) == 2:
-        newshape = (oldshape[0]*oldshape[1],1)
-    else:
-        newshape = (oldshape[0],1)
-    if (method == 'rjb') or (method == 'rrup') or (method == 'rx') or (method == 'ry0'):
-        if quadlist is None:
-            raise ShakeMapException('Cannot calculate rupture distance %s without a list of quadrilaterals' % method)
-        mindist = np.ones(newshape,dtype=mesh.lons.dtype)*1e16
-        x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
-        x.shape = newshape
-        y.shape = newshape
-        z.shape = newshape
-        points = np.hstack((x,y,z))
 
-    if method == 'rjb':
-        for quad in quadlist:
-            P0,P1,P2,P3 = quad
-            P0 = copy.deepcopy(P0)
-            P1 = copy.deepcopy(P1)
-            P2 = copy.deepcopy(P2)
-            P3 = copy.deepcopy(P3)
-            P0.depth = 0.0
-            P1.depth = 0.0
-            P2.depth = 0.0
-            P3.depth = 0.0
-            p0 = Vector.fromPoint(P0)
-            p1 = Vector.fromPoint(P1)
-            p2 = Vector.fromPoint(P2)
-            p3 = Vector.fromPoint(P3)
-            rjbdist = calc_rupture_distance(p0,p1,p2,p3,points)
-            mindist = np.minimum(mindist,rjbdist)
-        mindist = mindist.reshape(oldshape)
-        return mindist
-    elif method == 'rx':
-        # This is currently just a bandaid to get resonable and 'graceful'
-        # results for multiple segment ruptures. The 'correct' wayt to do
-        # this is to use the unpublished equations for GC2 (2nd version of
-        # Paul Spudich's generalized coordinate system). Rx appears to be
-        # defined the same as T in GC2, but gives slightly different values
-        # in the NGA W2 flatfile. 
-        meanrxdist = np.zeros(newshape, dtype=mesh.lons.dtype)
-        totweight = np.zeros(newshape, dtype=mesh.lons.dtype)
-        for quad in quadlist:
-            # Points on top edge of quad
-            P0, P1, P2, P3 = quad
-            
-            # Project these two points into a Cartesian space
-            west = min(P0.x, P1.x)
-            east = max(P0.x, P1.x)
-            south = min(P0.y, P1.y)
-            north = max(P0.y, P1.y)
-            proj = get_orthographic_projection(west, east, north, south)
-            # projected coordinates are in km
-            p0x, p0y = proj(P0.x, P0.y)
-            p1x, p1y = proj(P1.x, P1.y)
-            
-            # Convert from m to km
-            PP0 = Vector(p0x*1000, p0y*1000, 0.0)
-            PP1 = Vector(p1x*1000, p1y*1000, 0.0)
-            
-            # Project sites
-            ppointx, ppointy = proj(mesh.lons.flatten(), mesh.lats.flatten())
-            ppoints = np.zeros((len(ppointx), 3))
-            
-            # Convert coordinates to meters and put in numpy array
-            ppoints[:, 0] = ppointx*1000 
-            ppoints[:, 1] = ppointy*1000
-            
-            # Compute distance to "segment"
-            # Hacky... use Rjb function and put bottom points below top trace.
-            S0 = copy.deepcopy(P0)
-            S1 = copy.deepcopy(P1)
-            S2 = copy.deepcopy(P1)
-            S3 = copy.deepcopy(P0)
-            S0.depth = 0.0
-            S1.depth = 0.0
-            S2.depth = 1.0
-            S3.depth = 1.0
-            s0 = Vector.fromPoint(S0)
-            s1 = Vector.fromPoint(S1)
-            s2 = Vector.fromPoint(S2)
-            s3 = Vector.fromPoint(S3)
-            topdist = calc_rupture_distance(s0, s1, s2, s3, points)
-            
-            # Weight of Rx is inverse squared distance
-            dweight = 1.0/(topdist**2)
-            totweight = totweight + dweight
-            rxdist = calc_rx_distance(PP0, PP1, ppoints)
-            meanrxdist = meanrxdist + rxdist*dweight
-        meanrxdist = meanrxdist/totweight
-        meanrxdist = meanrxdist.reshape(oldshape)
-        return meanrxdist
+class Distance(object):
+    """
+    And object to hold distance information. 
+    """
+    def __init__(self, gmpe, source, sites, use_median_distance = True):
+        """
+        Construct a Distance object. 
+        :param gmpe:
+            Concrete subclass of GMPE 
+            https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
+        :param source:
+            Source object.
+        :param sites: 
+            Site object.
+        :param use_median_distance: 
+            Boolean; only used if GMPE requests fault distances and not fault is 
+            availalbe. Default is True, meaning that point-source distances are 
+            adjusted based on magnitude to get the median fault distance. 
+        :returns:
+            Distance object.
+        """
+        self.source = source
+        sm_dict = sites.GeoDict
+        west = sm_dict.xmin
+        east = sm_dict.xmax
+        south = sm_dict.ymin
+        north = sm_dict.ymax
+        nx = sm_dict.nx
+        ny = sm_dict.ny
+        lats = np.linspace(north, south, ny)
+        lons = np.linspace(west, east, nx)
+        lon, lat = np.meshgrid(lons, lats)
+        dep = np.zeros_like(lon)
+        mesh = Mesh(lon, lat, dep)
+        
+        self._distance_context = self._calcDistanceContext(gmpe, mesh)
+        
+        # Place holder for additional sigma due to point-to-fault conversion
+        self.delta_sigma = 0.0
     
-    elif method == 'rrup':
-        for quad in quadlist:
-            P0,P1,P2,P3 = quad
-            p0 = Vector.fromPoint(P0)
-            p1 = Vector.fromPoint(P1)
-            p2 = Vector.fromPoint(P2)
-            p3 = Vector.fromPoint(P3)
-            rrupdist = calc_rupture_distance(p0,p1,p2,p3,points)
-            mindist = np.minimum(mindist,rrupdist)
-        mindist = mindist.reshape(oldshape)
-        return mindist
-    elif method == 'ry0':
-        # This is just a bandaid on ry0 to get reasonably sensible results
-        # for multiple segments ruptures. The 'correct' way to do this is to
-        # compare the source-to-site azimuth and use Ry0 = Rx/abs(azimuth)
-        # as given in Abrahamson et al. (2014).
-        # Note that Ry0 is not the same as:
-        #    Ry (in the database summary paper), or
-        #    Ry2 that is given in the NGA W2 flatfile, or
-        #    U in the GC2 coordinate system.
-        # Note: this assumes that the quadrilaters are sorted in order along
-        #       strike.
-        FP0, FP1, FP2, FP3 = quadlist[0]
-        LP0, LP1, LP2, LP3 = quadlist[-1]
-        ry0dist = calc_ry0_distance(FP0, LP1, mesh)
-        return ry0dist
-    elif method == 'rcdbp':
-        raise NotImplementedError('rcdbp distance measure is not implemented yet')
-    elif method == 'repi':
-        if mypoint is None:
-            raise ShakeMapException('Cannot calculate epicentral distance without a point object')
-        newpoint = point.Point(mypoint.longitude,mypoint.latitude,0.0)
-        mindist = newpoint.distance_to_mesh(mesh)
-        mindist = mindist.reshape(oldshape)
-        return mindist
-    elif method == 'rhypo':
-        if mypoint is None:
-            raise ShakeMapException('Cannot calculate epicentral distance without a point object')
-        newpoint = point.Point(mypoint.longitude,mypoint.latitude,mypoint.depth)
-        mindist = newpoint.distance_to_mesh(mesh)
-        mindist = mindist.reshape(oldshape)
-        return mindist
-    else:
-        raise NotImplementedError('"%s" distance measure is not valid or is not implemented yet' % method)
+    def getDistanceContext(self):
+        return self._distance_context
+    
+    def _calcDistanceContext(self, gmpe, mesh):
+        """
+        Create a DistancesContext object
+        :param gmpe: 
+            Concrete subclass of GMPE 
+            (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
+        :param mesh:
+            Mesh object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
+        :returns:
+            DistancesContext object with distance grids required by input gmpe.
+        :raises TypeError:
+            if gmpe is not a subclass of GMPE
+        """
+        if not isinstance(gmpe, GMPE):
+            raise TypeError('getDistanceContext() cannot work with objects of type "%s"' % type(gmpe))
+        
+        if self.source.Fault is not None:
+            quadlist = self.source.Fault.getQuadrilaterals()
+        else:
+            quadlist = None
+        
+        lat = self.source.getEventParam('lat')
+        lon = self.source.getEventParam('lon')
+        depth = self.source.getEventParam('depth')
+        oqpoint = point.Point(lon, lat, depth)
+        
+        context = base.DistancesContext()
+        
+        ddict = get_distance(list(gmpe.REQUIRES_DISTANCES), mesh, quadlist = quadlist, mypoint = oqpoint)
+        
+        for method in gmpe.REQUIRES_DISTANCES:
+            (context.__dict__)[method] = ddict[method]
 
-def get_distance2(methods, mesh, quadlist = None, mypoint = None):
+        return context
+    
+    ## add class methods for fromPoint, fromSites, fromArray
+
+
+def get_distance(methods, mesh, quadlist = None, mypoint = None):
     """
     Calculate distance using any one of a number of distance measures. 
     One of quadlist OR mypoint must be specified.
@@ -361,7 +269,7 @@ def get_distance2(methods, mesh, quadlist = None, mypoint = None):
                 
                 # Compute u_i and t_i for this segment
                 t_i = calc_rx_distance(PP0, PP1, ppoints)
-                u_i = calc_u_i()
+#                u_i = calc_u_i()
                 point0 = point.Point(P0.longitude, P0.latitude, 0.0)
                 point1 = point.Point(P1.longitude, P1.latitude, 0.0)
                 r0 = point0.distance_to_mesh(mesh)
@@ -449,7 +357,7 @@ def distance_sq_to_segment(p0, p1):
     return dist
 
 #call this once per quad
-def calc_rupture_distance(P0,P1,P2,P3,points):
+def calc_rupture_distance(P0, P1, P2, P3, points):
     """
     Calculate the shortest distance from a set of points to a rupture surface.
     :param P0: Vector object (in ECEF coordinates) defining the first vertex of a fault plane.
@@ -476,13 +384,14 @@ def calc_rupture_distance(P0,P1,P2,P3,points):
     n2 = (P3-P2).cross(normalVector).getArray()
     n3 = (P0-P3).cross(normalVector).getArray()
     
-    sgn0 = np.signbit(np.sum(n0*p0d,axis=1))
-    sgn1 = np.signbit(np.sum(n1*p1d,axis=1))
-    sgn2 = np.signbit(np.sum(n2*p2d,axis=1))
-    sgn3 = np.signbit(np.sum(n3*p3d,axis=1))
+    sgn0 = np.signbit(np.sum(n0*p0d, axis = 1))
+    sgn1 = np.signbit(np.sum(n1*p1d, axis = 1))
+    sgn2 = np.signbit(np.sum(n2*p2d, axis = 1))
+    sgn3 = np.signbit(np.sum(n3*p3d, axis = 1))
     
     inside_idx = (sgn0 == sgn1) & (sgn1 == sgn2) & (sgn2 == sgn3)
-    dist[inside_idx] = np.power(np.abs(np.sum(p0d[inside_idx,:] * normalVector.getArray(),axis=1)),2)
+    dist[inside_idx] = np.power(np.abs(
+        np.sum(p0d[inside_idx,:] * normalVector.getArray(), axis=1)),2)
 
     outside_idx = np.logical_not(inside_idx)
     s0 = distance_sq_to_segment(p0d, p1d)
@@ -490,7 +399,7 @@ def calc_rupture_distance(P0,P1,P2,P3,points):
     s2 = distance_sq_to_segment(p2d, p3d)
     s3 = distance_sq_to_segment(p3d, p0d)
 
-    smin = np.minimum(np.minimum(s0,s1),np.minimum(s2,s3))
+    smin = np.minimum(np.minimum(s0,s1),np.minimum(s2, s3))
     dist[outside_idx] = smin[outside_idx]
     dist = np.sqrt(dist)/1000.0
     shp = dist.shape
@@ -501,7 +410,7 @@ def calc_rupture_distance(P0,P1,P2,P3,points):
     dist = np.fliplr(dist)
     return dist
 
-def calc_ry0_distance(P0,P1,mesh):
+def calc_ry0_distance(P0, P1, mesh):
     """Calculate Ry0 distance.
 
     Compute the minimum distance between each point of a mesh and the great
@@ -516,11 +425,13 @@ def calc_ry0_distance(P0,P1,mesh):
       Array of size mesh.lons of distances (in km) from input points to rupture surface.
     """
     #get the mean strike vector
-    surfaceP0 = point.Point(P0.longitude,P0.latitude,0.0)
-    surfaceP1 = point.Point(P1.longitude,P1.latitude,0.0)
+    surfaceP0 = point.Point(P0.longitude, P0.latitude, 0.0)
+    surfaceP1 = point.Point(P1.longitude, P1.latitude, 0.0)
     strike = P0.azimuth(P1)
-    dst1 = geodetic.distance_to_arc(P0.longitude,P0.latitude,(strike + 90.) % 360,mesh.lons, mesh.lats)
-    dst2 = geodetic.distance_to_arc(P1.longitude,P1.latitude,(strike + 90.) % 360,mesh.lons, mesh.lats)
+    dst1 = geodetic.distance_to_arc(P0.longitude,P0.latitude,
+                                    (strike + 90.) % 360,mesh.lons, mesh.lats)
+    dst2 = geodetic.distance_to_arc(P1.longitude,P1.latitude,
+                                    (strike + 90.) % 360,mesh.lons, mesh.lats)
     # Get the shortest distance from the two lines
     idx = np.sign(dst1) == np.sign(dst2)
     dst = np.zeros_like(dst1)
@@ -555,15 +466,15 @@ def calc_rx_distance(P0,P1,points):
     x2 = P1.x
     y1 = P0.y
     y2 = P1.y
-    vhat = Vector(y2-y1,-(x2-x1),0)
+    vhat = Vector(y2-y1, -(x2-x1), 0)
     vhat = vhat.norm()
-    r = np.zeros_like(points[:,0:2])
+    r = np.zeros_like(points[:, 0:2])
     r[:,0] = points[:,0] - x1
     r[:,1] = points[:,1] - y1
-    dist = np.sum(vhat.getArray()[0:2]*r,axis=1)/1000.0
+    dist = np.sum(vhat.getArray()[0:2]*r, axis = 1)/1000.0
     shp = dist.shape
     if len(shp) == 1:
-        dist.shape = (shp[0],1)
+        dist.shape = (shp[0], 1)
     dist = np.fliplr(dist)
     return dist
 
@@ -582,8 +493,8 @@ def get_top_edge(lat,lon,dep):
     p1 = None
     p2 = None
     if sum(np.diff(dep)) == 0:
-        p1 = Vector.fromPoint(point.Point(lon[0],lat[0],dep[0]))
-        p2 = Vector.fromPoint(point.Point(lon[1],lat[1],dep[1]))
+        p1 = Vector.fromPoint(point.Point(lon[0], lat[0], dep[0]))
+        p2 = Vector.fromPoint(point.Point(lon[1], lat[1], dep[1]))
     else:
         dep2 = dep[0:4]
         dd = np.diff(dep2)
@@ -591,7 +502,25 @@ def get_top_edge(lat,lon,dep):
         idx = np.append(idx,False)
         p1idx = dep2[idx].argmin()+1
         p2idx = p1idx + 1
-        p1 = Vector.fromPoint(point.Point(lon[p1idx],lat[p1idx],0.0))
-        p2 = Vector.fromPoint(point.Point(lon[p2idx],lat[p2idx],0.0))
-    return (p1,p2)
+        p1 = Vector.fromPoint(point.Point(lon[p1idx], lat[p1idx],0.0))
+        p2 = Vector.fromPoint(point.Point(lon[p2idx], lat[p2idx],0.0))
+    return (p1, p2)
 
+def minimize(a,b):
+    """
+    Get minimum values from two numpy arrays, ignoring sign in comparison 
+    but preserving sign in result.
+    :param a:
+      Numpy array
+    :param b:
+      Numpy array
+    :returns:
+      Numpy array
+    """
+    d = np.empty_like(a)
+    aidx = np.abs(a) < np.abs(b)
+    bidx = np.logical_not(aidx)
+    d[aidx] = a[aidx]
+    d[bidx] = b[bidx]
+    return d
+    

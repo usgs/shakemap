@@ -19,9 +19,8 @@ from openquake.hazardlib.const import TRT
 from shapely import geometry
 from ..utils.timeutils import ShakeDateTime
 from .ecef import latlon2ecef,ecef2latlon
-from openquake.hazardlib.gsim.base import GMPE
 from .fault import Fault
-from .distance import get_distance,get_distance2
+from .distance import get_distance
 
 #local imports
 from shakemap.utils.exception import ShakeMapException
@@ -139,7 +138,8 @@ class Source(object):
             if req not in list(event.keys()):
                 missing.append(req)
         if len(missing):
-           raise NameError('Input event dictionary is missing the following required keys: "%s"' % (','.join(missing)))
+           raise NameError('Input event dictionary is missing the following '\
+                           'required keys: "%s"' % (','.join(missing)))
         self.Fault = fault
         self.EventDict = event.copy()
         if isinstance(sourcedict,dict):
@@ -150,7 +150,8 @@ class Source(object):
     @classmethod
     def readFromFile(cls,eventxmlfile,faultfile=None,sourcefile=None):
         """
-        Class method to create a Source object by specifying an event.xml file, a fault file, and a source.txt file.
+        Class method to create a Source object by specifying an event.xml file, 
+        a fault file, and a source.txt file.
         :param eventxmlfile:
             Event xml file (see read_event_file())
         :param faultfile:
@@ -170,78 +171,16 @@ class Source(object):
             params = read_source(sourcefile)
         return cls(event,fault=fault,sourcedict=params)
 
-    def getDistanceContext(self,gmpe,mesh):
-        """
-        Create a DistancesContext object
-        :param gmpe: 
-            Concrete subclass of GMPE (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
-        :param mesh:
-            Mesh object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
-        :returns:
-            DistancesContext object with distance grids required by input gmpe.
-        :raises TypeError:
-            if gmpe is not a subclass of GMPE
-        """
-        if not isinstance(gmpe,GMPE):
-            raise TypeError('getDistanceContext() cannot work with objects of type "%s"' % type(gmpe))
-        context = base.DistancesContext()
-        for method in gmpe.REQUIRES_DISTANCES:
-            print('Calculating method %s' % method)
-            dist = self.calcDistance(mesh,method)
-            (context.__dict__)[method] = dist.reshape(mesh.lons.shape)
 
-        return context
-
-    def getDistanceContext2(self, gmpe, mesh):
-        """
-        Create a DistancesContext object
-        :param gmpe: 
-            Concrete subclass of GMPE (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
-        :param mesh:
-            Mesh object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
-        :returns:
-            DistancesContext object with distance grids required by input gmpe.
-        :raises TypeError:
-            if gmpe is not a subclass of GMPE
-        """
-        if not isinstance(gmpe,GMPE):
-            raise TypeError('getDistanceContext() cannot work with objects of type "%s"' % type(gmpe))
-        
-        if self.Fault is not None:
-            quadlist = self.Fault.getQuadrilaterals()
-        else:
-            quadlist = None
-        
-        lat = self.getEventParam('lat')
-        lon = self.getEventParam('lon')
-        depth = self.getEventParam('depth')
-        oqpoint = point.Point(lon, lat, depth)
-        
-        context = base.DistancesContext()
-        
-        ddict = get_distance2(list(gmpe.REQUIRES_DISTANCES), mesh, quadlist = quadlist, mypoint = oqpoint)
-        # need to worry about overwriting rjb with repi and rrup with rhyp
-#        #if user has specified a distance measure dependent on a fault but we don't have a fault
-#        #override their choice with the appropriate point source distance.
-#        if quadlist is None and (method != 'repi' or method != 'rhypo'):
-#            if method in ['rjb','rx']:
-#                method = 'repi'
-#            else:
-#                method = 'rhypo'
-        # Check for whether or not we have a fualt
-        
-        for method in gmpe.REQUIRES_DISTANCES:
-            (context.__dict__)[method] = ddict[method]
-
-        return context
-    
     def getRuptureContext(self,gmpe):
         """
-        Return a GEM RuptureContext https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
+        Return a GEM RuptureContext 
+        https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
         :returns:
             RuptureContext object with all known parameters filled in.
-        If Source does not contain a Fault, strike, dip, ztor, and width will be filled with default values.
-        Rake may not be known, or may be estimated from a focal mechanism.
+        If Source does not contain a Fault, strike, dip, ztor, and width will be 
+        filled with default values. Rake may not be known, or may be estimated 
+        from a focal mechanism.
         """
         #rupturecontext constructor inputs:
         # 'mag', 'strike', 'dip', 'rake', 'ztor', 'hypo_lon', 'hypo_lat',
@@ -347,31 +286,5 @@ class Source(object):
         """
         return self.Fault.getQuadrilaterals()
     
-    def calcDistance(self,mesh,method='rjb'):
-        """
-        Calculate distance from the source (fault or point source)
-        :param mesh:
-          Instance of an openquake.hazardlib.geo.Mesh object.
-        :param method:
-          One of: 'rjb','rx','rrup','ry0','rcdbp','epi','hypo'. NB - If no fault is provided, 'rjb' and 'rx' => 'repi',
-          anything else => 'rhypo'.
-        """
-        if self.Fault is not None:
-            quadlist = self.Fault.getQuadrilaterals()
-        else:
-            quadlist = None
-        lat = self.getEventParam('lat')
-        lon = self.getEventParam('lon')
-        depth = self.getEventParam('depth')
-        oqpoint = point.Point(lon,lat,depth)
-        #if user has specified a distance measure dependent on a fault but we don't have a fault
-        #override their choice with the appropriate point source distance.
-        if quadlist is None and (method != 'repi' or method != 'rhypo'):
-            if method in ['rjb','rx']:
-                method = 'repi'
-            else:
-                method = 'rhypo'
-        return get_distance(method, mesh, quadlist = quadlist, mypoint = oqpoint)
-
             
         
