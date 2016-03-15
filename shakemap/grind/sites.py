@@ -25,6 +25,10 @@ def _load(vs30File,samplegeodict=None,resample=False,method='linear',doPadding=F
         except Exception as msg2:
             msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (vs30File,str(msg1),str(msg2))
             raise ShakeMapException(msg)
+    
+    if vs30grid.getData().dtype != np.float64:
+        vs30grid.setData(vs30grid.getData().astype(np.float64))
+
     return vs30grid
 
 def _getFileGeoDict(fname):
@@ -141,7 +145,7 @@ class Sites(object):
         if vs30File is not None:
             vs30grid = cls._create(geodict,defaultVs30,vs30File,padding,resample)
         else:
-            griddata = np.ones((geodict.ny,geodict.nx))*defaultVs30
+            griddata = np.ones((geodict.ny,geodict.nx), dtype=np.float64)*defaultVs30
             vs30grid = Grid2D(griddata,geodict)
         return cls(vs30grid,vs30measured=vs30measured,backarc=backarc,defaultVs30=defaultVs30)
         
@@ -181,7 +185,7 @@ class Sites(object):
         if vs30File is not None:
             vs30grid = cls._create(geodict,defaultVs30,vs30File,padding,resample)
         else:
-            griddata = np.ones((geodict.ny,geodict.nx))*defaultVs30
+            griddata = np.ones((geodict.ny,geodict.nx), dtype=np.float64)*defaultVs30
             vs30grid = Grid2D(griddata,geodict)
         return cls(vs30grid,vs30measured=vs30measured,backarc=backarc,defaultVs30=defaultVs30)
 
