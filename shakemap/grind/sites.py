@@ -27,7 +27,6 @@ def _load(vs30File,samplegeodict=None,resample=False,method='linear',doPadding=F
             raise ShakeMapException(msg)
     
     if vs30grid.getData().dtype != np.float64:
-        print('Setting data to float64')
         vs30grid.setData(vs30grid.getData().astype(np.float64))
 
     return vs30grid
