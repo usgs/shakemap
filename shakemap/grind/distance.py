@@ -228,27 +228,6 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
         rhypodist = rhypodist.reshape(oldshape)
         distdict['rhypo'] = rhypodist
 
-    # ry0 does not require a loop, but it does require quads exist
-    if 'ry0' in methods:
-        if quadlist is not None:
-            # This is just a bandaid on ry0 to get reasonably sensible results
-            # for multiple segments ruptures. The 'correct' way to do this is to
-            # compare the source-to-site azimuth and use Ry0 = Rx/abs(azimuth)
-            # as given in Abrahamson et al. (2014).
-            # Note that Ry0 is not the same as:
-            #    Ry (in the database summary paper), or
-            #    Ry2 that is given in the NGA W2 flatfile, or
-            #    U in the GC2 coordinate system.
-            # Note: this assumes that the quadrilaters are sorted in order along
-            #       strike.
-            FP0, FP1, FP2, FP3 = quadlist[0]
-            LP0, LP1, LP2, LP3 = quadlist[-1]
-            ry0dist = calc_ry0_distance(FP0, LP1, lat, lon, dep)
-            distdict['ry0'] = ry0dist
-        else:
-            warnings.warn('No fault; Replacing ry0 with repi')
-            distdict['ry0'] = distdict['repi']
-    
     # --------------------------------------------------------
     # Loop over quadlist for those distances that require loop    
     # --------------------------------------------------------
@@ -258,7 +237,11 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
         minrjb = np.ones(newshape, dtype = lon.dtype)*1e16
     if 'rx' in methods:
         totweight = np.zeros(newshape, dtype = lon.dtype)
-        meanrxdist = np.zeros(newshape, dtype = lon.dtype)
+        GC2T = np.zeros(newshape, dtype = lon.dtype)
+        GC2U = np.zeros(newshape, dtype = lon.dtype)
+    
+    # Length of prior segments
+    s_i = 0.0
     
     if quadlist is not None: 
         for quad in quadlist:
@@ -280,7 +263,8 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
                 rjbdist = calc_rupture_distance(S0, S1, S2, S3, sites_ecef)
                 minrjb = np.minimum(minrjb, rjbdist)
             
-            if 'rx' in methods:
+            if ('rx' in methods) or ('ry' in methods) or \
+               ('ry0' in methods):
                 # This is currently just a bandaid to get resonable and 'graceful'
                 # results for multiple segment ruptures. The 'correct' wayt to do
                 # this is to use the unpublished equations for GC2 (2nd version of
@@ -289,29 +273,57 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
                 # in the NGA W2 flatfile. 
                 
                 # Compute u_i and t_i for this segment
-                t_i = calc_rx_distance(P0, P1, lat, lon)
-#                u_i = calc_u_i()
-                point0 = point.Point(P0.longitude, P0.latitude, 0.0)
-                point1 = point.Point(P1.longitude, P1.latitude, 0.0)
-                mesh = Mesh(lon, lat, dep)
-                r0 = point0.distance_to_mesh(mesh)
-                r1 = point1.distance_to_mesh(mesh)
-                li = get_quad_length(quad)
-                dweight = (0.5*(1.0/(r0**2) + 1.0/(r1**2)) * li).reshape(newshape)
-                totweight = totweight + dweight
-                rxdist = t_i
-                meanrxdist = meanrxdist + rxdist*dweight
+                t_i = calc_t_i(P0, P1, lat, lon)
+                u_i = calc_u_i(P0, P1, lat, lon)
+                
+                # Quad length
+                l_i = get_quad_length(quad)
+                
+                # Weight of segment, three cases
+                # Case 3: t_i == 0 and 0 <= u_i <= l_i
+                w_i = np.zeros_like(t_i)
+                # Case 1:
+                ix = t_i != 0
+                w_i[ix] = (1.0/t_i[ix])*(np.arctan((l_i - u_i[ix])/t_i[ix]) -
+                                         np.arctan(-u_i[ix]/t_i[ix]))
+                # Case 2:
+                ix = (t_i == 0) & ((u_i < 0) | (u_i > l_i))
+                w_i[ix] = 1/(u_i[ix] - l_i) - 1/u_i[ix]
+                
+                totweight = totweight + w_i
+                GC2T = GC2T + w_i*t_i
+                GC2U = GC2U + w_i*(u_i + s_i)
+                s_i = s_i + l_i
                 
         # Collect distances from loop into the distance dict
         if 'rjb' in methods:
             minrjb = minrjb.reshape(oldshape)
             distdict['rjb'] = minrjb
         
-        if 'rx' in methods:
-            # normalize by sum of quad weights
-            meanrxdist = meanrxdist/totweight
-            meanrxdist = meanrxdist.reshape(oldshape)
-            distdict['rx'] = meanrxdist
+        if ('rx' in methods) or ('ry' in methods) or \
+           ('ry0' in methods):
+            # Normalize by sum of quad weights
+            GC2T = GC2T/totweight
+            GC2U = GC2U/totweight
+            
+            # Take care of Rx
+            Rx = copy.deepcopy(GC2T) # preserve sign (no absolute value)
+            Rx = Rx.reshape(oldshape)
+            distdict['rx'] = Rx
+            
+            # Ry
+            Ry = GC2U - s_i/2.0
+            Ry = Ry.reshape(oldshape)
+            distdict['ry'] = Ry
+            
+            # Ry0
+            Ry0 = np.zeros_like(GC2U)
+            ix = GC2U < 0
+            Ry0[ix] = np.abs(GC2U[ix])
+            ix = GC2U > s_i
+            Ry0[ix] = GC2U[ix] - s_i
+            Ry0 = Ry0.reshape(oldshape)
+            distdict['ry0'] = Ry0
             
         if 'rrup' in methods:
             minrrup = minrrup.reshape(oldshape)
@@ -327,6 +339,12 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
         if 'rx' in methods:
             warnings.warn('No fault; Replacing rx with repi')
             distdict['rx'] = distdict['repi']
+        if 'ry0' in methods:
+            warnings.warn('No fault; Replacing ry0 with repi')
+            distdict['ry0'] = distdict['repi']
+        if 'ry' in methods:
+            warnings.warn('No fault; Replacing ry with repi')
+            distdict['ry'] = distdict['repi']
     
     return distdict
 
@@ -478,29 +496,64 @@ def calc_ry0_distance(P0, P1, lat, lon, dep):
     dst[idx] = np.fmin(np.abs(dst1[idx]), np.abs(dst2[idx]))
     return dst
 
-def calc_u_i(P0, P1, lat, lon, dep):
-    """Calculate u_i distance. See Spudich and Chiou OFR 2015-1028. 
+def calc_u_i(P0, P1, lat, lon):
+    """
+    Calculate u_i distance. See Spudich and Chiou OFR 2015-1028. This is the distance
+    along strike from the first vertex (P0) of the i-th segment. 
     
     :param P0:
-      Point object, representing the first top-edge vertex of a fault quadrilateral.
+        Point object, representing the first top-edge vertex of a fault quadrilateral.
     :param P1:
-      Point object, representing the second top-edge vertex of a fault quadrilateral.
+        Point object, representing the second top-edge vertex of a fault quadrilateral.
     :param lat:
-      A numpy array of latitude.
+        A numpy array of latitude.
     :param lon:
-      A numpy array of longitude.
-    :param dep:
-      A numpy array of depths (km).
+        A numpy array of longitude.
     :returns:
-      Array of size mesh.lons of distances (in km) from input points to rupture surface.
+        Array of size lat.shape of distances (in km).
     """
-    pass
+    # Project to Cartesian space
+    west = min(P0.x, P1.x)
+    east = max(P0.x, P1.x)
+    south = min(P0.y, P1.y)
+    north = max(P0.y, P1.y)
+    proj = get_orthographic_projection(west, east, north, south)
+    
+    # projected coordinates are in km
+    p0x, p0y = proj(P0.x, P0.y)
+    p1x, p1y = proj(P1.x, P1.y)
 
-def calc_rx_distance(P0, P1, lat, lon):
+    # projected coordinates are in km
+    p0x, p0y = proj(P0.x, P0.y)
+    p1x, p1y = proj(P1.x, P1.y)
+    
+    # Unit vector pointing along strike
+    u_i_hat = Vector(p1x - p0x, p1y - p0y, 0).norm()
+    
+    # Convert sites to Cartesian
+    sx, sy = proj(lon, lat)
+    sx1d = np.reshape(sx, (-1,))
+    sy1d = np.reshape(sy, (-1,))
+    
+    # Vectors from P0 to sites
+    r = np.zeros([len(sx1d), 2])
+    r[:,0] = sx1d - p0x
+    r[:,1] = sy1d - p0y
+    
+    # Dot product gives t_i
+    u_i = np.sum(u_i_hat.getArray()[0:2]*r, axis = 1)
+    shp = u_i.shape
+    if len(shp) == 1:
+        u_i.shape = (shp[0], 1)
+    u_i = np.fliplr(u_i)
+    
+    return u_i
+    
+
+def calc_t_i(P0, P1, lat, lon):
     """
-    The shortest horizontal distance from a set of points to a line defined by
-    extending the fault trace (or the top edge of the rupture) to
-    infinity in both directions. Values on the hanging-wall are
+    Calculate t_i distance. See Spudich and Chiou OFR 2015-1028. This is the distance
+    measured normal to strike from the i-th segment. Values on the hanging-wall are
     positive and those on the foot-wall are negative.
     :param P0: 
         Point object, representing the first top-edge vertex of a fault quadrilateral.
@@ -513,7 +566,7 @@ def calc_rx_distance(P0, P1, lat, lon):
     :returns:
         Array of size N of distances (in km) from input points to rupture surface.
     """
-    # Project to Cartesian space:
+    # Project to Cartesian space
     west = min(P0.x, P1.x)
     east = max(P0.x, P1.x)
     south = min(P0.y, P1.y)
@@ -524,30 +577,36 @@ def calc_rx_distance(P0, P1, lat, lon):
     p0x, p0y = proj(P0.x, P0.y)
     p1x, p1y = proj(P1.x, P1.y)
     
-    vhat = Vector(p1y - p0y, -(p1x - p0x), 0)
-    vhat = vhat.norm()
+    # Unit vector pointing normal to strike
+    t_i_hat = Vector(p1y - p0y, -(p1x - p0x), 0).norm()
     
     # Convert sites to Cartesian
     sx, sy = proj(lon, lat)
     sx1d = np.reshape(sx, (-1,))
     sy1d = np.reshape(sy, (-1,))
     
+    # Vectors from P0 to sites
     r = np.zeros([len(sx1d), 2])
     r[:,0] = sx1d - p0x
     r[:,1] = sy1d - p0y
-    dist = np.sum(vhat.getArray()[0:2]*r, axis = 1)
-    shp = dist.shape
+    
+    # Dot product gives t_i
+    t_i = np.sum(t_i_hat.getArray()[0:2]*r, axis = 1)
+    shp = t_i.shape
     if len(shp) == 1:
-        dist.shape = (shp[0], 1)
-    dist = np.fliplr(dist)
-    return dist
+        t_i.shape = (shp[0], 1)
+    t_i = np.fliplr(t_i)
+    return t_i
 
 def get_top_edge(lat, lon, dep):
     """
     Determine which edge of a quadrilateral rupture surface is the top.
-    :param lat: Sequence of 4 or 5 latitudes defining vertices of rupture surface.
-    :param lon: Sequence of 4 or 5 longitudes defining vertices of rupture surface.
-    :param dep: Sequence of 4 or 5 depths defining vertices of rupture surface.
+    :param lat: 
+        Sequence of 4 or 5 latitudes defining vertices of rupture surface.
+    :param lon: 
+        Sequence of 4 or 5 longitudes defining vertices of rupture surface.
+    :param dep: 
+        Sequence of 4 or 5 depths defining vertices of rupture surface.
     :returns:
         (P0,P1) where P0 and P1 are Vector objects in ECEF coordinates indicating 
         the vertices of the top edge.
