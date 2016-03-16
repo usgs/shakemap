@@ -66,13 +66,13 @@ class Sites(object):
     """An object to encapsulate information used to generate a GEM SitesContext.
     (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
     """
-    def __init__(self,vs30grid,vs30measured=False,backarc=False,defaultVs30=686.0):
+    def __init__(self,vs30grid,vs30measured_grid=None,backarc=False,defaultVs30=686.0):
         """
         Construct a Sites object.
         :param vs30grid:
             MapIO Grid2D object containing Vs30 values.
-        :param vs30measured:
-            Boolean indicating whether Vs30 values were measured or derived (i.e., from slope)
+        :param vs30measured_grid:
+            Boolean grid indicating whether Vs30 values were measured or derived (i.e., from slope)
         :param backarc:
             Boolean indicating whether event is on the backarc as defined here: 
             http://earthquake.usgs.gov/learn/glossary/?term=backarc
@@ -91,7 +91,10 @@ class Sites(object):
         self.SitesContext.z1pt0 = self.Z1Pt0
         self.SitesContext.z2pt5 = self.Z2Pt5
         self.SitesContext.backarc = backarc #zoneconfig might have this info
-        self.SitesContext.vs30measured = vs30measured #no idea where this might ever come from
+        if vs30measured_grid is None: # If we don't know, then use false
+            self.SitesContext.vs30measured = np.zeros_like(self.SitesContext.vs30, dtype=bool)
+        else:
+            self.SitesContext.vs30measured = vs30measured_grid
         self.SitesContext.lons = lons
         self.SitesContext.lats = lats
 
@@ -111,7 +114,7 @@ class Sites(object):
         
     @classmethod
     def createFromBounds(cls,xmin,xmax,ymin,ymax,dx,dy,defaultVs30=686.0,vs30File=None,
-                         vs30measured=False,backarc=False,padding=False,resample=False):
+                         vs30measured_grid=None,backarc=False,padding=False,resample=False):
         """Create a Sites object by defining a center point, resolution, extent, and Vs30 values.
 
         :param xmin:
@@ -130,8 +133,8 @@ class Sites(object):
           Default Vs30 value to use if vs30File not specified.
         :param vs30File:
           Name of GMT or GDAL format grid file containing Vs30 values.
-        :param vs30measured:
-          Boolean indicating whether Vs30 values were measured or derived (i.e., from slope)
+        :param vs30measured_grid:
+          Boolean grid indicating whether Vs30 values were measured or derived (i.e., from slope)
         :param backarc:
           Boolean indicating whether event is on the backarc as defined here: 
           http://earthquake.usgs.gov/learn/glossary/?term=backarc
@@ -147,11 +150,12 @@ class Sites(object):
         else:
             griddata = np.ones((geodict.ny,geodict.nx), dtype=np.float64)*defaultVs30
             vs30grid = Grid2D(griddata,geodict)
-        return cls(vs30grid,vs30measured=vs30measured,backarc=backarc,defaultVs30=defaultVs30)
+        return cls(vs30grid,vs30measured_grid=vs30measured_grid,backarc=backarc,
+                   defaultVs30=defaultVs30)
         
     @classmethod
     def createFromCenter(cls,cx,cy,xspan,yspan,dx,dy,defaultVs30=686.0,vs30File=None,
-                         vs30measured=False,backarc=False,padding=False,resample=False):
+                         vs30measured_grid=None,backarc=False,padding=False,resample=False):
         """Create a Sites object by defining a center point, resolution, extent, and Vs30 values.
 
         :param cx:
@@ -170,8 +174,8 @@ class Sites(object):
           Default Vs30 value to use if vs30File not specified.
         :param vs30File:
           Name of GMT or GDAL format grid file containing Vs30 values.
-        :param vs30measured:
-          Boolean indicating whether Vs30 values were measured or derived (i.e., from slope)
+        :param vs30measured_grid:
+          Boolean grid indicating whether Vs30 values were measured or derived (i.e., from slope)
         :param backarc:
           Boolean indicating whether event is on the backarc as defined here: 
           http://earthquake.usgs.gov/learn/glossary/?term=backarc
@@ -187,15 +191,19 @@ class Sites(object):
         else:
             griddata = np.ones((geodict.ny,geodict.nx), dtype=np.float64)*defaultVs30
             vs30grid = Grid2D(griddata,geodict)
-        return cls(vs30grid,vs30measured=vs30measured,backarc=backarc,defaultVs30=defaultVs30)
+        return cls(vs30grid,vs30measured_grid=vs30measured_grid,backarc=backarc,
+                   defaultVs30=defaultVs30)
 
-    def sampleFromSites(self,lats,lons):
+    def sampleFromSites(self,lats,lons, vs30measured_grid=None):
         """Create a SitesContext object by sampling the current Sites object.
 
         :param lats:
           Sequence of latitudes.
         :param lons:
           Sequence of longitudes.
+        :param vs30measured_grid:
+          Sequence of booleans of the same shape as lats/lons indicating whether
+          the vs30 values are measured or inferred.
         :returns:
           SitesContext object where data are sampled from the current Sites object.
         :raises ShakeMapException:
@@ -215,7 +223,10 @@ class Sites(object):
         site.lons = lons
         site.z1pt0 = calculate_z1p0(site.vs30)
         site.z2pt5 = calculate_z2p5(site.z1pt0)
-        site.vs30measured = self.SitesContext.vs30measured
+        if vs30measured_grid is None: # If we don't know, then use false
+            site.vs30measured = np.zeros_like(lons, dtype=bool)
+        else:
+            site.vs30measured = vs30measured_grid
         site.backarc = self.SitesContext.backarc
 
         return site
