@@ -11,7 +11,6 @@ from .ecef import latlon2ecef
 from .vector import Vector
 from .fault import get_quad_length
 from openquake.hazardlib.geo import point, geodetic
-from openquake.hazardlib.geo.mesh import Mesh
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib.gsim import base
@@ -32,6 +31,7 @@ class Distance(object):
         :param gmpe:
             Concrete subclass of GMPE 
             https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
+            can be individual instance or list of instances.
         :param source:
             Source object.
         :param lat: 
@@ -62,6 +62,7 @@ class Distance(object):
         :param gmpe:
             Concrete subclass of GMPE 
             https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
+            can be individual instance or list of instances.
         :param source:
             Source object.
         :param sites: 
@@ -88,6 +89,28 @@ class Distance(object):
     
     @classmethod
     def fromPoints(cls, gmpe, source, lat, lon, dep, use_median_distance = True):
+        """
+        Convenience class method to construct a Distance object from an array of lons, lats,
+        and depths.. 
+        :param gmpe:
+            Concrete subclass of GMPE 
+            https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
+            can be individual instance or list of instances.
+        :param source:
+            Source object.
+        :param lon: 
+            Numpy array of longitudes.
+        :param lat: 
+            Numpy array of latitudes.
+        :param dep: 
+            Numpy array of depths.
+        :param use_median_distance: 
+            Boolean; only used if GMPE requests fault distances and not fault is 
+            availalbe. Default is True, meaning that point-source distances are 
+            adjusted based on magnitude to get the median fault distance. 
+        :returns:
+            Distance object.
+        """
         return cls(gmpe, source, lat, lon, dep, use_median_distance)
     
     def getDistanceContext(self):
@@ -99,6 +122,7 @@ class Distance(object):
         :param gmpe: 
             Concrete subclass of GMPE 
             (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
+            can be individual instance or list of instances.
         :param lat:
             Numpy array of latitudes. 
         :param lon:
@@ -110,12 +134,20 @@ class Distance(object):
             availalbe. Default is True, meaning that point-source distances are 
             adjusted based on magnitude to get the median fault distance. 
         :returns:
-            DistancesContext object with distance grids required by input gmpe.
+            DistancesContext object with distance grids required by input gmpe(s).
         :raises TypeError:
             if gmpe is not a subclass of GMPE
         """
-        if not isinstance(gmpe, GMPE):
-            raise TypeError('getDistanceContext() cannot work with objects of type "%s"' % type(gmpe))
+        if not isinstance(gmpe, list):
+            gmpe = [ gmpe ]
+
+        requires = set()
+
+        for ig in gmpe:
+            if not isinstance(ig, GMPE):
+                raise TypeError('getDistanceContext() cannot work with objects of type "%s"' 
+                                % type(ig))
+            requires = requires | ig.REQUIRES_DISTANCES
         
         if self.source.Fault is not None:
             quadlist = self.source.Fault.getQuadrilaterals()
@@ -129,10 +161,10 @@ class Distance(object):
         
         context = base.DistancesContext()
         
-        ddict = get_distance(list(gmpe.REQUIRES_DISTANCES), lat, lon, dep,
+        ddict = get_distance(list(requires), lat, lon, dep,
                              quadlist = quadlist, hypo = hyppoint)
         
-        for method in gmpe.REQUIRES_DISTANCES:
+        for method in requires:
             (context.__dict__)[method] = ddict[method]
 
         return context
@@ -209,9 +241,8 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
         if hypo is None:
             raise ShakeMapException('Cannot calculate epicentral distance '\
                                     'without a point object')
-        epi = point.Point(hypo.longitude, hypo.latitude, 0.0)
-        mesh = Mesh(lon, lat, dep)
-        repidist = epi.distance_to_mesh(mesh)
+        repidist = geodetic.distance(hypo.longitude, hypo.latitude, 0.0,
+                                     lon, lat, dep)
         repidist = repidist.reshape(oldshape)
         distdict['repi'] = repidist
     
@@ -220,9 +251,8 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
         if hypo is None:
             raise ShakeMapException('Cannot calculate epicentral distance '\
                                     'without a point object')
-        hyppoint = point.Point(hypo.longitude, hypo.latitude, hypo.depth)
-        mesh = Mesh(lon, lat, dep)
-        rhypodist = hyppoint.distance_to_mesh(mesh)
+        rhypodist = geodetic.distance(hypo.longitude, hypo.latitude, hypo.depth,
+                                      lon, lat, dep)
         rhypodist = rhypodist.reshape(oldshape)
         distdict['rhypo'] = rhypodist
 
