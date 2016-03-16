@@ -11,7 +11,6 @@ from .ecef import latlon2ecef
 from .vector import Vector
 from .fault import get_quad_length
 from openquake.hazardlib.geo import point, geodetic
-from openquake.hazardlib.geo.mesh import Mesh
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib.gsim import base
@@ -209,9 +208,8 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
         if hypo is None:
             raise ShakeMapException('Cannot calculate epicentral distance '\
                                     'without a point object')
-        epi = point.Point(hypo.longitude, hypo.latitude, 0.0)
-        mesh = Mesh(lon, lat, dep)
-        repidist = epi.distance_to_mesh(mesh)
+        repidist = geodetic.distance(hypo.longitude, hypo.latitude, 0.0,
+                                     lon, lat, dep)
         repidist = repidist.reshape(oldshape)
         distdict['repi'] = repidist
     
@@ -220,9 +218,8 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
         if hypo is None:
             raise ShakeMapException('Cannot calculate epicentral distance '\
                                     'without a point object')
-        hyppoint = point.Point(hypo.longitude, hypo.latitude, hypo.depth)
-        mesh = Mesh(lon, lat, dep)
-        rhypodist = hyppoint.distance_to_mesh(mesh)
+        rhypodist = geodetic.distance(hypo.longitude, hypo.latitude, hypo.depth,
+                                      lon, lat, dep)
         rhypodist = rhypodist.reshape(oldshape)
         distdict['rhypo'] = rhypodist
 
