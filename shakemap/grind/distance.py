@@ -56,7 +56,7 @@ class Distance(object):
         self.delta_sigma = 0.0
     
     @classmethod
-    def fromSites(gmpe, source, sites, use_median_distance = True):
+    def fromSites(cls, gmpe, source, sites, use_median_distance = True):
         """
         Convenience class method to construct a Distance object from a sites object. 
         :param gmpe:
@@ -73,7 +73,6 @@ class Distance(object):
         :returns:
             Distance object.
         """
-        self.source = source
         sm_dict = sites.GeoDict
         west = sm_dict.xmin
         east = sm_dict.xmax
@@ -85,12 +84,11 @@ class Distance(object):
         lons = np.linspace(west, east, nx)
         lon, lat = np.meshgrid(lons, lats)
         dep = np.zeros_like(lon)
-#        mesh = Mesh(lon, lat, dep)
+        return cls(gmpe, source, lat, lon, dep, use_median_distance)
     
     @classmethod
-    def fromPoints(gmpe, source, lat, lon, dep, use_median_distance = True):
-        self.source = source
-        pass
+    def fromPoints(cls, gmpe, source, lat, lon, dep, use_median_distance = True):
+        return cls(gmpe, source, lat, lon, dep, use_median_distance)
     
     def getDistanceContext(self):
         return self._distance_context
