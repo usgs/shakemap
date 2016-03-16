@@ -26,9 +26,39 @@ class Distance(object):
     """
     And object to hold distance information. 
     """
-    def __init__(self, gmpe, source, sites, use_median_distance = True):
+    def __init__(self, gmpe, source, lat, lon, dep, use_median_distance = True):
         """
         Construct a Distance object. 
+        :param gmpe:
+            Concrete subclass of GMPE 
+            https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
+        :param source:
+            Source object.
+        :param lat: 
+            A numpy array of site latitudes. 
+        :param lon: 
+            A numpy array of site longitudes. 
+        :param dep: 
+            A numpy array of site depths (km). 
+        :param use_median_distance: 
+            Boolean; only used if GMPE requests fault distances and not fault is 
+            availalbe. Default is True, meaning that point-source distances are 
+            adjusted based on magnitude to get the median fault distance. 
+        :returns:
+            Distance object.
+        """
+        self.source = source
+        
+        self._distance_context = self._calcDistanceContext(
+            gmpe, lat, lon, dep, use_median_distance)
+        
+        # Place holder for additional sigma due to point-to-fault conversion
+        self.delta_sigma = 0.0
+    
+    @classmethod
+    def fromSites(gmpe, source, sites, use_median_distance = True):
+        """
+        Convenience class method to construct a Distance object from a sites object. 
         :param gmpe:
             Concrete subclass of GMPE 
             https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
@@ -55,24 +85,32 @@ class Distance(object):
         lons = np.linspace(west, east, nx)
         lon, lat = np.meshgrid(lons, lats)
         dep = np.zeros_like(lon)
-        mesh = Mesh(lon, lat, dep)
-        
-        self._distance_context = self._calcDistanceContext(gmpe, mesh)
-        
-        # Place holder for additional sigma due to point-to-fault conversion
-        self.delta_sigma = 0.0
+#        mesh = Mesh(lon, lat, dep)
+    
+    @classmethod
+    def fromPoints(gmpe, source, lat, lon, dep, use_median_distance = True):
+        self.source = source
+        pass
     
     def getDistanceContext(self):
         return self._distance_context
     
-    def _calcDistanceContext(self, gmpe, mesh):
+    def _calcDistanceContext(self, gmpe, lat, lon, dep, use_median_context = True):
         """
         Create a DistancesContext object
         :param gmpe: 
             Concrete subclass of GMPE 
             (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
-        :param mesh:
-            Mesh object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
+        :param lat:
+            Numpy array of latitudes. 
+        :param lon:
+            Numpy array of longitudes. 
+        :param dep:
+            Numpy array of depths (km). 
+        :param use_median_distance: 
+            Boolean; only used if GMPE requests fault distances and not fault is 
+            availalbe. Default is True, meaning that point-source distances are 
+            adjusted based on magnitude to get the median fault distance. 
         :returns:
             DistancesContext object with distance grids required by input gmpe.
         :raises TypeError:
@@ -86,14 +124,15 @@ class Distance(object):
         else:
             quadlist = None
         
-        lat = self.source.getEventParam('lat')
-        lon = self.source.getEventParam('lon')
-        depth = self.source.getEventParam('depth')
-        oqpoint = point.Point(lon, lat, depth)
+        hyplat = self.source.getEventParam('lat')
+        hyplon = self.source.getEventParam('lon')
+        hypdepth = self.source.getEventParam('depth')
+        hyppoint = point.Point(hyplon, hyplat, hypdepth)
         
         context = base.DistancesContext()
         
-        ddict = get_distance(list(gmpe.REQUIRES_DISTANCES), mesh, quadlist = quadlist, mypoint = oqpoint)
+        ddict = get_distance(list(gmpe.REQUIRES_DISTANCES), lat, lon, dep,
+                             quadlist = quadlist, hypo = hyppoint)
         
         for method in gmpe.REQUIRES_DISTANCES:
             (context.__dict__)[method] = ddict[method]
@@ -103,20 +142,26 @@ class Distance(object):
     ## add class methods for fromPoint, fromSites, fromArray
 
 
-def get_distance(methods, mesh, quadlist = None, mypoint = None):
+def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
     """
     Calculate distance using any one of a number of distance measures. 
-    One of quadlist OR mypoint must be specified.
+    One of quadlist OR hypo must be specified.
     :param methods:
-       List of strings (or just a string) of distances to compute; can include: 'rjb', 'rx', 'rrup', 'ry0', 'repi', 'rhypo'
-    :param mesh:
-       A Mesh object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
+       List of strings (or just a string) of distances to compute; 
+       can include: 'rjb', 'rx', 'rrup', 'ry0', 'repi', 'rhypo'
+    :param lat:
+       A numpy array of latitudes.
+    :param lon:
+       A numpy array of longidues.
+    :param dep:
+       A numpy array of depths (km).
     :param quadlist:
        optional list of quadrilaterals (see Fault.py)
-    :param mypoint:
-       optional Point object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py)
+    :param hypo:
+       Optional Point object of hypocenter. 
+    https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py
     :returns:
-       dictionary of numpy array of distances, size of mesh.lons
+       dictionary of numpy array of distances, size of lon.shape
     :raises ShakeMapException:
        if a fault distance method is called without quadlist
     :raises NotImplementedError:
@@ -133,24 +178,28 @@ def get_distance(methods, mesh, quadlist = None, mypoint = None):
     if not set(methods).issubset(methods_available):
         raise NotImplementedError('One or more requested distance method is not '\
                                   'valid or is not implemented yet')
+
+    if (lat.shape == lon.shape) and (lat.shape == dep.shape):
+        pass
+    else:
+        raise ShakeMapException('lat, lon, and dep must have the same shape.')
     
-    oldshape = mesh.lons.shape
+    oldshape = lon.shape
+    
     if len(oldshape) == 2:
         newshape = (oldshape[0]*oldshape[1],1)
     else:
         newshape = (oldshape[0],1)
     
-    # Need to integrate ps2ff...
+    # Need to integrate ps2ff around here...
     
-    if ('rrup' in methods) or \
-       ('rx' in methods) or \
-       ('rjb' in methods):
-        x,y,z = latlon2ecef(mesh.lats,mesh.lons,mesh.depths)
+    if ('rrup' in methods) or ('rjb' in methods):
+        x, y, z = latlon2ecef(lat, lon, dep)
         x.shape = newshape
         y.shape = newshape
         z.shape = newshape
-        points = np.hstack((x,y,z))
-        
+        sites_ecef = np.hstack((x, y, z))
+    
     # ---------------------------------------------
     # Distances that do not require loop over quads
     # ---------------------------------------------
@@ -159,21 +208,23 @@ def get_distance(methods, mesh, quadlist = None, mypoint = None):
        (('rjb' in methods) and (quadlist is None)) or \
        (('ry0' in methods) and (quadlist is None)) or \
        (('rx' in methods) and (quadlist is None)):
-        if mypoint is None:
+        if hypo is None:
             raise ShakeMapException('Cannot calculate epicentral distance '\
                                     'without a point object')
-        newpoint = point.Point(mypoint.longitude, mypoint.latitude, 0.0)
-        repidist = newpoint.distance_to_mesh(mesh)
+        epi = point.Point(hypo.longitude, hypo.latitude, 0.0)
+        mesh = Mesh(lon, lat, dep)
+        repidist = epi.distance_to_mesh(mesh)
         repidist = repidist.reshape(oldshape)
         distdict['repi'] = repidist
     
     if ('rhypo' in methods) or \
        (('rrup' in methods) and (quadlist is None)):
-        if mypoint is None:
+        if hypo is None:
             raise ShakeMapException('Cannot calculate epicentral distance '\
                                     'without a point object')
-        newpoint = point.Point(mypoint.longitude, mypoint.latitude, mypoint.depth)
-        rhypodist = newpoint.distance_to_mesh(mesh)
+        hyppoint = point.Point(hypo.longitude, hypo.latitude, hypo.depth)
+        mesh = Mesh(lon, lat, dep)
+        rhypodist = hyppoint.distance_to_mesh(mesh)
         rhypodist = rhypodist.reshape(oldshape)
         distdict['rhypo'] = rhypodist
 
@@ -192,7 +243,7 @@ def get_distance(methods, mesh, quadlist = None, mypoint = None):
             #       strike.
             FP0, FP1, FP2, FP3 = quadlist[0]
             LP0, LP1, LP2, LP3 = quadlist[-1]
-            ry0dist = calc_ry0_distance(FP0, LP1, mesh)
+            ry0dist = calc_ry0_distance(FP0, LP1, lat, lon, dep)
             distdict['ry0'] = ry0dist
         else:
             warnings.warn('No fault; Replacing ry0 with repi')
@@ -202,23 +253,19 @@ def get_distance(methods, mesh, quadlist = None, mypoint = None):
     # Loop over quadlist for those distances that require loop    
     # --------------------------------------------------------
     if 'rrup' in methods:
-        minrrup = np.ones(newshape, dtype = mesh.lons.dtype)*1e16
+        minrrup = np.ones(newshape, dtype = lon.dtype)*1e16
     if 'rjb' in methods:
-        minrjb = np.ones(newshape, dtype=mesh.lons.dtype)*1e16
+        minrjb = np.ones(newshape, dtype = lon.dtype)*1e16
     if 'rx' in methods:
-        totweight = np.zeros(newshape, dtype=mesh.lons.dtype)
-        meanrxdist = np.zeros(newshape, dtype=mesh.lons.dtype)
+        totweight = np.zeros(newshape, dtype = lon.dtype)
+        meanrxdist = np.zeros(newshape, dtype = lon.dtype)
     
     if quadlist is not None: 
         for quad in quadlist:
             P0, P1, P2, P3 = quad
-        
+            
             if 'rrup' in methods:
-                p0 = Vector.fromPoint(P0)
-                p1 = Vector.fromPoint(P1)
-                p2 = Vector.fromPoint(P2)
-                p3 = Vector.fromPoint(P3)
-                rrupdist = calc_rupture_distance(p0, p1, p2, p3, points)
+                rrupdist = calc_rupture_distance(P0, P1, P2, P3, sites_ecef)
                 minrrup = np.minimum(minrrup, rrupdist)
             
             if 'rjb' in methods:
@@ -230,11 +277,7 @@ def get_distance(methods, mesh, quadlist = None, mypoint = None):
                 S1.depth = 0.0
                 S2.depth = 0.0
                 S3.depth = 0.0
-                p0 = Vector.fromPoint(S0)
-                p1 = Vector.fromPoint(S1)
-                p2 = Vector.fromPoint(S2)
-                p3 = Vector.fromPoint(S3)
-                rjbdist = calc_rupture_distance(p0, p1, p2, p3, points)
+                rjbdist = calc_rupture_distance(S0, S1, S2, S3, sites_ecef)
                 minrjb = np.minimum(minrjb, rjbdist)
             
             if 'rx' in methods:
@@ -245,33 +288,12 @@ def get_distance(methods, mesh, quadlist = None, mypoint = None):
                 # defined the same as T in GC2, but gives slightly different values
                 # in the NGA W2 flatfile. 
                 
-                # Project top two points into a Cartesian space
-                west = min(P0.x, P1.x)
-                east = max(P0.x, P1.x)
-                south = min(P0.y, P1.y)
-                north = max(P0.y, P1.y)
-                proj = get_orthographic_projection(west, east, north, south)
-                # projected coordinates are in km
-                p0x, p0y = proj(P0.x, P0.y)
-                p1x, p1y = proj(P1.x, P1.y)
-                
-                # Convert from m to km
-                PP0 = Vector(p0x*1000, p0y*1000, 0.0)
-                PP1 = Vector(p1x*1000, p1y*1000, 0.0)
-                
-                # Project sites
-                ppointx, ppointy = proj(mesh.lons.flatten(), mesh.lats.flatten())
-                ppoints = np.zeros((len(ppointx), 3))
-                
-                # Convert coordinates to meters and put in numpy array
-                ppoints[:, 0] = ppointx*1000 
-                ppoints[:, 1] = ppointy*1000
-                
                 # Compute u_i and t_i for this segment
-                t_i = calc_rx_distance(PP0, PP1, ppoints)
+                t_i = calc_rx_distance(P0, P1, lat, lon)
 #                u_i = calc_u_i()
                 point0 = point.Point(P0.longitude, P0.latitude, 0.0)
                 point1 = point.Point(P1.longitude, P1.latitude, 0.0)
+                mesh = Mesh(lon, lat, dep)
                 r0 = point0.distance_to_mesh(mesh)
                 r1 = point1.distance_to_mesh(mesh)
                 li = get_quad_length(quad)
@@ -349,10 +371,10 @@ def distance_sq_to_segment(p0, p1):
 
     nr,nc = p0.shape
     t1 = c1/c2
-    t1.shape = (nr,1)
-    t2 = np.tile(t1,3)
-    tmp= p0+(v*t1)
-    dist[idx_other] = tmp[idx_other,0]**2 + tmp[idx_other,1]**2 + tmp[idx_other,2]**2
+    t1.shape = (nr, 1)
+    t2 = np.tile(t1, 3)
+    tmp= p0 + (v*t1)
+    dist[idx_other] = tmp[idx_other, 0]**2 + tmp[idx_other, 1]**2 + tmp[idx_other, 2]**2
     
     return dist
 
@@ -360,29 +382,40 @@ def distance_sq_to_segment(p0, p1):
 def calc_rupture_distance(P0, P1, P2, P3, points):
     """
     Calculate the shortest distance from a set of points to a rupture surface.
-    :param P0: Vector object (in ECEF coordinates) defining the first vertex of a fault plane.
-    :param P1: Vector object (in ECEF coordinates) defining the second vertex of a fault plane.
-    :param P2: Vector object (in ECEF coordinates) defining the third vertex of a fault plane.
-    :param P3: Vector object (in ECEF coordinates) defining the fourth vertex of a fault plane.
-    :param points: numpy array Nx3 of points (ECEF) to calculate distance from.
+    :param P0: 
+        Point object, representing the first top-edge vertex of a fault quadrilateral.
+    :param P1: 
+        Point object, representing the second top-edge vertex of a fault quadrilateral.
+    :param P2: 
+        Point object, representing the first bottom-edge vertex of a fault quadrilateral.
+    :param P3: 
+        Point object, representing the second bottom-edge vertex of a fault quadrilateral.
+    :param points: 
+        Numpy array Nx3 of points (ECEF) to calculate distance from.
     :returns:
         Array of size N of distances (in km) from input points to rupture surface.
     """
-    #Make a unit vector normal to the plane
-    normalVector = (P1-P0).cross(P2-P0).norm()
-
-    dist = np.ones_like(points[:,0])*np.nan
-
-    p0d = P0.getArray()-points
-    p1d = P1.getArray()-points
-    p2d = P2.getArray()-points
-    p3d = P3.getArray()-points
+    # Convert to ecef
+    p0 = Vector.fromPoint(P0)
+    p1 = Vector.fromPoint(P1)
+    p2 = Vector.fromPoint(P2)
+    p3 = Vector.fromPoint(P3)
     
-    #Create 4 planes with normals pointing outside rectangle
-    n0 = (P1-P0).cross(normalVector).getArray()
-    n1 = (P2-P1).cross(normalVector).getArray()
-    n2 = (P3-P2).cross(normalVector).getArray()
-    n3 = (P0-P3).cross(normalVector).getArray()
+    # Make a unit vector normal to the plane
+    normalVector = (p1 - p0).cross(p2 - p0).norm()
+
+    dist = np.ones_like(points[:, 0])*np.nan
+
+    p0d = p0.getArray() - points
+    p1d = p1.getArray() - points
+    p2d = p2.getArray() - points
+    p3d = p3.getArray() - points
+    
+    # Create 4 planes with normals pointing outside rectangle
+    n0 = (p1-p0).cross(normalVector).getArray()
+    n1 = (p2-p1).cross(normalVector).getArray()
+    n2 = (p3-p2).cross(normalVector).getArray()
+    n3 = (p0-p3).cross(normalVector).getArray()
     
     sgn0 = np.signbit(np.sum(n0*p0d, axis = 1))
     sgn1 = np.signbit(np.sum(n1*p1d, axis = 1))
@@ -391,7 +424,7 @@ def calc_rupture_distance(P0, P1, P2, P3, points):
     
     inside_idx = (sgn0 == sgn1) & (sgn1 == sgn2) & (sgn2 == sgn3)
     dist[inside_idx] = np.power(np.abs(
-        np.sum(p0d[inside_idx,:] * normalVector.getArray(), axis=1)),2)
+        np.sum(p0d[inside_idx,:] * normalVector.getArray(), axis=1)), 2)
 
     outside_idx = np.logical_not(inside_idx)
     s0 = distance_sq_to_segment(p0d, p1d)
@@ -410,10 +443,10 @@ def calc_rupture_distance(P0, P1, P2, P3, points):
     dist = np.fliplr(dist)
     return dist
 
-def calc_ry0_distance(P0, P1, mesh):
+def calc_ry0_distance(P0, P1, lat, lon, dep):
     """Calculate Ry0 distance.
 
-    Compute the minimum distance between each point of a mesh and the great
+    Compute the minimum distance between sites (lat, lon, dep) and the great
     circle arcs perpendicular to the average strike direction of the
     fault trace and passing through the end-points of the trace.
     
@@ -421,71 +454,103 @@ def calc_ry0_distance(P0, P1, mesh):
       Point object, representing the first top-edge vertex of a fault quadrilateral.
     :param P1:
       Point object, representing the second top-edge vertex of a fault quadrilateral.
+    :param lat: 
+      Numpy array of latitude. 
+    :param lon: 
+      Numpy array of longitude. 
+    :param dep: 
+      Numpy array of depths (km). 
     :returns:
-      Array of size mesh.lons of distances (in km) from input points to rupture surface.
+      Array of size lon.shape of distances (in km) from input points to rupture surface.
     """
-    #get the mean strike vector
+    
+    # Strike
     surfaceP0 = point.Point(P0.longitude, P0.latitude, 0.0)
     surfaceP1 = point.Point(P1.longitude, P1.latitude, 0.0)
     strike = P0.azimuth(P1)
     dst1 = geodetic.distance_to_arc(P0.longitude,P0.latitude,
-                                    (strike + 90.) % 360,mesh.lons, mesh.lats)
+                                    (strike + 90.) % 360, lon, lat)
     dst2 = geodetic.distance_to_arc(P1.longitude,P1.latitude,
-                                    (strike + 90.) % 360,mesh.lons, mesh.lats)
+                                    (strike + 90.) % 360, lon, lat)
     # Get the shortest distance from the two lines
     idx = np.sign(dst1) == np.sign(dst2)
     dst = np.zeros_like(dst1)
     dst[idx] = np.fmin(np.abs(dst1[idx]), np.abs(dst2[idx]))
     return dst
 
-def calc_u_i(P0, P1, mesh):
+def calc_u_i(P0, P1, lat, lon, dep):
     """Calculate u_i distance. See Spudich and Chiou OFR 2015-1028. 
     
     :param P0:
       Point object, representing the first top-edge vertex of a fault quadrilateral.
     :param P1:
       Point object, representing the second top-edge vertex of a fault quadrilateral.
+    :param lat:
+      A numpy array of latitude.
+    :param lon:
+      A numpy array of longitude.
+    :param dep:
+      A numpy array of depths (km).
     :returns:
       Array of size mesh.lons of distances (in km) from input points to rupture surface.
     """
     pass
 
-def calc_rx_distance(P0,P1,points):
+def calc_rx_distance(P0, P1, lat, lon):
     """
     The shortest horizontal distance from a set of points to a line defined by
     extending the fault trace (or the top edge of the rupture) to
     infinity in both directions. Values on the hanging-wall are
     positive and those on the foot-wall are negative.
-    :param P0: Vector object (in ECEF coordinates) defining the first vertex of the top edge of rupture surface.
-    :param P1: Vector object (in ECEF coordinates) defining the second vertex of the top edge of rupture surface.
-    :param points: numpy array Nx3 of points (ECEF) to calculate distance from.
+    :param P0: 
+        Point object, representing the first top-edge vertex of a fault quadrilateral.
+    :param P1: 
+        Point object, representing the second top-edge vertex of a fault quadrilateral.
+    :param lat: 
+        A numpy array of latitudes. 
+    :param lon: 
+        A numpy array of longitudes. 
     :returns:
         Array of size N of distances (in km) from input points to rupture surface.
     """
-    x1 = P0.x
-    x2 = P1.x
-    y1 = P0.y
-    y2 = P1.y
-    vhat = Vector(y2-y1, -(x2-x1), 0)
+    # Project to Cartesian space:
+    west = min(P0.x, P1.x)
+    east = max(P0.x, P1.x)
+    south = min(P0.y, P1.y)
+    north = max(P0.y, P1.y)
+    proj = get_orthographic_projection(west, east, north, south)
+    
+    # projected coordinates are in km
+    p0x, p0y = proj(P0.x, P0.y)
+    p1x, p1y = proj(P1.x, P1.y)
+    
+    vhat = Vector(p1y - p0y, -(p1x - p0x), 0)
     vhat = vhat.norm()
-    r = np.zeros_like(points[:, 0:2])
-    r[:,0] = points[:,0] - x1
-    r[:,1] = points[:,1] - y1
-    dist = np.sum(vhat.getArray()[0:2]*r, axis = 1)/1000.0
+    
+    # Convert sites to Cartesian
+    sx, sy = proj(lon, lat)
+    sx1d = np.reshape(sx, (-1,))
+    sy1d = np.reshape(sy, (-1,))
+    
+    r = np.zeros([len(sx1d), 2])
+    r[:,0] = sx1d - p0x
+    r[:,1] = sy1d - p0y
+    dist = np.sum(vhat.getArray()[0:2]*r, axis = 1)
     shp = dist.shape
     if len(shp) == 1:
         dist.shape = (shp[0], 1)
     dist = np.fliplr(dist)
     return dist
 
-def get_top_edge(lat,lon,dep):
+def get_top_edge(lat, lon, dep):
     """
     Determine which edge of a quadrilateral rupture surface is the top.
     :param lat: Sequence of 4 or 5 latitudes defining vertices of rupture surface.
     :param lon: Sequence of 4 or 5 longitudes defining vertices of rupture surface.
     :param dep: Sequence of 4 or 5 depths defining vertices of rupture surface.
     :returns:
-        (P0,P1) where P0 and P1 are Vector objects in ECEF coordinates indicating the vertices of the top edge.
+        (P0,P1) where P0 and P1 are Vector objects in ECEF coordinates indicating 
+        the vertices of the top edge.
     """
     lat = np.array(lat)
     lon = np.array(lon)
