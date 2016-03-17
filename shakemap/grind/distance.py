@@ -23,7 +23,7 @@ from shakemap.utils.exception import ShakeMapException
 
 class Distance(object):
     """
-    And object to hold distance information. 
+    Class for distance calculations. 
     """
     def __init__(self, gmpe, source, lat, lon, dep, use_median_distance = True):
         """
@@ -169,8 +169,6 @@ class Distance(object):
 
         return context
     
-    ## add class methods for fromPoint, fromSites, fromArray
-
 
 def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
     """
@@ -178,7 +176,20 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
     One of quadlist OR hypo must be specified.
     :param methods:
        List of strings (or just a string) of distances to compute; 
-       can include: 'rjb', 'rx', 'rrup', 'ry0', 'repi', 'rhypo'
+       can include: 'repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0'
+         repi:  Distance to epicenter. 
+         rhypo: Distance to hypocenter. 
+         rjb:   Joyner-Boore distance; this is closest distance to the 
+                surface projection of the rupture plane. 
+         rrup:  Rupture distance; closest distance to the rupture plane. 
+         rx:    Strike-normal distance; same as GC2 coordiante T. 
+         ry:    Strike-parallel distance; same as GC2 coordiante U, but 
+                with a shift in origin definition. See Spudich and Chiou
+                (2015) http://dx.doi.org/10.3133/ofr20151028. 
+         ry0:   Horizontal distance off the end of the rupture measured
+                parallel to strike. Can only be zero or positive. We
+                compute this as a function of GC2 coordinate U. 
+
     :param lat:
        A numpy array of latitudes.
     :param lon:
@@ -204,7 +215,7 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
     if not isinstance(methods, list):
         methods = [methods]
     
-    methods_available = set(['rjb', 'rx', 'rrup', 'ry0', 'repi', 'rhypo'])
+    methods_available = set(['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0'])
     if not set(methods).issubset(methods_available):
         raise NotImplementedError('One or more requested distance method is not '\
                                   'valid or is not implemented yet')
@@ -263,7 +274,8 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
         minrrup = np.ones(newshape, dtype = lon.dtype)*1e16
     if 'rjb' in methods:
         minrjb = np.ones(newshape, dtype = lon.dtype)*1e16
-    if 'rx' in methods:
+    if ('rx' in methods) or ('ry' in methods) or \
+       ('ry0' in methods):
         totweight = np.zeros(newshape, dtype = lon.dtype)
         GC2T = np.zeros(newshape, dtype = lon.dtype)
         GC2U = np.zeros(newshape, dtype = lon.dtype)
@@ -293,12 +305,16 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
             
             if ('rx' in methods) or ('ry' in methods) or \
                ('ry0' in methods):
-                # This is currently just a bandaid to get resonable and 'graceful'
-                # results for multiple segment ruptures. The 'correct' wayt to do
-                # this is to use the unpublished equations for GC2 (2nd version of
-                # Paul Spudich's generalized coordinate system). Rx appears to be
-                # defined the same as T in GC2, but gives slightly different values
-                # in the NGA W2 flatfile. 
+                # Rx, Ry, and Ry0 are all computed if one is requeest since
+                # they all require similar information on weights. This isn't
+                # necessary for a single segment fault though.
+                # Note, we are basing these calculations on GC2 coordinates U
+                # and T as described in:
+                # Spudich, Paul and Chiou, Brian, 2015, Strike-parallel and
+                #   strike-normal coordinate system around geometrically
+                #   complicated rupture traces—Use by NGA-West2 and further
+                #   improvements: U.S. Geological Survey Open-File Report 2015-1028,
+                #   20 p., http://dx.doi.org/10.3133/ofr20151028.
                 
                 # Compute u_i and t_i for this segment
                 t_i = calc_t_i(P0, P1, lat, lon)
