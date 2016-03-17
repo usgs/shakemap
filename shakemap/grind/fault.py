@@ -719,15 +719,12 @@ class Fault(object):
         return self.reference
         
     def getNumSegments(self):
-        #### Note: This doesn't look like it will work for mutiple quad faults.
-        ####       Also tested with a single quad with a single segment and it
-        ####       does not work. 
         """
         Return a count of the number of fault segments.
         :returns:
             number of fault segments
         """
-        return len(np.where(np.isnan(self.x))[0]) + 1
+        return len(np.where(np.isnan(self.lon))[0]) + 1
 
     def getNumQuads(self):
         """
