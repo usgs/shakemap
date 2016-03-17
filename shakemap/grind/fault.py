@@ -28,7 +28,7 @@ class Fault(object):
     """
     Class to handle fault files of various types and output fault data in various ways.
     """
-    def __init__(self,lon,lat,depth,reference):
+    def __init__(self, lon, lat, depth, reference):
         """
         Constructor for Fault.
         :param lon:
@@ -40,15 +40,16 @@ class Fault(object):
         :param reference:
             string citeable reference for Fault.
         """
-        self.lon = lon
-        self.lat = lat
-        self.depth = depth
-        self.reference = reference
+        self._lon = lon
+        self._lat = lat
+        self._depth = depth
+        self._reference = reference
         self._validate()
         self.setQuadrilaterals()
 
     @classmethod
-    def fromTrace(cls,xp0,yp0,xp1,yp1,zp,widths,dips,strike=None,reference=None):
+    def fromTrace(cls, xp0, yp0, xp1, yp1, zp, widths, dips, strike = None,
+                  reference = None):
         """
         Create a fault object from a set of vertices that define the top of the 
         fault, and an array of widths/dips.
@@ -97,10 +98,10 @@ class Fault(object):
             else:
                 raise ShakeMapException('Strike must be None, scalar, or same length as trace coordinates.')                
 
-        #convert dips to radians
+        # convert dips to radians
         dips = np.radians(dips)
 
-        #ensure that all input sequences are numpy arrays
+        # ensure that all input sequences are numpy arrays
         xp0 = np.array(xp0, dtype = 'd')
         xp1 = np.array(xp1, dtype = 'd')
         yp0 = np.array(yp0, dtype = 'd')
@@ -109,12 +110,14 @@ class Fault(object):
         widths = np.array(widths, dtype = 'd')
         dips = np.array(dips, dtype = 'd')
         
-        #get a projection object
+        # get a projection object
         west = np.min((xp0.min(),xp1.min()))
         east = np.max((xp0.max(),xp1.max()))
         south = np.min((yp0.min(),yp1.min()))
         north = np.max((yp0.max(),yp1.max()))
-        proj = get_orthographic_projection(west,east,north,south) #projected coordinates are in km
+        
+        # projected coordinates are in km
+        proj = get_orthographic_projection(west, east, north, south) 
         surfaces = []
         xp2 = np.zeros_like(xp0)
         xp3 = np.zeros_like(xp0)
@@ -123,25 +126,25 @@ class Fault(object):
         zpdown = np.zeros_like(zp)
         for i in range(0,len(xp0)):
             #Project the top edge coordinates
-            p0x,p0y = proj(xp0[i],yp0[i])
-            p1x,p1y = proj(xp1[i],yp1[i])
+            p0x,p0y = proj(xp0[i], yp0[i])
+            p1x,p1y = proj(xp1[i], yp1[i])
             
             #Get the rotation angle defined by these two points 
             if strike is None:
                 dx = p1x-p0x
                 dy = p1y-p0y
-                theta = np.arctan2(dx,dy) #theta is angle from north
+                theta = np.arctan2(dx, dy) #theta is angle from north
             elif len(strike) == 1:
                 theta = np.radians(strike)
             else:
                 theta = np.radians(strike[i])
             
-            R = np.array([[np.cos(theta),-np.sin(theta)],
-                          [np.sin(theta),np.cos(theta)]])
+            R = np.array([[np.cos(theta), -np.sin(theta)],
+                          [np.sin(theta), np.cos(theta)]])
 
             #Rotate the top edge points into a new coordinate system (vertical line)
-            p0 = np.array([p0x,p0y])
-            p1 = np.array([p1x,p1y])
+            p0 = np.array([p0x, p0y])
+            p1 = np.array([p1x, p1y])
             p0p = np.dot(R,p0)
             p1p = np.dot(R,p1)
 
@@ -154,20 +157,20 @@ class Fault(object):
             p2yp = p1p[1]
                 
             #Get right side coordinates in un-rotated projected system
-            p3p = np.array([p3xp,p3yp])
-            p2p = np.array([p2xp,p2yp])
-            Rback = np.array([[np.cos(-theta),-np.sin(-theta)],
-                              [np.sin(-theta),np.cos(-theta)]])
-            p3 = np.dot(Rback,p3p)
-            p2 = np.dot(Rback,p2p)
+            p3p = np.array([p3xp, p3yp])
+            p2p = np.array([p2xp, p2yp])
+            Rback = np.array([[np.cos(-theta), -np.sin(-theta)],
+                              [np.sin(-theta), np.cos(-theta)]])
+            p3 = np.dot(Rback, p3p)
+            p2 = np.dot(Rback, p2p)
             p3x = np.array([p3[0]])
             p3y = np.array([p3[1]])
             p2x = np.array([p2[0]])
             p2y = np.array([p2[1]])
 
             #project lower edge points back to lat/lon coordinates
-            lon3,lat3 = proj(p3x,p3y,reverse=True)
-            lon2,lat2 = proj(p2x,p2y,reverse=True)
+            lon3,lat3 = proj(p3x, p3y, reverse = True)
+            lon2,lat2 = proj(p2x, p2y, reverse = True)
 
             xp2[i] = lon2
             xp3[i] = lon3
@@ -180,13 +183,13 @@ class Fault(object):
         # first corner repeated, and then a nan.
         nrects = len(zp)
         anan = np.ones_like(xp0)*np.nan
-        lon = np.array(list(zip(xp0,xp1,xp2,xp3,xp0,anan))).reshape((nrects,6)).flatten(order='C')
-        lat = np.array(list(zip(yp0,yp1,yp2,yp3,yp0,anan))).reshape((nrects,6)).flatten(order='C')
+        lon = np.array(list(zip(xp0, xp1, xp2, xp3, xp0, anan))).reshape((nrects, 6)).flatten(order = 'C')
+        lat = np.array(list(zip(yp0, yp1, yp2, yp3, yp0, anan))).reshape((nrects, 6)).flatten(order = 'C')
 
         # we need an array of depths, but we need to double each zp and zpdown element we have
         dep = []
         for i in range(0,nrects):
-            dep += [zp[i],zp[i],zpdown[i],zpdown[i],zp[i],np.nan]
+            dep += [zp[i], zp[i], zpdown[i], zpdown[i], zp[i], np.nan]
         dep = np.array(dep)
         
         
@@ -195,32 +198,32 @@ class Fault(object):
         lat = lat[0:-1]
         dep = dep[0:-1]
         
-        return cls(lon,lat,dep,reference)
+        return cls(lon, lat, dep, reference)
 
-    def writeFaultFile(self,faultfile):
+    def writeFaultFile(self, faultfile):
         """
         Write fault data to fault file format as defined in ShakeMap Software Guide.
         :param faultfile:
           Filename of output data file OR file-like object.
         """
-        if not hasattr(faultfile,'read'):
-            f = open(faultfile,'wt')
+        if not hasattr(faultfile, 'read'):
+            f = open(faultfile, 'wt')
         else:
             f = faultfile #just a reference to the input file-like object
-        f.write('#%s\n' % self.reference)
+        f.write('#%s\n' % self._reference)
         for quad in self.getQuadrilaterals():
             P0,P1,P2,P3 = quad
-            f.write('%.4f %.4f %.4f\n' % (P0.latitude,P0.longitude,P0.depth))
-            f.write('%.4f %.4f %.4f\n' % (P1.latitude,P1.longitude,P1.depth))
-            f.write('%.4f %.4f %.4f\n' % (P2.latitude,P2.longitude,P2.depth))
-            f.write('%.4f %.4f %.4f\n' % (P3.latitude,P3.longitude,P3.depth))
-            f.write('%.4f %.4f %.4f\n' % (P0.latitude,P0.longitude,P0.depth))
+            f.write('%.4f %.4f %.4f\n' % (P0.latitude, P0.longitude, P0.depth))
+            f.write('%.4f %.4f %.4f\n' % (P1.latitude, P1.longitude, P1.depth))
+            f.write('%.4f %.4f %.4f\n' % (P2.latitude, P2.longitude, P2.depth))
+            f.write('%.4f %.4f %.4f\n' % (P3.latitude, P3.longitude, P3.depth))
+            f.write('%.4f %.4f %.4f\n' % (P0.latitude, P0.longitude, P0.depth))
             f.write(u'>\n')
         if not hasattr(faultfile,'read'):
             f.close()
     
     @classmethod
-    def readFaultFile(cls,faultfile):
+    def readFaultFile(cls, faultfile):
         """
         Read fault file format as defined in ShakeMap Software Guide.  
         :param faultfile: 
@@ -238,9 +241,9 @@ class Fault(object):
         y = []
         z = []
         isFile = False
-        if isinstance(faultfile,str):
+        if isinstance(faultfile, str):
             isFile = True
-            faultfile = open(faultfile,'rt')
+            faultfile = open(faultfile, 'rt')
             faultlines = faultfile.readlines()
         else:
             faultlines = faultfile.readlines()
@@ -355,10 +358,11 @@ class Fault(object):
         
         return cls(lon, lat, dep, reference)
     
-    def multiplyFaultLength(self,factor):
+        
+    def multiplyFaultLength(self, factor):
         # What does this do and why do we want to do it????
-        for i in range(0,len(self.Quadrilaterals)):
-            quad = self.Quadrilaterals[i]
+        for i in range(0,len(self._quadrilaterals)):
+            quad = self._quadrilaterals[i]
             P0,P1,P2,P3 = quad
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
@@ -378,8 +382,8 @@ class Fault(object):
             newP2 = newp2.toPoint()
             newP1.depth = P0.depth
             newP2.depth = P3.depth
-            self.Quadrilaterals[i][1] = newP1
-            self.Quadrilaterals[i][2] = newP2
+            self._quadrilaterals[i][1] = newP1
+            self._quadrilaterals[i][2] = newP2
     
     def getFaultLength(self):
         """
@@ -388,7 +392,7 @@ class Fault(object):
             Length of fault. 
         """
         flength = 0
-        for quad in self.Quadrilaterals:
+        for quad in self._quadrilaterals:
             flength = flength + get_quad_length(quad)
         return flength
     
@@ -399,9 +403,9 @@ class Fault(object):
             each quad is a tuple of four Point objects
             (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py)
         """
-        return self.Quadrilaterals
+        return self._quadrilaterals
 
-    def getQuadWidth(self,p0,p1,p3):
+    def getQuadWidth(self, p0, p1, p3):
         """
         Return width of an individual planar trapezoid, where the p0-p1 distance represents the long side.
         :param p0: 
@@ -426,8 +430,8 @@ class Fault(object):
         :returns:
           float strike angle
         """
-        P0 = self.Quadrilaterals[0][0]
-        P1 = self.Quadrilaterals[-1][1]
+        P0 = self._quadrilaterals[0][0]
+        P1 = self._quadrilaterals[-1][1]
         return P0.azimuth(P1)
 
     def getTopOfRupture(self):
@@ -437,7 +441,7 @@ class Fault(object):
             float shallowest depth of all vertices.
         """
         mindep = 9999999
-        for quad in self.Quadrilaterals:
+        for quad in self._quadrilaterals:
             P0,P1,P2,P3 = quad
             depths = np.array([P0.depth,P1.depth,P2.depth,P3.depth])
             if np.min(depths) < mindep:
@@ -451,11 +455,11 @@ class Fault(object):
            Average dip in degrees.
         """
         dipsum = 0.0
-        for quad in self.Quadrilaterals:
+        for quad in self._quadrilaterals:
             N = get_quad_normal(quad)
             V = get_vertical_vector(quad)
             dipsum = dipsum + np.degrees(np.arccos(Vector.dot(N, V)))
-        dip = dipsum/len(self.Quadrilaterals)
+        dip = dipsum/len(self._quadrilaterals)
         return dip
     
     def getWidth(self):
@@ -465,13 +469,13 @@ class Fault(object):
             Average width in km of all fault quadrilaterals.
         """
         wsum = 0.0
-        for quad in self.Quadrilaterals:
+        for quad in self._quadrilaterals:
             P0,P1,P2,P3 = quad
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
             p3 = Vector.fromPoint(P3)
-            wsum += self.getQuadWidth(p0,p1,p3)
-        mwidth = (wsum/len(self.Quadrilaterals))/1000.0
+            wsum += self.getQuadWidth(p0, p1, p3)
+        mwidth = (wsum/len(self._quadrilaterals))/1000.0
         return mwidth
     
     def getIndividualWidths(self):
@@ -483,11 +487,11 @@ class Fault(object):
         nquad = self.getNumQuads()
         widths = np.zeros(nquad)
         for i in range(nquad):
-            P0,P1,P2,P3 = self.Quadrilaterals[i]
+            P0,P1,P2,P3 = self._quadrilaterals[i]
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
             p3 = Vector.fromPoint(P3)
-            widths[i] = self.getQuadWidth(p0,p1,p3)/1000.0
+            widths[i] = self.getQuadWidth(p0, p1, p3)/1000.0
         return widths
     
     def getIndividualTopLengths(self):
@@ -500,14 +504,14 @@ class Fault(object):
         nquad = self.getNumQuads()
         lengths = np.zeros(nquad)
         for i in range(nquad):
-            P0,P1,P2,P3 = self.Quadrilaterals[i]
+            P0,P1,P2,P3 = self._quadrilaterals[i]
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
             lengths[i] = (p1 - p0).mag()/1000.0
         return lengths
     
     
-    def getTrapMeanLength(self,p0,p1,p2,p3):
+    def getTrapMeanLength(self, p0, p1, p2, p3):
         """
         Return the sqrt of the area of a quadrilateral (used for QA of fault plane).
         :param p0: 
@@ -522,14 +526,14 @@ class Fault(object):
             square root of trapezoid area.
         """
         #area of a trapezoid: A = (a+b)/2 * h (https://en.wikipedia.org/wiki/Trapezoid)
-        h = self.getQuadWidth(p0,p1,p3)
+        h = self.getQuadWidth(p0, p1, p3)
         a = (p1-p0).mag()
         b = (p2-p3).mag()
         A = ((a+b)/2.0)*h
         length = np.sqrt(A)
         return length
     
-    def getDistanceToPlane(self,planepoints,otherpoint):
+    def getDistanceToPlane(self, planepoints, otherpoint):
         """
         Calculate a point's distance to a plane.  Used to figure out if a quadrilateral points are all co-planar.
         :param planepoints:
@@ -544,11 +548,11 @@ class Fault(object):
         x1,y1,z1 = p0.getArray()
         x2,y2,z2 = p1.getArray()
         x3,y3,z3 = p2.getArray()
-        D = np.linalg.det(np.array([[x1,y1,z1],[x2,y2,z2],[x3,y3,z3]]))
+        D = np.linalg.det(np.array([[x1, y1, z1], [x2, y2 ,z2], [x3, y3, z3]]))
         d = -1
-        at = np.linalg.det(np.array([[1,y1,z1],[1,y2,z2],[1,y3,z3]]))
-        bt = np.linalg.det(np.array([[x1,1,z1],[x2,1,z2],[x3,1,z3]]))
-        ct = np.linalg.det(np.array([[x1,y1,1],[x2,y2,1],[x3,y3,1]]))
+        at = np.linalg.det(np.array([[1, y1, z1], [1, y2, z2], [1, y3, z3]]))
+        bt = np.linalg.det(np.array([[x1, 1, z1], [x2, 1, z2], [x3, 1, z3]]))
+        ct = np.linalg.det(np.array([[x1, y1, 1], [x2, y2, 1], [x3, y3, 1]]))
         a = (-d/D) *at
         b = (-d/D) *bt
         c = (-d/D) *ct
@@ -558,7 +562,7 @@ class Fault(object):
         dist = numer/denom
         return dist
 
-    def isPointToRight(self,P0,P1,P2):
+    def isPointToRight(self, P0, P1, P2):
         eps = 1e-6
         p0 = Vector.fromPoint(P0) # fromPoint converts to ECEF
         p1 = Vector.fromPoint(P1) 
@@ -572,16 +576,16 @@ class Fault(object):
             return True
         return False
 
-    def reverseQuad(self,P0,P1,P2,P3):
+    def reverseQuad(self, P0, P1, P2, P3):
         newP0 = copy.deepcopy(P1)
         newP1 = copy.deepcopy(P0)
         newP2 = copy.deepcopy(P3)
         newP3 = copy.deepcopy(P2)
-        if not self.isPointToRight(newP0,newP1,newP2):
+        if not self.isPointToRight(newP0, newP1, newP2):
             raise ShakeMapException('Third vertex of quadrilateral must be to the right of the second vertex')
-        return (newP0,newP1,newP2,newP3)
+        return (newP0, newP1, newP2, newP3)
     
-    def validateQuad(self,P0,P1,P2,P3):
+    def validateQuad(self, P0, P1, P2, P3):
         """
         Validate and fix* a given quadrilateral (*currently "fix" means check third vertex for co-planarity
         with other three points, and force it to be co-planar if it's not wildly out of the plane.()
@@ -628,16 +632,16 @@ class Fault(object):
         #get the new P2 value
         v1 = v0*d
         newp2 = p3 + v1
-        planepoints = [p0,p1,p2]
-        dnormal = self.getDistanceToPlane(planepoints,p2)
-        geometricMean = self.getTrapMeanLength(p0,p1,newp2,p3)
+        planepoints = [p0, p1, p2]
+        dnormal = self.getDistanceToPlane(planepoints, p2)
+        geometricMean = self.getTrapMeanLength(p0, p1,newp2, p3)
         if dnormal/geometricMean > OFFPLANE_TOLERANCE:
             raise ShakeMapException('Points in quadrilateral are not co-planar')
         newP0 = p0.toPoint()
         newP1 = p1.toPoint()
         newP2 = newp2.toPoint()
         newP3 = p3.toPoint()
-        return [newP0,newP1,newP2,newP3]
+        return [newP0, newP1, newP2, newP3]
         
     
     def setQuadrilaterals(self):
@@ -652,45 +656,68 @@ class Fault(object):
         #   strike angle, and between 0 and 90 degrees.
         #4) The top edge of each quad must be defined by the first two vertices of that quad.
         #5) 4 points of quadrilateral must be co-planar
-        self.lon = np.array(self.lon)
-        self.lat = np.array(self.lat)
-        self.depth = np.array(self.depth)
-        inan = np.isnan(self.lon)
-        numnans = len(self.lon[inan])
+        self._lon = np.array(self._lon)
+        self._lat = np.array(self._lat)
+        self._depth = np.array(self._depth)
+        inan = np.isnan(self._lon)
+        numnans = len(self._lon[inan])
         numsegments = numnans + 1
         #requirements:
         # 1) Coordinate arrays must be same length
         # 2) Polygons must be quadrilaterals
         # 3) Quads must be closed
         # 4) Quads must be planar
-        if len(self.lon) != len(self.lat) != len(self.depth):
+        if len(self._lon) != len(self._lat) != len(self._depth):
             raise IndexError('Length of input lon,lat,depth arrays must be equal')
         
+        # Addition: self._segment_index
+        #   It is also convenient to create a list of indexes for which 'trace'
+        #   each quad is on (i.e, grouped). This information is required for GC2
+        #   calculations. Also, in some rare situations, we need to be able to
+        #   overwrite the default values.
+        
         istart = 0
-        endpoints = list(np.where(np.isnan(self.lon))[0])
-        endpoints.append(len(self.lon))
-        self.Quadrilaterals = []
+        endpoints = list(np.where(np.isnan(self._lon))[0])
+        endpoints.append(len(self._lon))
+        self._quadrilaterals = []
+        self._segment_index = []
+        segind = 0
         for iend in endpoints:
-            lonseg = self.lon[istart:iend][0:-1] #remove closing points
-            latseg = self.lat[istart:iend][0:-1]
-            depthseg = self.depth[istart:iend][0:-1]
+            lonseg = self._lon[istart:iend][0:-1] #remove closing points
+            latseg = self._lat[istart:iend][0:-1]
+            depthseg = self._depth[istart:iend][0:-1]
             #each segment can have many contiguous quadrilaterals defined in it
             #separations (nans) between segments mean that segments are not contiguous.
             npoints = len(lonseg)
             nquads = int((npoints - 4)/2) + 1
             startidx = 0
             endidx = -1
-            for i in range(0,nquads):
-                topLeft = point.Point(lonseg[startidx],latseg[startidx],depthseg[startidx])
-                topRight = point.Point(lonseg[startidx+1],latseg[startidx+1],depthseg[startidx+1])
-                bottomRight = point.Point(lonseg[endidx-1],latseg[endidx-1],depthseg[endidx-1])
-                bottomLeft = point.Point(lonseg[endidx],latseg[endidx],depthseg[endidx])
-                surface = self.validateQuad(topLeft,topRight,bottomRight,bottomLeft)
-                self.Quadrilaterals.append(surface)
+            for i in range(0, nquads):
+                topLeft = point.Point(lonseg[startidx], latseg[startidx],
+                                      depthseg[startidx])
+                topRight = point.Point(lonseg[startidx+1], latseg[startidx+1],
+                                       depthseg[startidx+1])
+                bottomRight = point.Point(lonseg[endidx-1], latseg[endidx-1],
+                                          depthseg[endidx-1])
+                bottomLeft = point.Point(lonseg[endidx], latseg[endidx],
+                                         depthseg[endidx])
+                surface = self.validateQuad(topLeft, topRight, bottomRight,
+                                            bottomLeft)
+                self._quadrilaterals.append(surface)
                 startidx += 1
                 endidx -= 1
-            istart = iend+1
+            istart = iend + 1
+            self._segment_index.extend([segind]*nquads)
+            segind = segind + 1
 
+    def getSegmentIndex(self):
+        """
+        Return a list of segment indexes. 
+        :returns:
+            List of segment indexes; lenght equals the number of quadrilaterals. 
+        """
+        return self._segment_index
+    
     def plot(self,ax=None):
         if ax is None:
             fig = plt.figure()
@@ -698,16 +725,16 @@ class Fault(object):
         else:
             if 'xlim3d' not in list(ax.properties.keys()):
                 raise ShakeMapException('Non-3d axes object passed to plot() method.')
-        for quad in self.Quadrilaterals:
+        for quad in self._quadrilaterals:
             P0,P1,P2,P3 = quad
-            ax.plot([P0.longitude],[P0.latitude],[-P0.depth],'B.')
-            ax.text([P0.longitude],[P0.latitude],[-P0.depth],'P0')
-            ax.plot([P1.longitude],[P1.latitude],[-P1.depth],'b.')
-            ax.text([P1.longitude],[P1.latitude],[-P1.depth],'P1')
-            ax.plot([P2.longitude],[P2.latitude],[-P2.depth],'b.')
-            ax.text([P2.longitude],[P2.latitude],[-P2.depth],'P2')
-            ax.plot([P3.longitude],[P3.latitude],[-P3.depth],'b.')
-            ax.text([P3.longitude],[P3.latitude],[-P3.depth],'P3')
+            ax.plot([P0.longitude], [P0.latitude], [-P0.depth], 'B.')
+            ax.text([P0.longitude], [P0.latitude], [-P0.depth], 'P0')
+            ax.plot([P1.longitude], [P1.latitude], [-P1.depth], 'b.')
+            ax.text([P1.longitude], [P1.latitude], [-P1.depth], 'P1')
+            ax.plot([P2.longitude], [P2.latitude], [-P2.depth], 'b.')
+            ax.text([P2.longitude], [P2.latitude], [-P2.depth], 'P2')
+            ax.plot([P3.longitude], [P3.latitude], [-P3.depth], 'b.')
+            ax.text([P3.longitude], [P3.latitude], [-P3.depth], 'P3')
             
         
     def getReference(self):
@@ -716,7 +743,7 @@ class Fault(object):
         :returns:
            string citeable reference
         """
-        return self.reference
+        return self._reference
         
     def getNumSegments(self):
         """
@@ -724,7 +751,7 @@ class Fault(object):
         :returns:
             number of fault segments
         """
-        return len(np.where(np.isnan(self.lon))[0]) + 1
+        return len(np.where(np.isnan(self._lon))[0]) + 1
 
     def getNumQuads(self):
         """
@@ -732,7 +759,7 @@ class Fault(object):
         :returns:
             number of fault quadrilaterals. 
         """
-        return len(self.Quadrilaterals)
+        return len(self._quadrilaterals)
 
     def getFaultAsArrays(self):
         """
@@ -741,7 +768,7 @@ class Fault(object):
         :returns:
             3-tuple of numpy arrays indicating X,Y,Z (lon,lat,depth) coordinates.
         """
-        return (np.array(self.x),np.array(self.y),np.array(self.z))
+        return (np.array(self._x), np.array(self._y), np.array(self._z))
 
     def getFaultAsMesh(self):
         """
@@ -749,7 +776,7 @@ class Fault(object):
         :returns:
             Mesh (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
         """
-        fault = mesh.Mesh(self.x,self.y,self.z)
+        fault = mesh.Mesh(self._x, self._y, self._z)
         return fault
 
     def _validate(self):
@@ -760,22 +787,22 @@ class Fault(object):
         """
         #TODO - implement ccw algorithm...
         #http://stackoverflow.com/questions/1165647/how-to-determine-if-a-list-of-polygon-points-are-in-clockwise-order
-        if len(self.lon) != len(self.lat) or len(self.lon) != len(self.depth):
+        if len(self._lon) != len(self._lat) or len(self._lon) != len(self._depth):
             raise ShakeMapException("Fault coordinates don't match")
-        inan = np.where(np.isnan(self.lon))[0]
+        inan = np.where(np.isnan(self._lon))[0]
         if not len(inan):
             return
-        if not np.isnan(self.lon[inan[-1]]):
-            inan = list(inan).append(len(self.lon))
+        if not np.isnan(self._lon[inan[-1]]):
+            inan = list(inan).append(len(self._lon))
         istart = 0
         for i in range(0,len(inan)):
             iend = inan[i]-1
-            x1 = self.lon[istart]
-            x2 = self.lon[iend]
-            y1 = self.lat[istart]
-            y2 = self.lat[iend]
-            z1 = self.depth[istart]
-            z2 = self.depth[iend]
+            x1 = self._lon[istart]
+            x2 = self._lon[iend]
+            y1 = self._lat[istart]
+            y2 = self._lat[iend]
+            z1 = self._depth[istart]
+            z2 = self._depth[iend]
             if x1 != x2 or y1 != y2 or z1 != z2:
                 raise ShakeMapException('Unclosed segments exist in fault file.')
             istart = inan[i]+1
