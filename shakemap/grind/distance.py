@@ -5,6 +5,7 @@ import struct
 from datetime import datetime
 import copy
 import warnings
+import itertools as it
 
 #third party imports
 from .ecef import latlon2ecef
@@ -150,9 +151,9 @@ class Distance(object):
             requires = requires | ig.REQUIRES_DISTANCES
         
         if self.source.Fault is not None:
-            quadlist = self.source.Fault.getQuadrilaterals()
+            flt = self.source.Fault#.getQuadrilaterals()
         else:
-            quadlist = None
+            flt = None
         
         hyplat = self.source.getEventParam('lat')
         hyplon = self.source.getEventParam('lon')
@@ -162,7 +163,7 @@ class Distance(object):
         context = base.DistancesContext()
         
         ddict = get_distance(list(requires), lat, lon, dep,
-                             quadlist = quadlist, hypo = hyppoint)
+                             fault = flt, hypo = hyppoint)
         
         for method in requires:
             (context.__dict__)[method] = ddict[method]
@@ -170,7 +171,7 @@ class Distance(object):
         return context
     
 
-def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
+def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
     """
     Calculate distance using any one of a number of distance measures. 
     One of quadlist OR hypo must be specified.
@@ -196,8 +197,8 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
        A numpy array of longidues.
     :param dep:
        A numpy array of depths (km).
-    :param quadlist:
-       optional list of quadrilaterals (see Fault.py)
+    :param fault:
+       optional Fault instance. 
     :param hypo:
        Optional Point object of hypocenter. 
     https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py
@@ -208,6 +209,11 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
     :raises NotImplementedError:
        for unknown distance measures or ones not yet implemented.
     """
+    
+    if fault is not None:
+        quadlist = fault.getQuadrilaterals()
+    else:
+        quadlist = None
     
     # Dictionary for holding the distances
     distdict = dict()
@@ -279,6 +285,36 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
         totweight = np.zeros(newshape, dtype = lon.dtype)
         GC2T = np.zeros(newshape, dtype = lon.dtype)
         GC2U = np.zeros(newshape, dtype = lon.dtype)
+        
+        # For these distances, we need to sort out strike discordance and nominal
+        # strike prior to starting the loop if there are more than one segments
+        
+        segind = fault.getSegmentIndex()
+        uind = np.unique(flt.getSegmentIndex())
+        nseg = len(uind)
+        dist_save = 0
+        if nseg > 1:  
+            # a is the vector connecting the two segment endpoints that are most
+            # distant
+            it_seg = it.product(it.combinations(uind, 2),
+                                it.product([0, 1], [0, 1]))
+            for k in it_seg:
+                s1ind = k[0][0]
+                s2ind = k[0][1]
+                p1ind = k[1][0]
+                p2ind = k[1][1]
+                p1 = quadlist[s1ind][p1ind]
+                p2 = quadlist[s2ind][p2ind]
+                dist = geodetic.distance(p1.longitude, p1.latitude, 0.0, 
+                                         p2.longitude, p2.latitude, 0.0)
+                if dist > dist_save:
+                    dist_save = dist
+                    s1ind_save = s1ind
+                    s2ind_save = s2ind
+                    p1ind_save = p1ind
+                    p2ind_save = p2ind
+            ## -- need to complete -- ##
+        
     
     # Length of prior segments
     s_i = 0.0
@@ -305,9 +341,9 @@ def get_distance(methods, lat, lon, dep, quadlist = None, hypo = None):
             
             if ('rx' in methods) or ('ry' in methods) or \
                ('ry0' in methods):
-                # Rx, Ry, and Ry0 are all computed if one is requeest since
-                # they all require similar information on weights. This isn't
-                # necessary for a single segment fault though.
+                # Rx, Ry, and Ry0 are all computed if one is requested since
+                # they all require similar information for the weights. This
+                # isn't necessary for a single segment fault though.
                 # Note, we are basing these calculations on GC2 coordinates U
                 # and T as described in:
                 # Spudich, Paul and Chiou, Brian, 2015, Strike-parallel and
