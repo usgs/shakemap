@@ -190,6 +190,8 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
          ry0:   Horizontal distance off the end of the rupture measured
                 parallel to strike. Can only be zero or positive. We
                 compute this as a function of GC2 coordinate U. 
+         U:     GC2 coordinate U. 
+         T:     GC2 coordinate T. 
 
     :param lat:
        A numpy array of latitudes.
@@ -221,7 +223,7 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
     if not isinstance(methods, list):
         methods = [methods]
     
-    methods_available = set(['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0'])
+    methods_available = set(['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T'])
     if not set(methods).issubset(methods_available):
         raise NotImplementedError('One or more requested distance method is not '\
                                   'valid or is not implemented yet')
@@ -254,7 +256,9 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
     if ('repi' in methods) or \
        (('rjb' in methods) and (quadlist is None)) or \
        (('ry0' in methods) and (quadlist is None)) or \
-       (('rx' in methods) and (quadlist is None)):
+       (('rx' in methods) and (quadlist is None)) or \
+       (('T' in methods) and (quadlist is None)) or \
+       (('U' in methods) and (quadlist is None)):
         if hypo is None:
             raise ShakeMapException('Cannot calculate epicentral distance '\
                                     'without a point object')
@@ -281,47 +285,90 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
     if 'rjb' in methods:
         minrjb = np.ones(newshape, dtype = lon.dtype)*1e16
     if ('rx' in methods) or ('ry' in methods) or \
-       ('ry0' in methods):
+       ('ry0' in methods) or ('U' in methods) or ('T' in methods):
         totweight = np.zeros(newshape, dtype = lon.dtype)
         GC2T = np.zeros(newshape, dtype = lon.dtype)
         GC2U = np.zeros(newshape, dtype = lon.dtype)
         
         # For these distances, we need to sort out strike discordance and nominal
         # strike prior to starting the loop if there are more than one segments
-        
         segind = fault.getSegmentIndex()
-        uind = np.unique(flt.getSegmentIndex())
+        segindnp = np.array(segind)
+        uind = np.unique(segind)
         nseg = len(uind)
-        dist_save = 0
-        if nseg > 1:  
-            # a is the vector connecting the two segment endpoints that are most
-            # distant
+        if nseg > 1: 
+            quadlist = fault.getQuadrilaterals()
+            # Need to get index of first and last quad
+            # for each segment
+            iq0 = np.zeros(nseg, dtype = 'int16')
+            iq1 = np.zeros(nseg, dtype = 'int16')
+            for k in uind:
+                ii = [i for i, j in enumerate(segind) if j == uind[k]]
+                iq0[k] = int(np.min(ii))
+                iq1[k] = int(np.max(ii))
+            
             it_seg = it.product(it.combinations(uind, 2),
                                 it.product([0, 1], [0, 1]))
+            dist_save = 0
             for k in it_seg:
-                s1ind = k[0][0]
-                s2ind = k[0][1]
-                p1ind = k[1][0]
-                p2ind = k[1][1]
-                p1 = quadlist[s1ind][p1ind]
-                p2 = quadlist[s2ind][p2ind]
-                dist = geodetic.distance(p1.longitude, p1.latitude, 0.0, 
-                                         p2.longitude, p2.latitude, 0.0)
+                s0ind = k[0][0]
+                s1ind = k[0][1]
+                p0ind = k[1][0]
+                p1ind = k[1][1]
+                if p0ind == 0:
+                    P0 = quadlist[iq0[s0ind]][0]
+                else:
+                    P0 = quadlist[iq1[s0ind]][1]
+                if p1ind == 0:
+                    P1 = quadlist[iq1[s1ind]][0]
+                else:
+                    P1 = quadlist[iq0[s1ind]][1]
+                
+                dist = geodetic.distance(P0.longitude, P0.latitude, 0.0, 
+                                         P1.longitude, P1.latitude, 0.0)
                 if dist > dist_save:
                     dist_save = dist
-                    s1ind_save = s1ind
-                    s2ind_save = s2ind
-                    p1ind_save = p1ind
-                    p2ind_save = p2ind
-            ## -- need to complete -- ##
+                    A0 = P0
+                    A1 = P1
+            
+            A0.depth = 0
+            A1.depth = 0
+            p_origin = Vector.fromPoint(A0)
+            a0 = Vector.fromPoint(A0)
+            a1 = Vector.fromPoint(A1)
+            ahat = (a1 - a0).norm()
+            # Loop over traces
+            e_j = np.zeros(nseg)
+            b_prime = [None]*nseg
+            for j in range(nseg):
+                P0 = quadlist[iq0[j]][0]
+                P1 = quadlist[iq1[j]][1]
+                P0.depth = 0
+                P1.depth = 0
+                p0 = Vector.fromPoint(P0)
+                p1 = Vector.fromPoint(P1)
+                b_prime[j] = p1 - p0
+                e_j[j] = ahat.dot(b_prime[j])
+            E = np.sum(e_j)
+            # List of discordancy
+            dc = [np.sign(a) * np.sign(E) for a in e_j]
+            b = Vector(0, 0, 0)
+            for j in range(nseg):
+                b.x = b.x + b_prime[j].x*dc[j]
+                b.y = b.y + b_prime[j].y*dc[j]
+                b.z = b.z + b_prime[j].z*dc[j]
+            bhat = b.norm()
+
+
         
     
     # Length of prior segments
     s_i = 0.0
+    l_i = np.zeros(len(quadlist))
     
     if quadlist is not None: 
-        for quad in quadlist:
-            P0, P1, P2, P3 = quad
+        for i in range(len(quadlist)):
+            P0, P1, P2, P3 = quadlist[i]
             
             if 'rrup' in methods:
                 rrupdist = calc_rupture_distance(P0, P1, P2, P3, sites_ecef)
@@ -340,40 +387,50 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
                 minrjb = np.minimum(minrjb, rjbdist)
             
             if ('rx' in methods) or ('ry' in methods) or \
-               ('ry0' in methods):
+               ('ry0' in methods) or ('U' in methods) or ('T' in methods):
                 # Rx, Ry, and Ry0 are all computed if one is requested since
                 # they all require similar information for the weights. This
                 # isn't necessary for a single segment fault though.
                 # Note, we are basing these calculations on GC2 coordinates U
                 # and T as described in:
-                # Spudich, Paul and Chiou, Brian, 2015, Strike-parallel and
-                #   strike-normal coordinate system around geometrically
-                #   complicated rupture traces—Use by NGA-West2 and further
-                #   improvements: U.S. Geological Survey Open-File Report 2015-1028,
-                #   20 p., http://dx.doi.org/10.3133/ofr20151028.
+                # Spudich and Chiou (2015) http://dx.doi.org/10.3133/ofr20151028.
                 
                 # Compute u_i and t_i for this segment
                 t_i = calc_t_i(P0, P1, lat, lon)
                 u_i = calc_u_i(P0, P1, lat, lon)
                 
                 # Quad length
-                l_i = get_quad_length(quad)
+                l_i[i] = get_quad_length(quadlist[i])
                 
                 # Weight of segment, three cases
                 # Case 3: t_i == 0 and 0 <= u_i <= l_i
                 w_i = np.zeros_like(t_i)
                 # Case 1:
                 ix = t_i != 0
-                w_i[ix] = (1.0/t_i[ix])*(np.arctan((l_i - u_i[ix])/t_i[ix]) -
+                w_i[ix] = (1.0/t_i[ix])*(np.arctan((l_i[i] - u_i[ix])/t_i[ix]) -
                                          np.arctan(-u_i[ix]/t_i[ix]))
                 # Case 2:
-                ix = (t_i == 0) & ((u_i < 0) | (u_i > l_i))
-                w_i[ix] = 1/(u_i[ix] - l_i) - 1/u_i[ix]
+                ix = (t_i == 0) & ((u_i < 0) | (u_i > l_i[i]))
+                w_i[ix] = 1/(u_i[ix] - l_i[i]) - 1/u_i[ix]
                 
                 totweight = totweight + w_i
                 GC2T = GC2T + w_i*t_i
-                GC2U = GC2U + w_i*(u_i + s_i)
-                s_i = s_i + l_i
+                if nseg == 1:
+                    GC2U = GC2U + w_i*(u_i + s_i)
+                else:
+                    if i == 0:
+                        qind = np.array(range(len(quadlist)))
+                        l_kj = 0
+                        s_ij_1 = 0
+                    else:
+                        l_kj = l_i[(segindnp == segindnp[i]) & (qind < i) ]
+                        s_ij_1 = np.sum(l_kj)
+                    
+                    p1 = Vector.fromPoint(quadlist[iq0[segind[i]]][0])
+                    s_ij_2 = ((p1 - p_origin)*dc[segind[i]]).dot(bhat)/1000.0
+                    s_ij = s_ij_1 + s_ij_2
+                    GC2U = GC2U + w_i*(u_i + s_ij)
+                s_i = s_i + l_i[i]
                 
         # Collect distances from loop into the distance dict
         if 'rjb' in methods:
@@ -381,10 +438,12 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
             distdict['rjb'] = minrjb
         
         if ('rx' in methods) or ('ry' in methods) or \
-           ('ry0' in methods):
+           ('ry0' in methods) or ('U' in methods) or ('T' in methods):
             # Normalize by sum of quad weights
             GC2T = GC2T/totweight
             GC2U = GC2U/totweight
+            distdict['T'] = copy.deepcopy(GC2T).reshape(oldshape)
+            distdict['U'] = copy.deepcopy(GC2U).reshape(oldshape)
             
             # Take care of Rx
             Rx = copy.deepcopy(GC2T) # preserve sign (no absolute value)
@@ -400,6 +459,8 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
             Ry0 = np.zeros_like(GC2U)
             ix = GC2U < 0
             Ry0[ix] = np.abs(GC2U[ix])
+            if nseg > 1:
+                s_i = s_ij + l_i[-1]
             ix = GC2U > s_i
             Ry0[ix] = GC2U[ix] - s_i
             Ry0 = Ry0.reshape(oldshape)
