@@ -737,6 +737,22 @@ class Fault(object):
             ax.text([P3.longitude], [P3.latitude], [-P3.depth], 'P3')
             
         
+    def getLats(self):
+        """
+        Return a copy of the array of latitude points for the fault.
+        :returns:
+            Numpy array of latitude values.
+        """
+        return self._lat.copy()
+        
+    def getLons(self):
+        """
+        Return a copy of the array of longitude points for the fault.
+        :returns:
+            Numpy array of latitude values.
+        """
+        return self._lon.copy()
+
     def getReference(self):
         """
         Return whatever reference information was contained in fault file.
