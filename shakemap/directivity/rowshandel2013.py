@@ -2,15 +2,18 @@
 
 
 import numpy as np
+import copy
+
 import openquake.hazardlib.geo as geo
 from openquake.hazardlib.geo.utils import get_orthographic_projection
+
 import shakemap.grind.ecef as ecef
 import shakemap.grind.fault as fault
 from shakemap.grind.ecef import latlon2ecef
 from shakemap.grind.ecef import ecef2latlon
 from shakemap.grind.vector import Vector
-from shakemap.grind.distance import calcRuptureDistance
-from shakemap.grind.distance import getDistance
+from shakemap.grind.distance import calc_rupture_distance
+from shakemap.grind.distance import get_distance
 
 """
 Implements the Rowshandel (2013) directivity model. 
@@ -80,23 +83,23 @@ class Rowshandel2013(object):
         :param simpleCentering:
             Boolean; should the simple centering method be used. 
         """
-        self.flt = flt
-        self.hyp = hyp
-        self.sites = sites
-        self.rake = rake
-        self.dx = dx
-        self.M = M
+        self._flt = flt
+        self._hyp = hyp
+        self._sites = sites
+        self._rake = rake
+        self._dx = dx
+        self._M = M
         if np.all(T != np.array([1, 2, 3, 4, 5, 7.5])):
             raise IndexError('Invalid T value. Interpolation not yet supported.')
-        self.T = T
+        self._T = T
         if (a_weight > 1.0) or (a_weight < 0):
             raise ValueError('a_weight must be between 0 and 1.')
-        self.a_weight = a_weight
+        self._a_weight = a_weight
         if (mtype != 1) and (mtype != 2):
             raise ValueError('mtype can onlty be 1 or 2.')
-        self.mtype = mtype
-        self.simpleDT = simpleDT
-        self.simpleCentering = simpleCentering
+        self._mtype = mtype
+        self._simpleDT = simpleDT
+        self._simpleCentering = simpleCentering
         
         self.computeWrup()
         self.computeLD()
@@ -107,23 +110,38 @@ class Rowshandel2013(object):
         self.computeFd()
     
     
+    def getFd(self):
+        return copy.deepcopy(self._fd)
+
+    def getXiPrime(self):
+        return copy.deepcopy(self._xi_prime)
+
+    def getDT(self):
+        return copy.deepcopy(self._DT)
+
+    def getWP(self):
+        return copy.deepcopy(self._WP)
+
+    def getLD(self):
+        return copy.deepcopy(self._LD)
+
     def computeFd(self):
         """
         Fd is the term that modifies the GMPE output as an additive term 
         (in log space). 
         ln(Y) = f(M, R, ...) + Fd
         """
-        c1sel = self.__c1['mean'][self.__c1['T'] == self.T]
-        c2sel = self.__c2['mean'][self.__c2['T'] == self.T]
-        if self.simpleCentering:
+        c1sel = self.__c1['mean'][self.__c1['T'] == self._T]
+        c2sel = self.__c2['mean'][self.__c2['T'] == self._T]
+        if self._simpleCentering:
             # Eqn 3.14
-            xi = self.xi_prime * self.LD
+            xi = self._xi_prime * self._LD
             xi_c = 0.18  # for all events
             # ** could adjust xi_c based on mechanism
-            self.fd = c1sel*(self.xi_prime - xi_c) * self.DT * self.WP
+            self._fd = c1sel*(self._xi_prime - xi_c) * self._DT * self._WP
         else:
             # Eqn 3.13
-            self.fd = (c1sel*self.xi_prime + c2sel) * self.LD * self.DT * self.WP
+            self._fd = (c1sel*self._xi_prime + c2sel) * self._LD * self._DT * self._WP
 
 
     def computeWrup(self):
@@ -135,25 +153,21 @@ class Rowshandel2013(object):
             quad where the hypocenter is located.
           * Alternative is to compute max Wrup for the different quads. 
         """
-        nquad = len(self.flt.Quadrilaterals)
+        nquad = len(self._flt._quadrilaterals)
         
         #-------------------------------------------
         # First find which quad the hypocenter is on
         #-------------------------------------------
         
-        x, y, z = ecef.latlon2ecef(self.hyp[1], self.hyp[0], self.hyp[2])
+        x, y, z = ecef.latlon2ecef(self._hyp[1], self._hyp[0], self._hyp[2])
         hyp_ecef = np.array([[x, y, z]])
         qdist = np.zeros_like([nquad])
         for i in range(0, nquad):
-            P0, P1, P2, P3 = self.flt.Quadrilaterals[i]
-            p0 = Vector.fromPoint(P0) # convert to ECEF
-            p1 = Vector.fromPoint(P1)
-            p2 = Vector.fromPoint(P2)
-            p3 = Vector.fromPoint(P3)
-            qdist[i] = calcRuptureDistance(p0, p1, p2, p3, hyp_ecef)
+            P0, P1, P2, P3 = self._flt.getQuadrilaterals()[i]
+            qdist[i] = calc_rupture_distance(P0, P1, P2, P3, hyp_ecef)
         ind = int(np.where(qdist == np.min(qdist))[0])
         # *** check that this doesn't break with more than one quad
-        q = self.flt.Quadrilaterals[ind]
+        q = self._flt.getQuadrilaterals()[ind]
         
         #--------------------------
         # Compute Wrup on that quad
@@ -162,23 +176,23 @@ class Rowshandel2013(object):
         pp0 = Vector.fromPoint(geo.point.Point(
             q[0].longitude, q[0].latitude, q[0].depth) )
         hyp_ecef = Vector.fromPoint(geo.point.Point(
-            self.hyp[0], self.hyp[1], self.hyp[2]))
+            self._hyp[0], self._hyp[1], self._hyp[2]))
         hp0 = hyp_ecef - pp0
         ddv = fault.get_quad_down_dip_vector(q)
-        self.Wrup = Vector.dot(ddv, hp0)/1000
+        self._Wrup = Vector.dot(ddv, hp0)/1000
     
     def computeXiPrime(self):
         """
         Computes the xi' value. 
         """
         hypo_ecef = Vector.fromPoint(geo.point.Point(
-            self.hyp[0], self.hyp[1], self.hyp[2]))
-        epi_ll = Vector(self.hyp[0], self.hyp[1], 0)
+            self._hyp[0], self._hyp[1], self._hyp[2]))
+        epi_ll = Vector(self._hyp[0], self._hyp[1], 0)
         epi_ecef = Vector.fromPoint(geo.point.Point(
             epi_ll.x, epi_ll.y, 0))
         
-        slat = self.sites[1]
-        slon = self.sites[0]
+        slat = self._sites[1]
+        slon = self._sites[0]
         
         # Convert site to ECEF:
         site_ecef_x = np.ones_like(slat)
@@ -204,12 +218,12 @@ class Rowshandel2013(object):
         xi_prime_s = np.zeros(np.product(slat.shape))
         xi_prime_p = np.zeros(np.product(slat.shape))
         
-        for k in range(len(self.flt.Quadrilaterals)):
+        for k in range(len(self._flt._quadrilaterals)):
             # Select a quad
-            q = self.flt.Quadrilaterals[k]
+            q = self._flt.getQuadrilaterals()[k]
             
             # Quad mesh (ECEF coords)
-            mesh = fault.get_quad_mesh(q, self.dx)
+            mesh = fault.get_quad_mesh(q, self._dx)
             
             # Rupture plane normal vector (ECEF coords)
             rpnv = fault.get_quad_normal(q)
@@ -255,7 +269,7 @@ class Rowshandel2013(object):
             # Strike slip and dip slip components of unit slip vector
             # (ECEF coords)
             ds_mat, ss_mat = _get_quad_slip_ds_ss(
-                q, self.rake, cp_mat, pmatnorm)
+                q, self._rake, cp_mat, pmatnorm)
             
             slpmat = (ds_mat + ss_mat)
             mag = np.sqrt(np.sum(slpmat*slpmat, axis = 0))
@@ -277,7 +291,7 @@ class Rowshandel2013(object):
                 # Slip vector dot product
                 sdotqraw = np.sum(slpmatnorm*qmatnorm, axis = 0)
                 
-                if self.mtype == 1:
+                if self._mtype == 1:
                     # Only sum over (+) directivity effect subfaults
                     
                     # xi_p_prime
@@ -288,7 +302,7 @@ class Rowshandel2013(object):
                     sdotq = sdotqraw.clip(min = 0)
                     nsubs[i] = nsubs[i] + np.sum(sdotq > 0)
                     
-                elif self.mtype == 2:
+                elif self._mtype == 2:
                     # Sum over contributing subfaults
                     
                     # xi_p_prime
@@ -313,18 +327,18 @@ class Rowshandel2013(object):
         # o Normalize xi_prime_s and xi_prime_p
         # o Reshape them
         # o Add them together with the 'a' weights
-        xi_prime_tmp = (self.a_weight) * (xi_prime_s/nsubs) + \
-                       (1-self.a_weight) * (xi_prime_p/nsubp)
+        xi_prime_tmp = (self._a_weight) * (xi_prime_s/nsubs) + \
+                       (1-self._a_weight) * (xi_prime_p/nsubp)
         xi_prime_unscaled = xi_prime_unscaled + \
                             np.reshape(xi_prime_tmp, slat.shape)
 
         # Scale so that xi_prime has range (0, 1)
-        if self.mtype == 1: 
+        if self._mtype == 1: 
             xi_prime = xi_prime_unscaled
-        elif self.mtype == 2:
+        elif self._mtype == 2:
             xi_prime = 0.5*(xi_prime_unscaled + 1)
         
-        self.xi_prime = xi_prime
+        self._xi_prime = xi_prime
     
 
     def computeLD(self):
@@ -332,18 +346,18 @@ class Rowshandel2013(object):
         Computes LD -- the rupture length de-normalization term. 
         """
         # Use an orthographic projection
-        latmin = self.sites[1].min()
-        latmax = self.sites[1].max()
-        lonmin = self.sites[0].min()
-        lonmax = self.sites[0].max()
+        latmin = self._sites[1].min()
+        latmax = self._sites[1].max()
+        lonmin = self._sites[0].min()
+        lonmax = self._sites[0].max()
         proj = geo.utils.get_orthographic_projection(
             lonmin, lonmax, latmax, latmin)
         
         # Get epi projection
-        epi_x, epi_y = proj(self.hyp[0], self.hyp[1])
+        epi_x, epi_y = proj(self._hyp[0], self._hyp[1])
         
         # Get the lines for the top edge of the fault
-        qds = self.flt.Quadrilaterals
+        qds = self._flt.getQuadrilaterals()
         nq = len(qds)
         top_lat = np.array([[]])
         top_lon = np.array([[]])
@@ -358,8 +372,8 @@ class Rowshandel2013(object):
         top_x, top_y = proj(top_lon, top_lat)
     
         Lrup_max = 400
-        slat = self.sites[1]
-        slon = self.sites[0]
+        slat = self._sites[1]
+        slon = self._sites[0]
         LD = np.zeros_like(slat)
         Ls = np.zeros_like(slat)
         
@@ -394,26 +408,25 @@ class Rowshandel2013(object):
                 # Compute LD and save results into matrices
                 #-----------------------------------
             
-                Lrup = np.sqrt(Li*Li + self.Wrup*self.Wrup)
+                Lrup = np.sqrt(Li*Li + self._Wrup*self._Wrup)
                 LD[i, j] = np.log(Lrup)/np.log(Lrup_max)
                 Ls[i, j] = Li
-        self.LD = LD
-        self.Ls = Ls
+        self._LD = LD
+        self._Ls = Ls
 
 
     def computeDT(self):
         """
         Computes DT -- the distance taper term. 
         """
-        slat = self.sites[1]
-        slon = self.sites[0]
+        slat = self._sites[1]
+        slon = self._sites[0]
         site_z = np.zeros_like(slat)
-        mesh = geo.mesh.Mesh(slon, slat, site_z)
-        Rrup = np.reshape(getDistance(
-            'rrup', mesh, self.flt.Quadrilaterals), (-1, ))
+        ddict = get_distance('rrup', slat, slon, site_z, self._flt)
+        Rrup = np.reshape(ddict['rrup'], (-1, ))
         nsite = len(Rrup)
         
-        if self.simpleDT == True:   # eqn 3.10
+        if self._simpleDT == True:   # eqn 3.10
             R1 = 35
             R2 = 70
             DT = np.ones(nsite)
@@ -421,22 +434,22 @@ class Rowshandel2013(object):
             DT[ix] = 2 - Rrup[ix]/R1
             DT[Rrup >= R2] = 0
         else:                  # eqn 3.9
-            if self.T >= 1:
-                R1 = 20 + 10 * np.log(self.T)
-                R2 = 2*(20 + 10*np.log(self.T))
+            if self._T >= 1:
+                R1 = 20 + 10 * np.log(self._T)
+                R2 = 2*(20 + 10*np.log(self._T))
             else: 
                 R1 = 20
                 R2 = 40
             DT = np.ones(nsite)
             # As written in report:
-            # DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/(20 + 10 * np.log(self.T))
+            # DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/(20 + 10 * np.log(self._T))
             # Modification:
             DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/R1
             # Note: it is not clear if the above modification is 'correct' but it gives
             #       results that make more sense
             DT[Rrup >= R2] = 0
         DT = np.reshape(DT, slat.shape)
-        self.DT = DT
+        self._DT = DT
         
 
     def computeWP(self):
@@ -445,10 +458,10 @@ class Rowshandel2013(object):
         """
         sig = 0.6
         # As written in report:
-        # Tp = np.exp(1.27*self.M - 7.28)
+        # Tp = np.exp(1.27*self._M - 7.28)
         # Update (Rowshandel, personal communication)
-        Tp = np.exp(1.04*self.M - 6.0)
-        self.WP = np.exp(-(np.log10(self.T/Tp)*np.log10(self.T/Tp))/(2*sig*sig))
+        Tp = np.exp(1.04*self._M - 6.0)
+        self._WP = np.exp(-(np.log10(self._T/Tp)*np.log10(self._T/Tp))/(2*sig*sig))
 
 def _get_quad_slip_ds_ss(q, rake, cp, p):
     """

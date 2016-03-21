@@ -403,7 +403,7 @@ class Fault(object):
             each quad is a tuple of four Point objects
             (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py)
         """
-        return self._quadrilaterals
+        return copy.deepcopy(self._quadrilaterals)
 
     def getQuadWidth(self, p0, p1, p3):
         """
@@ -716,7 +716,7 @@ class Fault(object):
         :returns:
             List of segment indexes; lenght equals the number of quadrilaterals. 
         """
-        return self._segment_index
+        return copy.deepcopy(self._segment_index)
     
     def plot(self,ax=None):
         if ax is None:
@@ -759,7 +759,7 @@ class Fault(object):
         :returns:
            string citeable reference
         """
-        return self._reference
+        return self._reference.copy()
         
     def getNumSegments(self):
         """
@@ -847,7 +847,7 @@ def get_quad_mesh(q, dx):
     p2 = Vector.fromPoint(P2)
     p3 = Vector.fromPoint(P3)
     # Get nx based on length of top edge, minimum allowed is 2
-    toplen_km = getQuadLength(q)
+    toplen_km = get_quad_length(q)
     nx = int(np.max([round(toplen_km/dx, 0) + 1, 2]))
     
     # Get array of points along top and bottom edges
