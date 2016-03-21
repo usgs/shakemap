@@ -4,6 +4,7 @@
 from xml.dom import minidom
 import io
 import sys
+import copy
 
 #third party
 import pytz
@@ -121,7 +122,7 @@ class Source(object):
     """
     Encapsulate everything we need to know about an earthquake source.
     """
-    def __init__(self,event,fault=None,sourcedict=None):
+    def __init__(self, event, fault = None, sourcedict = None):
         """
         Construct a Source object.
         :param event:
@@ -140,15 +141,15 @@ class Source(object):
         if len(missing):
            raise NameError('Input event dictionary is missing the following '\
                            'required keys: "%s"' % (','.join(missing)))
-        self.Fault = fault
-        self.EventDict = event.copy()
-        if isinstance(sourcedict,dict):
+        self._fault = fault
+        self._event_dict = event.copy()
+        if isinstance(sourcedict, dict):
             for key,value in sourcedict.items():
-                self.setEventParam(key,value)
+                self.setEventParam(key, value)
         
 
     @classmethod
-    def readFromFile(cls,eventxmlfile,faultfile=None,sourcefile=None):
+    def readFromFile(cls, eventxmlfile, faultfile = None, sourcefile = None):
         """
         Class method to create a Source object by specifying an event.xml file, 
         a fault file, and a source.txt file.
@@ -172,7 +173,7 @@ class Source(object):
         return cls(event,fault=fault,sourcedict=params)
 
 
-    def getRuptureContext(self,gmpe):
+    def getRuptureContext(self, gmpe):
         """
         Return a GEM RuptureContext 
         https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
@@ -190,21 +191,21 @@ class Source(object):
             raise ShakeMapException('Rupture parameter "hypo_loc" is not supported!')
         rup = base.RuptureContext()
         rup.mag = self.getEventParam('mag')
-        if self.Fault is not None:
-            rup.strike = self.Fault.getStrike()
-            rup.dip = self.Fault.getDip()
-            rup.ztor = self.Fault.getTopOfRupture()
-            rup.width = self.Fault.getWidth()
+        if self._fault is not None:
+            rup.strike = self._fault.getStrike()
+            rup.dip = self._fault.getDip()
+            rup.ztor = self._fault.getTopOfRupture()
+            rup.width = self._fault.getWidth()
         else:
             rup.strike = DEFAULT_STRIKE
             rup.dip = DEFAULT_DIP
             rup.ztor = DEFAULT_ZTOR
             rup.width = DEFAULT_WIDTH
 
-        if 'rake' in self.EventDict:
-            rup.rake = self.getEventParam('rake')
-        elif 'mech' in self.EventDict:
-            mech = self.EventDict['mech']
+        if 'rake' in self._event_dict:
+            rup.rake = self._getEventParam('rake')
+        elif 'mech' in self._event_dict:
+            mech = self._event_dict['mech']
             rup.rake = RAKEDICT[mech]
         else:
             rup.rake = RAKEDICT['ALL']
@@ -214,7 +215,7 @@ class Source(object):
         rup.hypo_depth = self.getEventParam('depth')
         return rup
 
-    def setTectonicRegion(self,region):
+    def setTectonicRegion(self, region):
         """
         Set tectonic region.
         :param region:
@@ -222,7 +223,7 @@ class Source(object):
         """
         if not isinstance(region,TRT):
             raise ValueError('Input tectonic region must be of type openquake.hazardlib.const.TRT')
-        self.TectonicRegion = region
+        self._tectonic_region = copy.deepcopy(region)
 
     def getTectonicRegion(self):
         """
@@ -230,7 +231,7 @@ class Source(object):
         :returns:
             TRT object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/const.py)
         """
-        return self.TectonicRegion
+        return copy.deepcopy(self.TectonicRegion)
         
     def getEventDict(self):
         """
@@ -238,9 +239,9 @@ class Source(object):
         :returns:
            Copy of dictionary of event keys/values
         """
-        return self.EventDict.copy()
+        return self._event_dict.copy()
 
-    def setEventParam(self,key,value):
+    def setEventParam(self, key, value):
         """
         Set a parameter in the internal event dictionary
         :param key:
@@ -248,9 +249,9 @@ class Source(object):
         :param value:
             value (any object type)
         """
-        self.EventDict[key] = value
+        self._event_dict[key] = value
 
-    def getEventParam(self,key):
+    def getEventParam(self, key):
         """
         Get a parameter from the internal event dictionary
         :param key:
@@ -258,17 +259,17 @@ class Source(object):
         :returns:
             value (any object type)
         """
-        if key not in list(self.EventDict.keys()):
+        if key not in list(self._event_dict.keys()):
             raise NameError('Key "%s" not found in event dictionary' % key)
-        return self.EventDict[key]
+        return copy.deepcopy(self._event_dict[key])
 
-    def setFaultReference(self,reference):
+    def setFaultReference(self, reference):
         """
         Set the citeable reference for the fault
         :param reference:
             string citeable reference
         """
-        self.Fault.setReference(reference)
+        self._fault.setReference(reference)
 
     def getFaultReference(self):
         """
@@ -276,7 +277,7 @@ class Source(object):
         :returns:
             string citeable reference
         """
-        return self.Fault.getReference()
+        return self._fault.getReference()
 
     def getQuadrilaterals(self):
         """
@@ -284,7 +285,7 @@ class Source(object):
         :returns:
             List of quadrilateral tuples (4 Point objects each)
         """
-        return self.Fault.getQuadrilaterals()
+        return self._fault.getQuadrilaterals()
     
             
         

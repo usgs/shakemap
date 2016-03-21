@@ -48,13 +48,13 @@ class Distance(object):
         :returns:
             Distance object.
         """
-        self.source = source
+        self._source = source
         
         self._distance_context = self._calcDistanceContext(
             gmpe, lat, lon, dep, use_median_distance)
         
         # Place holder for additional sigma due to point-to-fault conversion
-        self.delta_sigma = 0.0
+        self._delta_sigma = 0.0
     
     @classmethod
     def fromSites(cls, gmpe, source, sites, use_median_distance = True):
@@ -115,7 +115,10 @@ class Distance(object):
         return cls(gmpe, source, lat, lon, dep, use_median_distance)
     
     def getDistanceContext(self):
-        return self._distance_context
+        return copy.deepcopy(self._distance_context)
+    
+    def getSource(self):
+        return copy.deepcopy(self._source)
     
     def _calcDistanceContext(self, gmpe, lat, lon, dep, use_median_context = True):
         """
@@ -150,14 +153,14 @@ class Distance(object):
                                 % type(ig))
             requires = requires | ig.REQUIRES_DISTANCES
         
-        if self.source.Fault is not None:
-            flt = self.source.Fault#.getQuadrilaterals()
+        if self._source.Fault is not None:
+            flt = self._source.Fault
         else:
             flt = None
         
-        hyplat = self.source.getEventParam('lat')
-        hyplon = self.source.getEventParam('lon')
-        hypdepth = self.source.getEventParam('depth')
+        hyplat = self._source.getEventParam('lat')
+        hyplon = self._source.getEventParam('lon')
+        hypdepth = self._source.getEventParam('depth')
         hyppoint = point.Point(hyplon, hyplat, hypdepth)
         
         context = base.DistancesContext()
