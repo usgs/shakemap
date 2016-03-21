@@ -793,8 +793,8 @@ Web Mapping (GIS) Services
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 In addition to the downloadable GIS-formatted ShakeMaps (including shapefiles) that are
 readily available for each ShakeMap event, USGS also hosts a real-time `30-day
-*Signficant* `Earthquake GIS ShakeMap Feed
-<http://geohazards.usgs.gov/arcgis/rest/services/ShakeMap/ShakeMap/MapServer>`_.
+Signficant `Earthquake GIS ShakeMap Feed
+<http://earthquake.usgs.gov/arcgis/rest/services/eq/sm_ShakeMap30DaySignificant/MapServer>`_.
 `ESRI`_ provides a separate `Disaster Response ArcGIS service
 <http://www.esri.com/>`_, providing `live feeds
 <https://tmservices1.esri.com/arcgis/rest/services/LiveFeeds/USGS_Seismic_Data/MapServer>`_
