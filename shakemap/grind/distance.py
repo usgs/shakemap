@@ -6,6 +6,7 @@ from datetime import datetime
 import copy
 import warnings
 import itertools as it
+import os
 
 #third party imports
 from .ecef import latlon2ecef
@@ -16,6 +17,9 @@ from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib.gsim import base
 import numpy as np
+import pandas as pd
+import re
+import scipy.interpolate as spint
 import matplotlib.pyplot as plt
 
 #local imports
@@ -120,7 +124,7 @@ class Distance(object):
     def getSource(self):
         return copy.deepcopy(self._source)
     
-    def _calcDistanceContext(self, gmpe, lat, lon, dep, use_median_context = True):
+    def _calcDistanceContext(self, gmpe, lat, lon, dep, use_median_distance = True):
         """
         Create a DistancesContext object
         :param gmpe: 
@@ -153,20 +157,10 @@ class Distance(object):
                                 % type(ig))
             requires = requires | ig.REQUIRES_DISTANCES
         
-        if self._source.Fault is not None:
-            flt = self._source.Fault
-        else:
-            flt = None
-        
-        hyplat = self._source.getEventParam('lat')
-        hyplon = self._source.getEventParam('lon')
-        hypdepth = self._source.getEventParam('depth')
-        hyppoint = point.Point(hyplon, hyplat, hypdepth)
-        
         context = base.DistancesContext()
         
-        ddict = get_distance(list(requires), lat, lon, dep,
-                             fault = flt, hypo = hyppoint)
+        ddict = get_distance(list(requires), lat, lon, dep, self._source,
+                             use_median_distance = use_median_distance)
         
         for method in requires:
             (context.__dict__)[method] = ddict[method]
@@ -174,7 +168,8 @@ class Distance(object):
         return context
     
 
-def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
+def get_distance(methods, lat, lon, dep, source, 
+                 use_median_distance = True):
     """
     Calculate distance using any one of a number of distance measures. 
     One of quadlist OR hypo must be specified.
@@ -202,11 +197,13 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
        A numpy array of longidues.
     :param dep:
        A numpy array of depths (km).
-    :param fault:
-       optional Fault instance. 
-    :param hypo:
-       Optional Point object of hypocenter. 
+    :param source:
+       source instance.
     https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py
+    :param use_median_distance: 
+        Boolean; only used if GMPE requests fault distances and not fault is 
+        availalbe. Default is True, meaning that point-source distances are 
+        adjusted based on magnitude to get the median fault distance. 
     :returns:
        dictionary of numpy array of distances, size of lon.shape
     :raises ShakeMapException:
@@ -214,7 +211,8 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
     :raises NotImplementedError:
        for unknown distance measures or ones not yet implemented.
     """
-    
+    fault = source.getFault()
+    hypo = source.getHypo()
     if fault is not None:
         quadlist = fault.getQuadrilaterals()
     else:
@@ -243,8 +241,6 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
     else:
         newshape = (oldshape[0],1)
     
-    # Need to integrate ps2ff around here...
-    
     if ('rrup' in methods) or ('rjb' in methods):
         x, y, z = latlon2ecef(lat, lon, dep)
         x.shape = newshape
@@ -271,7 +267,8 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
         distdict['repi'] = repidist
     
     if ('rhypo' in methods) or \
-       (('rrup' in methods) and (quadlist is None)):
+       (('rrup' in methods) and (quadlist is None)) or \
+       (('rjb' in methods) and (quadlist is None)):
         if hypo is None:
             raise ShakeMapException('Cannot calculate epicentral distance '\
                                     'without a point object')
@@ -293,83 +290,81 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
         GC2T = np.zeros(newshape, dtype = lon.dtype)
         GC2U = np.zeros(newshape, dtype = lon.dtype)
         
-        # For these distances, we need to sort out strike discordance and nominal
-        # strike prior to starting the loop if there are more than one segments
-        segind = fault.getSegmentIndex()
-        segindnp = np.array(segind)
-        uind = np.unique(segind)
-        nseg = len(uind)
-        if nseg > 1: 
-            quadlist = fault.getQuadrilaterals()
-            # Need to get index of first and last quad
-            # for each segment
-            iq0 = np.zeros(nseg, dtype = 'int16')
-            iq1 = np.zeros(nseg, dtype = 'int16')
-            for k in uind:
-                ii = [i for i, j in enumerate(segind) if j == uind[k]]
-                iq0[k] = int(np.min(ii))
-                iq1[k] = int(np.max(ii))
-            
-            it_seg = it.product(it.combinations(uind, 2),
-                                it.product([0, 1], [0, 1]))
-            dist_save = 0
-            for k in it_seg:
-                s0ind = k[0][0]
-                s1ind = k[0][1]
-                p0ind = k[1][0]
-                p1ind = k[1][1]
-                if p0ind == 0:
-                    P0 = quadlist[iq0[s0ind]][0]
-                else:
-                    P0 = quadlist[iq1[s0ind]][1]
-                if p1ind == 0:
-                    P1 = quadlist[iq1[s1ind]][0]
-                else:
-                    P1 = quadlist[iq0[s1ind]][1]
+        if quadlist is not None: 
+            # For these distances, we need to sort out strike discordance and nominal
+            # strike prior to starting the loop if there are more than one segments
+            segind = fault.getSegmentIndex()
+            segindnp = np.array(segind)
+            uind = np.unique(segind)
+            nseg = len(uind)
+            if nseg > 1: 
+                quadlist = fault.getQuadrilaterals()
+                # Need to get index of first and last quad
+                # for each segment
+                iq0 = np.zeros(nseg, dtype = 'int16')
+                iq1 = np.zeros(nseg, dtype = 'int16')
+                for k in uind:
+                    ii = [i for i, j in enumerate(segind) if j == uind[k]]
+                    iq0[k] = int(np.min(ii))
+                    iq1[k] = int(np.max(ii))
                 
-                dist = geodetic.distance(P0.longitude, P0.latitude, 0.0, 
-                                         P1.longitude, P1.latitude, 0.0)
-                if dist > dist_save:
-                    dist_save = dist
-                    A0 = P0
-                    A1 = P1
-            
-            A0.depth = 0
-            A1.depth = 0
-            p_origin = Vector.fromPoint(A0)
-            a0 = Vector.fromPoint(A0)
-            a1 = Vector.fromPoint(A1)
-            ahat = (a1 - a0).norm()
-            # Loop over traces
-            e_j = np.zeros(nseg)
-            b_prime = [None]*nseg
-            for j in range(nseg):
-                P0 = quadlist[iq0[j]][0]
-                P1 = quadlist[iq1[j]][1]
-                P0.depth = 0
-                P1.depth = 0
-                p0 = Vector.fromPoint(P0)
-                p1 = Vector.fromPoint(P1)
-                b_prime[j] = p1 - p0
-                e_j[j] = ahat.dot(b_prime[j])
-            E = np.sum(e_j)
-            # List of discordancy
-            dc = [np.sign(a) * np.sign(E) for a in e_j]
-            b = Vector(0, 0, 0)
-            for j in range(nseg):
-                b.x = b.x + b_prime[j].x*dc[j]
-                b.y = b.y + b_prime[j].y*dc[j]
-                b.z = b.z + b_prime[j].z*dc[j]
-            bhat = b.norm()
-
-
-        
+                it_seg = it.product(it.combinations(uind, 2),
+                                    it.product([0, 1], [0, 1]))
+                dist_save = 0
+                for k in it_seg:
+                    s0ind = k[0][0]
+                    s1ind = k[0][1]
+                    p0ind = k[1][0]
+                    p1ind = k[1][1]
+                    if p0ind == 0:
+                        P0 = quadlist[iq0[s0ind]][0]
+                    else:
+                        P0 = quadlist[iq1[s0ind]][1]
+                    if p1ind == 0:
+                        P1 = quadlist[iq1[s1ind]][0]
+                    else:
+                        P1 = quadlist[iq0[s1ind]][1]
+                    
+                    dist = geodetic.distance(P0.longitude, P0.latitude, 0.0, 
+                                             P1.longitude, P1.latitude, 0.0)
+                    if dist > dist_save:
+                        dist_save = dist
+                        A0 = P0
+                        A1 = P1
+                
+                A0.depth = 0
+                A1.depth = 0
+                p_origin = Vector.fromPoint(A0)
+                a0 = Vector.fromPoint(A0)
+                a1 = Vector.fromPoint(A1)
+                ahat = (a1 - a0).norm()
+                # Loop over traces
+                e_j = np.zeros(nseg)
+                b_prime = [None]*nseg
+                for j in range(nseg):
+                    P0 = quadlist[iq0[j]][0]
+                    P1 = quadlist[iq1[j]][1]
+                    P0.depth = 0
+                    P1.depth = 0
+                    p0 = Vector.fromPoint(P0)
+                    p1 = Vector.fromPoint(P1)
+                    b_prime[j] = p1 - p0
+                    e_j[j] = ahat.dot(b_prime[j])
+                E = np.sum(e_j)
+                # List of discordancy
+                dc = [np.sign(a) * np.sign(E) for a in e_j]
+                b = Vector(0, 0, 0)
+                for j in range(nseg):
+                    b.x = b.x + b_prime[j].x*dc[j]
+                    b.y = b.y + b_prime[j].y*dc[j]
+                    b.z = b.z + b_prime[j].z*dc[j]
+                    bhat = b.norm()
     
-    # Length of prior segments
-    s_i = 0.0
-    l_i = np.zeros(len(quadlist))
     
     if quadlist is not None: 
+        # Length of prior segments
+        s_i = 0.0
+        l_i = np.zeros(len(quadlist))
         for i in range(len(quadlist)):
             P0, P1, P2, P3 = quadlist[i]
             
@@ -475,14 +470,84 @@ def get_distance(methods, lat, lon, dep, fault = None, hypo = None):
     
     else:
         if 'rjb' in methods:
-            warnings.warn('No fault; Replacing rjb with repi')
-            distdict['rjb'] = distdict['repi']
+            if use_median_distance:
+                warnings.warn('No fault; Replacing rjb with median rjb given M and repi.')
+                # TODO: select files based on mechnanism and tectonic environment.
+                
+                cdir, tmp = os.path.split(__file__)
+                # Start with ratios
+                rf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p7_seis0_20_Ratios.csv")
+                repi2rjb_ratios_tbl = pd.read_csv(rf, comment = '#')
+                r2rrt_cols = repi2rjb_ratios_tbl.columns[1:]
+                mag_list = []
+                for column in (r2rrt_cols):
+                    if re.search('R\d+\.*\d*', column):
+                        magnitude = float(re.findall('R(\d+\.*\d*)', column)[0])
+                        mag_list.append(magnitude)
+                mag_list = np.array(mag_list)
+                dist_list = np.log(np.array(repi2rjb_ratios_tbl['Repi_km']))
+                repi2rjb_grid = repi2rjb_ratios_tbl.values[:, 1:]
+                repi2rjb_obj = spint.RectBivariateSpline(
+                    dist_list, mag_list, repi2rjb_grid, kx = 1, ky = 1)
+                def repi2rjb_tbl(repi, M):
+                    ratio = repi2rjb_obj.ev(np.log(repi), M)
+                    rjb = repi * ratio
+                    return rjb
+                repis = distdict['repi']
+                mags = np.ones_like(repis) * source.getEventParam('mag')
+                rjb_hat = repi2rjb_tbl(repis, mags)
+                distdict['rjb'] = rjb_hat
+                # Additional Variance
+                vf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p7_seis0_20_Var.csv")
+                repi2rjbvar_ratios_tbl = pd.read_csv(vf, comment = '#')
+                repi2rjbvar_grid = repi2rjbvar_ratios_tbl.values[:, 1:]
+                repi2rjbvar_obj = spint.RectBivariateSpline(
+                    dist_list, mag_list, repi2rjbvar_grid, kx = 1, ky = 1)
+                rjbvar = repi2rjbvar_obj.ev(np.log(repis), mags)
+                distdict['rjbvar'] = rjbvar
+            else:
+                warnings.warn('No fault; Replacing rjb with repi')
+                distdict['rjb'] = distdict['rhypo']
         if 'rrup' in methods:
-            warnings.warn('No fault; Replacing rrup with rhypo')
-            distdict['rrup'] = distdict['rhypo']
+            if use_median_distance:
+                warnings.warn('No fault; Replacing rrup with median rrup given M and repi.')
+                cdir, tmp = os.path.split(__file__)
+                # Start with ratios
+                rf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p7_seis0-20_Ratios.csv")
+                repi2rrup_ratios_tbl = pd.read_csv(rf, comment = '#')
+                r2rrt_cols = repi2rrup_ratios_tbl.columns[1:]
+                mag_list = []
+                for column in (r2rrt_cols):
+                    if re.search('R\d+\.*\d*', column):
+                        magnitude = float(re.findall('R(\d+\.*\d*)', column)[0])
+                        mag_list.append(magnitude)
+                mag_list = np.array(mag_list)
+                dist_list = np.log(np.array(repi2rrup_ratios_tbl['Repi_km']))
+                repi2rrup_grid = repi2rrup_ratios_tbl.values[:, 1:]
+                repi2rrup_obj = spint.RectBivariateSpline(
+                    dist_list, mag_list, repi2rrup_grid, kx = 1, ky = 1)
+                def repi2rrup_tbl(repi, M):
+                    ratio = repi2rrup_obj.ev(np.log(repi), M)
+                    rrup = repi * ratio
+                    return rrup
+                repis = distdict['repi']
+                mags = np.ones_like(repis) * source.getEventParam('mag')
+                rrup_hat = repi2rrup_tbl(repis, mags)
+                distdict['rrup'] = rrup_hat
+                # Additional Variance
+                vf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p7_seis0-20_Var.csv")
+                repi2rrupvar_ratios_tbl = pd.read_csv(vf, comment = '#')
+                repi2rrupvar_grid = repi2rrupvar_ratios_tbl.values[:, 1:]
+                repi2rrupvar_obj = spint.RectBivariateSpline(
+                    dist_list, mag_list, repi2rrupvar_grid, kx = 1, ky = 1)
+                rrupvar = repi2rrupvar_obj.ev(np.log(repis), mags)
+                distdict['rrupvar'] = rrupvar
+            else:
+                warnings.warn('No fault; Replacing rrup with rhypo')
+                distdict['rrup'] = distdict['rhypo']
         if 'rx' in methods:
-            warnings.warn('No fault; Replacing rx with repi')
-            distdict['rx'] = distdict['repi']
+            warnings.warn('No fault; Setting Rx to zero.')
+            distdict['rx'] = np.zeros_like(distdict['repi'])
         if 'ry0' in methods:
             warnings.warn('No fault; Replacing ry0 with repi')
             distdict['ry0'] = distdict['repi']

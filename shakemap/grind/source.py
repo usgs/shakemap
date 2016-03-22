@@ -215,6 +215,26 @@ class Source(object):
         rup.hypo_depth = self.getEventParam('depth')
         return rup
 
+    def getFault(self):
+        """
+        Return fault instance. 
+        :returns:
+           Fault instance
+        """
+        return copy.deepcopy(self._fault)
+    
+    def getHypo(self):
+        """
+        Return hypocenter point. 
+        :returns:
+           Hypocenter point. 
+        """
+        hyplat = self.getEventParam('lat')
+        hyplon = self.getEventParam('lon')
+        hypdepth = self.getEventParam('depth')
+        hyppoint = point.Point(hyplon, hyplat, hypdepth)
+        return hyppoint
+    
     def setTectonicRegion(self, region):
         """
         Set tectonic region.
