@@ -12,6 +12,7 @@ import os
 from .ecef import latlon2ecef
 from .vector import Vector
 from .fault import get_quad_length
+from .source import rake_to_mech
 from openquake.hazardlib.geo import point, geodetic
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib.gsim.base import GMPE
@@ -38,7 +39,13 @@ class Distance(object):
             https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
             can be individual instance or list of instances.
         :param source:
-            Source object.
+            Source instance. For point-source distances (Repi, Rhyp) the hypocenter
+            is taken from the source instance. The finite-fault distances (Rrup, 
+            Rjb, ...), are based on the fault representation in the source instance
+            if available. If a Fault instance is unavailalbe, the finite-fault
+            distances are computed from point-source distances, in which case the 
+            earthquake manitude from the Source instance is required for median
+            distance corrections if use_median_distance is True. 
         :param lat: 
             A numpy array of site latitudes. 
         :param lon: 
@@ -53,7 +60,7 @@ class Distance(object):
             Distance object.
         """
         self._source = source
-        
+            
         self._distance_context = self._calcDistanceContext(
             gmpe, lat, lon, dep, use_median_distance)
         
@@ -198,7 +205,7 @@ def get_distance(methods, lat, lon, dep, source,
     :param dep:
        A numpy array of depths (km).
     :param source:
-       source instance.
+       source instance. 
     https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py
     :param use_median_distance: 
         Boolean; only used if GMPE requests fault distances and not fault is 
@@ -254,6 +261,7 @@ def get_distance(methods, lat, lon, dep, source,
     
     if ('repi' in methods) or \
        (('rjb' in methods) and (quadlist is None)) or \
+       (('rrup' in methods) and (quadlist is None)) or \
        (('ry0' in methods) and (quadlist is None)) or \
        (('rx' in methods) and (quadlist is None)) or \
        (('T' in methods) and (quadlist is None)) or \
@@ -267,8 +275,7 @@ def get_distance(methods, lat, lon, dep, source,
         distdict['repi'] = repidist
     
     if ('rhypo' in methods) or \
-       (('rrup' in methods) and (quadlist is None)) or \
-       (('rjb' in methods) and (quadlist is None)):
+       (('rrup' in methods) and (quadlist is None)):
         if hypo is None:
             raise ShakeMapException('Cannot calculate epicentral distance '\
                                     'without a point object')
@@ -472,11 +479,51 @@ def get_distance(methods, lat, lon, dep, source,
         if 'rjb' in methods:
             if use_median_distance:
                 warnings.warn('No fault; Replacing rjb with median rjb given M and repi.')
-                # TODO: select files based on mechnanism and tectonic environment.
-                
                 cdir, tmp = os.path.split(__file__)
+                
+                # -------------------
+                # Sort out file names
+                # -------------------
+                rake = source._event_dict.get('rake')
+                mech = rake_to_mech(rake)
+                if not hasattr(source, '_tectonic_region'):
+                    rf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p0_seis0_20_Ratios.csv")
+                    vf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p0_seis0_20_Var.csv")
+                elif source._tectonic_region == 'Active Shallow Crust':
+                    if mech == 'ALL':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p7_seis0_20_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p7_seis0_20_Var.csv")
+                    elif mech == 'RS':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechR_ar1p7_seis0_20_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechR_ar1p7_seis0_20_Var.csv")
+                    elif mech == 'NM':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechN_ar1p7_seis0_20_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechN_ar1p7_seis0_20_Var.csv")
+                    elif mech == 'SS':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechSS_ar1p7_seis0_20_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechSS_ar1p7_seis0_20_Var.csv")
+                elif source._tectonic_region == 'Stable Shallow Crust':
+                    if mech == 'ALL':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rjb_S14_mechA_ar1p0_seis0_15_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rjb_S14_mechA_ar1p0_seis0_15_Var.csv")
+                    elif mech == 'RS':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rjb_S14_mechR_ar1p0_seis0_15_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rjb_S14_mechR_ar1p0_seis0_15_Var.csv")
+                    elif mech == 'NM':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rjb_S14_mechN_ar1p0_seis0_15_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rjb_S14_mechN_ar1p0_seis0_15_Var.csv")
+                    elif mech == 'SS':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rjb_S14_mechSS_ar1p0_seis0_15_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rjb_S14_mechSS_ar1p0_seis0_15_Var.csv")
+                else:
+                    warnings.warn('Unsupported tectonic region; using coefficients for unknown'\
+                                  'tectonic region.')
+                    rf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p0_seis0_20_Ratios.csv")
+                    vf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p0_seis0_20_Var.csv")
+                    
+                # -----------------
                 # Start with ratios
-                rf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p7_seis0_20_Ratios.csv")
+                # -----------------
                 repi2rjb_ratios_tbl = pd.read_csv(rf, comment = '#')
                 r2rrt_cols = repi2rjb_ratios_tbl.columns[1:]
                 mag_list = []
@@ -497,8 +544,9 @@ def get_distance(methods, lat, lon, dep, source,
                 mags = np.ones_like(repis) * source.getEventParam('mag')
                 rjb_hat = repi2rjb_tbl(repis, mags)
                 distdict['rjb'] = rjb_hat
+                # -------------------
                 # Additional Variance
-                vf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p7_seis0_20_Var.csv")
+                # -------------------
                 repi2rjbvar_ratios_tbl = pd.read_csv(vf, comment = '#')
                 repi2rjbvar_grid = repi2rjbvar_ratios_tbl.values[:, 1:]
                 repi2rjbvar_obj = spint.RectBivariateSpline(
@@ -507,13 +555,55 @@ def get_distance(methods, lat, lon, dep, source,
                 distdict['rjbvar'] = rjbvar
             else:
                 warnings.warn('No fault; Replacing rjb with repi')
-                distdict['rjb'] = distdict['rhypo']
+                distdict['rjb'] = distdict['repi']
         if 'rrup' in methods:
             if use_median_distance:
                 warnings.warn('No fault; Replacing rrup with median rrup given M and repi.')
                 cdir, tmp = os.path.split(__file__)
+                
+                # -------------------
+                # Sort out file names
+                # -------------------
+                rake = source._event_dict.get('rake')
+                mech = rake_to_mech(rake)
+                if not hasattr(source, '_tectonic_region'):
+                    rf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p0_seis0-20_Ratios.csv")
+                    vf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p0_seis0-20_Var.csv")
+                elif source._tectonic_region == 'Active Shallow Crust':
+                    if mech == 'ALL':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p7_seis0-20_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p7_seis0-20_Var.csv")
+                    elif mech == 'RS':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechR_ar1p7_seis0-20_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechR_ar1p7_seis0-20_Var.csv")
+                    elif mech == 'NM':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechN_ar1p7_seis0-20_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechN_ar1p7_seis0-20_Var.csv")
+                    elif mech == 'SS':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechSS_ar1p7_seis0-20_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechSS_ar1p7_seis0-20_Var.csv")
+                elif source._tectonic_region == 'Stable Shallow Crust':
+                    if mech == 'ALL':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rrup_S14_mechA_ar1p0_seis0-15_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rrup_S14_mechA_ar1p0_seis0-15_Var.csv")
+                    elif mech == 'RS':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rrup_S14_mechR_ar1p0_seis0-15_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rrup_S14_mechR_ar1p0_seis0-15_Var.csv")
+                    elif mech == 'NM':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rrup_S14_mechN_ar1p0_seis0-15_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rrup_S14_mechN_ar1p0_seis0-15_Var.csv")
+                    elif mech == 'SS':
+                        rf = os.path.join(cdir, "data", "ps2ff", "Rrup_S14_mechSS_ar1p0_seis0-15_Ratios.csv")
+                        vf = os.path.join(cdir, "data", "ps2ff", "Rrup_S14_mechSS_ar1p0_seis0-15_Var.csv")
+                else:
+                    warnings.warn('Unsupported tectonic region; using coefficients for unknown'\
+                                  'tectonic region.')
+                    rf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p0_seis0-20_Ratios.csv")
+                    vf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p0_seis0-20_Var.csv")
+                
+                # -----------------
                 # Start with ratios
-                rf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p7_seis0-20_Ratios.csv")
+                # -----------------
                 repi2rrup_ratios_tbl = pd.read_csv(rf, comment = '#')
                 r2rrt_cols = repi2rrup_ratios_tbl.columns[1:]
                 mag_list = []
@@ -534,8 +624,10 @@ def get_distance(methods, lat, lon, dep, source,
                 mags = np.ones_like(repis) * source.getEventParam('mag')
                 rrup_hat = repi2rrup_tbl(repis, mags)
                 distdict['rrup'] = rrup_hat
+                
+                # -------------------
                 # Additional Variance
-                vf = os.path.join(cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p7_seis0-20_Var.csv")
+                # -------------------
                 repi2rrupvar_ratios_tbl = pd.read_csv(vf, comment = '#')
                 repi2rrupvar_grid = repi2rrupvar_ratios_tbl.values[:, 1:]
                 repi2rrupvar_obj = spint.RectBivariateSpline(

@@ -21,7 +21,6 @@ from shapely import geometry
 from ..utils.timeutils import ShakeDateTime
 from .ecef import latlon2ecef,ecef2latlon
 from .fault import Fault
-from .distance import get_distance
 
 #local imports
 from shakemap.utils.exception import ShakeMapException
@@ -203,7 +202,7 @@ class Source(object):
             rup.width = DEFAULT_WIDTH
 
         if 'rake' in self._event_dict:
-            rup.rake = self._getEventParam('rake')
+            rup.rake = self.getEventParam('rake')
         elif 'mech' in self._event_dict:
             mech = self._event_dict['mech']
             rup.rake = RAKEDICT[mech]
@@ -281,6 +280,8 @@ class Source(object):
         """
         if key not in list(self._event_dict.keys()):
             raise NameError('Key "%s" not found in event dictionary' % key)
+        # rather than rais an error, can we return None?
+        # e.g. self._event_dict.get(key)
         return copy.deepcopy(self._event_dict[key])
 
     def setFaultReference(self, reference):
@@ -307,5 +308,16 @@ class Source(object):
         """
         return self._fault.getQuadrilaterals()
     
+def rake_to_mech(rake):
+    mech = 'ALL'
+    if (rake >= -180 and rake <= -150) or \
+       (rake >= -30  and rake <= 30) or \
+       (rake >= 150  and rake <= 180): 
+        mech = 'SS'
+    if rake >= -120 and rake <= -60:
+        mech = 'NM'
+    if rake >= 60 and rake <= 120:
+        mech = 'RS'
+    return mech
             
         
