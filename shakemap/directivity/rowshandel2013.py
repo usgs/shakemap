@@ -46,28 +46,22 @@ class Rowshandel2013(object):
             'T': np.array([1, 2, 3, 4, 5, 7.5, 10])}
     __c2['mean'] = (__c2['as'] + __c2['ba'] + __c2['cb'] + __c2['cy'] + __c2['id'])/5
     
-    def __init__(self, flt, hyp, sites, rake, dx, M, T, a_weight = 0.5,
+    def __init__(self, source, lat, lon, dep, dx, T, a_weight = 0.5,
                  mtype = 1, simpleDT = False, simpleCentering = True):
         """
         Constructor for rowshandel2013.
-        :param flt:
-            fault object.
-        :param hyp:
-            hypocenter; list of three elements: lon, lat, depth (km). 
-        :param sites:
-            two-element list; first element is a 2d numpy array of longitudes, 
-            second element is a 2d array of latitudes. 
-             ** TODO: change so that this argument is a SitesContext
-        :param rake:
-            Float for direction of slip on fault; motion of hangingwall
-            relative to footwall; clockwise from strike vector. 
-             ** Potentially allow for variable rake with subfault. 
+        :param source:
+            Source instance.
+        :param lat: 
+            A numpy array of site latitudes. 
+        :param lon: 
+            A numpy array of site longitudes. 
+        :param dep: 
+            A numpy array of site depths (km). 
         :param dx:
             Float for target mesh spacing for subfaults in km. The mesh
             snaps to the edges of the quadrilaterals so the actual mesh spacing 
             will not equal this exactly; spacing in x and y will not be equal. 
-        :param M:
-            Float for moment magnitude. 
         :param T:
             Period; Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5
              ** TODO: interpolate intermediate periods. 
@@ -83,12 +77,15 @@ class Rowshandel2013(object):
         :param simpleCentering:
             Boolean; should the simple centering method be used. 
         """
-        self._flt = flt
-        self._hyp = hyp
-        self._sites = sites
-        self._rake = rake
+        self._source = source
+        self._flt = source.getFault()
+        self._hyp = source.getHypo()
+        self._lat = lat
+        self._lon = lon
+        self._dep = dep
+        self._rake = source.getEventParam('rake')
         self._dx = dx
-        self._M = M
+        self._M = source.getEventParam('mag')
         if np.all(T != np.array([1, 2, 3, 4, 5, 7.5])):
             raise IndexError('Invalid T value. Interpolation not yet supported.')
         self._T = T
@@ -108,6 +105,49 @@ class Rowshandel2013(object):
         self.computeWP()
         self.computeXiPrime()
         self.computeFd()
+    
+    @classmethod
+    def fromSites(cls, source, sites, dx, T, a_weight = 0.5,
+                  mtype = 1, simpleDT = False, simpleCentering = True):
+        """
+        Class method for constructing a rowshandel2013 instance from 
+        a sites instance.
+        :param source:
+            Source instance.
+        :param sites: 
+            Sites object
+        :param dx:
+            Float for target mesh spacing for subfaults in km. The mesh
+            snaps to the edges of the quadrilaterals so the actual mesh spacing 
+            will not equal this exactly; spacing in x and y will not be equal. 
+        :param T:
+            Period; Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5
+             ** TODO: interpolate intermediate periods. 
+        :param a_weight:
+            Weighting factor for how p-dot-q and s-dot-q are averaged; 0 for 
+            only p-dot-q (propagation factor) and 1 for only s-dot-q (slip 
+            factor). 
+        :param mtype:
+            Integer, either 1 or 2; 1 for adding only positive components of dot
+            products, 2 for adding all components of dot products. 
+        :param simpleDT:
+            Boolean; should the simpler DT equation be used? Usually False. 
+        :param simpleCentering:
+            Boolean; should the simple centering method be used. 
+        """
+        sm_dict = sites.GeoDict
+        west = sm_dict.xmin
+        east = sm_dict.xmax
+        south = sm_dict.ymin
+        north = sm_dict.ymax
+        nx = sm_dict.nx
+        ny = sm_dict.ny
+        lats = np.linspace(north, south, ny)
+        lons = np.linspace(west, east, nx)
+        lon, lat = np.meshgrid(lons, lats)
+        dep = np.zeros_like(lon)
+        return cls(source, lat, lon, dep, dx, T,
+                   a_weight, mtype, simpleDT, simpleCentering)
     
     
     def getFd(self):
@@ -159,9 +199,10 @@ class Rowshandel2013(object):
         # First find which quad the hypocenter is on
         #-------------------------------------------
         
-        x, y, z = ecef.latlon2ecef(self._hyp[1], self._hyp[0], self._hyp[2])
+        x, y, z = ecef.latlon2ecef(
+            self._hyp.latitude, self._hyp.longitude, self._hyp.depth)
         hyp_ecef = np.array([[x, y, z]])
-        qdist = np.zeros_like([nquad])
+        qdist = np.zeros(nquad)
         for i in range(0, nquad):
             P0, P1, P2, P3 = self._flt.getQuadrilaterals()[i]
             qdist[i] = calc_rupture_distance(P0, P1, P2, P3, hyp_ecef)
@@ -176,7 +217,7 @@ class Rowshandel2013(object):
         pp0 = Vector.fromPoint(geo.point.Point(
             q[0].longitude, q[0].latitude, q[0].depth) )
         hyp_ecef = Vector.fromPoint(geo.point.Point(
-            self._hyp[0], self._hyp[1], self._hyp[2]))
+            self._hyp.longitude, self._hyp.latitude, self._hyp.depth))
         hp0 = hyp_ecef - pp0
         ddv = fault.get_quad_down_dip_vector(q)
         self._Wrup = Vector.dot(ddv, hp0)/1000
@@ -186,13 +227,13 @@ class Rowshandel2013(object):
         Computes the xi' value. 
         """
         hypo_ecef = Vector.fromPoint(geo.point.Point(
-            self._hyp[0], self._hyp[1], self._hyp[2]))
-        epi_ll = Vector(self._hyp[0], self._hyp[1], 0)
+            self._hyp.longitude, self._hyp.latitude, self._hyp.depth))
+        epi_ll = Vector(self._hyp.longitude, self._hyp.latitude, 0)
         epi_ecef = Vector.fromPoint(geo.point.Point(
             epi_ll.x, epi_ll.y, 0))
         
-        slat = self._sites[1]
-        slon = self._sites[0]
+        slat = self._lat
+        slon = self._lon
         
         # Convert site to ECEF:
         site_ecef_x = np.ones_like(slat)
@@ -346,15 +387,15 @@ class Rowshandel2013(object):
         Computes LD -- the rupture length de-normalization term. 
         """
         # Use an orthographic projection
-        latmin = self._sites[1].min()
-        latmax = self._sites[1].max()
-        lonmin = self._sites[0].min()
-        lonmax = self._sites[0].max()
+        latmin = self._lat.min()
+        latmax = self._lat.max()
+        lonmin = self._lon.min()
+        lonmax = self._lon.max()
         proj = geo.utils.get_orthographic_projection(
             lonmin, lonmax, latmax, latmin)
         
         # Get epi projection
-        epi_x, epi_y = proj(self._hyp[0], self._hyp[1])
+        epi_x, epi_y = proj(self._hyp.longitude, self._hyp.latitude)
         
         # Get the lines for the top edge of the fault
         qds = self._flt.getQuadrilaterals()
@@ -372,8 +413,8 @@ class Rowshandel2013(object):
         top_x, top_y = proj(top_lon, top_lat)
     
         Lrup_max = 400
-        slat = self._sites[1]
-        slon = self._sites[0]
+        slat = self._lat
+        slon = self._lon
         LD = np.zeros_like(slat)
         Ls = np.zeros_like(slat)
         
@@ -419,10 +460,10 @@ class Rowshandel2013(object):
         """
         Computes DT -- the distance taper term. 
         """
-        slat = self._sites[1]
-        slon = self._sites[0]
+        slat = self._lat
+        slon = self._lon
         site_z = np.zeros_like(slat)
-        ddict = get_distance('rrup', slat, slon, site_z, self._flt)
+        ddict = get_distance('rrup', slat, slon, site_z, self._source)
         Rrup = np.reshape(ddict['rrup'], (-1, ))
         nsite = len(Rrup)
         

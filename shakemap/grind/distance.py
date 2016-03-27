@@ -64,8 +64,6 @@ class Distance(object):
         self._distance_context = self._calcDistanceContext(
             gmpe, lat, lon, dep, use_median_distance)
         
-        # Place holder for additional sigma due to point-to-fault conversion
-        self._delta_sigma = 0.0
     
     @classmethod
     def fromSites(cls, gmpe, source, sites, use_median_distance = True):
