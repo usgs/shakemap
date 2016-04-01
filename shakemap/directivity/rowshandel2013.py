@@ -63,7 +63,8 @@ class Rowshandel2013(object):
             snaps to the edges of the quadrilaterals so the actual mesh spacing 
             will not equal this exactly; spacing in x and y will not be equal. 
         :param T:
-            Period; Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5
+            List floats (or a float) for periods to compute fd; 
+            Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5
              ** TODO: interpolate intermediate periods. 
         :param a_weight:
             Weighting factor for how p-dot-q and s-dot-q are averaged; 0 for 
@@ -86,9 +87,12 @@ class Rowshandel2013(object):
         self._rake = source.getEventParam('rake')
         self._dx = dx
         self._M = source.getEventParam('mag')
-        if np.all(T != np.array([1, 2, 3, 4, 5, 7.5])):
-            raise IndexError('Invalid T value. Interpolation not yet supported.')
-        self._T = T
+#        if np.all(T != np.array([1, 2, 3, 4, 5, 7.5])):
+#            raise IndexError('Invalid T value. Interpolation not yet supported.')
+        if isinstance(T, float):
+            self._T = [T]
+        else:
+            self._T = T
         if (a_weight > 1.0) or (a_weight < 0):
             raise ValueError('a_weight must be between 0 and 1.')
         self._a_weight = a_weight
@@ -98,12 +102,11 @@ class Rowshandel2013(object):
         self._simpleDT = simpleDT
         self._simpleCentering = simpleCentering
         
+        # Period independent parameters
         self.computeWrup()
         self.computeLD()
-        
-        self.computeDT()
-        self.computeWP()
         self.computeXiPrime()
+        
         self.computeFd()
     
     @classmethod
@@ -171,18 +174,28 @@ class Rowshandel2013(object):
         (in log space). 
         ln(Y) = f(M, R, ...) + Fd
         """
-        c1sel = self.__c1['mean'][self.__c1['T'] == self._T]
-        c2sel = self.__c2['mean'][self.__c2['T'] == self._T]
-        if self._simpleCentering:
-            # Eqn 3.14
-            xi = self._xi_prime * self._LD
-            xi_c = 0.18  # for all events
-            # ** could adjust xi_c based on mechanism
-            self._fd = c1sel*(self._xi_prime - xi_c) * self._DT * self._WP
-        else:
-            # Eqn 3.13
-            self._fd = (c1sel*self._xi_prime + c2sel) * self._LD * self._DT * self._WP
-
+        # fd is a list with same length as T
+        self._fd = [None]*len(self._T)
+        for i in range(len(self._T)):
+            period = self._T[i]
+            c1sel = self.__c1['mean'][self.__c1['T'] == period]
+            c2sel = self.__c2['mean'][self.__c2['T'] == period]
+            
+            # Period dependent parameters
+            self.computeWP(period)
+            self.computeDT(period)
+            
+            if self._simpleCentering:
+                # Eqn 3.14
+                xi = self._xi_prime * self._LD
+                xi_c = 0.18  # for all events
+                # ** could adjust xi_c based on mechanism
+                self._fd[i] = c1sel*(self._xi_prime - xi_c) * self._DT * self._WP
+            else:
+                # Eqn 3.13
+                self._fd[i] = (c1sel*self._xi_prime + c2sel) * self._LD * self._DT * self._WP
+            
+        
 
     def computeWrup(self):
         """
@@ -456,7 +469,7 @@ class Rowshandel2013(object):
         self._Ls = Ls
 
 
-    def computeDT(self):
+    def computeDT(self, period):
         """
         Computes DT -- the distance taper term. 
         """
@@ -475,15 +488,15 @@ class Rowshandel2013(object):
             DT[ix] = 2 - Rrup[ix]/R1
             DT[Rrup >= R2] = 0
         else:                  # eqn 3.9
-            if self._T >= 1:
-                R1 = 20 + 10 * np.log(self._T)
-                R2 = 2*(20 + 10*np.log(self._T))
+            if period >= 1:
+                R1 = 20 + 10 * np.log(period)
+                R2 = 2*(20 + 10*np.log(period))
             else: 
                 R1 = 20
                 R2 = 40
             DT = np.ones(nsite)
             # As written in report:
-            # DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/(20 + 10 * np.log(self._T))
+            # DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/(20 + 10 * np.log(period))
             # Modification:
             DT[(Rrup > R1) & (Rrup < R2)] = 2 - Rrup[(Rrup > R1) & (Rrup < R2)]/R1
             # Note: it is not clear if the above modification is 'correct' but it gives
@@ -493,7 +506,7 @@ class Rowshandel2013(object):
         self._DT = DT
         
 
-    def computeWP(self):
+    def computeWP(self, period):
         """
         Computes WP -- the narrow-band multiplier. 
         """
@@ -502,7 +515,8 @@ class Rowshandel2013(object):
         # Tp = np.exp(1.27*self._M - 7.28)
         # Update (Rowshandel, personal communication)
         Tp = np.exp(1.04*self._M - 6.0)
-        self._WP = np.exp(-(np.log10(self._T/Tp)*np.log10(self._T/Tp))/(2*sig*sig))
+        self._WP = np.exp(-(np.log10(period/Tp)*np.log10(period/Tp))/(2*sig*sig))
+
 
 def _get_quad_slip_ds_ss(q, rake, cp, p):
     """
