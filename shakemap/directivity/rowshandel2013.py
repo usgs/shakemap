@@ -188,9 +188,9 @@ class Rowshandel2013(object):
             if self._simpleCentering:
                 # Eqn 3.14
                 xi = self._xi_prime * self._LD
-                xi_c = 0.18  # for all events
+                xi_c = 0.5  # for all events (or 0.14, 0.18??)
                 # ** could adjust xi_c based on mechanism
-                self._fd[i] = c1sel*(self._xi_prime - xi_c) * self._DT * self._WP
+                self._fd[i] = c1sel*(xi - xi_c) * self._DT * self._WP
             else:
                 # Eqn 3.13
                 self._fd[i] = (c1sel*self._xi_prime + c2sel) * self._LD * self._DT * self._WP
@@ -510,10 +510,11 @@ class Rowshandel2013(object):
         """
         Computes WP -- the narrow-band multiplier. 
         """
-        sig = 0.6
         # As written in report:
+        # sig = 0.6
         # Tp = np.exp(1.27*self._M - 7.28)
         # Update (Rowshandel, personal communication)
+        sig = 0.55
         Tp = np.exp(1.04*self._M - 6.0)
         self._WP = np.exp(-(np.log10(period/Tp)*np.log10(period/Tp))/(2*sig*sig))
 

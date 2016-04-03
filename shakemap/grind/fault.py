@@ -407,7 +407,8 @@ class Fault(object):
 
     def getQuadWidth(self, p0, p1, p3):
         """
-        Return width of an individual planar trapezoid, where the p0-p1 distance represents the long side.
+        Return width of an individual planar trapezoid, where the p0-p1 distance 
+        represents the long side.
         :param p0: 
             ECEF x,y,z point representing the first vertex of a quadrilateral.
         :param p1: 
@@ -426,13 +427,27 @@ class Fault(object):
 
     def getStrike(self):
         """
-        Return representative strike angle from first vertex of first quad to second vertex of last quad.
+        Return strike angle. If fault consists of multiple quadrilaterals, the
+        average strike angle, weighted by quad length, is returned. 
+        Note: for faults with quads where the strike angle changes by 180 deg
+        due to reverses in dip direction are problematic and not handeled well
+        by this algorithm. 
         :returns:
           float strike angle
         """
-        P0 = self._quadrilaterals[0][0]
-        P1 = self._quadrilaterals[-1][1]
-        return P0.azimuth(P1)
+        nq = len(self._quadrilaterals)
+        strikes = np.zeros(nq)
+        lengths = np.zeros(nq)
+        for i in range(nq):
+            P0 = self._quadrilaterals[i][0]
+            P1 = self._quadrilaterals[i][1]
+            strikes[i] = P0.azimuth(P1)
+            lengths[i] = get_quad_length(self._quadrilaterals[i])
+        x = np.sin(np.radians(strikes))
+        y = np.cos(np.radians(strikes))
+        xbar = np.sum(x*lengths)/np.sum(lengths)
+        ybar = np.sum(y*lengths)/np.sum(lengths)
+        return np.degrees(atan2(xbar, ybar))
 
     def getTopOfRupture(self):
         """
