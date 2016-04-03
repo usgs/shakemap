@@ -447,7 +447,7 @@ class Fault(object):
         y = np.cos(np.radians(strikes))
         xbar = np.sum(x*lengths)/np.sum(lengths)
         ybar = np.sum(y*lengths)/np.sum(lengths)
-        return np.degrees(atan2(xbar, ybar))
+        return np.degrees(np.arctan2(xbar, ybar))
 
     def getTopOfRupture(self):
         """
