@@ -31,23 +31,26 @@ class Rowshandel2013(object):
     #---------------------------------------------------------------------------
     # C1 adn C2 are GMPE-specific coefficients. Also, these are for Model-I option. 
     #---------------------------------------------------------------------------
-    __c1 = {'as': np.array([0.375,0.561,0.833,0.873,1.019,1.387,1.551]), 
-            'ba': np.array([0.257,0.699,0.824,0.834,0.986,1.378,1.588]),
-            'cb': np.array([0.149,0.377,0.570,0.596,0.772,1.152,np.nan]), 
-            'cy': np.array([0.079,0.321,0.629,0.693,0.898,1.258,1.369]),
-            'id': np.array([0.325,0.803,1.544,1.576,1.823,2.089,2.250]),
-            'T': np.array([1, 2, 3, 4, 5, 7.5, 10])}
-    __c1['mean'] = (__c1['as'] + __c1['ba'] + __c1['cb'] + __c1['cy'] + __c1['id'])/5
-    __c2 = {'as': np.array([0.028,-0.071,-0.130,-0.146,-0.178,-0.250,-0.268]), 
-            'ba': np.array([0.024,-0.097,-0.133,-0.145,-0.182,-0.273,-0.319]),
-            'cb': np.array([-0.007,-0.057,-0.095,-0.106,-0.144,-0.230,np.nan]), 
-            'cy': np.array([-0.003,-0.404,-0.098,-0.115,-0.156,-0.224,-0.235]),
-            'id': np.array([-0.019,-0.082,-0.228,-0.255,-0.312,-0.358,-0.369]),
-            'T': np.array([1, 2, 3, 4, 5, 7.5, 10])}
-    __c2['mean'] = (__c2['as'] + __c2['ba'] + __c2['cb'] + __c2['cy'] + __c2['id'])/5
+#    __c1 = {'as': np.array([0.375,0.561,0.833,0.873,1.019,1.387,1.551]), 
+#            'ba': np.array([0.257,0.699,0.824,0.834,0.986,1.378,1.588]),
+#            'cb': np.array([0.149,0.377,0.570,0.596,0.772,1.152,np.nan]), 
+#            'cy': np.array([0.079,0.321,0.629,0.693,0.898,1.258,1.369]),
+#            'id': np.array([0.325,0.803,1.544,1.576,1.823,2.089,2.250]),
+#            'T': np.array([1, 2, 3, 4, 5, 7.5, 10])}
+#    __c1['mean'] = (__c1['as'] + __c1['ba'] + __c1['cb'] + __c1['cy'] + __c1['id'])/5
+#    __c2 = {'as': np.array([0.028,-0.071,-0.130,-0.146,-0.178,-0.250,-0.268]), 
+#            'ba': np.array([0.024,-0.097,-0.133,-0.145,-0.182,-0.273,-0.319]),
+#            'cb': np.array([-0.007,-0.057,-0.095,-0.106,-0.144,-0.230,np.nan]), 
+#            'cy': np.array([-0.003,-0.404,-0.098,-0.115,-0.156,-0.224,-0.235]),
+#            'id': np.array([-0.019,-0.082,-0.228,-0.255,-0.312,-0.358,-0.369]),
+#            'T': np.array([1, 2, 3, 4, 5, 7.5, 10])}
+#    __c2['mean'] = (__c2['as'] + __c2['ba'] + __c2['cb'] + __c2['cy'] + __c2['id'])/5
+    __c1 = [0.35, 0.75, 0.95, 1.28, 1.60]
+    __c2 = [-0.035, -0.10, -0.15, -0.26, -0.30]
+    __cT = [1.0, 3.0, 5.0, 7.5, 10.0]
     
     def __init__(self, source, lat, lon, dep, dx, T, a_weight = 0.5,
-                 mtype = 1, simpleDT = False, simpleCentering = True):
+                 mtype = 1, simpleDT = False, centered = True):
         """
         Constructor for rowshandel2013.
         :param source:
@@ -75,8 +78,8 @@ class Rowshandel2013(object):
             products, 2 for adding all components of dot products. 
         :param simpleDT:
             Boolean; should the simpler DT equation be used? Usually False. 
-        :param simpleCentering:
-            Boolean; should the simple centering method be used. 
+        :param centered:
+            Boolean; should the centered directivity parameter be used.
         """
         self._source = source
         self._flt = source.getFault()
@@ -100,18 +103,19 @@ class Rowshandel2013(object):
             raise ValueError('mtype can onlty be 1 or 2.')
         self._mtype = mtype
         self._simpleDT = simpleDT
-        self._simpleCentering = simpleCentering
+        self._centered = centered
         
         # Period independent parameters
         self.computeWrup()
         self.computeLD()
         self.computeXiPrime()
+        self.getCenteringTerm()
         
         self.computeFd()
     
     @classmethod
     def fromSites(cls, source, sites, dx, T, a_weight = 0.5,
-                  mtype = 1, simpleDT = False, simpleCentering = True):
+                  mtype = 1, simpleDT = False, centered = True):
         """
         Class method for constructing a rowshandel2013 instance from 
         a sites instance.
@@ -135,8 +139,8 @@ class Rowshandel2013(object):
             products, 2 for adding all components of dot products. 
         :param simpleDT:
             Boolean; should the simpler DT equation be used? Usually False. 
-        :param simpleCentering:
-            Boolean; should the simple centering method be used. 
+        :param centered:
+            Boolean; should the centered directivity parameter be used.
         """
         sm_dict = sites.GeoDict
         west = sm_dict.xmin
@@ -150,7 +154,7 @@ class Rowshandel2013(object):
         lon, lat = np.meshgrid(lons, lats)
         dep = np.zeros_like(lon)
         return cls(source, lat, lon, dep, dx, T,
-                   a_weight, mtype, simpleDT, simpleCentering)
+                   a_weight, mtype, simpleDT, centered)
     
     
     def getFd(self):
@@ -174,25 +178,23 @@ class Rowshandel2013(object):
         (in log space). 
         ln(Y) = f(M, R, ...) + Fd
         """
+        
+        xcipc = self._xi_prime - self._xi_c
+        
         # fd is a list with same length as T
         self._fd = [None]*len(self._T)
         for i in range(len(self._T)):
             period = self._T[i]
-            c1sel = self.__c1['mean'][self.__c1['T'] == period]
-            c2sel = self.__c2['mean'][self.__c2['T'] == period]
+            c1sel = self.__c1[self.__cT == period]
+            c2sel = self.__c2[self.__cT == period]
             
             # Period dependent parameters
             self.computeWP(period)
             self.computeDT(period)
             
-            if self._simpleCentering:
-                # Eqn 3.14
-                xi = self._xi_prime * self._LD
-                xi_c = 0.5  # for all events (or 0.14, 0.18??)
-                # ** could adjust xi_c based on mechanism
-                self._fd[i] = c1sel*(xi - xi_c) * self._DT * self._WP
+            if self._centered:
+                self._fd[i] = c1sel * self._WP * self._DT * xcipc
             else:
-                # Eqn 3.13
                 self._fd[i] = (c1sel*self._xi_prime + c2sel) * self._LD * self._DT * self._WP
             
         
@@ -504,7 +506,20 @@ class Rowshandel2013(object):
             DT[Rrup >= R2] = 0
         DT = np.reshape(DT, slat.shape)
         self._DT = DT
-        
+    
+    def getCenteringTerm(self):
+        L = self._flt.getFaultLength()
+        CSSLP = -0.32 + 0.15 * np.log(L)
+        CTRST = -0.20 + 0.09 * np.log(L)
+        CNRML = -0.20 + 0.08 * np.log(L)
+        if self._rake > 0:
+            act = (CSSLP - CTRST)/2
+            cct = (CSSLP + CTRST)/2
+            self._xi_c = act*np.cos(2*np.radians(self._rake)) + cct
+        else:
+            act = (CSSLP - CNRML)/2
+            cct = (CSSLP + CNRML)/2
+            self._xi_c = act*np.cos(2*np.radians(self._rake)) + cct
 
     def computeWP(self, period):
         """
