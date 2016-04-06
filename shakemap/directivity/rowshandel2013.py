@@ -283,6 +283,9 @@ class Rowshandel2013(object):
             
             # Rupture plane normal vector (ECEF coords)
             rpnv = fault.get_quad_normal(q)
+            rpnvcol = np.array([[rpnv.x],
+                                [rpnv.y],
+                                [rpnv.z]])
             
             # Strike vector (ECEF coords)
             strike_vec = fault.get_quad_strike_vector(q)
@@ -307,7 +310,12 @@ class Rowshandel2013(object):
             hypcol = np.array([[hypo_ecef.x],
                                [hypo_ecef.y],
                                [hypo_ecef.z]])
-            pmat = cp_mat - hypcol 
+            pmat = cp_mat - hypcol
+            
+            # Project pmat onto quad
+            ndotp = np.sum(pmat * rpnvcol, axis = 0)
+            pmat = pmat - ndotp
+            
             mag = np.sqrt(np.sum(pmat*pmat, axis = 0))
             pmatnorm = pmat/mag # like r1
             
@@ -370,8 +378,8 @@ class Rowshandel2013(object):
                     nsubs[i] = nsubs[i] + cp_mat.shape[1]
                 
                 # Normalize by n sub faults later
-                xi_prime_s[i] = np.sum(sdotq)
-                xi_prime_p[i] = np.sum(pdotq)
+                xi_prime_s[i] = xi_prime_s[i] + np.sum(sdotq)
+                xi_prime_p[i] = xi_prime_p[i] + np.sum(pdotq)
         
         # Apply a water level to nsubp and nsubs to avoid division by
         # zero. This should only occur when the numerator is also zero
