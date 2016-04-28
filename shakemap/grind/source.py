@@ -47,7 +47,9 @@ def read_event_file(eventxml):
     :returns:
        Dictionary with keys as indicated above in earthquake element attributes.
     """
-    event = {}
+    #fill in default values for mechanism, rake and dip
+    #these may be overriden by values in event.xml, source.txt, or by values passed in after reading input data.
+    event = {'mech':'ALL','rake':45.0,'dip':90.0}
     if isinstance(eventxml,str):
         root = minidom.parse(eventxml)
     else:
@@ -72,8 +74,14 @@ def read_event_file(eventxml):
     # 1) timezones other than UTC (use pytz)
     # 2) times < year 1900 (strftime fails) - subclass datetime, use Obspy utcdatetime
     # 3) daylight savings time (use pytz)
+
+    #read in optional float fields
+    for key in ['mech','rake','dip']:
+        if eq.hasAttribute(key):
+            event[key] = float(eq.getAttribute(key))
     
     event['time'] = ShakeDateTime(year,month,day,hour,minute,second,msec)
+    #read in all of the fields that we know to be strings
     for key in ['id','locstring','type','timezone']:
         if eq.hasAttribute(key):
             event[key] = eq.getAttribute(key)
@@ -121,15 +129,13 @@ class Source(object):
     """
     Encapsulate everything we need to know about an earthquake source.
     """
-    def __init__(self, event, fault = None, sourcedict = None):
+    def __init__(self, event, fault = None):
         """
         Construct a Source object.
         :param event:
-            dictionary of values (see read_event_file())
+            dictionary of values (see read_event_file() and read_source())
         :param fault:
             a Fault object
-        :param sourcedict:
-            Dictionary containing values from source.txt file (see read_source())
         :returns:
             Source object.
         """
@@ -142,10 +148,6 @@ class Source(object):
                            'required keys: "%s"' % (','.join(missing)))
         self._fault = fault
         self._event_dict = event.copy()
-        if isinstance(sourcedict, dict):
-            for key,value in sourcedict.items():
-                self.setEventParam(key, value)
-        
 
     @classmethod
     def readFromFile(cls, eventxmlfile, faultfile = None, sourcefile = None):
@@ -169,13 +171,18 @@ class Source(object):
         params = None
         if sourcefile is not None:
             params = read_source(sourcefile)
-        return cls(event,fault=fault,sourcedict=params)
+            event.update(params)
+        return cls(event,fault=fault)
 
 
-    def getRuptureContext(self, gmpe):
+    def getRuptureContext(self, gmpelist):
         """
-        Return a GEM RuptureContext 
+        Return a GEM RuptureContext suitable for any GMPE (except for those requiring hypo_loc).
         https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
+        :param gmpelist:
+          Sequence of hazardlib GMPE objects.
+        :raises:
+          ShakeMapException when a GMPE requiring 'hypo_loc' is passed in.
         :returns:
             RuptureContext object with all known parameters filled in.
         If Source does not contain a Fault, strike, dip, ztor, and width will be 
@@ -185,9 +192,11 @@ class Source(object):
         #rupturecontext constructor inputs:
         # 'mag', 'strike', 'dip', 'rake', 'ztor', 'hypo_lon', 'hypo_lat',
         # 'hypo_depth', 'width', 'hypo_loc'
-        reqset = gmpe.REQUIRES_RUPTURE_PARAMETERS
-        if 'hypo_loc' in reqset:
-            raise ShakeMapException('Rupture parameter "hypo_loc" is not supported!')
+        for gmpe in gmpelist:
+            reqset = gmpe.REQUIRES_RUPTURE_PARAMETERS
+            if 'hypo_loc' in reqset:
+                raise ShakeMapException('Rupture parameter "hypo_loc" is not supported!')
+            
         rup = base.RuptureContext()
         rup.mag = self.getEventParam('mag')
         if self._fault is not None:
@@ -197,7 +206,7 @@ class Source(object):
             rup.width = self._fault.getWidth()
         else:
             rup.strike = DEFAULT_STRIKE
-            rup.dip = DEFAULT_DIP
+            rup.dip = self.getEventParam('dip')
             rup.ztor = DEFAULT_ZTOR
             rup.width = DEFAULT_WIDTH
 
@@ -270,6 +279,54 @@ class Source(object):
         """
         self._event_dict[key] = value
 
+    def setMechanism(self,mech,rake=None,dip=None):
+        """
+        Set the earthquake mechanism manually (overriding any values read in from event.xml or source.txt.
+        If rake and dip are not specified, they will be assigned by mechanism as follows:
+        Mech     Rake    Dip
+        ----------------------
+        RS         90     40
+        NM        -90     50
+        SS          0     90
+        ALL        45     90
+        
+        :param mech:
+          String - one of 'RS' (reverse), 'NM' (normal), 'SS' (strike slip), or 'ALL' (unknown).
+        :param rake:
+          Value between -360 and 360 degrees. If set, will override default value for mechanism (see table above).
+        :param dip:
+          Value betweeen 0 and 90 degrees. If set, will override default value for mechanism (see table above).
+          (Value will be converted to range between -180 and 180 degrees.)
+        """
+        mechs = {'RS':{'rake':90.0,'dip':40.0},
+                 'NM':{'rake':-90.0,'dip':50.0},
+                 'SS':{'rake':0.0,'dip':90.0},
+                 'ALL':{'rake':45.0,'dip':90.0}}
+        if mech not in list(mechs.keys()):
+            raise ShakeMapException('Mechanism must be one of: %s' % str(list(mechs.keys())))
+        if dip is not None:
+            if dip < 0 or dip > 90:
+                raise ShakeMapException('Dip must be in range 0-90 degrees.')
+            if dip < 0 or dip > 90:
+                raise ShakeMapException('Dip must be in range 0-90 degrees.')
+        else:
+            dip = mechs[mech]['dip']
+            
+        if rake is not None:
+            if rake < -180:
+                rake += 360
+            if rake > 180:
+                rake -= 360
+            if rake < -180 or rake > 180:
+                raise ShakeMapException('Rake must be transformable to be in range -180 to 180 degrees.')
+        else:
+            rake = mechs[mech]['rake']
+        
+        self.setEventParam('dip',dip)
+        self.setEventParam('rake',rake)
+        self.setEventParam('mech',mech)
+                       
+    
     def getEventParam(self, key):
         """
         Get a parameter from the internal event dictionary

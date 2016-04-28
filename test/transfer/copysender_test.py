@@ -8,7 +8,7 @@ import shutil
 
 #hack the path so that I can debug these functions if I need to
 homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-shakedir = os.path.abspath(os.path.join(homedir,'..'))
+shakedir = os.path.abspath(os.path.join(homedir,'..','..'))
 sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring any installed mapio stuff
 
 from shakemap.transfer.copysender import CopySender
