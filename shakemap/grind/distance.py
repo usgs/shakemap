@@ -482,8 +482,7 @@ def get_distance(methods, lat, lon, dep, source,
                 # -------------------
                 # Sort out file names
                 # -------------------
-                rake = source._event_dict.get('rake')
-                mech = rake_to_mech(rake)
+                mech = source.getEventParam('mech')
                 if not hasattr(source, '_tectonic_region'):
                     rf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p0_seis0_20_Ratios.csv")
                     vf = os.path.join(cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p0_seis0_20_Var.csv")

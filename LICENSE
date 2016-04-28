@@ -10,3 +10,8 @@ science. The information has not received final approval by the USGS
 and is provided on the condition that neither the USGS nor the
 U.S. Government shall be held liable for any damages resulting from
 the authorized or unauthorized use of the information.
+
+Dependent libraries found in the "extern" directory are distributed under
+the open source (or open source-like) licenses/agreements. Appropriate
+license aggrements for each library can be found in the "extern"
+directory.

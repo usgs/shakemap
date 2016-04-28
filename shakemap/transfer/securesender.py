@@ -7,7 +7,7 @@ import os.path
 #depends on https://github.com/jbardin/scp.py
 #pip install git+git://github.com/jbardin/scp.py.git
 from paramiko import SSHClient
-from scp import SCPClient
+from shakemap.extern.scp.scp import SCPClient
 from .sender import Sender
 
 #local imports
