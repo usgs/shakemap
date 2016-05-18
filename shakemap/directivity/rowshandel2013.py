@@ -314,7 +314,7 @@ class Rowshandel2013(object):
             
             # Project pmat onto quad
             ndotp = np.sum(pmat * rpnvcol, axis = 0)
-            pmat = pmat - ndotp
+            pmat = pmat - ndotp * rpnvcol
             
             mag = np.sqrt(np.sum(pmat*pmat, axis = 0))
             pmatnorm = pmat/mag # like r1
