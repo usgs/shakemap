@@ -1,0 +1,402 @@
+#!/usr/bin/env python
+
+import os
+import time 
+import json
+import argparse
+
+import numpy as np
+from lxml import etree
+
+import openquake.hazardlib.geo as geo
+
+import shakemap.grind.fault as fault
+from shakemap.grind.ecef import latlon2ecef,ecef2latlon
+from shakemap.grind.vector import Vector
+from shakemap.utils.timeutils import ShakeDateTime
+
+
+#----------------------------------------------------
+# Converts rake to mechanism type
+#----------------------------------------------------
+def rake_to_type(rake):
+    type = 'ALL'
+    if (rake >= -180 and rake <= -150) or \
+       (rake >= -30  and rake <= 30) or \
+       (rake >= 150  and rake <= 180): 
+        type = 'SS'
+    if rake >= -120 and rake <= -60:
+        type = 'NM'
+    if rake >= 60 and rake <= 120:
+        type = 'RS'
+    return type
+
+#----------------------------------------------------
+# Convert average fault strike to quadrant
+#----------------------------------------------------
+def strike_to_quadrant(strike):
+    # assuming strike is between -180 and 180 (since it is
+    # computed from numpy.arctan2
+    #  \ 1 /
+    #   \ /
+    # 4  X  2
+    #   / \
+    #  / 3 \
+    if strike > 180:
+        strike = strike - 360
+    if strike < -180:
+        strike = strike + 360
+    if (strike > -45 and strike <= 45):
+        q = 1
+    if strike > 45 and strike <= 135:
+        q = 2
+    if (strike > 135 and strike <= 180) or \
+       (strike <= -135 and strike >= -180):
+        q = 3
+    if strike > -135 and strike <= -45:
+        q = 4
+    return q
+
+
+#----------------------------------------------------
+# Sort out event id and associated variables
+#----------------------------------------------------
+def get_event_id(event_name, mag, Directivity, iDir, quads):
+    event_legal = "".join(x for x in event_name if x.isalnum())
+    mag_str = str(mag).strip("0")
+    # PDL requrement: no ".", so replace with "p"
+    mag_str = mag_str.replace('.', 'p')
+    
+    # Get an 'average strike' from first quad to mean of trace
+    lat0 = [q[0].latitude for q in quads]
+    lon0 = [q[0].longitude for q in quads]
+    lat1 = [q[1].latitude for q in quads]
+    lon1 = [q[1].longitude for q in quads]
+    lat2 = [q[2].latitude for q in quads]
+    lon2 = [q[2].longitude for q in quads]
+    lat3 = [q[3].latitude for q in quads]
+    lon3 = [q[3].longitude for q in quads]
+    clat = np.mean(np.array([lat0, lat1, lat2, lat3]))
+    clon = np.mean(np.array([lon0, lon1, lon2, lon3]))
+    strike = geo.geodetic.azimuth(lon0[0], lat0[0], clon, clat)
+    squadrant = strike_to_quadrant(strike)
+    
+    if Directivity: 
+        dirtag = 'dir' + str(iDir)
+    else:
+        dirtag = ''
+    
+    nq = len(quads)
+    if (iDir == 0) and (Directivity) :
+        # Put hypo in center of first quad
+        selquad = quads[0]
+        if squadrant == 1:
+            ddes = "Northern directivity"
+        if squadrant == 2:
+            ddes = "Eastern directivity"
+        if squadrant == 3:
+            ddes = "Southern directivity"
+        if squadrant == 4:
+            ddes = "Western directivity"
+    elif (iDir == 1) or (not Directivity):
+        # Put hypo in center of middle quad
+        selquad = quads[int(np.round(nq/2, 0))-1]
+        ddes = "Bilateral directivity"
+    elif (iDir == 2) and (Directivity):
+        # Put hypo in center of last quad
+        selquad = quads[nq-1]
+        if squadrant == 1:
+            ddes = "Southern directivity"
+        if squadrant == 2:
+            ddes = "Western directivity"
+        if squadrant == 3:
+            ddes = "Northern directivity"
+        if squadrant == 4:
+            ddes = "Eastern directivity"
+        
+    if Directivity: 
+        id_str = "%s_M%s_se~%s" % (event_legal[:20], mag_str, dirtag)
+        id_str = id_str.lower()
+        real_desc = ddes
+    else:
+        id_str = "%s_M%s_se" % (event_legal[:20], mag_str)
+        id_str = id_str.lower()
+        real_desc = 'Median ground motions'
+    
+    eventsourcecode = "%s_M%s_se" % (event_legal[:20], mag_str)
+    eventsourcecode = eventsourcecode.lower()
+    return id_str, eventsourcecode, real_desc, selquad
+
+
+def main(args):
+    if args.shakehome:
+        shakehome = args.shakehome
+    else:
+        shakehome = os.path.join(os.path.expanduser('~'),'ShakeMap')
+        
+    rfile = args.file
+    with open(rfile) as f:    
+        ucerf = json.load(f)
+        nrup = len(ucerf['events'])
+        print('Total number of ruptures: %d' %nrup )
+    
+    # only use first entry for testing:
+    if args.index:
+        iter = args.index
+        iter = map(int, iter)
+    else:
+        iter = range(nrup)
+    
+    for i in iter:
+        event_name = ucerf['events'][i]['name']
+        short_name = event_name.split('EllB')[0].split('Shaw09')[0].split('2011')[0].split('HB08')[0].rstrip()
+        magnitude = ucerf['events'][i]['magnitude']
+        dip = ucerf['events'][i]['dip']
+        rake = ucerf['events'][i]['rake']
+        width = ucerf['events'][i]['width']
+        
+        sections = np.array(ucerf['events'][i]['sections'])
+        nsections = len(sections)
+        
+        secind = 0
+        new_seg_ind = []
+        rev = np.array([[]])
+        xp0 = np.array([[]])
+        xp1 = np.array([[]])
+        yp0 = np.array([[]])
+        yp1 = np.array([[]])
+        zp = np.array([[]])
+        dip_sec = np.array([[]])
+        strike_sec = np.array([[]])
+        width_sec = np.array([[]])
+        for j in range(0, nsections):
+            trace_sec = np.array(sections[j]['resampledTrace'])
+            top_sec_lon = trace_sec[:,0]
+            top_sec_lat = trace_sec[:,1]
+            top_sec_z = trace_sec[:,2]
+            n_sec_trace = len(trace_sec) - 1
+            dip_sec = np.append(dip_sec, np.repeat(sections[j]['dip'], n_sec_trace))
+            dipDir_sec = np.repeat(sections[j]['dipDir'], n_sec_trace)
+            strike_sec = np.append(strike_sec, dipDir_sec - 90)
+            width_sec = np.append(width_sec, np.repeat(sections[j]['width'], n_sec_trace))
+            rev_sec = sections[j]['reversed']
+            rev = np.append(rev, np.repeat(rev_sec, n_sec_trace))
+            xp0_sec = top_sec_lon[range(0, n_sec_trace)]
+            xp1_sec = top_sec_lon[range(1, n_sec_trace + 1)]
+            yp0_sec = top_sec_lat[range(0, n_sec_trace)]
+            yp1_sec = top_sec_lat[range(1, n_sec_trace + 1)]
+            zp_sec = top_sec_z[range(0, n_sec_trace)]
+            if rev_sec == False:
+                xp0 = np.append(xp0, xp0_sec)
+                xp1 = np.append(xp1, xp1_sec)
+                yp0 = np.append(yp0, yp0_sec)
+                yp1 = np.append(yp1, yp1_sec)
+                zp = np.append(zp, zp_sec)
+            else:
+                xp0 = np.append(xp0, xp0_sec[::-1])
+                xp1 = np.append(xp1, xp1_sec[::-1])
+                yp0 = np.append(yp0, yp0_sec[::-1])
+                yp1 = np.append(yp1, yp1_sec[::-1])
+                zp = np.append(zp, zp_sec[::-1])
+            new_seg_ind.extend([secind]*n_sec_trace)
+            secind = secind + 1
+        
+        flt = fault.Fault.fromTrace(xp0, yp0, xp1, yp1, zp, 
+                                    width_sec, dip_sec, strike = strike_sec, 
+                                    reference = args.reference)
+        flt._segment_index = new_seg_ind
+        
+        quads = flt.getQuadrilaterals()
+        
+        id_str, eventsourcecode, real_desc, selquad = get_event_id(
+            event_name, magnitude, args.directivity, args.dirind, quads)
+        
+        event = {'lat': 0, 
+                 'lon': 0, 
+                 'depth':0, 
+                 'mag': magnitude, 
+                 'id':id_str,
+                 'locstring':event_name,
+                 'type':'U', # overwrite later
+                 'timezone':'UTC'}
+        event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+        event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+
+        #---------------------
+        # Hypocenter placement
+        #---------------------
+        # top left
+        pp0 = Vector.fromPoint(geo.point.Point(
+            selquad[0].longitude, selquad[0].latitude, selquad[0].depth) )
+        # top right
+        pp1 = Vector.fromPoint(geo.point.Point(
+            selquad[1].longitude, selquad[1].latitude, selquad[1].depth) )
+        # bottom right
+        pp2 = Vector.fromPoint(geo.point.Point(
+            selquad[2].longitude, selquad[2].latitude, selquad[2].depth) )
+        # bottom left
+        pp3 = Vector.fromPoint(geo.point.Point(
+            selquad[3].longitude, selquad[3].latitude, selquad[3].depth) ) 
+        dxp = 0.5
+        dyp = 0.5
+        mp0 = pp0 + (pp1 - pp0)*dxp
+        mp1 = pp3 + (pp2 - pp3)*dxp
+        rp = mp0 + (mp1 - mp0)*dyp
+        hlat, hlon, hdepth = ecef2latlon(rp.x, rp.y, rp.z)
+
+        event['lat'] = hlat
+        event['lon'] = hlon
+        event['depth'] = hdepth
+
+        
+        #----------------------------------------------------
+        # For map display get trace of top/bottom edges and 
+        # put them in order.
+        #----------------------------------------------------
+        
+        qds = flt.getQuadrilaterals()
+        nq = len(qds)
+        
+        print('i = %i of %i, nq: %i' %(i, nrup-1, nq) )
+        
+        top_lat = np.array([[]])
+        top_lon = np.array([[]])
+        top_dep = np.array([[]])
+        bot_lat = np.array([[]])
+        bot_lon = np.array([[]])
+        bot_dep = np.array([[]])
+        for j in range(0, nq):
+            if rev[j] == True:
+                top_lat = np.append(top_lat, qds[j][1].latitude)
+                top_lat = np.append(top_lat, qds[j][0].latitude)
+                top_lon = np.append(top_lon, qds[j][1].longitude)
+                top_lon = np.append(top_lon, qds[j][0].longitude)
+                top_dep = np.append(top_dep, qds[j][1].depth)
+                top_dep = np.append(top_dep, qds[j][0].depth)
+                bot_lat = np.append(bot_lat, qds[j][2].latitude)
+                bot_lat = np.append(bot_lat, qds[j][3].latitude)
+                bot_lon = np.append(bot_lon, qds[j][2].longitude)
+                bot_lon = np.append(bot_lon, qds[j][3].longitude)
+                bot_dep = np.append(bot_dep, qds[j][2].depth)
+                bot_dep = np.append(bot_dep, qds[j][3].depth)
+            else: 
+                top_lat = np.append(top_lat, qds[j][0].latitude)
+                top_lat = np.append(top_lat, qds[j][1].latitude)
+                top_lon = np.append(top_lon, qds[j][0].longitude)
+                top_lon = np.append(top_lon, qds[j][1].longitude)
+                top_dep = np.append(top_dep, qds[j][0].depth)
+                top_dep = np.append(top_dep, qds[j][1].depth)
+                bot_lat = np.append(bot_lat, qds[j][3].latitude)
+                bot_lat = np.append(bot_lat, qds[j][2].latitude)
+                bot_lon = np.append(bot_lon, qds[j][3].longitude)
+                bot_lon = np.append(bot_lon, qds[j][2].longitude)
+                bot_dep = np.append(bot_dep, qds[j][3].depth)
+                bot_dep = np.append(bot_dep, qds[j][2].depth)
+        # Make edges into line objects
+        nl = len(top_lon)
+        topp = botp = [None] * nl
+        for i in range(0, nl):
+            topp[i] = geo.point.Point(top_lon[i], top_lat[i], top_dep[i])
+            botp[i] = geo.point.Point(bot_lon[i], bot_lat[i], bot_dep[i])
+        top = geo.line.Line(topp)
+        bot = geo.line.Line(botp)
+        edges = [top, bot]
+
+        #----------------------------------------------------
+        # Write files
+        #----------------------------------------------------
+            
+        # Create base directory if it doesn't exist
+        datdir = os.path.join(shakehome, 'data')
+        if os.path.isdir(datdir) == False:
+            os.mkdir(datdir)
+        
+        # Create event directory if it doesn't exist
+        evt_dir = os.path.join(datdir, id_str)
+        if os.path.isdir(evt_dir) == False:
+            os.mkdir(evt_dir)
+        print(evt_dir)
+        
+        # Create input directory if it doesn't exist
+        input_dir = os.path.join(evt_dir, 'input')
+        if os.path.isdir(input_dir) == False:
+            os.mkdir(input_dir)
+        
+        # Write fault files -- use top edge/bottom edges for maps because 
+        # UCERF3 subsections are so small and basically black out the full
+        # surface projection of the fault. 
+        flt.writeFaultFile(os.path.join(input_dir, input_dir, id_str + '-fault-for-calc.txt'))
+        ff = open(os.path.join(input_dir, id_str + '_for-map_fault.txt'), 'wt')
+        nl = len(top_lon)
+        for i in range(0, nl): # top edge
+            ff.write('%.4f %.4f %.4f\n' % (top_lat[i],top_lon[i],top_dep[i]))
+        for i in list(reversed(range(0, nl))): # bottom edge
+            ff.write('%.4f %.4f %.4f\n' % (bot_lat[i],bot_lon[i],bot_dep[i]))
+            ff.write('%.4f %.4f %.4f\n' % (top_lat[0],top_lon[0],top_dep[0])) # close
+        ff.close()
+        
+        # Need to parse 'time' for event.xml
+        evtime = time.strptime(str(event['time']), "%Y-%m-%d %H:%M:%S") 
+        
+        # Write event.xml file
+        xml_file = os.path.join(input_dir, 'event.xml')
+        root = etree.Element('earthquake')
+        root.set('id', id_str)
+        root.set('lat', str(hlat))
+        root.set('lon', str(hlon))
+        root.set('mag', str(magnitude))
+        root.set('year', time.strftime('%Y', evtime) )
+        root.set('month', time.strftime('%m', evtime) )
+        root.set('day', time.strftime('%d', evtime) )
+        root.set('hour', time.strftime('%H', evtime) )
+        root.set('minute', time.strftime('%M', evtime) )
+        root.set('second', time.strftime('%S', evtime) )
+        root.set('timezone', 'UTC')
+        root.set('depth', str(hdepth))
+        root.set('locstring', short_name)
+        root.set('description', real_desc)
+        root.set('created', '')
+        root.set('otime', '')
+        root.set('type', rake_to_type(rake)) 
+        root.set('network', '')
+        root.set('reference', flt.getReference())
+        
+        et = etree.ElementTree(root)
+        et.write(xml_file, pretty_print = True, xml_declaration = True,
+                 encoding = "us-ascii")
+
+
+
+
+
+
+if __name__ == '__main__':
+    desc = '''
+    Create ShakeMap input directory. This is designed primarily to be used with
+    an input file that provides rupture information. Currently, this only 
+    supports the BSSC2014 JSON format. 
+    
+    TODO: 
+      * Add support for NSHM XML format
+      * Add support for Excel rupture template
+      * prompt for minimal info if file is not provided
+    '''
+    parser = argparse.ArgumentParser(description=desc)
+    fh = 'File with rupture information; currently only BSSC2014 JSON format; Future: USGS NSHM xml format and Excel rupture template.'
+    parser.add_argument('-f','--file', help = fh)
+    shakehome = os.path.join(os.path.expanduser('~'),'ShakeMap')
+    parser.add_argument('-r','--reference', help='Reference for rupture source.',
+                        default='')
+    parser.add_argument('-d', '--dirind', help='Directivity; -1 for no directivity (default); 0 and 2 are the two opposing unilateral directions, 1 is for bilateral.',
+                        default = -1, type=int, choices=[-1, 0, 1, 2])
+    parser.add_argument('-i', '--index', help = 'List of rupture indices to run. Useful if you do not want to run all ruptures in the file.', 
+                        nargs='*')
+    parser.add_argument('-s','--shakehome', help='the location of ShakeMap install; default is %s.' % shakehome)
+    args = parser.parse_args()
+    if args.dirind == -1:
+        args.directivity = False
+    else:
+        args.directivity = True
+    main(args)
+
+    
