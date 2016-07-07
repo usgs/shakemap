@@ -774,7 +774,7 @@ class Fault(object):
         :returns:
            string citeable reference
         """
-        return self._reference.copy()
+        return copy.deepcopy(self._reference)
         
     def getNumSegments(self):
         """

@@ -77,7 +77,4 @@ if __name__ == '__main__':
     parser.add_argument('-o','--outfile', dest='outfile', type=str, help='specify output fault text file')
     args = parser.parse_args()
     main(args)
-
-    
-
     
