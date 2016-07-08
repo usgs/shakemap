@@ -221,7 +221,7 @@ def main(args):
                  'timezone':'UTC'}
         event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
         event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
-
+        
         #---------------------
         # Hypocenter placement
         #---------------------
@@ -360,7 +360,9 @@ def main(args):
         root.set('type', rake_to_type(rake)) 
         root.set('network', '')
         root.set('reference', flt.getReference())
-        
+        root.set('rake', str(rake))
+        root.set('directivity', str(args.directivity))
+
         et = etree.ElementTree(root)
         et.write(xml_file, pretty_print = True, xml_declaration = True,
                  encoding = "us-ascii")
@@ -384,13 +386,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=desc)
     fh = 'File with rupture information; currently only BSSC2014 JSON format; Future: USGS NSHM xml format and Excel rupture template.'
     parser.add_argument('-f','--file', help = fh)
-    shakehome = os.path.join(os.path.expanduser('~'),'ShakeMap')
     parser.add_argument('-r','--reference', help='Reference for rupture source.',
                         default='')
     parser.add_argument('-d', '--dirind', help='Directivity; -1 for no directivity (default); 0 and 2 are the two opposing unilateral directions, 1 is for bilateral.',
                         default = -1, type=int, choices=[-1, 0, 1, 2])
     parser.add_argument('-i', '--index', help = 'List of rupture indices to run. Useful if you do not want to run all ruptures in the file.', 
                         nargs='*')
+    shakehome = os.path.join(os.path.expanduser('~'),'ShakeMap')
     parser.add_argument('-s','--shakehome', help='the location of ShakeMap install; default is %s.' % shakehome)
     args = parser.parse_args()
     if args.dirind == -1:
