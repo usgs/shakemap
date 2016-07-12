@@ -154,7 +154,8 @@ class Distance(object):
         if not isinstance(gmpe, list):
             gmpe = [ gmpe ]
 
-        requires = set()
+        # require rhypo always
+        requires = set(['rhypo'])
 
         for ig in gmpe:
             if not isinstance(ig, GMPE):

@@ -6,13 +6,47 @@ import subprocess
 import xml.etree.ElementTree as ET
 import argparse
 import ast
+import warnings
 
 import numpy as np
 
-from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
-from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import CampbellBozorgnia2014
+#--------------------------------------------------
+# WUS GMPEs
 from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
+from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014 
+from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import CampbellBozorgnia2014 
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
+
+#--------------------------------------------------
+# CEUS GMPEs
+from openquake.hazardlib.gsim.frankel_1996 import FrankelEtAl1996MwNSHMP2008
+# Note: the Toro implementation includes the 2002 update. 
+from openquake.hazardlib.gsim.toro_1997 import ToroEtAl1997MwNSHMP2008
+from openquake.hazardlib.gsim.silva_2002 import SilvaEtAl2002MwNSHMP2008
+from openquake.hazardlib.gsim.campbell_2003 import Campbell2003MwNSHMP2008
+from openquake.hazardlib.gsim.tavakoli_pezeshk_2005 import TavakoliPezeshk2005MwNSHMP2008
+from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006Modified2011
+from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
+from openquake.hazardlib.gsim.boore_atkinson_2011 import Atkinson2008prime
+from openquake.hazardlib.gsim.somerville_2001 import SomervilleEtAl2001NSHMP2008
+
+#--------------------------------------------------
+# SZ/interface GMPEs
+# Note: do not use the "NSHMP" veresions of the subduction zone gmpes because they fix
+#       hypocentral depth at 20 km. 
+from openquake.hazardlib.gsim.atkinson_boore_2003 import AtkinsonBoore2003SInter
+from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SInter
+from openquake.hazardlib.gsim.atkinson_macias_2009 import AtkinsonMacias2009
+from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SInter
+
+# SZ/intraslab GMPEs
+from openquake.hazardlib.gsim.atkinson_boore_2003 import AtkinsonBoore2003SSlab
+from openquake.hazardlib.gsim.atkinson_boore_2003 import AtkinsonBoore2003SSlabCascadia
+from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SSlab
+from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SSlab
+
+#--------------------------------------------------
+# Openquake utilities
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib import imt,const
 from openquake.hazardlib.gsim.base import SitesContext,DistancesContext,RuptureContext
@@ -44,6 +78,10 @@ def get_extent(source):
     if mag < 6.48:
         mindist_km = 100.
     else:
+        # Note: This is an approximate equation developed for ACR/WUS. 
+        #       Probably should redo for SCR/CEUS.
+        #       Would be useful to have tectonic environment stored in
+        #       source object. 
         mindist_km = 27.24 * mag**2 - 250.4 * mag + 579.1
     # Projection
     proj = get_orthographic_projection(clon - 4, clon + 4, clat + 4, clat - 4)
@@ -183,8 +221,105 @@ def main(args):
             #         a conversion equation from another IM.
             #      2) His equations are not valid for Vs30 < 450 m/s.
             #      3) He does not seprate inter- and intra-event errors.
-            #      4) The NHSMP will no longer be using it in the future. 
-    
+            #      4) The NHSMP will no longer be using it in the future.
+            #----------------------------------------------------
+    elif args.gmpe == 'NSHMP14scr_rlme':
+        gmpes = [FrankelEtAl1996MwNSHMP2008(),
+                 ToroEtAl1997MwNSHMP2008(),
+                 SilvaEtAl2002MwNSHMP2008(),
+                 Campbell2003MwNSHMP2008(),
+                 TavakoliPezeshk2005MwNSHMP2008(),
+                 AtkinsonBoore2006Modified2011(),
+                 PezeshkEtAl2011(),
+                 Atkinson2008prime(),
+                 SomervilleEtAl2001NSHMP2008()]
+        wts = [0.06, 0.11, 0.06, 0.11, 0.11, 0.22, 0.15, 0.08, 0.1]
+        wts_largeR = [0.16, 0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0]
+    elif args.gmpe == 'NSHMP14scr_grd':
+        gmpes = [FrankelEtAl1996MwNSHMP2008(),
+                 ToroEtAl1997MwNSHMP2008(),
+                 SilvaEtAl2002MwNSHMP2008(),
+                 Campbell2003MwNSHMP2008(),
+                 TavakoliPezeshk2005MwNSHMP2008(),
+                 AtkinsonBoore2006Modified2011(),
+                 PezeshkEtAl2011(),
+                 Atkinson2008prime(),
+                 SomervilleEtAl2001NSHMP2008()]
+        wts = [0.06, 0.13, 0.06, 0.13, 0.13, 0.25, 0.16, 0.08, 0.0]
+        wts_largeR = [0.16, 0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0]
+    elif args.gmpe == 'NSHMPsub_i':
+        gmpes = [AtkinsonBoore2003SInter(), ZhaoEtAl2006SInter(),
+                 AtkinsonMacias2009(), AbrahamsonEtAl2015SInter()]
+        wts = [0.1, 0.3, 0.3, 0.3]
+    elif args.gmpe == 'NSHMPsub_s':
+        gmpes = [AtkinsonBoore2003SSlab(), AtkinsonBoore2003SSlabCascadia(),
+                 ZhaoEtAl2006SSlab(), AbrahamsonEtAl2015SSlab()]
+        wts = [0.1667, 0.1667, 0.33, 0.33]
+    elif args.gmpe == 'ASK14':
+        gmpes = [AbrahamsonEtAl2014()]
+        wts = [1.0]
+    elif args.gmpe == 'BSSA14':
+        gmpes = [BooreEtAl2014()]
+        wts = [1.0]
+    elif args.gmpe == 'CB14':
+        gmpes = [CampbellBozorgnia2014()]
+        wts = [1.0]
+    elif args.gmpe == 'CY14':
+        gmpes = [ChiouYoungs2014()]
+        wts = [1.0]
+    elif args.gmpe == 'F96':
+        gmpes = [FrankelEtAl1996MwNSHMP2008()]
+        wts = [1.0]
+    elif args.gmpe == 'T02':
+        gmpes = [ToroEtAl1997MwNSHMP2008()]
+        wts = [1.0]
+    elif args.gmpe == 'S02':
+        gmpes = [SilvaEtAl2002MwNSHMP2008()]
+        wts = [1.0]
+    elif args.gmpe == 'C03':
+        gmpes = [Campbell2003MwNSHMP2008()]
+        wts = [1.0]
+    elif args.gmpe == 'TP05':
+        gmpes = [TavakoliPezeshk2005MwNSHMP2008()]
+        wts = [1.0]
+    elif args.gmpe == 'AB06p':
+        gmpes = [AtkinsonBoore2006Modified2011()]
+        wts = [1.0]
+    elif args.gmpe == 'P11':
+        gmpes = [PezeshkEtAl2011()]
+        wts = [1.0]
+    elif args.gmpe == 'A08p':
+        gmpes = [Atkinson2008prime()]
+        wts = [1.0]
+    elif args.gmpe == 'S01':
+        gmpes = [SomervilleEtAl2001NSHMP2008()]
+        wts = [1.0]
+    elif args.gmpe == 'AB03ig':
+        gmpes = [AtkinsonBoore2003SInter()]
+        wts = [1.0]
+    elif args.gmpe == 'Z06i':
+        gmpes = [ZhaoEtAl2006SInter()]
+        wts = [1.0]
+    elif args.gmpe == 'AM09':
+        gmpes = [AtkinsonMacias2009()]
+        wts = [1.0]
+    elif args.gmpe == 'BCH15i':
+        gmpes = [AbrahamsonEtAl2015SInter()]
+        wts = [1.0]
+    elif args.gmpe == 'AB03sg':
+        gmpes = [AtkinsonBoore2003SSlab()]
+        wts = [1.0]
+    elif args.gmpe == 'AB03sc':
+        gmpes = [AtkinsonBoore2003SSlabCascadia()]
+        wts = [1.0]
+    elif args.gmpe == 'Z06s':
+        gmpes = [ZhaoEtAl2006SSlab()]
+        wts = [1.0]
+    elif args.gmpe == 'BCH15s':
+        gmpes = [AbrahamsonEtAl2015SSlab()]
+        wts = [1.0]
+    else:
+        raise Exception('Specified an unsupported GMPE.')
     #----------------------------------------
     # Make source instance and compute extent
     #----------------------------------------
@@ -201,15 +336,21 @@ def main(args):
     
     # Adjust number of cells
     res = args.res
-    ncell = (np.round(lonspan/res) + 1)*(np.round(latspan/res) + 1)
-    while ncell > 500000:
-        res = res * 2
-        ncell = (np.round(lonspan/res) + 1)*(np.round(latspan/res) + 1)
+    nx = np.floor(lonspan/res) + 1
+    ny = np.floor(latspan/res) + 1
+    ncell = nx * ny
+    nmax = args.max
+    if ncell > nmax:
+        res = (-(latspan + lonspan) - \
+              np.sqrt(latspan**2 + lonspan**2 + 2*latspan*lonspan*(2*nmax-1)))/\
+              (2*(1-nmax))
+        warnings.warn('resolution adjusted due to max number of cells allowed.')
+        nx = np.floor(lonspan/res) + 1
+        ny = np.floor(latspan/res) + 1
+        ncell = nx * ny
     
     # buffer to increase grid so that it doesn't barf when sent to ShakeMap
     buf = 2*res
-    smdx = res
-    smdy = res
     west = lon_mid - lonspan / 2.0 - buf
     east = lon_mid + lonspan / 2.0 + buf
     north = lat_mid + latspan / 2.0 + buf
@@ -220,7 +361,11 @@ def main(args):
     lonoff = lon_mid - hlon # move map east
     
     # Geodictionary for this ShakeMap
-    smdict = GeoDict.createDictFromBox(west, east, south, north, res, res)
+    tmpdict = {'xmin':west,'xmax':east,
+               'ymin':south,'ymax':north,
+               'dx':res,'dy':res,
+               'nx':nx,'ny':ny}
+    smdict = GeoDict(tmpdict, adjust = 'res')
      
     #---------------------
     # Make rupture context
@@ -269,8 +414,7 @@ def main(args):
     
     # Compute distances and site parameters on mesh. 
     dist = Distance(gmpes, source, lat, lon, dep)
-    dctx = dist.getDistanceContext()
-    
+    dctx = dist.getDistanceContext()    
     # Sites context
     sites = SitesContext()
     sites.vs30 = vs30grid._data
@@ -411,8 +555,15 @@ def main(args):
         # MMI - get from PGV
         gmice = WGRW12()
         tmp_pgv = np.reshape(nshmp['pgv']['mean'], (-1,))
+        
+        # Use rrup if available, otherwise rhypo
+        if hasattr(dctx, 'rrup'):
+            dist4gmice = dctx.rrup
+        else:
+            dist4gmice = dctx.rhypo
+        
         mmi = gmice.getMIfromGM(np.exp(tmp_pgv), 'PGV', 
-                                dists = dctx.rrup, 
+                                dists = dist4gmice, 
                                 mag = rupt.mag)
         GM2MIsd = gmice.getGM2MIsd()['pgv'] # in 'intensity' units
         c = WGRW12._WGRW12__constants['pgv']
@@ -436,26 +587,31 @@ def main(args):
 
 
 
-
-
-
-
-
-
 if __name__ == '__main__':
     desc = '''
     Create the ShakeMap *_estimates.grd and *_sd.grd files. Requires an input 
     directory with event.xml and fault files; the inputs should be created by
     the 'mkinputdir' script or similar. 
+
+    Note that GMPE sets besides NSHMP14acr are likely to cause errors. 
     '''
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-e','--event', help = 'Specifies the id of the event to process.')
     parser.add_argument('-v','--vs30', help = 'Specifies the path to the Vs30 grid to use.')
     parser.add_argument('-g','--gmpe', help = 'Select GMPE(s).',
-                        choices=['NSHMP14acr', 'NSHMP14scr', 'NSHMPsub_inter', 'NSHMPsub_intra'],
+                        choices=['NSHMP14acr', 'NSHMP14scr_rlme', 'NSHMP14scr_grd', 
+                                 'NSHMPsub_i', 'NSHMPsub_s',
+                                 'ASK14', 'BSSA14', 'CB14', 'CY14',
+                                 'F96', 'T02', 'S02', 'C03', 'TP05', 'AB06p', 'P11', 'A08p', 'S01', 
+                                 'AB03ig', 'Z06i', 'BCH15i',
+                                 'AB03sg', 'AB03sc', 'Z06s', 'BCH15s'],
                         default = 'NSHMP14acr')
     parser.add_argument('-r','--res', help = 'The resolution in decimal degrees; default is 30/60/60.',
                         default = 30/60/60, type = float)
+    parser.add_argument('-m','--max', help = 'Maximum number of cells allowed; '\
+                        'resolution is adjusted to ensure this number is not exceeded; '\
+                        'default is 500,000.',
+                        default = 500000, type = int)
     shakehome = os.path.join(os.path.expanduser('~'),'ShakeMap')
     parser.add_argument('-s','--shakehome', help='the location of ShakeMap install; default is %s.' % shakehome)
     args = parser.parse_args()
