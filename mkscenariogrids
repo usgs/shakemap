@@ -60,8 +60,8 @@ from shakemap.grind.distance import Distance
 from shakemap.grind.sites import Sites
 from shakemap.utils.timeutils import ShakeDateTime
 from shakemap.directivity.rowshandel2013 import Rowshandel2013
-from shakemap.grind.BeyerBommer2006 import ampIMCtoIMC, sigmaIMCtoIMC
 from shakemap.gmice.wgrw12 import WGRW12 
+import shakemap.gmpe.multigmpe as mg
 
 
 #----------------------------------------------------
@@ -445,11 +445,10 @@ def main(args):
     # Intensity measure calculation
     #----------------------------------------------------
     
-    # Make a dictionary to store information for the weighted means.
-    # The means are meant to match the NSHMP 2014 weights as closely
-    # as possible.
+    # Make a dictionary to store intensity measure(s) and
+    # their sigmas. 
     
-    nshmp = {'pga':{'mean':np.zeros(orig_shape), 'sigma':np.zeros(orig_shape)}, 
+    imdict = {'pga':{'mean':np.zeros(orig_shape), 'sigma':np.zeros(orig_shape)}, 
              'pgv':{'mean':np.zeros(orig_shape), 'sigma':np.zeros(orig_shape)}, 
              'psa03':{'mean':np.zeros(orig_shape), 'sigma':np.zeros(orig_shape)}, 
              'psa10':{'mean':np.zeros(orig_shape), 'sigma':np.zeros(orig_shape)}, 
@@ -472,41 +471,13 @@ def main(args):
         iimt = imt.from_string(val)
         
         # Note that the output is in units of ln(g), whereas ShakeMap wants %g
-        tmplnmu = np.zeros_like(sites.vs30)
-        tmplnsd2 = np.zeros_like(sites.vs30)
-        lmean = [None]*len(gmpes)
-        lsd = [None]*len(gmpes)
-        for i in range(len(gmpes)):
-            gmpe = gmpes[i]
-            # Need to select the appropriate z1pt0 value for different GMPEs.
-            # Note that these are required site parameters, so even though
-            # OQ has these equations built into the class, the arrays must
-            # be provided in the sites context. It might be worth sending
-            # a request to OQ to provide a subclass that that computes the
-            # depth parameters when not provided (as is done for BSSA14 but
-            # not the others). 
-            if gmpe == 'AbrahamsonEtAl2014()':
-                sites.z1pt0 = sites.z1pt0ask14
-            if gmpe == 'BooreEtAl2014()' or gmpe == 'ChiouYoungs2014()':
-                sites.z1pt0 = sites.z1pt0cy14
-            lmean[i], lsd[i] = gmpe.get_mean_and_stddevs(
-                sites, rupt, dctx, iimt, stddev_types)
-            
-            # Convert from RotD50 to peak component
-            # Note: conversion is based on linear amps (not log)!!
-            inc_in = const.IMC.RotD50
-            inc_out = const.IMC.GREATER_OF_TWO_HORIZONTAL            
-            lmean[i] = np.log(ampIMCtoIMC(np.exp(lmean[i]), inc_in, inc_out, iimt))
-            lsd[i] = np.log(sigmaIMCtoIMC(np.exp(lsd[i]), inc_in, inc_out, iimt))
-            
-            # Compute weighted mean and sd
-            tmplnmu = tmplnmu + wts[i] * lmean[i]
-            tmplnsd2 = tmplnsd2 + wts[i] * (lmean[i]**2 + lsd[i]**2)
-        tmplnsd2 = tmplnsd2 - tmplnmu**2
+        mgmpe = mg.multigmpe.fromList(gmpes, wts)
+        lnmu,lnsd = mgmpe.get_mean_and_stddevs(
+            sites, rupt, dctx, iimt, stddev_types)
         
         # Reshape the result: 
-        tmplnmu = np.reshape(tmplnmu, orig_shape)
-        tmplnsd2 = np.reshape(tmplnsd2, orig_shape)
+        lnmu = np.reshape(lnmu, orig_shape)
+        lnsd = np.reshape(lnsd, orig_shape)
         
         # Handle directivity factors
         # NOTE: currently, the Rowshandel model does not provide
@@ -522,26 +493,24 @@ def main(args):
                 # no directivity for pga and psa03
                 fd = 0
             
-            tmplnmu = tmplnmu + nshmp[key]['sigma'] + fd
-        else:
-            tmplnmu = tmplnmu + nshmp[key]['sigma']
+            lnmu = lnmu + fd
         
         # Put into intensity measure dictionary
-        nshmp[key]['mean'] = tmplnmu
-        nshmp[key]['sigma'] = np.sqrt(tmplnsd2)
-                
+        imdict[key]['mean'] = lnmu
+        imdict[key]['sigma'] = lnsd
+        
         #----------------------------------------------------
         # Write files
         #----------------------------------------------------
         
         # Loop over intensity dictionary (PGA PGV, PSA03, PSA10, PSA30)
-        for key,val in nshmp.items():
+        for key,val in imdict.items():
             if key != 'pgv':
-                mgrid = GMTGrid(100*np.exp(nshmp[key]['mean']), smdict)
-                sgrid = GMTGrid(nshmp[key]['sigma'], smdict)
+                mgrid = GMTGrid(100*np.exp(imdict[key]['mean']), smdict)
+                sgrid = GMTGrid(imdict[key]['sigma'], smdict)
             else:
-                mgrid = GMTGrid(np.exp(nshmp[key]['mean']), smdict)
-                sgrid = GMTGrid(nshmp[key]['sigma'], smdict)
+                mgrid = GMTGrid(np.exp(imdict[key]['mean']), smdict)
+                sgrid = GMTGrid(imdict[key]['sigma'], smdict)
             mgrid.save(os.path.join(input_dir, key + '_estimates.grd'))
             sgrid.save(os.path.join(input_dir, key + '_sd.grd'))
             
@@ -554,7 +523,7 @@ def main(args):
             
         # MMI - get from PGV
         gmice = WGRW12()
-        tmp_pgv = np.reshape(nshmp['pgv']['mean'], (-1,))
+        tmp_pgv = np.reshape(imdict['pgv']['mean'], (-1,))
         
         # Use rrup if available, otherwise rhypo
         if hasattr(dctx, 'rrup'):
@@ -574,7 +543,7 @@ def main(args):
         dmmi_damp[idx] = c['C2'] 
         idx = lamps >= c['T1']
         dmmi_damp[idx] = c['C4'] 
-        amp_sd = np.reshape(nshmp['pgv']['sigma'], (-1,)) / np.log(10) # convert to log10
+        amp_sd = np.reshape(imdict['pgv']['sigma'], (-1,)) / np.log(10) # convert to log10
         additional_var = dmmi_damp**2 * (amp_sd**2)
         mmi_sd = np.sqrt(GM2MIsd**2 + additional_var)
         mmi = np.reshape(mmi, orig_shape)
