@@ -470,8 +470,7 @@ def main(args):
     for key,val in imt_dict.items():
         iimt = imt.from_string(val)
         
-        # Note that the output is in units of ln(g), whereas ShakeMap wants %g
-        mgmpe = mg.multigmpe.fromList(gmpes, wts)
+        mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
         lnmu,lnsd = mgmpe.get_mean_and_stddevs(
             sites, rupt, dctx, iimt, stddev_types)
         
@@ -506,6 +505,8 @@ def main(args):
         # Loop over intensity dictionary (PGA PGV, PSA03, PSA10, PSA30)
         for key,val in imdict.items():
             if key != 'pgv':
+                # Note that the output is in units of ln(g), whereas
+                # ShakeMap wants %g
                 mgrid = GMTGrid(100*np.exp(imdict[key]['mean']), smdict)
                 sgrid = GMTGrid(imdict[key]['sigma'], smdict)
             else:
@@ -542,8 +543,9 @@ def main(args):
         idx = (lamps >= c2['T1']) & (lamps < c['T1'])
         dmmi_damp[idx] = c['C2'] 
         idx = lamps >= c['T1']
-        dmmi_damp[idx] = c['C4'] 
-        amp_sd = np.reshape(imdict['pgv']['sigma'], (-1,)) / np.log(10) # convert to log10
+        dmmi_damp[idx] = c['C4']
+        # convert to log10
+        amp_sd = np.reshape(imdict['pgv']['sigma'], (-1,)) / np.log(10)
         additional_var = dmmi_damp**2 * (amp_sd**2)
         mmi_sd = np.sqrt(GM2MIsd**2 + additional_var)
         mmi = np.reshape(mmi, orig_shape)
@@ -562,27 +564,31 @@ if __name__ == '__main__':
     directory with event.xml and fault files; the inputs should be created by
     the 'mkinputdir' script or similar. 
 
-    Note that GMPE sets besides NSHMP14acr are likely to cause errors. 
+    Currently any GMPE set besides NSHMP14acr (or any combination of its 
+    constituent GMPEs) is likely to cause errors. 
     '''
     parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('-e','--event', help = 'Specifies the id of the event to process.')
-    parser.add_argument('-v','--vs30', help = 'Specifies the path to the Vs30 grid to use.')
-    parser.add_argument('-g','--gmpe', help = 'Select GMPE(s).',
-                        choices=['NSHMP14acr', 'NSHMP14scr_rlme', 'NSHMP14scr_grd', 
-                                 'NSHMPsub_i', 'NSHMPsub_s',
-                                 'ASK14', 'BSSA14', 'CB14', 'CY14',
-                                 'F96', 'T02', 'S02', 'C03', 'TP05', 'AB06p', 'P11', 'A08p', 'S01', 
-                                 'AB03ig', 'Z06i', 'BCH15i',
-                                 'AB03sg', 'AB03sc', 'Z06s', 'BCH15s'],
-                        default = 'NSHMP14acr')
-    parser.add_argument('-r','--res', help = 'The resolution in decimal degrees; default is 30/60/60.',
-                        default = 30/60/60, type = float)
-    parser.add_argument('-m','--max', help = 'Maximum number of cells allowed; '\
-                        'resolution is adjusted to ensure this number is not exceeded; '\
-                        'default is 500,000.',
-                        default = 500000, type = int)
+    parser.add_argument('-e','--event',
+        help = 'Specifies the id of the event to process.')
+    parser.add_argument('-v','--vs30',
+        help = 'Specifies the path to the Vs30 grid to use.')
+    parser.add_argument('-g','--gmpe', default = 'NSHMP14acr',        
+        help = 'Select GMPE(s).', 
+        choices=['NSHMP14acr', 'NSHMP14scr_rlme', 'NSHMP14scr_grd', 
+                 'NSHMPsub_i', 'NSHMPsub_s',
+                 'ASK14', 'BSSA14', 'CB14', 'CY14',
+                 'F96', 'T02', 'S02', 'C03', 'TP05', 'AB06p', 'P11', 'A08p', 'S01', 
+                 'AB03ig', 'Z06i', 'BCH15i',
+                 'AB03sg', 'AB03sc', 'Z06s', 'BCH15s'])
+    parser.add_argument('-r','--res', default = 30/60/60, type = float, 
+        help = 'The resolution in decimal degrees; default is 30/60/60.')
+    parser.add_argument('-m','--max', default = 500000, type = int,
+        help = 'Maximum number of cells allowed; '\
+               'resolution is adjusted to ensure this number is not exceeded; '\
+               'default is 500,000.')
     shakehome = os.path.join(os.path.expanduser('~'),'ShakeMap')
-    parser.add_argument('-s','--shakehome', help='the location of ShakeMap install; default is %s.' % shakehome)
+    parser.add_argument('-s','--shakehome',
+        help='the location of ShakeMap install; default is %s.' % shakehome)
     args = parser.parse_args()
     main(args)
 
