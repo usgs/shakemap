@@ -7,9 +7,12 @@ from openquake.hazardlib import const
 
 from shakemap.grind.BeyerBommer2006 import ampIMCtoIMC, sigmaIMCtoIMC
 
-class multigmpe(GMPE):
+class MultiGMPE(GMPE):
     """
     Implements a GMPE that is the combination of multiple GMPEs. 
+    TODO: 
+        * convert IMT (e.g., PGV) from another IMT if it is not available from 
+          the GMPE in get_mean_and_stddevs. 
     """
     
     DEFINED_FOR_TECTONIC_REGION_TYPE = None
@@ -56,14 +59,23 @@ class multigmpe(GMPE):
         return lnmu, np.sqrt(lnsd2)
     
     @classmethod
-    def fromList(cls, GMPEs, weights):
+    def from_list(cls, GMPEs, weights):
         """
         multigmpe constructor.
         :param GMPEs:
-            List of OpenQuake GMPEs. 
+            List of OpenQuake GMPE instances. 
         :param weights: 
             List of weights. 
         """
+        # Check that weights sum to 1.0:
+        if np.sum(weights) != 1.0:
+            raise Exception('Weights must sum to one.')
+        
+        # Check that GMPEs is a list of OQ GMPE instances
+        for g in GMPEs:
+            if not isinstance(g, GMPE):
+                raise Exception("\"%s\" is not a GMPE instance." %g)
+        
         self = cls()
         self.GMPEs = GMPEs
         self.weights = weights
