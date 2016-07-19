@@ -5,9 +5,10 @@ install:
 #    - curl -O https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
 #    - sh Miniconda-latest-Linux-x86_64.sh -b
     - pip install conda
+    - conda -V
     - conda install --yes --channel conda-forge numpy 
     - conda install --yes --channel conda-forge scipy 
-    - conda install --yes --channel conda-forge matplotlib 
+#    - conda install --yes --channel conda-forge matplotlib 
 #    - conda install --yes --channel conda-forge jupyter 
     - conda install --yes --channel conda-forge rasterio 
     - conda install --yes --channel conda-forge fiona 
