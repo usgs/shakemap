@@ -1,12 +1,14 @@
 from distutils.core import setup
 import os.path
+import versioneer
 
 setup(name='shakemap',
-      version='0.1dev',
+      version=versioneer.get_version(),
+      cmdclass=versioneer.get_cmdclass(),
       description='USGS Near-Real-Time Ground Motion Mapping',
-      author='Bruce Worden, Mike Hearne',
-      author_email='cbworden@usgs.gov,mhearne@usgs.gov',
-      url='',
+      author='Bruce Worden, Mike Hearne, Eric Thompson',
+      author_email='cbworden@usgs.gov,mhearne@usgs.gov,emthompson@usgs.gov',
+      url='http://github.com/usgs/shakemap',
       packages=['shakemap','shakemap.gmpe','shakemap.grind','shakemap.genex',
                 'shakemap.mapping','shakemap.utils','shakemap.correlation',
                 'shakemap.gmice','shakemap.directivity'],

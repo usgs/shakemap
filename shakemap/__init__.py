@@ -1,3 +1,6 @@
 __all__ = ["correlation", "gmice", "gmpe","grind","mapping","genex","utils","directivity","transfer"]
-__version__ = ''
 
+
+from ._version import get_versions
+__version__ = get_versions()['']
+del get_versions
