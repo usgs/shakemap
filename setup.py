@@ -2,6 +2,7 @@ from distutils.core import setup
 import os.path
 import versioneer
 
+
 setup(name='shakemap',
       version=versioneer.get_version(),
       cmdclass=versioneer.get_cmdclass(),
