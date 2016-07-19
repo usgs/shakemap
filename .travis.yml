@@ -33,7 +33,9 @@ install:
     - pip -v install git+git://github.com/gem/oq-hazardlib.git
     - pip -v install git+git://github.com/usgs/neicio.git
     - pip install git+git://github.com/usgs/MapIO.git
-    - pip install .
+#    - pip install .
+    - python sestup.py install
 script:
-    - nosetests
+    - flake8 shakemap
+#    - nosetests
     
