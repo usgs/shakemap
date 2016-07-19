@@ -33,6 +33,7 @@ install:
     - pip -v install git+git://github.com/gem/oq-hazardlib.git
     - pip -v install git+git://github.com/usgs/neicio.git
     - pip install git+git://github.com/usgs/MapIO.git
+    - pip install flake8
 #    - pip install .
     - python setup.py install
 script:
