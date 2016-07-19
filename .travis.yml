@@ -2,6 +2,8 @@ language: python
 python:
     - "3.5"
 install: 
+    - curl -O https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
+    - /bin/sh Miniconda-latest-Linux-x86_64.sh
     - conda install --yes --channel conda-forge numpy scipy matplotlib jupyter rasterio fiona xlrd pandas basemap basemap-data-hires shapely h5py basemap-data-hires gdal==1.11.4 descartes 
     - pip -v install git+git://github.com/gem/oq-hazardlib.git
     - pip -v install git+git://github.com/usgs/neicio.git
