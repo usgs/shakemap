@@ -50,7 +50,9 @@ class NewmarkHall1982(object):
 class BommerAlarcon2006(object):
     
     """
-    Class for conversion between PGA and PSA10 by Beyer and Bommer (2006)
+    Class for conversion between PGA and PSA10 by Beyer and Bommer (2006).
+
+    Comments for testing.
     """
     
     __vfact = 20.0 * 9.81
@@ -71,7 +73,7 @@ class BommerAlarcon2006(object):
     def psa102pgv(cls,psa10):
         """
         Convert PSA10 in g to PGV cm/s.
-        ** PSA10 must be linear units **
+        ** PSA10 must be linear units. **
         :param psa10:
             Numpy array or float of PSA10 values; linear units.
         : returns:
