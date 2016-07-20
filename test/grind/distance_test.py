@@ -242,10 +242,3 @@ def test_chichi():
              [dctx.rx.min(), dctx.rx.max()], 'b');
     plt.savefig('Chi-Chi_Rx.png')
 
-if __name__ == '__main__':
-    test_repi()
-    test_rhypo()
-    test_rrup()
-    test_rjb()
-    test_rx()
-    test_chichi()
