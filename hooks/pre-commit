@@ -1,9 +1,9 @@
 #!/bin/sh
 
-version=`git describe --long | awk -F- '{print $1"."$2}'`
+#version=`git describe --long | awk -F- '{print $1"."$2}'`
 
-sed -i.bak "s/'.*'/'${version}'/g" shakemap/__init__.py
-rm shakemap/*.bak
-git add shakemap/__init__.py
+#sed -i.bak "s/'.*'/'${version}'/g" shakemap/__init__.py
+#rm shakemap/*.bak
+#git add shakemap/__init__.py
 
 
