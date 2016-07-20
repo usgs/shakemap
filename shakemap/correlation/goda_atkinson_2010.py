@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class GodaAtkinson2010(object):
     def getSpatialCorrelation(self, dists, imt):
         """
@@ -49,7 +50,8 @@ class GodaAtkinson2010(object):
                 beta  = 0.741
                 gamma = 1.201
             else:
-                # Here we use the average values because we don't have terms for this period
+                # Here we use the average values because we don't have terms for
+                # this period
                 alpha = 0.054
                 beta  = 0.319
                 gamma = 5.0
@@ -59,5 +61,6 @@ class GodaAtkinson2010(object):
             beta  = 0.319
             gamma = 5.0
             pass
-        return np.sqrt(1.0 - np.max(gamma * np.exp(-1.0 * alpha * np.power(dists, beta)) - gamma + 1, 0))
+        return np.sqrt(1.0 - np.max(gamma *
+            np.exp(-1.0 * alpha * np.power(dists, beta)) - gamma + 1, 0))
 
