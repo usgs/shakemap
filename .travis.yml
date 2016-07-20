@@ -1,0 +1,42 @@
+language: python
+python:
+    - "3.5"
+    
+install:
+    - sudo apt-get update
+#    - curl -O https://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh
+#    - sh Miniconda-latest-Linux-x86_64.sh -b
+#    - pip install conda
+#    - conda -V
+    - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - hash -r
+    - conda config --set always_yes yes --set changeps1 no
+    - conda update -q conda
+    - conda info -a
+    - conda install --yes --channel conda-forge numpy 
+    - conda install --yes --channel conda-forge scipy 
+#    - conda install --yes --channel conda-forge matplotlib 
+#    - conda install --yes --channel conda-forge jupyter 
+    - conda install --yes --channel conda-forge rasterio 
+    - conda install --yes --channel conda-forge fiona 
+    - conda install --yes --channel conda-forge xlrd 
+    - conda install --yes --channel conda-forge pandas 
+    - conda install --yes --channel conda-forge basemap 
+    - conda install --yes --channel conda-forge basemap-data-hires 
+    - conda install --yes --channel conda-forge shapely 
+    - conda install --yes --channel conda-forge h5py 
+    - conda install --yes --channel conda-forge basemap-data-hires 
+    - conda install --yes --channel conda-forge gdal==1.11.4 
+    - conda install --yes --channel conda-forge descartes 
+    - pip -v install git+git://github.com/gem/oq-hazardlib.git
+    - pip -v install git+git://github.com/usgs/neicio.git
+    - pip install git+git://github.com/usgs/MapIO.git
+    - pip install flake8
+#    - pip install .
+    - python setup.py install
+script:
+    - flake8 shakemap
+#    - nosetests
+    
