@@ -25,10 +25,21 @@ from shakemap.utils.exception import ShakeMapException
 from shakemap.grind.station import StationList
 from shakemap.grind.source import Source
 
-def test(stationfile,xmlfile,eventdict):
+def test():
+
     tmp,dbfile = tempfile.mkstemp()
     os.close(tmp)
     os.remove(dbfile)
+    
+    homedir = os.path.dirname(os.path.abspath(__file__))
+    xmlfile = os.path.abspath(os.path.join(homedir,'..','data','eventdata',
+                                           'northridge','northridge_stations.xml'))
+    stationfile = os.path.abspath(os.path.join(homedir,'..','data','eventdata',
+                                               'northridge','northridge_stations.db'))
+    eventdict = {'lat':34.213,'lon':-118.537,'depth':18.2,
+                 'mag':6.7,'time':datetime(1994,1,17,12,30,55),
+                 'mech':'ALL','dip':45,'rake':90}
+
     try:
         print('Testing load from XML format...')
         t1 = time.time()
@@ -80,17 +91,4 @@ def test(stationfile,xmlfile,eventdict):
         print('Error caught: %s' % str(msg))
     if os.path.isfile(dbfile):
         os.remove(dbfile)
-    
-    
-
-if __name__ == '__main__':
-    homedir = os.path.dirname(os.path.abspath(__file__))
-    xmlfile = os.path.abspath(os.path.join(homedir,'..','data','eventdata','northridge','northridge_stations.xml'))
-    dbfile = os.path.abspath(os.path.join(homedir,'..','data','eventdata','northridge','northridge_stations.db'))
-    eventdict = {'lat':34.213,'lon':-118.537,'depth':18.2,
-                 'mag':6.7,'time':datetime(1994,1,17,12,30,55),
-                 'mech':'ALL','dip':45,'rake':90}
-    test(dbfile,xmlfile,eventdict)
-    
-    
     

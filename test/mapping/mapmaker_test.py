@@ -29,9 +29,24 @@ from shakemap.grind.station import StationList
 from shakemap.grind.fault import Fault
 from shakemap.grind.source import Source
 
-def test_intensity(shakefile,topofile,coastfile,oceanfile,lakefile,
-                   countryfile,statefile,roadfile,stationfile,faultfile,cityfile,
-                   shakecpt,contourcpt):
+def test_intensity():
+
+    homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
+    datadir = os.path.abspath(os.path.join(homedir,'..','data','eventdata','northridge'))
+    shakefile = os.path.join(datadir,'northridge_grid.xml')
+    topofile = os.path.join(datadir,'northridge_topo.grd')
+    faultfile = os.path.join(datadir,'northridge_fault.txt')
+    cityfile = os.path.join(datadir,'northridge_cities.txt')
+    coastfile = os.path.join(datadir,'northridge_coastline.json')
+    countryfile = os.path.join(datadir,'northridge_countries.json')
+    statefile = os.path.join(datadir,'northridge_states.json')
+    lakefile = os.path.join(datadir,'northridge_lakes.json')
+    oceanfile = os.path.join(datadir,'northridge_ocean.json')
+    stationfile = os.path.join(datadir,'northridge_stations.db')
+    roadfile = os.path.join(datadir,'northridge_roads.json')
+    tancptfile = os.path.join(homedir,'..','..','shakemap','mapping','tan.cpt')
+    shakecptfile = os.path.join(homedir,'..','..','shakemap','mapping','shakecpt.cpt')
+
     layerdict = {'coast':coastfile,
                  'ocean':oceanfile,
                  'lake':lakefile,
@@ -39,8 +54,8 @@ def test_intensity(shakefile,topofile,coastfile,oceanfile,lakefile,
                  'roads':roadfile,
                  'state':statefile}
     
-    tancolormap = GMTColorMap.loadFromCPT(contourcpt)
-    shakecolormap = GMTColorMap.loadFromCPT(shakecpt)
+    tancolormap = GMTColorMap.loadFromCPT(tancptfile)
+    shakecolormap = GMTColorMap.loadFromCPT(shakecptfile)
     cities = BasemapCities.loadFromCSV(cityfile)
     shakemap = ShakeGrid.load(shakefile,adjust='res')
     stations = StationList(stationfile)
@@ -89,24 +104,3 @@ def test_intensity(shakefile,topofile,coastfile,oceanfile,lakefile,
     contour_psa30_map = maker.drawContourMap(outfolder)
     print('PSA3.0 contour map saved as: %s' % contour_psa30_map)
     
-    
-if __name__ == '__main__':
-    homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-    datadir = os.path.abspath(os.path.join(homedir,'..','data','eventdata','northridge'))
-    shakefile = os.path.join(datadir,'northridge_grid.xml')
-    topofile = os.path.join(datadir,'northridge_topo.grd')
-    faultfile = os.path.join(datadir,'northridge_fault.txt')
-    cityfile = os.path.join(datadir,'northridge_cities.txt')
-    coastfile = os.path.join(datadir,'northridge_coastline.json')
-    countryfile = os.path.join(datadir,'northridge_countries.json')
-    statefile = os.path.join(datadir,'northridge_states.json')
-    lakefile = os.path.join(datadir,'northridge_lakes.json')
-    oceanfile = os.path.join(datadir,'northridge_ocean.json')
-    stationfile = os.path.join(datadir,'northridge_stations.db')
-    roadfile = os.path.join(datadir,'northridge_roads.json')
-    tancptfile = os.path.join(homedir,'..','..','shakemap','mapping','tan.cpt')
-    shakecptfile = os.path.join(homedir,'..','..','shakemap','mapping','shakecpt.cpt')
-    
-    test_intensity(shakefile,topofile,coastfile,oceanfile,lakefile,
-                   countryfile,statefile,roadfile,stationfile,
-                   faultfile,cityfile,shakecptfile,tancptfile)
