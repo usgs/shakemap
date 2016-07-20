@@ -2,5 +2,5 @@ __all__ = ["correlation", "gmice", "gmpe","grind","mapping","genex","utils","dir
 
 
 from ._version import get_versions
-__version__ = get_versions()['v0.3.9']
+__version__ = get_versions()['v0.3.11']
 del get_versions
