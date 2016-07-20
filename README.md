@@ -25,7 +25,7 @@ The manual includes an both a Technical Guide and and User's Guide. Installation
 instructions can be found in the chapter titled Software & Implementation Guide. 
 
 This repository hosts the ShakeMap V3.5 manual and is
-also is where we refactoring the code base into Python. The core ShakeMap code,
+also where we refactoring the code base into Python. The core ShakeMap code,
 approaching fifteen years old, was overdue for a major overhaul to more
 organically incorporate (or eliminate) the many extensions that had been added
 over its lifetime, and to facilitate several new demands from ShakeMap’s
