@@ -8,11 +8,12 @@ from openquake.hazardlib import const
 from shakemap.grind.BeyerBommer2006 import ampIMCtoIMC, sigmaIMCtoIMC
 
 class MultiGMPE(GMPE):
-    """
-    Implements a GMPE that is the combination of multiple GMPEs. 
+    """Implements a GMPE that is the combination of multiple GMPEs. 
     TODO: 
-        * convert IMT (e.g., PGV) from another IMT if it is not available from 
+
+       * convert IMT (e.g., PGV) from another IMT if it is not available from 
           the GMPE in get_mean_and_stddevs. 
+          
     """
     
     DEFINED_FOR_TECTONIC_REGION_TYPE = None
@@ -60,8 +61,8 @@ class MultiGMPE(GMPE):
     
     @classmethod
     def from_list(cls, GMPEs, weights):
-        """
-        multigmpe constructor.
+        """Construct a MultiGMPE from lists of GMPEs and weights.
+
         :param GMPEs:
             List of OpenQuake GMPE instances. 
         :param weights: 

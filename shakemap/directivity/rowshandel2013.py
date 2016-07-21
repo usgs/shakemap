@@ -116,9 +116,11 @@ class Rowshandel2013(object):
     @classmethod
     def fromSites(cls, source, sites, dx, T, a_weight = 0.5,
                   mtype = 1, simpleDT = False, centered = True):
-        """
+        """Construct a rowshandel2013 instance from a sites instance.
+
         Class method for constructing a rowshandel2013 instance from 
         a sites instance.
+
         :param source:
             Source instance.
         :param sites: 
@@ -200,13 +202,16 @@ class Rowshandel2013(object):
         
 
     def computeWrup(self):
-        """
+        """Compute the the portion (in km) of the width of the fault which ruptures up-dip from the hypocenter to the top of the fault.
+
         Wrup is the portion (in km) of the width of the fault which 
         ruptures up-dip from the hypocenter to the top of the fault.
-          * This is ambiguous for faults with varible top of rupture (not 
-            allowed in NGA). For now, lets just compute this for the 
-            quad where the hypocenter is located.
-          * Alternative is to compute max Wrup for the different quads. 
+
+        * This is ambiguous for faults with varible top of rupture (not 
+          allowed in NGA). For now, lets just compute this for the 
+          quad where the hypocenter is located.
+        * Alternative is to compute max Wrup for the different quads. 
+        
         """
         nquad = len(self._flt._quadrilaterals)
         

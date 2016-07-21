@@ -6,17 +6,16 @@ from openquake.hazardlib import const
 import numpy as np
 
 class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
-    '''
-    Subclasses GEM OpenQuake Boore-Atkinson 2008 GMPE, but with methods that allow finer-grained
-    access to methods into that GMPE implementation.  Specifically, methods that allow the user to:
-     - apply or un-apply site corrections to a particular site.
-     - get ground motions on bare rock
-     - get the standard deviations for the GMPE
+    '''Subclasses GEM OpenQuake Boore-Atkinson 2008 GMPE, but with methods that allow finer-grained
+       access to methods into that GMPE implementation.  Specifically, methods that allow the user to:
+       
+      - apply or un-apply site corrections to a particular site.
+      - get ground motions on bare rock
+      - get the standard deviations for the GMPE
     '''
 
     def get_site_corrections(self, sites, rup, dists, imt, pgm, forward=True):
-        '''
-        Calculate site corrections for sites on rock (forward=True), OR
+        '''Calculate site corrections for sites on rock (forward=True), OR
         Remove site corrections from data on other substrates.
         '''
         C = self.COEFFS[imt]
@@ -34,8 +33,7 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
         return pgm_corrected
 
     def get_site_corrections_pga(self, sites, rup, dists, imt, pgm, pga4nl, forward=True):
-        '''
-        Calculate site corrections for sites on rock (forward=True), OR
+        '''Calculate site corrections for sites on rock (forward=True), OR
         Remove site corrections from data on other substrates.
         '''
         C = self.COEFFS[imt]
@@ -53,8 +51,7 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
 
 
     def get_amplitudes(self, rup, dists, imt):
-        '''
-        Calculate peak ground motion on rock.
+        '''Calculate peak ground motion on rock.
         '''
         C = self.COEFFS[imt]
         pgmrock = self._compute_magnitude_scaling(rup, C) + \
@@ -63,8 +60,7 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
         return pgmrock
 
     def get_stddevs(self, sites, rup, dists, imt, stddev_type):
-        '''
-        Get standard deviations of GMPE.
+        '''Get standard deviations of GMPE.
         '''
         C = self.COEFFS[imt]
 
@@ -80,8 +76,7 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
         return stddevs
 
     def _get_fault_type_dummy_variables(self, rup):
-        """
-        Override this function to allow for undefined rupture type
+        """Override this function to allow for undefined rupture type
         """
         if rup.rake is None:
             return 1, 0, 0, 0

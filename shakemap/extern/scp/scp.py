@@ -70,8 +70,7 @@ def asunicode_win(s):
 
 
 class SCPClient(object):
-    """
-    An scp1 implementation, compatible with openssh scp.
+    """An scp1 implementation, compatible with openssh scp.
     Raises SCPException for all transport related errors. Local filesystem
     and OS errors pass through.
 
@@ -121,20 +120,15 @@ class SCPClient(object):
 
     def put(self, files, remote_path=b'.',
             recursive=False, preserve_times=False):
-        """
-        Transfer files to remote host.
+        """Transfer files to remote host.
 
-        @param files: A single path, or a list of paths to be transfered.
+        :param files: A single path, or a list of paths to be transfered.
             recursive must be True to transfer directories.
-        @type files: string OR list of strings
-        @param remote_path: path in which to receive the files on the remote
+        :param remote_path: path in which to receive the files on the remote
             host. defaults to '.'
-        @type remote_path: str
-        @param recursive: transfer files and directories recursively
-        @type recursive: bool
-        @param preserve_times: preserve mtime and atime of transfered files
+        :param recursive: boolean transfer files and directories recursively
+        :param preserve_times: boolean preserve mtime and atime of transfered files
             and directories.
-        @type preserve_times: bool
         """
         self.preserve_times = preserve_times
         self.channel = self._open()
@@ -157,20 +151,15 @@ class SCPClient(object):
 
     def get(self, remote_path, local_path='',
             recursive=False, preserve_times=False):
-        """
-        Transfer files from remote host to localhost
+        """Transfer files from remote host to localhost.
 
-        @param remote_path: path to retreive from remote host. since this is
+        :param remote_path: path to retreive from remote host. since this is
             evaluated by scp on the remote host, shell wildcards and
             environment variables may be used.
-        @type remote_path: str
-        @param local_path: path in which to receive files locally
-        @type local_path: str
-        @param recursive: transfer files and directories recursively
-        @type recursive: bool
-        @param preserve_times: preserve mtime and atime of transfered files
+        :param local_path: path in which to receive files locally
+        :param recursive: boolean transfer files and directories recursively
+        :param preserve_times: boolean preserve mtime and atime of transfered files
             and directories.
-        @type preserve_times: bool
         """
         if not isinstance(remote_path, (list, tuple)):
             remote_path = [remote_path]
