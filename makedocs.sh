@@ -17,17 +17,15 @@ PACKAGE="shakemap"
 AUTHORS='Bruce Worden, Eric Thompson, Mike Hearne'
 
 # #clone the repository and cd to it
-# git clone https://github.com/usgs/shakemap.git $CLONE_DIR
-# cd $CLONE_DIR
+git clone https://github.com/mhearne-usgs/shakemap.git $CLONE_DIR
+cd $CLONE_DIR
+
+#clear out everything that's there now
+git rm -rf *
 
 #checkout an orphan branch called gh-pages
-git checkout --orphan gh-pages
+#git checkout --orphan gh-pages
 
-#remove the code that lives there
-#git rm -rf .
-
-
-#echo "sphinx-apidoc -o $SPHINX_DIR -f -l -F -H $PACKAGE -A $AUTHORS -V $VERSION $REPO_DIR"
 #Run the sphinx command that creates the initial set of .rst files, Makefile, and conf.py.
 sphinx-apidoc -o $SPHINX_DIR -f -l -F -H $PACKAGE -A "$AUTHORS" -V $VERSION $REPO_DIR
 
@@ -42,13 +40,16 @@ cd $SPHINX_DIR
 make html
 
 #copy the generated html to the gh-pages repository
-cp $SPHINX_DIR/_build/html/* $REPO_DIR
+
+#mkdir $CLONE_DIR
+cp -R $SPHINX_DIR/_build/html/* $CLONE_DIR
 
 #go to the gh-pages repository, add the new files, commit, and upload to GitHub
-cd $REPO_DIR
-git add .
+cd $CLONE_DIR
+touch $CLONE_DIR/.nojekyll
+git add --all
 git commit -am"Pushing version ${VERSION} to GitHub pages"
-git push -u origin gh-pages
+git push -u origin +gh-pages
 
 #go back to where we started and then clean up.
 rm -rf $SPHINX_DIR
