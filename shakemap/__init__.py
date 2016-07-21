@@ -1,4 +1,4 @@
-__all__ = ["correlation", "gmice", "gmpe","grind","mapping","genex","utils","directivity","transfer"]
+__all__ = ["correlation", "gmice", "gmpe","grind","mapping","genex","utils","directivity","transfer","extern"]
 
 
 from ._version import get_versions
