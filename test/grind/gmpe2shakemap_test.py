@@ -10,7 +10,8 @@ from openquake.hazardlib.gsim.campbell_bozorgnia_2008 import CampbellBozorgnia20
 # Inputs
 sm_amps_in = np.array([0.01, 0.03, 0.1, 0.3])*100.
 gmpe_amps_in = np.log(np.array([0.01, 0.03, 0.1, 0.3]))
-sigma_in = np.array([0.2, 0.3, 0.4, 0.5])
+sigma_in_log = np.array([0.2, 0.3, 0.4, 0.5])
+sigma_in_lin = np.array([1.23372505,  1.36350428,  1.50840426,  1.66936801])
 
 # PGA
 gmpe = FrankelEtAl1996MblgAB1987NSHMP2008()
@@ -25,13 +26,13 @@ np.testing.assert_almost_equal(
     sm_amps_out,
     np.array([1.1,   3.3,  11. ,  33.]))
 
-sigma_out = g2s.sigmaShakeMapToGMPE(sigma_in, gmpe, imt)
+sigma_out = g2s.sigmaShakeMapToGMPE(sigma_in_lin, gmpe, imt)
 np.testing.assert_almost_equal(
     sigma_out,
-    np.array([1.57711868,  1.17934718,  0.8969858 ,  0.67778574]))
+    np.array([0.2, 0.3, 0.4, 0.5]))
 
 
-sigma_out = g2s.sigmaGmpeToShakeMap(sigma_in, gmpe, imt)
+sigma_out = g2s.sigmaGmpeToShakeMap(sigma_in_log, gmpe, imt)
 np.testing.assert_almost_equal(
     sigma_out,
     np.array([1.23372505,  1.36350428,  1.50840426,  1.66936801]))
@@ -50,20 +51,20 @@ np.testing.assert_almost_equal(
     sm_amps_out,
     np.array([ 0.011,  0.033,  0.11 ,  0.33]))
 
-sigma_out = g2s.sigmaShakeMapToGMPE(sigma_in, gmpe, imt)
+sigma_out = g2s.sigmaShakeMapToGMPE(sigma_in_lin, gmpe, imt)
 np.testing.assert_almost_equal(
     sigma_out,
-    np.array([1.57724549,  1.17951676,  0.89720874,  0.67808076]))
+    np.array([ 0.2009975,  0.3006659,  0.4004997,  0.5003998]))
 
 
-sigma_out = g2s.sigmaGmpeToShakeMap(sigma_in, gmpe, imt)
+sigma_out = g2s.sigmaGmpeToShakeMap(sigma_in_log, gmpe, imt)
 np.testing.assert_almost_equal(
     sigma_out,
     np.array([1.23250054,  1.36258854,  1.50764041,  1.66869003]))
 
 # SA
 gmpe = CampbellBozorgnia2008()
-imt  = SA()
+imt  = SA(1.0)
 gmpe_amps_out = g2s.ampShakeMapToGMPE(sm_amps_in, gmpe, imt)
 np.testing.assert_almost_equal(
     gmpe_amps_out,
@@ -74,13 +75,13 @@ np.testing.assert_almost_equal(
     sm_amps_out,
     np.array([ 0.011,  0.033,  0.11 ,  0.33]))
 
-sigma_out = g2s.sigmaShakeMapToGMPE(sigma_in, gmpe, imt)
+sigma_out = g2s.sigmaShakeMapToGMPE(sigma_in_lin, gmpe, imt)
 np.testing.assert_almost_equal(
     sigma_out,
-    np.array([1.57724549,  1.17951676,  0.89720874,  0.67808076]))
+    np.array([0.2, 0.3, 0.4, 0.5]))
 
 
-sigma_out = g2s.sigmaGmpeToShakeMap(sigma_in, gmpe, imt)
+sigma_out = g2s.sigmaGmpeToShakeMap(sigma_in_log, gmpe, imt)
 np.testing.assert_almost_equal(
     sigma_out,
     np.array([1.23250054,  1.36258854,  1.50764041,  1.66869003]))

@@ -3,19 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to the ShakeMap Manual
+ShakeMap V4.0 API Documentation
 ===========================================
 
-.. toctree::
-   :maxdepth: 1
-
-   shake_index.rst
-   apidoc/index.rst
-
-.. Indices and tables
-.. ==================
-
-.. * :ref:`genindex`
-
-.. * :ref:`modindex`
-.. * :ref:`search`
+This is a placeholder for the eventual API docs for ShakeMap 4.0.
