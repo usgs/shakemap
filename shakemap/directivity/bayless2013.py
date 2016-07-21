@@ -6,8 +6,8 @@ import openquake.hazardlib.geo as geo
 import shakemap.grind.fault as fault
 import shakemap.grind.ecef as ecef
 from shakemap.grind.vector import Vector
-from shakemap.grind.distance import getDistance
-from shakemap.grind.distance import dist2_to_segment
+from shakemap.grind.distance import get_distance
+from shakemap.grind.distance import distance_sq_to_segment
 
 
 """
@@ -116,11 +116,11 @@ class Bayless2013(object):
             
             # Compute some genral stuff that is required for all mechanisms
             qlist = [self.flt.Quadrilaterals[self.i]]
-            self.Rrup = np.reshape(getDistance('rrup', self.mesh, qlist),
+            self.Rrup = np.reshape(get_distance('rrup', self.mesh, qlist),
                                    self.sites[0].shape)
-            self.Rx = np.reshape(getDistance('rx', self.mesh, qlist),
+            self.Rx = np.reshape(get_distance('rx', self.mesh, qlist),
                                  self.sites[0].shape)
-            self.Ry = np.reshape(getDistance('ry0', self.mesh, qlist),
+            self.Ry = np.reshape(get_distance('ry0', self.mesh, qlist),
                                  self.sites[0].shape)
             # NOTE: use Rx and Ry to compute Az in 'computeAz'. It is probably
             #       possible to make this a lot faster by avoiding the
@@ -164,15 +164,18 @@ class Bayless2013(object):
                 self.fd = self.fd + self.weights[i]*fdcombined
 
     def setPseudoHypocenters(self):
-        """
+        """ Set a pseudo-hypocenter.
+        
         Adapted from ShakeMap 3.5 src/contour/directivity.c 
+
         From Bayless and Somerville:
-            "Define the pseudo-hypocenter for rupture of successive segments as 
-             the point on the side edge of the fault segment that is closest to 
-             the side edge of the previous segment, and that lies half way 
-             between the top and bottom of the fault. We assume that the fault is
-             segmented along strike, not updip. All geometric parameters are 
-             computed relative to the pseudo-hypocenter."
+
+        "Define the pseudo-hypocenter for rupture of successive segments as 
+        the point on the side edge of the fault segment that is closest to 
+        the side edge of the previous segment, and that lies half way 
+        between the top and bottom of the fault. We assume that the fault is
+        segmented along strike, not updip. All geometric parameters are 
+        computed relative to the pseudo-hypocenter."
         """
         hyp_ecef = Vector.fromPoint(geo.point.Point(
             self.hyp[0], self.hyp[1], self.hyp[2]))
@@ -296,11 +299,13 @@ class Bayless2013(object):
         
 
     def computeD(self, i):
-        """
-        :param i:
-            Compute d for the i-th quad/segment. 
+        """Compute d for the i-th quad/segment. 
+
         Y = d/W, where d is the portion (in km) of the width of the fault which 
         ruptures up-dip from the hypocenter to the top of the fault.
+        
+        :param i:
+            index of segment for which d is to be computed. 
         """
         hyp_ecef = self.phyp[i] # already in ECEF
         hyp_col = np.array([[hyp_ecef.x], [hyp_ecef.y], [hyp_ecef.z]])
