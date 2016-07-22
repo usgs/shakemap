@@ -1,0 +1,113 @@
+#!/usr/bin/env python
+
+import argparse
+import subprocess
+import os.path
+import shutil
+
+#where should .rst files, Makefile, _build folder be written?
+SPHINX_DIR=$HOME/__tmpsphinx
+
+#where should the temporary clone of the shakemap gh-pages repo live?
+CLONE_DIR=$HOME/__tmpshake
+
+#get the human friendly version of the ShakeMap version
+VERSION_CMD='git tag'
+
+#we should already be in the repo folder where the code lives...
+#REPO_DIR=`pwd`
+
+#what is the package called and who are the authors
+PACKAGE="shakemap"
+AUTHORS='Bruce Worden, Eric Thompson, Mike Hearne'
+
+def getCommandOutput(cmd):
+    """
+    Internal method for calling external command.
+    @param cmd: String command ('ls -l', etc.)
+    @return: Three-element tuple containing a boolean indicating success or failure, 
+    the stdout from running the command, and stderr.
+    """
+    proc = subprocess.Popen(cmd,
+                            shell=True,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE
+                            )
+    stdout,stderr = proc.communicate()
+    retcode = proc.returncode
+    if retcode == 0:
+        retcode = True
+    else:
+        retcode = False
+    return (retcode,stdout,stderr)
+
+
+def main(args):
+    #find the make command on this system
+    res,stdout,stderr = getCommandOutput('which make')
+    if not res:
+        print('Could not find the "make" command on your system. Exiting.')
+        sys.exit(1)
+    make_cmd = stdout.strip()
+    
+    #get the git version
+    res,verstr,stderr = getCommandOutput(VERSION_CMD)
+    REPO_DIR = os.getcwd()
+
+    try:
+        #clone the repository
+        clonecmd = 'git clone -b gh-pages https://github.com/mhearne-usgs/shakemap.git %s' % CLONE_DIR
+        res,stdout,stderr = getCommandOutput(clonecmd)
+
+        #remove the current apidocs folder from that repo
+        apidocfolder = os.path.join(CLONE_DIR,'apidoc')
+        sh.rmtree(apidocfolder)
+
+        #run the sphinx api doc command
+        sphinx_cmd = 'sphinx-apidoc -o %s -f -l -F -H %s -A "%s" -V %s %s' % (SPHINX_DIR,PACKAGE,AUTHORS,verstr,REPO_DIR)
+        res,stdout,stderr = getCommandOutput(sphinx_cmd)
+
+        #this has created a conf.py file and a Makefile.  We need to "edit" the conf.py file to include the ReadTheDocs theme.
+        with open(os.path.join(SPHINX_DIR,'conf.py')) as f:
+            f.write("sys.path.insert(0, os.path.abspath('%s'))\n" % (REPO_DIR))
+            f.write("import sphinx_rtd_theme\n")
+            f.write("html_theme = 'sphinx_rtd_theme'\n")
+            f.write("html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]\n")
+
+        #run the make command to generate the HTML
+        os.chdir(SPHINX_DIR)
+        res,stdout,stderr = getCommandOutput('%s html' % make_cmd)
+        if not res:
+            print('Command to create HTML failed.  Exiting.')
+            sys.exit(1)
+
+        if args.post:
+            #copy the generated content to the gh-pages branch we created earlier
+            htmldir = os.path.join(SPHINX_DIR,'_build','html')
+            shutil.copytree(htmldir,apidocfolder)
+
+            #cd to directory above where html content was pushed
+            os.chdir(CLONE_DIR)
+            res,stdout,stderr = getCommandOutput('touch .nojekyll')
+            res1,stdout,stderr = getCommandOutput('git add --all')
+            res2,stdout,stderr = getCommandOutput('git commit -am"Pushing version %s to GitHub pages"' % verstr)
+            res3,stdout,stderr = getCommandOutput('git push -u origin +gh-pages')
+            if res1+res2+res3 < 3:
+                print('Something bad happened when attempting to add, commit, or push gh-pages content to GitHub. Exiting.')
+                sys.exit(1)
+    except:
+        pass
+    finally:
+        shutil.rmtree(CLONE_DIR)
+        shutil.rmtree(SPHINX_DIR)
+    
+
+if __name__ == '__main__':
+    desc = '''Create API documentation for ShakeMap and optionally post HTML output to GitHub.
+    '''
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument('-p','--post', action='store_true', default=False,
+                        help='Post content to the web')
+
+    pargs = parser.parse_args()
+    main(pargs)
