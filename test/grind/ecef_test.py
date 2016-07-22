@@ -14,7 +14,7 @@ sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring 
 
 from shakemap.grind.ecef import latlon2ecef,ecef2latlon
 
-def test():
+def test_ecef():
     print('Testing ECEF conversion code...')
     lat = 32.1
     lon = 118.5
@@ -35,7 +35,3 @@ def test():
     np.testing.assert_almost_equal(lon2,lon,decimal=2)
     np.testing.assert_almost_equal(dep2,dep,decimal=2)
     print('Passed tests of ECEF conversion code.')
-    
-if __name__ == '__main__':
-    test()
-    
