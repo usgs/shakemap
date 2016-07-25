@@ -15,7 +15,8 @@ from shakemap.grind.sites import Sites
 #local imports
 from shakemap.utils.exception import ShakeMapException
         
-def _test(vs30file=None):
+def test_sites():
+    vs30file = None
     print('Testing creation of Sites object with Vs30 file of %s...' % vs30file)
     cx = -118.2
     cy = 34.1
@@ -45,7 +46,5 @@ def _test(vs30file=None):
     print('Passed creation of Sites object with Vs30 file of %s' % vs30file)
 
 if __name__ == '__main__':
-    vs30file = None
-    if len(sys.argv) > 1:
-        vs30file = sys.argv[1]
-    _test(vs30file=vs30file)
+    test_sites()
+

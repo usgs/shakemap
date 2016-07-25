@@ -104,3 +104,6 @@ def test_intensity():
     contour_psa30_map = maker.drawContourMap(outfolder)
     print('PSA3.0 contour map saved as: %s' % contour_psa30_map)
     
+if __name__ == '__main__':
+    test_intensity()
+
