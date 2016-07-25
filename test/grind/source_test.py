@@ -15,7 +15,7 @@ from shakemap.utils.exception import ShakeMapException
 from shakemap.grind.source import Source
 
 #third party
-from openquake.hazardlib.gsim import base,abrahamson_2014
+from openquake.hazardlib.gsim import abrahamson_2014
 from openquake.hazardlib.geo.mesh import Mesh
 import numpy as np
 

@@ -3,7 +3,6 @@
 #stdlib imports
 import os.path
 import sys
-import io
 import tempfile
 import textwrap
 

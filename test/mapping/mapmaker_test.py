@@ -3,10 +3,8 @@
 #stdlib imports
 import os.path
 import sys
-import io
 
 #third party
-import numpy as np
 
 #hack the path so that I can debug these functions if I need to
 homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
@@ -14,15 +12,11 @@ shakedir = os.path.abspath(os.path.join(homedir,'..','..'))
 sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring any installed mapio stuff
 
 from shakemap.mapping.mapmaker import MapMaker
-from shakemap.mapping.sm_colordict import SM_colordict
 from shakemap.mapping.colormap import gmtColormap
 from shakemap.mapping.gmtcolormap import GMTColorMap
 
-from matplotlib.colors import LinearSegmentedColormap
-
 from mapio.basemapcity import BasemapCities
 from mapio.shake import ShakeGrid
-import matplotlib.pyplot as plt
 
 #local imports
 from shakemap.grind.station import StationList

@@ -3,12 +3,10 @@
 #stdlib imports
 import os.path
 import sys
-from collections import OrderedDict
 
 #third party
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import time as time
 
 #hack the path so that I can debug these functions if I need to
@@ -16,17 +14,12 @@ homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
 shakedir = os.path.abspath(os.path.join(homedir,'..'))
 sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring any installed mapio stuff
 
-from shakemap.grind.distance import *
-from shakemap.grind.vector import Vector
+from openquake.hazardlib.geo.utils import get_orthographic_projection
+
 from shakemap.grind.fault import Fault
 from shakemap.utils.timeutils import ShakeDateTime
 from shakemap.grind.source import Source
-
-from openquake.hazardlib.geo.geodetic import npoints_towards
-from openquake.hazardlib.geo.mesh import Mesh
-from openquake.hazardlib.geo.point import Point
-from openquake.hazardlib.geo.utils import get_orthographic_projection
-
+from shakemap.grind.distance import get_distance
 
 def test_chichi():
     # read in fault file
