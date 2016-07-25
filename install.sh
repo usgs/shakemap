@@ -21,7 +21,6 @@ source activate shake
 
 #do pip installs of those things that are not available via conda.
 pip -v install git+git://github.com/gem/oq-hazardlib.git
-#pip -v install git+git://github.com/usgs/neicio.git
 pip install git+git://github.com/usgs/MapIO.git
 pip install sphinx_rtd_theme
 pip install flake8

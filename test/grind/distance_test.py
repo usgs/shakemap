@@ -23,7 +23,7 @@ from shakemap.grind.distance import get_distance
 
 def test_chichi():
     # read in fault file
-    f = 'test/data/0137A.POL'
+    f = os.path.join(shakedir, 'data/0137A.POL')
     i0 = np.arange(0, 9*11*3, 11)
     i1 = i0 + 10
     cs = list(zip(i0, i1))
@@ -63,7 +63,7 @@ def test_chichi():
     source = Source(event, flt)
     
     # Get NGA distances
-    distfile = 'test/data/NGAW2_distances.csv'
+    distfile = os.path.join(shakedir, 'data/NGAW2_distances.csv')
     df = pd.read_csv(distfile)
     df2 = df.loc[df['EQID'] == 137]
     slat = df2['Station Latitude'].as_matrix()

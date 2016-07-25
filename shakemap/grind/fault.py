@@ -526,7 +526,7 @@ class Fault(object):
         return lengths
     
     
-    def getTrapMeanLength(self, p0, p1, p2, p3):
+    def _getTrapMeanLength(self, p0, p1, p2, p3):
         """
         Return the sqrt of the area of a quadrilateral (used for QA of fault plane).
         :param p0: 
@@ -649,7 +649,7 @@ class Fault(object):
         newp2 = p3 + v1
         planepoints = [p0, p1, p2]
         dnormal = self.getDistanceToPlane(planepoints, p2)
-        geometricMean = self.getTrapMeanLength(p0, p1,newp2, p3)
+        geometricMean = self._getTrapMeanLength(p0, p1,newp2, p3)
         if dnormal/geometricMean > OFFPLANE_TOLERANCE:
             raise ShakeMapException('Points in quadrilateral are not co-planar')
         newP0 = p0.toPoint()
