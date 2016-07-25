@@ -12,6 +12,7 @@ sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring 
 #local imports
 from shakemap.grind.sites import Sites
 
+def _test(vs30file=None):
 #local imports
 from shakemap.utils.exception import ShakeMapException
         
@@ -46,5 +47,7 @@ def test_sites():
     print('Passed creation of Sites object with Vs30 file of %s' % vs30file)
 
 if __name__ == '__main__':
-    test_sites()
-
+    vs30file = None
+    if len(sys.argv) > 1:
+        vs30file = sys.argv[1]
+    _test(vs30file=vs30file)

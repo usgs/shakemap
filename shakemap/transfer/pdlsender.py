@@ -14,13 +14,14 @@ import textwrap
 
 #third party
 from Crypto.PublicKey import RSA
-from neicio.cmdoutput import getCommandOutput
 
 #local
 from .sender import Sender
 
 #local imports
 from shakemap.utils.exception import ShakeMapException
+from shakemap.utils.misc import getCommandOutput
+
 
 class PDLSender(Sender):
     pdlcmd = '[JAVA] -jar [JARFILE] --send --status=[STATUS] --source=[PRODUCTSOURCE] --type=[PRODUCTTYPE] --code=[PRODUCTCODE] --eventsource=[EVENTSOURCE] --eventsourcecode=[EVENTSOURCECODE] --privateKey=[KEYFILE]  --configFile=[CONFIGFILE] [FILE] [DIRECTORY]'

@@ -1,45 +1,16 @@
-import sys
-import os.path
-import copy as copy
 import time as time
-from lxml import etree
-import cProfile
-import pstats
 
-import json
-from subprocess import call
-
-from xml.dom import minidom
 import numpy as np
-import random
 
-from openquake.hazardlib import imt
-from openquake.hazardlib import const
-
-from mapio.gmt import GMTGrid
-
-import openquake.hazardlib.gsim as gsim
 import openquake.hazardlib.geo as geo
-from openquake.hazardlib.geo import point
 
-import shakemap.grind.ecef as ecef
-from shakemap.grind.vector import Vector
-from shakemap.grind.distance import get_distance
-from shakemap.grind.distance import calc_rupture_distance
 from shakemap.grind.source import Source
-from shakemap.grind.sites import Sites
-from shakemap.grind.ecef import latlon2ecef
-from shakemap.grind.ecef import ecef2latlon
-import shakemap.grind.station as station
 import shakemap.grind.fault as fault
-
-from shakemap.gmice.wgrw12 import WGRW12 
 from shakemap.directivity.rowshandel2013 import Rowshandel2013 
 from shakemap.utils.timeutils import ShakeDateTime
 
 
 def test_ss3():
-    event_name = 'ss3'
     magnitude = 7.2
     dip = np.array([90])
     rake = 180.0

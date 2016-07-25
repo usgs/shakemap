@@ -3,17 +3,12 @@
 #stdlib modules
 import sys
 import os.path
-from xml.dom import minidom
-import copy
-import pprint
-import io
-import glob
+
 import tempfile
 import time
 from datetime import datetime
 
 #third party modules
-import numpy as np
 
 #hack the path so that I can debug these functions if I need to
 homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
@@ -21,7 +16,6 @@ shakedir = os.path.abspath(os.path.join(homedir,'..','..'))
 sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring any installed shakemap stuff
 
 #local imports
-from shakemap.utils.exception import ShakeMapException
 from shakemap.grind.station import StationList
 from shakemap.grind.source import Source
 

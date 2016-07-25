@@ -4,8 +4,6 @@
 import os.path
 import sys
 import tempfile
-import subprocess
-import sys
 import urllib.request, urllib.error, urllib.parse
 import zipfile
 import shutil
