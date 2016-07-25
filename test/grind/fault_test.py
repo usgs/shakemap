@@ -8,14 +8,17 @@ import io
 #third party
 import numpy as np
 
+import pytest
+
 #hack the path so that I can debug these functions if I need to
 homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
 shakedir = os.path.abspath(os.path.join(homedir,'..'))
 sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring any installed mapio stuff
 
 from shakemap.grind.fault import Fault
+from shakemap.utils.exception import ShakeMapException
 
-def _test_northridge():
+def test_northridge():
     #this should fail!
     fault_text = """
     # Source: Wald, D. J., T. H. Heaton, and K. W. Hudnut (1996). The Slip History of the 1994 Northridge, California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling Data, Bull. Seism. Soc. Am. 86, S49-S70.
@@ -34,7 +37,7 @@ def _test_northridge():
     topdist2 = quad[0].distance(quad[1])
     x = 1
     
-def _test_correct():
+def test_correct():
     #this fault should parse correctly
     fault_text = """#SOURCE: Barka, A., H. S. Akyz, E. Altunel, G. Sunal, Z. Akir, A. Dikbas, B. Yerli, R. Armijo, B. Meyer, J. B. d. Chabalier, T. Rockwell, J. R. Dolan, R. Hartleb, T. Dawson, S. Christofferson, A. Tucker, T. Fumal, R. Langridge, H. Stenner, W. Lettis, J. Bachhuber, and W. Page (2002). The Surface Rupture and Slip Distribution of the 17 August 1999 Izmit Earthquake (M 7.4), North Anatolian Fault, Bull. Seism. Soc. Am. 92, 43-60.
     40.70985 29.33760 0
@@ -86,7 +89,7 @@ def _test_correct():
     cbuf = io.StringIO(fault_text)
     fault = Fault.readFaultFile(cbuf)
 
-def _test_incorrect():
+def test_incorrect():
     fault_text = """# Source: Ji, C., D. V. Helmberger, D. J. Wald, and K.-F. Ma (2003). Slip history and dynamic implications of the 1999 Chi-Chi, Taiwan, earthquake, J. Geophys. Res. 108, 2412, doi:10.1029/2002JB001764.
     24.27980 120.72300	0 
     24.05000 121.00000	17
@@ -107,9 +110,10 @@ def _test_incorrect():
     23.60400 120.97200	17"""
 
     cbuf = io.StringIO(fault_text)
-    fault = Fault.readFaultFile(cbuf)
+    with pytest.raises(ShakeMapException):
+        fault = Fault.readFaultFile(cbuf)
 
-def _test_trace():
+def test_trace():
     xp0 = [0.0]
     xp1 = [0.0]
     yp0 = [0.0]
@@ -122,7 +126,6 @@ def _test_trace():
     fstr = io.StringIO()
     fault.writeFaultFile(fstr)
     print(fstr.getvalue())
-    sys.exit(0)
     
     xp0 = [-121.81529,-121.82298]
     xp1 = [-121.82298,-121.83068]
@@ -132,19 +135,3 @@ def _test_trace():
     widths = [15.0,20.0]
     dips = [30.0,45.0]
     fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,widths,dips,reference='From J Smith, (personal communication)')
-
-if __name__ == '__main__':
-    xp0 = np.array([-118.0])
-    xp1 = np.array([-118.0])
-    yp0 = np.array([34.0])
-    yp1 = np.array([34.5])
-    zp = np.array([5.0])
-    widths = np.array([10.0])
-    dips = np.array([45.0])
-    fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,widths,dips)
-    
-    _test_trace()
-    #_test_northridge()
-    #_test_correct()
-    # _test_incorrect()
-

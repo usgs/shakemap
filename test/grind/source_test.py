@@ -19,7 +19,7 @@ from openquake.hazardlib.gsim import base,abrahamson_2014
 from openquake.hazardlib.geo.mesh import Mesh
 import numpy as np
 
-def test():
+def test_source():
     fault_text = """30.979788       103.454422      1
 31.691615       104.419160      1
 31.723569       104.374760      1
@@ -78,7 +78,7 @@ def test():
         print('Exception raised appropriately for rake greater than 360.')
     print('Test setting mechanism and rake/dip...')
 
-def _test_northridge():
+def test_northridge():
     fault_text = """
     # Source: Wald, D. J., T. H. Heaton, and K. W. Hudnut (1996). The Slip History of the 1994 Northridge, California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling Data, Bull. Seism. Soc. Am. 86, S49-S70.
     34.315 -118.421 5.000
@@ -96,7 +96,7 @@ def _test_northridge():
     sfile = io.StringIO(source_text)
     source = Source.readFromFile(efile,faultfile=ffile,sourcefile=sfile)
     gmpe = abrahamson_2014.AbrahamsonEtAl2014()
-    rupture = source.getRuptureContext(gmpe)
+    rupture = source.getRuptureContext([gmpe])
     mapwidth = 2.0
     latmin = rupture.hypo_lat - mapwidth
     latmax = rupture.hypo_lat + mapwidth
@@ -122,6 +122,7 @@ def _test_northridge():
     fault = Fault.readFaultFile(cbuf)
         
 if __name__ == '__main__':
-    test()
+    test_source()
+    test_northridge()
             
         
