@@ -8,7 +8,7 @@ shakemap
     :target: https://travis-ci.org/usgs/shakemap
     :alt: Travis Build Status
 .. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg
-    :target:https://codecov.io/gh/usgs/shakemap
+    :target: https://codecov.io/gh/usgs/shakemap
     :alt: Code Coverage Status
 .. |QuantifiedCode| image:: https://www.quantifiedcode.com/api/v1/project/b5c9b23475e443aa99806921f729f55a/badge.svg
     :target: https://www.quantifiedcode.com/app/project/b5c9b23475e443aa99806921f729f55a
