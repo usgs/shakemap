@@ -46,38 +46,44 @@ class NewmarkHall1982(object):
         """
         return psa10*cls.__vfact
 
+    def getVfact(self):
+        return self.__vfact
+
 
 class BommerAlarcon2006(object):
     
     """
-    Class for conversion between PGV (units of cm/s) and PSA10 (units of g)
+    Class for conversion between PGV (units of cm/s) and PSA05 (units of g)
     by Alarcon and Bommer (2006).
 
     Comments for testing.
     """
     
-    __vfact = 20.0 * 10.0 * 9.81
+    __vfact = 1.0/(20.0) * 100.0 * 9.81
 
     @classmethod
-    def pgv2psa10(cls,pgv):
+    def pgv2psa05(cls,pgv):
         """
-        Convert PGV in cm/s to PSA10 in g.
+        Convert PGV in cm/s to PSA05 in g.
         ** PGV must be linear units **
         :param pgv:
             Numpy array or float of PGV values; linear units.
         : returns:
-            Values converted to PSA10. 
+            Values converted to PSA05. 
         """
         return pgv/cls.__vfact
 
     @classmethod
-    def psa102pgv(cls,psa10):
+    def psa052pgv(cls,psa05):
         """
-        Convert PSA10 in g to PGV cm/s.
+        Convert PSA05 in g to PGV cm/s.
         ** PSA10 must be linear units. **
-        :param psa10:
-            Numpy array or float of PSA10 values; linear units.
+        :param psa05:
+            Numpy array or float of PSA05 values; linear units.
         : returns:
             Values converted to PGV. 
         """
-        return psa10*cls.__vfact
+        return psa05*cls.__vfact
+    
+    def getVfact(self):
+        return self.__vfact
