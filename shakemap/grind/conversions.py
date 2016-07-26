@@ -50,12 +50,13 @@ class NewmarkHall1982(object):
 class BommerAlarcon2006(object):
     
     """
-    Class for conversion between PGA and PSA10 by Beyer and Bommer (2006).
+    Class for conversion between PGV (units of cm/s) and PSA10 (units of g)
+    by Alarcon and Bommer (2006).
 
     Comments for testing.
     """
     
-    __vfact = 20.0 * 9.81
+    __vfact = 20.0 * 10.0 * 9.81
 
     @classmethod
     def pgv2psa10(cls,pgv):
