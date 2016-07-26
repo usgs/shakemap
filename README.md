@@ -1,4 +1,4 @@
-#  [![Build Status][travis-image]][travis-url] [![Coverage Status][coverall-image]][coverall-url]
+# [![Build Status](https://travis-ci.org/usgs/shakemap.svg?branch=master)](https://travis-ci.org/usgs/shakemap)
 
 shakemap
 ========
