@@ -49,10 +49,12 @@ install:
     #- pip install .
     - python setup.py install
 script:
-    - python -m pytest
+#    - python -m pytest
+     - py.test --cov=shakemap
     #- flake8 shakemap
 after_success:
-    - pip install codecov codacy-coverage
-    - codecov
-    - coverage xml
-    - python-codacy-coverage -r coverage.xml
+#    - pip install codecov codacy-coverage
+#    - codecov
+#    - coverage xml
+#    - python-codacy-coverage -r coverage.xml
+    - bash <(curl -s https://codecov.io/bash)
