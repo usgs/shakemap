@@ -7,27 +7,18 @@ shakemap
 .. |Travis| image:: https://travis-ci.org/usgs/shakemap.svg?branch=master
     :target: https://travis-ci.org/usgs/shakemap
     :alt: Travis Build Status
-.. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg)
+.. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg
     :target:https://codecov.io/gh/usgs/shakemap
     :alt: Code Coverage Status
-.. |QuantifiedCode| image::https://www.quantifiedcode.com/api/v1/project/b5c9b23475e443aa99806921f729f55a/badge.svg
-    :target:https://www.quantifiedcode.com/app/project/b5c9b23475e443aa99806921f729f55a
+.. |QuantifiedCode| image:: https://www.quantifiedcode.com/api/v1/project/b5c9b23475e443aa99806921f729f55a/badge.svg
+    :target: https://www.quantifiedcode.com/app/project/b5c9b23475e443aa99806921f729f55a
     :alt: Code issues
-.. |Codacy| image::https://api.codacy.com/project/badge/Grade/1d3b94ef3793456f861c67d7905e7de7
-    :target:https://www.codacy.com/app/emthompson/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
+.. |Codacy| image:: https://api.codacy.com/project/badge/Grade/1d3b94ef3793456f861c67d7905e7de7
+    :target: https://www.codacy.com/app/emthompson/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
     :alt: Codacy code issues
 
-## Disclaimer
-This software is preliminary or provisional and is subject to revision. It is
-being provided to meet the need for timely best science. The software has not
-received final approval by the U.S. Geological Survey (USGS). No warranty,
-expressed or implied, is made by the USGS or the U.S. Government as to the
-functionality of the software and related material nor shall the fact of release
-constitute any such warranty. The software is provided on the condition that
-neither the USGS nor the U.S. Government shall be held liable for any damages
-resulting from the authorized or unauthorized use of the software. 
-
-## Introduction
+Introduction
+------------
 
 ShakeMap is a system for rapidly characterizing the extent nad distribution of
 strong ground shaking following significant earthquakes. The current stable
@@ -58,7 +49,8 @@ required extensive modifications to the original source code. Additional uses of
 ShakeMap, such as for scenario earthquakes and the ShakeMap Atlas, have also
 required ongoing modification of the code. 
 
-## Dependencies
+Dependencies
+------------
 
 - Mac OSX or Linux operating systems
 - Python 3
@@ -66,7 +58,8 @@ required ongoing modification of the code.
   basemap-data-hires, shapely, h5py, gdal, descartes, oq-hazlib, neicio,
   MapIO, matplotlib, jupyter
 
-## OQ Hazard Library
+OQ Hazard Library
+-----------------
 
 One of the significant factors driving the rewrite of ShakeMap into the Python
 language was the availability of the library of Ground Motion Prediction
