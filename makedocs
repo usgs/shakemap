@@ -5,21 +5,7 @@ import subprocess
 import os.path
 import shutil
 
-#where should .rst files, Makefile, _build folder be written?
-SPHINX_DIR=$HOME/__tmpsphinx
 
-#where should the temporary clone of the shakemap gh-pages repo live?
-CLONE_DIR=$HOME/__tmpshake
-
-#get the human friendly version of the ShakeMap version
-VERSION_CMD='git tag'
-
-#we should already be in the repo folder where the code lives...
-#REPO_DIR=`pwd`
-
-#what is the package called and who are the authors
-PACKAGE="shakemap"
-AUTHORS='Bruce Worden, Eric Thompson, Mike Hearne'
 
 def getCommandOutput(cmd):
     """
@@ -35,6 +21,7 @@ def getCommandOutput(cmd):
                             )
     stdout,stderr = proc.communicate()
     retcode = proc.returncode
+    stdout = stdout.decode('utf-8')
     if retcode == 0:
         retcode = True
     else:
@@ -43,16 +30,26 @@ def getCommandOutput(cmd):
 
 
 def main(args):
+
+    #where should .rst files, Makefile, _build folder be written?
+    SPHINX_DIR=os.path.join(os.path.expanduser('~'),'__api-doc')
+
+    #where should the temporary clone of the shakemap gh-pages repo live?
+    CLONE_DIR=os.path.join(os.path.expanduser('~'),'__shake-doc')
+
+    #get the human friendly version of the ShakeMap version
+    res,verstr,stderr = getCommandOutput('git tag')
+
+    #what is the package called and who are the authors
+    PACKAGE="shakemap"
+    AUTHORS='Bruce Worden, Eric Thompson, Mike Hearne'
+    
     #find the make command on this system
     res,stdout,stderr = getCommandOutput('which make')
     if not res:
         print('Could not find the "make" command on your system. Exiting.')
         sys.exit(1)
     make_cmd = stdout.strip()
-    
-    #get the git version
-    res,verstr,stderr = getCommandOutput(VERSION_CMD)
-    REPO_DIR = os.getcwd()
 
     try:
         #clone the repository

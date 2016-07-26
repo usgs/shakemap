@@ -5,9 +5,9 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
 PAPER         =
-BUILDDIR      = ../../shake-doc
-PDFBUILDDIR   = ../../shake-doc
-PDF           = ../../shake-doc/html/_static
+BUILDDIR      = $(HOME)/__shake-doc
+PDFBUILDDIR   = $(HOME)/__shake-doc
+PDF           = $(HOME)/__shake-doc/html/_static
 
 # User-friendly check for sphinx-build
 ifeq ($(shell which $(SPHINXBUILD) >/dev/null 2>&1; echo $$?), 1)
