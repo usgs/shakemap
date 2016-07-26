@@ -1,7 +1,21 @@
-# [![Build Status](https://travis-ci.org/usgs/shakemap.svg?branch=master)](https://travis-ci.org/usgs/shakemap)
-
 shakemap
 ========
+
+|Travis| |CodeCov|
+|QuantifiedCode| |Codacy|
+
+.. |Travis| image:: https://travis-ci.org/usgs/shakemap.svg?branch=master
+    :target: https://travis-ci.org/usgs/shakemap
+    :alt: Travis Build Status
+.. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg)
+    :target:https://codecov.io/gh/usgs/shakemap
+    :alt: Code Coverage Status
+.. |QuantifiedCode| image::https://www.quantifiedcode.com/api/v1/project/b5c9b23475e443aa99806921f729f55a/badge.svg
+    :target:https://www.quantifiedcode.com/app/project/b5c9b23475e443aa99806921f729f55a
+    :alt: Code issues
+.. |Codacy| image::https://api.codacy.com/project/badge/Grade/1d3b94ef3793456f861c67d7905e7de7
+    :target:https://www.codacy.com/app/emthompson/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
+    :alt: Codacy code issues
 
 ## Disclaimer
 This software is preliminary or provisional and is subject to revision. It is
