@@ -2,6 +2,7 @@
 
 import numpy as np
 import openquake.hazardlib.geo as geo
+import copy
 
 import shakemap.grind.fault as fault
 import shakemap.grind.ecef as ecef
@@ -49,7 +50,7 @@ class Bayless2013(object):
     # C0 adn C1 are for RotD50. One set for each mechanism (SS vs DS).
     # FN and FP are also available
     #---------------------------------------------------------------------------
-    __T = np.array([0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 7.5, 10])
+    __Tall = np.array([0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 7.5, 10])
     __C0ss = np.array([0.0, 0.0, -0.12, -0.175, -0.21, -0.235, -0.255,
                        -0.275, -0.29, -0.3])
     __C1ss = np.array([0.0, 0.0, 0.075, 0.090, 0.095, 0.099, 0.103, 0.108,
@@ -59,7 +60,7 @@ class Bayless2013(object):
     __C1ds = np.array([0.0, 0.0, 0.0, 0.0, 0.034, 0.093, 0.128, 0.15,
                        0.165, 0.179])
     
-    def __init__(self, flt, hyp, sites, rake, M, T):
+    def __init__(self, source, lat, lon, depth, T):
         """
         Constructor for bayless2013.
         :param flt:
@@ -80,48 +81,47 @@ class Bayless2013(object):
             Period; Currently, only acceptable values are:
              0.5 0.75, 1, 1.5, 2, 3, 4, 5, 7.5, 10
         """
-        self.flt = flt
-        self.hyp = hyp
-        self.sites = sites
-        self.rake = rake
-        self.M = M
-        self.T = T
+        self._source = source
+        self._flt = source.getFault()
+        self._rake = source.getEventParam('rake')
+        self._M = source.getEventParam('mag')
+        self._hyp = source.getHypo()
+        self._lon = lon
+        self._lat = lat
+        self._dep = depth
+        self._T = T
         
         # Lists of widths and lengths for each quad in the fault
-        self.W = self.flt.getIndividualWidths()
-        self.L = self.flt.getIndividualTopLengths()
+        self._W = self._flt.getIndividualWidths()
+        self._L = self._flt.getIndividualTopLengths()
         
         # Number of quads
-        self.nq = len(self.W)
+        self._nq = len(self._W)
         
         # Currently assuming that the rake is the same on all subfaults .
         self.getSlipCategory()
         
-        # Mesh object of sites
-        self.mesh = geo.mesh.Mesh(self.sites[0], self.sites[1],
-                                  np.zeros_like(self.sites[1]))
-        
         # Fault weights are supposed to be based on seismic moment.
         # Since moment is proportional to area, lets just use area
         # for now
-        area = self.W * self.L
+        area = self._W * self._L
         self.weights = area/np.sum(area)
         
         # Put in pseudo-hypocenters for each quad
         self.setPseudoHypocenters()
         
-        self.fd = 0
-        for i in range(self.nq):
+        self._fd = 0
+        for i in range(self._nq):
             self.i = i
             
             # Compute some genral stuff that is required for all mechanisms
-            qlist = [self.flt.Quadrilaterals[self.i]]
-            self.Rrup = np.reshape(get_distance('rrup', self.mesh, qlist),
-                                   self.sites[0].shape)
-            self.Rx = np.reshape(get_distance('rx', self.mesh, qlist),
-                                 self.sites[0].shape)
-            self.Ry = np.reshape(get_distance('ry0', self.mesh, qlist),
-                                 self.sites[0].shape)
+            qlist = [self._flt.getQuadrilaterals()[self.i]]
+            dtypes = ['rrup', 'rx', 'ry0']
+            dists = get_distance(dtypes, self._lat, self._lon, self._dep,
+                                 self._source)
+            self.__Rrup = np.reshape(dists['rrup'], self._lat.shape)
+            self.__Rx = np.reshape(dists['rx'], self._lat.shape)
+            self.__Ry = np.reshape(dists['ry0'], self._lat.shape)
             # NOTE: use Rx and Ry to compute Az in 'computeAz'. It is probably
             #       possible to make this a lot faster by avoiding the
             #       calculation of these distances each time.
@@ -132,20 +132,20 @@ class Bayless2013(object):
             self.computeAz() # uses Rx and Ry, which are for the i-th quad. 
             
             # Magnitude taper (does not depend on mechanism)
-            if self.M <= 5.0: 
+            if self._M <= 5.0: 
                 self.T_Mw = 0.0
-            elif (self.M > 5.0) and (self.M < 6.5):
-                self.T_Mw = 1.0 - (6.5 - self.M)/1.5
+            elif (self._M > 5.0) and (self._M < 6.5):
+                self.T_Mw = 1.0 - (6.5 - self._M)/1.5
             else:
                 self.T_Mw = 1.0
             
             if self.SlipCategory == 'SS':
                 self.computeSS()
-                self.fd = self.fd + self.weights[i]*self.fd_SS
+                self._fd = self._fd + self.weights[i]*self._fd_SS
             
             elif self.SlipCategory == 'DS':
                 self.computeDS()
-                self.fd = self.fd + self.weights[i]*self.fd_DS
+                self._fd = self._fd + self.weights[i]*self._fd_DS
             
             else:
                 # Compute both SS and DS
@@ -153,15 +153,15 @@ class Bayless2013(object):
                 self.computeDS()
             
                 # Normalize rake to reference angle
-                sintheta = np.abs(np.sin(np.radians(self.rake)))
-                costheta = np.abs(np.cos(np.radians(self.rake)))
+                sintheta = np.abs(np.sin(np.radians(self._rake)))
+                costheta = np.abs(np.cos(np.radians(self._rake)))
                 refrake = np.arctan2(sintheta, costheta)
             
                 # Compute weights:
                 DipWeight = refrake/(np.pi/2.0)
                 StrikeWeight = 1.0 - DipWeight
-                fdcombined = StrikeWeight*self.fd_SS + DipWeight*self.fd_DS
-                self.fd = self.fd + self.weights[i]*fdcombined
+                fdcombined = StrikeWeight*self._fd_SS + DipWeight*self._fd_DS
+                self._fd = self._fd + self.weights[i]*fdcombined
 
     def setPseudoHypocenters(self):
         """ Set a pseudo-hypocenter.
@@ -178,11 +178,11 @@ class Bayless2013(object):
         computed relative to the pseudo-hypocenter."
         """
         hyp_ecef = Vector.fromPoint(geo.point.Point(
-            self.hyp[0], self.hyp[1], self.hyp[2]))
+            self._hyp.longitude, self._hyp.latitude, self._hyp.depth))
         # Loop over each quad
-        self.phyp = [None]*self.nq
-        for i in range(self.nq):
-            P0,P1,P2,P3 = self.flt.Quadrilaterals[i]
+        self.phyp = [None]*self._nq
+        for i in range(self._nq):
+            P0,P1,P2,P3 = self._flt.getQuadrilaterals()[i]
             p0 = Vector.fromPoint(P0) # convert to ECEF
             p1 = Vector.fromPoint(P1)
             p2 = Vector.fromPoint(P2)
@@ -246,24 +246,24 @@ class Bayless2013(object):
         self.computeD(self.i)
         
         # Geometric directivity predictor:
-        RxoverW = (self.Rx / self.W[self.i]).clip(min = -np.pi/2.0, max = 2.0*np.pi/3.0)
+        RxoverW = (self.__Rx / self._W[self.i]).clip(min = -np.pi/2.0, max = 2.0*np.pi/3.0)
         f_geom = np.log(self.d) * np.cos(RxoverW)
         
         # Distance taper
-        T_CD = np.ones_like(self.sites[0])
-        ix = [(self.Rrup/self.W[self.i] > 1.5) & (self.Rrup/self.W[self.i] < 2.0)]
-        T_CD[ix] = 1.0 - (self.Rrup[ix]/self.W[self.i] - 1.5)/0.5
-        T_CD[self.Rrup/self.W[self.i] >= 2.0 ] = 0.0
+        T_CD = np.ones_like(self._lat)
+        ix = [(self.__Rrup/self._W[self.i] > 1.5) & (self.__Rrup/self._W[self.i] < 2.0)]
+        T_CD[ix] = 1.0 - (self.__Rrup[ix]/self._W[self.i] - 1.5)/0.5
+        T_CD[self.__Rrup/self._W[self.i] >= 2.0 ] = 0.0
         
         # Azimuth taper
         T_Az = np.sin(np.abs(self.Az))**2
         
         # Select Coefficients
-        ix = [self.T == self.__T]
+        ix = [self._T == self.__Tall]
         C0 = self.__C0ds[ix]
         C1 = self.__C1ds[ix]
         
-        self.fd_DS = (C0 + C1*f_geom) * T_CD * self.T_Mw * T_Az
+        self._fd_DS = (C0 + C1*f_geom) * T_CD * self._T_Mw * T_Az
         
         
     def computeSS(self):
@@ -275,26 +275,26 @@ class Bayless2013(object):
         f_geom = np.log(self.s) * (0.5 * np.cos(2*self.theta) + 0.5)
         
         # Distance taper
-        T_CD = np.ones_like(self.sites[0])
-        ix = [(self.Rrup/self.L[self.i] > 0.5) & (self.Rrup/self.L[self.i] < 1.0)]
-        T_CD[ix] = 1 - (self.Rrup[ix]/self.L[self.i] - 0.5)/0.5
-        T_CD[self.Rrup/self.L[self.i] >= 1.0 ] = 0.0
+        T_CD = np.ones_like(self._lat)
+        ix = [(self.__Rrup/self._L[self.i] > 0.5) & (self.__Rrup/self._L[self.i] < 1.0)]
+        T_CD[ix] = 1 - (self.__Rrup[ix]/self._L[self.i] - 0.5)/0.5
+        T_CD[self.__Rrup/self._L[self.i] >= 1.0 ] = 0.0
         
         # Azimuth taper
         T_Az = 1.0
         
         # Select Coefficients
-        ix = [self.T == self.__T]
+        ix = [self._T == self.__Tall]
         C0 = self.__C0ss[ix]
         C1 = self.__C1ss[ix]
-        self.fd_SS = (C0 + C1*f_geom) * T_CD * self.T_Mw * T_Az
+        self._fd_SS = (C0 + C1*f_geom) * T_CD * self.T_Mw * T_Az
         
     
     def computeAz(self):
-        Az = np.ones_like(self.Rx) * np.pi/2.0
-        Az = Az * np.sign(self.Rx)
-        ix = [self.Ry > 0.0]
-        Az[ix] = np.arctan(self.Rx[ix]/self.Ry[ix])
+        Az = np.ones_like(self.__Rx) * np.pi/2.0
+        Az = Az * np.sign(self.__Rx)
+        ix = [self.__Ry > 0.0]
+        Az[ix] = np.arctan(self.__Rx[ix]/self.__Ry[ix])
         self.Az = Az
         
 
@@ -311,7 +311,7 @@ class Bayless2013(object):
         hyp_col = np.array([[hyp_ecef.x], [hyp_ecef.y], [hyp_ecef.z]])
         
         # First compute "updip" vector
-        P0,P1,P2,P3 = self.flt.Quadrilaterals[i]
+        P0,P1,P2,P3 = self._flt.getQuadrilaterals()[i]
         p1 = Vector.fromPoint(P1) # convert to ECEF
         p2 = Vector.fromPoint(P2)
         e21 = p1 - p2
@@ -321,8 +321,8 @@ class Bayless2013(object):
         udip_col = np.array([[e21norm.x], [e21norm.y], [e21norm.z]]) # ECEF coords
         
         # Sites
-        slat = self.sites[1]
-        slon = self.sites[0]
+        slat = self._lat
+        slon = self._lon
         
         # Convert sites to ECEF:
         site_ecef_x = np.ones_like(slat)
@@ -342,7 +342,7 @@ class Bayless2013(object):
         
         # Dot hypocenter-to-site with updip vector
         d_raw = np.abs(np.sum(h2s_mat * udip_col, axis = 0))/1000.0 # convert to km
-        d_raw = np.reshape(d_raw, self.sites[0].shape)
+        d_raw = np.reshape(d_raw, self._lat.shape)
         self.d = d_raw.clip(min = 1.0, max = udip_len)
 
     def computeThetaAndS(self, i):
@@ -356,7 +356,7 @@ class Bayless2013(object):
         epi_col = np.array([[epi_ecef.x], [epi_ecef.y], [epi_ecef.z]])
         
         # First compute along strike vector
-        P0,P1,P2,P3 = self.flt.Quadrilaterals[i]
+        P0,P1,P2,P3 = self._flt.getQuadrilaterals()[i]
         p0 = Vector.fromPoint(P0) # convert to ECEF
         p1 = Vector.fromPoint(P1)
         e01 = p1 - p0
@@ -368,8 +368,8 @@ class Bayless2013(object):
         strike_col = np.array([[e01norm.x],[e01norm.y],[e01norm.z]]) # ECEF coords
         
         # Sites
-        slat = self.sites[1]
-        slon = self.sites[0]
+        slat = self._lat
+        slon = self._lon
         
         # Convert sites to ECEF:
         site_ecef_x = np.ones_like(slat)
@@ -396,7 +396,7 @@ class Bayless2013(object):
         s_raw = np.sum(e2s_mat * strike_col, axis = 0)/1000.0 # conver to km
         
         # Put back into a 2d array
-        s_raw = np.reshape(s_raw, self.sites[0].shape)
+        s_raw = np.reshape(s_raw, self._lat.shape)
         self.s = np.abs(s_raw.clip(min = strike_min,
                                    max = strike_max)).clip(min = np.exp(1))
         
@@ -409,15 +409,17 @@ class Bayless2013(object):
         sintheta = np.abs(np.sin(theta_raw))
         costheta = np.abs(np.cos(theta_raw))
         theta = np.arctan2(sintheta, costheta)
-        self.theta = np.reshape(theta, self.sites[0].shape)
+        self.theta = np.reshape(theta, self._lat.shape)
 
-
+    def getFd(self):
+        return copy.deepcopy(self._fd)
+    
     def getSlipCategory(self):
         """
         Sets self.SlipCategory based on rake angle. Can be SS for 
         strike slip, DS for dip slip, or Unspecified. 
         """
-        arake = np.abs(self.rake)
+        arake = np.abs(self._rake)
         self.SlipCategory = 'Unspecified'
         if ((arake >=  0) and (arake <= 30)) or ((arake >= 150) and (arake <= 180)):
             self.SlipCategory = 'SS'
