@@ -37,6 +37,9 @@ def main(args):
     #where should the temporary clone of the shakemap gh-pages repo live?
     CLONE_DIR=os.path.join(os.path.expanduser('~'),'__shake-doc')
 
+    #where is the repository where this script is running?
+    REPO_DIR = os.path.dirname(os.path.abspath(__file__)) #where is this script?
+
     #get the human friendly version of the ShakeMap version
     res,verstr,stderr = getCommandOutput('git tag')
 
@@ -60,6 +63,11 @@ def main(args):
         apidocfolder = os.path.join(CLONE_DIR,'apidoc')
         sh.rmtree(apidocfolder)
 
+        #run the make command to build the shakemap manual
+        makefile = os.path.join(REPO_DIR,'doc','Makefile')
+        manualcmd = '%s -f %s' % (make_cmd,makefile)
+        res,stdout,stderr = getCommandOutput(manualcmd)
+        
         #run the sphinx api doc command
         sphinx_cmd = 'sphinx-apidoc -o %s -f -l -F -H %s -A "%s" -V %s %s' % (SPHINX_DIR,PACKAGE,AUTHORS,verstr,REPO_DIR)
         res,stdout,stderr = getCommandOutput(sphinx_cmd)
