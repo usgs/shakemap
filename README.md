@@ -1,3 +1,5 @@
+#  [![Build Status][travis-image]][travis-url] [![Coverage Status][coverall-image]][coverall-url]
+
 shakemap
 ========
 
