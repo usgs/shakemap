@@ -40,10 +40,9 @@ install:
     # Only required for testing
     #--------------------------
     - pip install flake8
-    - pip install pytest
     - pip install pep8-naming
-    - pip install --user codecov
-    - pip install nbconvert[execute,serve,test]
+    - pip install pytest
+    - pip install pytest-cov
     #---------------------
     # Install shakemap
     #---------------------
@@ -53,4 +52,7 @@ script:
     - python -m pytest
     #- flake8 shakemap
 after_success:
-    - bash <(curl -s https://codecov.io/bash)
+    - pip install codecov codacy-coverage
+    - codecov
+    - coverage xml
+    - python-codacy-coverage -r coverage.xml
