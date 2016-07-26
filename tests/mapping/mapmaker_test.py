@@ -23,9 +23,8 @@ from shakemap.grind.station import StationList
 from shakemap.grind.fault import Fault
 from shakemap.grind.source import Source
 
-def test_intensity():
+def _test_intensity():
 
-    homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
     datadir = os.path.abspath(os.path.join(homedir,'..','data','eventdata','northridge'))
     shakefile = os.path.join(datadir,'northridge_grid.xml')
     topofile = os.path.join(datadir,'northridge_topo.grd')
@@ -38,8 +37,8 @@ def test_intensity():
     oceanfile = os.path.join(datadir,'northridge_ocean.json')
     stationfile = os.path.join(datadir,'northridge_stations.db')
     roadfile = os.path.join(datadir,'northridge_roads.json')
-    tancptfile = os.path.join(homedir,'..','..','shakemap','mapping','tan.cpt')
-    shakecptfile = os.path.join(homedir,'..','..','shakemap','mapping','shakecpt.cpt')
+    tancptfile = os.path.join(shakedir,'shakemap','mapping','tan.cpt')
+    shakecptfile = os.path.join(shakedir,'shakemap','mapping','shakecpt.cpt')
 
     layerdict = {'coast':coastfile,
                  'ocean':oceanfile,
@@ -99,5 +98,5 @@ def test_intensity():
     print('PSA3.0 contour map saved as: %s' % contour_psa30_map)
     
 if __name__ == '__main__':
-    test_intensity()
+    _test_intensity()
 

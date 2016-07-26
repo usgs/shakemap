@@ -19,7 +19,7 @@ sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring 
 from shakemap.grind.station import StationList
 from shakemap.grind.source import Source
 
-def test():
+def _test():
 
     tmp,dbfile = tempfile.mkstemp()
     os.close(tmp)
@@ -80,7 +80,6 @@ def test():
         assert(len(stations1) == len(stations2))
 
         
-               
     except Exception as msg:
         print('Error caught: %s' % str(msg))
     if os.path.isfile(dbfile):
