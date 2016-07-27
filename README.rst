@@ -12,8 +12,8 @@ development.
 .. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/usgs/shakemap
     :alt: Code Coverage Status
-.. |QuantifiedCode| image:: https://www.quantifiedcode.com/api/v1/project/b5c9b23475e443aa99806921f729f55a/badge.svg
-    :target: https://www.quantifiedcode.com/app/project/b5c9b23475e443aa99806921f729f55a
+.. |QuantifiedCode| image:: https://www.quantifiedcode.com/api/v1/project/3226dd92d6414343af0bc662fcc437cf/badge.svg
+    :target: https://www.quantifiedcode.com/app/project/3226dd92d6414343af0bc662fcc437cf
     :alt: Code issues
 .. |Codacy| image:: https://api.codacy.com/project/badge/Grade/1d3b94ef3793456f861c67d7905e7de7
     :target: https://www.codacy.com/app/emthompson/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
