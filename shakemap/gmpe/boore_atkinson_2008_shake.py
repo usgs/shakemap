@@ -18,7 +18,6 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
         '''Calculate site corrections for sites on rock (forward=True), OR
         Remove site corrections from data on other substrates.
         '''
-        C = self.COEFFS[imt]
         C_SR = self.COEFFS_SOIL_RESPONSE[imt]
         pga4nl = self._get_pga_on_rock(rup, dists, C)
         if forward:

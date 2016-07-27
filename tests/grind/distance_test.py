@@ -61,7 +61,7 @@ def test_chichi():
              'time':ShakeDateTime.utcfromtimestamp(int(time.time())), 
              'timezone':'UTC'}
     source = Source(event, flt)
-    
+
     # Get NGA distances
     distfile = os.path.join(shakedir, 'data/NGAW2_distances.csv')
     df = pd.read_csv(distfile)

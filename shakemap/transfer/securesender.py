@@ -36,7 +36,7 @@ class SecureSender(Sender):
                 break
         if not usePrivateKey and not usePassword:
             raise ShakeMapException('Either username/password must be specified, or the name of an SSH private key file.')
-        
+
         ssh = SSHClient()
         #load hosts found in ~/.ssh/known_hosts
         ssh.load_system_host_keys() #should we not assume that the user has these configured already?

@@ -20,14 +20,15 @@ from mpl_toolkits.mplot3d import Axes3D
 from shakemap.utils.exception import ShakeMapException
 
 # CONSTANTS
-# what is the maximum ratio of distance out of the plane defined by 3 points a 4th point can be before
-# being considered non-co-planar?
+# what is the maximum ratio of distance out of the plane defined by 3 points a
+# 4th point can be before being considered non-co-planar?
 OFFPLANE_TOLERANCE = 0.05
 
 
 class Fault(object):
     """
-    Class to handle fault files of various types and output fault data in various ways.
+    Class to handle fault files of various types and output fault data in 
+    various ways.
     """
 
     def __init__(self, lon, lat, depth, reference):
@@ -1061,7 +1062,7 @@ def get_quad_slip(q, rake):
     :returns:
         Unit slip vector in ECEF space.
     """
-    P0, P1, P2, P3 = q
+    P0, P1, P2 = q[0:3]
     strike = P0.azimuth(P1)
     dip = getQuadDip(q)
     s1_local = getLocalUnitSlipVector(strike, dip, rake)

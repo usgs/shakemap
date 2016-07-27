@@ -1,14 +1,7 @@
 """
 Implements conversion for various "Intensity Measure
 Components" per Beyer and Bommer, 2006, BSSA, 96(4A).
-"""
 
-from openquake.hazardlib import const
-from openquake.hazardlib.imt import PGA, PGV, SA
-
-import numpy as np
-
-"""
 IMC equivalencies:
 OpenQuake                   Beyer&Bommer
 ----------------------------------------------
@@ -21,6 +14,12 @@ RANDOM_HORIZONTAL           Random
 GREATER_OF_TWO_HORIZONTAL   Env_xy
 VERTICAL                    ---
 """
+
+from openquake.hazardlib import const
+from openquake.hazardlib.imt import PGA, PGV, SA
+
+import numpy as np
+
 
 __pga_pgv_col_names = [ 'c12', 'c34', 'R' ]
 __sa_col_names = [ 'c1', 'c2', 'c3', 'c4', 'R' ]
@@ -57,7 +56,7 @@ def ampIMCtoIMC(amps, imc_in, imc_out, imt):
         returns amps converted from imc_in to imc_out
     """
     if imc_in == const.IMC.AVERAGE_HORIZONTAL:
-        # The amps are already in the B&B "reference" type ("GM", i.e., 
+        # The amps are already in the B&B "reference" type ("GM", i.e.,
         # geometric mean)
         denom = 1
     elif imc_in == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
@@ -87,7 +86,7 @@ def ampIMCtoIMC(amps, imc_in, imc_out, imt):
 def sigmaIMCtoIMC(sigmas, imc_in, imc_out, imt):
     """ 
     Returns sigmas converted from one IMC to another.
-    IMPORTANT: Assumes the input sigmas are in log space 
+    IMPORTANT: Assumes the input sigmas are in log space
     IMPORTANT: IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
     Inputs:
         sigmas -- a numpy array of ground motions in IMC imc_in and IMT imt

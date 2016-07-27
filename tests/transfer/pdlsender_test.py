@@ -54,7 +54,7 @@ def _test_send(internalhub):
         f.write(textwrap.dedent(configtext))
         f.close()
         key = RSA.generate(2048)
-        keyfile = os.path.join(tempdir,'pdlkey') 
+        keyfile = os.path.join(tempdir,'pdlkey')
         f = open(keyfile,'wb')
         f.write(key.exportKey('PEM'))
         f.close()

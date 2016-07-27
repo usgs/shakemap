@@ -32,7 +32,7 @@ def test():
     assert adotb == 6
     aplusb = a + b
     print('Passed Vector class tests.')
-    
+
 if __name__ == '__main__':
     test()
     

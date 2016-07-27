@@ -6,11 +6,7 @@ import tempfile
 import sys
 import urllib.request, urllib.error, urllib.parse
 import zipfile
-import shutil
 import io
-from distutils import spawn
-import textwrap
-
 
 #third party
 from Crypto.PublicKey import RSA
@@ -24,7 +20,10 @@ from shakemap.utils.misc import getCommandOutput
 
 
 class PDLSender(Sender):
-    pdlcmd = '[JAVA] -jar [JARFILE] --send --status=[STATUS] --source=[PRODUCTSOURCE] --type=[PRODUCTTYPE] --code=[PRODUCTCODE] --eventsource=[EVENTSOURCE] --eventsourcecode=[EVENTSOURCECODE] --privateKey=[KEYFILE]  --configFile=[CONFIGFILE] [FILE] [DIRECTORY]'
+    pdlcmd = '[JAVA] -jar [JARFILE] --send --status=[STATUS]"\
+        " --source=[PRODUCTSOURCE] --type=[PRODUCTTYPE] --code=[PRODUCTCODE]"\
+        " --eventsource=[EVENTSOURCE] --eventsourcecode=[EVENTSOURCECODE]"\
+        " --privateKey=[KEYFILE]  --configFile=[CONFIGFILE] [FILE] [DIRECTORY]'
     required_properties = ['java','jarfile','keyfile','configfile',
                            'productsource','producttype','productcode',
                            'eventsource','eventsourcecode']

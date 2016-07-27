@@ -48,7 +48,7 @@ def main(args):
     #what is the package called and who are the authors
     PACKAGE="shakemap"
     AUTHORS='Bruce Worden, Eric Thompson, Mike Hearne'
-    
+
     #find the make command on this system
     res,stdout,stderr = getCommandOutput('which make')
     if not res:

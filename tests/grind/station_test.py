@@ -24,7 +24,7 @@ def _test():
     tmp,dbfile = tempfile.mkstemp()
     os.close(tmp)
     os.remove(dbfile)
-    
+
     homedir = os.path.dirname(os.path.abspath(__file__))
     xmlfile = os.path.abspath(os.path.join(homedir,'..','data','eventdata',
                                            'northridge','northridge_stations.xml'))

@@ -24,7 +24,7 @@ def test(vs30file=None):
     mysite = Sites.createFromCenter(cx,cy,xspan,yspan,dx,dy,vs30File=vs30file,
                                     padding=True,resample=False)
     sc = mysite.getSitesContext()
-    
+
     cx = -118.2
     cy = 83
     dx = 0.0083

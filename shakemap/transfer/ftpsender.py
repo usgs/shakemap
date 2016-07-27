@@ -4,7 +4,6 @@
 from ftplib import FTP
 import os.path
 import sys
-import urllib.request, urllib.error, urllib.parse
 
 #local
 from .sender import Sender
@@ -86,7 +85,7 @@ class FTPSender(Sender):
                     ftp.rmd(ftpfolder)
         ftp.quit()
         return nfiles
-    
+
     def send(self):
         '''Send any files or folders that have been passed to constructor.
         :returns:

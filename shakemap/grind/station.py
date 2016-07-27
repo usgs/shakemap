@@ -67,7 +67,6 @@ IMT_MAP = {'mmi':'MMI',
            'psa03':'SA(0.3)',
            'psa10':'SA(1.0)',
            'psa30':'SA(3.0)'}
-           
 
 def _getOrientation(orig_channel):
     if orig_channel[-1] in ('N','E','Z'):
@@ -257,7 +256,7 @@ class StationList(object):
         stationquery = 'SELECT id,lat,lon,code,network FROM station where instrumented = 1'
         self.cursor.execute(stationquery)
         rows = self.cursor.fetchall()
-        emag = source.getEventDict()['mag']        
+        emag = source.getEventDict()['mag']
         distances = ['rhypo','repi','rjb','rrup']
 
         #pre-fetch all of the IMT ids before looping

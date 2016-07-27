@@ -193,7 +193,7 @@ def test_fromTrace():
     fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,widths,dips,reference='From J Smith, (personal communication)')
     fstr = io.StringIO()
     fault.writeFaultFile(fstr)
-    
+
     xp0 = [-121.81529, -121.82298]
     xp1 = [-121.82298, -121.83068]
     yp0 = [37.73707, 37.74233]
