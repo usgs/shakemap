@@ -105,7 +105,7 @@ class GMTColorMap(object):
         """
         if name is None:
             fpath,fname = os.path.split(cptfile)
-            name,ext = os.path.splitext(fname)
+            name = os.path.splitext(fname)[0]
         cdict,zmin,zmax = read_cpt(cptfile)
         cmap = LinearSegmentedColormap(name,cdict)
         return cls(cmap,zmin,zmax)

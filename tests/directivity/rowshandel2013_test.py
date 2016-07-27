@@ -6,7 +6,7 @@ import openquake.hazardlib.geo as geo
 
 from shakemap.grind.source import Source
 import shakemap.grind.fault as fault
-from shakemap.directivity.rowshandel2013 import Rowshandel2013 
+from shakemap.directivity.rowshandel2013 import Rowshandel2013
 from shakemap.utils.timeutils import ShakeDateTime
 
 
@@ -49,7 +49,7 @@ def test_ss3():
     source = Source(event, flt)
     source.setEventParam('rake', rake)
 
-    test1 = Rowshandel2013(source, slat, slon, deps, dx = 1, T = [1.0, 3.0], 
+    test1 = Rowshandel2013(source, slat, slon, deps, dx = 1, T = [1.0, 3.0],
                            a_weight = 0.5, mtype = 1)
     # Test xiprime
     xip = test1.getXiPrime()

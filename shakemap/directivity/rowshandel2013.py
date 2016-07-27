@@ -564,7 +564,7 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
         of the unit slip vector in ECEF space.
     """
     # Get quad vertices, strike, dip
-    P0, P1, P2, P3 = q
+    P0, P1, P2 = q[0:3]
     strike = P0.azimuth(P1)
     dip = fault.get_quad_dip(q)
 

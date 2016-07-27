@@ -12,7 +12,6 @@ shakedir = os.path.abspath(os.path.join(homedir,'..','..'))
 sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring any installed mapio stuff
 
 from shakemap.mapping.mapmaker import MapMaker
-from shakemap.mapping.colormap import gmtColormap
 from shakemap.mapping.gmtcolormap import GMTColorMap
 
 from mapio.basemapcity import BasemapCities
@@ -46,7 +45,7 @@ def _test_intensity():
                  'country':countryfile,
                  'roads':roadfile,
                  'state':statefile}
-    
+
     tancolormap = GMTColorMap.loadFromCPT(tancptfile)
     shakecolormap = GMTColorMap.loadFromCPT(shakecptfile)
     cities = BasemapCities.loadFromCSV(cityfile)
@@ -61,7 +60,7 @@ def _test_intensity():
                  'time':edict['event_timestamp']}
     source = Source(eventdict,fault)
     maker = MapMaker(shakemap,topofile,stations,fault,layerdict,source,cities)
-    
+
     #draw intensity map
     outfolder = os.path.expanduser('~')
     maker.setIntensityLayer('mmi')

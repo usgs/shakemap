@@ -18,7 +18,7 @@ def getCustomValidator():
         'directory_type': directory_type,
         'annotatedfloat_type':annotatedfloat_type,
         'gmpe_type':gmpe_type,}
-    
+
     validator = Validator(fdict)
     return validator
 

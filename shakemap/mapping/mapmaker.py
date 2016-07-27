@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-#stdlib
+# stdlib
 import os.path
 import time
 from functools import partial
 from collections import OrderedDict
 
-#third party
+# third party
 from mapio.basemapcity import BasemapCities
 from mapio.gmt import GMTGrid
 import fiona
@@ -26,11 +26,9 @@ from descartes import PolygonPatch
 from scipy.ndimage import gaussian_filter
 import pyproj
 
-#local imports
+# local imports
 from shakemap.utils.exception import ShakeMapException
-from shakemap.grind.station import StationList
 from shakemap.gmice.wgrw12 import WGRW12
-from shakemap.grind.distance import get_distance
 
 
 CITY_COLS = 2
@@ -58,7 +56,7 @@ BORDER_ZORDER = 1001
 
 
 
-def getProjectedPolygon(polygon,m):
+def getProjectedPolygon(polygon, m):
     extlon,extlat = zip(*polygon.exterior.coords[:])
     extx,exty = m(extlon,extlat)
     extpts = list(zip(extx,exty))
@@ -73,7 +71,7 @@ def getProjectedPolygon(polygon,m):
     ppolygon = sPolygon(extpts,ints)
     return ppolygon
 
-def getProjectedPatches(polygon,m,edgecolor=WATERCOLOR):
+def getProjectedPatches(polygon, m, edgecolor = WATERCOLOR):
     patches = []
     if isinstance(polygon,MultiPolygon):
         for p in polygon:
@@ -111,14 +109,14 @@ class MapMaker(object):
         self.fig_width = FIG_WIDTH
         self.fig_height = FIG_HEIGHT
 
-        #clip all the vector data now so that map rendering will be fast
+        # clip all the vector data now so that map rendering will be fast
         t1 = time.time()
         self._clipBounds()
         t2 = time.time()
         print('%.1f seconds to clip vectors.' % (t2-t1))
-        
+
     def _clipBounds(self):
-        #returns a list of GeoJSON-like mapping objects
+        # returns a list of GeoJSON-like mapping objects
         xmin,xmax,ymin,ymax = self.shakemap.getBounds()
         bbox = (xmin,ymin,xmax,ymax)
         bboxpoly = sPolygon([(xmin,ymax),(xmax,ymax),(xmax,ymin),(xmin,ymin),(xmin,ymax)])
@@ -134,7 +132,7 @@ class MapMaker(object):
             print('Filename is %s' % value)
             f.close()
             self.vectors[key] = vshapes
-        
+
     def setCityGrid(self,nx=2,ny=2,cities_per_grid=10):
         self.city_cols = nx
         self.city_rows = ny

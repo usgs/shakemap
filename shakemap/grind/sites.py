@@ -25,7 +25,7 @@ def _load(vs30File,samplegeodict=None,resample=False,method='linear',doPadding=F
         except Exception as msg2:
             msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (vs30File,str(msg1),str(msg2))
             raise ShakeMapException(msg)
-    
+
     if vs30grid.getData().dtype != np.float64:
         vs30grid.setData(vs30grid.getData().astype(np.float64))
 

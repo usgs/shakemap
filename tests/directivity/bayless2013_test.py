@@ -20,7 +20,7 @@ def test_ss3():
     zp = np.array([0])
     epix = np.array([0])
     epiy = np.array([0.2 * flty[1]])
-    
+
     # Convert to lat/lon
     proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
     tlon,tlat = proj(fltx, flty, reverse = True)
@@ -30,10 +30,10 @@ def test_ss3():
                                 np.array([tlon[1]]), np.array([tlat[1]]),
                                 zp, width, dip, reference = 'ss3')
 
-    event = {'lat': epilat[0], 
-             'lon': epilon[0], 
-             'depth':10, 
-             'mag': magnitude, 
+    event = {'lat': epilat[0],
+             'lon': epilon[0],
+             'depth':10,
+             'mag': magnitude,
              'id':'ss3',
              'locstring':'test',
              'type':'SS',

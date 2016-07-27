@@ -13,7 +13,7 @@ class WGRW12(object):
       #
       # or
       #
-      # MMI = c2->C1 + c2->C2 * log(Y) + C5 + C6 * log(D) + C7 * M   
+      # MMI = c2->C1 + c2->C2 * log(Y) + C5 + C6 * log(D) + C7 * M
       #                            for log(Y) <= c2->T1
       # MMI = C1 + C2 * log(Y) + C5 + C6 * log(D) + C7 * M for c2->T1 < log(Y) <= T1
       # MMI = C3 + C4 * log(Y) + C5 + C6 * log(D) + C7 * M for log(Y) > T1
