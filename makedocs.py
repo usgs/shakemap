@@ -41,7 +41,7 @@ def main(args):
     REPO_DIR = os.path.dirname(os.path.abspath(__file__)) #where is this script?
 
     #get the human friendly version of the ShakeMap version
-    res,verstr,stderr = getCommandOutput('git tag')
+    res,verstr,stderr = getCommandOutput('git describe')
     if not len(verstr.strip()):
         verstr = DEFAULT_TAG
 
@@ -73,22 +73,23 @@ def main(args):
         res,stdout,stderr = getCommandOutput(manualcmd)
         
         #run the sphinx api doc command
-        sphinx_cmd = 'sphinx-apidoc -o %s -f -l -F -H %s -A "%s" -V %s %s' % (SPHINX_DIR,PACKAGE,AUTHORS,verstr,REPO_DIR)
+        package_dir = os.path.join(REPO_DIR,'shakemap')
+        sphinx_cmd = 'sphinx-apidoc -o %s -f -l -F -H %s -A "%s" -V %s %s' % (SPHINX_DIR,PACKAGE,AUTHORS,verstr,package_dir)
         res,stdout,stderr = getCommandOutput(sphinx_cmd)
-
-        #Go to the sphinx directory and build the html
-        os.chdir(SPHINX_DIR)
-        res,stdout,stderr = getCommandOutput('%s html' % make_cmd)
 
         #this has created a conf.py file and a Makefile.  We need to "edit" the conf.py file to include the ReadTheDocs theme.
         fname = os.path.join(SPHINX_DIR,'conf.py')
-        f = open(fname,'wt')
+        f = open(fname,'at')
         f.write("sys.path.insert(0, os.path.abspath('%s'))\n" % (REPO_DIR))
         f.write("import sphinx_rtd_theme\n")
         f.write("html_theme = 'sphinx_rtd_theme'\n")
         f.write("html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]\n")
         f.close()
 
+        #Go to the sphinx directory and build the html
+        os.chdir(SPHINX_DIR)
+        res,stdout,stderr = getCommandOutput('%s html' % make_cmd)
+        
         #copy the generated content to the gh-pages branch we created earlier
         htmldir = os.path.join(SPHINX_DIR,'_build','html')
         if os.path.isdir(apidocfolder):
