@@ -5,7 +5,7 @@ import subprocess
 import os.path
 import shutil
 
-
+DEFAULT_TAG = '0.1'
 
 def getCommandOutput(cmd):
     """
@@ -42,6 +42,8 @@ def main(args):
 
     #get the human friendly version of the ShakeMap version
     res,verstr,stderr = getCommandOutput('git tag')
+    if not len(verstr.strip()):
+        verstr = DEFAULT_TAG
 
     #what is the package called and who are the authors
     PACKAGE="shakemap"
@@ -56,41 +58,44 @@ def main(args):
 
     try:
         #clone the repository
-        clonecmd = 'git clone -b gh-pages https://github.com/mhearne-usgs/shakemap.git %s' % CLONE_DIR
+        clonecmd = 'git clone -b gh-pages https://github.com/usgs/shakemap.git %s' % CLONE_DIR
         res,stdout,stderr = getCommandOutput(clonecmd)
 
         #remove the current apidocs folder from that repo
-        apidocfolder = os.path.join(CLONE_DIR,'apidoc')
-        sh.rmtree(apidocfolder)
+        apidocfolder = os.path.join(CLONE_DIR,'html','apidoc')
+        if os.path.isdir(apidocfolder):
+            shutil.rmtree(apidocfolder)
 
         #run the make command to build the shakemap manual
         makefile = os.path.join(REPO_DIR,'doc','Makefile')
-        manualcmd = '%s -f %s' % (make_cmd,makefile)
+        os.chdir(os.path.join(REPO_DIR,'doc'))
+        manualcmd = '%s html' % make_cmd
         res,stdout,stderr = getCommandOutput(manualcmd)
         
         #run the sphinx api doc command
         sphinx_cmd = 'sphinx-apidoc -o %s -f -l -F -H %s -A "%s" -V %s %s' % (SPHINX_DIR,PACKAGE,AUTHORS,verstr,REPO_DIR)
         res,stdout,stderr = getCommandOutput(sphinx_cmd)
 
-        #this has created a conf.py file and a Makefile.  We need to "edit" the conf.py file to include the ReadTheDocs theme.
-        with open(os.path.join(SPHINX_DIR,'conf.py')) as f:
-            f.write("sys.path.insert(0, os.path.abspath('%s'))\n" % (REPO_DIR))
-            f.write("import sphinx_rtd_theme\n")
-            f.write("html_theme = 'sphinx_rtd_theme'\n")
-            f.write("html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]\n")
-
-        #run the make command to generate the HTML
+        #Go to the sphinx directory and build the html
         os.chdir(SPHINX_DIR)
         res,stdout,stderr = getCommandOutput('%s html' % make_cmd)
-        if not res:
-            print('Command to create HTML failed.  Exiting.')
-            sys.exit(1)
 
+        #this has created a conf.py file and a Makefile.  We need to "edit" the conf.py file to include the ReadTheDocs theme.
+        fname = os.path.join(SPHINX_DIR,'conf.py')
+        f = open(fname,'wt')
+        f.write("sys.path.insert(0, os.path.abspath('%s'))\n" % (REPO_DIR))
+        f.write("import sphinx_rtd_theme\n")
+        f.write("html_theme = 'sphinx_rtd_theme'\n")
+        f.write("html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]\n")
+        f.close()
+
+        #copy the generated content to the gh-pages branch we created earlier
+        htmldir = os.path.join(SPHINX_DIR,'_build','html')
+        if os.path.isdir(apidocfolder):
+            shutil.rmtree(apidocfolder)
+        shutil.copytree(htmldir,apidocfolder)
+        
         if args.post:
-            #copy the generated content to the gh-pages branch we created earlier
-            htmldir = os.path.join(SPHINX_DIR,'_build','html')
-            shutil.copytree(htmldir,apidocfolder)
-
             #cd to directory above where html content was pushed
             os.chdir(CLONE_DIR)
             res,stdout,stderr = getCommandOutput('touch .nojekyll')
@@ -100,11 +105,17 @@ def main(args):
             if res1+res2+res3 < 3:
                 print('Something bad happened when attempting to add, commit, or push gh-pages content to GitHub. Exiting.')
                 sys.exit(1)
+        else:
+            if not args.clean:
+                indexpage = os.path.join(CLONE_DIR,'html','index.html')
+                print('You can inspect the ShakeMap manual and API docs by looking here: %s' % indexpage)
     except:
         pass
     finally:
-        shutil.rmtree(CLONE_DIR)
-        shutil.rmtree(SPHINX_DIR)
+        if args.clean:
+            print('Cleaning up %s and %s created directories...' % (CLONE_DIR,SPHINX_DIR))
+            shutil.rmtree(CLONE_DIR)
+            shutil.rmtree(SPHINX_DIR)
     
 
 if __name__ == '__main__':
@@ -113,6 +124,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-p','--post', action='store_true', default=False,
                         help='Post content to the web')
+    parser.add_argument('-c','--clean', action='store_true', default=False,
+                        help='Clean up local directories containing generated HTML content')
 
     pargs = parser.parse_args()
     main(pargs)
