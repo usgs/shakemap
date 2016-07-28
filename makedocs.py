@@ -80,7 +80,7 @@ def main(args):
         manualcmd = '%s html' % make_cmd
         res,stdout,stderr = getCommandOutput(manualcmd)
         if not res:
-            raise Exception('Could not build the ShakeMap manual.')
+            raise Exception('Could not build the ShakeMap manual - error "%s".' % stderr)
         
         #run the sphinx api doc command
         sys.stderr.write('Building shakemap API documentation (REST)...\n')
@@ -88,7 +88,7 @@ def main(args):
         sphinx_cmd = 'sphinx-apidoc -o %s -f -l -F -H %s -A "%s" -V %s %s' % (SPHINX_DIR,PACKAGE,AUTHORS,verstr,package_dir)
         res,stdout,stderr = getCommandOutput(sphinx_cmd)
         if not res:
-            raise Exception('Could not build ShakeMap API documentation.')
+            raise Exception('Could not build ShakeMap API documentation - error "%s".' % stderr)
 
         #run the make command to build the shakemap manual (pdf version)
         sys.stderr.write('Building shakemap manual (PDF)...\n')
@@ -96,7 +96,7 @@ def main(args):
         manualcmd = '%s latexpdf' % make_cmd
         res,stdout,stderr = getCommandOutput(manualcmd)
         if not res:
-            raise Exception('Could not build the PDF version of the ShakeMap manual.')
+            raise Exception('Could not build the PDF version of the ShakeMap manual - error "%s".' % stderr)
 
         #this has created a conf.py file and a Makefile.  We need to "edit" the conf.py file to include the ReadTheDocs theme.
         fname = os.path.join(SPHINX_DIR,'conf.py')
@@ -112,7 +112,7 @@ def main(args):
         os.chdir(SPHINX_DIR)
         res,stdout,stderr = getCommandOutput('%s html' % make_cmd)
         if not res:
-            raise Exception('Could not build HTML for API documentation.')
+            raise Exception('Could not build HTML for API documentation. - error "%s"' % stderr)
         
         #copy the generated content to the gh-pages branch we created earlier
         htmldir = os.path.join(SPHINX_DIR,'_build','html')
@@ -125,11 +125,12 @@ def main(args):
             htmldir = os.path.join(CLONE_DIR) #this should probably not have 'html' in it
             os.chdir(htmldir)
             res,stdout,stderr = getCommandOutput('touch .nojekyll')
-            res1,stdout,stderr = getCommandOutput('git add --all')
-            res2,stdout,stderr = getCommandOutput('git commit -am"Pushing version %s to GitHub pages"' % verstr)
-            res3,stdout,stderr = getCommandOutput('git push -u origin +gh-pages')
+            res1,stdout,stderr1 = getCommandOutput('git add --all')
+            res2,stdout,stderr2 = getCommandOutput('git commit -am"Pushing version %s to GitHub pages"' % verstr)
+            res3,stdout,stderr3 = getCommandOutput('git push -u origin +gh-pages')
             if res1+res2+res3 < 3:
-                print('Something bad happened when attempting to add, commit, or push gh-pages content to GitHub. Exiting.')
+                stderr = stderr1+stderr2+stderr3
+                print('Something bad happened when attempting to add, commit, or push gh-pages content to GitHub - error "%s". Exiting.' % stderr)
                 sys.exit(1)
             print('You can inspect the ShakeMap manual and API docs by looking here: http://usgs.github.io/shakemap/index.html')
         else:
