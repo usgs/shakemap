@@ -361,11 +361,11 @@ class Fault(object):
         # first corner repeated, and then a nan.
         anan = np.ones_like(xp0) * np.nan
         lon = np.array(list(zip(xp0, xp1, xp2, xp3, xp0, anan))
-                       ).reshape((nq, 6)).flatten(order = 'C')
+                       ).reshape((nq, 6)).flatten(order='C')
         lat = np.array(list(zip(yp0, yp1, yp2, yp3, yp0, anan))
-                       ).reshape((nq, 6)).flatten(order = 'C')
+                       ).reshape((nq, 6)).flatten(order='C')
         dep = np.array(list(zip(zp0, zp1, zp2, zp3, zp0, anan))
-                       ).reshape((nq, 6)).flatten(order = 'C')
+                       ).reshape((nq, 6)).flatten(order='C')
 
         return cls(lon, lat, dep, reference)
 

@@ -20,6 +20,7 @@ from shakemap.utils.exception import ShakeMapException
 from shakemap.grind.fault import get_local_unit_slip_vector
 from shakemap.grind.fault import get_quad_slip
 
+
 def test_misc():
     # Make a fault
     lat0 = np.array([34.1])
@@ -49,7 +50,7 @@ def test_slip():
     slp = get_quad_slip(flt.getQuadrilaterals()[0], 30).getArray()
     slpd = np.array([0.80816457,  0.25350787,  0.53160491])
     np.testing.assert_allclose(slp, slpd)
-    
+
     slp = get_local_unit_slip_vector(22, 30, 86).getArray()
     slpd = np.array([0.82714003,  0.38830563,  0.49878203])
     np.testing.assert_allclose(slp, slpd)

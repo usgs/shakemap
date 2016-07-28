@@ -32,7 +32,7 @@ class Distance(object):
     Class for distance calculations.
     """
 
-    def __init__(self, gmpe, source, lat, lon, dep, use_median_distance = True):
+    def __init__(self, gmpe, source, lat, lon, dep, use_median_distance=True):
         """
         Construct a Distance object.
         :param gmpe:
@@ -66,7 +66,7 @@ class Distance(object):
             gmpe, lat, lon, dep, use_median_distance)
 
     @classmethod
-    def fromSites(cls, gmpe, source, sites, use_median_distance = True):
+    def fromSites(cls, gmpe, source, sites, use_median_distance=True):
         """
         Convenience class method to construct a Distance object from a sites object.
         :param gmpe:
@@ -130,7 +130,7 @@ class Distance(object):
         return copy.deepcopy(self._source)
 
     def _calcDistanceContext(self, gmpe, lat, lon, dep,
-                             use_median_distance = True):
+                             use_median_distance=True):
         """
         Create a DistancesContext object
         :param gmpe:
@@ -177,7 +177,7 @@ class Distance(object):
 
 
 def get_distance(methods, lat, lon, dep, source,
-                 use_median_distance = True):
+                 use_median_distance=True):
     """
     Calculate distance using any one of a number of distance measures.
     One of quadlist OR hypo must be specified.
