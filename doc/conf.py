@@ -53,7 +53,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'ShakeMap Manual'
+project = u'ShakeMap Documentation'
 copyright = u'2015, C. Bruce Worden, David Wald'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -209,7 +209,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'ShakeMapManual.tex', u'ShakeMap Manual',
+  ('shake_index', 'ShakeMapManual.tex', u'ShakeMap Manual',
    u'C. Bruce Worden, David Wald', 'manual'),
 ]
 
