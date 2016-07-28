@@ -21,26 +21,27 @@ from openquake.hazardlib.imt import PGA, PGV, SA
 import numpy as np
 
 
-__pga_pgv_col_names = [ 'c12', 'c34', 'R' ]
-__sa_col_names = [ 'c1', 'c2', 'c3', 'c4', 'R' ]
-__pga_dict = { \
-    const.IMC.MEDIAN_HORIZONTAL         : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.01, 1.00 ]))), \
-    const.IMC.GMRotI50                  : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ]))), \
-    const.IMC.RotD50                    : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ]))), \
-    const.IMC.RANDOM_HORIZONTAL         : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.07, 1.03 ]))), \
-    const.IMC.GREATER_OF_TWO_HORIZONTAL : dict(list(zip(__pga_pgv_col_names, [ 1.1, 0.05, 1.02 ]))) }
-__pgv_dict = { \
-    const.IMC.MEDIAN_HORIZONTAL         : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.01, 1.00 ]))), \
-    const.IMC.GMRotI50                  : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ]))), \
-    const.IMC.RotD50                    : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.02, 1.00 ]))), \
-    const.IMC.RANDOM_HORIZONTAL         : dict(list(zip(__pga_pgv_col_names, [ 1.0, 0.07, 1.03 ]))), \
-    const.IMC.GREATER_OF_TWO_HORIZONTAL : dict(list(zip(__pga_pgv_col_names, [ 1.1, 0.05, 1.02 ]))) }
-__sa_dict  = { \
-    const.IMC.MEDIAN_HORIZONTAL         : dict(list(zip(__sa_col_names, [ 1.0, 1.0, 0.01, 0.02, 1.00 ]))), \
-    const.IMC.GMRotI50                  : dict(list(zip(__sa_col_names, [ 1.0, 1.0, 0.03, 0.04, 1.00 ]))), \
-    const.IMC.RotD50                    : dict(list(zip(__sa_col_names, [ 1.0, 1.0, 0.02, 0.03, 1.00 ]))), \
-    const.IMC.RANDOM_HORIZONTAL         : dict(list(zip(__sa_col_names, [ 1.0, 1.0, 0.07, 0.11, 1.05 ]))), \
-    const.IMC.GREATER_OF_TWO_HORIZONTAL : dict(list(zip(__sa_col_names, [ 1.1, 1.2, 0.04, 0.07, 1.02 ]))) }
+__pga_pgv_col_names = ['c12', 'c34', 'R']
+__sa_col_names = ['c1', 'c2', 'c3', 'c4', 'R']
+__pga_dict = {
+    const.IMC.MEDIAN_HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.0, 0.01, 1.00]))),
+    const.IMC.GMRotI50: dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
+    const.IMC.RotD50: dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
+    const.IMC.RANDOM_HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
+    const.IMC.GREATER_OF_TWO_HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.1, 0.05, 1.02])))}
+__pgv_dict = {
+    const.IMC.MEDIAN_HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.0, 0.01, 1.00]))),
+    const.IMC.GMRotI50: dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
+    const.IMC.RotD50: dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
+    const.IMC.RANDOM_HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
+    const.IMC.GREATER_OF_TWO_HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.1, 0.05, 1.02])))}
+__sa_dict = {
+    const.IMC.MEDIAN_HORIZONTAL: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.01, 0.02, 1.00]))),
+    const.IMC.GMRotI50: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.03, 0.04, 1.00]))),
+    const.IMC.RotD50: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.02, 0.03, 1.00]))),
+    const.IMC.RANDOM_HORIZONTAL: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.07, 0.11, 1.05]))),
+    const.IMC.GREATER_OF_TWO_HORIZONTAL: dict(list(zip(__sa_col_names, [1.1, 1.2, 0.04, 0.07, 1.02])))}
+
 
 def ampIMCtoIMC(amps, imc_in, imc_out, imt):
     """ 
@@ -60,28 +61,29 @@ def ampIMCtoIMC(amps, imc_in, imc_out, imt):
         # geometric mean)
         denom = 1
     elif imc_in == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-         imc_in == const.IMC.MEDIAN_HORIZONTAL or \
-         imc_in == const.IMC.GMRotI50          or\
-         imc_in == const.IMC.RotD50            or\
-         imc_in == const.IMC.RANDOM_HORIZONTAL:
+            imc_in == const.IMC.MEDIAN_HORIZONTAL or \
+            imc_in == const.IMC.GMRotI50          or\
+            imc_in == const.IMC.RotD50            or\
+            imc_in == const.IMC.RANDOM_HORIZONTAL:
         denom = __GM2other(imt, imc_in)
     else:
         raise ValueError('unknown IMC %r' % imc_in)
 
     if imc_out == const.IMC.AVERAGE_HORIZONTAL:
-        # The previous step will put the amps into the B&B "reference" 
+        # The previous step will put the amps into the B&B "reference"
         # type ("GM", i.e. geometric mean)
         numer = 1
     elif imc_out == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-         imc_out == const.IMC.MEDIAN_HORIZONTAL or \
-         imc_out == const.IMC.GMRotI50          or\
-         imc_out == const.IMC.RotD50            or\
-         imc_out == const.IMC.RANDOM_HORIZONTAL:
+            imc_out == const.IMC.MEDIAN_HORIZONTAL or \
+            imc_out == const.IMC.GMRotI50          or\
+            imc_out == const.IMC.RotD50            or\
+            imc_out == const.IMC.RANDOM_HORIZONTAL:
         numer = __GM2other(imt, imc_out)
     else:
         raise ValueError('unknown IMC %r' % imc_out)
 
     return amps * (numer / denom)
+
 
 def sigmaIMCtoIMC(sigmas, imc_in, imc_out, imt):
     """ 
@@ -97,15 +99,15 @@ def sigmaIMCtoIMC(sigmas, imc_in, imc_out, imt):
         returns sigmas converted from imc_in to imc_out
     """
     if imc_in == const.IMC.AVERAGE_HORIZONTAL:
-        # The amps are already in the B&B "reference" type ("GM", i.e., 
+        # The amps are already in the B&B "reference" type ("GM", i.e.,
         # geometric mean)
         R = 1
         sig_log_ratio = 0
     elif imc_in == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-         imc_in == const.IMC.MEDIAN_HORIZONTAL or \
-         imc_in == const.IMC.GMRotI50          or\
-         imc_in == const.IMC.RotD50            or\
-         imc_in == const.IMC.RANDOM_HORIZONTAL:
+            imc_in == const.IMC.MEDIAN_HORIZONTAL or \
+            imc_in == const.IMC.GMRotI50          or\
+            imc_in == const.IMC.RotD50            or\
+            imc_in == const.IMC.RANDOM_HORIZONTAL:
         R, sig_log_ratio = __GM2otherSigma(imt, imc_in)
     else:
         raise ValueError('unknown IMC %r' % imc_in)
@@ -113,21 +115,22 @@ def sigmaIMCtoIMC(sigmas, imc_in, imc_out, imt):
     sigma_GM2 = (sigmas**2 - sig_log_ratio**2) / R**2
 
     if imc_out == const.IMC.AVERAGE_HORIZONTAL:
-        # The sigmas (sigma_GM2) are already in the B&B "reference" type ("GM", i.e., 
+        # The sigmas (sigma_GM2) are already in the B&B "reference" type ("GM", i.e.,
         # geometric mean)
         R = 1
         sig_log_ratio = 0
     elif imc_out == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-         imc_out == const.IMC.MEDIAN_HORIZONTAL or \
-         imc_out == const.IMC.GMRotI50          or\
-         imc_out == const.IMC.RotD50            or\
-         imc_out == const.IMC.RANDOM_HORIZONTAL:
+            imc_out == const.IMC.MEDIAN_HORIZONTAL or \
+            imc_out == const.IMC.GMRotI50          or\
+            imc_out == const.IMC.RotD50            or\
+            imc_out == const.IMC.RANDOM_HORIZONTAL:
         R, sig_log_ratio = __GM2otherSigma(imt, imc_out)
     else:
         raise ValueError('unknown IMC %r' % imc_out)
 
     sigma_out = np.sqrt(sigma_GM2 * R**2 + sig_log_ratio**2)
     return sigma_out
+
 
 def __GM2other(imt, imc):
     """ Helper function to extract coefficients from the parameter tables """
@@ -152,6 +155,7 @@ def __GM2other(imt, imc):
     else:
         raise ValueError('unknown IMT %r' % imt)
 
+
 def __GM2otherSigma(imt, imc):
     """ Helper function to extract coefficients from the parameter tables """
     if 'PGA' in imt:
@@ -175,4 +179,3 @@ def __GM2otherSigma(imt, imc):
             return R, __sa_dict[imc]['c4']
     else:
         raise ValueError('unknown IMT %r' % imt)
-    

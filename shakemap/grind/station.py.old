@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#stdlib modules
+# stdlib modules
 import sys
 import os.path
 from xml.dom import minidom
@@ -8,12 +8,13 @@ import copy
 import pprint
 import io
 
-#third party modules
+# third party modules
 import numpy as np
 from neicio.tag import Tag
 
-#local imports
+# local imports
 from shakemap.utils.exception import ShakeMapException
+
 
 def _getStationAttributes(station):
     """
@@ -23,7 +24,7 @@ def _getStationAttributes(station):
     for attr in list(station.attributes.items()):
         key = attr[0]
         value = attr[1]
-        #is this value a float or str?
+        # is this value a float or str?
         try:
             value = float(value)
         except:
@@ -31,33 +32,35 @@ def _getStationAttributes(station):
         attrdict[key] = value
     return attrdict
 
+
 def get_peak_values(stationdict):
     """Return the peak ground motion values (horizontal channels), intensity, station code, and coordinates of station data.
     Inputs:
-    
+
      * stationdict Dictionary returned by filter_stations()
-     
+
     Output:
-    
+
      * Dictionary containing numpy arrays for keys: lat,lon,pga,pgv,psa03,psa10,psa30,mmi,code
 
      NB: If any of the peak ground motion fields are not defined, numpy.NaN is assigned for that value,
     ensuring each array is of the same length.
     """
-    peakdict = {'lat':[],
-                'lon':[],
-                'pga':[],
-                'pgv':[],
-                'psa03':[],
-                'psa10':[],
-                'psa30':[],
-                'mmi':[],
-                'code':[]
+    peakdict = {'lat': [],
+                'lon': [],
+                'pga': [],
+                'pgv': [],
+                'psa03': [],
+                'psa10': [],
+                'psa30': [],
+                'mmi': [],
+                'code': []
                 }
-    peakkeys = ['pga','pgv','psa03','psa10','psa30']
-    for stationcode,stationtuple in stationdict.items():
-        attributes,compdict = stationtuple
-        #we need to check the components to see if the two horizontal channels are distinguishable from the vertical channel
+    peakkeys = ['pga', 'pgv', 'psa03', 'psa10', 'psa30']
+    for stationcode, stationtuple in stationdict.items():
+        attributes, compdict = stationtuple
+        # we need to check the components to see if the two horizontal channels
+        # are distinguishable from the vertical channel
         channelsum = 0
         channels = list(compdict.keys())
         for channel in list(compdict.keys()):
@@ -72,11 +75,11 @@ def get_peak_values(stationdict):
         peakdict['lat'].append(attributes['lat'])
         peakdict['lon'].append(attributes['lon'])
         peakdict['code'].append(stationcode)
-        #make sure we get the peak value from 
+        # make sure we get the peak value from
         for key in peakkeys:
             value = -1
-            for channel,pgmdict in compdict.items():
-                if channel.lower().endswith('z'): #is vertical channel guaranteed to end with 'Z'????
+            for channel, pgmdict in compdict.items():
+                if channel.lower().endswith('z'):  # is vertical channel guaranteed to end with 'Z'????
                     continue
                 if key in pgmdict and pgmdict[key]['value'] > value and pgmdict[key]['flag'] == '0':
                     value = pgmdict[key]['value']
@@ -86,7 +89,8 @@ def get_peak_values(stationdict):
     for key in list(peakdict.keys()):
         peakdict[key] = np.array(peakdict[key])
     return peakdict
-            
+
+
 def write_stations(stationdict):
     """Write station dictionary structure to an XML string.
     Inputs:
@@ -96,19 +100,20 @@ def write_stations(stationdict):
     Outputs:
      * XML string suitable for writing to a file
     """
-    earthquakeTag = Tag('earthquake-data') #top level
-    for stationcode,stationtuple in stationdict.items():
-        attributes,compdict = stationtuple
-        stationTag = Tag('station',attributes=attributes)
-        for compname,pgmdict in compdict.items():
-            compTag = Tag('comp',attributes={'name':compname})
-            for pgm,pgmvaldict in pgmdict.items():
-                pgmTag = Tag(pgm,attributes=pgmvaldict)
+    earthquakeTag = Tag('earthquake-data')  # top level
+    for stationcode, stationtuple in stationdict.items():
+        attributes, compdict = stationtuple
+        stationTag = Tag('station', attributes=attributes)
+        for compname, pgmdict in compdict.items():
+            compTag = Tag('comp', attributes={'name': compname})
+            for pgm, pgmvaldict in pgmdict.items():
+                pgmTag = Tag(pgm, attributes=pgmvaldict)
                 compTag.addChild(pgmTag)
             stationTag.addChild(compTag)
         earthquakeTag.addChild(stationTag)
     xmlstr = earthquakeTag.renderToXML(ntabs=0)
     return xmlstr
+
 
 def _getGroundMotions(comp):
     """
@@ -124,27 +129,28 @@ def _getGroundMotions(comp):
             key = 'pga'
         if key == 'vel':
             key = 'pgv'
-        
+
         value = float(pgm.getAttribute('value'))
         if pgm.hasAttribute('flag'):
             flag = pgm.getAttribute('flag')
         else:
             flag = '0'
-        pgmdict[key] = {'value':value,'flag':flag}
+        pgmdict[key] = {'value': value, 'flag': flag}
     return pgmdict
+
 
 def filter_stations(xmlfiles):
     """Read in N station data files in XML format and condense them into one data structure.
     Input:
-    
+
      * xmlfiles - Sequence of xml files containing station data
-     
+
     Output:
      * stationdict, a dictionary (keys are station codes) of unique station two-tuples.  
        First element contains a dictionary of station attributes. The second element contains:
-    
+
        * a dictionary of components (keys are component names), values are:
-       
+
          * a dictionary of peak ground motions where keys are pga, pgv, etc. and values are a dictionary with keys {value,flag}.
 
     Example:
@@ -210,10 +216,12 @@ def filter_stations(xmlfiles):
     stationdict = {}
     for xmlfile in xmlfiles:
         if not os.path.isfile(xmlfile):
-            raise ShakeMapException('Input xml file "%s" does not exist.' % xmlfile)
+            raise ShakeMapException(
+                'Input xml file "%s" does not exist.' % xmlfile)
         tstationdict = filter_station(xmlfile)
-        stationdict.update(tstationdict)        
+        stationdict.update(tstationdict)
     return stationdict
+
 
 def filter_station(xmlfile):
     """
@@ -229,7 +237,7 @@ def filter_station(xmlfile):
     stationdict = {}
     dom = minidom.parse(xmlfile)
     for root in dom.childNodes:
-        if not isinstance(root,minidom.DocumentType):
+        if not isinstance(root, minidom.DocumentType):
             break
     stations = root.getElementsByTagName('station')
     for station in stations:
@@ -248,11 +256,9 @@ def filter_station(xmlfile):
             else:
                 pgmdict = {}
             pgmdict.update(tpgmdict)
-            #copy the VALUES, not REFERENCES, of the component list into our growing dictionary
+            # copy the VALUES, not REFERENCES, of the component list into our
+            # growing dictionary
             compdict[compname] = copy.deepcopy(pgmdict)
-        stationdict[code] = (attributes,copy.deepcopy(compdict))
+        stationdict[code] = (attributes, copy.deepcopy(compdict))
     dom.unlink()
     return stationdict
-
-    
-    

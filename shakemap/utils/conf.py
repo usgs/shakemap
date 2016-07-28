@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-#stdlib imports
+# stdlib imports
 import os.path
 import tempfile
 import textwrap
@@ -8,56 +8,62 @@ import sys
 import re
 import io
 
-#third party libraries
+# third party libraries
 from configobj import ConfigObj
-from validate import Validator,VdtTypeError,VdtParamError
+from validate import Validator, VdtTypeError, VdtParamError
+
 
 def getCustomValidator():
     fdict = {
         'file_type': file_type,
         'directory_type': directory_type,
-        'annotatedfloat_type':annotatedfloat_type,
-        'gmpe_type':gmpe_type,}
+        'annotatedfloat_type': annotatedfloat_type,
+        'gmpe_type': gmpe_type, }
 
     validator = Validator(fdict)
     return validator
 
-def createDefaultConfig(configspec,includeComments=False):
-    configfolder = os.path.join(os.path.expanduser('~'),'.shakemap')
+
+def createDefaultConfig(configspec, includeComments=False):
+    configfolder = os.path.join(os.path.expanduser('~'), '.shakemap')
     if not os.path.isdir(configfolder):
         os.mkdir(configfolder)
-    outfile = os.path.join(configfolder,'config.ini')
-    config = ConfigObj(configspec=configspec,stringify=False)
+    outfile = os.path.join(configfolder, 'config.ini')
+    config = ConfigObj(configspec=configspec, stringify=False)
     validator = getCustomValidator()
-    config.validate(validator,copy=True)
+    config.validate(validator, copy=True)
     lines = config.write()
-    f = open(outfile,'wt')
-    #TODO - should we write out the docs for the parameters that have default=None?
+    f = open(outfile, 'wt')
+    # TODO - should we write out the docs for the parameters that have
+    # default=None?
     for line in lines:
         if line.strip().startswith('#') and not includeComments:
             continue
         parts = line.split('=')
-        #this is a hack because I can't figure out what to do with floats with default value of None.
-        #tried stringify=False/True, still get errors when I try to validate
-        if len(parts) > 1 and parts[1].strip() == '""': 
+        # this is a hack because I can't figure out what to do with floats with default value of None.
+        # tried stringify=False/True, still get errors when I try to validate
+        if len(parts) > 1 and parts[1].strip() == '""':
             continue
         if not len(line.strip()):
             continue
-        f.write(line+'\n')
+        f.write(line + '\n')
     f.close()
     return outfile
 
-def whatIs(configspec,param):
+
+def whatIs(configspec, param):
     config = ConfigObj(configspec=configspec)
     validator = getCustomValidator()
-    config.validate(validator,copy=True)
-    comment = '%s is not a value found in %s.' % (param,configspec)
+    config.validate(validator, copy=True)
+    comment = '%s is not a value found in %s.' % (param, configspec)
     for sectionkey in config.sections:
         section = config[sectionkey]
         for key in list(section.keys()):
             if param.lower() == key.lower():
-                comment = 'Section [%s] has that option:' % (sectionkey) +'\n'.join(section.comments[key])
+                comment = 'Section [%s] has that option:' % (
+                    sectionkey) + '\n'.join(section.comments[key])
     return comment
+
 
 def annotatedfloat_type(value):
     try:
@@ -68,19 +74,20 @@ def annotatedfloat_type(value):
     out = []
     if value.find('c') > 0:
         try:
-            out = float(value.replace('c',''))/3600.0
+            out = float(value.replace('c', '')) / 3600.0
         except:
             raise VdtTypeError(value)
     if value.find('m') > 0:
         try:
-            out = float(value.replace('m',''))/60.0
+            out = float(value.replace('m', '')) / 60.0
         except:
             raise VdtTypeError(value)
     return out
 
-def gmpe_type(value,*args):
+
+def gmpe_type(value, *args):
     if len(args) != len(value):
-        raise VdtParamError('gmpe',value)
+        raise VdtParamError('gmpe', value)
     out = []
     try:
         minmag = float(value[0])
@@ -95,32 +102,35 @@ def gmpe_type(value,*args):
             raise VdtTypeError(value)
         if not (maxdep >= 0.0 and maxdep <= 10000.0 and maxdep > mindep):
             raise VdtTypeError(value)
-        out += [minmag,maxmag,mindep,maxdep]
+        out += [minmag, maxmag, mindep, maxdep]
     except:
-        raise VdtParamError('gmpe',value)
+        raise VdtParamError('gmpe', value)
     return out
+
 
 def file_type(value):
     if not os.path.isfile(value):
         raise VdtTypeError(value)
     return value
 
+
 def directory_type(value):
     if not os.path.isdir(value):
         raise VdtTypeError(value)
     return value
 
-def validate(configspec,configfile,macros=None):
+
+def validate(configspec, configfile, macros=None):
     '''return a validated config object.
     '''
-    #first, replace all the macros if we have the values
+    # first, replace all the macros if we have the values
     if macros is not None:
-        configstr = open(configfile,'rt').read()
-        for key,value in macros.items():
-            macro = '<'+key.upper()+'>'
-            configstr = configstr.replace(macro,value)
+        configstr = open(configfile, 'rt').read()
+        for key, value in macros.items():
+            macro = '<' + key.upper() + '>'
+            configstr = configstr.replace(macro, value)
         configfile = io.StringIO(configstr)
-    config = ConfigObj(configfile,configspec=configspec)
+    config = ConfigObj(configfile, configspec=configspec)
     validator = getCustomValidator()
     result = config.validate(validator)
     # for rkey,rvalue in result.iteritems():
@@ -131,9 +141,10 @@ def validate(configspec,configfile,macros=None):
     else:
         return False
 
+
 def _test_validate():
     dummydir = os.path.expanduser('~')
-    dummyfile = os.path.join(os.path.expanduser('~'),'.bash_profile') 
+    dummyfile = os.path.join(os.path.expanduser('~'), '.bash_profile')
     data = '''[grind]
     smVs30default = 686.0
     use_gmpe_sc = False
@@ -202,34 +213,36 @@ def _test_validate():
         eventsource = <EVENT_NETWORK>
         eventsourcecode = <EVENT_ID>
         privatekey = %s
-    ''' % (dummydir,dummyfile,dummyfile,dummyfile,dummyfile)
+    ''' % (dummydir, dummyfile, dummyfile, dummyfile, dummyfile)
     try:
-        fh,tfile = tempfile.mkstemp()
+        fh, tfile = tempfile.mkstemp()
         os.close(fh)
-        f = open(tfile,'wt')
+        f = open(tfile, 'wt')
         f.write(textwrap.dedent(data))
         f.close()
-        homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-        configspec = os.path.join(homedir,'configspec.ini')
-        macros = {'shakemap_network':'us',
-                  'event_code':'2015abcd',
-                  'event_network':'us',
-                  'event_id':'us2015abcd'}
-        ret = validate(configspec,tfile,macros=macros)
+        homedir = os.path.dirname(os.path.abspath(
+            __file__))  # where is this script?
+        configspec = os.path.join(homedir, 'configspec.ini')
+        macros = {'shakemap_network': 'us',
+                  'event_code': '2015abcd',
+                  'event_network': 'us',
+                  'event_id': 'us2015abcd'}
+        ret = validate(configspec, tfile, macros=macros)
         print(ret)
         config = ConfigObj(tfile)
         pass
     except Exception as e:
         print('_test_validate() failed with error "%s"' % str(e))
     os.remove(tfile)
-    
+
 if __name__ == '__main__':
     _test_validate()
     sys.exit(0)
-    homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-    configspec = os.path.join(homedir,'configspec.ini')
+    homedir = os.path.dirname(os.path.abspath(
+        __file__))  # where is this script?
+    configspec = os.path.join(homedir, 'configspec.ini')
     configfile = createDefaultConfig(configspec)
 
-    print(whatIs(configspec,'pgm2mi'))
+    print(whatIs(configspec, 'pgm2mi'))
 
-    print(validate(configspec,configfile))
+    print(validate(configspec, configfile))

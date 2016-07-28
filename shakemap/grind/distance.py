@@ -416,8 +416,8 @@ def get_distance(methods, lat, lon, dep, source,
                 w_i = np.zeros_like(t_i)
                 # Case 1:
                 ix = t_i != 0
-                w_i[ix] = (1.0 / t_i[ix]) * (np.arctan((l_i[i] - \
-                           u_i[ix]) / t_i[ix]) - np.arctan(-u_i[ix] / t_i[ix]))
+                w_i[ix] = (1.0 / t_i[ix]) * (np.arctan((l_i[i] -
+                                                        u_i[ix]) / t_i[ix]) - np.arctan(-u_i[ix] / t_i[ix]))
                 # Case 2:
                 ix = (t_i == 0) & ((u_i < 0) | (u_i > l_i[i]))
                 w_i[ix] = 1 / (u_i[ix] - l_i[i]) - 1 / u_i[ix]

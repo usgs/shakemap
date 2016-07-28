@@ -1,25 +1,28 @@
 #!/usr/bin/env python
 
-#stdlib imports
+# stdlib imports
 import os.path
 import sys
 import io
 
-#hack the path so that I can debug these functions if I need to
-homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-shakedir = os.path.abspath(os.path.join(homedir,'..','..'))
-sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring any installed shakemap stuff
+# hack the path so that I can debug these functions if I need to
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+# put this at the front of the system path, ignoring any installed
+# shakemap stuff
+sys.path.insert(0, shakedir)
 
-#third party
+# third party
 from openquake.hazardlib.gsim import abrahamson_2014
 from openquake.hazardlib.geo.mesh import Mesh
 import numpy as np
 import pytest
 
-#local imports
+# local imports
 from shakemap.utils.exception import ShakeMapException
 from shakemap.grind.source import Source
 from shakemap.grind.fault import Fault
+
 
 def test_source():
     fault_text = """30.979788       103.454422      1
@@ -38,36 +41,34 @@ def test_source():
     ffile = io.StringIO(fault_text)
     efile = io.StringIO(event_text)
     sfile = io.StringIO(source_text)
-    source = Source.readFromFile(efile,faultfile=ffile,sourcefile=sfile)
+    source = Source.readFromFile(efile, faultfile=ffile, sourcefile=sfile)
 
     gmpe = abrahamson_2014.AbrahamsonEtAl2014()
     rupture = source.getRuptureContext([gmpe])
-    testdict = {'mag':7.9,
+    testdict = {'mag': 7.9,
                 'strike': -133.083550974,
                 'dip': 49.8524115024,
                 'rake': 45.0,
-                'ztor':0.999999999995,
-                'hypo_lon':103.3639,
-                'hypo_lat':30.9858,
-                'hypo_depth':19.0,
-                'width':27.8623813381}
+                'ztor': 0.999999999995,
+                'hypo_lon': 103.3639,
+                'hypo_lat': 30.9858,
+                'hypo_depth': 19.0,
+                'width': 27.8623813381}
     for key in testdict.keys():
         value = eval('rupture.%s' % key)
-        np.testing.assert_almost_equal(testdict[key],value)
-    
+        np.testing.assert_almost_equal(testdict[key], value)
+
     mech = 'RS'
     exp_dip = 40
     exp_rake = 90
     source.setMechanism(mech)
     assert source.getEventParam('dip') == exp_dip
     assert source.getEventParam('rake') == exp_rake
-    source.setMechanism('ALL',dip=45,rake=315)
+    source.setMechanism('ALL', dip=45, rake=315)
     assert source.getEventParam('rake') == -45
-    
-    
-    #this should raise an exception
-    with pytest.raises(Exception) as e_info:
-        source.setMechanism('ALL',dip=110)
-    with pytest.raises(Exception) as e_info:
-        source.setMechanism('ALL',rake=620)
 
+    # this should raise an exception
+    with pytest.raises(Exception) as e_info:
+        source.setMechanism('ALL', dip=110)
+    with pytest.raises(Exception) as e_info:
+        source.setMechanism('ALL', rake=620)

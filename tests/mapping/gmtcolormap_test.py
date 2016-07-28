@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
-#stdlib imports
+# stdlib imports
 import os.path
 import sys
 import tempfile
 import textwrap
 
-#third party
+# third party
 import numpy as np
 
-#hack the path so that I can debug these functions if I need to
-homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-shakedir = os.path.abspath(os.path.join(homedir,'..','..'))
-sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring any installed mapio stuff
+# hack the path so that I can debug these functions if I need to
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+# put this at the front of the system path, ignoring any installed mapio stuff
+sys.path.insert(0, shakedir)
 
 from shakemap.mapping.gmtcolormap import GMTColorMap
 
@@ -49,19 +50,20 @@ def test():
     F       255     255     255
     N       128     128     128
     '''
-    cptfiles = [cptfiletext1,cptfiletext2]
-    vmins = [0,-100]
-    vmaxs = [10,9200]
-    vmids = [5,2600]
-    cmins = [(1.0,1.0,1.0),([ 0.76470588, 1.0, 0.75686275])]
-    cmaxs = [(0.78431373, 0.0, 0.0),(1.0,0.0,0.0)]
-    cmids = [(0.48865821, 1.0, 0.56516724),(0.23590927, 0.23560169, 0.2354479)]
-    midnorms = [0.5,0.29032258]
+    cptfiles = [cptfiletext1, cptfiletext2]
+    vmins = [0, -100]
+    vmaxs = [10, 9200]
+    vmids = [5, 2600]
+    cmins = [(1.0, 1.0, 1.0), ([0.76470588, 1.0, 0.75686275])]
+    cmaxs = [(0.78431373, 0.0, 0.0), (1.0, 0.0, 0.0)]
+    cmids = [(0.48865821, 1.0, 0.56516724),
+             (0.23590927, 0.23560169, 0.2354479)]
+    midnorms = [0.5, 0.29032258]
     try:
-        for i in range(0,len(cptfiles)):
-            tmp,tfile = tempfile.mkstemp()
+        for i in range(0, len(cptfiles)):
+            tmp, tfile = tempfile.mkstemp()
             os.close(tmp)
-            f = open(tfile,'wt')
+            f = open(tfile, 'wt')
             cptfiletext = cptfiles[i]
             vmin = vmins[i]
             vmid = vmids[i]
@@ -83,30 +85,30 @@ def test():
             norm0 = gmtmap.getNorm(vmin)
             normm = gmtmap.getNorm(vmid)
             norm1 = gmtmap.getNorm(vmax)
-            np.testing.assert_almost_equal(norm0,0)
-            np.testing.assert_almost_equal(normm,midnorm)
-            np.testing.assert_almost_equal(norm1,1)
+            np.testing.assert_almost_equal(norm0, 0)
+            np.testing.assert_almost_equal(normm, midnorm)
+            np.testing.assert_almost_equal(norm1, 1)
             print('Passed getting normalized values...')
 
             print('Testing getting normalized colors at specific values...')
             rgba0 = np.array(gmtmap.getNormColor(vmin))
             rgbam = np.array(gmtmap.getNormColor(vmid))
             rgba1 = np.array(gmtmap.getNormColor(vmax))
-            np.testing.assert_almost_equal(rgba0[0,0:3],cmin)
-            np.testing.assert_almost_equal(rgbam[0,0:3],cmid)
-            np.testing.assert_almost_equal(rgba1[0,0:3],cmax)
+            np.testing.assert_almost_equal(rgba0[0, 0:3], cmin)
+            np.testing.assert_almost_equal(rgbam[0, 0:3], cmid)
+            np.testing.assert_almost_equal(rgba1[0, 0:3], cmax)
             print('Passed getting normalized colors at specific values.')
 
             print('Testing getting RGB (0-255) colors at specific values...')
-            r0,g0,b0,a0 = gmtmap.getRGBColor(vmin)[0]
-            rm,gm,bm,am = gmtmap.getRGBColor(vmid)[0]
-            r1,g1,b1,a1 = gmtmap.getRGBColor(vmax)[0]
-            cmintest = tuple(np.round(np.array(cmin)*255).astype(np.int16))
-            cmidtest = tuple(np.round(np.array(cmid)*255).astype(np.int16))
-            cmaxtest = tuple(np.round(np.array(cmax)*255).astype(np.int16))
-            assert (r0,g0,b0) == cmintest
-            assert (rm,gm,bm) == cmidtest
-            assert (r1,g1,b1) == cmaxtest
+            r0, g0, b0, a0 = gmtmap.getRGBColor(vmin)[0]
+            rm, gm, bm, am = gmtmap.getRGBColor(vmid)[0]
+            r1, g1, b1, a1 = gmtmap.getRGBColor(vmax)[0]
+            cmintest = tuple(np.round(np.array(cmin) * 255).astype(np.int16))
+            cmidtest = tuple(np.round(np.array(cmid) * 255).astype(np.int16))
+            cmaxtest = tuple(np.round(np.array(cmax) * 255).astype(np.int16))
+            assert (r0, g0, b0) == cmintest
+            assert (rm, gm, bm) == cmidtest
+            assert (r1, g1, b1) == cmaxtest
             print('Passed getting RGB (0-255) colors at specific values...')
 
             # print('Testing save method (and reading back in)...')
@@ -128,6 +130,6 @@ def test():
         print('At least one test failed: "%s"' % str(e))
         if os.path.isfile(tfile):
             os.remove(tfile)
-    
+
 if __name__ == '__main__':
     test()

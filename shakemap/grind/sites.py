@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-#stdlib imports
+# stdlib imports
 import sys
 
-#third party imports
+# third party imports
 from mapio.gmt import GMTGrid
 from mapio.gdal import GDALGrid
 from mapio.grid2d import Grid2D
@@ -11,25 +11,28 @@ from mapio.geodict import GeoDict
 from openquake.hazardlib.gsim.base import SitesContext
 import numpy as np
 
-#local imports
+# local imports
 from shakemap.utils.exception import ShakeMapException
 
-def _load(vs30File,samplegeodict=None,resample=False,method='linear',doPadding=False,padValue=np.nan):
+
+def _load(vs30File, samplegeodict=None, resample=False, method='linear', doPadding=False, padValue=np.nan):
     try:
-        vs30grid = GMTGrid.load(vs30File,samplegeodict=samplegeodict,resample=resample,
-                                method=method,doPadding=doPadding,padValue=padValue)
+        vs30grid = GMTGrid.load(vs30File, samplegeodict=samplegeodict, resample=resample,
+                                method=method, doPadding=doPadding, padValue=padValue)
     except Exception as msg1:
         try:
-            vs30grid = GDALGrid.load(vs30File,samplegeodict=samplegeodict,resample=resample,
-                                     method=method,doPadding=doPadding,padValue=padValue)
+            vs30grid = GDALGrid.load(vs30File, samplegeodict=samplegeodict, resample=resample,
+                                     method=method, doPadding=doPadding, padValue=padValue)
         except Exception as msg2:
-            msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (vs30File,str(msg1),str(msg2))
+            msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (
+                vs30File, str(msg1), str(msg2))
             raise ShakeMapException(msg)
 
     if vs30grid.getData().dtype != np.float64:
         vs30grid.setData(vs30grid.getData().astype(np.float64))
 
     return vs30grid
+
 
 def _getFileGeoDict(fname):
     geodict = None
@@ -39,10 +42,12 @@ def _getFileGeoDict(fname):
         try:
             geodict = GDALGrid.getFileGeoDict(fname)
         except Exception as msg2:
-            msg = 'File geodict failure with %s - error messages: "%s"\n "%s"' % (fname,str(msg1),str(msg2))
+            msg = 'File geodict failure with %s - error messages: "%s"\n "%s"' % (
+                fname, str(msg1), str(msg2))
             raise ShakeMapException(msg)
     return geodict
-    
+
+
 def calculate_z1p0(vs30):
     c1 = 6.745
     c2 = 1.35
@@ -51,22 +56,25 @@ def calculate_z1p0(vs30):
     Z1Pt0 = np.zeros_like(vs30)
     Z1Pt0[vs30 < 180] = np.exp(c1)
     idx = (vs30 >= 180) & (vs30 <= 500)
-    Z1Pt0[idx] = np.exp(c1 - c2*np.log(vs30[idx]/180.0))
+    Z1Pt0[idx] = np.exp(c1 - c2 * np.log(vs30[idx] / 180.0))
     idx = vs30 > 500
-    Z1Pt0[idx] = np.exp(c3 -  c4 * np.log(vs30[idx]/500.0))
+    Z1Pt0[idx] = np.exp(c3 - c4 * np.log(vs30[idx] / 500.0))
     return Z1Pt0
+
 
 def calculate_z2p5(z1pt0):
     c1 = 519
     c2 = 3.595
-    Z2Pt5 = c1 + z1pt0*c2
+    Z2Pt5 = c1 + z1pt0 * c2
     return Z2Pt5
+
 
 class Sites(object):
     """An object to encapsulate information used to generate a GEM SitesContext.
     (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
     """
-    def __init__(self,vs30grid,vs30measured_grid=None,backarc=False,defaultVs30=686.0):
+
+    def __init__(self, vs30grid, vs30measured_grid=None, backarc=False, defaultVs30=686.0):
         """
         Construct a Sites object.
         :param vs30grid:
@@ -82,39 +90,45 @@ class Sites(object):
         self.Vs30 = vs30grid
         self.defaultVs30 = defaultVs30
         self.GeoDict = vs30grid.getGeoDict().copy()
-        lons = np.linspace(self.GeoDict.xmin,self.GeoDict.xmax,self.GeoDict.nx)
-        lats = np.linspace(self.GeoDict.ymin,self.GeoDict.ymax,self.GeoDict.ny)
+        lons = np.linspace(self.GeoDict.xmin,
+                           self.GeoDict.xmax, self.GeoDict.nx)
+        lats = np.linspace(self.GeoDict.ymin,
+                           self.GeoDict.ymax, self.GeoDict.ny)
         self.Z1Pt0 = calculate_z1p0(self.Vs30.getData())
         self.Z2Pt5 = calculate_z2p5(self.Z1Pt0)
         self.SitesContext = SitesContext()
         self.SitesContext.vs30 = self.Vs30.getData().copy()
         self.SitesContext.z1pt0 = self.Z1Pt0
         self.SitesContext.z2pt5 = self.Z2Pt5
-        self.SitesContext.backarc = backarc #zoneconfig might have this info
-        if vs30measured_grid is None: # If we don't know, then use false
-            self.SitesContext.vs30measured = np.zeros_like(self.SitesContext.vs30, dtype=bool)
+        self.SitesContext.backarc = backarc  # zoneconfig might have this info
+        if vs30measured_grid is None:  # If we don't know, then use false
+            self.SitesContext.vs30measured = np.zeros_like(
+                self.SitesContext.vs30, dtype=bool)
         else:
             self.SitesContext.vs30measured = vs30measured_grid
         self.SitesContext.lons = lons
         self.SitesContext.lats = lats
 
     @classmethod
-    def _create(cls,geodict,defaultVs30,vs30File,padding,resample):
+    def _create(cls, geodict, defaultVs30, vs30File, padding, resample):
         if vs30File is not None:
             fgeodict = _getFileGeoDict(vs30File)
             if not resample:
                 if not padding:
-                    geodict = fgeodict.getBoundsWithin(geodict) #we want something that is within and aligned
+                    # we want something that is within and aligned
+                    geodict = fgeodict.getBoundsWithin(geodict)
                 else:
-                    geodict = fgeodict.getAligned(geodict) #we want something that is just aligned, since we're padding edges
-            vs30grid = _load(vs30File,samplegeodict=geodict,resample=resample,
-                             method='linear',doPadding=padding,padValue=defaultVs30)
+                    # we want something that is just aligned, since we're
+                    # padding edges
+                    geodict = fgeodict.getAligned(geodict)
+            vs30grid = _load(vs30File, samplegeodict=geodict, resample=resample,
+                             method='linear', doPadding=padding, padValue=defaultVs30)
 
         return vs30grid
-        
+
     @classmethod
-    def createFromBounds(cls,xmin,xmax,ymin,ymax,dx,dy,defaultVs30=686.0,vs30File=None,
-                         vs30measured_grid=None,backarc=False,padding=False,resample=False):
+    def createFromBounds(cls, xmin, xmax, ymin, ymax, dx, dy, defaultVs30=686.0, vs30File=None,
+                         vs30measured_grid=None, backarc=False, padding=False, resample=False):
         """Create a Sites object by defining a center point, resolution, extent, and Vs30 values.
 
         :param xmin:
@@ -144,18 +158,20 @@ class Sites(object):
         :param resample:
           Boolean indicating whether or not the grid should be resampled.
         """
-        geodict = GeoDict.createDictFromBox(xmin,xmax,ymin,ymax,dx,dy)
+        geodict = GeoDict.createDictFromBox(xmin, xmax, ymin, ymax, dx, dy)
         if vs30File is not None:
-            vs30grid = cls._create(geodict,defaultVs30,vs30File,padding,resample)
+            vs30grid = cls._create(geodict, defaultVs30,
+                                   vs30File, padding, resample)
         else:
-            griddata = np.ones((geodict.ny,geodict.nx), dtype=np.float64)*defaultVs30
-            vs30grid = Grid2D(griddata,geodict)
-        return cls(vs30grid,vs30measured_grid=vs30measured_grid,backarc=backarc,
+            griddata = np.ones((geodict.ny, geodict.nx),
+                               dtype=np.float64) * defaultVs30
+            vs30grid = Grid2D(griddata, geodict)
+        return cls(vs30grid, vs30measured_grid=vs30measured_grid, backarc=backarc,
                    defaultVs30=defaultVs30)
-        
+
     @classmethod
-    def createFromCenter(cls,cx,cy,xspan,yspan,dx,dy,defaultVs30=686.0,vs30File=None,
-                         vs30measured_grid=None,backarc=False,padding=False,resample=False):
+    def createFromCenter(cls, cx, cy, xspan, yspan, dx, dy, defaultVs30=686.0, vs30File=None,
+                         vs30measured_grid=None, backarc=False, padding=False, resample=False):
         """Create a Sites object by defining a center point, resolution, extent, and Vs30 values.
 
         :param cx:
@@ -185,16 +201,18 @@ class Sites(object):
         :param resample:
           Boolean indicating whether or not the grid should be resampled.
         """
-        geodict = GeoDict.createDictFromCenter(cx,cy,dx,dy,xspan,yspan)
+        geodict = GeoDict.createDictFromCenter(cx, cy, dx, dy, xspan, yspan)
         if vs30File is not None:
-            vs30grid = cls._create(geodict,defaultVs30,vs30File,padding,resample)
+            vs30grid = cls._create(geodict, defaultVs30,
+                                   vs30File, padding, resample)
         else:
-            griddata = np.ones((geodict.ny,geodict.nx), dtype=np.float64)*defaultVs30
-            vs30grid = Grid2D(griddata,geodict)
-        return cls(vs30grid,vs30measured_grid=vs30measured_grid,backarc=backarc,
+            griddata = np.ones((geodict.ny, geodict.nx),
+                               dtype=np.float64) * defaultVs30
+            vs30grid = Grid2D(griddata, geodict)
+        return cls(vs30grid, vs30measured_grid=vs30measured_grid, backarc=backarc,
                    defaultVs30=defaultVs30)
 
-    def sampleFromSites(self,lats,lons, vs30measured_grid=None):
+    def sampleFromSites(self, lats, lons, vs30measured_grid=None):
         """Create a SitesContext object by sampling the current Sites object.
 
         :param lats:
@@ -216,14 +234,15 @@ class Sites(object):
         if latshape != lonshape:
             msg = 'Input lat/lon arrays must have the same dimensions'
             raise ShakeMapException(msg)
-        
+
         site = SitesContext()
-        site.vs30 = self.Vs30.getValue(lats,lons,default=self.defaultVs30) #use default vs30 if outside grid
+        # use default vs30 if outside grid
+        site.vs30 = self.Vs30.getValue(lats, lons, default=self.defaultVs30)
         site.lats = lats
         site.lons = lons
         site.z1pt0 = calculate_z1p0(site.vs30)
         site.z2pt5 = calculate_z2p5(site.z1pt0)
-        if vs30measured_grid is None: # If we don't know, then use false
+        if vs30measured_grid is None:  # If we don't know, then use false
             site.vs30measured = np.zeros_like(lons, dtype=bool)
         else:
             site.vs30measured = vs30measured_grid
@@ -236,14 +255,15 @@ class Sites(object):
         Return the Grid2D object containing Vs30 values for this Sites object.
         """
         return self.Vs30
-    
+
     def getSitesContext(self):
         """Return a SitesContext object appropriate for GMPE use.
         :returns:
            SitesContext object.
         """
         return self.SitesContext
-        
+
+
 def _test(vs30file=None):
     cx = -118.2
     cy = 34.1
@@ -251,17 +271,18 @@ def _test(vs30file=None):
     dy = 0.0083
     xspan = 3.0
     yspan = 3.0
-    mysite = Sites.createFromCenter(cx,cy,xspan,yspan,dx,dy,vs30File=vs30file,
-                                    padding=True,resample=False)
+    mysite = Sites.createFromCenter(cx, cy, xspan, yspan, dx, dy, vs30File=vs30file,
+                                    padding=True, resample=False)
     sc = mysite.getSitesContext()
-    
+
     cx = -118.2
     cy = 83
     dx = 0.0083
     dy = 0.0083
     xspan = 3.0
     yspan = 3.0
-    mysite = Sites.createFromCenter(cx,cy,xspan,yspan,dx,dy,vs30File=vs30file,padding=True,resample=False)
+    mysite = Sites.createFromCenter(
+        cx, cy, xspan, yspan, dx, dy, vs30File=vs30file, padding=True, resample=False)
 
     xmin = 116.234
     xmax = 120.876
@@ -269,7 +290,8 @@ def _test(vs30file=None):
     ymax = 24.75435
     dx = 0.0083
     dy = 0.0083
-    mysite = Sites.createFromBounds(xmin,xmax,ymin,ymax,dx,dy,vs30File=vs30file,padding=False,resample=False)
+    mysite = Sites.createFromBounds(
+        xmin, xmax, ymin, ymax, dx, dy, vs30File=vs30file, padding=False, resample=False)
 
 if __name__ == '__main__':
     vs30file = None

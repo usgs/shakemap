@@ -15,11 +15,10 @@ def getCommandOutput(cmd):
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE
                             )
-    stdout,stderr = proc.communicate()
+    stdout, stderr = proc.communicate()
     retcode = proc.returncode
     if retcode == 0:
         retcode = True
     else:
         retcode = False
-    return (retcode,stdout,stderr)
-
+    return (retcode, stdout, stderr)
