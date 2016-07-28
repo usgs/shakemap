@@ -17,6 +17,43 @@ sys.path.insert(0, shakedir)
 
 from shakemap.grind.fault import Fault
 from shakemap.utils.exception import ShakeMapException
+from shakemap.grind.fault import get_local_unit_slip_vector
+from shakemap.grind.fault import get_quad_slip
+
+
+def test_misc():
+    # Make a fault
+    lat0 = np.array([34.1])
+    lon0 = np.array([-118.2])
+    lat1 = np.array([34.2])
+    lon1 = np.array([-118.15])
+    z = np.array([1.0])
+    W = np.array([3.0])
+    dip = np.array([30.])
+    flt = Fault.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    fm = flt.getFaultAsMesh()
+    fa = flt.getFaultAsArrays()
+    ref = flt.getReference()
+
+
+def test_slip():
+    # Make a fault
+    lat0 = np.array([34.1])
+    lon0 = np.array([-118.2])
+    lat1 = np.array([34.2])
+    lon1 = np.array([-118.15])
+    z = np.array([1.0])
+    W = np.array([3.0])
+    dip = np.array([30.])
+    flt = Fault.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+
+    slp = get_quad_slip(flt.getQuadrilaterals()[0], 30).getArray()
+    slpd = np.array([0.80816457,  0.25350787,  0.53160491])
+    np.testing.assert_allclose(slp, slpd)
+
+    slp = get_local_unit_slip_vector(22, 30, 86).getArray()
+    slpd = np.array([0.82714003,  0.38830563,  0.49878203])
+    np.testing.assert_allclose(slp, slpd)
 
 
 def test_northridge():

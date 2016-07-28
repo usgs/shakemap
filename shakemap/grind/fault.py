@@ -369,32 +369,6 @@ class Fault(object):
 
         return cls(lon, lat, dep, reference)
 
-    def multiplyFaultLength(self, factor):
-        # What does this do and why do we want to do it????
-        for i in range(0, len(self._quadrilaterals)):
-            quad = self._quadrilaterals[i]
-            P0, P1, P2, P3 = quad
-            p0 = Vector.fromPoint(P0)
-            p1 = Vector.fromPoint(P1)
-            p2 = Vector.fromPoint(P2)
-            p3 = Vector.fromPoint(P3)
-            dtop = p1 - p0
-            toplen = dtop.mag()
-            topnorm = dtop.norm()
-            dbottom = p2 - p3
-            bottomlen = dbottom.mag()
-            bottomnorm = dbottom.norm()
-            newtoplen = toplen * factor
-            newbottomlen = bottomlen * factor
-            newp1 = p0 + topnorm * newtoplen
-            newp2 = p3 + bottomnorm * newbottomlen
-            newP1 = newp1.toPoint()
-            newP2 = newp2.toPoint()
-            newP1.depth = P0.depth
-            newP2.depth = P3.depth
-            self._quadrilaterals[i][1] = newP1
-            self._quadrilaterals[i][2] = newP2
-
     def getFaultLength(self):
         """
         Compute lenght of fault based on top edge.
@@ -833,7 +807,7 @@ class Fault(object):
         :returns:
             3-tuple of numpy arrays indicating X,Y,Z (lon,lat,depth) coordinates.
         """
-        return (np.array(self._x), np.array(self._y), np.array(self._z))
+        return (np.array(self._lon), np.array(self._lat), np.array(self._depth))
 
     def getFaultAsMesh(self):
         """
@@ -841,7 +815,7 @@ class Fault(object):
         :returns:
             Mesh (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
         """
-        fault = mesh.Mesh(self._x, self._y, self._z)
+        fault = mesh.Mesh(self._lon, self._lat, self._depth)
         return fault
 
     def _validate(self):
@@ -1064,8 +1038,8 @@ def get_quad_slip(q, rake):
     """
     P0, P1, P2 = q[0:3]
     strike = P0.azimuth(P1)
-    dip = getQuadDip(q)
-    s1_local = getLocalUnitSlipVector(strike, dip, rake)
+    dip = get_quad_dip(q)
+    s1_local = get_local_unit_slip_vector(strike, dip, rake)
     s0_local = Vector(0, 0, 0)
     qlats = [a.latitude for a in q]
     qlons = [a.longitude for a in q]
