@@ -32,7 +32,7 @@ class Distance(object):
     Class for distance calculations.
     """
 
-    def __init__(self, gmpe, source, lat, lon, dep, use_median_distance=True):
+    def __init__(self, gmpe, source, lat, lon, dep, use_median_distance = True):
         """
         Construct a Distance object.
         :param gmpe:
@@ -66,7 +66,7 @@ class Distance(object):
             gmpe, lat, lon, dep, use_median_distance)
 
     @classmethod
-    def fromSites(cls, gmpe, source, sites, use_median_distance=True):
+    def fromSites(cls, gmpe, source, sites, use_median_distance = True):
         """
         Convenience class method to construct a Distance object from a sites object.
         :param gmpe:
@@ -100,8 +100,8 @@ class Distance(object):
     @classmethod
     def fromPoints(cls, gmpe, source, lat, lon, dep, use_median_distance=True):
         """
-        Convenience class method to construct a Distance object from an array of lons, lats,
-        and depths..
+        Convenience class method to construct a Distance object from an array of
+        lons, lats, and depths.
         :param gmpe:
             Concrete subclass of GMPE
             https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
@@ -130,7 +130,7 @@ class Distance(object):
         return copy.deepcopy(self._source)
 
     def _calcDistanceContext(self, gmpe, lat, lon, dep,
-                             use_median_distance=True):
+                             use_median_distance = True):
         """
         Create a DistancesContext object
         :param gmpe:
@@ -177,7 +177,7 @@ class Distance(object):
 
 
 def get_distance(methods, lat, lon, dep, source,
-                 use_median_distance=True):
+                 use_median_distance = True):
     """
     Calculate distance using any one of a number of distance measures.
     One of quadlist OR hypo must be specified.
@@ -822,42 +822,6 @@ def calc_rupture_distance(P0, P1, P2, P3, points):
     return dist
 
 
-def calc_ry0_distance(P0, P1, lat, lon, dep):
-    """Calculate Ry0 distance.
-
-    Compute the minimum distance between sites (lat, lon, dep) and the great
-    circle arcs perpendicular to the average strike direction of the
-    fault trace and passing through the end-points of the trace.
-
-    :param P0:
-      Point object, representing the first top-edge vertex of a fault quadrilateral.
-    :param P1:
-      Point object, representing the second top-edge vertex of a fault quadrilateral.
-    :param lat:
-      Numpy array of latitude.
-    :param lon:
-      Numpy array of longitude.
-    :param dep:
-      Numpy array of depths (km).
-    :returns:
-      Array of size lon.shape of distances (in km) from input points to rupture surface.
-    """
-
-    # Strike
-    surfaceP0 = point.Point(P0.longitude, P0.latitude, 0.0)
-    surfaceP1 = point.Point(P1.longitude, P1.latitude, 0.0)
-    strike = P0.azimuth(P1)
-    dst1 = geodetic.distance_to_arc(P0.longitude, P0.latitude,
-                                    (strike + 90.) % 360, lon, lat)
-    dst2 = geodetic.distance_to_arc(P1.longitude, P1.latitude,
-                                    (strike + 90.) % 360, lon, lat)
-    # Get the shortest distance from the two lines
-    idx = np.sign(dst1) == np.sign(dst2)
-    dst = np.zeros_like(dst1)
-    dst[idx] = np.fmin(np.abs(dst1[idx]), np.abs(dst2[idx]))
-    return dst
-
-
 def calc_u_i(P0, P1, lat, lon):
     """
     Calculate u_i distance. See Spudich and Chiou OFR 2015-1028. This is the distance
@@ -959,55 +923,3 @@ def calc_t_i(P0, P1, lat, lon):
         t_i.shape = (shp[0], 1)
     t_i = np.fliplr(t_i)
     return t_i
-
-
-def get_top_edge(lat, lon, dep):
-    """
-    Determine which edge of a quadrilateral rupture surface is the top.
-    :param lat:
-        Sequence of 4 or 5 latitudes defining vertices of rupture surface.
-    :param lon:
-        Sequence of 4 or 5 longitudes defining vertices of rupture surface.
-    :param dep:
-        Sequence of 4 or 5 depths defining vertices of rupture surface.
-    :returns:
-        (P0,P1) where P0 and P1 are Vector objects in ECEF coordinates indicating
-        the vertices of the top edge.
-    """
-    lat = np.array(lat)
-    lon = np.array(lon)
-    dep = np.array(dep)
-    p1 = None
-    p2 = None
-    if sum(np.diff(dep)) == 0:
-        p1 = Vector.fromPoint(point.Point(lon[0], lat[0], dep[0]))
-        p2 = Vector.fromPoint(point.Point(lon[1], lat[1], dep[1]))
-    else:
-        dep2 = dep[0:4]
-        dd = np.diff(dep2)
-        idx = dd == 0
-        idx = np.append(idx, False)
-        p1idx = dep2[idx].argmin() + 1
-        p2idx = p1idx + 1
-        p1 = Vector.fromPoint(point.Point(lon[p1idx], lat[p1idx], 0.0))
-        p2 = Vector.fromPoint(point.Point(lon[p2idx], lat[p2idx], 0.0))
-    return (p1, p2)
-
-
-def minimize(a, b):
-    """
-    Get minimum values from two numpy arrays, ignoring sign in comparison
-    but preserving sign in result.
-    :param a:
-      Numpy array
-    :param b:
-      Numpy array
-    :returns:
-      Numpy array
-    """
-    d = np.empty_like(a)
-    aidx = np.abs(a) < np.abs(b)
-    bidx = np.logical_not(aidx)
-    d[aidx] = a[aidx]
-    d[bidx] = b[bidx]
-    return d
