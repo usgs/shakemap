@@ -169,5 +169,3 @@ def z2p5_from_vs30_cb14_cal(vs30):
     # z2p5 = z_2.5 in units of m
     z2p5 = 1000 * np.exp(7.089 - (1.144) * np.log(vs30))
     return z2p5
-
-
