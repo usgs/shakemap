@@ -1,18 +1,18 @@
 #!/usr/bin/env python
 
-#stdlib imports
+# stdlib imports
 import os.path
 import sys
 
-#third party
+# third party
 import numpy as np
 import pandas as pd
 import time as time
 
-#hack the path so that I can debug these functions if I need to
-homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
+# hack the path so that I can debug these functions if I need to
+homedir = os.path.dirname(os.path.abspath(__file__)) # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir,'..'))
-sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring any installed mapio stuff
+sys.path.insert(0,shakedir) # put this at the front of the system path, ignoring any installed mapio stuff
 
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
@@ -28,7 +28,7 @@ from shakemap.grind.distance import get_distance
 
 def test1():
     # Make sites instance
-    vs30file = '../data/Vs30_test.grd'
+    vs30file = os.path.join(shakedir, 'data/Vs30_test.grd')
     cx = -118.2
     cy = 34.1
     dx = 0.0083
