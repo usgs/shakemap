@@ -5,10 +5,11 @@ from openquake.hazardlib import const
 
 import numpy as np
 
+
 class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
     '''Subclasses GEM OpenQuake Boore-Atkinson 2008 GMPE, but with methods that allow finer-grained
        access to methods into that GMPE implementation.  Specifically, methods that allow the user to:
-       
+
       - apply or un-apply site corrections to a particular site.
       - get ground motions on bare rock
       - get the standard deviations for the GMPE
@@ -22,12 +23,13 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
         pga4nl = self._get_pga_on_rock(rup, dists, C)
         if forward:
             pgm_corrected = pgm + \
-               self._get_site_amplification_linear(sites.vs30, C_SR) + \
-               self._get_site_amplification_non_linear(sites.vs30, pga4nl, C_SR)
+                self._get_site_amplification_linear(sites.vs30, C_SR) + \
+                self._get_site_amplification_non_linear(
+                    sites.vs30, pga4nl, C_SR)
         else:
             pgm_corrected = pgm - \
-               (self._get_site_amplification_linear(sites.vs30, C_SR) + \
-                self._get_site_amplification_non_linear(sites.vs30, pga4nl, C_SR))
+                (self._get_site_amplification_linear(sites.vs30, C_SR) +
+                 self._get_site_amplification_non_linear(sites.vs30, pga4nl, C_SR))
 
         return pgm_corrected
 
@@ -39,22 +41,22 @@ class BooreAtkinson2008ShakeMap(BooreAtkinson2008):
         C_SR = self.COEFFS_SOIL_RESPONSE[imt]
         if forward:
             pgm_corrected = pgm + \
-               self._get_site_amplification_linear(sites.vs30, C_SR) + \
-               self._get_site_amplification_non_linear(sites.vs30, pga4nl, C_SR)
+                self._get_site_amplification_linear(sites.vs30, C_SR) + \
+                self._get_site_amplification_non_linear(
+                    sites.vs30, pga4nl, C_SR)
         else:
             pgm_corrected = pgm - \
-               (self._get_site_amplification_linear(sites.vs30, C_SR) + \
-                self._get_site_amplification_non_linear(sites.vs30, pga4nl, C_SR))
+                (self._get_site_amplification_linear(sites.vs30, C_SR) +
+                 self._get_site_amplification_non_linear(sites.vs30, pga4nl, C_SR))
 
         return pgm_corrected
-
 
     def get_amplitudes(self, rup, dists, imt):
         '''Calculate peak ground motion on rock.
         '''
         C = self.COEFFS[imt]
         pgmrock = self._compute_magnitude_scaling(rup, C) + \
-                  self._compute_distance_scaling(rup, dists, C)
+            self._compute_distance_scaling(rup, dists, C)
 
         return pgmrock
 

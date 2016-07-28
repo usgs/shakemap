@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
-#stdlib imports
+# stdlib imports
 import os.path
 import sys
 import io
 
-#third party
+# third party
 import numpy as np
 import pytest
 
-#hack the path so that I can debug these functions if I need to
-homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-shakedir = os.path.abspath(os.path.join(homedir,'..'))
-sys.path.insert(0,shakedir) #put this at the front of the system path, ignoring any installed mapio stuff
+# hack the path so that I can debug these functions if I need to
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..'))
+# put this at the front of the system path, ignoring any installed mapio stuff
+sys.path.insert(0, shakedir)
 
 from shakemap.grind.fault import Fault
 from shakemap.utils.exception import ShakeMapException
@@ -30,13 +31,13 @@ def test_northridge():
     cbuf = io.StringIO(fault_text)
     fault = Fault.readFaultFile(cbuf)
     strike = fault.getStrike()
-    np.testing.assert_allclose(strike, 122.06408, atol = 0.001)
+    np.testing.assert_allclose(strike, 122.06408, atol=0.001)
     dip = fault.getDip()
-    np.testing.assert_allclose(dip, 40.20979, atol = 0.001)
+    np.testing.assert_allclose(dip, 40.20979, atol=0.001)
     L = fault.getFaultLength()
-    np.testing.assert_allclose(L, 17.99198, atol = 0.001)
+    np.testing.assert_allclose(L, 17.99198, atol=0.001)
     W = fault.getWidth()
-    np.testing.assert_allclose(W, 23.93699, atol = 0.001)
+    np.testing.assert_allclose(W, 23.93699, atol=0.001)
     nq = fault.getNumQuads()
     np.testing.assert_allclose(nq, 1)
     ns = fault.getNumSegments()
@@ -44,17 +45,17 @@ def test_northridge():
     sind = fault.getSegmentIndex()
     np.testing.assert_allclose(sind, [0])
     ztor = fault.getTopOfRupture()
-    np.testing.assert_allclose(ztor, 5, atol = 0.001)
+    np.testing.assert_allclose(ztor, 5, atol=0.001)
     itl = fault.getIndividualTopLengths()
-    np.testing.assert_allclose(itl, 17.9919846, atol = 0.001)
+    np.testing.assert_allclose(itl, 17.9919846, atol=0.001)
     iw = fault.getIndividualWidths()
-    np.testing.assert_allclose(iw, 23.93699668, atol = 0.001)
+    np.testing.assert_allclose(iw, 23.93699668, atol=0.001)
     lats = fault.getLats()
-    lats_d = np.array([ 34.315,  34.401,  34.261,  34.175,  34.315])
-    np.testing.assert_allclose(lats, lats_d, atol = 0.001)
+    lats_d = np.array([34.315,  34.401,  34.261,  34.175,  34.315])
+    np.testing.assert_allclose(lats, lats_d, atol=0.001)
     lons = fault.getLons()
     lons_d = np.array([-118.421, -118.587, -118.693, -118.527, -118.421])
-    np.testing.assert_allclose(lons, lons_d, atol = 0.001)
+    np.testing.assert_allclose(lons, lons_d, atol=0.001)
 
 
 def parse_complicated_fault():
@@ -108,13 +109,13 @@ def parse_complicated_fault():
     cbuf = io.StringIO(fault_text)
     fault = Fault.readFaultFile(cbuf)
     strike = fault.getStrike()
-    np.testing.assert_allclose(strike, -100.464330, atol = 0.001)
+    np.testing.assert_allclose(strike, -100.464330, atol=0.001)
     dip = fault.getDip()
-    np.testing.assert_allclose(dip, 89.3985, atol = 0.001)
+    np.testing.assert_allclose(dip, 89.3985, atol=0.001)
     L = fault.getFaultLength()
-    np.testing.assert_allclose(L, 119.5578, atol = 0.001)
+    np.testing.assert_allclose(L, 119.5578, atol=0.001)
     W = fault.getWidth()
-    np.testing.assert_allclose(W, 20.001, atol = 0.001)
+    np.testing.assert_allclose(W, 20.001, atol=0.001)
     nq = fault.getNumQuads()
     np.testing.assert_allclose(nq, 9)
     ns = fault.getNumSegments()
@@ -122,17 +123,17 @@ def parse_complicated_fault():
     sind = fault.getSegmentIndex()
     np.testing.assert_allclose(sind, [0, 1, 2, 2, 3, 3, 4, 5, 6])
     ztor = fault.getTopOfRupture()
-    np.testing.assert_allclose(ztor, 0, atol = 0.001)
+    np.testing.assert_allclose(ztor, 0, atol=0.001)
     itl = fault.getIndividualTopLengths()
-    itl_d = np.array([ 15.13750778,  22.80237887,  18.98053425,   6.98263853,
-                       13.55978731,   8.43444811,   5.41399812,  20.57788056,
-                       7.66869463])
-    np.testing.assert_allclose(itl, itl_d, atol = 0.001)
+    itl_d = np.array([15.13750778,  22.80237887,  18.98053425,   6.98263853,
+                      13.55978731,   8.43444811,   5.41399812,  20.57788056,
+                      7.66869463])
+    np.testing.assert_allclose(itl, itl_d, atol=0.001)
     iw = fault.getIndividualWidths()
-    iw_d = np.array([ 20.00122876,  20.00122608,  20.00120173,  20.00121028,
-                      20.00121513,  20.00121568,  20.00107293,  20.00105498,
-                      20.00083348])
-    np.testing.assert_allclose(iw, iw_d, atol = 0.001)
+    iw_d = np.array([20.00122876,  20.00122608,  20.00120173,  20.00121028,
+                     20.00121513,  20.00121568,  20.00107293,  20.00105498,
+                     20.00083348])
+    np.testing.assert_allclose(iw, iw_d, atol=0.001)
     lats = fault.getLats()
     lats_d = np.array([40.70985, 40.72733, 40.72933, 40.71185, 40.70985,
                        np.nan, 40.70513, 40.74903, 40.75103, 40.70713,
@@ -143,9 +144,9 @@ def parse_complicated_fault():
                        40.70268, 40.71821, 40.71621, np.nan, 40.69947,
                        40.79654, 40.79854, 40.70147, 40.69947, np.nan,
                        40.80199, 40.84501, 40.84701, 40.80399, 40.80199])
-    np.testing.assert_allclose(lats, lats_d, atol = 0.001)
+    np.testing.assert_allclose(lats, lats_d, atol=0.001)
     lons = fault.getLons()
-    lons_d = np.array([29.3376, 29.51528, 29.51528, 29.3376 , 29.3376,
+    lons_d = np.array([29.3376, 29.51528, 29.51528, 29.3376, 29.3376,
                        np.nan, 29.61152, 29.87519, 29.87519, 29.61152,
                        29.61152, np.nan, 29.88662, 30.11126, 30.19265,
                        30.19265, 30.11126, 29.88662, 29.88662, np.nan,
@@ -154,7 +155,7 @@ def parse_complicated_fault():
                        30.63731, 30.57658, 30.57658, np.nan, 30.729,
                        30.93655, 30.93655, 30.729, 30.729, np.nan,
                        30.94688,  31.01799, 31.01799, 30.94688, 30.94688])
-    np.testing.assert_allclose(lons, lons_d, atol = 0.001)
+    np.testing.assert_allclose(lons, lons_d, atol=0.001)
 
 
 def test_incorrect():
@@ -181,6 +182,7 @@ def test_incorrect():
     with pytest.raises(ShakeMapException):
         fault = Fault.readFaultFile(cbuf)
 
+
 def test_fromTrace():
     xp0 = [0.0]
     xp1 = [0.0]
@@ -190,7 +192,8 @@ def test_fromTrace():
     widths = [10.0]
     dips = [45.0]
 
-    fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,widths,dips,reference='From J Smith, (personal communication)')
+    fault = Fault.fromTrace(xp0, yp0, xp1, yp1, zp, widths,
+                            dips, reference='From J Smith, (personal communication)')
     fstr = io.StringIO()
     fault.writeFaultFile(fstr)
 
@@ -201,4 +204,5 @@ def test_fromTrace():
     zp = [10, 15]
     widths = [15.0, 20.0]
     dips = [30.0, 45.0]
-    fault = Fault.fromTrace(xp0,yp0,xp1,yp1,zp,widths,dips,reference='From J Smith, (personal communication)')
+    fault = Fault.fromTrace(xp0, yp0, xp1, yp1, zp, widths,
+                            dips, reference='From J Smith, (personal communication)')

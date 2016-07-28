@@ -8,14 +8,15 @@ from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
 from openquake.hazardlib.gsim.campbell_bozorgnia_2008 import CampbellBozorgnia2008
 
 # Inputs
-sm_amps_in = np.array([0.01, 0.03, 0.1, 0.3])*100.
+sm_amps_in = np.array([0.01, 0.03, 0.1, 0.3]) * 100.
 gmpe_amps_in = np.log(np.array([0.01, 0.03, 0.1, 0.3]))
 sigma_in_log = np.array([0.2, 0.3, 0.4, 0.5])
 sigma_in_lin = np.array([1.23372505, 1.36350428, 1.50840426, 1.66936801])
 
+
 def test_pga():
     gmpe = FrankelEtAl1996MblgAB1987NSHMP2008()
-    imt  = PGA()
+    imt = PGA()
     gmpe_amps_out = g2s.ampShakeMapToGMPE(sm_amps_in, gmpe, imt)
     np.testing.assert_almost_equal(
         gmpe_amps_out,
@@ -39,7 +40,7 @@ def test_pga():
 
 def test_pgv():
     gmpe = AbrahamsonEtAl2014()
-    imt  = PGV()
+    imt = PGV()
     gmpe_amps_out = g2s.ampShakeMapToGMPE(sm_amps_in, gmpe, imt)
     np.testing.assert_almost_equal(
         gmpe_amps_out,
@@ -48,7 +49,7 @@ def test_pgv():
     sm_amps_out = g2s.ampGmpeToShakeMap(gmpe_amps_in, gmpe, imt)
     np.testing.assert_almost_equal(
         sm_amps_out,
-        np.array([ 0.011, 0.033, 0.11 , 0.33]))
+        np.array([0.011, 0.033, 0.11, 0.33]))
 
     sigma_out = g2s.sigmaShakeMapToGMPE(sigma_in_lin, gmpe, imt)
     np.testing.assert_almost_equal(
@@ -63,11 +64,11 @@ def test_pgv():
 
 def test_sa03():
     gmpe = CampbellBozorgnia2008()
-    imt  = SA(0.3)
+    imt = SA(0.3)
     gmpe_amps_out = g2s.ampShakeMapToGMPE(sm_amps_in, gmpe, imt)
     np.testing.assert_almost_equal(
         gmpe_amps_out,
-        np.array([-4.7374321, -3.6388198, -2.434847 , -1.3362347]))
+        np.array([-4.7374321, -3.6388198, -2.434847, -1.3362347]))
 
     sm_amps_out = g2s.ampGmpeToShakeMap(gmpe_amps_in, gmpe, imt)
     np.testing.assert_almost_equal(
