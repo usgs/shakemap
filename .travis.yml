@@ -51,6 +51,7 @@ install:
 script:
      - export PYTHONPATH="."
      - py.test --cov=shakemap
+     - python makedocs.py -p
     #- flake8 shakemap
 after_success:
     - pip install codecov codacy-coverage
