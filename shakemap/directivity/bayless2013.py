@@ -51,14 +51,14 @@ class Bayless2013(object):
     # C0 adn C1 are for RotD50. One set for each mechanism (SS vs DS).
     # FN and FP are also available
     #-------------------------------------------------------------------------
-    __Tall = np.array([0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 7.5, 10])
-    __C0ss = np.array([0.0, 0.0, -0.12, -0.175, -0.21, -0.235, -0.255,
+    __periods = np.array([0.5, 0.75, 1.0, 1.5, 2.0, 3.0, 4.0, 5.0, 7.5, 10])
+    __c0ss = np.array([0.0, 0.0, -0.12, -0.175, -0.21, -0.235, -0.255,
                        -0.275, -0.29, -0.3])
-    __C1ss = np.array([0.0, 0.0, 0.075, 0.090, 0.095, 0.099, 0.103, 0.108,
+    __c1ss = np.array([0.0, 0.0, 0.075, 0.090, 0.095, 0.099, 0.103, 0.108,
                        0.112, 0.115])
-    __C0ds = np.array([0.0, 0.0, 0.0, 0.0, 0.0, -0.033, -0.089, -0.133,
+    __c0ds = np.array([0.0, 0.0, 0.0, 0.0, 0.0, -0.033, -0.089, -0.133,
                        -0.16, -0.176])
-    __C1ds = np.array([0.0, 0.0, 0.0, 0.0, 0.034, 0.093, 0.128, 0.15,
+    __c1ds = np.array([0.0, 0.0, 0.0, 0.0, 0.034, 0.093, 0.128, 0.15,
                        0.165, 0.179])
 
     def __init__(self, source, lat, lon, depth, T):
@@ -274,9 +274,9 @@ class Bayless2013(object):
         T_Az = np.sin(np.abs(self.Az))**2
 
         # Select Coefficients
-        ix = [self._T == self.__Tall]
-        C0 = self.__C0ds[ix]
-        C1 = self.__C1ds[ix]
+        ix = [self._T == self.__periods]
+        C0 = self.__c0ds[ix]
+        C1 = self.__c1ds[ix]
 
         self._fd_DS = (C0 + C1 * f_geom) * T_CD * self._T_Mw * T_Az
 
@@ -304,9 +304,9 @@ class Bayless2013(object):
         T_Az = 1.0
 
         # Select Coefficients
-        ix = [self._T == self.__Tall]
-        C0 = self.__C0ss[ix]
-        C1 = self.__C1ss[ix]
+        ix = [self._T == self.__periods]
+        C0 = self.__c0ss[ix]
+        C1 = self.__c1ss[ix]
         self._fd_SS = (C0 + C1 * f_geom) * T_CD * self.T_Mw * T_Az
 
     def computeAz(self):

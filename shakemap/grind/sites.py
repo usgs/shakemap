@@ -96,18 +96,18 @@ class Sites(object):
                            self.GeoDict.ymax, self.GeoDict.ny)
         self.Z1Pt0 = calculate_z1p0(self.Vs30.getData())
         self.Z2Pt5 = calculate_z2p5(self.Z1Pt0)
-        self.SitesContext = SitesContext()
-        self.SitesContext.vs30 = self.Vs30.getData().copy()
-        self.SitesContext.z1pt0 = self.Z1Pt0
-        self.SitesContext.z2pt5 = self.Z2Pt5
-        self.SitesContext.backarc = backarc  # zoneconfig might have this info
+        self._SitesContext = SitesContext()
+        self._SitesContext.vs30 = self.Vs30.getData().copy()
+        self._SitesContext.z1pt0 = self.Z1Pt0
+        self._SitesContext.z2pt5 = self.Z2Pt5
+        self._SitesContext.backarc = backarc  # zoneconfig might have this info
         if vs30measured_grid is None:  # If we don't know, then use false
-            self.SitesContext.vs30measured = np.zeros_like(
-                self.SitesContext.vs30, dtype=bool)
+            self._SitesContext.vs30measured = np.zeros_like(
+                self._SitesContext.vs30, dtype=bool)
         else:
-            self.SitesContext.vs30measured = vs30measured_grid
-        self.SitesContext.lons = lons
-        self.SitesContext.lats = lats
+            self._SitesContext.vs30measured = vs30measured_grid
+        self._SitesContext.lons = lons
+        self._SitesContext.lats = lats
 
     @classmethod
     def _create(cls, geodict, defaultVs30, vs30File, padding, resample):
@@ -121,15 +121,18 @@ class Sites(object):
                     # we want something that is just aligned, since we're
                     # padding edges
                     geodict = fgeodict.getAligned(geodict)
-            vs30grid = _load(vs30File, samplegeodict=geodict, resample=resample,
-                             method='linear', doPadding=padding, padValue=defaultVs30)
+            vs30grid = _load(vs30File, samplegeodict = geodict,
+                             resample = resample, method = 'linear',
+                             doPadding = padding, padValue = defaultVs30)
 
         return vs30grid
 
     @classmethod
-    def createFromBounds(cls, xmin, xmax, ymin, ymax, dx, dy, defaultVs30=686.0, vs30File=None,
-                         vs30measured_grid=None, backarc=False, padding=False, resample=False):
-        """Create a Sites object by defining a center point, resolution, extent, and Vs30 values.
+    def createFromBounds(cls, xmin, xmax, ymin, ymax, dx, dy, defaultVs30 = 686.0,
+                         vs30File = None, vs30measured_grid = None,
+                         backarc = False, padding = False, resample = False):
+        """Create a Sites object by defining a center point, resolution, extent, 
+        and Vs30 values.
 
         :param xmin:
           X coordinate of left edge of bounds.
@@ -166,13 +169,15 @@ class Sites(object):
             griddata = np.ones((geodict.ny, geodict.nx),
                                dtype=np.float64) * defaultVs30
             vs30grid = Grid2D(griddata, geodict)
-        return cls(vs30grid, vs30measured_grid=vs30measured_grid, backarc=backarc,
-                   defaultVs30=defaultVs30)
+        return cls(vs30grid, vs30measured_grid = vs30measured_grid,
+                   backarc = backarc, defaultVs30 = defaultVs30)
 
     @classmethod
-    def createFromCenter(cls, cx, cy, xspan, yspan, dx, dy, defaultVs30=686.0, vs30File=None,
-                         vs30measured_grid=None, backarc=False, padding=False, resample=False):
-        """Create a Sites object by defining a center point, resolution, extent, and Vs30 values.
+    def createFromCenter(cls, cx, cy, xspan, yspan, dx, dy, defaultVs30 = 686.0,
+                         vs30File = None, vs30measured_grid = None,
+                         backarc = False, padding = False, resample = False):
+        """Create a Sites object by defining a center point, resolution, extent, 
+        and Vs30 values.
 
         :param cx:
           X coordinate of desired center point.
@@ -209,8 +214,8 @@ class Sites(object):
             griddata = np.ones((geodict.ny, geodict.nx),
                                dtype=np.float64) * defaultVs30
             vs30grid = Grid2D(griddata, geodict)
-        return cls(vs30grid, vs30measured_grid=vs30measured_grid, backarc=backarc,
-                   defaultVs30=defaultVs30)
+        return cls(vs30grid, vs30measured_grid = vs30measured_grid,
+                   backarc = backarc, defaultVs30 = defaultVs30)
 
     def sampleFromSites(self, lats, lons, vs30measured_grid=None):
         """Create a SitesContext object by sampling the current Sites object.
@@ -246,7 +251,7 @@ class Sites(object):
             site.vs30measured = np.zeros_like(lons, dtype=bool)
         else:
             site.vs30measured = vs30measured_grid
-        site.backarc = self.SitesContext.backarc
+        site.backarc = self._SitesContext.backarc
 
         return site
 
@@ -261,4 +266,4 @@ class Sites(object):
         :returns:
            SitesContext object.
         """
-        return self.SitesContext
+        return self._SitesContext

@@ -141,3 +141,33 @@ class MultiGMPE(GMPE):
         self.REQUIRES_DISTANCES = set.union(*distpars)
 
         return self
+
+#----------------------------------------------------
+# Functions for getting depth parameters from Vs30
+#----------------------------------------------------
+
+
+def z1_from_vs30_cy14_cal(vs30):
+    # vs30 = V_S30 in units of m/s
+    # z1   = z_1 in units of m
+    z1 = np.exp(-(7.15 / 4.0) *
+                np.log((vs30**4.0 + 571.**4) / (1360**4.0 + 571.**4)))
+    return z1
+
+
+def z1_from_vs30_ask14_cal(vs30):
+    # vs30 = V_S30 in units of m/s
+    # z1   = z_1 in units of m
+    # ASK14 define units as KM, but implemented as m in OQ
+    z1 = np.exp(-(7.67 / 4.0) *
+                np.log((vs30**4.0 + 610.**4) / (1360**4.0 + 610.**4)))
+    return z1
+
+
+def z2p5_from_vs30_cb14_cal(vs30):
+    # vs30 = V_S30 in units of m/s
+    # z2p5 = z_2.5 in units of m
+    z2p5 = 1000 * np.exp(7.089 - (1.144) * np.log(vs30))
+    return z2p5
+
+
