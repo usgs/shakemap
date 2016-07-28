@@ -47,7 +47,7 @@ class Rowshandel2013(object):
 #    __c2['mean'] = (__c2['as'] + __c2['ba'] + __c2['cb'] + __c2['cy'] + __c2['id'])/5
     __c1 = [0.35, 0.75, 0.95, 1.28, 1.60]
     __c2 = [-0.035, -0.10, -0.15, -0.26, -0.30]
-    __cT = [1.0, 3.0, 5.0, 7.5, 10.0]
+    __periods = [1.0, 3.0, 5.0, 7.5, 10.0]
 
     def __init__(self, source, lat, lon, dep, dx, T, a_weight=0.5,
                  mtype=1, simpleDT=False, centered=True):
@@ -186,8 +186,8 @@ class Rowshandel2013(object):
         self._fd = [None] * len(self._T)
         for i in range(len(self._T)):
             period = self._T[i]
-            c1sel = self.__c1[self.__cT == period]
-            c2sel = self.__c2[self.__cT == period]
+            c1sel = self.__c1[self.__periods == period]
+            c2sel = self.__c2[self.__periods == period]
 
             # Period dependent parameters
             self.computeWP(period)

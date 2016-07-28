@@ -15,14 +15,17 @@ import numpy as np
 from shakemap.utils.exception import ShakeMapException
 
 
-def _load(vs30File, samplegeodict=None, resample=False, method='linear', doPadding=False, padValue=np.nan):
+def _load(vs30File, samplegeodict=None, resample=False, method='linear',
+          doPadding=False, padValue=np.nan):
     try:
-        vs30grid = GMTGrid.load(vs30File, samplegeodict=samplegeodict, resample=resample,
-                                method=method, doPadding=doPadding, padValue=padValue)
+        vs30grid = GMTGrid.load(vs30File, samplegeodict=samplegeodict,
+                                resample=resample, method=method,
+                                doPadding=doPadding, padValue=padValue)
     except Exception as msg1:
         try:
-            vs30grid = GDALGrid.load(vs30File, samplegeodict=samplegeodict, resample=resample,
-                                     method=method, doPadding=doPadding, padValue=padValue)
+            vs30grid = GDALGrid.load(vs30File, samplegeodict=samplegeodict,
+                                     resample=resample, method=method,
+                                     doPadding=doPadding, padValue=padValue)
         except Exception as msg2:
             msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (
                 vs30File, str(msg1), str(msg2))
@@ -88,26 +91,18 @@ class Sites(object):
           Default Vs30 value to use in locations where Vs30Grid is not specified.
         """
         self.Vs30 = vs30grid
+        self.backarc = backarc
         self.defaultVs30 = defaultVs30
+        self.vs30measured_grid = vs30measured_grid
         self.GeoDict = vs30grid.getGeoDict().copy()
-        lons = np.linspace(self.GeoDict.xmin,
-                           self.GeoDict.xmax, self.GeoDict.nx)
-        lats = np.linspace(self.GeoDict.ymin,
-                           self.GeoDict.ymax, self.GeoDict.ny)
+        self.lons = np.linspace(self.GeoDict.xmin,
+                                self.GeoDict.xmax,
+                                self.GeoDict.nx)
+        self.lats = np.linspace(self.GeoDict.ymin,
+                                self.GeoDict.ymax,
+                                self.GeoDict.ny)
         self.Z1Pt0 = calculate_z1p0(self.Vs30.getData())
         self.Z2Pt5 = calculate_z2p5(self.Z1Pt0)
-        self.SitesContext = SitesContext()
-        self.SitesContext.vs30 = self.Vs30.getData().copy()
-        self.SitesContext.z1pt0 = self.Z1Pt0
-        self.SitesContext.z2pt5 = self.Z2Pt5
-        self.SitesContext.backarc = backarc  # zoneconfig might have this info
-        if vs30measured_grid is None:  # If we don't know, then use false
-            self.SitesContext.vs30measured = np.zeros_like(
-                self.SitesContext.vs30, dtype=bool)
-        else:
-            self.SitesContext.vs30measured = vs30measured_grid
-        self.SitesContext.lons = lons
-        self.SitesContext.lats = lats
 
     @classmethod
     def _create(cls, geodict, defaultVs30, vs30File, padding, resample):
@@ -121,15 +116,18 @@ class Sites(object):
                     # we want something that is just aligned, since we're
                     # padding edges
                     geodict = fgeodict.getAligned(geodict)
-            vs30grid = _load(vs30File, samplegeodict=geodict, resample=resample,
-                             method='linear', doPadding=padding, padValue=defaultVs30)
+            vs30grid = _load(vs30File, samplegeodict=geodict,
+                             resample=resample, method='linear',
+                             doPadding=padding, padValue=defaultVs30)
 
         return vs30grid
 
     @classmethod
-    def createFromBounds(cls, xmin, xmax, ymin, ymax, dx, dy, defaultVs30=686.0, vs30File=None,
-                         vs30measured_grid=None, backarc=False, padding=False, resample=False):
-        """Create a Sites object by defining a center point, resolution, extent, and Vs30 values.
+    def createFromBounds(cls, xmin, xmax, ymin, ymax, dx, dy, defaultVs30=686.0,
+                         vs30File=None, vs30measured_grid=None,
+                         backarc=False, padding=False, resample=False):
+        """Create a Sites object by defining a center point, resolution, extent, 
+        and Vs30 values.
 
         :param xmin:
           X coordinate of left edge of bounds.
@@ -166,13 +164,15 @@ class Sites(object):
             griddata = np.ones((geodict.ny, geodict.nx),
                                dtype=np.float64) * defaultVs30
             vs30grid = Grid2D(griddata, geodict)
-        return cls(vs30grid, vs30measured_grid=vs30measured_grid, backarc=backarc,
-                   defaultVs30=defaultVs30)
+        return cls(vs30grid, vs30measured_grid=vs30measured_grid,
+                   backarc=backarc, defaultVs30=defaultVs30)
 
     @classmethod
-    def createFromCenter(cls, cx, cy, xspan, yspan, dx, dy, defaultVs30=686.0, vs30File=None,
-                         vs30measured_grid=None, backarc=False, padding=False, resample=False):
-        """Create a Sites object by defining a center point, resolution, extent, and Vs30 values.
+    def createFromCenter(cls, cx, cy, xspan, yspan, dx, dy, defaultVs30=686.0,
+                         vs30File=None, vs30measured_grid=None,
+                         backarc=False, padding=False, resample=False):
+        """Create a Sites object by defining a center point, resolution, extent, 
+        and Vs30 values.
 
         :param cx:
           X coordinate of desired center point.
@@ -209,8 +209,8 @@ class Sites(object):
             griddata = np.ones((geodict.ny, geodict.nx),
                                dtype=np.float64) * defaultVs30
             vs30grid = Grid2D(griddata, geodict)
-        return cls(vs30grid, vs30measured_grid=vs30measured_grid, backarc=backarc,
-                   defaultVs30=defaultVs30)
+        return cls(vs30grid, vs30measured_grid=vs30measured_grid,
+                   backarc=backarc, defaultVs30=defaultVs30)
 
     def sampleFromSites(self, lats, lons, vs30measured_grid=None):
         """Create a SitesContext object by sampling the current Sites object.
@@ -246,7 +246,7 @@ class Sites(object):
             site.vs30measured = np.zeros_like(lons, dtype=bool)
         else:
             site.vs30measured = vs30measured_grid
-        site.backarc = self.SitesContext.backarc
+        site.backarc = self.backarc
 
         return site
 
@@ -261,4 +261,16 @@ class Sites(object):
         :returns:
            SitesContext object.
         """
-        return self.SitesContext
+        sctx = SitesContext()
+        sctx.vs30 = self.Vs30.getData().copy()
+        sctx.z1pt0 = self.Z1Pt0
+        sctx.z2pt5 = self.Z2Pt5
+        sctx.backarc = self.backarc  # zoneconfig might have this info
+        if self.vs30measured_grid is None:  # If we don't know, then use false
+            sctx.vs30measured = np.zeros_like(
+                sctx.vs30, dtype=bool)
+        else:
+            sctx.vs30measured = self.vs30measured_grid
+        sctx.lons = self.lons
+        sctx.lats = self.lats
+        return sctx

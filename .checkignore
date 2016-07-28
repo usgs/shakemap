@@ -1,0 +1,3 @@
+tests/*
+versioneer.py
+shakemap/_version.py

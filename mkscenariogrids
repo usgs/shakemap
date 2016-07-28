@@ -111,34 +111,6 @@ def get_extent(source):
     return lonmin, lonmax, latmin, latmax
 
 #----------------------------------------------------
-# Functions for getting depth parameters from Vs30
-#----------------------------------------------------
-
-
-def z1_from_vs30_cy14_cal(vs30):
-    # vs30 = V_S30 in units of m/s
-    # z1   = z_1 in units of m
-    z1 = np.exp(-(7.15 / 4.0) *
-                np.log((vs30**4.0 + 571.**4) / (1360**4.0 + 571.**4)))
-    return z1
-
-
-def z1_from_vs30_ask14_cal(vs30):
-    # vs30 = V_S30 in units of m/s
-    # z1   = z_1 in units of m
-    # ASK14 define units as KM, but implemented as m in OQ
-    z1 = np.exp(-(7.67 / 4.0) *
-                np.log((vs30**4.0 + 610.**4) / (1360**4.0 + 610.**4)))
-    return z1
-
-
-def z2p5_from_vs30_cb14_cal(vs30):
-    # vs30 = V_S30 in units of m/s
-    # z2p5 = z_2.5 in units of m
-    z2p5 = 1000 * np.exp(7.089 - (1.144) * np.log(vs30))
-    return z2p5
-
-#----------------------------------------------------
 # Wrapper for command line calls
 #----------------------------------------------------
 
@@ -434,9 +406,9 @@ def main(args):
 
     sites.vs30measured = np.ones_like(sites.vs30, dtype=bool)
     # Add z1 and z2.5
-    sites.z1pt0cy14 = z1_from_vs30_cy14_cal(sites.vs30)
-    sites.z1pt0ask14 = z1_from_vs30_ask14_cal(sites.vs30)
-    sites.z2pt5 = z2p5_from_vs30_cb14_cal(sites.vs30) / 1000.0
+    sites.z1pt0cy14 = mg.z1_from_vs30_cy14_cal(sites.vs30)
+    sites.z1pt0ask14 = mg.z1_from_vs30_ask14_cal(sites.vs30)
+    sites.z2pt5 = mg.z2p5_from_vs30_cb14_cal(sites.vs30) / 1000.0
     # note: function gives z2pt5 in m, but CB14 expect km.
 
     #----------------------------------------------------

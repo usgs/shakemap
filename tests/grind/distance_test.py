@@ -3,11 +3,11 @@
 # stdlib imports
 import os.path
 import sys
+import time as time
 
 # third party
 import numpy as np
 import pandas as pd
-import time as time
 
 # hack the path so that I can debug these functions if I need to
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
