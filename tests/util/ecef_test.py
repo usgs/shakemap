@@ -13,7 +13,7 @@ shakedir = os.path.abspath(os.path.join(homedir, '..'))
 # put this at the front of the system path, ignoring any installed mapio stuff
 sys.path.insert(0, shakedir)
 
-from shakemap.grind.ecef import latlon2ecef, ecef2latlon
+from shakemap.utils.ecef import latlon2ecef, ecef2latlon
 
 
 def test_ecef():

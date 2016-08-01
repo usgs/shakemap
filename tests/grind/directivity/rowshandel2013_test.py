@@ -6,7 +6,7 @@ import openquake.hazardlib.geo as geo
 
 from shakemap.grind.source import Source
 import shakemap.grind.fault as fault
-from shakemap.directivity.rowshandel2013 import Rowshandel2013
+from shakemap.grind.directivity.rowshandel2013 import Rowshandel2013
 from shakemap.utils.timeutils import ShakeDateTime
 
 

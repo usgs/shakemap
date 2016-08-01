@@ -7,13 +7,12 @@ import copy
 import openquake.hazardlib.geo as geo
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 
-import shakemap.grind.ecef as ecef
 import shakemap.grind.fault as fault
-from shakemap.grind.ecef import latlon2ecef
-from shakemap.grind.ecef import ecef2latlon
 from shakemap.grind.vector import Vector
 from shakemap.grind.distance import calc_rupture_distance
 from shakemap.grind.distance import get_distance
+from shakemap.utils.ecef import latlon2ecef
+from shakemap.utils.ecef import ecef2latlon
 
 """
 Implements the Rowshandel (2013) directivity model.
@@ -217,7 +216,7 @@ class Rowshandel2013(object):
         # First find which quad the hypocenter is on
         #-------------------------------------------
 
-        x, y, z = ecef.latlon2ecef(
+        x, y, z = latlon2ecef(
             self._hyp.latitude, self._hyp.longitude, self._hyp.depth)
         hyp_ecef = np.array([[x, y, z]])
         qdist = np.zeros(nquad)
@@ -260,7 +259,7 @@ class Rowshandel2013(object):
 
         # Make a 3x(#number of sites) matrix of site locations
         # (rows are x, y, z) in ECEF
-        site_ecef_x, site_ecef_y, site_ecef_z = ecef.latlon2ecef(
+        site_ecef_x, site_ecef_y, site_ecef_z = latlon2ecef(
             slat, slon, np.zeros(slon.shape))
         site_mat = np.array([np.reshape(site_ecef_x, (-1,)),
                              np.reshape(site_ecef_y, (-1,)),

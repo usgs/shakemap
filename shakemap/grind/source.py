@@ -19,7 +19,7 @@ from openquake.hazardlib.gsim import base, abrahamson_2014
 from openquake.hazardlib.const import TRT
 from shapely import geometry
 from ..utils.timeutils import ShakeDateTime
-from .ecef import latlon2ecef, ecef2latlon
+from ..utils.ecef import latlon2ecef, ecef2latlon
 from .fault import Fault
 
 # local imports

@@ -10,7 +10,7 @@ from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import CampbellBozorgnia20
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 from openquake.hazardlib import imt, const
 
-import shakemap.gmpe.multigmpe as mg
+import shakemap.grind.multigmpe as mg
 from shakemap.grind.sites import Sites
 from shakemap.grind.source import Source
 from shakemap.grind.fault import Fault

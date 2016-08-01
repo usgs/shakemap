@@ -10,8 +10,8 @@ import numpy as np
 from openquake.hazardlib.geo import mesh
 from openquake.hazardlib.geo import point, utils
 from openquake.hazardlib.geo.utils import get_orthographic_projection
-from .ecef import latlon2ecef
-from .ecef import ecef2latlon
+from ..utils.ecef import latlon2ecef
+from ..utils.ecef import ecef2latlon
 from .vector import Vector
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
