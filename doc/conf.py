@@ -53,7 +53,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'ShakeMap Manual'
+project = u'ShakeMap Documentation'
 copyright = u'2015, C. Bruce Worden, David Wald'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -208,10 +208,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
-latex_documents = [
-    ('index', 'ShakeMapManual.tex', u'ShakeMap Manual',
-     u'C. Bruce Worden, David Wald', 'manual'),
-]
+latex_documents = [('shake_index', 'ShakeMapManual.tex', u'ShakeMap Manual',
+                    u'C. Bruce Worden, David Wald', 'manual'),]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.
