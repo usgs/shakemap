@@ -20,7 +20,7 @@ from openquake.hazardlib.imt import PGA, PGV, SA
 
 import numpy as np
 
-class BeyerBommer2006():
+class BeyerBommer2006(object):
     __pga_pgv_col_names = ['c12', 'c34', 'R']
     __sa_col_names = ['c1', 'c2', 'c3', 'c4', 'R']
     __pga_dict = {
@@ -42,8 +42,8 @@ class BeyerBommer2006():
         const.IMC.RANDOM_HORIZONTAL: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.07, 0.11, 1.05]))),
         const.IMC.GREATER_OF_TWO_HORIZONTAL: dict(list(zip(__sa_col_names, [1.1, 1.2, 0.04, 0.07, 1.02])))}
     
-    @classmethod
-    def ampIMCtoIMC(cls, amps, imc_in, imc_out, imt):
+    @staticmethod
+    def ampIMCtoIMC(amps, imc_in, imc_out, imt):
         """ 
         Returns amps converted from one IMC to another.
         IMPORTANT: Assumes the input amps are in linear (not log) space 
@@ -56,7 +56,6 @@ class BeyerBommer2006():
         Outputs:
         returns amps converted from imc_in to imc_out
         """
-        self = cls()
         if imc_in == const.IMC.AVERAGE_HORIZONTAL:
             # The amps are already in the B&B "reference" type ("GM", i.e.,
             # geometric mean)
@@ -66,7 +65,7 @@ class BeyerBommer2006():
              imc_in == const.IMC.GMRotI50          or\
              imc_in == const.IMC.RotD50            or\
              imc_in == const.IMC.RANDOM_HORIZONTAL:
-            denom = self.__GM2other(imt, imc_in)
+            denom = BeyerBommer2006.__GM2other(imt, imc_in)
         else:
             raise ValueError('unknown IMC %r' % imc_in)
 
@@ -79,14 +78,14 @@ class BeyerBommer2006():
              imc_out == const.IMC.GMRotI50          or\
              imc_out == const.IMC.RotD50            or\
              imc_out == const.IMC.RANDOM_HORIZONTAL:
-            numer = self.__GM2other(imt, imc_out)
+            numer = BeyerBommer2006.__GM2other(imt, imc_out)
         else:
             raise ValueError('unknown IMC %r' % imc_out)
         
         return amps * (numer / denom)
 
-    @classmethod
-    def sigmaIMCtoIMC(cls, sigmas, imc_in, imc_out, imt):
+    @staticmethod
+    def sigmaIMCtoIMC(sigmas, imc_in, imc_out, imt):
         """ 
         Returns sigmas converted from one IMC to another.
         IMPORTANT: Assumes the input sigmas are in log space
@@ -99,7 +98,6 @@ class BeyerBommer2006():
         Outputs:
         returns sigmas converted from imc_in to imc_out
         """
-        self = cls()
         if imc_in == const.IMC.AVERAGE_HORIZONTAL:
             # The amps are already in the B&B "reference" type ("GM", i.e.,
             # geometric mean)
@@ -110,7 +108,7 @@ class BeyerBommer2006():
              imc_in == const.IMC.GMRotI50          or\
              imc_in == const.IMC.RotD50            or\
              imc_in == const.IMC.RANDOM_HORIZONTAL:
-            R, sig_log_ratio = self.__GM2otherSigma(imt, imc_in)
+            R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_in)
         else:
             raise ValueError('unknown IMC %r' % imc_in)
 
@@ -126,57 +124,58 @@ class BeyerBommer2006():
              imc_out == const.IMC.GMRotI50          or\
              imc_out == const.IMC.RotD50            or\
              imc_out == const.IMC.RANDOM_HORIZONTAL:
-            R, sig_log_ratio = self.__GM2otherSigma(imt, imc_out)
+            R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_out)
         else:
             raise ValueError('unknown IMC %r' % imc_out)
 
         sigma_out = np.sqrt(sigma_GM2 * R**2 + sig_log_ratio**2)
         return sigma_out
 
-    def __GM2other(self, imt, imc):
+    @staticmethod
+    def __GM2other(imt, imc):
         """ Helper function to extract coefficients from the parameter tables """
         if 'PGA' in imt:
-            return self.__pga_dict[imc]['c12']
+            return BeyerBommer2006.__pga_dict[imc]['c12']
         elif 'PGV' in imt:
-            return self.__pgv_dict[imc]['c12']
+            return BeyerBommer2006.__pgv_dict[imc]['c12']
         elif 'SA' in imt:
             pp = imt.period
             if pp <= 0.15:
-                return self.__sa_dict[imc]['c1']
+                return BeyerBommer2006.__sa_dict[imc]['c1']
             elif pp < 0.8:
-                c1 = self.__sa_dict[imc]['c1']
-                c2 = self.__sa_dict[imc]['c2']
+                c1 = BeyerBommer2006.__sa_dict[imc]['c1']
+                c2 = BeyerBommer2006.__sa_dict[imc]['c2']
                 return c1 + (c2 - c1) * np.log(pp / 0.15) / np.log(0.8 / 0.15)
             elif pp <= 5.0:
-                return self.__sa_dict[imc]['c2']
+                return BeyerBommer2006.__sa_dict[imc]['c2']
             else:
                 # Not sure what's right here; should probably raise an error
                 # but for now let's just use c2
-                return self.__sa_dict[imc]['c2']
+                return BeyerBommer2006.__sa_dict[imc]['c2']
         else:
             raise ValueError('unknown IMT %r' % imt)
 
-
-    def __GM2otherSigma(self, imt, imc):
+    @staticmethod
+    def __GM2otherSigma(imt, imc):
         """ Helper function to extract coefficients from the parameter tables """
         if 'PGA' in imt:
-            return self.__pga_dict[imc]['R'], self.__pga_dict[imc]['c34']
+            return BeyerBommer2006.__pga_dict[imc]['R'], BeyerBommer2006.__pga_dict[imc]['c34']
         elif 'PGV' in imt:
-            return self.__pgv_dict[imc]['R'], self.__pgv_dict[imc]['c34']
+            return BeyerBommer2006.__pgv_dict[imc]['R'], BeyerBommer2006.__pgv_dict[imc]['c34']
         elif 'SA' in imt:
-            R = self.__sa_dict[imc]['R']
+            R = BeyerBommer2006.__sa_dict[imc]['R']
             pp = imt.period
             if pp <= 0.15:
-                return R, __sa_dict[imc]['c3']
+                return R, BeyerBommer2006.__sa_dict[imc]['c3']
             elif pp < 0.8:
-                c3 = self.__sa_dict[imc]['c3']
-                c4 = self.__sa_dict[imc]['c4']
+                c3 = BeyerBommer2006.__sa_dict[imc]['c3']
+                c4 = BeyerBommer2006.__sa_dict[imc]['c4']
                 return R, c3 + (c4 - c3) * np.log(pp / 0.15) / np.log(0.8 / 0.15)
             elif pp <= 5.0:
-                return R, self.__sa_dict[imc]['c4']
+                return R, BeyerBommer2006.__sa_dict[imc]['c4']
             else:
                 # Not sure what's right here; should probably raise an error
                 # but for now let's just use c4
-                return R, self.__sa_dict[imc]['c4']
+                return R, BeyerBommer2006.__sa_dict[imc]['c4']
         else:
             raise ValueError('unknown IMT %r' % imt)

@@ -19,8 +19,8 @@ class NewmarkHall1982(object):
     2.54 is the conversion factor to convert from cm/s to in/s
     """
 
-    @classmethod
-    def pgv2psa10(cls, pgv):
+    @staticmethod
+    def pgv2psa10(pgv):
         """
         Convert PGV in cm/s to PSA10 in g.
         ** PGV must be linear units **
@@ -29,10 +29,10 @@ class NewmarkHall1982(object):
         : returns:
             Values converted to PSA10.
         """
-        return pgv / cls.__vfact
+        return pgv / NewmarkHall1982.__vfact
 
-    @classmethod
-    def psa102pgv(cls, psa10):
+    @staticmethod
+    def psa102pgv(psa10):
         """
         Convert PSA10 in g to PGV cm/s.
         ** PSA10 must be linear units **
@@ -41,7 +41,7 @@ class NewmarkHall1982(object):
         : returns:
             Values converted to PGV.
         """
-        return psa10 * cls.__vfact
+        return psa10 * NewmarkHall1982.__vfact
 
     def getVfact(self):
         return self.__vfact

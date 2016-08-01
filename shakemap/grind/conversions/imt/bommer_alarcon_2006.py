@@ -10,8 +10,8 @@ class BommerAlarcon2006(object):
 
     __vfact = 1.0 / (20.0) * 100.0 * 9.81
 
-    @classmethod
-    def pgv2psa05(cls, pgv):
+    @staticmethod
+    def pgv2psa05(pgv):
         """
         Convert PGV in cm/s to PSA05 in g.
         ** PGV must be linear units **
@@ -20,10 +20,10 @@ class BommerAlarcon2006(object):
         : returns:
             Values converted to PSA05.
         """
-        return pgv / cls.__vfact
+        return pgv / BommerAlarcon2006.__vfact
 
-    @classmethod
-    def psa052pgv(cls, psa05):
+    @staticmethod
+    def psa052pgv(psa05):
         """
         Convert PSA05 in g to PGV cm/s.
         ** PSA10 must be linear units. **
@@ -32,7 +32,7 @@ class BommerAlarcon2006(object):
         : returns:
             Values converted to PGV.
         """
-        return psa05 * cls.__vfact
+        return psa05 * BommerAlarcon2006.__vfact
 
     def getVfact(self):
         return self.__vfact
