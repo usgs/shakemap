@@ -3,11 +3,13 @@ import sys
 import time as time
 
 import numpy as np
+import pytest 
 
 from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
 from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
 from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import CampbellBozorgnia2014
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
+from openquake.hazardlib.gsim.campbell_2003 import Campbell2003
 from openquake.hazardlib import imt, const
 
 import shakemap.grind.multigmpe as mg
@@ -123,3 +125,17 @@ def test_multigmpe():
 
     np.testing.assert_allclose(lnmu, lnmud)
     np.testing.assert_allclose(lnsd, lnsdd)
+
+    # Check for exception due to weights:
+    wts = [0.25, 0.25, 0.25, 0.25 + 1e-4]
+    with pytest.raises(Exception) as a:
+        mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
+
+    # Check exception on GMPE check
+    with pytest.raises(Exception) as a:
+        mgmpe = mg.MultiGMPE.from_list(AbrahamsonEtAl2014, wts)
+
+    # Check exception on tectonic region
+    with pytest.raises(Exception) as a:
+        gmpes = [BooreEtAl2014(), Campbell2003()]
+        mgmpe = mg.MultiGMPE.from_list(AbrahamsonEtAl2014, wts)
