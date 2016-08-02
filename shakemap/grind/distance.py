@@ -10,7 +10,7 @@ import os
 
 # third party imports
 from ..utils.ecef import latlon2ecef
-from .vector import Vector
+from ..utils.vector import Vector
 from .fault import get_quad_length
 from .source import rake_to_mech
 from openquake.hazardlib.geo import point, geodetic
