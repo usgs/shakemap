@@ -5,7 +5,7 @@ import numpy as np
 from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib import const
 
-from shakemap.grind.BeyerBommer2006 import ampIMCtoIMC, sigmaIMCtoIMC
+from shakemap.grind.conversions.imc.beyer_bommer_2006 import BeyerBommer2006 as bb06
 
 
 class MultiGMPE(GMPE):
@@ -51,16 +51,14 @@ class MultiGMPE(GMPE):
             inc_in = self.IMCs[i]
             inc_out = self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
             lmean[i] = np.log(
-                ampIMCtoIMC(
-                    np.exp(
-                        lmean[i]),
+                bb06.ampIMCtoIMC(
+                    np.exp(lmean[i]),
                     inc_in,
                     inc_out,
                     imt))
             lsd[i] = np.log(
-                sigmaIMCtoIMC(
-                    np.exp(
-                        lsd[i]),
+                bb06.sigmaIMCtoIMC(
+                    np.exp(lsd[i]),
                     inc_in,
                     inc_out,
                     imt))

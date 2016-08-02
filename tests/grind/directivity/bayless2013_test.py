@@ -6,7 +6,7 @@ import openquake.hazardlib.geo as geo
 
 from shakemap.grind.source import Source
 import shakemap.grind.fault as fault
-from shakemap.directivity.bayless2013 import Bayless2013
+from shakemap.grind.directivity.bayless2013 import Bayless2013
 from shakemap.utils.timeutils import ShakeDateTime
 
 

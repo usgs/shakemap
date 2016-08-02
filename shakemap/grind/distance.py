@@ -9,7 +9,7 @@ import itertools as it
 import os
 
 # third party imports
-from .ecef import latlon2ecef
+from ..utils.ecef import latlon2ecef
 from .vector import Vector
 from .fault import get_quad_length
 from .source import rake_to_mech
