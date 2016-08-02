@@ -58,7 +58,7 @@ Dependencies
 - Python 3
 - Python libraries: numpy, scipy, rasterio, fiona, xlrd, pandas, basemap,
   basemap-data-hires, shapely, h5py, gdal, descartes, oq-hazlib, neicio,
-  MapIO, matplotlib, jupyter
+  MapIO, matplotlib, jupyter, pytables, lxml
 
 OQ Hazard Library
 -----------------
