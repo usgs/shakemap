@@ -34,5 +34,6 @@ class BommerAlarcon2006(object):
         """
         return psa05 * BommerAlarcon2006.__vfact
 
-    def getVfact(self):
-        return self.__vfact
+    @staticmethod
+    def getVfact():
+        return BommerAlarcon2006.__vfact
