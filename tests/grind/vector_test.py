@@ -13,7 +13,7 @@ shakedir = os.path.abspath(os.path.join(homedir, '..'))
 # put this at the front of the system path, ignoring any installed mapio stuff
 sys.path.insert(0, shakedir)
 
-from shakemap.grind.vector import Vector
+from shakemap.utils.vector import Vector
 
 
 def test():

@@ -8,11 +8,11 @@ import openquake.hazardlib.geo as geo
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 
 import shakemap.grind.fault as fault
-from shakemap.grind.vector import Vector
 from shakemap.grind.distance import calc_rupture_distance
 from shakemap.grind.distance import get_distance
 from shakemap.utils.ecef import latlon2ecef
 from shakemap.utils.ecef import ecef2latlon
+from shakemap.utils.vector import Vector
 
 """
 Implements the Rowshandel (2013) directivity model.
