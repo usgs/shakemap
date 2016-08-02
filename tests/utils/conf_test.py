@@ -2,6 +2,8 @@ import os.path
 import tempfile
 import textwrap
 
+homedir = os.path.dirname(os.path.abspath(__file__))
+
 
 def test_conf():
     dummydir = os.path.expanduser('~')
@@ -80,8 +82,7 @@ def test_conf():
         f = open(tfile, 'wt')
         f.write(textwrap.dedent(data))
         f.close()
-        homedir = os.path.dirname(os.path.abspath(
-            __file__))  # where is this script?
+        # where is this script?
         configspec = os.path.join(homedir, 'configspec.ini')
         macros = {'shakemap_network': 'us',
                   'event_code': '2015abcd',
