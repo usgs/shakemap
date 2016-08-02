@@ -43,6 +43,7 @@ class NewmarkHall1982(object):
         """
         return psa10 * NewmarkHall1982.__vfact
 
-    def getVfact(self):
-        return self.__vfact
+    @staticmethod
+    def getVfact():
+        return NewmarkHall1982.__vfact
 

@@ -10,7 +10,7 @@ def test_newmarkhall1982():
     # NewmarkHall1982
     PSA10out = nh82.NewmarkHall1982.pgv2psa10(PGVin)
     PGVout = nh82.NewmarkHall1982.psa102pgv(PSA10in)
-    vfact = nh82.NewmarkHall1982().getVfact()
+    vfact = nh82.NewmarkHall1982.getVfact()
 
     assert abs(PSA10out - 0.1056348) < 0.0001
     assert abs(PGVout - 9.46658) < 0.001
