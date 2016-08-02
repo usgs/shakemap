@@ -2,8 +2,15 @@ import os.path
 import tempfile
 import textwrap
 
-homedir = os.path.dirname(os.path.abspath(__file__))
+from configobj import ConfigObj
+from validate import Validator, VdtTypeError, VdtParamError
 
+from shakemap.utils.conf import validate
+from shakemap.utils.conf import whatIs
+from shakemap.utils.conf import createDefaultConfig
+
+homedir = os.path.dirname(os.path.abspath(__file__))
+shakedir = os.path.abspath(os.path.join(homedir, '..'))
 
 def test_conf():
     dummydir = os.path.expanduser('~')
@@ -76,24 +83,21 @@ def test_conf():
         eventsourcecode = <EVENT_ID>
         privatekey = %s
     ''' % (dummydir, dummyfile, dummyfile, dummyfile, dummyfile)
-    try:
-        fh, tfile = tempfile.mkstemp()
-        os.close(fh)
-        f = open(tfile, 'wt')
-        f.write(textwrap.dedent(data))
-        f.close()
-        # where is this script?
-        configspec = os.path.join(homedir, 'configspec.ini')
-        macros = {'shakemap_network': 'us',
-                  'event_code': '2015abcd',
-                  'event_network': 'us',
-                  'event_id': 'us2015abcd'}
-        ret = validate(configspec, tfile, macros=macros)
-        print(ret)
-        config = ConfigObj(tfile)
-        pass
-    except Exception as e:
-        print('_test_validate() failed with error "%s"' % str(e))
+    fh, tfile = tempfile.mkstemp()
+    os.close(fh)
+    f = open(tfile, 'wt')
+    f.write(textwrap.dedent(data))
+    f.close()
+    configspec = os.path.join(shakedir, '../shakemap/utils/configspec.ini')
+    macros = {'shakemap_network': 'us',
+              'event_code': '2015abcd',
+              'event_network': 'us',
+              'event_id': 'us2015abcd'}
+    ret = validate(configspec, tfile, macros=macros)
+    config = ConfigObj(tfile)
+    configfile = createDefaultConfig(configspec)
+    validate(configspec, configfile)
+    whatIs(configspec, 'pgm2mi')
     os.remove(tfile)
 
 if __name__ == '__main__':
