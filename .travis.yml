@@ -18,7 +18,9 @@ install:
     - conda install --yes --channel conda-forge rasterio 
     - conda install --yes --channel conda-forge fiona 
     - conda install --yes --channel conda-forge xlrd 
+    - conda install --yes --channel conda-forge xlwt
     - conda install --yes --channel conda-forge pandas 
+    - conda install --yes --channel conda-forge pytables
     - conda install --yes --channel conda-forge basemap 
     - conda install --yes --channel conda-forge basemap-data-hires 
     - conda install --yes --channel conda-forge shapely 
@@ -27,10 +29,12 @@ install:
     - conda install --yes --channel conda-forge gdal==1.11.4 
     - conda install --yes --channel conda-forge descartes 
     - conda install --yes --channel conda-forge paramiko 
-    - conda install --yes --channel conda-forge pyproj 
+    - conda install --yes --channel conda-forge configobj
+    - conda install --yes --channel conda-forge pyproj
+    - conda install --yes --channel conda-forge psutil
+    - conda install --yes lxml
     - conda install --yes sphinx
     - pip -v install git+git://github.com/gem/oq-hazardlib.git
-    - pip -v install git+git://github.com/usgs/neicio.git
     - pip -v install git+git://github.com/usgs/MapIO.git
     - pip -v install git+git://github.com/snide/sphinx_rtd_theme.git
     #-----------------------

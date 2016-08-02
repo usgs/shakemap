@@ -1,7 +1,7 @@
 #!/bin/bash
 echo $PATH
 
-DEPS="numpy scipy matplotlib jupyter rasterio fiona xlrd xlwt pandas basemap basemap-data-hires shapely h5py basemap-data-hires gdal==1.11.4 descartes paramiko sphinx configobj pyproj pytest psutil"
+DEPS="numpy scipy matplotlib jupyter rasterio fiona xlrd xlwt pandas pytables basemap basemap-data-hires shapely h5py basemap-data-hires gdal==1.11.4 descartes paramiko sphinx configobj pyproj pytest psutil lxml"
 
 if [ "$#" -le 1 ]; then
     #turn off whatever other virtual environment user might be in
