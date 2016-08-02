@@ -133,9 +133,9 @@ def test_multigmpe():
 
     # Check exception on GMPE check
     with pytest.raises(Exception) as a:
-        mgmpe = mg.MultiGMPE.from_list(AbrahamsonEtAl2014, wts)
+        mgmpe = mg.MultiGMPE.from_list('BA08', wts)
 
     # Check exception on tectonic region
     with pytest.raises(Exception) as a:
         gmpes = [BooreEtAl2014(), Campbell2003()]
-        mgmpe = mg.MultiGMPE.from_list(AbrahamsonEtAl2014, wts)
+        mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
