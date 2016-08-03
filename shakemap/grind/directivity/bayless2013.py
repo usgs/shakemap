@@ -6,7 +6,6 @@ import copy
 
 import shakemap.grind.fault as fault
 from shakemap.grind.distance import get_distance
-from shakemap.grind.distance import distance_sq_to_segment
 import shakemap.utils.ecef as ecef
 from shakemap.utils.vector import Vector
 

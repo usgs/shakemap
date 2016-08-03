@@ -9,10 +9,11 @@ from shakemap.grind.conversions.imc.beyer_bommer_2006 import BeyerBommer2006 as 
 
 
 class MultiGMPE(GMPE):
-    """Implements a GMPE that is the combination of multiple GMPEs.
-    TODO:
-
-       * convert IMT (e.g., PGV) from another IMT if it is not available from
+    """
+    Implements a GMPE that is the combination of multiple GMPEs.
+    
+    Todo:
+        * Convert IMT (e.g., PGV) from another IMT if it is not available from
           the GMPE in get_mean_and_stddevs.
 
     """
@@ -26,6 +27,9 @@ class MultiGMPE(GMPE):
     REQUIRES_DISTANCES = None
 
     def get_mean_and_stddevs(self, sites, rup, dists, imt, stddev_types):
+        """
+        See superclass `method <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs>`__. 
+        """
         lnmu = np.zeros_like(sites.vs30)
         lnsd2 = np.zeros_like(sites.vs30)
         lmean = [None] * len(self.GMPEs)
@@ -72,12 +76,14 @@ class MultiGMPE(GMPE):
 
     @classmethod
     def from_list(cls, GMPEs, weights):
-        """Construct a MultiGMPE from lists of GMPEs and weights.
+        """Construct a MultiGMPE instance from lists of GMPEs and weights.
 
         :param GMPEs:
-            List of OpenQuake GMPE instances.
+            List of OpenQuake 
+            `GMPE <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#built-in-gsims>`__ 
+            instances.
         :param weights:
-            List of weights.
+            List of weights; must sum to 1.0. 
         """
         # Check that weights sum to 1.0:
         if np.sum(weights) != 1.0:
@@ -145,25 +151,44 @@ class MultiGMPE(GMPE):
 #----------------------------------------------------
 
 
-def z1_from_vs30_cy14_cal(vs30):
-    # vs30 = V_S30 in units of m/s
-    # z1   = z_1 in units of m
+def _z1_from_vs30_cy14_cal(vs30):
+    """
+    Compute z1.0 using CY14 relationship. 
+
+    :param vs30:
+        Numpy array of Vs30 values in m/s. 
+    :returns: 
+        Numpy array of z1.0 in m.  
+    """
     z1 = np.exp(-(7.15 / 4.0) *
                 np.log((vs30**4.0 + 571.**4) / (1360**4.0 + 571.**4)))
     return z1
 
 
-def z1_from_vs30_ask14_cal(vs30):
-    # vs30 = V_S30 in units of m/s
-    # z1   = z_1 in units of m
+def _z1_from_vs30_ask14_cal(vs30):
+    """
+    Calculate z1.0 using ASK14 relationship. 
+
+    :param vs30:
+        Numpy array of Vs30 values in m/s. 
+    :returns: 
+        Numpy array of z1.0 in m.  
+    
+    """
     # ASK14 define units as KM, but implemented as m in OQ
     z1 = np.exp(-(7.67 / 4.0) *
                 np.log((vs30**4.0 + 610.**4) / (1360**4.0 + 610.**4)))
     return z1
 
 
-def z2p5_from_vs30_cb14_cal(vs30):
-    # vs30 = V_S30 in units of m/s
-    # z2p5 = z_2.5 in units of m
+def _z2p5_from_vs30_cb14_cal(vs30):
+    """
+    Calculate z2.5 using CB14 relationship. 
+
+    :param vs30:
+        Numpy array of Vs30 values in m/s. 
+    :returns: 
+        Numpy array of z2.5 in m.  
+    """
     z2p5 = 1000 * np.exp(7.089 - (1.144) * np.log(vs30))
     return z2p5

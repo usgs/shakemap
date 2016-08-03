@@ -8,7 +8,7 @@ import openquake.hazardlib.geo as geo
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 
 import shakemap.grind.fault as fault
-from shakemap.grind.distance import calc_rupture_distance
+from shakemap.grind.distance import _calc_rupture_distance
 from shakemap.grind.distance import get_distance
 from shakemap.utils.ecef import latlon2ecef
 from shakemap.utils.ecef import ecef2latlon
@@ -266,7 +266,7 @@ class Rowshandel2013(object):
         qdist = np.zeros(nquad)
         for i in range(0, nquad):
             P0, P1, P2, P3 = self._flt.getQuadrilaterals()[i]
-            qdist[i] = calc_rupture_distance(P0, P1, P2, P3, hyp_ecef)
+            qdist[i] = _calc_rupture_distance(P0, P1, P2, P3, hyp_ecef)
         ind = int(np.where(qdist == np.min(qdist))[0])
         # *** check that this doesn't break with more than one quad
         q = self._flt.getQuadrilaterals()[ind]

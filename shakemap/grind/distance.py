@@ -29,30 +29,39 @@ from shakemap.utils.exception import ShakeMapException
 
 class Distance(object):
     """
-    Class for distance calculations.
+    Class for distance calculations. Primary method is 'get_distance'. 
+    To gracefully handle multiple segment ruptures, many of the distances
+    are based on the Spudich and Chiou (2015) GC2 coordinate system. 
+
+
+    References: 
+        Spudich, Paul and Chiou, Brian, 2015, Strike-parallel and strike-normal
+        coordinate system around geometrically complicated rupture traces—Use by
+        NGA-West2 and further improvements: U.S. Geological Survey Open-File
+        Report 2015-1028, 20 p., http://dx.doi.org/10.3133/ofr20151028.
     """
 
     def __init__(self, gmpe, source, lat, lon, dep, use_median_distance=True):
         """
-        Construct a Distance object.
         :param gmpe:
             Concrete subclass of GMPE
-            https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#built-in-gsims>`__;
             can be individual instance or list of instances.
         :param source:
-            Source instance. For point-source distances (Repi, Rhyp) the hypocenter
-            is taken from the source instance. The finite-fault distances (Rrup,
-            Rjb, ...), are based on the fault representation in the source instance
-            if available. If a Fault instance is unavailalbe, the finite-fault
-            distances are computed from point-source distances, in which case the
-            earthquake manitude from the Source instance is required for median
-            distance corrections if use_median_distance is True.
+            Shakemap Source instance. For point-source distances (Repi, Rhyp) the
+            hypocenter is taken from the source instance. The finite-fault 
+            distances (Rrup, Rjb, ...), are based on the fault representation in
+            the source instance if available. If a Fault instance is unavailalbe, 
+            the finite-fault distances are computed from point-source distances, 
+            in which case the earthquake manitude from the Source instance is 
+            required for median distance corrections if use_median_distance is 
+            True.
         :param lat:
             A numpy array of site latitudes.
         :param lon:
             A numpy array of site longitudes.
         :param dep:
-            A numpy array of site depths (km).
+            A numpy array of site depths (km); down is positive. 
         :param use_median_distance:
             Boolean; only used if GMPE requests fault distances and not fault is
             availalbe. Default is True, meaning that point-source distances are
@@ -69,14 +78,15 @@ class Distance(object):
     def fromSites(cls, gmpe, source, sites, use_median_distance=True):
         """
         Convenience class method to construct a Distance object from a sites object.
+
         :param gmpe:
             Concrete subclass of GMPE
-            https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#built-in-gsims>`__;
             can be individual instance or list of instances.
         :param source:
-            Source object.
+            Shakeamp Source object.
         :param sites:
-            Site object.
+            Shakemap Sites object.
         :param use_median_distance:
             Boolean; only used if GMPE requests fault distances and not fault is
             availalbe. Default is True, meaning that point-source distances are
@@ -84,7 +94,7 @@ class Distance(object):
         :returns:
             Distance object.
         """
-        sm_dict = sites.GeoDict
+        sm_dict = sites._GeoDict
         west = sm_dict.xmin
         east = sm_dict.xmax
         south = sm_dict.ymin
@@ -97,42 +107,26 @@ class Distance(object):
         dep = np.zeros_like(lon)
         return cls(gmpe, source, lat, lon, dep, use_median_distance)
 
-    @classmethod
-    def fromPoints(cls, gmpe, source, lat, lon, dep, use_median_distance=True):
-        """
-        Convenience class method to construct a Distance object from an array of
-        lons, lats, and depths.
-        :param gmpe:
-            Concrete subclass of GMPE
-            https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
-            can be individual instance or list of instances.
-        :param source:
-            Source object.
-        :param lon:
-            Numpy array of longitudes.
-        :param lat:
-            Numpy array of latitudes.
-        :param dep:
-            Numpy array of depths.
-        :param use_median_distance:
-            Boolean; only used if GMPE requests fault distances and not fault is
-            availalbe. Default is True, meaning that point-source distances are
-            adjusted based on magnitude to get the median fault distance.
-        :returns:
-            Distance object.
-        """
-        return cls(gmpe, source, lat, lon, dep, use_median_distance)
-
     def getDistanceContext(self):
+        """
+        :returns:
+            Openquake distance context
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html?highlight=distancescontext#openquake.hazardlib.gsim.base.DistancesContext>`__.
+        """
         return copy.deepcopy(self._distance_context)
 
     def getSource(self):
+        """
+        :returns:
+            Shakemap Source object. 
+        """
         return copy.deepcopy(self._source)
 
     def _calcDistanceContext(self, gmpe, lat, lon, dep,
                              use_median_distance=True):
         """
-        Create a DistancesContext object
+        Create a DistancesContext object.
+
         :param gmpe:
             Concrete subclass of GMPE
             (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
@@ -180,25 +174,38 @@ def get_distance(methods, lat, lon, dep, source,
                  use_median_distance=True):
     """
     Calculate distance using any one of a number of distance measures.
-    One of quadlist OR hypo must be specified.
-    :param methods:
-       List of strings (or just a string) of distances to compute;
-       can include: 'repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0'
-         repi:  Distance to epicenter.
-         rhypo: Distance to hypocenter.
-         rjb:   Joyner-Boore distance; this is closest distance to the
-                surface projection of the rupture plane.
-         rrup:  Rupture distance; closest distance to the rupture plane.
-         rx:    Strike-normal distance; same as GC2 coordiante T.
-         ry:    Strike-parallel distance; same as GC2 coordiante U, but
-                with a shift in origin definition. See Spudich and Chiou
-                (2015) http://dx.doi.org/10.3133/ofr20151028.
-         ry0:   Horizontal distance off the end of the rupture measured
-                parallel to strike. Can only be zero or positive. We
-                compute this as a function of GC2 coordinate U.
-         U:     GC2 coordinate U.
-         T:     GC2 coordinate T.
+    One of quadlist OR hypo must be specified. The following table gives
+    the allowed distance strings and a description of each. 
 
+    +--------+----------------------------------------------------------+
+    | String | Description                                              |
+    +========+==========================================================+
+    | repi   | Distance to epicenter.                                   |
+    +--------+----------------------------------------------------------+
+    | rhypo  | Distance to hypocenter.                                  |
+    +--------+----------------------------------------------------------+
+    | rjb    | Joyner-Boore distance; this is closest distance to the   |
+    |        | surface projection of the rupture plane.                 |
+    +--------+----------------------------------------------------------+
+    | rrup   | Rupture distance; closest distance to the rupture plane. |
+    +--------+----------------------------------------------------------+
+    | rx     | Strike-normal distance; same as GC2 coordiante T.        |
+    +--------+----------------------------------------------------------+
+    | ry     | Strike-parallel distance; same as GC2 coordiante U, but  |
+    |        | with a shift in origin definition. See Spudich and Chiou |
+    |        | (2015) http://dx.doi.org/10.3133/ofr20151028.            |
+    +--------+----------------------------------------------------------+
+    | ry0    | Horizontal distance off the end of the rupture measured  |
+    |        | parallel to strike. Can only be zero or positive. We     |
+    |        | compute this as a function of GC2 coordinate U.          |
+    +--------+----------------------------------------------------------+
+    | U      | GC2 coordinate U.                                        |
+    +--------+----------------------------------------------------------+
+    | T      | GC2 coordinate T.                                        |
+    +--------+----------------------------------------------------------+
+
+    :param methods:
+        List of strings (or just a string) of distances to compute.
     :param lat:
        A numpy array of latitudes.
     :param lon:
@@ -207,17 +214,12 @@ def get_distance(methods, lat, lon, dep, source,
        A numpy array of depths (km).
     :param source:
        source instance.
-    https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py
     :param use_median_distance:
         Boolean; only used if GMPE requests fault distances and not fault is
         availalbe. Default is True, meaning that point-source distances are
         adjusted based on magnitude to get the median fault distance.
     :returns:
        dictionary of numpy array of distances, size of lon.shape
-    :raises ShakeMapException:
-       if a fault distance method is called without quadlist
-    :raises NotImplementedError:
-       for unknown distance measures or ones not yet implemented.
     """
     fault = source.getFault()
     hypo = source.getHypo()
@@ -304,7 +306,7 @@ def get_distance(methods, lat, lon, dep, source,
             # For these distances, we need to sort out strike discordance and nominal
             # strike prior to starting the loop if there are more than one
             # segments
-            segind = fault.getSegmentIndex()
+            segind = fault._getSegmentIndex()
             segindnp = np.array(segind)
             uind = np.unique(segind)
             nseg = len(uind)
@@ -379,7 +381,7 @@ def get_distance(methods, lat, lon, dep, source,
             P0, P1, P2, P3 = quadlist[i]
 
             if 'rrup' in methods:
-                rrupdist = calc_rupture_distance(P0, P1, P2, P3, sites_ecef)
+                rrupdist = _calc_rupture_distance(P0, P1, P2, P3, sites_ecef)
                 minrrup = np.minimum(minrrup, rrupdist)
 
             if 'rjb' in methods:
@@ -391,7 +393,7 @@ def get_distance(methods, lat, lon, dep, source,
                 S1.depth = 0.0
                 S2.depth = 0.0
                 S3.depth = 0.0
-                rjbdist = calc_rupture_distance(S0, S1, S2, S3, sites_ecef)
+                rjbdist = _calc_rupture_distance(S0, S1, S2, S3, sites_ecef)
                 minrjb = np.minimum(minrjb, rjbdist)
 
             if ('rx' in methods) or ('ry' in methods) or \
@@ -405,8 +407,8 @@ def get_distance(methods, lat, lon, dep, source,
                 # http://dx.doi.org/10.3133/ofr20151028.
 
                 # Compute u_i and t_i for this segment
-                t_i = calc_t_i(P0, P1, lat, lon)
-                u_i = calc_u_i(P0, P1, lat, lon)
+                t_i = __calc_t_i(P0, P1, lat, lon)
+                u_i = __calc_u_i(P0, P1, lat, lon)
 
                 # Quad length
                 l_i[i] = get_quad_length(quadlist[i])
@@ -702,11 +704,14 @@ def get_distance(methods, lat, lon, dep, source,
     return distdict
 
 
-def distance_sq_to_segment(p0, p1):
+def _distance_sq_to_segment(p0, p1):
     """
     Calculate the distance^2 from the origin to a segment defined by two vectors
-    :param p0: numpy array Nx3 (ECEF)
-    :param p1: numpy array Nx3 (ECEF)
+
+    :param p0: 
+        Numpy array Nx3 (ECEF).
+    :param p1: 
+        Numpy array Nx3 (ECEF).
     :returns:
         The squared distance from the origin to a segment.
     """
@@ -757,9 +762,10 @@ def distance_sq_to_segment(p0, p1):
 # call this once per quad
 
 
-def calc_rupture_distance(P0, P1, P2, P3, points):
+def _calc_rupture_distance(P0, P1, P2, P3, points):
     """
     Calculate the shortest distance from a set of points to a rupture surface.
+
     :param P0:
         Point object, representing the first top-edge vertex of a fault quadrilateral.
     :param P1:
@@ -805,10 +811,10 @@ def calc_rupture_distance(P0, P1, P2, P3, points):
         np.sum(p0d[inside_idx, :] * normalVector.getArray(), axis=1)), 2)
 
     outside_idx = np.logical_not(inside_idx)
-    s0 = distance_sq_to_segment(p0d, p1d)
-    s1 = distance_sq_to_segment(p1d, p2d)
-    s2 = distance_sq_to_segment(p2d, p3d)
-    s3 = distance_sq_to_segment(p3d, p0d)
+    s0 = _distance_sq_to_segment(p0d, p1d)
+    s1 = _distance_sq_to_segment(p1d, p2d)
+    s2 = _distance_sq_to_segment(p2d, p3d)
+    s3 = _distance_sq_to_segment(p3d, p0d)
 
     smin = np.minimum(np.minimum(s0, s1), np.minimum(s2, s3))
     dist[outside_idx] = smin[outside_idx]
@@ -822,7 +828,7 @@ def calc_rupture_distance(P0, P1, P2, P3, points):
     return dist
 
 
-def calc_u_i(P0, P1, lat, lon):
+def __calc_u_i(P0, P1, lat, lon):
     """
     Calculate u_i distance. See Spudich and Chiou OFR 2015-1028. This is the distance
     along strike from the first vertex (P0) of the i-th segment.
@@ -876,11 +882,12 @@ def calc_u_i(P0, P1, lat, lon):
     return u_i
 
 
-def calc_t_i(P0, P1, lat, lon):
+def __calc_t_i(P0, P1, lat, lon):
     """
     Calculate t_i distance. See Spudich and Chiou OFR 2015-1028. This is the distance
     measured normal to strike from the i-th segment. Values on the hanging-wall are
     positive and those on the foot-wall are negative.
+
     :param P0:
         Point object, representing the first top-edge vertex of a fault quadrilateral.
     :param P1:

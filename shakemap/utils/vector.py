@@ -8,17 +8,22 @@ from ..utils.ecef import latlon2ecef, ecef2latlon
 class Vector(object):
     """
     Three-dimensional vector object, stored as three floats of x,y,z.
+
+    Todo: 
+        Optimize/vectorize calculations like dot/cross for arrays of
+        vectors. 
     """
 
     def __init__(self, x, y, z):
         """
         Create three dimensional vector object in cartesian space.
+
         :param x:
-            number representing x coordinate
+            x coordinate (float). 
         :param y:
-            number representing y coordinate
+            y coordinate (float). 
         :param z:
-            number representing z coordinate
+            z coordinate (float). 
         :returns:
             Vector object containing x,y,z coordinates as floats.
         """
@@ -29,12 +34,16 @@ class Vector(object):
     @classmethod
     def fromPoint(cls, oqpoint):
         """
-        Class method which allows user to create a Vector from a GEM Hazardlib Point object.  The Point lat,lon,depth
-        values are converted to Earth-Centered-Earth-Fixed (ECEF) cartesian coordinates.
+        Class method which allows user to create a Vector from a GEM Hazardlib 
+        Point object.  The Point lat, lon, depth values are converted to 
+        Earth-Centered-Earth-Fixed (ECEF) cartesian coordinates.
+
         :param oqpoint:
-            a Point object as defined at https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py
+            Openquake 
+            `Point <https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py>`))
+            object. 
         :returns:
-            a Vector object.
+            A Vector object.
         """
         x, y, z = latlon2ecef(
             oqpoint.latitude, oqpoint.longitude, oqpoint.depth)
@@ -44,6 +53,7 @@ class Vector(object):
     def fromTuple(cls, a):
         """
         Class method which allows user to create a Vector from an x/y/z tuple.
+
         :param a:
             an x/y/z tuple.
         :returns:
@@ -54,11 +64,12 @@ class Vector(object):
 
     def __add__(self, other):
         """
-        Add another Vector object to this one (x+x,y+y,z+z)
+        Add another Vector object to this one (x+x,y+y,z+z).
+
         :param other:
-           Another Vector object
+            Another Vector object
         :returns:
-           A third Vector object.
+            A third Vector object.
         :raises TypeError:
             If other is not a Vector object.
         """
@@ -68,11 +79,12 @@ class Vector(object):
 
     def __sub__(self, other):
         """
-        Subtract another Vector object from this one (x+x,y+y,z+z)
+        Subtract another Vector object from this one (x+x,y+y,z+z).
+
         :param other:
-           Another Vector object
+            Another Vector object.
         :returns:
-           A third Vector object.
+            A third Vector object.
         :raises TypeError:
             If other is not a Vector object.
         """
@@ -85,12 +97,13 @@ class Vector(object):
     def __mul__(self, length):
         """
         Multiply the Vector by a scalar, changing it's length.
+
         :param length:
-           A scalar number
+            A scalar number.
         :returns:
-           A Vector object.
+            A Vector object.
         :raises TypeError:
-           when length is not a number.
+            when length is not a number.
         """
         try:
             length = float(length)
@@ -103,12 +116,13 @@ class Vector(object):
     def __rmul__(self, length):
         """
         Multiply the Vector by a scalar, changing it's length.
+
         :param length:
-           A scalar number
+            A scalar number.
         :returns:
-           A Vector object.
+            A Vector object.
         :raises TypeError:
-           when length is not a number.
+            When length is not a number.
         """
         try:
             length = float(length)
@@ -121,10 +135,11 @@ class Vector(object):
     def __eq__(self, other):
         """
         Check equality between this Vector and another.
+
         :param other:
-           Another Vector object
+            Another Vector object.
         :returns:
-           True or False
+            True or False.
         :raises TypeError:
             If other is not a Vector object.
         """
@@ -139,10 +154,11 @@ class Vector(object):
     def distance(self, other):
         """
         Calculate distance between this Vector and another.
+
         :param other:
-           Another Vector object
+            Another Vector object.
         :returns:
-           float distance between Vectors
+            float distance between Vectors.
         :raises TypeError:
             If other is not a Vector object.
         """
@@ -156,10 +172,11 @@ class Vector(object):
     def cross(self, other):
         """
         Calculate cross product between this Vector and another.
+
         :param other:
-           Another Vector object
+            Another Vector object.
         :returns:
-           a Vector object
+            a Vector object.
         :raises TypeError:
             If other is not a Vector object.
         """
@@ -173,10 +190,11 @@ class Vector(object):
     def dot(self, other):
         """
         Calculate dot product between this Vector and another.
+
         :param other:
-           Another Vector object
+           Another Vector object.
         :returns:
-           a float dot product
+           a float dot product.
         :raises TypeError:
             If other is not a Vector object.
         """
@@ -189,25 +207,22 @@ class Vector(object):
 
     def getArray(self):
         """
-        Return x,y,z parameters as numpy array.
         :returns:
-           3 element array of [x,y,z]
+            3 element Numpy array of [x,y,z]
         """
         return np.array((self.x, self.y, self.z))
 
     def getTuple(self):
         """
-        Return x,y,z parameters as tuple
         :returns:
-           3 element tuple of (x,y,z)
+            3 element tuple of (x,y,z)
         """
         return (self.x, self.y, self.z)
 
     def norm(self):
         """
-        Return the normalized form of the Vector.
         :returns:
-           Normalized Vector.
+            Normalized Vector.
         """
         length = np.sqrt(self.x**2 + self.y**2 + self.z**2)
         x = self.x / length
@@ -217,18 +232,20 @@ class Vector(object):
 
     def mag(self):
         """
-        Return the length of the Vector.
         :returns:
-           float length of Vector.
+            Length of Vector (float).
         """
         length = np.sqrt(self.x**2 + self.y**2 + self.z**2)
         return length
 
     def toPoint(self):
         """
-        Convert the Vector to a hazardlib Point object, after translating back to lat,lon,depth.
+        Convert the Vector to a hazardlib Point object, after translating 
+        back to lat, lon, depth.
+
         :returns:
-           a Point object as defined at https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py
+            An Openquake 
+            `Point <https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py>`__.
         """
         lat, lon, dep = ecef2latlon(self.x, self.y, self.z)
         return point.Point(lon, lat, dep)
