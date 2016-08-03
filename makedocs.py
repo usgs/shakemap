@@ -113,6 +113,7 @@ def main(args):
         f.write("import sphinx_rtd_theme\n")
         f.write("html_theme = 'sphinx_rtd_theme'\n")
         f.write("html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]\n")
+        f.write("autoclass_content = 'both'\n")
         f.close()
 
         # Go to the sphinx directory and build the html

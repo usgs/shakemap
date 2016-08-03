@@ -2,10 +2,30 @@ import numpy as np
 
 
 class GodaAtkinson2010(object):
+    """
+    Imlements the Goda and Atkinson (2010) spatial correlation model for IMTs. 
 
-    def getSpatialCorrelation(self, dists, imt):
+    Todo:
+        Inherit from SpatialCorrelation class. 
+
+    References: 
+        Goda, K., & Atkinson, G. M. (2010). Intraevent spatial correlation of
+        ground-motion parameters using SK-net data. Bulletin of the Seismological
+        Society of America, 100(6), 3055-3067.
+        `[link] <http://www.bssaonline.org/content/100/6/3055.short>`__
+    """
+    @staticmethod
+    def getSpatialCorrelation(dists, imt):
         """
-        Put some documentation here
+        Method for evalulating spatial correlation model. 
+
+        :param dists:
+            Numpy array of distances (km). 
+        :param imt:
+            Openquake intensity measure type instance. 
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`__
+        :returns:
+            Numpy array of correlation values. 
         """
         if 'PGA' in imt:
             alpha = 0.060

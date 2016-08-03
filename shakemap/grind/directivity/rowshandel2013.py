@@ -14,36 +14,57 @@ from shakemap.utils.ecef import latlon2ecef
 from shakemap.utils.ecef import ecef2latlon
 from shakemap.utils.vector import Vector
 
-"""
-Implements the Rowshandel (2013) directivity model.
-
-To do:
-    * Add checks on function arguments (e.g., mtype) for valid values.
-    * Add a validation function.
-"""
-
 
 class Rowshandel2013(object):
     """
-    Class for Rowshandel (2013) directvity model.
+    Implements the Rowshandel (2013) directivity model. Note that the report
+    provides many options for computing the directivity factor and we have 
+    also used some coefficients that are unpublished updates by Rowshandel. 
+    Some of the implementation options are controlled by arguments (e.g., 
+    mtype). 
+    
+    Fd is the directivity function. One of the options is whether or not to
+    use the 'centering' term (the argument is 'centered' and defaults to 
+    True). If it is True then
+
+    Fd = C1 * (XiPrime - Xic) * LD * DT * WP
+
+    otherwise 
+
+    Fd = (C1 * Xiprime + C2) * LD * DT * WP
+
+    where
+
+    - C1 and C2 are regression coefficients. 
+    - XiPrime is a factor that accounts for rupture propagation and slip
+      direction. 
+    - Xic is the centering term. 
+    - LD is the rupture length de-normalization factor. 
+    - DT is the distance-taper. 
+    - WP is the narrow-band multiplier. 
+
+    Note that Fd is intended to be used in GMPEs as:
+
+    ln(IM_dir) = ln(IM) + Fd
+
+    where
+
+    - Fd is the directivity effect
+    - IM is the intensity measure predicted by the GMPE. 
+    - IM_dir is the directivity-adjusted IM. 
+
+    To do:
+        * Add checks on function arguments (e.g., mtype) for valid values.
+        * Add a validation function.
+        * Interpolate periods. 
+
+    References: 
+        Rowshandel, B. (2013). Rowshandel’s NGA-West2 directivity model, 
+        Chapter 3 of PEER Report No. 2013/09, P. Spudich (Editor), Pacific 
+        Earthquake Engineering Research Center, Berkeley, CA.
+        `[link] <http://peer.berkeley.edu/publications/peer_reports/reports_2013/webPEER-2013-09-Spudich.pdf>`__
     """
-    #-------------------------------------------------------------------------
-    # C1 adn C2 are GMPE-specific coefficients. Also, these are for Model-I option.
-    #-------------------------------------------------------------------------
-#    __c1 = {'as': np.array([0.375,0.561,0.833,0.873,1.019,1.387,1.551]),
-#            'ba': np.array([0.257,0.699,0.824,0.834,0.986,1.378,1.588]),
-#            'cb': np.array([0.149,0.377,0.570,0.596,0.772,1.152,np.nan]),
-#            'cy': np.array([0.079,0.321,0.629,0.693,0.898,1.258,1.369]),
-#            'id': np.array([0.325,0.803,1.544,1.576,1.823,2.089,2.250]),
-#            'T': np.array([1, 2, 3, 4, 5, 7.5, 10])}
-#    __c1['mean'] = (__c1['as'] + __c1['ba'] + __c1['cb'] + __c1['cy'] + __c1['id'])/5
-#    __c2 = {'as': np.array([0.028,-0.071,-0.130,-0.146,-0.178,-0.250,-0.268]),
-#            'ba': np.array([0.024,-0.097,-0.133,-0.145,-0.182,-0.273,-0.319]),
-#            'cb': np.array([-0.007,-0.057,-0.095,-0.106,-0.144,-0.230,np.nan]),
-#            'cy': np.array([-0.003,-0.404,-0.098,-0.115,-0.156,-0.224,-0.235]),
-#            'id': np.array([-0.019,-0.082,-0.228,-0.255,-0.312,-0.358,-0.369]),
-#            'T': np.array([1, 2, 3, 4, 5, 7.5, 10])}
-#    __c2['mean'] = (__c2['as'] + __c2['ba'] + __c2['cb'] + __c2['cy'] + __c2['id'])/5
+
     __c1 = [0.35, 0.75, 0.95, 1.28, 1.60]
     __c2 = [-0.035, -0.10, -0.15, -0.26, -0.30]
     __periods = [1.0, 3.0, 5.0, 7.5, 10.0]
@@ -52,22 +73,22 @@ class Rowshandel2013(object):
                  mtype=1, simpleDT=False, centered=True):
         """
         Constructor for rowshandel2013.
+
         :param source:
             Source instance.
         :param lat:
-            A numpy array of site latitudes.
+            Numpy array of site latitudes.
         :param lon:
-            A numpy array of site longitudes.
+            Numpy array of site longitudes.
         :param dep:
-            A numpy array of site depths (km).
+            Numpy array of site depths (km); positive down.
         :param dx:
             Float for target mesh spacing for subfaults in km. The mesh
             snaps to the edges of the quadrilaterals so the actual mesh spacing
             will not equal this exactly; spacing in x and y will not be equal.
         :param T:
             List floats (or a float) for periods to compute fd;
-            Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5
-             ** TODO: interpolate intermediate periods.
+            Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5. 
         :param a_weight:
             Weighting factor for how p-dot-q and s-dot-q are averaged; 0 for
             only p-dot-q (propagation factor) and 1 for only s-dot-q (slip
@@ -105,12 +126,12 @@ class Rowshandel2013(object):
         self._centered = centered
 
         # Period independent parameters
-        self.computeWrup()
-        self.computeLD()
-        self.computeXiPrime()
-        self.getCenteringTerm()
+        self.__computeWrup()
+        self.__computeLD()
+        self.__computeXiPrime()
+        self.__getCenteringTerm()
 
-        self.computeFd()
+        self.__computeFd()
 
     @classmethod
     def fromSites(cls, source, sites, dx, T, a_weight=0.5,
@@ -123,14 +144,13 @@ class Rowshandel2013(object):
         :param source:
             Source instance.
         :param sites:
-            Sites object
+            Sites object. 
         :param dx:
             Float for target mesh spacing for subfaults in km. The mesh
             snaps to the edges of the quadrilaterals so the actual mesh spacing
             will not equal this exactly; spacing in x and y will not be equal.
         :param T:
-            Period; Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5
-             ** TODO: interpolate intermediate periods.
+            Period; Currently, only acceptable values are 1, 2, 3, 4, 5, 7.5. 
         :param a_weight:
             Weighting factor for how p-dot-q and s-dot-q are averaged; 0 for
             only p-dot-q (propagation factor) and 1 for only s-dot-q (slip
@@ -158,21 +178,43 @@ class Rowshandel2013(object):
                    a_weight, mtype, simpleDT, centered)
 
     def getFd(self):
+        """
+        :returns:
+            Numpy array of Fd; this is the directivity amplification factor
+            (log units). 
+        """
         return copy.deepcopy(self._fd)
 
     def getXiPrime(self):
+        """
+        :returns: 
+            Numpy array of Xi'; this is the variable that accounts for geometric
+            factors in Fd. 
+        """
         return copy.deepcopy(self._xi_prime)
 
     def getDT(self):
+        """
+        :returns:
+           Numpy array of the distance taper factor.
+        """
         return copy.deepcopy(self._DT)
 
     def getWP(self):
+        """
+        :returns:
+            Numpy array of the narrow-band multiplier. 
+        """
         return copy.deepcopy(self._WP)
 
     def getLD(self):
+        """
+        :returns:
+            Numpy array of the rupture length de-normalization factor. 
+        """
         return copy.deepcopy(self._LD)
 
-    def computeFd(self):
+    def __computeFd(self):
         """
         Fd is the term that modifies the GMPE output as an additive term
         (in log space).
@@ -189,8 +231,8 @@ class Rowshandel2013(object):
             c2sel = self.__c2[self.__periods == period]
 
             # Period dependent parameters
-            self.computeWP(period)
-            self.computeDT(period)
+            self.__computeWP(period)
+            self.__computeDT(period)
 
             if self._centered:
                 self._fd[i] = c1sel * self._WP * self._DT * xcipc
@@ -198,8 +240,10 @@ class Rowshandel2013(object):
                 self._fd[i] = (c1sel * self._xi_prime + c2sel) * \
                     self._LD * self._DT * self._WP
 
-    def computeWrup(self):
-        """Compute the the portion (in km) of the width of the fault which ruptures up-dip from the hypocenter to the top of the fault.
+    def __computeWrup(self):
+        """
+        Compute the the portion (in km) of the width of the fault which ruptures
+        up-dip from the hypocenter to the top of the fault.
 
         Wrup is the portion (in km) of the width of the fault which
         ruptures up-dip from the hypocenter to the top of the fault.
@@ -239,7 +283,7 @@ class Rowshandel2013(object):
         ddv = fault.get_quad_down_dip_vector(q)
         self._Wrup = Vector.dot(ddv, hp0) / 1000
 
-    def computeXiPrime(self):
+    def __computeXiPrime(self):
         """
         Computes the xi' value.
         """
@@ -405,7 +449,7 @@ class Rowshandel2013(object):
 
         self._xi_prime = xi_prime
 
-    def computeLD(self):
+    def __computeLD(self):
         """
         Computes LD -- the rupture length de-normalization term.
         """
@@ -478,7 +522,7 @@ class Rowshandel2013(object):
         self._LD = LD
         self._Ls = Ls
 
-    def computeDT(self, period):
+    def __computeDT(self, period):
         """
         Computes DT -- the distance taper term.
         """
@@ -515,7 +559,7 @@ class Rowshandel2013(object):
         DT = np.reshape(DT, slat.shape)
         self._DT = DT
 
-    def getCenteringTerm(self):
+    def __getCenteringTerm(self):
         L = self._flt.getFaultLength()
         CSSLP = -0.32 + 0.15 * np.log(L)
         CTRST = -0.20 + 0.09 * np.log(L)
@@ -529,7 +573,7 @@ class Rowshandel2013(object):
             cct = (CSSLP + CNRML) / 2
             self._xi_c = act * np.cos(2 * np.radians(self._rake)) + cct
 
-    def computeWP(self, period):
+    def __computeWP(self, period):
         """
         Computes WP -- the narrow-band multiplier.
         """

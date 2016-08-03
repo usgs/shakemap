@@ -34,7 +34,7 @@ class BeyerBommer2006(object):
     Note that AVERAGE_HORIZONTAL is the "reference" type
 
     Todo: 
-        Inherit from ConvertIMT class. 
+        Inherit from ConvertIMC class. 
     
     References: 
         Beyer, K., & Bommer, J. J. (2006). Relationships between median values
