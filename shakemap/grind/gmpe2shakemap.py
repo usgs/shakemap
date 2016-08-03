@@ -13,11 +13,9 @@ from openquake.hazardlib import const
 def ampShakeMapToGMPE(sm_amps, gmpe, imt):
     """
     Convert Shakemap ground motion amplitudes to match the 
-    intensity measure type 
-    (`IMT <http://docs.openquake.org/oq-hazardlib/master/imt.html>`__)
     and intensity measure component
     (`IMC <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__)
-    of a GMPE. 
+    of a GMPE and convert from linear to natural log units. 
 
     :param sa_amps:
         Numpy array of ground motion amplitudes. 
@@ -44,11 +42,9 @@ def ampShakeMapToGMPE(sm_amps, gmpe, imt):
 def ampGmpeToShakeMap(gmpe_amps, gmpe, imt):
     """
     Convert ground motion amplitudes from a GMPE to match the 
-    intensity measure type 
-    (`IMT <http://docs.openquake.org/oq-hazardlib/master/imt.html>`__)
     and intensity measure component
     (`IMC <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__)
-    used by Shakemap. 
+    used by Shakemap and convert from natural log to linear units. 
 
     :param gmpe_amps:
         Numpy array of ground motion amplitudes from a GMPE. 
