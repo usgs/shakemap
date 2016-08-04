@@ -38,7 +38,7 @@ class NewmarkHall1982(object):
 
         :param pgv:
             Numpy array or float of PGV values; linear units.
-        : returns:
+        :returns:
             Values converted to PSA10.
         """
         return pgv / NewmarkHall1982.__vfact

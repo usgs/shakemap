@@ -4,27 +4,27 @@ echo $PATH
 DEPS="numpy scipy matplotlib jupyter rasterio fiona xlrd xlwt pandas pytables basemap basemap-data-hires shapely h5py basemap-data-hires gdal==1.11.4 descartes paramiko sphinx configobj pyproj pytest psutil lxml"
 
 if [ "$#" -le 1 ]; then
-    #turn off whatever other virtual environment user might be in
+    # turn off whatever other virtual environment user might be in
     source deactivate
     
-    #remove any previous virtual environments called shake
+    # remove any previous virtual environments called shake
     conda remove --name shake --all -y
     
-    #create a new virtual environment called shake with the below list of dependencies installed into it
+    # create a new virtual environment called shake with the below list of dependencies installed into it
     conda create --name shake --yes --channel conda-forge python=3.5 $DEPS -y
 else
     conda install --yes --channel conda-forge python=3.5 $DEPS -y
 fi
 
-#activate the new environment
+# activate the new environment
 source activate shake
 
-#do pip installs of those things that are not available via conda.
+# do pip installs of those things that are not available via conda.
 pip -v install git+git://github.com/gem/oq-hazardlib.git
 pip install git+git://github.com/usgs/MapIO.git
 pip install sphinx_rtd_theme
 pip install flake8
 pip install pep8-naming
 
-#tell the user they have to activate this environment
+# tell the user they have to activate this environment
 echo "Type 'source activate shake' to use this new virtual environment."

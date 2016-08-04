@@ -8,10 +8,10 @@ class BommerAlarcon2006(object):
     - PSA05 stands for spectral acceleration with oscillator period of 0.5 sec
     - PGV is peak ground velocity. 
 
-    Todo: 
+    Todo:
         Inherit from ConvertIMT class. 
 
-    References: 
+    References:
         Bommer, J. J., & Alarcon, J. E. (2006). The prediction and use of peak 
         ground velocity. Journal of Earthquake Engineering, 10(01), 1-31.
         `[link] <http://www.worldscientific.com/doi/abs/10.1142/S1363246906002463>`__
@@ -24,9 +24,10 @@ class BommerAlarcon2006(object):
         """
         Convert PGV in cm/s to PSA05 in g.
         **Important:** PGV must be linear units.
+
         :param pgv:
             Numpy array or float of PGV values; linear units.
-        : returns:
+        :returns:
             Numpy array or float of PSA05 (spectral acceleration with oscillator
             period of 0.5 sec) converted from PGV.
         """
@@ -38,9 +39,10 @@ class BommerAlarcon2006(object):
         Convert PSA05 (spectral acceleration with oscillator period of 0.5 sec)
         in g to PGV cm/s.
         **Important:** PSA10 must be linear units.
+
         :param psa05:
             Numpy array or float of PSA05 values; linear units.
-        : returns:
+        :returns:
             Numpy array or float of PGV converted from psa05.
         """
         return psa05 * BommerAlarcon2006.__vfact

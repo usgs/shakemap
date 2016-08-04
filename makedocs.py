@@ -5,30 +5,11 @@ import subprocess
 import os.path
 import shutil
 import sys
+import re
+
+from shakemap.utils.misc import getCommandOutput
 
 DEFAULT_TAG = '0.1'
-
-
-def getCommandOutput(cmd):
-    """
-    Internal method for calling external command.
-    @param cmd: String command ('ls -l', etc.)
-    @return: Three-element tuple containing a boolean indicating success or failure, 
-    the stdout from running the command, and stderr.
-    """
-    proc = subprocess.Popen(cmd,
-                            shell=True,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE
-                            )
-    stdout, stderr = proc.communicate()
-    retcode = proc.returncode
-    stdout = stdout.decode('utf-8')
-    if retcode == 0:
-        retcode = True
-    else:
-        retcode = False
-    return (retcode, stdout, stderr)
 
 
 def main(args):
@@ -48,10 +29,15 @@ def main(args):
     print("Repo dir: %s" %REPO_DIR)
 
     # get the human friendly version of the ShakeMap version
-    res, verstr, stderr = getCommandOutput('git describe')
-    if not len(verstr.strip()):
+    res, verstr, stderr = getCommandOutput('git describe --tags')
+    verstr = verstr.decode().strip()
+    if not len(verstr):
         verstr = DEFAULT_TAG
-    verstr = verstr.strip()
+    else:
+        if verstr[0] == 'v':
+            verstr = verstr[1:]
+        spl = re.findall(r"[\w']+", verstr)
+        verstr = "%s.%s.%s" %(spl[0], spl[1], spl[2])
 
     # what is the package called and who are the authors
     PACKAGE = "shakemap"
@@ -62,7 +48,7 @@ def main(args):
     if not res:
         print('Could not find the "make" command on your system. Exiting.')
         sys.exit(1)
-    make_cmd = stdout.strip()
+    make_cmd = stdout.decode().strip()
 
     try:
         # clone the repository
@@ -76,15 +62,15 @@ def main(args):
                 raise Exception('Could not clone gh-pages branch.')
 
         # remove the current apidocs folder from that repo
-        apidocfolder = os.path.join(CLONE_DIR,'apidoc')
+        apidocfolder = os.path.join(CLONE_DIR, 'apidoc')
         # this should probably not have 'html' in the path
         if os.path.isdir(apidocfolder):
             shutil.rmtree(apidocfolder)
 
         # run the make command to build the shakemap manual
         sys.stderr.write('Building shakemap manual (HTML)...\n')
-        makefile = os.path.join(REPO_DIR,'doc','Makefile')
-        os.chdir(os.path.join(REPO_DIR,'doc'))
+        makefile = os.path.join(REPO_DIR, 'doc', 'Makefile')
+        os.chdir(os.path.join(REPO_DIR, 'doc'))
         manualcmd = '%s html' % make_cmd
         res,stdout,stderr = getCommandOutput(manualcmd)
         res,stdout,stderr = getCommandOutput(manualcmd)
@@ -94,7 +80,7 @@ def main(args):
         # run the sphinx api doc command
         sys.stderr.write('Building shakemap API documentation (REST)...\n')
         package_dir = os.path.join(REPO_DIR,'shakemap')
-        sphinx_cmd = 'sphinx-apidoc -o %s -f -l -F -H %s -A "%s" -V %s %s' % (SPHINX_DIR,PACKAGE,AUTHORS,verstr,package_dir)
+        sphinx_cmd = 'sphinx-apidoc -o %s -f -l -e -d 12 -F -H %s -A "%s" -V %s %s' % (SPHINX_DIR,PACKAGE,AUTHORS,verstr,package_dir)
         print("\n'%s'\n" %sphinx_cmd)
         res,stdout,stderr = getCommandOutput(sphinx_cmd)
         if not res:
@@ -110,14 +96,24 @@ def main(args):
                 raise Exception('Could not build the PDF version of the ShakeMap manual - error "%s".' % stderr)
 
         # this has created a conf.py file and a Makefile.
-        # We need to "edit" the conf.py file to include the ReadTheDocs theme.
+        
+        # Edit the conf.py file to include the theme.
         fname = os.path.join(SPHINX_DIR,'conf.py')
         f = open(fname,'at')
         f.write("sys.path.insert(0, os.path.abspath('%s'))\n" % (REPO_DIR))
+
         f.write("import sphinx_rtd_theme\n")
         f.write("html_theme = 'sphinx_rtd_theme'\n")
         f.write("html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]\n")
+
+        f.write("html_theme_options = {\n")
+        f.write("    'collapse_navigation': False,\n")
+#        f.write("    'navigation_depth': 12,\n")
+        f.write("}\n")
+
+        # This line is needed to inclue __init__ methods in documentation
         f.write("autoclass_content = 'both'\n")
+        f.write("html_show_copyright = False\n")
         f.close()
 
         # Go to the sphinx directory and build the html
