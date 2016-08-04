@@ -36,10 +36,13 @@ def main(args):
     # where should .rst files, Makefile, _build folder be written?
     SPHINX_DIR = os.path.join(os.path.expanduser('~'), '__api-doc')
     print("Sphinx dir: %s" %SPHINX_DIR)
+    shutil.rmtree(SPHINX_DIR, ignore_errors=True)
 
     # where should the temporary clone of the shakemap gh-pages repo live?
-    CLONE_DIR=os.path.join(os.path.expanduser('~'),'__shake-doc','html')
+    TOP_DIR=os.path.join(os.path.expanduser('~'),'__shake-doc')
+    CLONE_DIR=os.path.join(TOP_DIR,'html')
     print("Clone dir: %s" %CLONE_DIR)
+    shutil.rmtree(TOP_DIR, ignore_errors=True)
     # where is the repository where this script is running?
     REPO_DIR = os.path.dirname(os.path.abspath(__file__))  # where is this script?
     print("Repo dir: %s" %REPO_DIR)
@@ -83,6 +86,7 @@ def main(args):
         makefile = os.path.join(REPO_DIR,'doc','Makefile')
         os.chdir(os.path.join(REPO_DIR,'doc'))
         manualcmd = '%s html' % make_cmd
+        res,stdout,stderr = getCommandOutput(manualcmd)
         res,stdout,stderr = getCommandOutput(manualcmd)
         if not res:
             raise Exception('Could not build the ShakeMap manual - error "%s".' % stderr)
