@@ -1,0 +1,78 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import argparse
+
+import numpy as np
+
+from shakemap.utils.misc import getCommandOutput
+
+def run_one(event, args):
+    cmd = 'mkscenariogrids -e ' + event + \
+          ' -v ' + args.vs30 + \
+          ' -g ' + args.gmpe + \
+          ' -m ' + str(args.max) + \
+          ' -r ' + str(args.res) + \
+          ' -s ' + args.shakehome
+    rc, so, se = getCommandOutput(cmd)
+
+def main(args):
+    #----------------------------------------------------
+    # Get list of existing events
+    #----------------------------------------------------
+    cmd = 'ls ' + os.path.join(args.shakehome, "data")
+    rc, so, se = getCommandOutput(cmd)
+    events = so.decode().split("\n")
+
+    # Remove empty list elements
+    events = [x for x in events if x]
+    nr = len(events)
+
+    #----------------------------------------------------
+    # Distribute runs onto different forks
+    #----------------------------------------------------
+    NP = min(args.nproc, nr)
+    ii = 0
+    for i in range(nr):
+        if i >= NP: 
+            os.waitpid(-1, 0)
+
+        if os.fork() == 0:
+            run_one(events[ii], args)
+            sys.exit(0)
+        else:
+            ii = ii + 1
+
+if __name__ == '__main__':
+    desc = '''
+    This is a wrapper around 'mkscenariogrids' that grabs the list
+    of all the existing event directories, loops over them and
+    breaks up the run onto multiple processors. Usuallly want to
+    run 'mkinputdir' first. 
+    '''
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument('-n', '--nproc', help = 'Number of processors.', type=int)
+    parser.add_argument('-v', '--vs30',
+                        help='Specifies the path to the Vs30 grid to use.')
+    parser.add_argument('-g', '--gmpe', default='NSHMP14acr',
+                        help='Select GMPE(s).',
+                        choices=['NSHMP14acr', 'NSHMP14scr_rlme', 'NSHMP14scr_grd',
+                                 'NSHMPsub_i', 'NSHMPsub_s',
+                                 'ASK14', 'BSSA14', 'CB14', 'CY14',
+                                 'F96', 'T02', 'S02', 'C03', 'TP05', 'AB06p', 'P11', 'A08p', 'S01',
+                                 'AB03ig', 'Z06i', 'BCH15i',
+                                 'AB03sg', 'AB03sc', 'Z06s', 'BCH15s'])
+    parser.add_argument('-r', '--res', default=30 / 60 / 60, type=float,
+                        help='The resolution in decimal degrees; default is 30/60/60.')
+    parser.add_argument('-m', '--max', default=500000, type=int,
+                        help='Maximum number of cells allowed; '
+                        'resolution is adjusted to ensure this number is not exceeded; '
+                        'default is 500,000.')
+    shakehome = os.path.join(os.path.expanduser('~'), 'ShakeMap')
+    parser.add_argument('-s', '--shakehome',
+                        help='the location of ShakeMap install; default is %s.' % shakehome)
+    args = parser.parse_args()
+    main(args)
+
+    
