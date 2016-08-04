@@ -58,10 +58,10 @@ import shakemap.grind.fault as fault
 from shakemap.grind.source import Source
 from shakemap.grind.distance import Distance
 from shakemap.grind.sites import Sites
+import shakemap.grind.multigmpe as mg
+from shakemap.grind.directivity.rowshandel2013 import Rowshandel2013
 from shakemap.utils.timeutils import ShakeDateTime
-from shakemap.directivity.rowshandel2013 import Rowshandel2013
 from shakemap.gmice.wgrw12 import WGRW12
-import shakemap.gmpe.multigmpe as mg
 
 
 #----------------------------------------------------
@@ -406,9 +406,9 @@ def main(args):
 
     sites.vs30measured = np.ones_like(sites.vs30, dtype=bool)
     # Add z1 and z2.5
-    sites.z1pt0cy14 = mg.z1_from_vs30_cy14_cal(sites.vs30)
-    sites.z1pt0ask14 = mg.z1_from_vs30_ask14_cal(sites.vs30)
-    sites.z2pt5 = mg.z2p5_from_vs30_cb14_cal(sites.vs30) / 1000.0
+    sites.z1pt0cy14 = mg._z1_from_vs30_cy14_cal(sites.vs30)
+    sites.z1pt0ask14 = mg._z1_from_vs30_ask14_cal(sites.vs30)
+    sites.z2pt5 = mg._z2p5_from_vs30_cb14_cal(sites.vs30) / 1000.0
     # note: function gives z2pt5 in m, but CB14 expect km.
 
     #----------------------------------------------------
