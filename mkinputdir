@@ -11,8 +11,8 @@ from lxml import etree
 import openquake.hazardlib.geo as geo
 
 import shakemap.grind.fault as fault
-from shakemap.grind.ecef import latlon2ecef, ecef2latlon
-from shakemap.grind.vector import Vector
+from shakemap.utils.ecef import latlon2ecef, ecef2latlon
+from shakemap.utils.vector import Vector
 from shakemap.utils.timeutils import ShakeDateTime
 
 
