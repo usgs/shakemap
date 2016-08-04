@@ -33,22 +33,23 @@ class Fault(object):
 
     def __init__(self, lon, lat, depth, reference):
         """
-        Constructor for Fault.
+        Constructor for Fault class.
+
         :param lon:
-            sequence of fault longitude vertices in clockwise order.
+            Sequence of fault longitude vertices in clockwise order.
         :param lat:
-            sequence of fault latitude vertices in clockwise order.
+            Sequence of fault latitude vertices in clockwise order.
         :param depth:
-            sequence of fault depth vertices in clockwise order.
+            Sequence of fault depth vertices in clockwise order.
         :param reference:
-            string citeable reference for Fault.
+            String citeable reference for Fault.
         """
         self._lon = lon
         self._lat = lat
         self._depth = depth
         self._reference = reference
         self._validate()
-        self.setQuadrilaterals()
+        self._setQuadrilaterals()
 
     @classmethod
     def fromTrace(cls, xp0, yp0, xp1, yp1, zp, widths, dips, strike=None,
@@ -60,34 +61,36 @@ class Fault(object):
         These top of rupture points are defined by specifying the x and y
         coordinates of each of the two vertices, and then specifying an array of
         depths,widths, and dips for each rectangle.
+
         :param xp0:
-          Array of longitude coordinates for the first (top of rupture) vertex of
-          each rectangle (decimal degrees).
+            Array of longitude coordinates for the first (top of rupture) vertex
+            of each rectangle (decimal degrees).
         :param yp0:
-          Array of latitude coordinates for the first (top of rupture) vertex of
-          each rectangle (decimal degrees).
+            Array of latitude coordinates for the first (top of rupture) vertex
+            of each rectangle (decimal degrees).
         :param xp1:
-          Array of longitude coordinates for the second (top of rupture) vertex of
-          each rectangle (decimal degrees).
+            Array of longitude coordinates for the second (top of rupture) vertex
+            of each rectangle (decimal degrees).
         :param yp1:
-          Array of latitude coordinates for the second (top of rupture) vertex of
-          each rectangle (decimal degrees).
+            Array of latitude coordinates for the second (top of rupture) vertex
+            of each rectangle (decimal degrees).
         :param zp:
-          Array of depths for each of the top of rupture rectangles (km).
+            Array of depths for each of the top of rupture rectangles (km).
         :param widths:
-          Array of widths for each of rectangle (km).
+            Array of widths for each of rectangle (km).
         :param dips:
-          Array of dips for each of rectangle (degrees).
+            Array of dips for each of rectangle (degrees).
         :param strike:
-          If None then strike is computed from verticies of top edge of each
-          quadrilateral. If a scalar, then all quadrilaterals are constructed
-          assuming this strike direction. If a vector with the same length as
-          the trace coordinates then it specifies the strike for each quadrilateral.
+            If None then strike is computed from verticies of top edge of each
+            quadrilateral. If a scalar, then all quadrilaterals are constructed
+            assuming this strike direction. If a vector with the same length as
+            the trace coordinates then it specifies the strike for each 
+            quadrilateral.
         :param reference:
-          String explaining where the fault definition came from (publication style
-          reference, etc.)
+            String explaining where the fault definition came from (publication
+            style reference, etc.)
         :returns:
-          Fault object, where the fault is modeled as a series of rectangles.
+            Fault object, where the fault is modeled as a series of rectangles.
         """
         if len(xp0) == len(yp0) == len(xp1) == len(
                 yp1) == len(zp) == len(dips) == len(widths):
@@ -212,8 +215,9 @@ class Fault(object):
     def writeFaultFile(self, faultfile):
         """
         Write fault data to fault file format as defined in ShakeMap Software Guide.
+
         :param faultfile:
-          Filename of output data file OR file-like object.
+            Filename of output data file OR file-like object.
         """
         if not hasattr(faultfile, 'read'):
             f = open(faultfile, 'wt')
@@ -235,12 +239,13 @@ class Fault(object):
     def readFaultFile(cls, faultfile):
         """
         Read fault file format as defined in ShakeMap Software Guide.
+
         :param faultfile:
             Path to fault file OR file-like object in GMT psxy format, where
-             * Fault vertices are space separated lat,lon,depth triplets on a single line.
-             * Fault segments are separated by lines containing ">"
-             * Fault segments must be closed.
-             * Fault segments must be all clockwise or all counter-clockwise.
+            * Fault vertices are space separated lat,lon,depth triplets on a single line.
+            * Fault segments are separated by lines containing ">"
+            * Fault segments must be closed.
+            * Fault segments must be all clockwise or all counter-clockwise.
         :returns:
            Fault object.
         :raises ShakeMapException:
@@ -298,41 +303,44 @@ class Fault(object):
         Create a fault object from the vector of vertices that fully define the
         quadrilaterals. The points p0, ..., p3 are labeled below for a trapezoid:
 
-        p0--------p1
-        |          \
-        |           \
-        p3----------p2
+        ::
+
+              p0--------p1
+             /          |
+            /           |
+           p3-----------p2
 
         All of the following vector arguments must have the same length.
+
         :param xp0:
-          Vector of longitudes of p0.
+            Vector of longitudes of p0.
         :param yp0:
-          Vector of latitudes of p0.
+            Vector of latitudes of p0.
         :param zp0:
-          Vector of depths of p0 (positive down).
+            Vector of depths of p0 (positive down).
         :param xp1:
-          Vector of longitudes of p1.
+            Vector of longitudes of p1.
         :param yp1:
-          Vector of latitudes of p1.
+            Vector of latitudes of p1.
         :param zp1:
-          Vector of depths of p1 (positive down).
+            Vector of depths of p1 (positive down).
         :param xp2:
-          Vector of longitudes of p2.
+            Vector of longitudes of p2.
         :param yp2:
-          Vector of latitudes of p2.
+            Vector of latitudes of p2.
         :param zp2:
-          Vector of depths of p2 (positive down).
+            Vector of depths of p2 (positive down).
         :param xp3:
-          Vector of longitudes of p3.
+            Vector of longitudes of p3.
         :param yp3:
-          Vector of latitudes of p3.
+            Vector of latitudes of p3.
         :param zp3:
-          Vector of depths of p3 (positive down).
+            Vector of depths of p3 (positive down).
         :param reference:
-          String explaining where the fault definition came from (publication style
-          reference, etc.)
+            String explaining where the fault definition came from (publication
+            style reference, etc.)
         :returns:
-          Fault object, where the fault is modeled as a series of trapezoids.
+            Fault object, where the fault is modeled as a series of trapezoids.
         """
         if len(xp0) == len(yp0) == len(zp0) == len(xp1) == len(yp1) == len(zp1) == \
            len(xp2) == len(yp2) == len(zp2) == len(xp3) == len(yp3) == len(zp3):
@@ -372,6 +380,7 @@ class Fault(object):
     def getFaultLength(self):
         """
         Compute lenght of fault based on top edge.
+
         :returns:
             Length of fault.
         """
@@ -383,8 +392,9 @@ class Fault(object):
     def getQuadrilaterals(self):
         """
         Return a list of quadrilaterals.
+
         :returns:
-            each quad is a tuple of four Point objects
+            Each quad is a tuple of four Point objects
             (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py)
         """
         return copy.deepcopy(self._quadrilaterals)
@@ -393,6 +403,7 @@ class Fault(object):
         """
         Return width of an individual planar trapezoid, where the p0-p1 distance
         represents the long side.
+
         :param p0:
             ECEF x,y,z point representing the first vertex of a quadrilateral.
         :param p1:
@@ -400,7 +411,7 @@ class Fault(object):
         :param p3:
             ECEF x,y,z point representing the fourth vertex of a quadrilateral.
         :returns:
-           width of planar trapezoid.
+           Width of planar trapezoid (float).
         """
         AB = p0 - p1
         AC = p0 - p3
@@ -416,8 +427,9 @@ class Fault(object):
         Note: for faults with quads where the strike angle changes by 180 deg
         due to reverses in dip direction are problematic and not handeled well
         by this algorithm.
+
         :returns:
-          float strike angle
+            Strike angle (float). 
         """
         nq = len(self._quadrilaterals)
         strikes = np.zeros(nq)
@@ -436,8 +448,9 @@ class Fault(object):
     def getTopOfRupture(self):
         """
         Determine shallowest vertex of entire fault.
+
         :returns:
-            float shallowest depth of all vertices.
+            Shallowest depth of all vertices (float).
         """
         mindep = 9999999
         for quad in self._quadrilaterals:
@@ -450,8 +463,9 @@ class Fault(object):
     def getDip(self):
         """
         Return average dip of all quadrilaterals in the fault.
+
         :returns:
-           Average dip in degrees.
+           Average dip in degrees (float).
         """
         dipsum = 0.0
         for quad in self._quadrilaterals:
@@ -464,8 +478,9 @@ class Fault(object):
     def getWidth(self):
         """
         Return the average fault width (km) for all quadrilaterals defined for the fault.
+
         :returns:
-            Average width in km of all fault quadrilaterals.
+            Average width in km of all fault quadrilaterals (float).
         """
         wsum = 0.0
         for quad in self._quadrilaterals:
@@ -480,6 +495,7 @@ class Fault(object):
     def getIndividualWidths(self):
         """
         Return an array of fault widths (km), one for each quadrilateral defined for the fault.
+
         :returns:
             Array of quad widths in km of all fault quadrilaterals.
         """
@@ -497,6 +513,7 @@ class Fault(object):
         """
         Return an array of fault lengths along top edge (km),
         one for each quadrilateral defined for the fault.
+
         :returns:
             Array of lengths in km of top edge of quadrilaterals.
         """
@@ -511,7 +528,9 @@ class Fault(object):
 
     def _getTrapMeanLength(self, p0, p1, p2, p3):
         """
-        Return the sqrt of the area of a quadrilateral (used for QA of fault plane).
+        Return the sqrt of the area of a quadrilateral (used for QA of fault 
+        plane).
+
         :param p0:
             ECEF x,y,z point representing the first vertex of a quadrilateral.
         :param p1:
@@ -534,7 +553,9 @@ class Fault(object):
 
     def getDistanceToPlane(self, planepoints, otherpoint):
         """
-        Calculate a point's distance to a plane.  Used to figure out if a quadrilateral points are all co-planar.
+        Calculate a point's distance to a plane.  Used to figure out if a
+        quadrilateral points are all co-planar.
+
         :param planepoints:
             List of three points (Vector objects) defining a plane.
         :param otherpoint:
@@ -557,19 +578,14 @@ class Fault(object):
         b = (-d / D) * bt
         c = (-d / D) * ct
 
-        numer = np.abs(
-            a *
-            otherpoint.x +
-            b *
-            otherpoint.y +
-            c *
-            otherpoint.z +
-            d)
+        numer = np.abs(a * otherpoint.x +
+                       b * otherpoint.y +
+                       c * otherpoint.z + d)
         denom = np.sqrt(a**2 + b**2 + c**2)
         dist = numer / denom
         return dist
 
-    def isPointToRight(self, P0, P1, P2):
+    def _isPointToRight(self, P0, P1, P2):
         eps = 1e-6
         p0 = Vector.fromPoint(P0)  # fromPoint converts to ECEF
         p1 = Vector.fromPoint(P1)
@@ -583,20 +599,21 @@ class Fault(object):
             return True
         return False
 
-    def reverseQuad(self, P0, P1, P2, P3):
+    def _reverseQuad(self, P0, P1, P2, P3):
         newP0 = copy.deepcopy(P1)
         newP1 = copy.deepcopy(P0)
         newP2 = copy.deepcopy(P3)
         newP3 = copy.deepcopy(P2)
-        if not self.isPointToRight(newP0, newP1, newP2):
+        if not self._isPointToRight(newP0, newP1, newP2):
             raise ShakeMapException(
                 'Third vertex of quadrilateral must be to the right of the second vertex')
         return (newP0, newP1, newP2, newP3)
 
-    def validateQuad(self, P0, P1, P2, P3):
+    def _validateQuad(self, P0, P1, P2, P3):
         """
         Validate and fix* a given quadrilateral (*currently "fix" means check third vertex for co-planarity
         with other three points, and force it to be co-planar if it's not wildly out of the plane.()
+
         :param P0:
             First vertex https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py
         :param P1:
@@ -627,8 +644,8 @@ class Fault(object):
             raise ShakeMapException(
                 'Top edge of a quadrilateral must be defined by the first two vertices')
         # Is dip angle clockwise and btw 0-90 degrees?
-        if not self.isPointToRight(P0, P1, P2):
-            P0, P1, P2, P3 = self.reverseQuad(P0, P1, P2, P3)
+        if not self._isPointToRight(P0, P1, P2):
+            P0, P1, P2, P3 = self._reverseQuad(P0, P1, P2, P3)
             print('Reversing quad where dip not between 0 and 90 degrees.')
         # Are all 4 points (reasonably) co-planar?
         # Translate vertices to ECEF
@@ -655,7 +672,7 @@ class Fault(object):
         newP3 = p3.toPoint()
         return [newP0, newP1, newP2, newP3]
 
-    def setQuadrilaterals(self):
+    def _setQuadrilaterals(self):
         """
         Create internal list of N quadrilaterals.
         """
@@ -724,8 +741,8 @@ class Fault(object):
                         endidx - 1])
                 bottomLeft = point.Point(lonseg[endidx], latseg[endidx],
                                          depthseg[endidx])
-                surface = self.validateQuad(topLeft, topRight, bottomRight,
-                                            bottomLeft)
+                surface = self._validateQuad(topLeft, topRight, bottomRight,
+                                             bottomLeft)
                 self._quadrilaterals.append(surface)
                 startidx += 1
                 endidx -= 1
@@ -733,15 +750,16 @@ class Fault(object):
             self._segment_index.extend([segind] * nquads)
             segind = segind + 1
 
-    def getSegmentIndex(self):
+    def _getSegmentIndex(self):
         """
         Return a list of segment indexes.
+
         :returns:
             List of segment indexes; lenght equals the number of quadrilaterals.
         """
         return copy.deepcopy(self._segment_index)
 
-    def plot(self, ax=None):
+    def _plot(self, ax=None):
         if ax is None:
             fig = plt.figure()
             ax = fig.add_subplot(111, projection='3d')
@@ -763,6 +781,7 @@ class Fault(object):
     def getLats(self):
         """
         Return a copy of the array of latitude points for the fault.
+
         :returns:
             Numpy array of latitude values.
         """
@@ -771,6 +790,7 @@ class Fault(object):
     def getLons(self):
         """
         Return a copy of the array of longitude points for the fault.
+
         :returns:
             Numpy array of latitude values.
         """
@@ -779,14 +799,16 @@ class Fault(object):
     def getReference(self):
         """
         Return whatever reference information was contained in fault file.
+
         :returns:
-           string citeable reference
+            string citeable reference
         """
         return copy.deepcopy(self._reference)
 
     def getNumSegments(self):
         """
         Return a count of the number of fault segments.
+
         :returns:
             number of fault segments
         """
@@ -795,6 +817,7 @@ class Fault(object):
     def getNumQuads(self):
         """
         Return a count of the number of fault quadrilaterals.
+
         :returns:
             number of fault quadrilaterals.
         """
@@ -802,8 +825,9 @@ class Fault(object):
 
     def getFaultAsArrays(self):
         """
-        Return a 3-tuple of numpy arrays indicating X,Y,Z (lon,lat,depth) coordinates.  Fault segments are separated by
-        numpy.NaN values.
+        Return a 3-tuple of numpy arrays indicating X, Y, Z (lon,lat,depth)
+        coordinates. Fault segments are separated by numpy.NaN values.
+
         :returns:
             3-tuple of numpy arrays indicating X,Y,Z (lon,lat,depth) coordinates.
         """
@@ -812,6 +836,7 @@ class Fault(object):
     def getFaultAsMesh(self):
         """
         Return fault segments as a OQ-Hazardlib Mesh object.
+
         :returns:
             Mesh (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
         """
@@ -855,6 +880,7 @@ class Fault(object):
 def get_quad_mesh(q, dx):
     """
     Length of top eduge of a quadrilateral.
+
     :param q:
         A quadrilateral.
     :param dx:
@@ -863,11 +889,12 @@ def get_quad_mesh(q, dx):
         value in general.
     :returns:
         Mesh dictionary, which includes numpy arrays:
-           llx: lower left x coordinate in ECEF coords.
-           lly: lower left y coordinate in ECEF coords.
-           llz: lower left z coordinate in ECEF coords.
-           ulx: upper left x coordinate in ECEF coords.
-           etc.
+
+        - llx: lower left x coordinate in ECEF coords.
+        - lly: lower left y coordinate in ECEF coords.
+        - llz: lower left z coordinate in ECEF coords.
+        - ulx: upper left x coordinate in ECEF coords.
+        - etc.
     """
     P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0)  # fromPoint converts to ECEF
@@ -954,6 +981,7 @@ def get_quad_mesh(q, dx):
 def get_local_unit_slip_vector(strike, dip, rake):
     """
     Compute the components of a unit slip vector.
+
     :param strike:
         Clockwise angle (deg) from north of the line at the intersection
         of the fault plane and the horizontal plane.
@@ -980,6 +1008,7 @@ def get_local_unit_slip_vector(strike, dip, rake):
 def get_local_unit_slip_vector_DS(strike, dip, rake):
     """
     Compute the DIP SLIP components of a unit slip vector.
+
     :param strike:
         Clockwise angle (deg) from north of the line at the intersection
         of the fault plane and the horizontal plane.
@@ -1004,6 +1033,7 @@ def get_local_unit_slip_vector_DS(strike, dip, rake):
 def get_local_unit_slip_vector_SS(strike, dip, rake):
     """
     Compute the STRIKE SLIP components of a unit slip vector.
+
     :param strike:
         Clockwise angle (deg) from north of the line at the intersection
         of the fault plane and the horizontal plane.
@@ -1028,6 +1058,7 @@ def get_local_unit_slip_vector_SS(strike, dip, rake):
 def get_quad_slip(q, rake):
     """
     Compute the unit slip vector in ECEF space for a quad and rake angle.
+
     :param q:
         A quadrilateral.
     :param rake:
@@ -1056,6 +1087,7 @@ def get_quad_slip(q, rake):
 def get_quad_length(q):
     """
     Length of top eduge of a quadrilateral.
+
     :param q:
         A quadrilateral.
     :returns:
@@ -1071,6 +1103,7 @@ def get_quad_length(q):
 def get_quad_dip(q):
     """
     Dip of a quadrilateral.
+
     :param q:
         A quadrilateral.
     :returns:
@@ -1086,6 +1119,7 @@ def get_quad_normal(q):
     """
     Compute the unit normal vector for a quadrilateral in
     ECEF coordinates.
+
     :param q:
         A quadrilateral.
     :returns:
@@ -1105,6 +1139,7 @@ def get_quad_strike_vector(q):
     """
     Compute the unit vector pointing in the direction of strike for a
     quadrilateral in ECEF coordinates. Top edge assumed to be horizontal.
+
     :param q:
         A quadrilateral.
     :returns:
@@ -1121,6 +1156,7 @@ def get_quad_down_dip_vector(q):
     """
     Compute the unit vector pointing down dip for a quadrilateral in
     ECEF coordinates.
+
     :param q:
         A quadrilateral.
     :returns:
@@ -1139,6 +1175,7 @@ def get_vertical_vector(q):
     """
     Compute the vertical unit vector for a quadrilateral
     in ECEF coordinates.
+
     :param q:
         A quadrilateral.
     :returns:

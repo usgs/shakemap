@@ -6,46 +6,66 @@ import copy
 
 import shakemap.grind.fault as fault
 from shakemap.grind.distance import get_distance
-from shakemap.grind.distance import distance_sq_to_segment
 import shakemap.utils.ecef as ecef
 from shakemap.utils.vector import Vector
 
 
-"""
-Implements the Bayless and Somerville (2013) directivity model. This is an update
-to Somerville et al. (1997), which defines some of the input parameters.
-
-Fd is the directivity effect parameter, and it is evaluated as
-
-Fd = (c0 + c1 * Fgeom) * Tcd * Tmw * Taz
-
-Model is seprated into strike-slip and dip-slip categories:
-SS: (abs(rake) >  0 & abs(rake) < 30) | (abs(rake) > 150 & abs(rake) < 180)
-DS:  abs(rake) > 60 & abs(rake) < 120
-
-Notes from Somerville et al. (1997):
- * d = length of dipping fault rupturing towards site
- * Y = d/W
- * s = length of striking fault rupturing towards site
- * X = s/L
-
-Bayless and Somerville state that each quadrilateral should have a pseudo-
-hypocenter:
-    'Define the pseudo-hypocenter for rupture of successive segments as the point
-     on the side edge of the fault segment that is closest to the side edge of
-     the previous segment, and that lies half way between the top and bottom of
-     the fault. We assume that the fault is segmented along strike, not updip.
-     All geometric parameters are computed relative to the pseudo-hypocenter.'
-
-TODO:
- - Interpolate for arbitrary periods
-
-"""
-
-
 class Bayless2013(object):
     """
-    Class for Bayless and Somerville (2013) directvity model.
+    Implements the Bayless and Somerville (2013) directivity model. This is an update
+    to Somerville et al. (1997), which defines some of the input parameters.
+
+    Fd is the directivity effect parameter, and it is evaluated as
+
+    Fd = (c0 + c1 * Fgeom) * Tcd * Tmw * Taz
+
+    Note that Fd is intended to be used in GMPEs as:
+
+    ln(IM_dir) = ln(IM) + Fd
+
+    where
+
+    - Fd is the directivity effect
+    - IM is the intensity measure predicted by the GMPE. 
+    - IM_dir is the directivity-adjusted IM. 
+
+    The model is seprated into strike-slip and dip-slip categories:
+    SS: (abs(rake) >  0 & abs(rake) < 30) | (abs(rake) > 150 & abs(rake) < 180)
+    DS:  abs(rake) > 60 & abs(rake) < 120
+
+    Notes from Somerville et al. (1997):
+
+    * d = length of dipping fault rupturing towards site
+    * Y = d/W
+    * s = length of striking fault rupturing towards site
+    * X = s/L
+
+    Bayless and Somerville state that each quadrilateral should have a pseudo-
+    hypocenter:
+
+        "Define the pseudo-hypocenter for rupture of successive segments as the point
+        on the side edge of the fault segment that is closest to the side edge of
+        the previous segment, and that lies half way between the top and bottom of
+        the fault. We assume that the fault is segmented along strike, not updip.
+        All geometric parameters are computed relative to the pseudo-hypocenter."
+
+    Todo:
+
+        - Interpolate for arbitrary periods
+        - Inherit from Directivity base class. 
+
+    References: 
+        Bayless, J., and Somerville, P. (2013). Bayless-Somerville Directivity Model, 
+        Chapter 3 of PEER Report No. 2013/09, P. Spudich (Editor), Pacific Earthquake 
+        Engineering Research Center, Berkeley, CA.
+        `[link] <http://peer.berkeley.edu/publications/peer_reports/reports_2013/webPEER-2013-09-Spudich.pdf>`__
+
+        Somerville, P. G., Smith, N. F., Graves, R. W., and Abrahamson, N. A. (1997). 
+        Modification of empirical strong ground motion attenuation relations to include 
+        the amplitude and duration effects of rupture directivity, Seismol. Res. Lett. 
+        68, 199–222.
+        `[link] <http://srl.geoscienceworld.org/content/68/1/199.abstract>`__
+
     """
     #-------------------------------------------------------------------------
     # C0 adn C1 are for RotD50. One set for each mechanism (SS vs DS).
@@ -64,23 +84,18 @@ class Bayless2013(object):
     def __init__(self, source, lat, lon, depth, T):
         """
         Constructor for bayless2013.
-        :param flt:
-            pyhsake fault object.
-        :param hyp:
-            hypocenter; list of three elements: lon, lat, depth (km).
-        :param sites:
-            two-element list; first element is a 2d numpy array of longitudes,
-            second element is a 2d array of latitudes.
-             ** TODO: change so that this argument is a SitesContext
-        :param rake:
-            Float (scalar) for direction of slip on fault; motion of hangingwall
-            relative to footwall; clockwise from strike vector.
-             ** Potentially allow for variable rake with subfault.
-        :param M:
-            Float (scalar) for moment magnitude.
+
+        :param source:
+            Shakemap Source object.
+        :param lat:
+            Numpy array of latitudes. 
+        :param lon:
+            Numpy array of longitudes. 
+        :param depth:
+            Numpy array of depths (km); down is positive. 
         :param T:
-            Period; Currently, only acceptable values are:
-             0.5 0.75, 1, 1.5, 2, 3, 4, 5, 7.5, 10
+            Period; Currently, only acceptable values are 
+            0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 7.5, 10. 
         """
         self._source = source
         self._flt = source.getFault()
@@ -100,7 +115,7 @@ class Bayless2013(object):
         self._nq = len(self._W)
 
         # Currently assuming that the rake is the same on all subfaults .
-        self.getSlipCategory()
+        self.__getSlipCategory()
 
         # Fault weights are supposed to be based on seismic moment.
         # Since moment is proportional to area, lets just use area
@@ -109,7 +124,7 @@ class Bayless2013(object):
         self.weights = area / np.sum(area)
 
         # Put in pseudo-hypocenters for each quad
-        self.setPseudoHypocenters()
+        self.__setPseudoHypocenters()
 
         self._fd = 0
         for i in range(self._nq):
@@ -130,7 +145,7 @@ class Bayless2013(object):
             # Az is the NGA definition of source-to-site azimuth for a finite
             # fault. See Kaklamanos et al. (2011) Figure 2 for illustration.
 
-            self.computeAz()  # uses Rx and Ry, which are for the i-th quad.
+            self.__computeAz()  # uses Rx and Ry, which are for the i-th quad.
 
             # Magnitude taper (does not depend on mechanism)
             if self._M <= 5.0:
@@ -141,17 +156,17 @@ class Bayless2013(object):
                 self.T_Mw = 1.0
 
             if self.SlipCategory == 'SS':
-                self.computeSS()
+                self.__computeSS()
                 self._fd = self._fd + self.weights[i] * self._fd_SS
 
             elif self.SlipCategory == 'DS':
-                self.computeDS()
+                self.__computeDS()
                 self._fd = self._fd + self.weights[i] * self._fd_DS
 
             else:
                 # Compute both SS and DS
-                self.computeSS()
-                self.computeDS()
+                self.__computeSS()
+                self.__computeDS()
 
                 # Normalize rake to reference angle
                 sintheta = np.abs(np.sin(np.radians(self._rake)))
@@ -164,7 +179,7 @@ class Bayless2013(object):
                 fdcombined = StrikeWeight * self._fd_SS + DipWeight * self._fd_DS
                 self._fd = self._fd + self.weights[i] * fdcombined
 
-    def setPseudoHypocenters(self):
+    def __setPseudoHypocenters(self):
         """ Set a pseudo-hypocenter.
 
         Adapted from ShakeMap 3.5 src/contour/directivity.c
@@ -240,10 +255,10 @@ class Bayless2013(object):
                     mag = e21.mag()
                     self.phyp[i] = p2 + e21norm * (0.5 * mag)
 
-    def computeDS(self):
+    def __computeDS(self):
         # d is the length of dipping fault rupturing toward site;
         # Note: max[(Y*W),exp(0)] -- just apply a min of 1?
-        self.computeD(self.i)
+        self.__computeD(self.i)
 
         # Geometric directivity predictor:
         RxoverW = (
@@ -280,10 +295,10 @@ class Bayless2013(object):
 
         self._fd_DS = (C0 + C1 * f_geom) * T_CD * self._T_Mw * T_Az
 
-    def computeSS(self):
+    def __computeSS(self):
         # s is the length of striking fault rupturing toward site; max[(X*L),exp(1)]
         # theta (see Figure 5 in SSGA97)
-        self.computeThetaAndS(self.i)
+        self.__computeThetaAndS(self.i)
 
         # Geometric directivity predictor:
         f_geom = np.log(self.s) * (0.5 * np.cos(2 * self.theta) + 0.5)
@@ -309,14 +324,14 @@ class Bayless2013(object):
         C1 = self.__c1ss[ix]
         self._fd_SS = (C0 + C1 * f_geom) * T_CD * self.T_Mw * T_Az
 
-    def computeAz(self):
+    def __computeAz(self):
         Az = np.ones_like(self.__Rx) * np.pi / 2.0
         Az = Az * np.sign(self.__Rx)
         ix = [self.__Ry > 0.0]
         Az[ix] = np.arctan(self.__Rx[ix] / self.__Ry[ix])
         self.Az = Az
 
-    def computeD(self, i):
+    def __computeD(self, i):
         """Compute d for the i-th quad/segment.
 
         Y = d/W, where d is the portion (in km) of the width of the fault which
@@ -366,7 +381,7 @@ class Bayless2013(object):
         d_raw = np.reshape(d_raw, self._lat.shape)
         self.d = d_raw.clip(min=1.0, max=udip_len)
 
-    def computeThetaAndS(self, i):
+    def __computeThetaAndS(self, i):
         """
         :param i:
             Compute d for the i-th quad/segment.
@@ -434,9 +449,13 @@ class Bayless2013(object):
         self.theta = np.reshape(theta, self._lat.shape)
 
     def getFd(self):
+        """
+        :returns:
+            Numpy array of Fd; Fd is the directivity amplification factor. 
+        """
         return copy.deepcopy(self._fd)
 
-    def getSlipCategory(self):
+    def __getSlipCategory(self):
         """
         Sets self.SlipCategory based on rake angle. Can be SS for
         strike slip, DS for dip slip, or Unspecified.

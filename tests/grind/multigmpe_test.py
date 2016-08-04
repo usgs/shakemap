@@ -49,9 +49,9 @@ def test_multigmpe():
     sctx.z1pt0 = np.reshape(sctx.z1pt0, (-1,))
 
     # Need separate z1pt0 arrays
-    sctx.z1pt0cy14 = mg.z1_from_vs30_cy14_cal(sctx.vs30)
-    sctx.z1pt0ask14 = mg.z1_from_vs30_ask14_cal(sctx.vs30)
-    sctx.z2pt5 = mg.z2p5_from_vs30_cb14_cal(sctx.vs30) / 1000.0
+    sctx.z1pt0cy14 = mg._z1_from_vs30_cy14_cal(sctx.vs30)
+    sctx.z1pt0ask14 = mg._z1_from_vs30_ask14_cal(sctx.vs30)
+    sctx.z2pt5 = mg._z2p5_from_vs30_cb14_cal(sctx.vs30) / 1000.0
 
     # Make souce instance
     lat0 = np.array([34.1])

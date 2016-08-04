@@ -5,10 +5,13 @@ import subprocess
 
 def getCommandOutput(cmd):
     """
-    Internal method for calling external command.
-    @param cmd: String command ('ls -l', etc.)
-    @return: Three-element tuple containing a boolean indicating success or failure, 
-    the stdout from running the command, and stderr.
+    Method for calling external system command.
+
+    :param cmd: 
+        String command (e.g., 'ls -l', etc.). 
+    :returns: 
+        Three-element tuple containing a boolean indicating success or failure, 
+        the stdout from running the command, and stderr.
     """
     proc = subprocess.Popen(cmd,
                             shell=True,

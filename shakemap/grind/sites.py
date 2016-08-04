@@ -51,7 +51,9 @@ def _getFileGeoDict(fname):
     return geodict
 
 
-def calculate_z1p0(vs30):
+def _calculate_z1p0(vs30):
+    # I think these are older generation equations (c2008). Probably need to be
+    # more careful about what version of these equations are used. 
     c1 = 6.745
     c2 = 1.35
     c3 = 5.394
@@ -65,7 +67,9 @@ def calculate_z1p0(vs30):
     return Z1Pt0
 
 
-def calculate_z2p5(z1pt0):
+def _calculate_z2p5(z1pt0):
+    # I think these are older generation equations (c2008). Probably need to be
+    # more careful about what version of these equations are used. 
     c1 = 519
     c2 = 3.595
     Z2Pt5 = c1 + z1pt0 * c2
@@ -73,36 +77,40 @@ def calculate_z2p5(z1pt0):
 
 
 class Sites(object):
-    """An object to encapsulate information used to generate a GEM SitesContext.
-    (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py)
+    """
+    An object to encapsulate information used to generate a GEM 
+    `SitesContext <https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py>`__.
     """
 
-    def __init__(self, vs30grid, vs30measured_grid=None, backarc=False, defaultVs30=686.0):
+    def __init__(self, vs30grid, vs30measured_grid=None, backarc=False,
+                 defaultVs30=686.0):
         """
         Construct a Sites object.
+
         :param vs30grid:
             MapIO Grid2D object containing Vs30 values.
         :param vs30measured_grid:
-            Boolean grid indicating whether Vs30 values were measured or derived (i.e., from slope)
+            Boolean grid indicating whether Vs30 values were measured or derived
+            (i.e., from slope)
         :param backarc:
-            Boolean indicating whether event is on the backarc as defined here: 
-            http://earthquake.usgs.gov/learn/glossary/?term=backarc
+            Boolean indicating whether event is on the backarc as defined 
+            `here <http://earthquake.usgs.gov/learn/glossary/?term=backarc>`__.
         :param defaultVs30:
           Default Vs30 value to use in locations where Vs30Grid is not specified.
         """
-        self.Vs30 = vs30grid
-        self.backarc = backarc
-        self.defaultVs30 = defaultVs30
-        self.vs30measured_grid = vs30measured_grid
-        self.GeoDict = vs30grid.getGeoDict().copy()
-        self.lons = np.linspace(self.GeoDict.xmin,
-                                self.GeoDict.xmax,
-                                self.GeoDict.nx)
-        self.lats = np.linspace(self.GeoDict.ymin,
-                                self.GeoDict.ymax,
-                                self.GeoDict.ny)
-        self.Z1Pt0 = calculate_z1p0(self.Vs30.getData())
-        self.Z2Pt5 = calculate_z2p5(self.Z1Pt0)
+        self._Vs30 = vs30grid
+        self._backarc = backarc
+        self._defaultVs30 = defaultVs30
+        self._vs30measured_grid = vs30measured_grid
+        self._GeoDict = vs30grid.getGeoDict().copy()
+        self._lons = np.linspace(self._GeoDict.xmin,
+                                 self._GeoDict.xmax,
+                                 self._GeoDict.nx)
+        self._lats = np.linspace(self._GeoDict.ymin,
+                                 self._GeoDict.ymax,
+                                 self._GeoDict.ny)
+        self._Z1Pt0 = _calculate_z1p0(self._Vs30.getData())
+        self._Z2Pt5 = _calculate_z2p5(self._Z1Pt0)
 
     @classmethod
     def _create(cls, geodict, defaultVs30, vs30File, padding, resample):
@@ -126,35 +134,38 @@ class Sites(object):
     def createFromBounds(cls, xmin, xmax, ymin, ymax, dx, dy, defaultVs30=686.0,
                          vs30File=None, vs30measured_grid=None,
                          backarc=False, padding=False, resample=False):
-        """Create a Sites object by defining a center point, resolution, extent, 
+        """
+        Create a Sites object by defining a center point, resolution, extent, 
         and Vs30 values.
 
         :param xmin:
-          X coordinate of left edge of bounds.
+            X coordinate of left edge of bounds.
         :param xmax:
-          X coordinate of right edge of bounds.
+            X coordinate of right edge of bounds.
         :param ymin:
-          Y coordinate of bottom edge of bounds.
+            Y coordinate of bottom edge of bounds.
         :param ymax:
-          Y coordinate of top edge of bounds.
+            Y coordinate of top edge of bounds.
         :param dx:
-          Resolution of desired grid in X direction.
+            Resolution of desired grid in X direction.
         :param dy:
-          Resolution of desired grid in Y direction.
+            Resolution of desired grid in Y direction.
         :param defaultVs30:
-          Default Vs30 value to use if vs30File not specified.
+            Default Vs30 value to use if vs30File not specified.
         :param vs30File:
-          Name of GMT or GDAL format grid file containing Vs30 values.
+            Name of GMT or GDAL format grid file containing Vs30 values.
         :param vs30measured_grid:
-          Boolean grid indicating whether Vs30 values were measured or derived (i.e., from slope)
+            Boolean grid indicating whether Vs30 values were measured or derived 
+            (i.e., from slope)
         :param backarc:
-          Boolean indicating whether event is on the backarc as defined here: 
-          http://earthquake.usgs.gov/learn/glossary/?term=backarc
+            Boolean indicating whether event is on the backarc as defined
+            `here <http://earthquake.usgs.gov/learn/glossary/?term=backarc>`__.
         :param padding:
-          Boolean indicating whether or not to pad resulting Vs30 grid out to edges of input
-          bounds.  If False, grid will be clipped to the extent of the input file.
+            Boolean indicating whether or not to pad resulting Vs30 grid out to
+            edges of input bounds. If False, grid will be clipped to the extent
+            of the input file.
         :param resample:
-          Boolean indicating whether or not the grid should be resampled.
+            Boolean indicating whether or not the grid should be resampled.
         """
         geodict = GeoDict.createDictFromBox(xmin, xmax, ymin, ymax, dx, dy)
         if vs30File is not None:
@@ -171,35 +182,38 @@ class Sites(object):
     def createFromCenter(cls, cx, cy, xspan, yspan, dx, dy, defaultVs30=686.0,
                          vs30File=None, vs30measured_grid=None,
                          backarc=False, padding=False, resample=False):
-        """Create a Sites object by defining a center point, resolution, extent, 
+        """
+        Create a Sites object by defining a center point, resolution, extent, 
         and Vs30 values.
 
         :param cx:
-          X coordinate of desired center point.
+            X coordinate of desired center point.
         :param cy:
-          X coordinate of desired center point.
+            Y coordinate of desired center point.
         :param xspan:
-          Width of desired grid.
+            Width of desired grid.
         :param yspan:
-          Height of desired grid.
+            Height of desired grid.
         :param dx:
-          Resolution of desired grid in X direction.
+            Resolution of desired grid in X direction.
         :param dy:
-          Resolution of desired grid in Y direction.
+            Resolution of desired grid in Y direction.
         :param defaultVs30:
-          Default Vs30 value to use if vs30File not specified.
+            Default Vs30 value to use if vs30File not specified.
         :param vs30File:
-          Name of GMT or GDAL format grid file containing Vs30 values.
+            Name of GMT or GDAL format grid file containing Vs30 values.
         :param vs30measured_grid:
-          Boolean grid indicating whether Vs30 values were measured or derived (i.e., from slope)
+            Boolean grid indicating whether Vs30 values were measured or derived 
+            (i.e., from slope)
         :param backarc:
-          Boolean indicating whether event is on the backarc as defined here: 
-          http://earthquake.usgs.gov/learn/glossary/?term=backarc
+            Boolean indicating whether event is on the backarc as defined
+            `here <http://earthquake.usgs.gov/learn/glossary/?term=backarc>`__.
         :param padding:
-          Boolean indicating whether or not to pad resulting Vs30 grid out to edges of input
-          bounds.  If False, grid will be clipped to the extent of the input file.
+            Boolean indicating whether or not to pad resulting Vs30 grid out to
+            edges of input bounds. If False, grid will be clipped to the extent
+            of the input file.
         :param resample:
-          Boolean indicating whether or not the grid should be resampled.
+            Boolean indicating whether or not the grid should be resampled.
         """
         geodict = GeoDict.createDictFromCenter(cx, cy, dx, dy, xspan, yspan)
         if vs30File is not None:
@@ -213,19 +227,21 @@ class Sites(object):
                    backarc=backarc, defaultVs30=defaultVs30)
 
     def sampleFromSites(self, lats, lons, vs30measured_grid=None):
-        """Create a SitesContext object by sampling the current Sites object.
+        """
+        Create a SitesContext object by sampling the current Sites object.
 
         :param lats:
-          Sequence of latitudes.
+            Sequence of latitudes.
         :param lons:
-          Sequence of longitudes.
+            Sequence of longitudes.
         :param vs30measured_grid:
-          Sequence of booleans of the same shape as lats/lons indicating whether
-          the vs30 values are measured or inferred.
+            Sequence of booleans of the same shape as lats/lons indicating 
+            whether the vs30 values are measured or inferred.
         :returns:
-          SitesContext object where data are sampled from the current Sites object.
+            SitesContext object where data are sampled from the current Sites
+            object.
         :raises ShakeMapException:
-           When lat/lon input sequences do not share dimensionality.
+             When lat/lon input sequences do not share dimensionality.
         """
         lats = np.array(lats)
         lons = np.array(lons)
@@ -237,40 +253,41 @@ class Sites(object):
 
         site = SitesContext()
         # use default vs30 if outside grid
-        site.vs30 = self.Vs30.getValue(lats, lons, default=self.defaultVs30)
+        site.vs30 = self._Vs30.getValue(lats, lons, default=self._defaultVs30)
         site.lats = lats
         site.lons = lons
-        site.z1pt0 = calculate_z1p0(site.vs30)
-        site.z2pt5 = calculate_z2p5(site.z1pt0)
+        site.z1pt0 = _calculate_z1p0(site.vs30)
+        site.z2pt5 = _calculate_z2p5(site.z1pt0)
         if vs30measured_grid is None:  # If we don't know, then use false
             site.vs30measured = np.zeros_like(lons, dtype=bool)
         else:
             site.vs30measured = vs30measured_grid
-        site.backarc = self.backarc
+        site.backarc = self._backarc
 
         return site
 
     def getVs30Grid(self):
         """
-        Return the Grid2D object containing Vs30 values for this Sites object.
+        :returns:
+            Grid2D object containing Vs30 values for this Sites object.
         """
-        return self.Vs30
+        return self._Vs30
 
     def getSitesContext(self):
-        """Return a SitesContext object appropriate for GMPE use.
+        """
         :returns:
            SitesContext object.
         """
         sctx = SitesContext()
-        sctx.vs30 = self.Vs30.getData().copy()
-        sctx.z1pt0 = self.Z1Pt0
-        sctx.z2pt5 = self.Z2Pt5
-        sctx.backarc = self.backarc  # zoneconfig might have this info
-        if self.vs30measured_grid is None:  # If we don't know, then use false
+        sctx.vs30 = self._Vs30.getData().copy()
+        sctx.z1pt0 = self._Z1Pt0
+        sctx.z2pt5 = self._Z2Pt5
+        sctx.backarc = self._backarc  # zoneconfig might have this info
+        if self._vs30measured_grid is None:  # If we don't know, then use false
             sctx.vs30measured = np.zeros_like(
                 sctx.vs30, dtype=bool)
         else:
-            sctx.vs30measured = self.vs30measured_grid
-        sctx.lons = self.lons
-        sctx.lats = self.lats
+            sctx.vs30measured = self._vs30measured_grid
+        sctx.lons = self._lons
+        sctx.lats = self._lats
         return sctx

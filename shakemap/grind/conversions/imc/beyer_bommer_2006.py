@@ -1,19 +1,3 @@
-"""
-Implements conversion for various "Intensity Measure
-Components" per Beyer and Bommer, 2006, BSSA, 96(4A).
-
-IMC equivalencies:
-OpenQuake                   Beyer&Bommer
-----------------------------------------------
-AVERAGE_HORIZONTAL          GMxy (Geometric mean)       # This is the "reference" type
-HORIZONTAL                  ???
-MEDIAN_HORIZONTAL           AMxy (Arithmetic mean)
-GMRotI50                    GMRotI50
-RotD50                      GMRotD50
-RANDOM_HORIZONTAL           Random
-GREATER_OF_TWO_HORIZONTAL   Env_xy
-VERTICAL                    ---
-"""
 
 from openquake.hazardlib import const
 from openquake.hazardlib.imt import PGA, PGV, SA
@@ -21,6 +5,44 @@ from openquake.hazardlib.imt import PGA, PGV, SA
 import numpy as np
 
 class BeyerBommer2006(object):
+    """
+    Implements conversion for various "Intensity Measure
+    Components" (IMCs) per Beyer and Bommer (2006).
+    
+    IMC equivalencies:
+    
+    +---------------------------+------------------------+
+    | OpenQuake                 | Beyer & Bommer         |
+    +===========================+========================+
+    | AVERAGE_HORIZONTAL        | GMxy (Geometric mean)  |
+    +---------------------------+------------------------+
+    | HORIZONTAL                | ???                    |
+    +---------------------------+------------------------+
+    | MEDIAN_HORIZONTAL         | AMxy (Arithmetic mean) |
+    +---------------------------+------------------------+
+    | GMRotI50                  | GMRotI50               |
+    +---------------------------+------------------------+
+    | RotD50                    | GMRotD50               |
+    +---------------------------+------------------------+
+    | RANDOM_HORIZONTAL         | Random                 |
+    +---------------------------+------------------------+
+    | GREATER_OF_TWO_HORIZONTAL | Env_xy                 |
+    +---------------------------+------------------------+
+    | VERTICAL                  | ---                    |
+    +---------------------------+------------------------+
+
+    Note that AVERAGE_HORIZONTAL is the "reference" type
+
+    Todo: 
+        Inherit from ConvertIMC class. 
+    
+    References: 
+        Beyer, K., & Bommer, J. J. (2006). Relationships between median values
+        and between aleatory variabilities for different definitions of the 
+        horizontal component of motion. Bulletin of the Seismological Society of
+        America, 96(4A), 1512-1522. 
+        `[link] <http://www.bssaonline.org/content/96/4A/1512.short>`__
+    """
     __pga_pgv_col_names = ['c12', 'c34', 'R']
     __sa_col_names = ['c1', 'c2', 'c3', 'c4', 'R']
     __pga_dict = {
@@ -46,15 +68,25 @@ class BeyerBommer2006(object):
     def ampIMCtoIMC(amps, imc_in, imc_out, imt):
         """ 
         Returns amps converted from one IMC to another.
-        IMPORTANT: Assumes the input amps are in linear (not log) space 
-        IMPORTANT: IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
-        Inputs:
-        amps -- a numpy array of ground motions in IMC imc_in and IMT imt
-        imc_in -- the IMC type of the input amp array
-        imc_out -- the desired IMC type of the output amps
-        imt -- the IMT of the input amps (must be one of PGA, PGV, or SA)
-        Outputs:
-        returns amps converted from imc_in to imc_out
+
+        **Important**: 
+
+            - Assumes the input amps are in linear (not log) space 
+            - IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
+        
+        :param amps: 
+            Numpy array of ground motion amplitudes. 
+        :param imc_in:
+            OpenQuake IMC type of the input amp array. 
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__
+        :param imc_out:
+            Desired OpenQuake IMC type of the output amps. 
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__
+        :param imt:
+            OpenQuake IMT of the input amps (must be one of PGA, PGV, or SA). 
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
+        :returns:
+            Numpy array of amps converted from imc_in to imc_out
         """
         if imc_in == const.IMC.AVERAGE_HORIZONTAL:
             # The amps are already in the B&B "reference" type ("GM", i.e.,
@@ -62,8 +94,8 @@ class BeyerBommer2006(object):
             denom = 1
         elif imc_in == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
              imc_in == const.IMC.MEDIAN_HORIZONTAL or \
-             imc_in == const.IMC.GMRotI50          or\
-             imc_in == const.IMC.RotD50            or\
+             imc_in == const.IMC.GMRotI50 or \
+             imc_in == const.IMC.RotD50 or \
              imc_in == const.IMC.RANDOM_HORIZONTAL:
             denom = BeyerBommer2006.__GM2other(imt, imc_in)
         else:
@@ -75,8 +107,8 @@ class BeyerBommer2006(object):
             numer = 1
         elif imc_out == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
              imc_out == const.IMC.MEDIAN_HORIZONTAL or \
-             imc_out == const.IMC.GMRotI50          or\
-             imc_out == const.IMC.RotD50            or\
+             imc_out == const.IMC.GMRotI50 or \
+             imc_out == const.IMC.RotD50 or \
              imc_out == const.IMC.RANDOM_HORIZONTAL:
             numer = BeyerBommer2006.__GM2other(imt, imc_out)
         else:
@@ -87,16 +119,27 @@ class BeyerBommer2006(object):
     @staticmethod
     def sigmaIMCtoIMC(sigmas, imc_in, imc_out, imt):
         """ 
-        Returns sigmas converted from one IMC to another.
-        IMPORTANT: Assumes the input sigmas are in log space
-        IMPORTANT: IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
-        Inputs:
-        sigmas -- a numpy array of ground motions in IMC imc_in and IMT imt
-        imc_in -- the IMC type of the input sigmas array
-        imc_out -- the desired IMC type of the output sigmas
-        imt -- the IMT of the input sigmas (must be one of PGA, PGV, or SA)
-        Outputs:
-        returns sigmas converted from imc_in to imc_out
+        Returns standard deviations converted from one IMC to another.
+
+        **Important**: 
+
+            - Assumes the input sigmas are in log space
+            - IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
+        
+        :param sigmas:
+            Numpy array of standard deviations. 
+        :param imc_in:
+            OpenQuake IMC type of the input sigmas array. 
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__
+        :param imc_out:
+            Desired OpenQuake IMC type of the output sigmas. 
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__
+        :param imt:
+            OpenQuake IMT of the input sigmas (must be one of PGA, PGV, or SA)
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`__
+
+        :returns:
+            Numpy array of standard deviations converted from imc_in to imc_out
         """
         if imc_in == const.IMC.AVERAGE_HORIZONTAL:
             # The amps are already in the B&B "reference" type ("GM", i.e.,
@@ -105,8 +148,8 @@ class BeyerBommer2006(object):
             sig_log_ratio = 0
         elif imc_in == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
              imc_in == const.IMC.MEDIAN_HORIZONTAL or \
-             imc_in == const.IMC.GMRotI50          or\
-             imc_in == const.IMC.RotD50            or\
+             imc_in == const.IMC.GMRotI50 or\
+             imc_in == const.IMC.RotD50 or\
              imc_in == const.IMC.RANDOM_HORIZONTAL:
             R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_in)
         else:
@@ -121,8 +164,8 @@ class BeyerBommer2006(object):
             sig_log_ratio = 0
         elif imc_out == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
              imc_out == const.IMC.MEDIAN_HORIZONTAL or \
-             imc_out == const.IMC.GMRotI50          or\
-             imc_out == const.IMC.RotD50            or\
+             imc_out == const.IMC.GMRotI50 or\
+             imc_out == const.IMC.RotD50 or\
              imc_out == const.IMC.RANDOM_HORIZONTAL:
             R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_out)
         else:

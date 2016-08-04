@@ -39,9 +39,28 @@ def read_event_file(eventxml):
     """
     Read event.xml file from disk, returning a dictionary of attributes.
     Input XML format looks like this:
-    ******
-    <earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9" year="2008" month="05" day="12" hour="06" minute="28" second="01" timezone="GMT" depth="19.0" locstring="EASTERN SICHUAN, CHINA" created="1211173621" otime="1210573681" type="" />
-    ******
+
+    .. code-block:: xml
+
+         <earthquake 
+             id="2008ryan" 
+             lat="30.9858" 
+             lon="103.3639" 
+             mag="7.9" 
+             year="2008" 
+             month="05" 
+             day="12" 
+             hour="06" 
+             minute="28" 
+             second="01" 
+             timezone="GMT" 
+             depth="19.0" 
+             locstring="EASTERN SICHUAN, CHINA" 
+             created="1211173621" 
+             otime="1210573681" 
+             type="" 
+         />
+
     :param eventxml:
         Path to event XML file OR file-like object
     :returns:
@@ -97,6 +116,7 @@ def read_event_file(eventxml):
 def read_source(sourcefile):
     """
     Read source.txt file, which has lines like key=value.
+
     :param sourcefile:
         Path to source.txt file OR file-like object
     :returns:
@@ -132,15 +152,18 @@ def read_source(sourcefile):
 class Source(object):
     """
     Encapsulate everything we need to know about an earthquake source.
+    Primary purose of this is to construct the OpenQuake 
+    `RuptureContext <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.RuptureContext>`__. 
     """
 
     def __init__(self, event, fault=None):
         """
         Construct a Source object.
+
         :param event:
-            dictionary of values (see read_event_file() and read_source())
+            Dictionary of values (see read_event_file() and read_source())
         :param fault:
-            a Fault object
+            A Fault object.
         :returns:
             Source object.
         """
@@ -159,6 +182,7 @@ class Source(object):
         """
         Class method to create a Source object by specifying an event.xml file,
         a fault file, and a source.txt file.
+
         :param eventxmlfile:
             Event xml file (see read_event_file())
         :param faultfile:
@@ -181,17 +205,20 @@ class Source(object):
 
     def getRuptureContext(self, gmpelist):
         """
-        Return a GEM RuptureContext suitable for any GMPE (except for those requiring hypo_loc).
-        https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py
-        :param gmpelist:
-          Sequence of hazardlib GMPE objects.
-        :raises:
-          ShakeMapException when a GMPE requiring 'hypo_loc' is passed in.
-        :returns:
-            RuptureContext object with all known parameters filled in.
+        Return an Openquake 
+        `RuptureContext <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.RuptureContext>`__
+        suitable for any GMPE (except for those requiring hypo_loc).
+
         If Source does not contain a Fault, strike, dip, ztor, and width will be
         filled with default values. Rake may not be known, or may be estimated
         from a focal mechanism.
+
+        :param gmpelist:
+            Sequence of hazardlib GMPE objects.
+        :raises:
+            ShakeMapException when a GMPE requiring 'hypo_loc' is passed in.
+        :returns:
+            RuptureContext object with all known parameters filled in.
         """
         # rupturecontext constructor inputs:
         # 'mag', 'strike', 'dip', 'rake', 'ztor', 'hypo_lon', 'hypo_lat',
@@ -230,7 +257,6 @@ class Source(object):
 
     def getFault(self):
         """
-        Return fault instance.
         :returns:
            Fault instance
         """
@@ -238,7 +264,6 @@ class Source(object):
 
     def getHypo(self):
         """
-        Return hypocenter point.
         :returns:
            Hypocenter point.
         """
@@ -251,8 +276,10 @@ class Source(object):
     def setTectonicRegion(self, region):
         """
         Set tectonic region.
+
         :param region:
-            TRT object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/const.py)
+            `TRT <http://docs.openquake.org/oq-hazardlib/master/const.html#openquake.hazardlib.const.TRT>`__ 
+            object. 
         """
         if not isinstance(region, TRT):
             raise ValueError(
@@ -262,14 +289,17 @@ class Source(object):
     def getTectonicRegion(self):
         """
         Get tectonic region.
+
         :returns:
-            TRT object (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/const.py)
+            `TRT <http://docs.openquake.org/oq-hazardlib/master/const.html#openquake.hazardlib.const.TRT>`__
+            object.
         """
         return copy.deepcopy(self.TectonicRegion)
 
     def getEventDict(self):
         """
         Return the event dictionary.
+
         :returns:
            Copy of dictionary of event keys/values
         """
@@ -287,22 +317,32 @@ class Source(object):
 
     def setMechanism(self, mech, rake=None, dip=None):
         """
-        Set the earthquake mechanism manually (overriding any values read in from event.xml or source.txt.
-        If rake and dip are not specified, they will be assigned by mechanism as follows:
-        Mech     Rake    Dip
-        ----------------------
-        RS         90     40
-        NM        -90     50
-        SS          0     90
-        ALL        45     90
+        Set the earthquake mechanism manually (overriding any values read 
+        in from event.xml or source.txt. If rake and dip are not specified, 
+        they will be assigned by mechanism as follows:
+
+        +-------+--------+-----+
+        | Mech  |  Rake  | Dip |
+        +=======+========+=====+
+        | RS    |    90  |  40 |
+        +-------+--------+-----+
+        | NM    |   -90  |  50 |
+        +-------+--------+-----+
+        | SS    |     0  |  90 |
+        +-------+--------+-----+
+        | ALL   |    45  |  90 |
+        +-------+--------+-----+
 
         :param mech:
-          String - one of 'RS' (reverse), 'NM' (normal), 'SS' (strike slip), or 'ALL' (unknown).
+            String - one of 'RS' (reverse), 'NM' (normal), 'SS' (strike slip), 
+            or 'ALL' (unknown).
         :param rake:
-          Value between -360 and 360 degrees. If set, will override default value for mechanism (see table above).
+            Value between -360 and 360 degrees. If set, will override default
+            value for mechanism (see table above).
         :param dip:
-          Value betweeen 0 and 90 degrees. If set, will override default value for mechanism (see table above).
-          (Value will be converted to range between -180 and 180 degrees.)
+            Value betweeen 0 and 90 degrees. If set, will override default value
+            for mechanism (see table above). Value will be converted to range 
+            between -180 and 180 degrees.
         """
         mechs = {'RS': {'rake': 90.0, 'dip': 40.0},
                  'NM': {'rake': -90.0, 'dip': 50.0},
@@ -338,11 +378,12 @@ class Source(object):
 
     def getEventParam(self, key):
         """
-        Get a parameter from the internal event dictionary
+        Get a parameter from the internal event dictionary. 
+
         :param key:
-            string key
+            String key. 
         :returns:
-            value (any object type)
+            Value (any object type). 
         """
         if key not in list(self._event_dict.keys()):
             raise NameError('Key "%s" not found in event dictionary' % key)
@@ -352,30 +393,39 @@ class Source(object):
 
     def setFaultReference(self, reference):
         """
-        Set the citeable reference for the fault
+        Set the citeable reference for the fault.
+
         :param reference:
-            string citeable reference
+            String citeable reference. 
         """
         self._fault.setReference(reference)
 
     def getFaultReference(self):
         """
-        Get the citeable reference for the fault
+        Get the citeable reference for the fault. 
+
         :returns:
-            string citeable reference
+            String citeable reference. 
         """
         return self._fault.getReference()
 
     def getQuadrilaterals(self):
         """
         Get the list of quadrilaterals defining the fault.
+
         :returns:
-            List of quadrilateral tuples (4 Point objects each)
+            List of quadrilateral tuples (4 Point objects each). 
         """
         return self._fault.getQuadrilaterals()
 
 
 def rake_to_mech(rake):
+    """
+    Convert rake to mechanism. 
+
+    :param rake: 
+        Rake angle in degrees. 
+    """
     mech = 'ALL'
     if (rake >= -180 and rake <= -150) or \
        (rake >= -30  and rake <= 30) or \
