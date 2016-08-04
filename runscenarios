@@ -9,6 +9,7 @@ import numpy as np
 from shakemap.utils.misc import getCommandOutput
 
 def run_one(event, args):
+    print('> %s' %event)
     cmd = 'mkscenariogrids -e ' + event + \
           ' -v ' + args.vs30 + \
           ' -g ' + args.gmpe + \
@@ -16,6 +17,8 @@ def run_one(event, args):
           ' -r ' + str(args.res) + \
           ' -s ' + args.shakehome
     rc, so, se = getCommandOutput(cmd)
+    if not rc:
+        raise Exception(se)
 
 def main(args):
     #----------------------------------------------------
@@ -28,6 +31,7 @@ def main(args):
     # Remove empty list elements
     events = [x for x in events if x]
     nr = len(events)
+    print('nr: %i' %nr)
 
     #----------------------------------------------------
     # Distribute runs onto different forks
