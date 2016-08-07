@@ -214,7 +214,8 @@ class Fault(object):
 
     def writeFaultFile(self, faultfile):
         """
-        Write fault data to fault file format as defined in ShakeMap Software Guide.
+        Write fault data to fault file format as defined in ShakeMap Software
+        Guide.
 
         :param faultfile:
             Filename of output data file OR file-like object.
@@ -242,7 +243,8 @@ class Fault(object):
 
         :param faultfile:
             Path to fault file OR file-like object in GMT psxy format, where
-            * Fault vertices are space separated lat,lon,depth triplets on a single line.
+            * Fault vertices are space separated lat,lon,depth triplets on a
+              single line.
             * Fault segments are separated by lines containing ">"
             * Fault segments must be closed.
             * Fault segments must be all clockwise or all counter-clockwise.
@@ -477,7 +479,8 @@ class Fault(object):
 
     def getWidth(self):
         """
-        Return the average fault width (km) for all quadrilaterals defined for the fault.
+        Return the average fault width (km) for all quadrilaterals defined for
+        the fault.
 
         :returns:
             Average width in km of all fault quadrilaterals (float).
@@ -494,7 +497,8 @@ class Fault(object):
 
     def getIndividualWidths(self):
         """
-        Return an array of fault widths (km), one for each quadrilateral defined for the fault.
+        Return an array of fault widths (km), one for each quadrilateral defined
+        for the fault.
 
         :returns:
             Array of quad widths in km of all fault quadrilaterals.
@@ -570,19 +574,22 @@ class Fault(object):
         x2, y2, z2 = p1.getArray()
         x3, y3, z3 = p2.getArray()
         D = np.linalg.det(np.array([[x1, y1, z1], [x2, y2, z2], [x3, y3, z3]]))
-        d = -1
-        at = np.linalg.det(np.array([[1, y1, z1], [1, y2, z2], [1, y3, z3]]))
-        bt = np.linalg.det(np.array([[x1, 1, z1], [x2, 1, z2], [x3, 1, z3]]))
-        ct = np.linalg.det(np.array([[x1, y1, 1], [x2, y2, 1], [x3, y3, 1]]))
-        a = (-d / D) * at
-        b = (-d / D) * bt
-        c = (-d / D) * ct
+        if D == 0:
+            d = -1
+            at = np.linalg.det(np.array([[1, y1, z1], [1, y2, z2], [1, y3, z3]]))
+            bt = np.linalg.det(np.array([[x1, 1, z1], [x2, 1, z2], [x3, 1, z3]]))
+            ct = np.linalg.det(np.array([[x1, y1, 1], [x2, y2, 1], [x3, y3, 1]]))
+            a = (-d / D) * at
+            b = (-d / D) * bt
+            c = (-d / D) * ct
 
-        numer = np.abs(a * otherpoint.x +
-                       b * otherpoint.y +
-                       c * otherpoint.z + d)
-        denom = np.sqrt(a**2 + b**2 + c**2)
-        dist = numer / denom
+            numer = np.abs(a * otherpoint.x +
+                           b * otherpoint.y +
+                           c * otherpoint.z + d)
+            denom = np.sqrt(a**2 + b**2 + c**2)
+            dist = numer / denom
+        else:
+            dist == 0
         return dist
 
     def _isPointToRight(self, P0, P1, P2):
@@ -611,8 +618,9 @@ class Fault(object):
 
     def _validateQuad(self, P0, P1, P2, P3):
         """
-        Validate and fix* a given quadrilateral (*currently "fix" means check third vertex for co-planarity
-        with other three points, and force it to be co-planar if it's not wildly out of the plane.()
+        Validate and fix* a given quadrilateral (*currently "fix" means check
+        third vertex for co-planarity with other three points, and force it to
+        be co-planar if it's not wildly out of the plane.()
 
         :param P0:
             First vertex https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py
@@ -626,8 +634,10 @@ class Fault(object):
            Tuple of (potentially) modified vertices.
         :raises ShakeMapException:
            * if top and bottom edges are not parallel to surface
-           * if dip angle is not dipping to the right relative to strike (defined by first two vertices)
-           * if all 4 points are not reasonably co-planar (P2 is more than 5% of mean length of trapezoid out of plane)
+           * if dip angle is not dipping to the right relative to strike 
+             (defined by first two vertices)
+           * if all 4 points are not reasonably co-planar (P2 is more than 5% of
+             mean length of trapezoid out of plane)
         """
         # TODO: Someday fix the rule about dip angle being clockwise and 0-90 degrees
         # In theory, you could flip the quadrilateral by 180 degrees and it
@@ -677,12 +687,15 @@ class Fault(object):
         Create internal list of N quadrilaterals.
         """
         # Fault QA rules
-        # 1) Fault must consist of 1 or more quadrilaterals, where each quad top/bottom edges are
-        #   parallel to the surface
-        # 2) The strike angle of each quadrilateral is defined by the first two vertices of that quad
-        # 3) The dip angle is defined by segments 2 and 3, or 1 and 4.  This angle must be clockwise with respect to the
-        #   strike angle, and between 0 and 90 degrees.
-        # 4) The top edge of each quad must be defined by the first two vertices of that quad.
+        # 1) Fault must consist of 1 or more quadrilaterals, where each quad
+        #    top/bottom edges are parallel to the surface
+        # 2) The strike angle of each quadrilateral is defined by the first two
+        #    vertices of that quad
+        # 3) The dip angle is defined by segments 2 and 3, or 1 and 4.  This
+        #    angle must be clockwise with respect to the strike angle, and
+        #    between 0 and 90 degrees.
+        # 4) The top edge of each quad must be defined by the first two vertices
+        #    of that quad.
         # 5) 4 points of quadrilateral must be co-planar
         self._lon = np.array(self._lon)
         self._lat = np.array(self._lat)
