@@ -589,7 +589,7 @@ class Fault(object):
             denom = np.sqrt(a**2 + b**2 + c**2)
             dist = numer / denom
         else:
-            dist == 0
+            dist = 0
         return dist
 
     def _isPointToRight(self, P0, P1, P2):
