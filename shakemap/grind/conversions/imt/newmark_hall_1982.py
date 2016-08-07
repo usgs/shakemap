@@ -17,8 +17,8 @@ class NewmarkHall1982(object):
     - 1.65 is the N&H amplification factor for velocity at 5% damping
     - 386.09 is the acceleration of gravity in inches per second per g
 
-    Todo: 
-        Inherit from ConvertIMT class. 
+    To do
+        - Inherit from ConvertIMT class. 
     
     References: 
         Newmark, N. M., & Hall, W. J. (1982). Earthquake spectra and design. 

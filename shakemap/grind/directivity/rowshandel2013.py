@@ -53,10 +53,9 @@ class Rowshandel2013(object):
     - IM is the intensity measure predicted by the GMPE. 
     - IM_dir is the directivity-adjusted IM. 
 
-    To do:
-        * Add checks on function arguments (e.g., mtype) for valid values.
-        * Add a validation function.
-        * Interpolate periods. 
+    To do
+        - Add checks on function arguments (e.g., mtype) for valid values.
+        - Interpolate periods. 
 
     References: 
         Rowshandel, B. (2013). Rowshandel’s NGA-West2 directivity model, 

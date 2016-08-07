@@ -8,8 +8,8 @@ class BommerAlarcon2006(object):
     - PSA05 stands for spectral acceleration with oscillator period of 0.5 sec
     - PGV is peak ground velocity. 
 
-    Todo:
-        Inherit from ConvertIMT class. 
+    To do
+        - Inherit from ConvertIMT class. 
 
     References:
         Bommer, J. J., & Alarcon, J. E. (2006). The prediction and use of peak 

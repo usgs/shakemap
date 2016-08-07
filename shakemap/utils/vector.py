@@ -9,9 +9,9 @@ class Vector(object):
     """
     Three-dimensional vector object, stored as three floats of x,y,z.
 
-    Todo: 
-        Optimize/vectorize calculations like dot/cross for arrays of
-        vectors. 
+    To do 
+        - Optimize/vectorize calculations like dot/cross for arrays of
+          vectors. 
     """
 
     def __init__(self, x, y, z):
