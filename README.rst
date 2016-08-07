@@ -4,7 +4,6 @@ Note, this repository consists of experimental code that is still under
 development. 
 
 |Travis| |CodeCov|
-|QuantifiedCode| |Codacy|
 
 .. |Travis| image:: https://travis-ci.org/usgs/shakemap.svg?branch=master
     :target: https://travis-ci.org/usgs/shakemap
