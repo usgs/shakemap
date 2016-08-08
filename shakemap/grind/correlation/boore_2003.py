@@ -33,6 +33,6 @@ class Boore2003(object):
         :returns: 
             Numpy array of correlation values. 
         """
-        if imt is not PGA():
+        if imt != PGA():
             raise Exception('PGA is the only supported IMT.')
         return 1.0 - np.exp(-1.0 * np.sqrt(0.6 * dists))

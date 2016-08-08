@@ -8,7 +8,6 @@ class WGRW12(object):
     Implements the ground motion intensity conversion equations (GMICE) of 
     Worden et al. (2012). 
 
-
     References: 
         Worden, C. B., Gerstenberger, M. C., Rhoades, D. A., & Wald, D. J.
         (2012). Probabilistic relationships between ground‐motion parameters
@@ -77,7 +76,6 @@ class WGRW12(object):
             Magnitude (float). 
         :returns:
             Macroseismic intensity. 
-
         """
         c, c2 = self.__getConsts(imt)
 
@@ -141,7 +139,6 @@ class WGRW12(object):
         :returns:
             Ground motion amplitude; linear units; %g for PGA and PSA, cm/s for
             PGV.
-
         """
         c, c2 = self.__getConsts(imt)
 

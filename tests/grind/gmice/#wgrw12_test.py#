@@ -1,0 +1,36 @@
+
+import numpy as np
+
+import shakemap.grind.gmice.wgrw12 as w12
+
+
+# Inputs
+sm_amps_in = np.array([0.01, 0.03, 0.1, 0.3]) * 100.
+gmpe_amps_in = np.log(np.array([0.01, 0.03, 0.1, 0.3]))
+sigma_in_log = np.array([0.2, 0.3, 0.4, 0.5])
+sigma_in_lin = np.array([1.23372505, 1.36350428, 1.50840426, 1.66936801])
+
+
+def test_wgrw12():
+    amps = 
+
+    w12().getMIfromGM(amps, imt, dists=None, mag=None)
+    
+    w12().getGMfromMI(mmi, imt, dists=None, mag=None)
+    
+    w12().getGM2MIsd()
+    
+    w12().getMI2GMsd()
+    
+    w12().getName()
+    
+    w12().getScale()
+    
+    w12().getMinMax()
+    
+    w12().getDistanceType()
+    
+    
+
+
+
