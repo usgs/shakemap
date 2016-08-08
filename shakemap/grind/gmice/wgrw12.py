@@ -1,11 +1,19 @@
-"""
-Implements the GMICE of Worden et al., 2013, BSSA, 102(1), pp. 204-221
-"""
 
 import numpy as np
 
 
 class WGRW12(object):
+    """
+    Implements the ground motion intensity conversion equations (GMICE) of 
+    Worden et al. (2012). 
+
+
+    References: 
+        Worden, C. B., Gerstenberger, M. C., Rhoades, D. A., & Wald, D. J.
+        (2012). Probabilistic relationships between ground‐motion parameters
+        and modified Mercalli intensity in California. Bulletin of the
+        Seismological Society of America, 102(1), 204-221.
+    """
       #------------------------------------------------------------------------
       #
       # MMI = c2->C1 + c2->C2 * log(Y)  for log(Y) <= c2->T1
@@ -52,8 +60,22 @@ class WGRW12(object):
 
     def getMIfromGM(self, amps, imt, dists=None, mag=None):
         """ 
-        Function getMIfromGM
-        Put some documentation here.
+        Function to compute macroseismic intensity from an instrumental
+        intensity. Supported PSA are for 0.3, 1.0, and 3.0 sec periods. 
+
+        :param amps:
+            Ground motion amplitude; linear units; %g for PGA and PSA, cm/s for
+            PGV.
+        :param imt:
+            OpenQuake IMT of the input amps (must be one of PGA, PGV, or SA).
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
+        :param dists: 
+            Numpy array of distances (km). 
+        :param mag:
+            Magnitude (float). 
+        :returns:
+            Macroseismic intensity. 
+
         """
         c, c2 = self.__getConsts(imt)
 
@@ -102,8 +124,22 @@ class WGRW12(object):
 
     def getGMfromMI(self, mmi, imt, dists=None, mag=None):
         """ 
-        Function getGMfromMI
-        Put some documentation here.
+        Function to tcompute instrumental intensity from macroseismic intensity.
+        Supported PSA are for 0.3, 1.0, and 3.0 sec periods.
+
+        :param mmi: Macroseismic intensity.
+        :param imt:
+            OpenQuake IMT of the requested instrumental intensities (must be one
+            of PGA, PGV, or SA).
+            `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
+        :param dists:
+            Numpy array of distances (km).
+        :param mag:
+            Magnitude (float).
+        :returns:
+            Ground motion amplitude; linear units; %g for PGA and PSA, cm/s for
+            PGV.
+
         """
         c, c2 = self.__getConsts(imt)
 
@@ -146,7 +182,10 @@ class WGRW12(object):
         return pgm
 
     def getGM2MIsd(self):
-        """ Return dictionary of GM to MI sigmas (in MMI units)"""
+        """
+        :returns:
+            Dictionary of GM to MI sigmas (in MMI units).
+        """
         return {'pga': self.__constants['pga']['SMMI'],
                 'pgv': self.__constants['pgv']['SMMI'],
                 'psa03': self.__constants['psa03']['SMMI'],
@@ -154,7 +193,10 @@ class WGRW12(object):
                 'psa30': self.__constants['psa30']['SMMI']}
 
     def getMI2GMsd(self):
-        """ Return dictionary of MI to GM sigmas (in linear PGM units)"""
+        """
+        :returns:
+            Dictionary of MI to GM sigmas (in linear PGM units). 
+        """
         return {'pga': 10**self.__constants['pga']['SPGM'],
                 'pgv': 10**self.__constants['pgv']['SPGM'],
                 'psa03': 10**self.__constants['psa03']['SPGM'],
@@ -162,12 +204,24 @@ class WGRW12(object):
                 'psa30': 10**self.__constants['psa30']['SPGM']}
 
     def getName(self):
+        """
+        :returns:
+            Name of GMICE. 
+        """
         return 'Worden et al. (2012)'
 
     def getScale(self):
+        """
+        :returns:
+            Name of GMICE scale file.
+        """
         return 'scale_wgrw12.ps'
 
     def getMinMax(self):
+        """
+        :returns: 
+            Tuple of min and max values of GMICE.
+        """
         return (1.0, 10.0)
 
     def getDistanceType(self):

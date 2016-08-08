@@ -3,7 +3,6 @@
 # stdlib imports
 import shutil
 import os.path
-import tempfile
 
 # local imports
 from .sender import Sender
@@ -53,11 +52,11 @@ class CopySender(Sender):
                 'Output directory "%s" does not exist.' % self.properties['directory'])
 
         for filename in self.files:
-            fbase, fname = os.path.split(filename)
+            fname = os.path.split(filename)[1]
             dfile = os.path.join(self.properties['directory'], fname)
             os.remove(dfile)
 
         for folder in self.directories:
-            fbase, dirname = os.path.split(folder)
+            dirname = os.path.split(folder)[1]
             dfolder = os.path.join(self.properties['directory'], dirname)
             shutil.rmtree(dfolder)

@@ -15,4 +15,3 @@ def test_newmarkhall1982():
     assert abs(PSA10out - 0.1056348) < 0.0001
     assert abs(PGVout - 9.46658) < 0.001
     assert abs(vfact - 94.6658) < 0.001
-

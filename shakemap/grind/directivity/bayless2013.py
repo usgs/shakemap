@@ -4,7 +4,6 @@ import numpy as np
 import openquake.hazardlib.geo as geo
 import copy
 
-import shakemap.grind.fault as fault
 from shakemap.grind.distance import get_distance
 import shakemap.utils.ecef as ecef
 from shakemap.utils.vector import Vector
@@ -236,7 +235,6 @@ class Bayless2013(object):
                 p1p = np.reshape(p1.getArray() - hyp_ecef.getArray(), [1, 3])
                 p2p = np.reshape(p2.getArray() - hyp_ecef.getArray(), [1, 3])
                 p3p = np.reshape(p3.getArray() - hyp_ecef.getArray(), [1, 3])
-                s0 = dist2_to_segment(p0p, p1p)
                 s1 = dist2_to_segment(p1p, p2p)
                 s2 = dist2_to_segment(p2p, p3p)
                 s3 = dist2_to_segment(p3p, p0p)

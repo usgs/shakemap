@@ -61,7 +61,7 @@ from shakemap.grind.sites import Sites
 import shakemap.grind.multigmpe as mg
 from shakemap.grind.directivity.rowshandel2013 import Rowshandel2013
 from shakemap.utils.timeutils import ShakeDateTime
-from shakemap.gmice.wgrw12 import WGRW12
+from shakemap.grind.gmice.wgrw12 import WGRW12
 
 
 #----------------------------------------------------
@@ -336,10 +336,10 @@ def main(args):
         ncell = nx * ny
 
     # Adjust extents to be divisible by res
-    lonmin = res * np.round(lonmin/res)
-    lonmax = res * np.round(lonmax/res)
-    latmin = res * np.round(latmin/res)
-    latmax = res * np.round(latmax/res)
+    lonmin = res * np.round(lonmin / res)
+    lonmax = res * np.round(lonmax / res)
+    latmin = res * np.round(latmin / res)
+    latmax = res * np.round(latmax / res)
 
     # Recompute latspan and lonspan
     lonspan = float(lonmax - lonmin)

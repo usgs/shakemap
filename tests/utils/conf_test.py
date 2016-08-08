@@ -3,7 +3,6 @@ import tempfile
 import textwrap
 
 from configobj import ConfigObj
-from validate import Validator, VdtTypeError, VdtParamError
 
 from shakemap.utils.conf import validate
 from shakemap.utils.conf import whatIs
@@ -11,6 +10,7 @@ from shakemap.utils.conf import createDefaultConfig
 
 homedir = os.path.dirname(os.path.abspath(__file__))
 shakedir = os.path.abspath(os.path.join(homedir, '..'))
+
 
 def test_conf():
     dummydir = os.path.expanduser('~')
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     test_conf()
     sys.exit(0)
     # where is this script?
-    homedir = os.path.dirname(os.path.abspath(__file__))  
+    homedir = os.path.dirname(os.path.abspath(__file__))
     configspec = os.path.join(homedir, 'configspec.ini')
     configfile = createDefaultConfig(configspec)
 

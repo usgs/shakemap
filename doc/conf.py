@@ -209,7 +209,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [('index', 'ShakeMapManual.tex', u'ShakeMap Manual',
-                    u'C. Bruce Worden, David Wald', 'manual'),]
+                    u'C. Bruce Worden, David Wald', 'manual'), ]
 
 # The name of an image file (relative to this directory) to place at the top of
 # the title page.

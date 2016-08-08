@@ -2,24 +2,14 @@
 
 # stdlib imports
 from xml.dom import minidom
-import io
-import sys
 import copy
 
 # third party
-import pytz
 import numpy as np
-from openquake.hazardlib.geo import geodetic
 from openquake.hazardlib.geo import point
-from openquake.hazardlib.geo import Mesh
-from openquake.hazardlib.geo.surface import multi
-from openquake.hazardlib.geo.surface import planar
-from openquake.hazardlib.geo import utils
-from openquake.hazardlib.gsim import base, abrahamson_2014
+from openquake.hazardlib.gsim import base
 from openquake.hazardlib.const import TRT
-from shapely import geometry
 from ..utils.timeutils import ShakeDateTime
-from ..utils.ecef import latlon2ecef, ecef2latlon
 from .fault import Fault
 
 # local imports

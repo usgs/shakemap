@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # stdlib imports
-import sys
 import os.path
 
 # depends on https://github.com/jbardin/scp.py

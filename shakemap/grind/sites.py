@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # stdlib imports
-import sys
 
 # third party imports
 from mapio.gmt import GMTGrid
@@ -53,7 +52,7 @@ def _getFileGeoDict(fname):
 
 def _calculate_z1p0(vs30):
     # I think these are older generation equations (c2008). Probably need to be
-    # more careful about what version of these equations are used. 
+    # more careful about what version of these equations are used.
     c1 = 6.745
     c2 = 1.35
     c3 = 5.394
@@ -69,7 +68,7 @@ def _calculate_z1p0(vs30):
 
 def _calculate_z2p5(z1pt0):
     # I think these are older generation equations (c2008). Probably need to be
-    # more careful about what version of these equations are used. 
+    # more careful about what version of these equations are used.
     c1 = 519
     c2 = 3.595
     Z2Pt5 = c1 + z1pt0 * c2

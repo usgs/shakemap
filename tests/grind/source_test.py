@@ -14,14 +14,11 @@ sys.path.insert(0, shakedir)
 
 # third party
 from openquake.hazardlib.gsim import abrahamson_2014
-from openquake.hazardlib.geo.mesh import Mesh
 import numpy as np
 import pytest
 
 # local imports
-from shakemap.utils.exception import ShakeMapException
 from shakemap.grind.source import Source
-from shakemap.grind.fault import Fault
 
 
 def test_source():

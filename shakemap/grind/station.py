@@ -14,7 +14,7 @@ import numpy as np
 from openquake.hazardlib import imt as GEM_IMT
 
 # local imports
-from shakemap.gmice.wgrw12 import WGRW12
+from shakemap.grind.gmice.wgrw12 import WGRW12
 from .distance import get_distance
 
 TABLES = {'station':

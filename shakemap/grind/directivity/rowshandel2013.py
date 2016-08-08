@@ -22,7 +22,7 @@ class Rowshandel2013(object):
     also used some coefficients that are unpublished updates by Rowshandel. 
     Some of the implementation options are controlled by arguments (e.g., 
     mtype). 
-    
+
     Fd is the directivity function. One of the options is whether or not to
     use the 'centering' term (the argument is 'centered' and defaults to 
     True). If it is True then
@@ -336,12 +336,6 @@ class Rowshandel2013(object):
             strike_vec = fault.get_quad_strike_vector(q)
             strike_vec_col = np.array([[strike_vec.x], [strike_vec.y], [
                                       strike_vec.z]])  # convert to column vector
-
-            # Down dip vector (ECEF coords)
-            ddip_vec = fault.get_quad_down_dip_vector(q)
-            ddip_vec_col = np.array([[ddip_vec.x],
-                                     [ddip_vec.y],
-                                     [ddip_vec.z]])  # convert to column vector
 
             # Make 3x(i*j) matrix of cp
             ni, nj = mesh['llx'].shape

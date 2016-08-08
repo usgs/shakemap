@@ -2,7 +2,6 @@
 
 # stdlib imports
 import os.path
-import tempfile
 
 # local imports
 from shakemap.utils.exception import ShakeMapException

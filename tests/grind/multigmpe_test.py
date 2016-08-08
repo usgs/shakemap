@@ -3,7 +3,7 @@ import sys
 import time as time
 
 import numpy as np
-import pytest 
+import pytest
 
 from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
 from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014

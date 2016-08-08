@@ -1,2 +1,1 @@
-__all__ = ["conversions", "correlation", "directivity"]
-
+__all__ = ["conversions", "correlation", "directivity","gmice"]

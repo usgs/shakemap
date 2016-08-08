@@ -1,16 +1,16 @@
 
 from openquake.hazardlib import const
-from openquake.hazardlib.imt import PGA, PGV, SA
 
 import numpy as np
+
 
 class BeyerBommer2006(object):
     """
     Implements conversion for various "Intensity Measure
     Components" (IMCs) per Beyer and Bommer (2006).
-    
+
     IMC equivalencies:
-    
+
     +---------------------------+------------------------+
     | OpenQuake                 | Beyer & Bommer         |
     +===========================+========================+
@@ -35,7 +35,7 @@ class BeyerBommer2006(object):
 
     To do
         - Inherit from ConvertIMC class. 
-    
+
     References: 
         Beyer, K., & Bommer, J. J. (2006). Relationships between median values
         and between aleatory variabilities for different definitions of the 
@@ -63,7 +63,7 @@ class BeyerBommer2006(object):
         const.IMC.RotD50: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.02, 0.03, 1.00]))),
         const.IMC.RANDOM_HORIZONTAL: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.07, 0.11, 1.05]))),
         const.IMC.GREATER_OF_TWO_HORIZONTAL: dict(list(zip(__sa_col_names, [1.1, 1.2, 0.04, 0.07, 1.02])))}
-    
+
     @staticmethod
     def ampIMCtoIMC(amps, imc_in, imc_out, imt):
         """ 
@@ -73,7 +73,7 @@ class BeyerBommer2006(object):
 
             - Assumes the input amps are in linear (not log) space 
             - IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
-        
+
         :param amps: 
             Numpy array of ground motion amplitudes. 
         :param imc_in:
@@ -93,10 +93,10 @@ class BeyerBommer2006(object):
             # geometric mean)
             denom = 1
         elif imc_in == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-             imc_in == const.IMC.MEDIAN_HORIZONTAL or \
-             imc_in == const.IMC.GMRotI50 or \
-             imc_in == const.IMC.RotD50 or \
-             imc_in == const.IMC.RANDOM_HORIZONTAL:
+                imc_in == const.IMC.MEDIAN_HORIZONTAL or \
+                imc_in == const.IMC.GMRotI50 or \
+                imc_in == const.IMC.RotD50 or \
+                imc_in == const.IMC.RANDOM_HORIZONTAL:
             denom = BeyerBommer2006.__GM2other(imt, imc_in)
         else:
             raise ValueError('unknown IMC %r' % imc_in)
@@ -106,14 +106,14 @@ class BeyerBommer2006(object):
             # type ("GM", i.e. geometric mean)
             numer = 1
         elif imc_out == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-             imc_out == const.IMC.MEDIAN_HORIZONTAL or \
-             imc_out == const.IMC.GMRotI50 or \
-             imc_out == const.IMC.RotD50 or \
-             imc_out == const.IMC.RANDOM_HORIZONTAL:
+                imc_out == const.IMC.MEDIAN_HORIZONTAL or \
+                imc_out == const.IMC.GMRotI50 or \
+                imc_out == const.IMC.RotD50 or \
+                imc_out == const.IMC.RANDOM_HORIZONTAL:
             numer = BeyerBommer2006.__GM2other(imt, imc_out)
         else:
             raise ValueError('unknown IMC %r' % imc_out)
-        
+
         return amps * (numer / denom)
 
     @staticmethod
@@ -125,7 +125,7 @@ class BeyerBommer2006(object):
 
             - Assumes the input sigmas are in log space
             - IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
-        
+
         :param sigmas:
             Numpy array of standard deviations. 
         :param imc_in:
@@ -147,10 +147,10 @@ class BeyerBommer2006(object):
             R = 1
             sig_log_ratio = 0
         elif imc_in == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-             imc_in == const.IMC.MEDIAN_HORIZONTAL or \
-             imc_in == const.IMC.GMRotI50 or\
-             imc_in == const.IMC.RotD50 or\
-             imc_in == const.IMC.RANDOM_HORIZONTAL:
+                imc_in == const.IMC.MEDIAN_HORIZONTAL or \
+                imc_in == const.IMC.GMRotI50 or\
+                imc_in == const.IMC.RotD50 or\
+                imc_in == const.IMC.RANDOM_HORIZONTAL:
             R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_in)
         else:
             raise ValueError('unknown IMC %r' % imc_in)
@@ -163,10 +163,10 @@ class BeyerBommer2006(object):
             R = 1
             sig_log_ratio = 0
         elif imc_out == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-             imc_out == const.IMC.MEDIAN_HORIZONTAL or \
-             imc_out == const.IMC.GMRotI50 or\
-             imc_out == const.IMC.RotD50 or\
-             imc_out == const.IMC.RANDOM_HORIZONTAL:
+                imc_out == const.IMC.MEDIAN_HORIZONTAL or \
+                imc_out == const.IMC.GMRotI50 or\
+                imc_out == const.IMC.RotD50 or\
+                imc_out == const.IMC.RANDOM_HORIZONTAL:
             R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_out)
         else:
             raise ValueError('unknown IMC %r' % imc_out)
