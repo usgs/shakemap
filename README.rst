@@ -4,7 +4,6 @@ Note, this repository consists of experimental code that is still under
 development. 
 
 |Travis| |CodeCov|
-|QuantifiedCode| |Codacy|
 
 .. |Travis| image:: https://travis-ci.org/usgs/shakemap.svg?branch=master
     :target: https://travis-ci.org/usgs/shakemap
@@ -12,12 +11,6 @@ development.
 .. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/usgs/shakemap
     :alt: Code Coverage Status
-.. |QuantifiedCode| image:: https://www.quantifiedcode.com/api/v1/project/3226dd92d6414343af0bc662fcc437cf/badge.svg
-    :target: https://www.quantifiedcode.com/app/project/3226dd92d6414343af0bc662fcc437cf
-    :alt: Code issues
-.. |Codacy| image:: https://api.codacy.com/project/badge/Grade/1d3b94ef3793456f861c67d7905e7de7
-    :target: https://www.codacy.com/app/emthompson/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
-    :alt: Codacy code issues
 
 Introduction
 ------------

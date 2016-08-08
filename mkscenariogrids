@@ -146,6 +146,7 @@ def main(args):
     evt_dir = os.path.join(datdir, id_str)
     input_dir = os.path.join(evt_dir, 'input')
     xml_file = os.path.join(input_dir, 'event.xml')
+
     #------------------
     # Read in event.xml
     #------------------
@@ -175,7 +176,9 @@ def main(args):
     #------------------------------------------
     cmd = 'ls %s/*fault-for-calc.txt' % (input_dir)
     rc, so, se = getCommandOutput(cmd)
+
     # probably need to add some error checking here
+
     ruptfile = so.decode('utf-8').strip()
     flt = fault.Fault.readFaultFile(ruptfile)
     event = {'lat': hlat,
@@ -301,6 +304,7 @@ def main(args):
         wts = [1.0]
     else:
         raise Exception('Specified an unsupported GMPE.')
+
     #----------------------------------------
     # Make source instance and compute extent
     #----------------------------------------
@@ -315,7 +319,7 @@ def main(args):
     lonspan = float(lonmax - lonmin)
     latspan = float(latmax - latmin)
 
-    # Adjust number of cells
+    # Adjust number of cells if necessary
     res = args.res
     nx = np.floor(lonspan / res) + 1
     ny = np.floor(latspan / res) + 1
@@ -330,6 +334,16 @@ def main(args):
         nx = np.floor(lonspan / res) + 1
         ny = np.floor(latspan / res) + 1
         ncell = nx * ny
+
+    # Adjust extents to be divisible by res
+    lonmin = res * np.round(lonmin/res)
+    lonmax = res * np.round(lonmax/res)
+    latmin = res * np.round(latmin/res)
+    latmax = res * np.round(latmax/res)
+
+    # Recompute latspan and lonspan
+    lonspan = float(lonmax - lonmin)
+    latspan = float(latmax - latmin)
 
     # buffer to increase grid so that it doesn't barf when sent to ShakeMap
     buf = 2 * res
@@ -347,7 +361,7 @@ def main(args):
                'ymin': south, 'ymax': north,
                'dx': res, 'dy': res,
                'nx': nx, 'ny': ny}
-    smdict = GeoDict(tmpdict, adjust='res')
+    smdict = GeoDict(tmpdict, adjust='bounds')
 
     #---------------------
     # Make rupture context
@@ -405,6 +419,7 @@ def main(args):
     sites.vs30 = np.clip(sites.vs30, 0, 2000)
 
     sites.vs30measured = np.ones_like(sites.vs30, dtype=bool)
+
     # Add z1 and z2.5
     sites.z1pt0cy14 = mg._z1_from_vs30_cy14_cal(sites.vs30)
     sites.z1pt0ask14 = mg._z1_from_vs30_ask14_cal(sites.vs30)
@@ -526,6 +541,7 @@ def main(args):
         dmmi_damp[idx] = c['C2']
         idx = lamps >= c['T1']
         dmmi_damp[idx] = c['C4']
+
         # convert to log10
         amp_sd = np.reshape(imdict['pgv']['sigma'], (-1,)) / np.log(10)
         additional_var = dmmi_damp**2 * (amp_sd**2)

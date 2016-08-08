@@ -6,8 +6,8 @@ class Boore2003(object):
     Implements the correlation model proposed in the appendix of Boore et al. 
     (2003). 
 
-    Todo:
-        Inherit from SpatialCorrelation class. 
+    To do
+        - Inherit from SpatialCorrelation class. 
 
     References:
         Boore, D. M., Gibbs, J. F., Joyner, W. B., Tinsley, J. C., & Ponti, D. 

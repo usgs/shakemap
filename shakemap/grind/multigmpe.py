@@ -12,7 +12,8 @@ class MultiGMPE(GMPE):
     """
     Implements a GMPE that is the combination of multiple GMPEs.
     
-    Todo:
+    To do
+
         * Convert IMT (e.g., PGV) from another IMT if it is not available from
           the GMPE in get_mean_and_stddevs.
 

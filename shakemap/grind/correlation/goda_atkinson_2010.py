@@ -5,8 +5,8 @@ class GodaAtkinson2010(object):
     """
     Imlements the Goda and Atkinson (2010) spatial correlation model for IMTs. 
 
-    Todo:
-        Inherit from SpatialCorrelation class. 
+    To do
+        - Inherit from SpatialCorrelation class. 
 
     References: 
         Goda, K., & Atkinson, G. M. (2010). Intraevent spatial correlation of
