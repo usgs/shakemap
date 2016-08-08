@@ -12,7 +12,7 @@ import pytest
 
 # hack the path so that I can debug these functions if I need to
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..'))
+shakedir = os.path.abspath(os.path.join(homedir, '../..'))
 # put this at the front of the system path, ignoring any installed mapio stuff
 sys.path.insert(0, shakedir)
 
@@ -28,9 +28,12 @@ def test_pisgah_bullion_mtn(tmpdir):
 
     # make a temporary directory
     p = tmpdir.mkdir("sub")
-    jsonfile = os.path.join(shakedir, 'data/eventdata/UCERF3_EventSet_All.json')
+    jsonfile = os.path.join(shakedir, 'tests/data/eventdata/UCERF3_EventSet_All.json')
     cmd = 'mkinputdir -f %s -i 46 -s %s' %(jsonfile, p)
     rc,so,se = getCommandOutput(cmd)
+    if se != b'':
+        print(so.decode())
+        print(se.decode())
     assert se == b''
 
 def test_misc():

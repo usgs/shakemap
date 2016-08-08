@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import numpy as np
 
@@ -14,6 +15,7 @@ class WGRW12(object):
         and modified Mercalli intensity in California. Bulletin of the
         Seismological Society of America, 102(1), 204-221.
     """
+
       #------------------------------------------------------------------------
       #
       # MMI = c2->C1 + c2->C2 * log(Y)  for log(Y) <= c2->T1
