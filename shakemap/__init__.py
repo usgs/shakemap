@@ -1,4 +1,4 @@
-__all__ = ["gmice", "grind", "mapping",
+__all__ = ["gmice", "grind", "mapping", "plotting",
            "genex", "utils", "transfer"]
 
 

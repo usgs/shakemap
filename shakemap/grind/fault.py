@@ -11,7 +11,6 @@ from openquake.hazardlib.geo.utils import get_orthographic_projection
 from ..utils.ecef import latlon2ecef
 from ..utils.ecef import ecef2latlon
 from ..utils.vector import Vector
-import matplotlib.pyplot as plt
 
 # local imports
 from shakemap.utils.exception import ShakeMapException
@@ -750,25 +749,6 @@ class Fault(object):
             List of segment indexes; lenght equals the number of quadrilaterals.
         """
         return copy.deepcopy(self._segment_index)
-
-    def _plot(self, ax=None):
-        if ax is None:
-            fig = plt.figure()
-            ax = fig.add_subplot(111, projection='3d')
-        else:
-            if 'xlim3d' not in list(ax.properties.keys()):
-                raise ShakeMapException(
-                    'Non-3d axes object passed to plot() method.')
-        for quad in self._quadrilaterals:
-            P0, P1, P2, P3 = quad
-            ax.plot([P0.longitude], [P0.latitude], [-P0.depth], 'B.')
-            ax.text([P0.longitude], [P0.latitude], [-P0.depth], 'P0')
-            ax.plot([P1.longitude], [P1.latitude], [-P1.depth], 'b.')
-            ax.text([P1.longitude], [P1.latitude], [-P1.depth], 'P1')
-            ax.plot([P2.longitude], [P2.latitude], [-P2.depth], 'b.')
-            ax.text([P2.longitude], [P2.latitude], [-P2.depth], 'P2')
-            ax.plot([P3.longitude], [P3.latitude], [-P3.depth], 'b.')
-            ax.text([P3.longitude], [P3.latitude], [-P3.depth], 'P3')
 
     def getLats(self):
         """
