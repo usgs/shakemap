@@ -3,7 +3,6 @@
 # stdlib imports
 from ftplib import FTP
 import os.path
-import sys
 
 # local
 from .sender import Sender

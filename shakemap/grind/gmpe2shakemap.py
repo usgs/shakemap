@@ -6,7 +6,7 @@ ShakeMap amps are %g and max horizontal
 
 from shakemap.grind.conversions.imc.beyer_bommer_2006 import BeyerBommer2006 as bb06
 
-from openquake.hazardlib.imt import PGA, PGV, SA
+from openquake.hazardlib.imt import PGV
 from openquake.hazardlib import const
 
 

@@ -11,7 +11,7 @@ from shakemap.grind.conversions.imc.beyer_bommer_2006 import BeyerBommer2006 as 
 class MultiGMPE(GMPE):
     """
     Implements a GMPE that is the combination of multiple GMPEs.
-    
+
     To do
 
         * Convert IMT (e.g., PGV) from another IMT if it is not available from
@@ -174,7 +174,7 @@ def _z1_from_vs30_ask14_cal(vs30):
         Numpy array of Vs30 values in m/s. 
     :returns: 
         Numpy array of z1.0 in m.  
-    
+
     """
     # ASK14 define units as KM, but implemented as m in OQ
     z1 = np.exp(-(7.67 / 4.0) *

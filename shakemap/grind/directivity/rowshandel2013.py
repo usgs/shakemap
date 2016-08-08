@@ -21,27 +21,27 @@ class Rowshandel2013(object):
     provides many options for computing the directivity factor and we have 
     also used some coefficients that are unpublished updates by Rowshandel. 
     Some of the implementation options are controlled by arguments (e.g., 
-    mtype). 
-    
+    mtype).
+
     Fd is the directivity function. One of the options is whether or not to
-    use the 'centering' term (the argument is 'centered' and defaults to 
+    use the 'centering' term (the argument is 'centered' and defaults to
     True). If it is True then
 
     Fd = C1 * (XiPrime - Xic) * LD * DT * WP
 
-    otherwise 
+    otherwise
 
     Fd = (C1 * Xiprime + C2) * LD * DT * WP
 
     where
 
-    - C1 and C2 are regression coefficients. 
+    - C1 and C2 are regression coefficients.
     - XiPrime is a factor that accounts for rupture propagation and slip
-      direction. 
-    - Xic is the centering term. 
-    - LD is the rupture length de-normalization factor. 
-    - DT is the distance-taper. 
-    - WP is the narrow-band multiplier. 
+      direction.
+    - Xic is the centering term.
+    - LD is the rupture length de-normalization factor.
+    - DT is the distance-taper.
+    - WP is the narrow-band multiplier.
 
     Note that Fd is intended to be used in GMPEs as:
 
@@ -49,9 +49,9 @@ class Rowshandel2013(object):
 
     where
 
-    - Fd is the directivity effect
-    - IM is the intensity measure predicted by the GMPE. 
-    - IM_dir is the directivity-adjusted IM. 
+    - Fd is the directivity effect.
+    - IM is the intensity measure predicted by the GMPE.
+    - IM_dir is the directivity-adjusted IM.
 
     To do
         - Add checks on function arguments (e.g., mtype) for valid values.
@@ -78,6 +78,7 @@ class Rowshandel2013(object):
         :param lat:
             Numpy array of site latitudes.
         :param lon:
+with warnings.catch_warnings():
             Numpy array of site longitudes.
         :param dep:
             Numpy array of site depths (km); positive down.
@@ -336,12 +337,6 @@ class Rowshandel2013(object):
             strike_vec = fault.get_quad_strike_vector(q)
             strike_vec_col = np.array([[strike_vec.x], [strike_vec.y], [
                                       strike_vec.z]])  # convert to column vector
-
-            # Down dip vector (ECEF coords)
-            ddip_vec = fault.get_quad_down_dip_vector(q)
-            ddip_vec_col = np.array([[ddip_vec.x],
-                                     [ddip_vec.y],
-                                     [ddip_vec.z]])  # convert to column vector
 
             # Make 3x(i*j) matrix of cp
             ni, nj = mesh['llx'].shape

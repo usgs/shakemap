@@ -58,7 +58,6 @@ script:
      - export PYTHONPATH="."
      - py.test --cov=shakemap
      - echo `sphinx-build --version`
-     - python makedocs.py -p
     #- flake8 shakemap
 after_success:
     - pip install codecov codacy-coverage

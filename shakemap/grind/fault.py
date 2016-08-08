@@ -1,20 +1,16 @@
 #!/usr/bin/env python
 
 # stdlib modules
-import io
-import sys
 import copy
 
 # third party imports
 import numpy as np
 from openquake.hazardlib.geo import mesh
-from openquake.hazardlib.geo import point, utils
+from openquake.hazardlib.geo import point
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from ..utils.ecef import latlon2ecef
 from ..utils.ecef import ecef2latlon
 from ..utils.vector import Vector
-import matplotlib.pyplot as plt
-from mpl_toolkits.mplot3d import Axes3D
 
 # local imports
 from shakemap.utils.exception import ShakeMapException
@@ -401,27 +397,6 @@ class Fault(object):
         """
         return copy.deepcopy(self._quadrilaterals)
 
-    def getQuadWidth(self, p0, p1, p3):
-        """
-        Return width of an individual planar trapezoid, where the p0-p1 distance
-        represents the long side.
-
-        :param p0:
-            ECEF x,y,z point representing the first vertex of a quadrilateral.
-        :param p1:
-            ECEF x,y,z point representing the second vertex of a quadrilateral.
-        :param p3:
-            ECEF x,y,z point representing the fourth vertex of a quadrilateral.
-        :returns:
-           Width of planar trapezoid (float).
-        """
-        AB = p0 - p1
-        AC = p0 - p3
-        t1 = (AB.cross(AC).cross(AB)).norm()
-        width = t1.dot(AC)
-
-        return width
-
     def getStrike(self):
         """
         Return strike angle. If fault consists of multiple quadrilaterals, the
@@ -491,7 +466,7 @@ class Fault(object):
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
             p3 = Vector.fromPoint(P3)
-            wsum += self.getQuadWidth(p0, p1, p3)
+            wsum += get_quad_width(p0, p1, p3)
         mwidth = (wsum / len(self._quadrilaterals)) / 1000.0
         return mwidth
 
@@ -510,7 +485,7 @@ class Fault(object):
             p0 = Vector.fromPoint(P0)
             p1 = Vector.fromPoint(P1)
             p3 = Vector.fromPoint(P3)
-            widths[i] = self.getQuadWidth(p0, p1, p3) / 1000.0
+            widths[i] = get_quad_width(p0, p1, p3) / 1000.0
         return widths
 
     def getIndividualTopLengths(self):
@@ -548,7 +523,7 @@ class Fault(object):
         """
         # area of a trapezoid: A = (a+b)/2 * h
         # (https://en.wikipedia.org/wiki/Trapezoid)
-        h = self.getQuadWidth(p0, p1, p3)
+        h = get_quad_width(p0, p1, p3)
         a = (p1 - p0).mag()
         b = (p2 - p3).mag()
         A = ((a + b) / 2.0) * h
@@ -574,11 +549,14 @@ class Fault(object):
         x2, y2, z2 = p1.getArray()
         x3, y3, z3 = p2.getArray()
         D = np.linalg.det(np.array([[x1, y1, z1], [x2, y2, z2], [x3, y3, z3]]))
-        if D == 0:
+        if D != 0:
             d = -1
-            at = np.linalg.det(np.array([[1, y1, z1], [1, y2, z2], [1, y3, z3]]))
-            bt = np.linalg.det(np.array([[x1, 1, z1], [x2, 1, z2], [x3, 1, z3]]))
-            ct = np.linalg.det(np.array([[x1, y1, 1], [x2, y2, 1], [x3, y3, 1]]))
+            at = np.linalg.det(
+                np.array([[1, y1, z1], [1, y2, z2], [1, y3, z3]]))
+            bt = np.linalg.det(
+                np.array([[x1, 1, z1], [x2, 1, z2], [x3, 1, z3]]))
+            ct = np.linalg.det(
+                np.array([[x1, y1, 1], [x2, y2, 1], [x3, y3, 1]]))
             a = (-d / D) * at
             b = (-d / D) * bt
             c = (-d / D) * ct
@@ -772,25 +750,6 @@ class Fault(object):
         """
         return copy.deepcopy(self._segment_index)
 
-    def _plot(self, ax=None):
-        if ax is None:
-            fig = plt.figure()
-            ax = fig.add_subplot(111, projection='3d')
-        else:
-            if 'xlim3d' not in list(ax.properties.keys()):
-                raise ShakeMapException(
-                    'Non-3d axes object passed to plot() method.')
-        for quad in self._quadrilaterals:
-            P0, P1, P2, P3 = quad
-            ax.plot([P0.longitude], [P0.latitude], [-P0.depth], 'B.')
-            ax.text([P0.longitude], [P0.latitude], [-P0.depth], 'P0')
-            ax.plot([P1.longitude], [P1.latitude], [-P1.depth], 'b.')
-            ax.text([P1.longitude], [P1.latitude], [-P1.depth], 'P1')
-            ax.plot([P2.longitude], [P2.latitude], [-P2.depth], 'b.')
-            ax.text([P2.longitude], [P2.latitude], [-P2.depth], 'P2')
-            ax.plot([P3.longitude], [P3.latitude], [-P3.depth], 'b.')
-            ax.text([P3.longitude], [P3.latitude], [-P3.depth], 'P3')
-
     def getLats(self):
         """
         Return a copy of the array of latitude points for the fault.
@@ -889,6 +848,27 @@ class Fault(object):
                     'Unclosed segments exist in fault file.')
             istart = inan[i] + 1
 
+
+def get_quad_width(p0, p1, p3):
+    """
+    Return width of an individual planar trapezoid, where the p0-p1 distance
+    represents the long side.
+
+    :param p0:
+        ECEF x,y,z point representing the first vertex of a quadrilateral.
+    :param p1:
+        ECEF x,y,z point representing the second vertex of a quadrilateral.
+    :param p3:
+        ECEF x,y,z point representing the fourth vertex of a quadrilateral.
+    :returns:
+        Width of planar trapezoid (float).
+    """
+    AB = p0 - p1
+    AC = p0 - p3
+    t1 = (AB.cross(AC).cross(AB)).norm()
+    width = t1.dot(AC)
+
+    return width
 
 def get_quad_mesh(q, dx):
     """

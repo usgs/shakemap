@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 # stdlib imports
-import struct
-from datetime import datetime
 import copy
 import warnings
 import itertools as it
@@ -13,7 +11,7 @@ from ..utils.ecef import latlon2ecef
 from ..utils.vector import Vector
 from .fault import get_quad_length
 from .source import rake_to_mech
-from openquake.hazardlib.geo import point, geodetic
+from openquake.hazardlib.geo import geodetic
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib.gsim import base
@@ -21,7 +19,6 @@ import numpy as np
 import pandas as pd
 import re
 import scipy.interpolate as spint
-import matplotlib.pyplot as plt
 
 # local imports
 from shakemap.utils.exception import ShakeMapException

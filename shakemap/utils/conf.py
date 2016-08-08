@@ -2,10 +2,6 @@
 
 # stdlib imports
 import os.path
-import tempfile
-import textwrap
-import sys
-import re
 import io
 
 # third party libraries

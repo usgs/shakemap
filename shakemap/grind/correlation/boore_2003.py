@@ -1,6 +1,7 @@
 import numpy as np
 from openquake.hazardlib.imt import PGA
 
+
 class Boore2003(object):
     """
     Implements the correlation model proposed in the appendix of Boore et al. 
@@ -18,7 +19,7 @@ class Boore2003(object):
         `[link] <http://www.bssaonline.org/content/93/6/2737.short>`__
     """
     @staticmethod
-    def getSpatialCorrelation(dists, imt = PGA()):
+    def getSpatialCorrelation(dists, imt=PGA()):
         """
         Method for evalulating spatial correlation model. 
 

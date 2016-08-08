@@ -19,14 +19,13 @@ class NewmarkHall1982(object):
 
     To do
         - Inherit from ConvertIMT class. 
-    
+
     References: 
         Newmark, N. M., & Hall, W. J. (1982). Earthquake spectra and design. 
         Earthquake Engineering Research Institute, El Cerrito, California. 
     """
 
     __vfact = 37.27 * 2.54
-
 
     @staticmethod
     def pgv2psa10(pgv):
@@ -65,4 +64,3 @@ class NewmarkHall1982(object):
             The Newmark and Hall (1982) conversion factor. 
         """
         return NewmarkHall1982.__vfact
-

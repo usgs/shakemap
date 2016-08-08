@@ -2,16 +2,8 @@
 
 # stdlib imports
 import os.path
-import tempfile
-import sys
-import urllib.request
-import urllib.error
-import urllib.parse
-import zipfile
-import io
 
 # third party
-from Crypto.PublicKey import RSA
 
 # local
 from .sender import Sender
