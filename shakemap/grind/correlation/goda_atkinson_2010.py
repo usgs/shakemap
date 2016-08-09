@@ -82,4 +82,9 @@ class GodaAtkinson2010(object):
             beta = 0.319
             gamma = 5.0
             pass
-        return np.sqrt(1.0 - np.max(gamma * np.exp(-1.0 * alpha * np.power(dists, beta)) - gamma + 1, 0))
+        cor = np.sqrt(1.0 - np.maximum(gamma *
+                                       np.exp(-1.0 * alpha *
+                                              np.power(dists, beta)) -
+                                       gamma + 1,
+                                       0))
+        return cor
