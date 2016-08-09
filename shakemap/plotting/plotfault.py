@@ -14,6 +14,8 @@ def plot_fault_wire3d(fault, ax = None):
         A Fault instance. 
     :param ax:
         A matplotlib axis (optional). 
+    :returns:
+        Matplotlib axis. 
     """
 
     if ax is None:
@@ -31,4 +33,4 @@ def plot_fault_wire3d(fault, ax = None):
         z = [-p.depth for p in quad]
         z.append(z[0])
         ax.plot(x, y, z)
-
+    return ax

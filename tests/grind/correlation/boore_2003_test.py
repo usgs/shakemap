@@ -1,12 +1,14 @@
 
 import numpy as np
+import pytest
 
 import shakemap.grind.correlation.boore_2003 as b03
 
 
 def test_boore2003():
+    cormod = b03.Boore2003()
     d = np.linspace(0, 10, 101)
-    cor = b03.Boore2003.getSpatialCorrelation(d)
+    cor = cormod.getSpatialCorrelation(d)
     cor_target = np.array(
       [ 0.        ,  0.21725552,  0.29277765,  0.34574891,  0.38731108,
         0.42173472,  0.45118836,  0.47694783,  0.49983654,  0.52042113,
@@ -31,3 +33,6 @@ def test_boore2003():
         0.91366237]
                          )
     np.testing.assert_allclose(cor, cor_target)
+
+    with pytest.raises(Exception) as a:
+        cormod.getSpatialCorrelation(d, imt = "PGV")
