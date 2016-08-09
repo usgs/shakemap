@@ -57,7 +57,7 @@ install:
     - python setup.py install
 script:
      - export PYTHONPATH="."
-     - py.test --cov=shakemap
+     - py.test --mpl --cov=shakemap
      - echo `sphinx-build --version`
     #- flake8 shakemap
 after_success:
