@@ -14,13 +14,15 @@ def plot_fault_wire3d(fault, ax = None):
         A Fault instance. 
     :param ax:
         A matplotlib axis (optional). 
+    :returns:
+        Matplotlib axis. 
     """
 
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
     else:
-        if 'xlim3d' not in list(ax.properties.keys()):
+        if 'xlim3d' not in list(ax.properties().keys()):
             raise ShakeMapException(
                 'Non-3d axes object passed to plot() method.')
     for quad in fault.getQuadrilaterals():
@@ -31,4 +33,4 @@ def plot_fault_wire3d(fault, ax = None):
         z = [-p.depth for p in quad]
         z.append(z[0])
         ax.plot(x, y, z)
-
+    return ax

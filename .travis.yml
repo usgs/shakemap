@@ -13,51 +13,33 @@ install:
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
     - conda info -a
-    - conda install --yes --channel conda-forge numpy 
-    - conda install --yes --channel conda-forge scipy
-    - conda install --yes --channel conda-forge rasterio 
-    - conda install --yes --channel conda-forge fiona 
-    - conda install --yes --channel conda-forge xlrd 
-    - conda install --yes --channel conda-forge xlwt
-    - conda install --yes --channel conda-forge pandas 
-    - conda install --yes --channel conda-forge pytables
-    - conda install --yes --channel conda-forge basemap 
-    - conda install --yes --channel conda-forge basemap-data-hires 
-    - conda install --yes --channel conda-forge shapely 
-    - conda install --yes --channel conda-forge h5py 
-    - conda install --yes --channel conda-forge basemap-data-hires 
-    - conda install --yes --channel conda-forge gdal==1.11.4 
-    - conda install --yes --channel conda-forge descartes 
-    - conda install --yes --channel conda-forge paramiko 
-    - conda install --yes --channel conda-forge configobj
-    - conda install --yes --channel conda-forge pyproj
-    - conda install --yes --channel conda-forge psutil
+    - conda install --yes --channel conda-forge numpy scipy rasterio fiona xlrd xlwt pandas pytables basemap basemap-data-hires shapely h5py basemap-data-hires gdal==1.11.4 descartes paramiko configobj pyproj matplotlib psutil sphinx
     - conda install --yes lxml
-    - conda install --yes sphinx
     - pip -v install git+git://github.com/gem/oq-hazardlib.git
     - pip -v install git+git://github.com/usgs/MapIO.git
     - pip -v install git+git://github.com/snide/sphinx_rtd_theme.git
     #-----------------------
     # Not needed for testing
     #-----------------------
-    #- conda install --yes --channel conda-forge matplotlib 
     #- conda install --yes --channel conda-forge jupyter 
     #--------------------------
     # Only required for testing
     #--------------------------
-    - pip install flake8
-    - pip install pep8-naming
-    - pip install pytest
-    - pip install pytest-cov
+    - conda install --yes --channel conda-forge pytest pytest-cov pytest-mpl flake8 pep8-naming
     #---------------------
     # Install shakemap
     #---------------------
     #- pip install .
     - python setup.py install
+before_script:
+    # This is to take care of Invalid DISPLAY variable
+    - "export DISPLAY=:99.0"
+    - "sh -e /etc/init.d/xvfb start"
+    - sleep 3 # give xvfb some time to start
 script:
-     - export PYTHONPATH="."
-     - py.test --cov=shakemap
-     - echo `sphinx-build --version`
+    - export PYTHONPATH="."
+    - py.test --mpl --cov=shakemap
+    - echo `sphinx-build --version`
     #- flake8 shakemap
 after_success:
     - pip install codecov codacy-coverage

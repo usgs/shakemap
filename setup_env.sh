@@ -1,7 +1,7 @@
 #!/bin/bash
 echo $PATH
 
-DEPS="numpy scipy matplotlib jupyter rasterio fiona xlrd xlwt pandas pytables basemap basemap-data-hires shapely h5py basemap-data-hires gdal==1.11.4 descartes paramiko sphinx configobj pyproj pytest psutil lxml"
+DEPS="numpy scipy matplotlib jupyter rasterio fiona xlrd xlwt pandas pytables basemap basemap-data-hires shapely h5py basemap-data-hires gdal==1.11.4 descartes paramiko sphinx configobj pyproj pytest pytest-cov pytest-mpl psutil lxml flake8 pep8-naming"
 
 if [ "$#" -le 1 ]; then
     # turn off whatever other virtual environment user might be in
@@ -23,8 +23,6 @@ source activate shake
 pip -v install git+git://github.com/gem/oq-hazardlib.git
 pip install git+git://github.com/usgs/MapIO.git
 pip install sphinx_rtd_theme
-pip install flake8
-pip install pep8-naming
 
 # tell the user they have to activate this environment
 echo "Type 'source activate shake' to use this new virtual environment."

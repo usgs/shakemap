@@ -148,11 +148,11 @@ class Bayless2013(object):
 
             # Magnitude taper (does not depend on mechanism)
             if self._M <= 5.0:
-                self.T_Mw = 0.0
+                self._T_Mw = 0.0
             elif (self._M > 5.0) and (self._M < 6.5):
-                self.T_Mw = 1.0 - (6.5 - self._M) / 1.5
+                self._T_Mw = 1.0 - (6.5 - self._M) / 1.5
             else:
-                self.T_Mw = 1.0
+                self._T_Mw = 1.0
 
             if self.SlipCategory == 'SS':
                 self.__computeSS()
@@ -320,7 +320,7 @@ class Bayless2013(object):
         ix = [self._T == self.__periods]
         C0 = self.__c0ss[ix]
         C1 = self.__c1ss[ix]
-        self._fd_SS = (C0 + C1 * f_geom) * T_CD * self.T_Mw * T_Az
+        self._fd_SS = (C0 + C1 * f_geom) * T_CD * self._T_Mw * T_Az
 
     def __computeAz(self):
         Az = np.ones_like(self.__Rx) * np.pi / 2.0
