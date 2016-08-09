@@ -22,7 +22,7 @@ def plot_fault_wire3d(fault, ax = None):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
     else:
-        if 'xlim3d' not in list(ax.properties.keys()):
+        if 'xlim3d' not in list(ax.properties().keys()):
             raise ShakeMapException(
                 'Non-3d axes object passed to plot() method.')
     for quad in fault.getQuadrilaterals():

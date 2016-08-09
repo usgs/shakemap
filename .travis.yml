@@ -45,10 +45,11 @@ install:
     #--------------------------
     # Only required for testing
     #--------------------------
-    - pip install flake8
-    - pip install pep8-naming
-    - pip install pytest
-    - pip install pytest-cov
+    - conda install --yes pytest
+    - conda install --yes pytest-cov
+    - conda install --yes pytest-mpl
+    - conda install --yes flake8
+    - conda install --yes pep8-naming
     #---------------------
     # Install shakemap
     #---------------------
