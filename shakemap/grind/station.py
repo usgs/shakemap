@@ -237,7 +237,11 @@ class StationList(object):
                     for imt_type, imt_dict in pgm_dict.items():
                         imtquery = 'SELECT id FROM imt WHERE imt_type == "%s"' % imt_type
                         cursor.execute(imtquery)
-                        imtid = cursor.fetchone()[0]
+                        this_row = cursor.fetchone()
+                        if this_row is not None:
+                            imtid = this_row[0]
+                        else:
+                            continue
                         amp = imt_dict['value']
                         if np.isnan(amp):
                             amp = 'NULL'
@@ -279,7 +283,7 @@ class StationList(object):
             try:
                 imtdict[imt] = self.cursor.fetchone()[0]
             except:
-                x = 1
+                pass
 
         for row in rows:
             sid, lat, lon, code, network = row
@@ -303,7 +307,11 @@ class StationList(object):
                 ampquery = 'SELECT amp FROM amp WHERE station_id=%i AND imt_id=%i' % (
                     sid, imtid)
                 self.cursor.execute(ampquery)
-                imtvalue = self.cursor.fetchone()[0]
+                this_row = self.cursor.fetchone()
+                if this_row is not None:
+                    imtvalue = this_row[0]
+                else:
+                    continue
                 gemimt = GEM_IMT.from_string(IMT_MAP[imt])
                 dmmi = gmice.getMIfromGM(imtvalue, gemimt, dists=ddict[
                                          'repi'][0], mag=emag)
@@ -317,7 +325,11 @@ class StationList(object):
             mmiquery = 'SELECT amp FROM amp WHERE station_id=%i AND imt_id=%i' % (sid, imtdict[
                                                                                   'mmi'])
             self.cursor.execute(mmiquery)
-            mmivalue = self.cursor.fetchone()[0]
+            this_row = self.cursor.fetchone()
+            if this_row is not None:
+                mmivalue = this_row[0]
+            else:
+                continue
             for imt, imtid in imtdict.items():
                 if not imt.startswith('mmi_'):
                     continue
@@ -365,20 +377,24 @@ class StationList(object):
                     c = 1
                 imtquery = 'SELECT id FROM imt WHERE imt_type = "%s"' % imt
                 self.cursor.execute(imtquery)
-                imtid = self.cursor.fetchone()[0]
+                this_row = self.cursor.fetchone()
+                if this_row is not None:
+                    imtid = this_row[0]
+                else:
+                    continue
                 ampquery = 'SELECT amp,uncertainty FROM amp WHERE amp.flag = "0" AND imt_id = %i AND station_id=%i' % (
                     imtid, sid)
                 self.cursor.execute(ampquery)
-                row = self.cursor.fetchone()
-                if row is not None:
-                    if row[0] is None:
+                this_row = self.cursor.fetchone()
+                if this_row is not None:
+                    if this_row[0] is None:
                         amp = np.nan
                     else:
-                        amp = row[0]
-                    if row[1] is None:
+                        amp = this_row[0]
+                    if this_row[1] is None:
                         unc = np.nan
                     else:
-                        unc = row[0]
+                        unc = this_row[1]
                     df.ix[rowidx, imt] = amp
                     df.ix[rowidx, imt + '_unc'] = unc
 
@@ -410,14 +426,18 @@ class StationList(object):
             sid = row[0]
             imtquery = 'SELECT id FROM imt WHERE imt_type = "mmi"'
             self.cursor.execute(imtquery)
-            imtid = self.cursor.fetchone()[0]
+            this_row = self.cursor.fetchone()
+            if this_row is not None:
+                imtid = this_row[0]
+            else:
+                continue
             ampquery = 'SELECT amp,uncertainty FROM amp WHERE amp.flag = "0" AND imt_id = %i AND station_id=%i' % (
                 imtid, sid)
             self.cursor.execute(ampquery)
-            row = self.cursor.fetchone()
-            if row is not None:
-                df.ix[rowidx, 'mmi'] = row[0]
-                df.ix[rowidx, 'mmi_unc'] = row[1]
+            this_row = self.cursor.fetchone()
+            if this_row is not None:
+                df.ix[rowidx, 'mmi'] = this_row[0]
+                df.ix[rowidx, 'mmi_unc'] = this_row[1]
 
             rowidx += 1
 
