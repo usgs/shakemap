@@ -1,3 +1,4 @@
+import numpy as np
 
 class NewmarkHall1982(object):
 
@@ -17,6 +18,10 @@ class NewmarkHall1982(object):
     - 1.65 is the N&H amplification factor for velocity at 5% damping
     - 386.09 is the acceleration of gravity in inches per second per g
 
+    The sigma factor was computed from an average sigma value determined
+    by plotting PGV/PSA10 versus Distance for earthquakes with magnitudes
+    greater than or equal to 5.0.
+    
     To do
         - Inherit from ConvertIMT class. 
 
@@ -26,37 +31,52 @@ class NewmarkHall1982(object):
     """
 
     __vfact = 37.27 * 2.54
+    __vsigma = 1.6315154
 
     @staticmethod
-    def pgv2psa10(pgv):
+    def pgv2psa10(pgv, sigmaGlin):
         """
         Convert PGV in cm/s to PSA10 (spectral acceleration with oscillator
         period of 1.0 sec) in g.
 
-        **Important:** PGV must be linear units. 
+        **Important:** PGV and sigma must be linear units. 
 
         :param pgv:
-            Numpy array or float of PGV values; linear units.
+            Numpy array or float of PGV values; linear units (cm/s).
+        :param sigmaGlin:
+            Numpy array or float of standard deviation of PGV from a GMPE;
+            linear units.
         :returns:
-            Values converted to PSA10.
+            Values converted to PSA10 and total standard deviation.
         """
-        return pgv / NewmarkHall1982.__vfact
-
+        pgv = NewmarkHall1982.__vfact * NewmarkHall1982.__vfact
+        sigmaG = np.log(sigmaGlin)
+        sigmaTot = np.sqrt(((sigmaG) ** 2) + ((NewmarkHall1982.__vsigma) ** 2))
+        return pgv, exp(sigmaTot)
+    
+    
     @staticmethod
-    def psa102pgv(psa10):
+    def psa102pgv(psa10, sigmaGlin):
         """
         Convert PSA10 (spectral acceleration with oscillator period of 1.0 sec)
         in g to PGV cm/s.
 
-        **Important:** PSA10 must be linear units. 
+        **Important:** PSA10 and sigma must be linear units. 
 
         :param psa10:
-            Numpy array or float of PSA10 values; linear units.
+            Numpy array or float of PSA10 values; linear units (%g).
+        :param sigmaGlin:
+            Numpy array or float of standard deviation of PGV from a GMPE;
+            linear units.
         :returns:
-            Values converted to PGV.
+            Values converted to PGV and total standard deviation.
         """
-        return psa10 * NewmarkHall1982.__vfact
+        pgv = psa10 * NewmarkHall1982.__vfact
+        sigmaG = np.log(sigmaGlin)
+        sigmaTot = np.sqrt(((sigmaG) ** 2) + ((NewmarkHall1982.__vsigma) ** 2))
+        return pgv, exp(sigmaTot)
 
+    
     @staticmethod
     def getVfact():
         """
