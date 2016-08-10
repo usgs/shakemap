@@ -10,6 +10,7 @@ from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
 from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import CampbellBozorgnia2014
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 from openquake.hazardlib.gsim.campbell_2003 import Campbell2003
+from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006
 from openquake.hazardlib import imt, const
 
 import shakemap.grind.multigmpe as mg
@@ -140,3 +141,13 @@ def test_multigmpe():
     with pytest.raises(Exception) as a:
         gmpes = [BooreEtAl2014(), Campbell2003()]
         mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
+
+    # Try a GMPE without PGV
+#    gmpes = [Campbell2003(), AtkinsonBoore2006()]
+    gmpes = [Campbell2003()]
+    wts = [1.0]
+    mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
+    lnmu, lnsd = mgmpe.get_mean_and_stddevs(
+        sctx, rupt, dctx, iimt, stddev_types)
+
+    
