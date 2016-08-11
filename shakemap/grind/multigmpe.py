@@ -7,7 +7,8 @@ from openquake.hazardlib import const
 from openquake.hazardlib.imt import PGV
 from openquake.hazardlib.imt import SA
 
-from shakemap.grind.conversions.imt.newmark_hall_1982 import NewmarkHall1982 as nh82
+from shakemap.grind.conversions.imt.newmark_hall_1982 import NewmarkHall1982
+from shakemap.grind.conversions.imc.beyer_bommer_2006 import BeyerBommer2006
 from shakemap.grind.gmpe2shakemap import ampGmpeToShakeMap
 
 class MultiGMPE(GMPE):
@@ -35,10 +36,12 @@ class MultiGMPE(GMPE):
         """
         See superclass `method <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs>`__. 
         """
+
+        # These are arrays to hold the weighted combination of the GMPEs
         lnmu = np.zeros_like(sites.vs30)
-        lnsd2 = np.zeros_like(sites.vs30)
-        lmean = [None] * len(self.GMPEs)
-        lsd = [None] * len(self.GMPEs)
+        stddev_types = self.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        lnsd2 = [np.zeros_like(sites.vs30) for a in stddev_types]
+
         for i in range(len(self.GMPEs)):
             #---------------------------------------------------------------
             # Loop over GMPE list
@@ -63,41 +66,50 @@ class MultiGMPE(GMPE):
 
 
             #---------------------------------------------------------------
-            # Convert component
-            #---------------------------------------------------------------
-
-#            self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
-            
-            #---------------------------------------------------------------
-            # If IMT is PGV and not given by GMPE, convert from PSA10
+            # Evaluate GMPEs
             #---------------------------------------------------------------
 
             gmpe_imts = [imt.__name__ for imt in \
                          gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
             if (isinstance(imt, PGV)) and ("PGV" not in gmpe_imts):
+
+                # If IMT is PGV and not given by GMPE, convert from PSA10
+
                 psa10, psa10sd = gmpe.get_mean_and_stddevs(
                     sites, rup, dists, SA(1.0), stddev_types)
-                convertimt = nh82()
-                # Note that we need to make this compatible with NH82 module.
-                # Lets remove the ampGmpeToShakeMap module, do the IMT conversion
-                # above and work directly with log(g) units rather than g. 
-                psa10_sm = ampGmpeToShakeMap(psa10, gmpe, SA(1.0))
-                lmean = convertimt.psa102pgv(psa10_sm/100)
-                lsd = psa10sd # need to update here to add in SD of conversion
+                lmean, lsd = NewmarkHall1982.psa102pgv(psa10, psa10sd[0])
             else:
                 lmean, lsd = gmpe.get_mean_and_stddevs(
                     sites, rup, dists, imt, stddev_types)
+
+            #---------------------------------------------------------------
+            # Convertions due to component definition
+            #---------------------------------------------------------------
+
+            imc_in = gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
+            imc_out = self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
+            lmean = BeyerBommer2006.ampIMCtoIMC(lmean, imc_in, imc_out, imt)
+            for j in range(len(lnsd2)):
+                lsd[j] = BeyerBommer2006.sigmaIMCtoIMC(
+                    lsd[j], imc_in, imc_out, imt)
 
             #---------------------------------------------------------------
             # Compute weighted mean and sd
             #---------------------------------------------------------------
 
             lnmu = lnmu + self.weights[i] * lmean
-            lnsd2 = lnsd2 + self.weights[i] * (lmean**2 + lsd**2)
 
-        lnsd2 = lnsd2 - lnmu**2
+            # Note: the lnsd2 calculation isn't complete until we drop out of
+            # this loop and substract lnmu**2
+            for j in range(len(lnsd2)):
+                lnsd2[j] = lnsd2[j] + self.weights[i] * (lmean**2 + lsd[j]**2)
 
-        return lnmu, np.sqrt(lnsd2)
+        for j in range(len(lnsd2)):
+            lnsd2[j] = lnsd2[j] - lnmu**2
+
+        lnsd = [np.sqrt(a) for a in lnsd2]
+
+        return lnmu, lnsd
 
     @classmethod
     def from_list(cls, GMPEs, weights, imc = const.IMC.GREATER_OF_TWO_HORIZONTAL):
@@ -117,16 +129,22 @@ class MultiGMPE(GMPE):
             of the ShakeMap manual. 
         """
 
-        #---------------------------------------------
+        #---------------------------------------------------------
         # Check that weights sum to 1.0:
-        #---------------------------------------------
+        #---------------------------------------------------------
 
         if np.sum(weights) != 1.0:
             raise Exception('Weights must sum to one.')
 
-        #---------------------------------------------
+        #---------------------------------------------------------
+        # Check that length of weights equals length of gmpe list
+        #---------------------------------------------------------
+        if len(weights) != len(GMPEs):
+            raise Exception('Length of weights must match length of GMPE list.')
+
+        #---------------------------------------------------------
         # Check that GMPEs is a list of OQ GMPE instances
-        #---------------------------------------------
+        #---------------------------------------------------------
 
         for g in GMPEs:
             if not isinstance(g, GMPE):
@@ -167,18 +185,19 @@ class MultiGMPE(GMPE):
         self.IMCs = [g.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT for g in GMPEs]
 
         #---------------------------------------------------------
-        # For ShakeMap, the target IMC is max
+        # Store the component
         #---------------------------------------------------------
         self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = imc
 
         #---------------------------------------------------------
         # For scenarios, we only care about total standard deviation,
         # but for real-time we need inter and intra. For now, lets
-        # just take the intersection of the different GMPEs to make life
-        # slightly easier in the short term.
+        # just use total to make life easier. 
         #---------------------------------------------------------
-        stdlist = [set(g.DEFINED_FOR_STANDARD_DEVIATION_TYPES) for g in GMPEs]
-        self.DEFINED_FOR_STANDARD_DEVIATION_TYPES = set.intersection(*stdlist)
+#        stdlist = [set(g.DEFINED_FOR_STANDARD_DEVIATION_TYPES) for g in GMPEs]
+        self.DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
+            const.StdDev.TOTAL
+        ])
 
         #---------------------------------------------------------
         # Need union of site parameters, but it is complicated by the
