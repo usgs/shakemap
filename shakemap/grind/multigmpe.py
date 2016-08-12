@@ -9,7 +9,7 @@ from openquake.hazardlib.imt import SA
 
 from shakemap.grind.conversions.imt.newmark_hall_1982 import NewmarkHall1982
 from shakemap.grind.conversions.imc.beyer_bommer_2006 import BeyerBommer2006
-from shakemap.grind.gmpe2shakemap import ampGmpeToShakeMap
+
 
 class MultiGMPE(GMPE):
     """
