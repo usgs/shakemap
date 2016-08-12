@@ -16,7 +16,7 @@ class BeyerBommer2006(object):
     +===========================+========================+
     | AVERAGE_HORIZONTAL        | GMxy (Geometric mean)  |
     +---------------------------+------------------------+
-    | HORIZONTAL                | ???                    |
+    | HORIZONTAL                | Random?                |
     +---------------------------+------------------------+
     | MEDIAN_HORIZONTAL         | AMxy (Arithmetic mean) |
     +---------------------------+------------------------+
@@ -31,18 +31,29 @@ class BeyerBommer2006(object):
     | VERTICAL                  | ---                    |
     +---------------------------+------------------------+
 
-    Note that AVERAGE_HORIZONTAL is the "reference" type
+    Notes 
+
+        - AVERAGE_HORIZONTAL is the "reference" type. 
+        - The OQ IMC "HORIZONAL" indicates that the horizontal IMC category
+          may be ambiguous. In these cases, we are assuming that it is a 
+          random horizontal component as a default.
 
     To do
+
         - Inherit from ConvertIMC class. 
 
-    References: 
+    References
+
         Beyer, K., & Bommer, J. J. (2006). Relationships between median values
         and between aleatory variabilities for different definitions of the 
         horizontal component of motion. Bulletin of the Seismological Society of
         America, 96(4A), 1512-1522. 
         `[link] <http://www.bssaonline.org/content/96/4A/1512.short>`__
     """
+
+    # c12 = median ratio
+    # c34 = std. of log ratio
+    # R = ratio of sigma_pga values
     __pga_pgv_col_names = ['c12', 'c34', 'R']
     __sa_col_names = ['c1', 'c2', 'c3', 'c4', 'R']
     __pga_dict = {
@@ -50,18 +61,21 @@ class BeyerBommer2006(object):
         const.IMC.GMRotI50: dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
         const.IMC.RotD50: dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
         const.IMC.RANDOM_HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
+        const.IMC.HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
         const.IMC.GREATER_OF_TWO_HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.1, 0.05, 1.02])))}
     __pgv_dict = {
         const.IMC.MEDIAN_HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.0, 0.01, 1.00]))),
         const.IMC.GMRotI50: dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
         const.IMC.RotD50: dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
         const.IMC.RANDOM_HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
+        const.IMC.HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
         const.IMC.GREATER_OF_TWO_HORIZONTAL: dict(list(zip(__pga_pgv_col_names, [1.1, 0.05, 1.02])))}
     __sa_dict = {
         const.IMC.MEDIAN_HORIZONTAL: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.01, 0.02, 1.00]))),
         const.IMC.GMRotI50: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.03, 0.04, 1.00]))),
         const.IMC.RotD50: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.02, 0.03, 1.00]))),
         const.IMC.RANDOM_HORIZONTAL: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.07, 0.11, 1.05]))),
+        const.IMC.HORIZONTAL: dict(list(zip(__sa_col_names, [1.0, 1.0, 0.07, 0.11, 1.05]))),
         const.IMC.GREATER_OF_TWO_HORIZONTAL: dict(list(zip(__sa_col_names, [1.1, 1.2, 0.04, 0.07, 1.02])))}
 
     @staticmethod
@@ -69,52 +83,30 @@ class BeyerBommer2006(object):
         """ 
         Returns amps converted from one IMC to another.
 
-        **Important**: 
+        **Important**:
 
-            - Assumes the input amps are in linear (not log) space 
-            - IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
+            - Assumes the input amps are in natural log (not linear) space
+            - IMC type 'VERTICAL' is not supported
 
-        :param amps: 
-            Numpy array of ground motion amplitudes. 
+        :param amps:
+            Numpy array of ground motion amplitudes.
         :param imc_in:
-            OpenQuake IMC type of the input amp array. 
+            OpenQuake IMC type of the input amp array.
             `[link] <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__
         :param imc_out:
-            Desired OpenQuake IMC type of the output amps. 
+            Desired OpenQuake IMC type of the output amps.
             `[link] <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__
         :param imt:
-            OpenQuake IMT of the input amps (must be one of PGA, PGV, or SA). 
+            OpenQuake IMT of the input amps (must be one of PGA, PGV, or SA).
             `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
         :returns:
-            Numpy array of amps converted from imc_in to imc_out
+            Numpy array of amps converted from imc_in to imc_out.
         """
-        if imc_in == const.IMC.AVERAGE_HORIZONTAL:
-            # The amps are already in the B&B "reference" type ("GM", i.e.,
-            # geometric mean)
-            denom = 1
-        elif imc_in == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-                imc_in == const.IMC.MEDIAN_HORIZONTAL or \
-                imc_in == const.IMC.GMRotI50 or \
-                imc_in == const.IMC.RotD50 or \
-                imc_in == const.IMC.RANDOM_HORIZONTAL:
-            denom = BeyerBommer2006.__GM2other(imt, imc_in)
-        else:
-            raise ValueError('unknown IMC %r' % imc_in)
+        
+        denom = BeyerBommer2006.__GM2other(imt, imc_in)
+        numer = BeyerBommer2006.__GM2other(imt, imc_out)
 
-        if imc_out == const.IMC.AVERAGE_HORIZONTAL:
-            # The previous step will put the amps into the B&B "reference"
-            # type ("GM", i.e. geometric mean)
-            numer = 1
-        elif imc_out == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-                imc_out == const.IMC.MEDIAN_HORIZONTAL or \
-                imc_out == const.IMC.GMRotI50 or \
-                imc_out == const.IMC.RotD50 or \
-                imc_out == const.IMC.RANDOM_HORIZONTAL:
-            numer = BeyerBommer2006.__GM2other(imt, imc_out)
-        else:
-            raise ValueError('unknown IMC %r' % imc_out)
-
-        return amps * (numer / denom)
+        return amps + np.log(numer / denom)
 
     @staticmethod
     def sigmaIMCtoIMC(sigmas, imc_in, imc_out, imt):
@@ -123,7 +115,7 @@ class BeyerBommer2006(object):
 
         **Important**: 
 
-            - Assumes the input sigmas are in log space
+            - Assumes the input sigmas are in natural log space
             - IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
 
         :param sigmas:
@@ -141,42 +133,52 @@ class BeyerBommer2006(object):
         :returns:
             Numpy array of standard deviations converted from imc_in to imc_out
         """
-        if imc_in == const.IMC.AVERAGE_HORIZONTAL:
-            # The amps are already in the B&B "reference" type ("GM", i.e.,
-            # geometric mean)
-            R = 1
-            sig_log_ratio = 0
-        elif imc_in == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-                imc_in == const.IMC.MEDIAN_HORIZONTAL or \
-                imc_in == const.IMC.GMRotI50 or\
-                imc_in == const.IMC.RotD50 or\
-                imc_in == const.IMC.RANDOM_HORIZONTAL:
-            R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_in)
-        else:
-            raise ValueError('unknown IMC %r' % imc_in)
 
+        #---------------------------------------------------
+        # Take input sigma to geometric mean sigma. 
+        # Solve eqn 8 for sigma_GM2, which is sigma_logSa_GM
+        # This is the sigma converted to geometric mean
+        # (i.e., reference component). 
+        #---------------------------------------------------
+        R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_in)
         sigma_GM2 = (sigmas**2 - sig_log_ratio**2) / R**2
 
-        if imc_out == const.IMC.AVERAGE_HORIZONTAL:
-            # The sigmas (sigma_GM2) are already in the B&B "reference" type ("GM", i.e.,
-            # geometric mean)
-            R = 1
-            sig_log_ratio = 0
-        elif imc_out == const.IMC.GREATER_OF_TWO_HORIZONTAL or \
-                imc_out == const.IMC.MEDIAN_HORIZONTAL or \
-                imc_out == const.IMC.GMRotI50 or\
-                imc_out == const.IMC.RotD50 or\
-                imc_out == const.IMC.RANDOM_HORIZONTAL:
-            R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_out)
-        else:
-            raise ValueError('unknown IMC %r' % imc_out)
-
+        #---------------------------------------------------
+        # Evaluate equation 8 to go from GM to requested IMC
+        #---------------------------------------------------
+        R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_out)
         sigma_out = np.sqrt(sigma_GM2 * R**2 + sig_log_ratio**2)
+
         return sigma_out
 
     @staticmethod
     def __GM2other(imt, imc):
-        """ Helper function to extract coefficients from the parameter tables """
+        """
+        Helper function to extract coefficients from the parameters for 
+        converting the median ground motions.
+
+        :param imt:
+            Intensity measure type.
+        :param imc:
+            Intensity measure component.
+        :returns:
+            Median ratios. This is directly from Table 2 for PGA and PGV, and
+            computed from coefficients in Table 3 along with eqn 10 for Sa. 
+        """
+
+        if imc == const.IMC.AVERAGE_HORIZONTAL:
+            # The amps are already in the B&B "reference" type ("GM", i.e.,
+            # geometric mean)
+            return 1.
+
+        if imc != const.IMC.GREATER_OF_TWO_HORIZONTAL and \
+                imc != const.IMC.MEDIAN_HORIZONTAL and \
+                imc != const.IMC.GMRotI50 and \
+                imc != const.IMC.RotD50 and \
+                imc != const.IMC.RANDOM_HORIZONTAL and \
+                imc != const.IMC.HORIZONTAL:
+            raise ValueError('unknown IMC %r' % imc)
+
         if 'PGA' in imt:
             return BeyerBommer2006.__pga_dict[imc]['c12']
         elif 'PGV' in imt:
@@ -200,7 +202,31 @@ class BeyerBommer2006(object):
 
     @staticmethod
     def __GM2otherSigma(imt, imc):
-        """ Helper function to extract coefficients from the parameter tables """
+        """
+        Helper function to extract coefficients from the parameters for
+        converting standard deviations. 
+
+        :param imt:
+            Intensity measure type.
+        :param imc:
+            Intensity measure component.
+        :returns:
+            Coefficients: R (ratio of sigma values), standard deviation of sigma ratios.  
+        """
+
+        if imc == const.IMC.AVERAGE_HORIZONTAL:
+            # The amps are already in the B&B "reference" type ("GM", i.e.,
+            # geometric mean)
+            return 1., 0.
+
+        if imc != const.IMC.GREATER_OF_TWO_HORIZONTAL and \
+                imc != const.IMC.MEDIAN_HORIZONTAL and \
+                imc != const.IMC.GMRotI50 and \
+                imc != const.IMC.RotD50 and \
+                imc != const.IMC.RANDOM_HORIZONTAL and \
+                imc != const.IMC.HORIZONTAL:
+            raise ValueError('unknown IMC %r' % imc)
+
         if 'PGA' in imt:
             return BeyerBommer2006.__pga_dict[imc]['R'], BeyerBommer2006.__pga_dict[imc]['c34']
         elif 'PGV' in imt:

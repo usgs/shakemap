@@ -4,9 +4,12 @@ import numpy as np
 
 from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib import const
+from openquake.hazardlib.imt import PGV
+from openquake.hazardlib.imt import SA
 
-from shakemap.grind.conversions.imc.beyer_bommer_2006 import BeyerBommer2006 as bb06
-
+from shakemap.grind.conversions.imt.newmark_hall_1982 import NewmarkHall1982
+from shakemap.grind.conversions.imc.beyer_bommer_2006 import BeyerBommer2006
+from shakemap.grind.gmpe2shakemap import ampGmpeToShakeMap
 
 class MultiGMPE(GMPE):
     """
@@ -14,8 +17,10 @@ class MultiGMPE(GMPE):
 
     To do
 
-        * Convert IMT (e.g., PGV) from another IMT if it is not available from
-          the GMPE in get_mean_and_stddevs.
+        * Update IMT conversion to account for additional uncertainty. 
+        * Develop a method to include GMPEs that don't have a site term. 
+        * Add a check that the lenght of the weights match the length 
+          of the GMPE list. 
 
     """
 
@@ -31,12 +36,20 @@ class MultiGMPE(GMPE):
         """
         See superclass `method <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs>`__. 
         """
+
+        # These are arrays to hold the weighted combination of the GMPEs
         lnmu = np.zeros_like(sites.vs30)
-        lnsd2 = np.zeros_like(sites.vs30)
-        lmean = [None] * len(self.GMPEs)
-        lsd = [None] * len(self.GMPEs)
+        stddev_types = self.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        lnsd2 = [np.zeros_like(sites.vs30) for a in stddev_types]
+
         for i in range(len(self.GMPEs)):
+            #---------------------------------------------------------------
+            # Loop over GMPE list
+            #---------------------------------------------------------------
+
             gmpe = self.GMPEs[i]
+
+            #---------------------------------------------------------------
             # Need to select the appropriate z1pt0 value for different GMPEs.
             # Note that these are required site parameters, so even though
             # OQ has these equations built into the class, the arrays must
@@ -44,39 +57,62 @@ class MultiGMPE(GMPE):
             # a request to OQ to provide a subclass that that computes the
             # depth parameters when not provided (as is done for BSSA14 but
             # not the others).
+            #---------------------------------------------------------------
+
             if gmpe == 'AbrahamsonEtAl2014()':
                 sites.z1pt0 = sites.z1pt0ask14
             if gmpe == 'BooreEtAl2014()' or gmpe == 'ChiouYoungs2014()':
                 sites.z1pt0 = sites.z1pt0cy14
-            lmean[i], lsd[i] = gmpe.get_mean_and_stddevs(
-                sites, rup, dists, imt, stddev_types)
 
-            # Convert component type.
-            # Note: conversion is based on linear amps (not log)!!
-            inc_in = self.IMCs[i]
-            inc_out = self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
-            lmean[i] = np.log(
-                bb06.ampIMCtoIMC(
-                    np.exp(lmean[i]),
-                    inc_in,
-                    inc_out,
-                    imt))
-            lsd[i] = np.log(
-                bb06.sigmaIMCtoIMC(
-                    np.exp(lsd[i]),
-                    inc_in,
-                    inc_out,
-                    imt))
 
+            #---------------------------------------------------------------
+            # Evaluate GMPEs
+            #---------------------------------------------------------------
+
+            gmpe_imts = [imt.__name__ for imt in \
+                         gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
+            if (isinstance(imt, PGV)) and ("PGV" not in gmpe_imts):
+
+                # If IMT is PGV and not given by GMPE, convert from PSA10
+
+                psa10, psa10sd = gmpe.get_mean_and_stddevs(
+                    sites, rup, dists, SA(1.0), stddev_types)
+                lmean, lsd = NewmarkHall1982.psa102pgv(psa10, psa10sd[0])
+            else:
+                lmean, lsd = gmpe.get_mean_and_stddevs(
+                    sites, rup, dists, imt, stddev_types)
+
+            #---------------------------------------------------------------
+            # Convertions due to component definition
+            #---------------------------------------------------------------
+
+            imc_in = gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
+            imc_out = self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
+            lmean = BeyerBommer2006.ampIMCtoIMC(lmean, imc_in, imc_out, imt)
+            for j in range(len(lnsd2)):
+                lsd[j] = BeyerBommer2006.sigmaIMCtoIMC(
+                    lsd[j], imc_in, imc_out, imt)
+
+            #---------------------------------------------------------------
             # Compute weighted mean and sd
-            lnmu = lnmu + self.weights[i] * lmean[i]
-            lnsd2 = lnsd2 + self.weights[i] * (lmean[i]**2 + lsd[i]**2)
-        lnsd2 = lnsd2 - lnmu**2
+            #---------------------------------------------------------------
 
-        return lnmu, np.sqrt(lnsd2)
+            lnmu = lnmu + self.weights[i] * lmean
+
+            # Note: the lnsd2 calculation isn't complete until we drop out of
+            # this loop and substract lnmu**2
+            for j in range(len(lnsd2)):
+                lnsd2[j] = lnsd2[j] + self.weights[i] * (lmean**2 + lsd[j]**2)
+
+        for j in range(len(lnsd2)):
+            lnsd2[j] = lnsd2[j] - lnmu**2
+
+        lnsd = [np.sqrt(a) for a in lnsd2]
+
+        return lnmu, lnsd
 
     @classmethod
-    def from_list(cls, GMPEs, weights):
+    def from_list(cls, GMPEs, weights, imc = const.IMC.GREATER_OF_TWO_HORIZONTAL):
         """Construct a MultiGMPE instance from lists of GMPEs and weights.
 
         :param GMPEs:
@@ -84,13 +120,32 @@ class MultiGMPE(GMPE):
             `GMPE <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#built-in-gsims>`__ 
             instances.
         :param weights:
-            List of weights; must sum to 1.0. 
+            List of weights; must sum to 1.0.
+        :param imc: Requested intensity measure component. Must be one listed
+            `here <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__.
+            The amplitudes returned by the GMPEs will be converted to this IMT. 
+            Default is 'GREATER_OF_TWO_HORIZONTAL', which is used by ShakeMap. 
+            See discussion in `this section <http://usgs.github.io/shakemap/tg_choice_of_parameters.html#use-of-peak-values-rather-than-mean>`__
+            of the ShakeMap manual. 
         """
+
+        #---------------------------------------------------------
         # Check that weights sum to 1.0:
+        #---------------------------------------------------------
+
         if np.sum(weights) != 1.0:
             raise Exception('Weights must sum to one.')
 
+        #---------------------------------------------------------
+        # Check that length of weights equals length of gmpe list
+        #---------------------------------------------------------
+        if len(weights) != len(GMPEs):
+            raise Exception('Length of weights must match length of GMPE list.')
+
+        #---------------------------------------------------------
         # Check that GMPEs is a list of OQ GMPE instances
+        #---------------------------------------------------------
+
         for g in GMPEs:
             if not isinstance(g, GMPE):
                 raise Exception("\"%s\" is not a GMPE instance." % g)
@@ -99,8 +154,11 @@ class MultiGMPE(GMPE):
         self.GMPEs = GMPEs
         self.weights = weights
 
+        #---------------------------------------------------------
         # Check that GMPEs all are for the same tectonic region,
         # otherwise raise exception.
+        #---------------------------------------------------------
+
         tmp = set([i.DEFINED_FOR_TECTONIC_REGION_TYPE for i in GMPEs])
         if len(tmp) == 1:
             self.DEFINED_FOR_TECTONIC_REGION_TYPE = \
@@ -108,6 +166,7 @@ class MultiGMPE(GMPE):
         else:
             raise Exception('GMPEs are not all for the same tectonic region.')
 
+        #---------------------------------------------------------
         # Combine the intensity measure types. This is problematic:
         #   - Logically, we should only include the intersection of the sets
         #     of imts for the different GMPEs.
@@ -115,33 +174,47 @@ class MultiGMPE(GMPE):
         #     subduction zones do not have PGV.
         #   - So instead we will use the union of the imts and then convert
         #     to get the missing imts later in get_mean_and_stddevs.
+        #---------------------------------------------------------
+
         imts = [g.DEFINED_FOR_INTENSITY_MEASURE_TYPES for g in GMPEs]
         self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set.union(*imts)
 
+        #---------------------------------------------------------
         # Store intensity measure types for conversion in get_mean_and_stddevs.
+        #---------------------------------------------------------
         self.IMCs = [g.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT for g in GMPEs]
 
-        # For ShakeMap, the target IMC is max
-        self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = \
-            const.IMC.GREATER_OF_TWO_HORIZONTAL
+        #---------------------------------------------------------
+        # Store the component
+        #---------------------------------------------------------
+        self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = imc
 
+        #---------------------------------------------------------
         # For scenarios, we only care about total standard deviation,
         # but for real-time we need inter and intra. For now, lets
-        # just take the intersection of the different GMPEs to make life
-        # slightly easier.
-        stdlist = [set(g.DEFINED_FOR_STANDARD_DEVIATION_TYPES) for g in GMPEs]
-        self.DEFINED_FOR_STANDARD_DEVIATION_TYPES = set.intersection(*stdlist)
+        # just use total to make life easier. 
+        #---------------------------------------------------------
+#        stdlist = [set(g.DEFINED_FOR_STANDARD_DEVIATION_TYPES) for g in GMPEs]
+        self.DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
+            const.StdDev.TOTAL
+        ])
 
+        #---------------------------------------------------------
         # Need union of site parameters, but it is complicated by the
         # different depth parameter flavors.
+        #---------------------------------------------------------
         sitepars = [g.REQUIRES_SITES_PARAMETERS for g in GMPEs]
         self.REQUIRES_SITES_PARAMETERS = set.union(*sitepars)
 
+        #---------------------------------------------------------
         # Union of rupture parameters
+        #---------------------------------------------------------
         ruppars = [g.REQUIRES_RUPTURE_PARAMETERS for g in GMPEs]
         self.REQUIRES_RUPTURE_PARAMETERS = set.union(*ruppars)
 
+        #---------------------------------------------------------
         # Union of distance parameters
+        #---------------------------------------------------------
         distpars = [g.REQUIRES_DISTANCES for g in GMPEs]
         self.REQUIRES_DISTANCES = set.union(*distpars)
 

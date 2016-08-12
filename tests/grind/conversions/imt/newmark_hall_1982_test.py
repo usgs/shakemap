@@ -1,17 +1,21 @@
 
-import shakemap.grind.conversions.imt.newmark_hall_1982 as nh82
+import numpy as np
+
+from shakemap.grind.conversions.imt.newmark_hall_1982 import NewmarkHall1982
 
 
 def test_newmarkhall1982():
     # Inputs
-    PGVin = 10
-    PSA10in = 0.1
+    PGVin = np.log(10)
+    PSA10in = np.log(0.1)
+    sd = 0.6
 
     # NewmarkHall1982
-    PSA10out = nh82.NewmarkHall1982.pgv2psa10(PGVin)
-    PGVout = nh82.NewmarkHall1982.psa102pgv(PSA10in)
-    vfact = nh82.NewmarkHall1982.getVfact()
+    PGVout, PGVsdout = NewmarkHall1982.psa102pgv(PSA10in, sd)
+    mfact = NewmarkHall1982.getConversionFactor()
+    lnsig = NewmarkHall1982.getLnSigma()
 
-    assert abs(PSA10out - 0.1056348) < 0.0001
-    assert abs(PGVout - 9.46658) < 0.001
-    assert abs(vfact - 94.6658) < 0.001
+    assert abs(PGVout - np.log(9.46658)) < 0.001
+    assert abs(PGVsdout - 0.790489) < 0.001
+    assert abs(mfact - 94.6658) < 0.001
+    assert abs(lnsig - 0.5146578) < 0.001

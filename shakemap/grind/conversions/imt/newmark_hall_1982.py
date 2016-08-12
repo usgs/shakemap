@@ -1,3 +1,5 @@
+
+import copy
 import numpy as np
 
 class NewmarkHall1982(object):
@@ -30,57 +32,50 @@ class NewmarkHall1982(object):
         Earthquake Engineering Research Institute, El Cerrito, California. 
     """
 
-    __vfact = 37.27 * 2.54
-    __vsigma = 1.6315154
+    __lnfact = np.log(37.27 * 2.54)
+    __lnsigma = 0.5146578
 
     @staticmethod
-    def pgv2psa10(pgv, sigmaGlin):
-        """
-        Convert PGV in cm/s to PSA10 (spectral acceleration with oscillator
-        period of 1.0 sec) in g.
-
-        **Important:** PGV and sigma must be linear units. 
-
-        :param pgv:
-            Numpy array or float of PGV values; linear units (cm/s).
-        :param sigmaGlin:
-            Numpy array or float of standard deviation of PGV from a GMPE;
-            linear units.
-        :returns:
-            Values converted to PSA10 and total standard deviation.
-        """
-        pgv = NewmarkHall1982.__vfact * NewmarkHall1982.__vfact
-        sigmaG = np.log(sigmaGlin)
-        sigmaTot = np.sqrt(((sigmaG) ** 2) + ((NewmarkHall1982.__vsigma) ** 2))
-        return pgv, exp(sigmaTot)
-    
-    
-    @staticmethod
-    def psa102pgv(psa10, sigmaGlin):
+    def psa102pgv(psa10, sigma):
         """
         Convert PSA10 (spectral acceleration with oscillator period of 1.0 sec)
-        in g to PGV cm/s.
+        to PGV.
 
-        **Important:** PSA10 and sigma must be linear units. 
+        **Important:** PSA10 and sigma must be logarithmic units. 
 
         :param psa10:
-            Numpy array or float of PSA10 values; linear units (%g).
-        :param sigmaGlin:
+            Numpy array or float of PSA10 values; units must be natural log 
+            of g.
+        :param sigma:
             Numpy array or float of standard deviation of PGV from a GMPE;
-            linear units.
+            units must be natural log.
         :returns:
-            Values converted to PGV and total standard deviation.
+            Two arrays
+                - Array of PGV iwth natural log of cm/s units.
+                - Array of its standard deviation with natural log units. 
         """
-        pgv = psa10 * NewmarkHall1982.__vfact
-        sigmaG = np.log(sigmaGlin)
-        sigmaTot = np.sqrt(((sigmaG) ** 2) + ((NewmarkHall1982.__vsigma) ** 2))
-        return pgv, exp(sigmaTot)
+        pgv = psa10 + NewmarkHall1982.__lnfact
+
+        sigmaTot = np.sqrt((sigma ** 2) +
+                           (NewmarkHall1982.__lnsigma ** 2))
+
+        return pgv, sigmaTot
 
     
     @staticmethod
-    def getVfact():
+    def getConversionFactor():
         """
         :returns: 
-            The Newmark and Hall (1982) conversion factor. 
+            The Newmark and Hall (1982) multiplicative conversion factor for 
+            convering Sa(1.0) to PGV (cm/s). 
         """
-        return NewmarkHall1982.__vfact
+        return np.exp(NewmarkHall1982.__lnfact)
+
+    @staticmethod
+    def getLnSigma():
+        """
+        :returns: 
+            The the estimate of the logarithmic standard deviation of the PGV
+            predicted by Newmark and Hall (1982). 
+        """
+        return copy.copy(NewmarkHall1982.__lnsigma)
