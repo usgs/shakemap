@@ -127,18 +127,19 @@ def test_multigmpe():
     np.testing.assert_allclose(lnsd[0], lnsdd)
 
     # Check for exception due to weights:
-    wts = [0.25, 0.25, 0.25, 0.25 + 1e-4]
     with pytest.raises(Exception) as a:
+        wts = [0.25, 0.25, 0.25, 0.25 + 1e-4]
         mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
 
     # Check exception on GMPE check
-    wts = [0.25, 0.25, 0.25, 0.25]
     with pytest.raises(Exception) as a:
+        wts = [1.0]
         mgmpe = mg.MultiGMPE.from_list(['BA08'], wts)
 
     # Check exception on tectonic region
     with pytest.raises(Exception) as a:
         gmpes = [BooreEtAl2014(), Campbell2003()]
+        wts = [0.5, 0.5]
         mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
 
     # Check exception on length of gmpe and weight lenghts
@@ -148,8 +149,7 @@ def test_multigmpe():
         mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
     
 
-    # Try a GMPE without PGV
-#    gmpes = [Campbell2003(), AtkinsonBoore2006()]
+    # Check PGV from a GMPE without PGV
     gmpes = [Campbell2003()]
     wts = [1.0]
     mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
