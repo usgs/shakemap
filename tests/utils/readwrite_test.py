@@ -77,6 +77,57 @@ def test_read_nshmp_fault_xml():
     assert sub[0]['IncrementalMfd'][2]['type'] == 'SINGLE'
     assert sub[0]['IncrementalMfd'][2]['weight'] == '0.333'
 
+def test_read_nshmp_grid_xml():
+    file = os.path.join(datdir, 'USGS_grid.xml')
+    sub = read_nshmp_rlme_xml(file)
+
+    # Test Settings
+    mfds = sub['Settings']['DefaultMfds']
+    srcp = sub['Settings']['SourceProperties']
+    assert [m['a'] for m in mfds] == ['0.0', '0.0', '0.0', '0.0']
+    assert [m['b'] for m in mfds] == ['1.0', '1.0', '1.0', '1.0']
+    assert [m['dMag'] for m in mfds] == ['0.1', '0.1', '0.1', '0.1']
+    assert [m['mMax'] for m in mfds] == ['6.45', '6.95', '7.45', '7.95']
+    assert [m['mMin'] for m in mfds] == ['4.75', '4.75', '4.75', '4.75']
+    assert [m['type'] for m in mfds] == ['GR', 'GR', 'GR', 'GR']
+    assert [m['weight'] for m in mfds] == ['0.2', '0.5', '0.2', '0.1']
+    assert srcp['focalMechMap'] == '[STRIKE_SLIP:1.0,NORMAL:0.0,REVERSE:0.0]'
+    assert srcp['magDepthMap'] == '[10.0::[5.0:1.0]]'
+    assert srcp['maxDepth'] == '22.0'
+    assert srcp['ruptureScaling'] == 'NSHM_SOMERVILLE'
+    assert srcp['strike'] == 'NaN'
+
+    # Test nodes
+    nodes = sub['Nodes']
+    z = np.array([n['dep'] for n in nodes])
+    ztarget = np.array(
+      [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.])
+    np.testing.assert_allclose(z, ztarget)
+
+    lat = np.array([n['lat'] for n in nodes])
+    lattarget = np.array(
+      [ 34.6,  34.6,  34.6,  34.6,  34.6,  34.6,  34.7,  34.7,  34.7,
+        34.7,  34.7,  34.7,  34.7,  39.5])
+    np.testing.assert_allclose(lat, lattarget)
+
+    lon = np.array([n['lon'] for n in nodes])
+    lontarget = np.array(
+      [-109.8, -109.7, -109.6, -109.5, -109.4, -109.3, -110. , -109.9,
+       -109.8, -109.7, -109.6, -109.5, -109.4, -110.7])
+    np.testing.assert_allclose(lon, lontarget)
+
+    a = np.array([float(n['a']) for n in nodes])
+    atarget = np.array(
+      [ 0.06516867,  0.06632903,  0.06741378,  0.06840201,  0.0692732 ,
+        0.07000767,  0.06527287,  0.06659666,  0.06788012,  0.06910356,
+        0.07024578,  0.07128526,  0.07220085,  0.27957186])
+    np.testing.assert_allclose(lon, lontarget)
+
+    t = np.array([n['type'] for n in nodes])
+    ttarget = ['GR', 'GR', 'GR', 'GR', 'GR', 'GR', 'GR', 'GR', 'GR', 'GR', 'GR',
+       'GR', 'GR', 'GR']
+    assert all(t == ttarget)
+
 
 def test_read_nshmp_rlme_xml():
     file = os.path.join(datdir, 'Charlevoix Seismic Zone.xml')
@@ -96,7 +147,7 @@ def test_read_nshmp_rlme_xml():
     assert srcp['ruptureScaling'] == 'NSHM_POINT_WC94_LENGTH'
     assert srcp['strike'] == 'NaN'
 
-    # Test Notes
+    # Test Nodes
     nodes = sub['Nodes']
     z = np.array([n['dep'] for n in nodes])
     ztarget = np.array(
