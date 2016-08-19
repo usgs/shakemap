@@ -5,6 +5,7 @@ import os.path
 import numpy as np
 
 from shakemap.utils.readwrite import read_nshmp_fault_xml
+from shakemap.utils.readwrite import read_nshmp_rlme_xml
 
 homedir = os.path.dirname(os.path.abspath(__file__))
 shakedir = os.path.abspath(os.path.join(homedir, '../..'))
@@ -75,3 +76,85 @@ def test_read_nshmp_fault_xml():
     assert sub[0]['IncrementalMfd'][2]['rate'] == '0.0019'
     assert sub[0]['IncrementalMfd'][2]['type'] == 'SINGLE'
     assert sub[0]['IncrementalMfd'][2]['weight'] == '0.333'
+
+
+def test_read_nshmp_rlme_xml():
+    file = os.path.join(datdir, 'Charlevoix Seismic Zone.xml')
+    sub = read_nshmp_rlme_xml(file)
+
+    # Test Settings
+    mfds = sub['Settings']['DefaultMfds']
+    srcp = sub['Settings']['SourceProperties']
+    assert [m['floats'] for m in mfds] == ['false', 'false', 'false', 'false']
+    assert [m['m'] for m in mfds] == ['6.75', '7.0', '7.25', '7.5']
+    assert [m['rate'] for m in mfds] == ['0.0', '0.0', '0.0', '0.0']
+    assert [m['type'] for m in mfds] == ['SINGLE', 'SINGLE', 'SINGLE', 'SINGLE']
+    assert [m['weight'] for m in mfds] == ['0.2', '0.5', '0.2', '0.1']
+    assert srcp['focalMechMap'] == '[STRIKE_SLIP:1.0,NORMAL:0.0,REVERSE:0.0]'
+    assert srcp['magDepthMap'] == '[10.0::[5.0:1.0]]'
+    assert srcp['maxDepth'] == '22.0'
+    assert srcp['ruptureScaling'] == 'NSHM_POINT_WC94_LENGTH'
+    assert srcp['strike'] == 'NaN'
+
+    # Test Notes
+    nodes = sub['Nodes']
+    z = np.array([n['dep'] for n in nodes])
+    ztarget = np.array(
+      [ 0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+        0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+        0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+        0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+        0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.,
+        0.,  0.])
+    np.testing.assert_allclose(z, ztarget)
+
+    lat = np.array([n['lat'] for n in nodes])
+    lattarget = np.array(
+      [ 47. ,  47.1,  47.1,  47.1,  47.2,  47.2,  47.2,  47.2,  47.2,
+        47.3,  47.3,  47.3,  47.3,  47.3,  47.3,  47.3,  47.4,  47.4,
+        47.4,  47.4,  47.4,  47.4,  47.4,  47.4,  47.4,  47.5,  47.5,
+        47.5,  47.5,  47.5,  47.5,  47.5,  47.5,  47.5,  47.5,  47.6,
+        47.6,  47.6,  47.6,  47.6,  47.6,  47.6,  47.6,  47.6,  47.6,
+        47.7,  47.7,  47.7,  47.7,  47.7,  47.7,  47.7,  47.7,  47.7,
+        47.7,  47.8,  47.8,  47.8,  47.8,  47.8,  47.8,  47.8,  47.8,
+        47.8,  47.9,  47.9,  47.9])
+    np.testing.assert_allclose(lat, lattarget)
+
+    lon = np.array([n['lon'] for n in nodes])
+    lontarget = np.array(
+      [-70.4, -70.5, -70.4, -70.3, -70.6, -70.5, -70.4, -70.3, -70.2,
+       -70.7, -70.6, -70.5, -70.4, -70.3, -70.2, -70.1, -70.7, -70.6,
+       -70.5, -70.4, -70.3, -70.2, -70.1, -70. , -69.9, -70.7, -70.6,
+       -70.5, -70.4, -70.3, -70.2, -70.1, -70. , -69.9, -69.8, -70.6,
+       -70.5, -70.4, -70.3, -70.2, -70.1, -70. , -69.9, -69.8, -69.7,
+       -70.5, -70.4, -70.3, -70.2, -70.1, -70. , -69.9, -69.8, -69.7,
+       -69.6, -70.4, -70.3, -70.2, -70.1, -70. , -69.9, -69.8, -69.7,
+       -69.6, -70.1, -70. , -69.9])
+    np.testing.assert_allclose(lon, lontarget)
+
+    rate = np.array([float(n['rate']) for n in nodes])
+    ratetarget = np.array(
+      [  2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
+         2.04776120e-05])
+    np.testing.assert_allclose(rate, ratetarget)
