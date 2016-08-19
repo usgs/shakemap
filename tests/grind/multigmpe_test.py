@@ -10,7 +10,6 @@ from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
 from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import CampbellBozorgnia2014
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 from openquake.hazardlib.gsim.campbell_2003 import Campbell2003
-from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006
 from openquake.hazardlib import imt, const
 
 import shakemap.grind.multigmpe as mg

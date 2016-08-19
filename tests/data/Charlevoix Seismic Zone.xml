@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<GridSourceSet id="-1" name="Charlevoix Seismic Zone" weight="1.0">
+  <!-- This model is an example and for review purposes only -->
+  <!-- Original source file: Chlvx_RLME_2014.675.in -->
+  <Settings>
+    <DefaultMfds>
+      <IncrementalMfd floats="false" m="6.75" rate="0.0" type="SINGLE" weight="0.2"/>
+      <IncrementalMfd floats="false" m="7.0" rate="0.0" type="SINGLE" weight="0.5"/>
+      <IncrementalMfd floats="false" m="7.25" rate="0.0" type="SINGLE" weight="0.2"/>
+      <IncrementalMfd floats="false" m="7.5" rate="0.0" type="SINGLE" weight="0.1"/>
+    </DefaultMfds>
+    <SourceProperties focalMechMap="[STRIKE_SLIP:1.0,NORMAL:0.0,REVERSE:0.0]" magDepthMap="[10.0::[5.0:1.0]]" maxDepth="22.0" ruptureScaling="NSHM_POINT_WC94_LENGTH" strike="NaN"/>
+  </Settings>
+  <Nodes>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.4,47.0,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.5,47.1,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.4,47.1,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.3,47.1,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.6,47.2,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.5,47.2,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.4,47.2,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.3,47.2,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.2,47.2,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.7,47.3,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.6,47.3,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.5,47.3,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.4,47.3,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.3,47.3,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.2,47.3,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.1,47.3,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.7,47.4,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.6,47.4,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.5,47.4,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.4,47.4,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.3,47.4,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.2,47.4,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.1,47.4,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.0,47.4,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.9,47.4,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.7,47.5,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.6,47.5,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.5,47.5,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.4,47.5,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.3,47.5,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.2,47.5,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.1,47.5,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.0,47.5,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.9,47.5,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.8,47.5,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.6,47.6,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.5,47.6,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.4,47.6,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.3,47.6,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.2,47.6,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.1,47.6,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.0,47.6,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.9,47.6,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.8,47.6,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.7,47.6,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.5,47.7,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.4,47.7,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.3,47.7,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.2,47.7,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.1,47.7,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.0,47.7,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.9,47.7,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.8,47.7,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.7,47.7,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.6,47.7,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.4,47.8,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.3,47.8,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.2,47.8,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.1,47.8,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.0,47.8,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.9,47.8,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.8,47.8,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.7,47.8,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.6,47.8,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.1,47.9,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-70.0,47.9,0.0</Node>
+    <Node rate="2.0477612e-05" type="SINGLE">-69.9,47.9,0.0</Node>
+  </Nodes>
+</GridSourceSet>

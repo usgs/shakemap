@@ -7,7 +7,7 @@ from lxml import etree
 def read_nshmp_fault_xml(file):
     """
     Method for reading the XML format used by the NSHMP for faults. 
-    `[example] <https://github.com/emthompson-usgs/nshmp-model-cous-2014/blob/master/Western%20US/Fault/Geologic%20Model%20Full%20Rupture.xml>`__
+    `[example] <https://github.com/usgs/nshmp-model-cous-2014/blob/master/Western%20US/Fault/Geologic%20Model%20Full%20Rupture.xml>`__
 
     :param file:
         An XML file in the format used for the 2014 USGS NSHMP. 
@@ -21,6 +21,7 @@ def read_nshmp_fault_xml(file):
         of dictionaries. 
 
     """
+
     tree = etree.parse(file)
     root = tree.getroot()
     sources = root.findall('Source')
@@ -41,6 +42,7 @@ def read_nshmp_fault_xml(file):
                 # Attributes
                 for k,v in a.attrib.iteritems():
                     chd['Geometry'].update({k: v})
+
                 # Children (Trace, LowerTrace)
                 t = a.getchildren()
 
@@ -65,6 +67,7 @@ def read_nshmp_fault_xml(file):
             elif a.tag == 'IncrementalMfd':
                 # These only contain attributes
                 imfd = {}
+
                 for k,v in a.attrib.iteritems():
                     imfd.update({k: v})
                 chd['IncrementalMfd'].append(imfd)
@@ -72,3 +75,64 @@ def read_nshmp_fault_xml(file):
         srclist.append(chd)
 
     return srclist
+
+def read_nshmp_rlme_xml(file):
+    """
+    Method for reading the XML format used by the NSHMP for faults. 
+    `[example] <https://github.com/usgs/nshmp-model-cous-2014/blob/master/Central%20%26%20Eastern%20US/Grid/rlme/Charlevoix%20Seismic%20Zone.xml>`__
+
+    :param file:
+        An XML file in the format used for the 2014 USGS NSHMP. 
+
+    :returns:
+        A dictionary with two entries: 'Settings' and 'Nodes'. 
+        'Settings" is a dictionary, 'Nodes' is a list of dictionaries with
+        length equal to the total number of RLME nodes. The Node dictionaries
+        include elements for 'lat', 'lon', 'dep', 'rate', etc. 
+
+    """
+
+    tree = etree.parse(file)
+    root = tree.getroot()
+    settings = root.findall('Settings')[0]
+    nodes = root.findall('Nodes')[0].getchildren()
+
+    #----------------------------------------------
+    # Settings; includes 
+    #    list of DefaultMfds and 
+    #    dictionary of SourceProperties
+    #----------------------------------------------
+    setdict = {}
+    for c in settings.getchildren():
+
+        if c.tag == 'DefaultMfds':
+            mfdlist = []
+
+            for m in c.getchildren():
+                mdict = {}
+                for k,v in m.attrib.iteritems():
+                    mdict.update({k: v})
+                mfdlist.append(mdict)
+            setdict.update({'DefaultMfds':mfdlist})
+
+        if c.tag == 'SourceProperties':
+            pdict = {}
+            for k,v in c.attrib.iteritems():
+                pdict.update({k: v})
+            setdict.update({'SourceProperties':pdict})
+
+    #----------------------------------------------
+    # Nodes; list of dictionaries
+    #----------------------------------------------
+    nlist = []
+    for n in nodes:
+        ndict = {}
+        for k,v in n.attrib.iteritems():
+            ndict.update({k: v})
+        loc = n.text.split(',')
+        ndict['lat'] = float(loc[1])
+        ndict['lon'] = float(loc[0])
+        ndict['dep'] = float(loc[2])
+        nlist.append(ndict)
+
+    return {'Settings':setdict,'Nodes':nlist}
