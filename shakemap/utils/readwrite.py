@@ -1,15 +1,16 @@
+#!/usr/bin/env python
 
+import numpy as np
 from lxml import etree
 
 
 def read_nshmp_fault_xml(file):
     """
     Method for reading the XML format used by the NSHMP for faults. 
-    `This <https://github.com/emthompson-usgs/nshmp-model-cous-2014/blob/master/Western%20US/Fault/Geologic%20Model%20Full%20Rupture.xml>`__
-    is an example. 
+    `[example] <https://github.com/emthompson-usgs/nshmp-model-cous-2014/blob/master/Western%20US/Fault/Geologic%20Model%20Full%20Rupture.xml>`__
 
     :param file:
-        An XML file. 
+        An XML file in the format used for the 2014 USGS NSHMP. 
 
     :returns:
         A list with length equal to the number of faults; 
