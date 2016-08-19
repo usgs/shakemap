@@ -5,7 +5,7 @@ import os.path
 import numpy as np
 
 from shakemap.utils.readwrite import read_nshmp_fault_xml
-from shakemap.utils.readwrite import read_nshmp_rlme_xml
+from shakemap.utils.readwrite import read_nshmp_grid_xml
 
 homedir = os.path.dirname(os.path.abspath(__file__))
 shakedir = os.path.abspath(os.path.join(homedir, '../..'))
@@ -79,7 +79,7 @@ def test_read_nshmp_fault_xml():
 
 def test_read_nshmp_grid_xml():
     file = os.path.join(datdir, 'USGS_grid.xml')
-    sub = read_nshmp_rlme_xml(file)
+    sub = read_nshmp_grid_xml(file)
 
     # Test Settings
     mfds = sub['Settings']['DefaultMfds']
@@ -131,7 +131,7 @@ def test_read_nshmp_grid_xml():
 
 def test_read_nshmp_rlme_xml():
     file = os.path.join(datdir, 'Charlevoix Seismic Zone.xml')
-    sub = read_nshmp_rlme_xml(file)
+    sub = read_nshmp_grid_xml(file)
 
     # Test Settings
     mfds = sub['Settings']['DefaultMfds']

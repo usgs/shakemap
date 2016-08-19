@@ -76,10 +76,12 @@ def read_nshmp_fault_xml(file):
 
     return srclist
 
-def read_nshmp_rlme_xml(file):
+def read_nshmp_grid_xml(file):
     """
-    Method for reading the XML format used by the NSHMP for faults. 
+    Method for reading the XML format used by the NSHMP for gridded seismicity.  
     `[example] <https://github.com/usgs/nshmp-model-cous-2014/blob/master/Central%20%26%20Eastern%20US/Grid/rlme/Charlevoix%20Seismic%20Zone.xml>`__
+
+    This function works for both grided source, including RMLEs. 
 
     :param file:
         An XML file in the format used for the 2014 USGS NSHMP. 
@@ -88,7 +90,9 @@ def read_nshmp_rlme_xml(file):
         A dictionary with two entries: 'Settings' and 'Nodes'. 
         'Settings" is a dictionary, 'Nodes' is a list of dictionaries with
         length equal to the total number of RLME nodes. The Node dictionaries
-        include elements for 'lat', 'lon', 'dep', 'rate', etc. 
+        include elements for 'lat', 'lon', 'dep', 'rate', etc. Note that there
+        are minor differences in these values depending on whether or not the
+        gridded seismicity is for RLMEs or not. 
 
     """
 
