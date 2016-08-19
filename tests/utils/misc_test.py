@@ -1,15 +1,15 @@
 
-from shakemap.utils.misc import getCommandOutput
+from shakemap.utils.misc import get_command_output
 from shakemap.utils.timeutils import ShakeDateTime
 
 
-def test_getCommandOutput():
+def test_get_command_output():
     cmd = 'ls *.py'
-    rc, so, se = getCommandOutput(cmd)
+    rc, so, se = get_command_output(cmd)
     assert rc == True
 
     cmd = 'ls asdf'
-    rc, so, se = getCommandOutput(cmd)
+    rc, so, se = get_command_output(cmd)
     assert rc == False
 
 

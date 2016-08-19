@@ -7,7 +7,7 @@ import sys
 import re
 from distutils.dir_util import copy_tree
 
-from shakemap.utils.misc import getCommandOutput
+from shakemap.utils.misc import get_command_output
 
 
 DEFAULT_TAG = '0.1'
@@ -38,7 +38,7 @@ def main(args):
     #-------------------------------------------------------------
     # get the human-friendly version of the ShakeMap version
     #-------------------------------------------------------------
-    res, verstr, stderr = getCommandOutput('git describe --tags')
+    res, verstr, stderr = get_command_output('git describe --tags')
     verstr = verstr.decode().strip()
     if not len(verstr):
         verstr = DEFAULT_TAG
@@ -55,7 +55,7 @@ def main(args):
     AUTHORS = 'Bruce Worden, Eric Thompson, Mike Hearne'
 
     # find the make command on this system
-    res, stdout, stderr = getCommandOutput('which make')
+    res, stdout, stderr = get_command_output('which make')
     if not res:
         print('Could not find the "make" command on your system. Exiting.')
         sys.exit(1)
@@ -70,7 +70,7 @@ def main(args):
             shutil.rmtree(CLONE_DIR)
         clonecmd = 'git clone -b gh-pages https://github.com/usgs/'\
                    'shakemap.git %s' % CLONE_DIR
-        res, stdout, stderr = getCommandOutput(clonecmd)
+        res, stdout, stderr = get_command_output(clonecmd)
         if not res:
             raise Exception('Could not clone gh-pages branch.')
 
@@ -85,7 +85,7 @@ def main(args):
                  ' -V %s %s' % (API_DIR, PACKAGE, AUTHORS, verstr,
                                 PACKAGE_DIR)
 
-    res, stdout, stderr = getCommandOutput(sphinx_cmd)
+    res, stdout, stderr = get_command_output(sphinx_cmd)
 
     if not res:
         raise Exception('Could not build ShakeMap API documentation'
@@ -95,28 +95,28 @@ def main(args):
     # change index.rst to api_index.rst
     #-------------------------------------------------------------
     move_cmd = 'mv %s/index.rst %s/api_index.rst' % (API_DIR, API_DIR)
-    res, stdout, stderr = getCommandOutput(move_cmd)
+    res, stdout, stderr = get_command_output(move_cmd)
 
     # Change name of API documentation in api_index.rst
     cmd = "sed -i -e 's/Welcome to shakemap.*/ShakeMap 4.0 API/g' "\
           "%s/api_index.rst" % API_DIR
-    res, stdout, stderr = getCommandOutput(cmd)
+    res, stdout, stderr = get_command_output(cmd)
 
     #--------------------------------------------
     # try to clean up some of the excess labeling
     #--------------------------------------------
     clean_cmd = "sed -i -e 's/ module//g' `find %s/*.rst -type f "\
                 "-maxdepth 0 -print`" % API_DIR
-    res, stdout, stderr = getCommandOutput(clean_cmd)
+    res, stdout, stderr = get_command_output(clean_cmd)
     clean_cmd = "sed -i -e 's/ package//g' `find %s/*.rst -type f "\
                 "-maxdepth 0 -print`" % API_DIR
-    res, stdout, stderr = getCommandOutput(clean_cmd)
+    res, stdout, stderr = get_command_output(clean_cmd)
     clean_cmd = "sed -i -e '/Subpackages/d' `find %s/*.rst -type f "\
                 "-maxdepth 0 -print`" % API_DIR
-    res, stdout, stderr = getCommandOutput(clean_cmd)
+    res, stdout, stderr = get_command_output(clean_cmd)
     clean_cmd = "sed -i -e '/-.*-/d' `find %s/*.rst -type f "\
                 "-maxdepth 0 -print`" % API_DIR
-    res, stdout, stderr = getCommandOutput(clean_cmd)
+    res, stdout, stderr = get_command_output(clean_cmd)
 
     #-------------------------------------------------------------
     # run the make command to build the shakemap manual (pdf version)
@@ -126,7 +126,7 @@ def main(args):
         os.chdir(DOC_DIR)
         # Need to run HTML to create __shakedoc/html/_static
         manualcmd = '%s latexpdf' % make_cmd
-        res, stdout, stderr = getCommandOutput(manualcmd)
+        res, stdout, stderr = get_command_output(manualcmd)
         if not res:
             raise Exception('Could not build the PDF version of the ShakeMap '
                             'manual - error "%s".' % stderr)
@@ -219,7 +219,7 @@ def main(args):
     #-------------------------------------------------------------
     sys.stderr.write('Building shakemap manual (HTML)...\n')
     os.chdir(API_DIR)
-    res, stdout, stderr = getCommandOutput('%s html' % make_cmd)
+    res, stdout, stderr = get_command_output('%s html' % make_cmd)
     if not res:
         raise Exception('Could not build HTML for API documentation. - '
                         'error "%s"' % stderr)
@@ -240,11 +240,11 @@ def main(args):
 
         # cd to directory above where html content was pushed
         os.chdir(CLONE_DIR)
-        res, stdout, stderr = getCommandOutput('touch .nojekyll')
-        res1, stdout, stderr1 = getCommandOutput('git add --all')
-        res2, stdout, stderr2 = getCommandOutput(
+        res, stdout, stderr = get_command_output('touch .nojekyll')
+        res1, stdout, stderr1 = get_command_output('git add --all')
+        res2, stdout, stderr2 = get_command_output(
             'git commit -am"Pushing version %s to GitHub pages"' % verstr)
-        res3, stdout, stderr3 = getCommandOutput(
+        res3, stdout, stderr3 = get_command_output(
             'git push -u origin +gh-pages')
         if res1 + res2 + res3 < 3:
             stderr = stderr1 + stderr2 + stderr3

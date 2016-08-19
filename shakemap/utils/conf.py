@@ -9,7 +9,7 @@ from configobj import ConfigObj
 from validate import Validator, VdtTypeError, VdtParamError
 
 
-def getCustomValidator():
+def get_custom_validator():
     fdict = {
         'file_type': file_type,
         'directory_type': directory_type,
@@ -20,13 +20,13 @@ def getCustomValidator():
     return validator
 
 
-def createDefaultConfig(configspec, includeComments=False):
+def create_default_config(configspec, includeComments=False):
     configfolder = os.path.join(os.path.expanduser('~'), '.shakemap')
     if not os.path.isdir(configfolder):
         os.mkdir(configfolder)
     outfile = os.path.join(configfolder, 'config.ini')
     config = ConfigObj(configspec=configspec, stringify=False)
-    validator = getCustomValidator()
+    validator = get_custom_validator()
     config.validate(validator, copy=True)
     lines = config.write()
     f = open(outfile, 'wt')
@@ -49,7 +49,7 @@ def createDefaultConfig(configspec, includeComments=False):
 
 def whatIs(configspec, param):
     config = ConfigObj(configspec=configspec)
-    validator = getCustomValidator()
+    validator = get_custom_validator()
     config.validate(validator, copy=True)
     comment = '%s is not a value found in %s.' % (param, configspec)
     for sectionkey in config.sections:
@@ -127,7 +127,7 @@ def validate(configspec, configfile, macros=None):
             configstr = configstr.replace(macro, value)
         configfile = io.StringIO(configstr)
     config = ConfigObj(configfile, configspec=configspec)
-    validator = getCustomValidator()
+    validator = get_custom_validator()
     result = config.validate(validator)
     # for rkey,rvalue in result.iteritems():
     #     if not rvalue and rkey.find('transfer') > -1:

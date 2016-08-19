@@ -6,7 +6,7 @@ import argparse
 
 import numpy as np
 
-from shakemap.utils.misc import getCommandOutput
+from shakemap.utils.misc import get_command_output
 
 
 def run_one(event, args):
@@ -17,7 +17,7 @@ def run_one(event, args):
           ' -m ' + str(args.max) + \
           ' -r ' + str(args.res) + \
           ' -s ' + args.shakehome
-    rc, so, se = getCommandOutput(cmd)
+    rc, so, se = get_command_output(cmd)
     if not rc:
         raise Exception(se)
 
@@ -27,7 +27,7 @@ def main(args):
     # Get list of existing events
     #----------------------------------------------------
     cmd = 'ls ' + os.path.join(args.shakehome, "data")
-    rc, so, se = getCommandOutput(cmd)
+    rc, so, se = get_command_output(cmd)
     events = so.decode().split("\n")
 
     # Remove empty list elements

@@ -6,7 +6,7 @@ from configobj import ConfigObj
 
 from shakemap.utils.conf import validate
 from shakemap.utils.conf import whatIs
-from shakemap.utils.conf import createDefaultConfig
+from shakemap.utils.conf import create_default_config
 
 homedir = os.path.dirname(os.path.abspath(__file__))
 shakedir = os.path.abspath(os.path.join(homedir, '..'))
@@ -95,7 +95,7 @@ def test_conf():
               'event_id': 'us2015abcd'}
     ret = validate(configspec, tfile, macros=macros)
     config = ConfigObj(tfile)
-    configfile = createDefaultConfig(configspec)
+    configfile = create_default_config(configspec)
     validate(configspec, configfile)
     whatIs(configspec, 'pgm2mi')
     os.remove(tfile)
@@ -106,7 +106,7 @@ if __name__ == '__main__':
     # where is this script?
     homedir = os.path.dirname(os.path.abspath(__file__))
     configspec = os.path.join(homedir, 'configspec.ini')
-    configfile = createDefaultConfig(configspec)
+    configfile = create_default_config(configspec)
 
     print(whatIs(configspec, 'pgm2mi'))
 

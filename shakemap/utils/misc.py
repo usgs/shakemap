@@ -3,7 +3,7 @@
 import subprocess
 
 
-def getCommandOutput(cmd):
+def get_command_output(cmd):
     """
     Method for calling external system command.
 

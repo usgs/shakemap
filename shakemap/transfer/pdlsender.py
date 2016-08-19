@@ -10,7 +10,7 @@ from .sender import Sender
 
 # local imports
 from shakemap.utils.exception import ShakeMapException
-from shakemap.utils.misc import getCommandOutput
+from shakemap.utils.misc import get_command_output
 
 
 class PDLSender(Sender):
@@ -36,7 +36,7 @@ class PDLSender(Sender):
         for propkey, propvalue in self.properties.items():
             cmd = cmd.replace('[' + propkey.upper() + ']', propvalue)
 
-        retcode, stdout, stderr = getCommandOutput(cmd)
+        retcode, stdout, stderr = get_command_output(cmd)
         if not retcode:
             fmt = 'Could not delete product "%s" due to error "%s"'
             tpl = (code, stdout + stderr)
@@ -74,7 +74,7 @@ class PDLSender(Sender):
             cmd = cmd.replace('[' + propkey.upper() + ']', propvalue)
 
         # call PDL on the command line
-        retcode, stdout, stderr = getCommandOutput(cmd)
+        retcode, stdout, stderr = get_command_output(cmd)
         if not retcode:
             fmt = 'Could not send product "%s" due to error "%s"'
             tpl = (code, stdout + stderr)
