@@ -7,22 +7,22 @@ import itertools as it
 import os
 
 # third party imports
-from ..utils.ecef import latlon2ecef
-from ..utils.vector import Vector
-from .fault import get_quad_length
-from .source import rake_to_mech
-from openquake.hazardlib.geo import geodetic
-from openquake.hazardlib.geo.utils import get_orthographic_projection
-from openquake.hazardlib.gsim.base import GMPE
-from openquake.hazardlib.gsim import base
 import numpy as np
 import pandas as pd
 import re
 import scipy.interpolate as spint
 
+from openquake.hazardlib.geo import geodetic
+from openquake.hazardlib.geo.utils import get_orthographic_projection
+from openquake.hazardlib.gsim.base import GMPE
+from openquake.hazardlib.gsim import base
+
 # local imports
 from shakemap.utils.exception import ShakeMapException
-
+from shakemap.utils.ecef import latlon2ecef
+from shakemap.utils.vector import Vector
+from shakemap.grind.fault import get_quad_length
+from shakemap.grind.source import rake_to_mech
 
 class Distance(object):
     """
@@ -257,6 +257,20 @@ def get_distance(methods, lat, lon, dep, source,
         z.shape = newshape
         sites_ecef = np.hstack((x, y, z))
 
+    # Define a projection that spands sites and fault
+    if fault is None:
+        all_lat = lat
+        all_lon = lon
+    else:
+        all_lat = np.append(lat, fault.getLats())
+        all_lon = np.append(lon, fault.getLons())
+
+    west = np.nanmin(all_lon)
+    east = np.nanmax(all_lon)
+    south = np.nanmin(all_lat)
+    north = np.nanmax(all_lat)
+    proj = get_orthographic_projection(west, east, north, south)
+
     # ---------------------------------------------
     # Distances that do not require loop over quads
     # ---------------------------------------------
@@ -300,15 +314,24 @@ def get_distance(methods, lat, lon, dep, source,
         GC2U = np.zeros(newshape, dtype=lon.dtype)
 
         if quadlist is not None:
-            # For these distances, we need to sort out strike discordance and nominal
-            # strike prior to starting the loop if there are more than one
-            # segments
+            #-----------------------------------------------------------------
+            # For these distances, we need to sort out strike discordance and
+            # nominal strike prior to starting the loop if there is more than
+            # one segment.
+            #-----------------------------------------------------------------
+
             segind = fault._getSegmentIndex()
             segindnp = np.array(segind)
             uind = np.unique(segind)
             nseg = len(uind)
+
+            #-------------------------------------------------------------------
+            # The first thing we need to worry about is finding the coordinate
+            # shift. U's origin is " selected from the two endpoints most
+            # distant from each other." 
+            #-------------------------------------------------------------------
+
             if nseg > 1:
-                quadlist = fault.getQuadrilaterals()
                 # Need to get index of first and last quad
                 # for each segment
                 iq0 = np.zeros(nseg, dtype='int16')
@@ -318,9 +341,18 @@ def get_distance(methods, lat, lon, dep, source,
                     iq0[k] = int(np.min(ii))
                     iq1[k] = int(np.max(ii))
 
+                #---------------------------------------------------------------
+                # This is an iterator for each possible combination of segments
+                # including segment orientations (i.e., flipped). 
+                #---------------------------------------------------------------
+
                 it_seg = it.product(it.combinations(uind, 2),
                                     it.product([0, 1], [0, 1]))
+
+                # Placeholder for the segment pair/orientation that gives the
+                # largest distance. 
                 dist_save = 0
+
                 for k in it_seg:
                     s0ind = k[0][0]
                     s1ind = k[0][1]
@@ -342,33 +374,49 @@ def get_distance(methods, lat, lon, dep, source,
                         A0 = P0
                         A1 = P1
 
-                A0.depth = 0
-                A1.depth = 0
-                p_origin = Vector.fromPoint(A0)
-                a0 = Vector.fromPoint(A0)
-                a1 = Vector.fromPoint(A1)
-                ahat = (a1 - a0).norm()
-                # Loop over traces
-                e_j = np.zeros(nseg)
-                b_prime = [None] * nseg
-                for j in range(nseg):
-                    P0 = quadlist[iq0[j]][0]
-                    P1 = quadlist[iq1[j]][1]
-                    P0.depth = 0
-                    P1.depth = 0
-                    p0 = Vector.fromPoint(P0)
-                    p1 = Vector.fromPoint(P1)
-                    b_prime[j] = p1 - p0
-                    e_j[j] = ahat.dot(b_prime[j])
-                E = np.sum(e_j)
-                # List of discordancy
-                dc = [np.sign(a) * np.sign(E) for a in e_j]
-                b = Vector(0, 0, 0)
-                for j in range(nseg):
-                    b.x = b.x + b_prime[j].x * dc[j]
-                    b.y = b.y + b_prime[j].y * dc[j]
-                    b.z = b.z + b_prime[j].z * dc[j]
+                #---------------------------------------------------------------
+                # A0 and A1 are the furthest two segment endpoints, but we still
+                # need to sort out which one is the "origin".
+                #---------------------------------------------------------------
+
+                # Primate fixes the trend of the trial a vector.
+                primate = -1
+                while primate < 0:
+                    A0.depth = 0
+                    A1.depth = 0
+                    p_origin = Vector.fromPoint(A0)
+                    a0 = Vector.fromPoint(A0)
+                    a1 = Vector.fromPoint(A1)
+                    ahat = (a1 - a0).norm()
+
+                    # Loop over traces
+                    e_j = np.zeros(nseg)
+                    b_prime = [None] * nseg
+                    for j in range(nseg):
+                        P0 = quadlist[iq0[j]][0]
+                        P1 = quadlist[iq1[j]][1]
+                        P0.depth = 0
+                        P1.depth = 0
+                        p0 = Vector.fromPoint(P0)
+                        p1 = Vector.fromPoint(P1)
+                        b_prime[j] = p1 - p0
+                        e_j[j] = ahat.dot(b_prime[j])
+                    E = np.sum(e_j)
+
+                    # List of discordancy
+                    dc = [np.sign(a) * np.sign(E) for a in e_j]
+                    b = Vector(0, 0, 0)
+                    for j in range(nseg):
+                        b.x = b.x + b_prime[j].x * dc[j]
+                        b.y = b.y + b_prime[j].y * dc[j]
+                        b.z = b.z + b_prime[j].z * dc[j]
                     bhat = b.norm()
+                    primate = bhat.dot(ahat)
+                    if primate < 0:
+                        tmpA0 = copy.copy(A0)
+                        tmpA1 = copy.copy(A1)
+                        A0 = tmpA1
+                        A1 = tmpA0
 
     if quadlist is not None:
         # Length of prior segments
@@ -404,8 +452,8 @@ def get_distance(methods, lat, lon, dep, source,
                 # http://dx.doi.org/10.3133/ofr20151028.
 
                 # Compute u_i and t_i for this segment
-                t_i = __calc_t_i(P0, P1, lat, lon)
-                u_i = __calc_u_i(P0, P1, lat, lon)
+                t_i = __calc_t_i(P0, P1, lat, lon, proj)
+                u_i = __calc_u_i(P0, P1, lat, lon, proj)
 
                 # Quad length
                 l_i[i] = get_quad_length(quadlist[i])
@@ -416,7 +464,7 @@ def get_distance(methods, lat, lon, dep, source,
                 # Case 1:
                 ix = t_i != 0
                 w_i[ix] = (1.0 / t_i[ix]) * (np.arctan((l_i[i] -
-                                                        u_i[ix]) / t_i[ix]) - np.arctan(-u_i[ix] / t_i[ix]))
+                    u_i[ix]) / t_i[ix]) - np.arctan(-u_i[ix] / t_i[ix]))
                 # Case 2:
                 ix = (t_i == 0) & ((u_i < 0) | (u_i > l_i[i]))
                 w_i[ix] = 1 / (u_i[ix] - l_i[i]) - 1 / u_i[ix]
@@ -435,8 +483,11 @@ def get_distance(methods, lat, lon, dep, source,
                         s_ij_1 = np.sum(l_kj)
 
                     p1 = Vector.fromPoint(quadlist[iq0[segind[i]]][0])
-                    s_ij_2 = ((p1 - p_origin) *
-                              dc[segind[i]]).dot(bhat) / 1000.0
+                    s_ij_2 = ((p1 - p_origin) * dc[segind[i]]).dot(ahat) / 1000.0
+                    # This is implemented with GC2N, for GC2T use:
+#                    s_ij_2 = (p1 - p_origin).dot(bhat) / 1000.0
+
+
                     s_ij = s_ij_1 + s_ij_2
                     GC2U = GC2U + w_i * (u_i + s_ij)
                 s_i = s_i + l_i[i]
@@ -825,7 +876,7 @@ def _calc_rupture_distance(P0, P1, P2, P3, points):
     return dist
 
 
-def __calc_u_i(P0, P1, lat, lon):
+def __calc_u_i(P0, P1, lat, lon, proj):
     """
     Calculate u_i distance. See Spudich and Chiou OFR 2015-1028. This is the distance
     along strike from the first vertex (P0) of the i-th segment.
@@ -838,19 +889,12 @@ def __calc_u_i(P0, P1, lat, lon):
         A numpy array of latitude.
     :param lon:
         A numpy array of longitude.
+    :param proj:
+        An orthographic projection from 
+        openquake.hazardlib.geo.utils.get_orthographic_projection. 
     :returns:
         Array of size lat.shape of distances (in km).
     """
-    # Project to Cartesian space
-    west = min(P0.x, P1.x)
-    east = max(P0.x, P1.x)
-    south = min(P0.y, P1.y)
-    north = max(P0.y, P1.y)
-    proj = get_orthographic_projection(west, east, north, south)
-
-    # projected coordinates are in km
-    p0x, p0y = proj(P0.x, P0.y)
-    p1x, p1y = proj(P1.x, P1.y)
 
     # projected coordinates are in km
     p0x, p0y = proj(P0.x, P0.y)
@@ -879,7 +923,7 @@ def __calc_u_i(P0, P1, lat, lon):
     return u_i
 
 
-def __calc_t_i(P0, P1, lat, lon):
+def __calc_t_i(P0, P1, lat, lon, proj):
     """
     Calculate t_i distance. See Spudich and Chiou OFR 2015-1028. This is the distance
     measured normal to strike from the i-th segment. Values on the hanging-wall are
@@ -893,15 +937,12 @@ def __calc_t_i(P0, P1, lat, lon):
         A numpy array of latitudes.
     :param lon:
         A numpy array of longitudes.
+    :param proj:
+        An orthographic projection from 
+        openquake.hazardlib.geo.utils.get_orthographic_projection. 
     :returns:
         Array of size N of distances (in km) from input points to rupture surface.
     """
-    # Project to Cartesian space
-    west = min(P0.x, P1.x)
-    east = max(P0.x, P1.x)
-    south = min(P0.y, P1.y)
-    north = max(P0.y, P1.y)
-    proj = get_orthographic_projection(west, east, north, south)
 
     # projected coordinates are in km
     p0x, p0y = proj(P0.x, P0.y)

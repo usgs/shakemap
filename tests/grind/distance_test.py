@@ -9,12 +9,6 @@ import time as time
 import numpy as np
 import pandas as pd
 
-# hack the path so that I can debug these functions if I need to
-homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..'))
-# put this at the front of the system path, ignoring any installed mapio stuff
-sys.path.insert(0, shakedir)
-
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
 from openquake.hazardlib.gsim.berge_thierry_2003 import BergeThierryEtAl2003SIGMA
@@ -26,10 +20,14 @@ from shakemap.grind.sites import Sites
 from shakemap.grind.distance import Distance
 from shakemap.grind.distance import get_distance
 
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+sys.path.insert(0, shakedir)
+
 
 def test_distance_no_fault():
     # Make sites instance
-    vs30file = os.path.join(shakedir, 'data/Vs30_test.grd')
+    vs30file = os.path.join(shakedir, 'tests/data/Vs30_test.grd')
     cx = -118.2
     cy = 34.1
     dx = 0.0083
@@ -523,7 +521,7 @@ def test_distance_no_fault():
 
 def test_distance_from_sites_source():
     # Make sites instance
-    vs30file = os.path.join(shakedir, 'data/Vs30_test.grd')
+    vs30file = os.path.join(shakedir, 'tests/data/Vs30_test.grd')
     cx = -118.2
     cy = 34.1
     dx = 0.0083
@@ -688,7 +686,7 @@ def test_distance_from_sites_source():
 
 def test_chichi_with_get_distance():
     # read in fault file
-    f = os.path.join(shakedir, 'data/0137A.POL')
+    f = os.path.join(shakedir, 'tests/data/0137A.POL')
     i0 = np.arange(0, 9 * 11 * 3, 11)
     i1 = i0 + 10
     cs = list(zip(i0, i1))
@@ -728,7 +726,7 @@ def test_chichi_with_get_distance():
     source = Source(event, flt)
 
     # Get NGA distances
-    distfile = os.path.join(shakedir, 'data/NGAW2_distances.csv')
+    distfile = os.path.join(shakedir, 'tests/data/NGAW2_distances.csv')
     df = pd.read_csv(distfile)
     df2 = df.loc[df['EQID'] == 137]
     slat = df2['Station Latitude'].as_matrix()
@@ -983,3 +981,10 @@ def test_chichi_with_get_distance():
 
     np.testing.assert_allclose(
         nga_T, dists['T'], rtol=0, atol=2)
+
+
+if __name__ == "__main__":
+    test_distance_no_fault()
+    test_distance_from_sites_source()
+    test_chichi_with_get_distance()
+    

@@ -9,7 +9,7 @@ from shakemap.utils.conf import whatIs
 from shakemap.utils.conf import create_default_config
 
 homedir = os.path.dirname(os.path.abspath(__file__))
-shakedir = os.path.abspath(os.path.join(homedir, '..'))
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 
 
 def test_conf():
@@ -88,7 +88,7 @@ def test_conf():
     f = open(tfile, 'wt')
     f.write(textwrap.dedent(data))
     f.close()
-    configspec = os.path.join(shakedir, '../shakemap/utils/configspec.ini')
+    configspec = os.path.join(shakedir, 'shakemap/utils/configspec.ini')
     macros = {'shakemap_network': 'us',
               'event_code': '2015abcd',
               'event_network': 'us',

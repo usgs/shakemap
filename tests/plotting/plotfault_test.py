@@ -8,7 +8,7 @@ from shakemap.plotting.plotfault import plot_fault_wire3d
 from shakemap.grind.fault import Fault
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '../..'))
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 sys.path.insert(0, shakedir)
 
 @pytest.mark.mpl_image_compare
