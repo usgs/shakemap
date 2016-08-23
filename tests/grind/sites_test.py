@@ -4,10 +4,8 @@
 import sys
 import os.path
 
-# hack the path so that I can debug these functions if I need to
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..'))
-# put this at the front of the system path, ignoring any installed mapio stuff
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 sys.path.insert(0, shakedir)
 
 import numpy as np
@@ -17,7 +15,7 @@ from shakemap.grind.sites import Sites
 
 
 def test(vs30file=None):
-    vs30file = os.path.join(shakedir, 'data/Vs30_test.grd')
+    vs30file = os.path.join(shakedir, 'tests/data/Vs30_test.grd')
     cx = -118.2
     cy = 34.1
     dx = 0.0083

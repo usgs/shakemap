@@ -19,10 +19,8 @@ from shakemap.grind.fault import Fault
 from shakemap.grind.distance import Distance
 from shakemap.utils.timeutils import ShakeDateTime
 
-# hack the path so that I can debug these functions if I need to
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..'))
-# put this at the front of the system path, ignoring any installed mapio stuff
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 sys.path.insert(0, shakedir)
 
 
@@ -33,7 +31,7 @@ def test_multigmpe():
     wts = [0.25, 0.25, 0.25, 0.25]
 
     # Make sites instance
-    vs30file = os.path.join(shakedir, 'data/Vs30_test.grd')
+    vs30file = os.path.join(shakedir, 'tests/data/Vs30_test.grd')
     cx = -118.2
     cy = 34.1
     dx = 0.0083

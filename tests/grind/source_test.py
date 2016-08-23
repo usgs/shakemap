@@ -5,11 +5,8 @@ import os.path
 import sys
 import io
 
-# hack the path so that I can debug these functions if I need to
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
-# put this at the front of the system path, ignoring any installed
-# shakemap stuff
 sys.path.insert(0, shakedir)
 
 # third party
