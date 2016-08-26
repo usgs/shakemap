@@ -82,10 +82,7 @@ class WGRW12(object):
         if dists is not None and mag is not None:
             doresid = True
             ldd = np.log10(np.clip(dists, 10, 300))
-            if mag < 3.0:
-                mag = 3.0
-            elif mag > 7.3:
-                mag = 7.3
+            lmm = np.clip(mag, 3.0, 7.0)
         else:
             doresid = False
 
@@ -117,7 +114,7 @@ class WGRW12(object):
         mmi[idx] = c['C3'] + c['C4'] * lamps[idx]
 
         if doresid:
-            mmi += c['C5'] + c['C6'] * ldd + c['C7'] * mag
+            mmi += c['C5'] + c['C6'] * ldd + c['C7'] * lmm
 
         mmi = np.clip(mmi, 1.0, 10.0)
         return mmi
@@ -145,15 +142,12 @@ class WGRW12(object):
         if dists is not None and mag is not None:
             doresid = True
             ldd = np.log10(np.clip(dists, 10, 300))
-            if mag < 3.0:
-                mag = 3.0
-            elif mag > 7.3:
-                mag = 7.3
+            lmm = np.clip(mag, 3.0, 7.0)
         else:
             doresid = False
 
         if doresid:
-            mmi -= c['C5'] + c['C6'] * ldd + c['C7'] * mag
+            mmi -= c['C5'] + c['C6'] * ldd + c['C7'] * lmm
 
         pgm = np.zeros_like(mmi)
 
