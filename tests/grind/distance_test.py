@@ -5,6 +5,10 @@ import os.path
 import sys
 import time as time
 
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+sys.path.insert(0, shakedir)
+
 # third party
 import numpy as np
 import pandas as pd
@@ -19,11 +23,6 @@ from shakemap.grind.source import Source
 from shakemap.grind.sites import Sites
 from shakemap.grind.distance import Distance
 from shakemap.grind.distance import get_distance
-
-homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
-sys.path.insert(0, shakedir)
-
 
 def test_distance_no_fault():
     # Make sites instance

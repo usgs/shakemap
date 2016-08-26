@@ -1,4 +1,15 @@
+#!/usr/bin/env python 
+
+#stdlib imports
+import os.path
+import sys
 import time as time
+
+# hack the path so that I can debug these functions if I need to
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..','..','..'))
+# put this at the front of the system path, ignoring any installed mapio stuff
+sys.path.insert(0, shakedir)
 
 import numpy as np
 
@@ -607,3 +618,8 @@ def test_so6():
           1.53992995e-03,   0.00000000e+00,   0.00000000e+00]]
     )
     np.testing.assert_allclose(fd, fd_test, rtol=1e-4)
+
+if __name__ == '__main__':
+    test_ss3()
+    test_rv4()
+    test_so6()

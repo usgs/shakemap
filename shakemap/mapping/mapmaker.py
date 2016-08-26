@@ -353,7 +353,7 @@ class MapMaker(object):
                 mlat = row['lat']
                 mlon = row['lon']
                 mmi = row['mmi']
-                mcolor = self.intensity_colormap.getHexColor(mmi)[0]
+                mcolor = self.intensity_colormap.getDataColor(mmi)
                 m.plot(mlon, mlat, 'o', latlon=True,
                        markerfacecolor=mcolor, markeredgecolor='k', markersize=4, zorder=STATIONS_ZORDER)
 
@@ -361,7 +361,7 @@ class MapMaker(object):
                 mlat = row['lat']
                 mlon = row['lon']
                 dmmi = row[dimt]
-                mcolor = self.intensity_colormap.getHexColor(dmmi)[0]
+                mcolor = self.intensity_colormap.getDataColor(dmmi)
                 m.plot(mlon, mlat, '^', latlon=True,
                        markerfacecolor=mcolor, markeredgecolor='k', markersize=6, zorder=STATIONS_ZORDER)
 
