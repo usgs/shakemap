@@ -22,6 +22,7 @@ source activate shake
 # do pip installs of those things that are not available via conda.
 pip -v install git+git://github.com/gem/oq-hazardlib.git
 pip install git+git://github.com/usgs/MapIO.git
+pip install git+git://github.com/usgs/earthquake-impact-utils.git
 pip install sphinx_rtd_theme
 
 # tell the user they have to activate this environment

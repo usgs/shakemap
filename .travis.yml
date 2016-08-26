@@ -13,23 +13,11 @@ install:
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
     - conda info -a
-    - conda install --yes --channel conda-forge numpy scipy rasterio fiona xlrd xlwt pandas pytables basemap basemap-data-hires shapely h5py basemap-data-hires gdal==1.11.4 descartes paramiko configobj pyproj matplotlib psutil sphinx
-    - conda install --yes lxml
-    - pip -v install git+git://github.com/gem/oq-hazardlib.git
-    - pip -v install git+git://github.com/usgs/MapIO.git
-    - pip -v install git+git://github.com/snide/sphinx_rtd_theme.git
-    #-----------------------
-    # Not needed for testing
-    #-----------------------
-    #- conda install --yes --channel conda-forge jupyter 
-    #--------------------------
-    # Only required for testing
-    #--------------------------
-    - conda install --yes --channel conda-forge pytest pytest-cov pytest-mpl flake8 pep8-naming
+    - bash setup_env.sh
+    - source activate shake
     #---------------------
     # Install shakemap
     #---------------------
-    #- pip install .
     - python setup.py install
 before_script:
     # This is to take care of Invalid DISPLAY variable

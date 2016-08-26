@@ -10,7 +10,7 @@ from .sender import Sender
 
 # local imports
 from shakemap.utils.exception import ShakeMapException
-from shakemap.utils.misc import get_command_output
+from impactutils.io.cmd import get_command_output
 
 
 class PDLSender(Sender):

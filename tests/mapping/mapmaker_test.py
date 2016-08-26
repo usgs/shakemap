@@ -13,7 +13,7 @@ shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 sys.path.insert(0, shakedir)
 
 from shakemap.mapping.mapmaker import MapMaker
-from shakemap.mapping.gmtcolormap import GMTColorMap
+from impactutils.colors.cpalette import ColorPalette
 
 from mapio.basemapcity import BasemapCities
 from mapio.shake import ShakeGrid
@@ -50,8 +50,8 @@ def _test_intensity():
                  'roads': roadfile,
                  'state': statefile}
 
-    tancolormap = GMTColorMap.loadFromCPT(tancptfile)
-    shakecolormap = GMTColorMap.loadFromCPT(shakecptfile)
+    tancolormap = ColorPalette.fromPreset('shaketopo')
+    shakecolormap = ColorPalette.fromPreset('mmi')
     cities = BasemapCities.loadFromCSV(cityfile)
     shakemap = ShakeGrid.load(shakefile, adjust='res')
     stations = StationList(stationfile)

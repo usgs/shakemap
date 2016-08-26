@@ -7,8 +7,7 @@ import sys
 import re
 from distutils.dir_util import copy_tree
 
-from shakemap.utils.misc import get_command_output
-
+from impactutils.io.cmd import get_command_output
 
 DEFAULT_TAG = '0.1'
 
