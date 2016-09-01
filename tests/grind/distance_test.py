@@ -12,10 +12,12 @@ sys.path.insert(0, shakedir)
 # third party
 import numpy as np
 import pandas as pd
+import pytest
 
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
 from openquake.hazardlib.gsim.berge_thierry_2003 import BergeThierryEtAl2003SIGMA
+import openquake.hazardlib.geo as geo
 
 from shakemap.grind.fault import Fault
 from shakemap.utils.timeutils import ShakeDateTime
@@ -23,6 +25,166 @@ from shakemap.grind.source import Source
 from shakemap.grind.sites import Sites
 from shakemap.grind.distance import Distance
 from shakemap.grind.distance import get_distance
+
+
+def test_san_fernando():
+    # This is a challenging fault due to overlapping and discordant
+    # segments, as brought up by Graeme Weatherill. Our initial
+    # implementation put the origin on the wrong side of the fault.
+    x0 = np.array([7.1845, 7.8693])
+    y0 = np.array([-10.3793, -16.2096])
+    z0 = np.array([3.0000, 0.0000])
+    x1 = np.array([-7.8506, -7.5856])
+    y1 = np.array([-4.9073, -12.0682])
+    z1 = np.array([3.0000, 0.0000])
+    x2 = np.array([-4.6129, -5.5149])
+    y2 = np.array([3.9887, -4.3408])
+    z2 = np.array([16.0300, 8.0000])
+    x3 = np.array([10.4222, 9.9400])
+    y3 = np.array([-1.4833, -8.4823])
+    z3 = np.array([16.0300, 8.0000])
+
+    epilat = 34.44000
+    epilon = -118.41000
+    proj = geo.utils.get_orthographic_projection(epilon-1, epilon+1, epilat+1, epilat-1)
+    lon0,lat0 = proj(x0, y0, reverse = True)
+    lon1,lat1 = proj(x1, y1, reverse = True)
+    lon2,lat2 = proj(x2, y2, reverse = True)
+    lon3,lat3 = proj(x3, y3, reverse = True)
+
+    flt = Fault.fromVertices(lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3)
+    flt._segment_index = [0, 1]
+    # Make a source object; most of the 'event' values don't matter
+    event = {'lat': 0,  'lon': 0, 'depth':0, 'mag': 6.61, 
+             'id':'', 'locstring':'', 'type':'U', 
+             'time':ShakeDateTime.utcfromtimestamp(int(time.time())), 
+             'timezone':'UTC'}
+    source = Source(event, flt)
+
+    # Grid of sites
+    buf = 0.25
+    lat = np.linspace(np.nanmin(flt._lat)-buf, np.nanmax(flt._lat)+buf, 10)
+    lon = np.linspace(np.nanmin(flt._lon)-buf, np.nanmax(flt._lon)+buf, 10)
+    lons, lats = np.meshgrid(lon, lat)
+    dep = np.zeros_like(lons)
+    x,y = proj(lon, lat)
+    fltx,flty = proj(flt._lon, flt._lat)
+
+    # Calculate U and T
+    dtypes = ['U', 'T']
+    dists = get_distance(dtypes, lats, lons, dep, source)
+
+    targetU = np.array(
+      [[ 29.37274442,  22.55921426,  15.74430792,   8.92431537,
+          2.09614172,  -4.74048224, -11.58205029, -18.42291427,
+        -25.25861466, -32.08756169],
+       [ 31.8402756 ,  25.0301238 ,  18.21895675,  11.40186646,
+          4.57482033,  -2.26111412,  -9.09895161, -15.93021905,
+        -22.75187671, -29.56571757],
+       [ 34.30499675,  27.49265389,  20.67666228,  13.85014399,
+          7.010665  ,   0.1685581 ,  -6.65422814, -13.45289344,
+        -20.24469851, -27.03653207],
+       [ 36.78041882,  29.96257834,  23.12595215,  16.23824582,
+          9.32875394,   2.4168577 ,  -4.27408998, -10.95053933,
+        -17.70508027, -24.48047773],
+       [ 39.29097203,  32.49019347,  25.68246436,  18.73718077,
+         12.08645715,   5.98975307,  -1.38538441,  -8.2846706 ,
+        -15.08893691, -21.88043156],
+       [ 41.84517958,  35.09593746,  28.42265169,  21.9878218 ,
+         15.29722825,   8.37840908,   1.38837536,  -5.56171834,
+        -12.42651675, -19.24830413],
+       [ 44.41402272,  37.69495473,  31.02404955,  24.38393744,
+         17.66876715,  10.84512023,   3.96438201,  -2.92249323,
+         -9.78301284, -16.61472025],
+       [ 46.97050164,  40.25427448,  33.55659689,  26.85757277,
+         20.1224817 ,  13.33474131,   6.50744948,  -0.33504889,
+         -7.1728932 , -13.99714828],
+       [ 49.51003399,  42.7889965 ,  36.07379761,  29.35223182,
+         22.60939439,  15.83734827,   9.03978846,   2.22775333,
+         -4.58724508, -11.39745932],
+       [ 52.03683129,  45.31138145,  38.58688357,  31.85609168,
+         25.11154338,  18.34911473,  11.56992421,   4.77919028,
+         -2.01654482,  -8.81176529]])
+    np.testing.assert_allclose(dists['U'], targetU)
+
+    targetT = np.array(
+      [[-40.32654805, -38.14066537, -35.95781299, -33.79265063,
+        -31.65892948, -29.56075203, -27.48748112, -25.41823592,
+        -23.33452174, -21.22822801],
+       [-32.28894353, -30.06603457, -27.83163648, -25.61482279,
+        -23.45367121, -21.36959238, -19.34738882, -17.33510593,
+        -15.28949735, -13.20224592],
+       [-24.30254163, -22.03532096, -19.70590091, -17.35907062,
+        -15.10840929, -13.02682541, -11.13554925,  -9.25705749,
+         -7.26675455,  -5.19396824],
+       [-16.41306482, -14.1418547 , -11.68888578,  -8.9318195 ,
+         -6.39939727,  -4.10984325,  -2.85061088,  -1.29211846,
+          0.68929792,   2.78115216],
+       [ -8.63784529,  -6.5089946 ,  -4.32108309,  -1.44275161,
+         -0.05102145,  -0.20890633,   3.92700516,   6.36977183,
+          8.55572399,  10.72128633],
+       [ -0.88135778,   1.06766314,   2.77955566,   3.8241835 ,
+          5.99212478,   8.76823285,  11.54715599,  14.0961506 ,
+         16.4200502 ,  18.65346494],
+       [  6.98140207,   8.91888936,  10.77724993,  12.6499521 ,
+         14.79454638,  17.18482779,  19.63520498,  22.03525644,
+         24.35152986,  26.60592498],
+       [ 14.95635952,  16.95134069,  18.94768299,  20.99811237,
+         23.15975573,  25.42700742,  27.74302905,  30.0547134 ,
+         32.33583361,  34.58421221],
+       [ 22.9921068 ,  25.0353212 ,  27.09829391,  29.20364631,
+         31.3678744 ,  33.58684524,  35.8383652 ,  38.09736043,
+         40.34713771,  42.58152772],
+       [ 31.05186177,  33.1252095 ,  35.21960344,  37.34488267,
+         39.50633206,  41.70076344,  43.91762786,  46.14415669,
+         48.37021739,  50.59029205]])
+    np.testing.assert_allclose(dists['T'], targetT)
+
+
+def test_exceptions():
+    vs30file = os.path.join(shakedir, 'tests/data/Vs30_test.grd')
+    cx = -118.2
+    cy = 34.1
+    dx = 0.0083
+    dy = 0.0083
+    xspan = 0.0083 * 5
+    yspan = 0.0083 * 5
+    site = Sites.createFromCenter(cx, cy, xspan, yspan, dx, dy,
+                                  vs30File=vs30file,
+                                  padding=True, resample=False)
+    # Make souce instance
+    lat0 = np.array([34.1])
+    lon0 = np.array([-118.2])
+    lat1 = np.array([34.2])
+    lon1 = np.array([-118.15])
+    z = np.array([1.0])
+    W = np.array([3.0])
+    dip = np.array([30.])
+
+    flt = Fault.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
+             'id': '', 'locstring': '', 'type': 'U', 'mech':'RS',
+             'rake':90,
+             'time': ShakeDateTime.utcfromtimestamp(int(time.time())),
+             'timezone': 'UTC'}
+    source = Source(event, flt)
+
+    gmpelist = ["Primate"]
+    with pytest.raises(Exception) as e:
+        dists = Distance.fromSites(gmpelist, source, site)
+
+    gmpelist = [AbrahamsonEtAl2014()]
+    sctx = site.getSitesContext()
+    dist_types = ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'V']
+    with pytest.raises(Exception) as e:
+        dists = get_distance(dist_types, sctx.lats, sctx.lons,
+                             np.zeros_like(sctx.lons), source)
+
+    dist_types = ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T']
+    with pytest.raises(Exception) as e:
+        dists = get_distance(dist_types, sctx.lats, sctx.lons[0:4,],
+                             np.zeros_like(sctx.lons), source)
+
 
 def test_distance_no_fault():
     # Make sites instance
@@ -92,6 +254,32 @@ def test_distance_no_fault():
 
     np.testing.assert_allclose(
         rrup, dctx.rrup, rtol=0, atol=0.01)
+
+    # Souce instance
+    #  - Tectonic region unsupported
+    #  - Mech is ALL
+    source._tectonic_region = 'Volcano'
+    dists = Distance.fromSites(gmpe, source, site)
+    dctx = dists.getDistanceContext()
+    rjbt = np.array(
+      [[ 1.69885399,  1.43717125,  1.2401229 ,  1.12306082,  1.08344161,
+         1.12306082,  1.2401229 ,  1.43717125,  1.69885399],
+       [ 1.31170897,  1.03475736,  0.82507289,  0.69891123,  0.6553167 ,
+         0.69891123,  0.82507289,  1.03475736,  1.31170897],
+       [ 1.02288894,  0.72918893,  0.50725874,  0.36675284,  0.31957002,
+         0.36675284,  0.50725874,  0.72918893,  1.02288894],
+       [ 0.83950888,  0.53487557,  0.30135487,  0.14776055,  0.09290799,
+         0.14776055,  0.30135487,  0.53487557,  0.83950888],
+       [ 0.77835253,  0.46963915,  0.2280053 ,  0.06643829,  0.        ,
+         0.06643829,  0.2280053 ,  0.46963915,  0.77835253],
+       [ 0.83964536,  0.53495323,  0.30139344,  0.14777086,  0.09290799,
+         0.14777086,  0.30139344,  0.53495323,  0.83964536],
+       [ 1.02314515,  0.72933979,  0.50732902,  0.36677229,  0.31957002,
+         0.36677229,  0.50732902,  0.72933979,  1.02314515],
+       [ 1.31208408,  1.03497272,  0.82517579,  0.69893672,  0.6553167 ,
+         0.69893672,  0.82517579,  1.03497272,  1.31208408]])
+    np.testing.assert_allclose(
+        rjbt, dctx.rjb, rtol=0, atol=0.01)
 
     # Souce instance
     #  - Tectonic region: active
@@ -681,6 +869,10 @@ def test_distance_from_sites_source():
 
     np.testing.assert_allclose(
         rrup, dctx.rrup, rtol=0, atol=0.01)
+
+    # Test getSource
+    src = dists.getSource()
+    assert isinstance(src, Source) == True
 
 
 def test_chichi_with_get_distance():
