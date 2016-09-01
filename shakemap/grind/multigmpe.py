@@ -39,7 +39,10 @@ class MultiGMPE(GMPE):
 
         # These are arrays to hold the weighted combination of the GMPEs
         lnmu = np.zeros_like(sites.vs30)
-        stddev_types = self.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        sd_avail = self.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        if not sd_avail.issuperset(set(stddev_types)):
+            raise Exception("Requested an unavailable stddev_type.")
+        
         lnsd2 = [np.zeros_like(sites.vs30) for a in stddev_types]
 
         for i in range(len(self.GMPEs)):
@@ -52,17 +55,23 @@ class MultiGMPE(GMPE):
             #---------------------------------------------------------------
             # Need to select the appropriate z1pt0 value for different GMPEs.
             # Note that these are required site parameters, so even though
-            # OQ has these equations built into the class, the arrays must
-            # be provided in the sites context. It might be worth sending
-            # a request to OQ to provide a subclass that that computes the
-            # depth parameters when not provided (as is done for BSSA14 but
-            # not the others).
+            # OQ has these equations built into the class in most cases. 
+            # I have submitted an issue to OQ requesting subclasses of these
+            # methods that do not require the depth parameters in the
+            # SitesContext to make this easier. 
             #---------------------------------------------------------------
 
             if gmpe == 'AbrahamsonEtAl2014()':
-                sites.z1pt0 = sites.z1pt0ask14
-            if gmpe == 'BooreEtAl2014()' or gmpe == 'ChiouYoungs2014()':
-                sites.z1pt0 = sites.z1pt0cy14
+                sites.z1pt0 = sites.z1pt0_ask14_cal
+            if gmpe == 'ChiouYoungs2014()':
+                # Also BooreEtAl2014() if using subclass with depth parameter
+                sites.z1pt0 = sites.z1pt0_cy14_cal
+            if gmpe == 'CampbellBozorgnia2014()':
+                sites.z2pt5 = sites.z2pt5_cb14_cal
+            if gmpe == 'ChiouYoungs2008()':
+                sites.z1pt0 = sites.z1pt0_cy08
+            if gmpe == 'CampbellBozorgnia2008()':
+                sites.z2pt5 = sites.z2pt5_cb07
 
 
             #---------------------------------------------------------------
@@ -72,9 +81,10 @@ class MultiGMPE(GMPE):
             gmpe_imts = [imt.__name__ for imt in \
                          gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
             if (isinstance(imt, PGV)) and ("PGV" not in gmpe_imts):
-
-                # If IMT is PGV and not given by GMPE, convert from PSA10
-
+                #-----------------------------------------------------------
+                # If IMT is PGV and PGV is not given by the GMPE, then
+                # convert from PSA10.
+                #-----------------------------------------------------------
                 psa10, psa10sd = gmpe.get_mean_and_stddevs(
                     sites, rup, dists, SA(1.0), stddev_types)
                 lmean, lsd = NewmarkHall1982.psa102pgv(psa10, psa10sd[0])
@@ -190,14 +200,11 @@ class MultiGMPE(GMPE):
         self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = imc
 
         #---------------------------------------------------------
-        # For scenarios, we only care about total standard deviation,
-        # but for real-time we need inter and intra. For now, lets
-        # just use total to make life easier. 
+        # Intersection of GMPE standard deviation types
         #---------------------------------------------------------
-#        stdlist = [set(g.DEFINED_FOR_STANDARD_DEVIATION_TYPES) for g in GMPEs]
-        self.DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
-            const.StdDev.TOTAL
-        ])
+        stdlist = [set(g.DEFINED_FOR_STANDARD_DEVIATION_TYPES) for g in GMPEs]
+        self.DEFINED_FOR_STANDARD_DEVIATION_TYPES = \
+            set.intersection(*stdlist)
 
         #---------------------------------------------------------
         # Need union of site parameters, but it is complicated by the
@@ -220,49 +227,3 @@ class MultiGMPE(GMPE):
 
         return self
 
-#----------------------------------------------------
-# Functions for getting depth parameters from Vs30
-#----------------------------------------------------
-
-
-def _z1_from_vs30_cy14_cal(vs30):
-    """
-    Compute z1.0 using CY14 relationship. 
-
-    :param vs30:
-        Numpy array of Vs30 values in m/s. 
-    :returns: 
-        Numpy array of z1.0 in m.  
-    """
-    z1 = np.exp(-(7.15 / 4.0) *
-                np.log((vs30**4.0 + 571.**4) / (1360**4.0 + 571.**4)))
-    return z1
-
-
-def _z1_from_vs30_ask14_cal(vs30):
-    """
-    Calculate z1.0 using ASK14 relationship. 
-
-    :param vs30:
-        Numpy array of Vs30 values in m/s. 
-    :returns: 
-        Numpy array of z1.0 in m.  
-
-    """
-    # ASK14 define units as KM, but implemented as m in OQ
-    z1 = np.exp(-(7.67 / 4.0) *
-                np.log((vs30**4.0 + 610.**4) / (1360**4.0 + 610.**4)))
-    return z1
-
-
-def _z2p5_from_vs30_cb14_cal(vs30):
-    """
-    Calculate z2.5 using CB14 relationship. 
-
-    :param vs30:
-        Numpy array of Vs30 values in m/s. 
-    :returns: 
-        Numpy array of z2.5 in m.  
-    """
-    z2p5 = 1000 * np.exp(7.089 - (1.144) * np.log(vs30))
-    return z2p5
