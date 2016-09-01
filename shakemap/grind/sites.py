@@ -50,29 +50,74 @@ def _getFileGeoDict(fname):
     return geodict
 
 
-def _calculate_z1p0(vs30):
-    # I think these are older generation equations (c2008). Probably need to be
-    # more careful about what version of these equations are used.
-    c1 = 6.745
-    c2 = 1.35
-    c3 = 5.394
-    c4 = 4.48
-    Z1Pt0 = np.zeros_like(vs30)
-    Z1Pt0[vs30 < 180] = np.exp(c1)
-    idx = (vs30 >= 180) & (vs30 <= 500)
-    Z1Pt0[idx] = np.exp(c1 - c2 * np.log(vs30[idx] / 180.0))
-    idx = vs30 > 500
-    Z1Pt0[idx] = np.exp(c3 - c4 * np.log(vs30[idx] / 500.0))
-    return Z1Pt0
+def _z1pt0_from_vs30_cy14_cal(vs30):
+    """
+    Compute z1.0 using CY14 relationship for California. 
+
+    :param vs30:
+        Numpy array of Vs30 values in m/s. 
+    :returns: 
+        Numpy array of z1.0 in m.  
+    """
+    z1 = np.exp(-(7.15 / 4.0) *
+                np.log((vs30**4.0 + 571.**4) / (1360**4.0 + 571.**4)))
+    return z1
 
 
-def _calculate_z2p5(z1pt0):
-    # I think these are older generation equations (c2008). Probably need to be
-    # more careful about what version of these equations are used.
-    c1 = 519
-    c2 = 3.595
-    Z2Pt5 = c1 + z1pt0 * c2
-    return Z2Pt5
+def _z1pt0_from_vs30_ask14_cal(vs30):
+    """
+    Calculate z1.0 using ASK14 relationship for California. 
+
+    :param vs30:
+        Numpy array of Vs30 values in m/s. 
+    :returns: 
+        Numpy array of z1.0 in m.  
+
+    """
+    # ASK14 define units as km, but implemented as m in OQ
+    z1 = np.exp(-(7.67 / 4.0) *
+                np.log((vs30**4.0 + 610.**4) / (1360**4.0 + 610.**4)))
+    return z1
+
+
+def _z2pt5_from_vs30_cb14_cal(vs30):
+    """
+    Calculate z2.5 using CB14 relationship for California. 
+
+    :param vs30:
+        Numpy array of Vs30 values in m/s.
+    :returns:
+        Numpy array of z2.5 in m. *NOTE*: OQ's CampbellBozorgnia2014 class
+        expects z2.5 to be in km!
+    """
+    z2p5 = 1000 * np.exp(7.089 - 1.144 * np.log(vs30))
+    return z2p5
+
+
+def _z1pt0_from_vs30_cy08(vs30):
+    """
+    Chiou and Youngs (2008) z1.0 equation.
+
+    :param vs30:
+        Numpy array of Vs30 values in m/s.
+    :returns:
+        Numpy array of z1.0 in m.
+    """
+    z1pt0 = np.exp(28.5 - (3.82/8.0)*np.log(vs30**8 + 378.7**8))
+    return z1pt0
+
+
+def _z2pt5_from_z1pt0_cb07(z1pt0):
+    """
+    Equations are from 2007 PEER report by Campbell and Bozorgnia. 
+
+    :param z1pt0:
+        Numpy array of z1.0 in m. 
+    :returns:
+        Numpy array of z2.5 in m. 
+    """
+    z2pt5 = 519.0 + z1pt0 * 3.595
+    return z2pt5
 
 
 class Sites(object):
@@ -81,7 +126,7 @@ class Sites(object):
     `SitesContext <https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py>`__.
     """
 
-    def __init__(self, vs30grid, vs30measured_grid=None, backarc=False,
+    def __init__(self, vs30grid, vs30measured_grid=None, backarc=None,
                  defaultVs30=686.0):
         """
         Construct a Sites object.
@@ -89,16 +134,22 @@ class Sites(object):
         :param vs30grid:
             MapIO Grid2D object containing Vs30 values.
         :param vs30measured_grid:
-            Boolean grid indicating whether Vs30 values were measured or derived
-            (i.e., from slope)
+            Boolean array indicating whether Vs30 values were measured or derived
+            (i.e., from topographic slope). 
         :param backarc:
-            Boolean indicating whether event is on the backarc as defined 
-            `here <http://earthquake.usgs.gov/learn/glossary/?term=backarc>`__.
+            Boolean array indicating whether site is in the subduction 
+            `backarc <http://earthquake.usgs.gov/learn/glossary/?term=backarc>`__.
         :param defaultVs30:
-          Default Vs30 value to use in locations where Vs30Grid is not specified.
+            Default Vs30 value to use in locations where Vs30Grid is not specified.
         """
         self._Vs30 = vs30grid
-        self._backarc = backarc
+        if backarc is None:
+            self._backarc = np.zeros_like(vs30grid.getData(), dtype=bool)
+        else:
+            self._backarc = backarc
+            # Could add a check here that if backarc is provided that it's type
+            # is bool and dimensions match vs30grid
+
         self._defaultVs30 = defaultVs30
         self._vs30measured_grid = vs30measured_grid
         self._GeoDict = vs30grid.getGeoDict().copy()
@@ -108,8 +159,12 @@ class Sites(object):
         self._lats = np.linspace(self._GeoDict.ymin,
                                  self._GeoDict.ymax,
                                  self._GeoDict.ny)
-        self._Z1Pt0 = _calculate_z1p0(self._Vs30.getData())
-        self._Z2Pt5 = _calculate_z2p5(self._Z1Pt0)
+        self._z1pt0_cy14_cal = _z1pt0_from_vs30_cy14_cal(self._Vs30.getData())
+        self._z1pt0_ask14_cal = _z1pt0_from_vs30_ask14_cal(self._Vs30.getData())
+        self._z2pt5_cb14_cal = _z2pt5_from_vs30_cb14_cal(self._Vs30.getData())/1000.0
+        self._z1pt0_cy08 = _z1pt0_from_vs30_cy08(self._Vs30.getData())
+        # Use cy08 z1pt0?
+        self._z2pt5_cb07 = _z2pt5_from_z1pt0_cb07(self._z1pt0_cy08)
 
     @classmethod
     def _create(cls, geodict, defaultVs30, vs30File, padding, resample):
@@ -132,7 +187,7 @@ class Sites(object):
     @classmethod
     def createFromBounds(cls, xmin, xmax, ymin, ymax, dx, dy, defaultVs30=686.0,
                          vs30File=None, vs30measured_grid=None,
-                         backarc=False, padding=False, resample=False):
+                         backarc=None, padding=False, resample=False):
         """
         Create a Sites object by defining a center point, resolution, extent, 
         and Vs30 values.
@@ -157,8 +212,8 @@ class Sites(object):
             Boolean grid indicating whether Vs30 values were measured or derived 
             (i.e., from slope)
         :param backarc:
-            Boolean indicating whether event is on the backarc as defined
-            `here <http://earthquake.usgs.gov/learn/glossary/?term=backarc>`__.
+            Boolean array indicating whether site is in the subduction 
+            `backarc <http://earthquake.usgs.gov/learn/glossary/?term=backarc>`__.
         :param padding:
             Boolean indicating whether or not to pad resulting Vs30 grid out to
             edges of input bounds. If False, grid will be clipped to the extent
@@ -180,7 +235,7 @@ class Sites(object):
     @classmethod
     def createFromCenter(cls, cx, cy, xspan, yspan, dx, dy, defaultVs30=686.0,
                          vs30File=None, vs30measured_grid=None,
-                         backarc=False, padding=False, resample=False):
+                         backarc=None, padding=False, resample=False):
         """
         Create a Sites object by defining a center point, resolution, extent, 
         and Vs30 values.
@@ -205,8 +260,8 @@ class Sites(object):
             Boolean grid indicating whether Vs30 values were measured or derived 
             (i.e., from slope)
         :param backarc:
-            Boolean indicating whether event is on the backarc as defined
-            `here <http://earthquake.usgs.gov/learn/glossary/?term=backarc>`__.
+            Boolean array indicating whether site is in the subduction 
+            `backarc <http://earthquake.usgs.gov/learn/glossary/?term=backarc>`__.
         :param padding:
             Boolean indicating whether or not to pad resulting Vs30 grid out to
             edges of input bounds. If False, grid will be clipped to the extent
@@ -255,13 +310,21 @@ class Sites(object):
         site.vs30 = self._Vs30.getValue(lats, lons, default=self._defaultVs30)
         site.lats = lats
         site.lons = lons
-        site.z1pt0 = _calculate_z1p0(site.vs30)
-        site.z2pt5 = _calculate_z2p5(site.z1pt0)
+        site.z1pt0_cy14_cal = _z1pt0_from_vs30_cy14_cal(site.vs30)
+        site.z1pt0_ask14_cal = _z1pt0_from_vs30_ask14_cal(site.vs30)
+        site.z2pt5_cb14_cal = _z2pt5_from_vs30_cb14_cal(site.vs30)/1000.0
+        site.z1pt0_cy08 = _z1pt0_from_vs30_cy08(site.vs30)
+        # Use cy08 z1pt0?
+        self._z2pt5_cb07 = _z2pt5_from_z1pt0_cb07(site.z1pt0_cy08)
+        
         if vs30measured_grid is None:  # If we don't know, then use false
             site.vs30measured = np.zeros_like(lons, dtype=bool)
         else:
             site.vs30measured = vs30measured_grid
-        site.backarc = self._backarc
+
+        # Backarc should be a numpy array
+        backarcgrid = Grid2D(self._backarc, self._Vs30.getGeoDict())
+        site.backarc = backarcgrid.getValue(lats, lons, default=self._defaultVs30)
 
         return site
 
@@ -279,8 +342,15 @@ class Sites(object):
         """
         sctx = SitesContext()
         sctx.vs30 = self._Vs30.getData().copy()
-        sctx.z1pt0 = self._Z1Pt0
-        sctx.z2pt5 = self._Z2Pt5
+
+        # Leave out z*pt* slots because they need to be filled in based on
+        # selected GMPE later
+        sctx.z1pt0_cy14_cal = self._z1pt0_cy14_cal
+        sctx.z1pt0_ask14_cal = self._z1pt0_ask14_cal
+        sctx.z2pt5_cb14_cal = self._z2pt5_cb14_cal
+        sctx.z1pt0_cy08 = self._z1pt0_cy08
+        sctx.z2pt5_cb07 = self._z2pt5_cb07
+
         sctx.backarc = self._backarc  # zoneconfig might have this info
         if self._vs30measured_grid is None:  # If we don't know, then use false
             sctx.vs30measured = np.zeros_like(
