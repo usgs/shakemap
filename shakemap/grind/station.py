@@ -14,11 +14,10 @@ import pandas as pd
 import numpy as np
 from openquake.hazardlib import imt as GEM_IMT
 from openquake.hazardlib.gsim import base
-from openquake.hazardlib import const
 
 # local imports
-from shakemap.grind.gmice.wgrw12 import WGRW12
 from .distance import get_distance, get_distance_measures
+import shakemap.grind.sites as sites
 
 TABLES = {'station':
           {'id': 'integer primary key',
@@ -126,8 +125,6 @@ def _getGroundMotions(comp):
             key = 'pgv'
 
         value = float(pgm.getAttribute('value'))
-        if np.isnan(value):
-            x = 1
         if pgm.hasAttribute('flag'):
             flag = pgm.getAttribute('flag')
         else:
@@ -321,14 +318,13 @@ class StationList(object):
         return cls(dbfile)
 
 
-    def fillTables(self, source, vs30, gmpe, gmice=None, ipe=None):
+    def fillTables(self, source, vs30, gmpe=None, ipe=None, gmice=None):
         """
         Populate tables with derived MMI/PGM values and distances.
 
         :param source:
           ShakeMap Source object.
         """
-        gmice = WGRW12()
         emag = source.getEventDict()['mag']
         #
         # Do the distances for all of the stations
@@ -438,7 +434,11 @@ class StationList(object):
         self.db.commit()
 
         #
-        # Use the gmpe to predict ground motions at each station
+        # Use the GMPE to predict ground motions for each of the
+        # IMTs at each station
+        # Compute predictions on both rock and soil, and find the
+        # site amplification factors for each IMT
+        # Also store the Vs30
         #
         rx = source.getRuptureContext([gmpe])
         dx = base.DistancesContext()
@@ -449,10 +449,7 @@ class StationList(object):
         sx.lons = lons
         vs30_soil = vs30.getValue(lats, lons, default=760.0)
         vs30_rock = np.zeros_like(vs30_soil) + 760.0
-#        sx.z1pt0 = sites._calculate_z1pt0(sx.vs30)
-#        sx.z2pt5 = sites._calculate_z2pt5(sx.z1pt0)
-        stddev_types = [const.StdDev.TOTAL, const.StdDev.INTER_EVENT, 
-                        const.StdDev.INTRA_EVENT]
+        sx.vs30measured = np.zeros_like(vs30_soil)
         pred_rows = []
         siteamp_rows = []
         vs30_rows = []
@@ -460,19 +457,41 @@ class StationList(object):
         for imt in BASE_IMTS:
             gemimt = GEM_IMT.from_string(GEM_IMT_MAP[imt])
             sx.vs30 = vs30_soil
-            pred_soil, pred_stdev = gmpe.get_mean_and_stddevs(sx, rx, dx, imt, stddev_types)
+            sx.z1pt0 = sites._calculate_z1p0(sx.vs30)
+            sx.z2pt5 = sites._calculate_z2p5(sx.z1pt0)
+            if imt == 'mmi':
+                stddev_types = ipe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+                pred_soil, pred_stdev = ipe.get_mean_and_stddevs(sx, rx, dx, gemimt, stddev_types)
+            else:
+                stddev_types = gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+                pred_soil, pred_stdev = gmpe.get_mean_and_stddevs(sx, rx, dx, gemimt, stddev_types)
+            
             sx.vs30 = vs30_rock
-            pred_rock, junk = gmpe.get_mean_and_stddevs(sx, rx, dx, imt, stddev_types)
+            sx.z1pt0 = sites._calculate_z1p0(sx.vs30)
+            sx.z2pt5 = sites._calculate_z2p5(sx.z1pt0)
+            if imt == 'mmi':
+                pred_rock, junk = ipe.get_mean_and_stddevs(sx, rx, dx, gemimt, stddev_types)
+            else:
+                pred_rock, junk = gmpe.get_mean_and_stddevs(sx, rx, dx, gemimt, stddev_types)
+            
             amp_facts = pred_soil - pred_rock
 
-            for irow in range(nrows):
-                pred_rows.append(
-                    (station_rows[irow][0], IMT_TYPES[imt], SOIL_TYPES['rock'], 
-                     pred_rock[irow], pred_stdev[const.StdDev.TOTAL][irow],
-                     pred_stdev[const.StdDev.INTER_EVENT][irow],
-                     pred_stdev[const.StdDev.INTRA_EVENT][irow]))
-                siteamp_rows.append(
-                    (station_rows[irow][0], IMT_TYPES[imt], amp_facts[irow]))
+            if len(stddev_types) == 3:
+                for irow in range(nrows):
+                    pred_rows.append(
+                        (station_rows[irow][0], IMT_TYPES[imt], SOIL_TYPES['rock'], 
+                        pred_rock[irow], pred_stdev[0][irow],
+                        pred_stdev[1][irow], pred_stdev[2][irow]))
+                    siteamp_rows.append(
+                        (station_rows[irow][0], IMT_TYPES[imt], amp_facts[irow]))
+            else:
+                for irow in range(nrows):
+                    pred_rows.append(
+                        (station_rows[irow][0], IMT_TYPES[imt], SOIL_TYPES['rock'], 
+                        pred_rock[irow], pred_stdev[0][irow], 'NULL', 'NULL'))
+                    siteamp_rows.append(
+                        (station_rows[irow][0], IMT_TYPES[imt], amp_facts[irow]))
+
 
         for irow in range(nrows):
             vs30_rows.append((vs30_soil[irow], station_rows[irow][0]))
@@ -491,35 +510,53 @@ class StationList(object):
 
 
     def getInstrumentedStations(self):
+
+        return self.getStationDataframe(1)
+
+
+    def getMMIStations(self):
+
+        return self.getStationDataframe(0)
+
+
+    def getStationDataframe(self, instrumented):
+
         dstr = ''
-        columns = ['id', 'lat', 'lon', 'code', 'network']
-        for mm in DISTANCES:
-            dstr += ", %s" % (mm)
+        columns = []
+        basic_columns = ['id', 'lat', 'lon', 'code', 'network', 'vs30']
+        for mm in basic_columns + DISTANCES:
+            if mm == basic_columns[0]:
+                dstr = '%s' % (mm)
+            else:
+                dstr += ", %s" % (mm)
             columns.append(mm)
 
-        stationquery = 'SELECT id, lat, lon, code, network%s FROM station '\
-                       'where instrumented = 1' % (dstr)
+        stationquery = 'SELECT %s FROM station '\
+                       'where instrumented = %d' % (dstr, instrumented)
         
         self.cursor.execute(stationquery)
-        rows = self.cursor.fetchall()
-        nrows = len(rows)
+        station_rows = self.cursor.fetchall()
+        nstation_rows = len(station_rows)
         try:
-            df = pd.DataFrame(rows, columns=columns)
-        except e:
+            df = pd.DataFrame(station_rows, columns=columns)
+        except:
             print('Exception in creating data frame')
-            raise e
+            raise
 
         ncols = 0
         new_cols = []
         for imt in IMT_TYPES_ORDERED.keys():
+            if (instrumented and imt.endswith('_from_mmi')) or \
+               (not instrumented and imt.startswith('mmi_from_')):
+                continue
             new_cols.append(imt)
             new_cols.append(imt + '_unc')
             ncols += 2
-        app = np.empty((np.shape(rows)[0], ncols))
+        app = np.empty((np.shape(station_rows)[0], ncols))
         app[:] = np.nan
 
         col_dict = dict(zip(new_cols, range(ncols)))
-        id_dict = dict(zip(df['id'], range(nrows)))
+        id_dict = dict(zip(df['id'], range(nstation_rows)))
 
         #
         # Get all of the unflagged instrumented amps with the proper
@@ -528,8 +565,8 @@ class StationList(object):
         self.cursor.execute(
             'SELECT a.amp, a.uncertainty, a.imt_id, a.station_id FROM '\
             'amp a, station s WHERE a.flag = "0" AND s.id = a.station_id '\
-            'AND s.instrumented = 1 AND a.orientation NOT IN ("Z", "U") '\
-            'AND a.amp IS NOT NULL'
+            'AND s.instrumented = %d AND a.orientation NOT IN ("Z", "U") '\
+            'AND a.amp IS NOT NULL' % (instrumented)
             )
         amp_rows = self.cursor.fetchall()
 
@@ -555,99 +592,85 @@ class StationList(object):
         df2 = pd.DataFrame(app, columns=new_cols)
         df = pd.concat([df, df2], axis=1)
 
-        df['name'] = df.network.map(str) + '.' + df.code.map(str)
-        del df['network']
-        del df['code']
-        newcols = ['name', 'lat', 'lon', ] + DISTANCES
-        for imt in IMT_TYPES_ORDERED.keys():
-            if not imt.startswith('mmi_from_'):
-                continue
-            newcols.append(imt)
-            newcols.append(imt + '_unc')
-        if pd.__version__ >= '0.17.0':
-            df = df[newcols].sort_values('name')
-        else:
-            df = df[newcols].sort('name')
-        return df
-
-
-    def getMMIStations(self):
-        dstr = ''
-        columns = ['id', 'lat', 'lon', 'code', 'network']
-        for mm in DISTANCES:
-            dstr += ", %s" % (mm)
-            columns.append(mm)
-
-        stationquery = 'SELECT id, lat, lon, code, network%s FROM station '\
-                       'where instrumented = 0' % (dstr)
-        
-        self.cursor.execute(stationquery)
-        rows = self.cursor.fetchall()
-        nrows = len(rows)
-        try:
-            df = pd.DataFrame(rows, columns=columns)
-        except e:
-            print('Exception in creating data frame')
-            raise e
-
+        del amp_rows, new_cols, col_dict, id_dict
+        #
+        # Get all of the predicted amps along with their uncertainties
+        #
+        nstation_rows = len(station_rows)
         ncols = 0
-        new_cols = []
-        for imt in IMT_TYPES_ORDERED.keys():
-            new_cols.append(imt)
-            new_cols.append(imt + '_unc')
-            ncols += 2
-        app = np.empty((np.shape(rows)[0], ncols))
-        app[:] = np.nan
+        pred_cols = []
+        for imt in BASE_IMTS:
+            pred_cols.append(imt + '_predicted')
+            pred_cols.append(imt + '_predicted_unc_total')
+            pred_cols.append(imt + '_predicted_unc_intra')
+            pred_cols.append(imt + '_site_factor')
+            ncols += 4
+        pred_arr = np.empty((np.shape(station_rows)[0], ncols))
+        pred_arr[:] = np.nan
 
-        col_dict = dict(zip(new_cols, range(ncols)))
-        id_dict = dict(zip(df['id'], range(nrows)))
+        col_dict = dict(zip(pred_cols, range(ncols)))
+        id_dict = dict(zip(df['id'], range(nstation_rows)))
+
+        self.cursor.execute(
+            'SELECT p.amp, p.uncertainty_total, p.uncertainty_intra, '\
+                   'p.imt_id, p.station_id FROM predicted p, station s '\
+                   'WHERE s.id = p.station_id AND s.instrumented = %d AND '\
+                   'p.amp IS NOT NULL' % (instrumented)
+            )
+        pred_rows = self.cursor.fetchall()
 
         #
-        # Get all of the unflagged uninstrumented amps 
+        # Go through all the predicted amps and put them into the data 
+        # frame
+        #
+        for this_row in pred_rows:
+            imt_id = this_row[3]
+            if imt_id not in IMT_LOOKUP:
+                continue
+            imt = IMT_LOOKUP[imt_id]
+            rowidx = id_dict[this_row[4]]
+            pred_arr[rowidx, col_dict[imt + '_predicted']] = this_row[0]
+            pred_arr[rowidx, col_dict[imt + '_predicted_unc_total']] = this_row[1]
+            if this_row[2] != 'NULL':
+                pred_arr[rowidx, col_dict[imt + '_predicted_unc_intra']] = this_row[2]
+
+        del pred_rows
+
+        #
+        # Go through all the site amplicication factors and put them 
+        # into the data frame
         #
         self.cursor.execute(
-            'SELECT a.amp, a.uncertainty, a.imt_id, a.station_id FROM '\
-            'amp a, station s WHERE a.flag = "0" AND s.id = a.station_id '\
-            'AND s.instrumented = 0 '\
-            'AND a.amp IS NOT NULL'
+            'SELECT p.amp_factor, p.imt_id, p.station_id FROM siteamp p, '\
+                   'station s WHERE s.id = p.station_id AND '\
+                   's.instrumented = %d AND p.amp_factor IS NOT NULL' % 
+                   (instrumented)
             )
-        amp_rows = self.cursor.fetchall()
+        siteamp_rows = self.cursor.fetchall()
 
-        #
-        # Go through all the instrumented amps and put them into the data 
-        # frame
-        #
-        for this_row in amp_rows:
-            imt_id = this_row[2]
+        for this_row in siteamp_rows:
+            imt_id = this_row[1]
             if imt_id not in IMT_LOOKUP:
                 continue
-            #
-            # Set the cell to the peak amp
-            #
             imt = IMT_LOOKUP[imt_id]
-            rowidx = id_dict[this_row[3]]
-            cval = app[rowidx, col_dict[imt]]
-            amp = this_row[0]
-            if np.isnan(cval) or (cval < amp):
-                app[rowidx, col_dict[imt]] = amp
-                app[rowidx, col_dict[imt + '_unc']] = this_row[1]
+            rowidx = id_dict[this_row[2]]
+            pred_arr[rowidx, col_dict[imt + '_site_factor']] = this_row[0]
 
-        df2 = pd.DataFrame(app, columns=new_cols)
-        df = pd.concat([df, df2], axis=1)
+        df3 = pd.DataFrame(pred_arr, columns=pred_cols)
+        df = pd.concat([df, df3], axis=1)
 
         df['name'] = df.network.map(str) + '.' + df.code.map(str)
-        del df['network']
-        del df['code']
-        newcols = ['name', 'lat', 'lon', ] + DISTANCES
-        for imt in IMT_TYPES_ORDERED.keys():
-            if not imt.endswith('_from_mmi'):
-                continue
-            newcols.append(imt)
-            newcols.append(imt + '_unc')
-        if pd.__version__ >= '0.17.0':
-            df = df[newcols].sort_values('name')
-        else:
-            df = df[newcols].sort('name')
+        #
+        # Is there any reason to do this sort?
+        #
+#        if pd.__version__ >= '0.17.0':
+#            df = df.sort_values('name')
+#        else:
+#            df = df.sort('name')
+
+#        del df['network']
+#        del df['code']
+
         return df
 
 
