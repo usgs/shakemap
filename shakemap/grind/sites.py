@@ -280,22 +280,27 @@ class Sites(object):
         return cls(vs30grid, vs30measured_grid=vs30measured_grid,
                    backarc=backarc, defaultVs30=defaultVs30)
 
-    def sampleFromSites(self, lats, lons, vs30measured_grid=None):
+    def getSitesContextFromLatLon(self, lats, lons, vs30measured_grid=None):
         """
         Create a SitesContext object by sampling the current Sites object.
 
         :param lats:
             Sequence of latitudes.
+
         :param lons:
             Sequence of longitudes.
+
         :param vs30measured_grid:
             Sequence of booleans of the same shape as lats/lons indicating 
             whether the vs30 values are measured or inferred.
+
         :returns:
             SitesContext object where data are sampled from the current Sites
             object.
+
         :raises ShakeMapException:
              When lat/lon input sequences do not share dimensionality.
+
         """
         lats = np.array(lats)
         lons = np.array(lons)
@@ -328,6 +333,63 @@ class Sites(object):
 
         return site
 
+    def getRockSitesContextFromLatLon(self, lats, lons,
+                                      rock_vs30 = 760.0,
+                                      vs30measured_grid=None):
+        """
+        Create a SitesContext object by sampling the current Sites object.
+
+        :param lats:
+            Sequence of latitudes.
+
+        :param lons:
+            Sequence of longitudes.
+
+        :param rock_vs30:
+            Vs30 in m/s for rock grid; default is 760 m/s. 
+
+        :param vs30measured_grid:
+            Sequence of booleans of the same shape as lats/lons indicating 
+            whether the vs30 values are measured or inferred.
+
+        :returns:
+            SitesContext object where data are sampled from the current Sites
+            object.
+
+        :raises ShakeMapException:
+             When lat/lon input sequences do not share dimensionality.
+
+        """
+        lats = np.array(lats)
+        lons = np.array(lons)
+        latshape = lats.shape
+        lonshape = lons.shape
+        if latshape != lonshape:
+            msg = 'Input lat/lon arrays must have the same dimensions'
+            raise ShakeMapException(msg)
+
+        sctx = SitesContext()
+        # use default vs30 if outside grid
+        sctx.vs30 = np.ones_like(self._Vs30.getValue(lats, lons))*rock_vs30
+        sctx.lats = lats
+        sctx.lons = lons
+        sctx.z1pt0_cy14_cal = _z1pt0_from_vs30_cy14_cal(sctx.vs30)
+        sctx.z1pt0_ask14_cal = _z1pt0_from_vs30_ask14_cal(sctx.vs30)
+        sctx.z2pt5_cb14_cal = _z2pt5_from_vs30_cb14_cal(sctx.vs30)/1000.0
+        sctx.z1pt0_cy08 = _z1pt0_from_vs30_cy08(sctx.vs30)
+        sctx._z2pt5_cb07 = _z2pt5_from_z1pt0_cb07(sctx.z1pt0_cy08)
+        
+        if vs30measured_grid is None:  # If we don't know, then use false
+            sctx.vs30measured = np.zeros_like(lons, dtype=bool)
+        else:
+            sctx.vs30measured = vs30measured_grid
+
+        # Backarc should be a numpy array
+        backarcgrid = Grid2D(self._backarc, self._Vs30.getGeoDict())
+        sctx.backarc = backarcgrid.getValue(lats, lons, default=self._defaultVs30)
+
+        return sctx
+
     def getVs30Grid(self):
         """
         :returns:
@@ -338,7 +400,7 @@ class Sites(object):
     def getSitesContext(self):
         """
         :returns:
-           SitesContext object.
+            SitesContext object.
         """
         sctx = SitesContext()
         sctx.vs30 = self._Vs30.getData().copy()
@@ -357,6 +419,33 @@ class Sites(object):
                 sctx.vs30, dtype=bool)
         else:
             sctx.vs30measured = self._vs30measured_grid
+        sctx.lons = self._lons
+        sctx.lats = self._lats
+        return sctx
+
+    def getRockSitesContext(self, rock_vs30 = 760.0):
+        """
+        Returns a site context with Vs30 values for reference rock conditions. 
+
+        :param rock_vs30:
+            Vs30 in m/s for rock grid; default is 760 m/s. 
+
+        :returns:
+            SitesContext object.
+        """
+        sctx = SitesContext()
+        sctx.vs30 = np.ones_like(self._Vs30.getData()) * rock_vs30
+
+        # Leave out z*pt* slots because they need to be filled in based on
+        # selected GMPE later
+        sctx.z1pt0_cy14_cal = _z1pt0_from_vs30_cy14_cal(sctx.vs30)
+        sctx.z1pt0_ask14_cal = _z1pt0_from_vs30_ask14_cal(sctx.vs30)
+        sctx.z2pt5_cb14_cal = _z2pt5_from_vs30_cb14_cal(sctx.vs30)/1000.0
+        sctx.z1pt0_cy08 = _z1pt0_from_vs30_cy08(sctx.vs30)
+        sctx.z2pt5_cb07 = _z2pt5_from_z1pt0_cb07(sctx.z1pt0_cy08)
+
+        sctx.backarc = self._backarc  # zoneconfig might have this info
+        sctx.vs30measured = np.zeros_like(sctx.vs30, dtype=bool)
         sctx.lons = self._lons
         sctx.lats = self._lats
         return sctx
