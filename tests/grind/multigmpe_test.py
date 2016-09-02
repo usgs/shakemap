@@ -11,6 +11,7 @@ from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
 from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import CampbellBozorgnia2014
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 from openquake.hazardlib.gsim.campbell_2003 import Campbell2003
+from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006
 from openquake.hazardlib import imt, const
 from openquake.hazardlib.gsim.base import RuptureContext
 from openquake.hazardlib.gsim.base import DistancesContext
@@ -23,6 +24,16 @@ from shakemap.grind.source import Source
 from shakemap.grind.fault import Fault
 from shakemap.grind.distance import Distance
 from shakemap.utils.timeutils import ShakeDateTime
+
+
+def test_get_default_site_factors():
+    gmpes = [BooreEtAl2014()]
+    wts = [1.0]
+    mgmpe = mg.MultiGMPE.from_list(
+        gmpes, wts, default_gmpe_for_site = BooreEtAl2014())
+    per = np.logspace(np.log10(0.01), np.log10(10))
+#    IMT = [imt.SA(T) for T in per]
+#    mgmpe.get_default_site_factors()
 
 @pytest.mark.mpl_image_compare
 def test_nga_w2_m8():
@@ -563,6 +574,17 @@ def test_nga_w2_m6():
     plt.legend(loc = 3)
     return fig
 
+def test_multigmpe_has_site():
+    gmpes = [AtkinsonBoore2006(), Campbell2003()]
+    wts = [0.4, 0.6]
+
+    with pytest.raises(Exception) as a:
+        mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
+
+    mgmpe = mg.MultiGMPE.from_list(
+        gmpes, wts, default_gmpe_for_site = AtkinsonBoore2006())
+    assert mgmpe.HAS_SITE == [True, False]
+
 
 def test_multigmpe():
     # Define gmpes and their weights
@@ -682,14 +704,15 @@ def test_multigmpe():
         wts = [1.0]
         mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
         stddev_types = [const.StdDev.INTER_EVENT]
-        lnmu, lnsd = mgmpe.get_mean_and_stddevs(sctx, rupt, dctx, iimt,
-                                                stddev_types)
+        lnmu, lnsd = mgmpe.get_mean_and_stddevs(
+            sctx, rupt, dctx, iimt, stddev_types)
     stddev_types = [const.StdDev.TOTAL]
 
     # Check PGV from a GMPE without PGV
     gmpes = [Campbell2003()]
     wts = [1.0]
-    mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
+    mgmpe = mg.MultiGMPE.from_list(
+        gmpes, wts, default_gmpe_for_site = AtkinsonBoore2006())
     lnmu, lnsd = mgmpe.get_mean_and_stddevs(
         sctx, rupt, dctx, iimt, stddev_types)
 
