@@ -87,6 +87,7 @@ def test_sites(vs30file=None):
     np.testing.assert_allclose(grd, grd_target)
 
     sc = mysite.getSitesContext()
+    scr = mysite.getRockSitesContext()
 
     grd = sc.backarc
     grdt = np.array(
@@ -139,6 +140,18 @@ def test_sites(vs30file=None):
        [ 420.07458496,  330.57504272,  392.33255005,  430.33862305,
          432.01391602,  429.43969727,  427.30435181,  425.96151733,
          426.15856934]])
+    np.testing.assert_allclose(grd, grdt)
+
+    grd = scr.vs30
+    grdt = np.array(
+      [[ 760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.],
+       [ 760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.],
+       [ 760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.],
+       [ 760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.],
+       [ 760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.],
+       [ 760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.],
+       [ 760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.],
+       [ 760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.,  760.]])
     np.testing.assert_allclose(grd, grdt)
 
     grd = sc.vs30measured
@@ -285,23 +298,32 @@ def test_sites(vs30file=None):
          1.16593269,  1.17260055,  1.17683042,  1.17620792]])
     np.testing.assert_allclose(grd, grdt)
 
-    scsamp = mysite.sampleFromSites(np.array([34.1, 34.111]),
-                                    np.array([-118.2, -118.222]))
+    scsamp = mysite.getSitesContextFromLatLon(np.array([34.1, 34.111]),
+                                              np.array([-118.2, -118.222]))
     vs30 = scsamp.vs30
     vs30t = np.array([ 395.53771973,  428.14602661])
     np.testing.assert_allclose(vs30, vs30t)
 
+    scrsamp = mysite.getRockSitesContextFromLatLon(
+        np.array([34.1, 34.111]),
+        np.array([-118.2, -118.222]))
+    vs30 = scrsamp.vs30
+    vs30t = np.array([ 760.,  760.])
+    np.testing.assert_allclose(vs30, vs30t)
+    
+
     lats = np.array([34.1, 34.111])
     lons = np.array([-118.2, -118.222])
     meas = np.zeros_like(lons, dtype=bool)
-    scsamp = mysite.sampleFromSites(lats, lons, meas)
+    scsamp = mysite.getSitesContextFromLatLon(lats, lons, meas)
     grd = scsamp.vs30measured
     grdt = np.array([False, False], dtype=bool)
     np.testing.assert_allclose(grd, grdt)
 
     with pytest.raises(Exception) as e:
-        scsamp = mysite.sampleFromSites(np.array([34.1, 34.111, 34.5]),
-                                        np.array([-118.2, -118.222]))
+        scsamp = mysite.getSitesContextFromLatLon(
+            np.array([34.1, 34.111, 34.5]),
+            np.array([-118.2, -118.222]))
 
     mysite = Sites.createFromCenter(cx, cy, xspan, yspan, dx, dy,
                                     vs30File=None, padding=True,
