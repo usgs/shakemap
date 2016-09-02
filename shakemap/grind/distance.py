@@ -282,6 +282,9 @@ def get_distance(methods, lat, lon, dep, source,
        (('rx' in methods) and (quadlist is None)) or \
        (('T' in methods) and (quadlist is None)) or \
        (('U' in methods) and (quadlist is None)):
+        # I don't think this error check makes sense any more because hypo
+        # is assigned above with source.getHypo() that constructs it from
+        # source._event_dict entries. 
         if hypo is None:
             raise ShakeMapException('Cannot calculate epicentral distance '
                                     'without a point object')

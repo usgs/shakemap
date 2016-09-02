@@ -676,6 +676,15 @@ def test_multigmpe():
         wts = [1.0]
         mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
     
+    # Check exception on standard deviation type
+    with pytest.raises(Exception) as a:
+        gmpes = [Campbell2003()]
+        wts = [1.0]
+        mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
+        stddev_types = [const.StdDev.INTER_EVENT]
+        lnmu, lnsd = mgmpe.get_mean_and_stddevs(sctx, rupt, dctx, iimt,
+                                                stddev_types)
+    stddev_types = [const.StdDev.TOTAL]
 
     # Check PGV from a GMPE without PGV
     gmpes = [Campbell2003()]

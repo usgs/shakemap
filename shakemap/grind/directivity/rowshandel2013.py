@@ -163,7 +163,7 @@ with warnings.catch_warnings():
         :param centered:
             Boolean; should the centered directivity parameter be used.
         """
-        sm_dict = sites.GeoDict
+        sm_dict = sites.getVs30Grid().getGeoDict()
         west = sm_dict.xmin
         east = sm_dict.xmax
         south = sm_dict.ymin
