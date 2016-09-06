@@ -18,11 +18,11 @@ sys.path.insert(0, shakedir)
 
 def test_depthpars():
     vs30 = np.linspace(200, 700, 6)
-    cy14 = sites._z1pt0_from_vs30_cy14_cal(vs30)
-    cb14 = sites._z2pt5_from_vs30_cb14_cal(vs30)
-    ask14 = sites._z1pt0_from_vs30_ask14_cal(vs30)
-    cy08 = sites._z1pt0_from_vs30_cy08(vs30)
-    cb07 = sites._z2pt5_from_z1pt0_cb07(cy08)
+    cy14 = sites.Sites._z1pt0_from_vs30_cy14_cal(vs30)
+    cb14 = sites.Sites._z2pt5_from_vs30_cb14_cal(vs30)
+    ask14 = sites.Sites._z1pt0_from_vs30_ask14_cal(vs30)
+    cy08 = sites.Sites._z1pt0_from_vs30_cy08(vs30)
+    cb07 = sites.Sites._z2pt5_from_z1pt0_cb07(cy08)
 
     cy14t = np.array(
       [ 509.34591289,  458.77871089,  355.71703571,  228.88509539,
@@ -87,7 +87,7 @@ def test_sites(vs30file=None):
     np.testing.assert_allclose(grd, grd_target)
 
     sc = mysite.getSitesContext()
-    scr = mysite.getRockSitesContext()
+    scr = mysite.getSitesContext(rock_vs30 = 760.0)
 
     grd = sc.backarc
     grdt = np.array(
@@ -298,15 +298,17 @@ def test_sites(vs30file=None):
          1.16593269,  1.17260055,  1.17683042,  1.17620792]])
     np.testing.assert_allclose(grd, grdt)
 
-    scsamp = mysite.getSitesContextFromLatLon(np.array([34.1, 34.111]),
-                                              np.array([-118.2, -118.222]))
+    lldict = {'lats':np.array([34.1, 34.111]),
+              'lons':np.array([-118.2, -118.222])}
+    scsamp = mysite.getSitesContext(lldict)
+
     vs30 = scsamp.vs30
     vs30t = np.array([ 395.53771973,  428.14602661])
     np.testing.assert_allclose(vs30, vs30t)
 
-    scrsamp = mysite.getRockSitesContextFromLatLon(
-        np.array([34.1, 34.111]),
-        np.array([-118.2, -118.222]))
+    lldict = {'lats':np.array([34.1, 34.111]),
+              'lons':np.array([-118.2, -118.222])}
+    scrsamp = mysite.getSitesContext(lldict, rock_vs30=760)
     vs30 = scrsamp.vs30
     vs30t = np.array([ 760.,  760.])
     np.testing.assert_allclose(vs30, vs30t)
@@ -314,8 +316,8 @@ def test_sites(vs30file=None):
 
     lats = np.array([34.1, 34.111])
     lons = np.array([-118.2, -118.222])
-    meas = np.zeros_like(lons, dtype=bool)
-    scsamp = mysite.getSitesContextFromLatLon(lats, lons, meas)
+    lldict = {'lats':lats, 'lons':lons}
+    scsamp = mysite.getSitesContext(lldict)
     grd = scsamp.vs30measured
     grdt = np.array([False, False], dtype=bool)
     np.testing.assert_allclose(grd, grdt)

@@ -71,22 +71,22 @@ def test_nga_w2_m8():
     gmpe = mgmpe = mg.MultiGMPE.from_list(gmpes, [1.0],
         imc = 'Average Horizontal (RotD50)')
     sctx.vs30measured = np.zeros_like(dctx.rjb, dtype=bool)
-    sctx.z1pt0_cy14_cal = sites._z1pt0_from_vs30_cy14_cal(sctx.vs30)
+    sctx.z1pt0_cy14_cal = sites.Sites._z1pt0_from_vs30_cy14_cal(sctx.vs30)
     cy14, sd_cy14 = gmpe.get_mean_and_stddevs(sctx, rctx, dctx, IMT,
         [const.StdDev.TOTAL])
 
     gmpes = [AbrahamsonEtAl2014()]
     gmpe = mgmpe = mg.MultiGMPE.from_list(gmpes, [1.0],
         imc = 'Average Horizontal (RotD50)')
-    sctx.z1pt0_ask14_cal = sites._z1pt0_from_vs30_ask14_cal(sctx.vs30)
+    sctx.z1pt0_ask14_cal = sites.Sites._z1pt0_from_vs30_ask14_cal(sctx.vs30)
     ask14, sd_ask14 = gmpe.get_mean_and_stddevs(sctx, rctx, dctx, IMT,
         [const.StdDev.TOTAL])
     
     gmpes = [CampbellBozorgnia2014()]
     gmpe = mgmpe = mg.MultiGMPE.from_list(gmpes, [1.0],
         imc = 'Average Horizontal (RotD50)')
-    sctx.z2pt5_cb14_cal = sites._z2pt5_from_vs30_cb14_cal(sctx.vs30)/1000.0
-    #                                                     Important ^^^^^^^
+    sctx.z2pt5_cb14_cal = sites.Sites._z2pt5_from_vs30_cb14_cal(sctx.vs30)/1000.0
+    #                                                           Important ^^^^^^^
     cb14, sd_cb14 = gmpe.get_mean_and_stddevs(sctx, rctx, dctx, IMT,
         [const.StdDev.TOTAL])
 
@@ -348,21 +348,21 @@ def test_nga_w2_m6():
     gmpe = mgmpe = mg.MultiGMPE.from_list(gmpes, [1.0],
         imc = 'Average Horizontal (RotD50)')
     sctx.vs30measured = np.zeros_like(dctx.rjb, dtype=bool)
-    sctx.z1pt0_cy14_cal = sites._z1pt0_from_vs30_cy14_cal(sctx.vs30)
+    sctx.z1pt0_cy14_cal = sites.Sites._z1pt0_from_vs30_cy14_cal(sctx.vs30)
     cy14, sd_cy14 = gmpe.get_mean_and_stddevs(sctx, rctx, dctx, IMT,
         [const.StdDev.TOTAL])
 
     gmpes = [AbrahamsonEtAl2014()]
     gmpe = mgmpe = mg.MultiGMPE.from_list(gmpes, [1.0],
         imc = 'Average Horizontal (RotD50)')
-    sctx.z1pt0_ask14_cal = sites._z1pt0_from_vs30_ask14_cal(sctx.vs30)
+    sctx.z1pt0_ask14_cal = sites.Sites._z1pt0_from_vs30_ask14_cal(sctx.vs30)
     ask14, sd_ask14 = gmpe.get_mean_and_stddevs(sctx, rctx, dctx, IMT,
         [const.StdDev.TOTAL])
     
     gmpes = [CampbellBozorgnia2014()]
     gmpe = mgmpe = mg.MultiGMPE.from_list(gmpes, [1.0],
         imc = 'Average Horizontal (RotD50)')
-    sctx.z2pt5_cb14_cal = sites._z2pt5_from_vs30_cb14_cal(sctx.vs30)/1000.0
+    sctx.z2pt5_cb14_cal = sites.Sites._z2pt5_from_vs30_cb14_cal(sctx.vs30)/1000.0
     #                                                     Important ^^^^^^^
     cb14, sd_cb14 = gmpe.get_mean_and_stddevs(sctx, rctx, dctx, IMT,
         [const.StdDev.TOTAL])

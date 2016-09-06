@@ -14,112 +14,6 @@ import numpy as np
 from shakemap.utils.exception import ShakeMapException
 
 
-def _load(vs30File, samplegeodict=None, resample=False, method='linear',
-          doPadding=False, padValue=np.nan):
-    try:
-        vs30grid = GMTGrid.load(vs30File, samplegeodict=samplegeodict,
-                                resample=resample, method=method,
-                                doPadding=doPadding, padValue=padValue)
-    except Exception as msg1:
-        try:
-            vs30grid = GDALGrid.load(vs30File, samplegeodict=samplegeodict,
-                                     resample=resample, method=method,
-                                     doPadding=doPadding, padValue=padValue)
-        except Exception as msg2:
-            msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (
-                vs30File, str(msg1), str(msg2))
-            raise ShakeMapException(msg)
-
-    if vs30grid.getData().dtype != np.float64:
-        vs30grid.setData(vs30grid.getData().astype(np.float64))
-
-    return vs30grid
-
-
-def _getFileGeoDict(fname):
-    geodict = None
-    try:
-        geodict = GMTGrid.getFileGeoDict(fname)
-    except Exception as msg1:
-        try:
-            geodict = GDALGrid.getFileGeoDict(fname)
-        except Exception as msg2:
-            msg = 'File geodict failure with %s - error messages: "%s"\n "%s"' % (
-                fname, str(msg1), str(msg2))
-            raise ShakeMapException(msg)
-    return geodict
-
-
-def _z1pt0_from_vs30_cy14_cal(vs30):
-    """
-    Compute z1.0 using CY14 relationship for California. 
-
-    :param vs30:
-        Numpy array of Vs30 values in m/s. 
-    :returns: 
-        Numpy array of z1.0 in m.  
-    """
-    z1 = np.exp(-(7.15 / 4.0) *
-                np.log((vs30**4.0 + 571.**4) / (1360**4.0 + 571.**4)))
-    return z1
-
-
-def _z1pt0_from_vs30_ask14_cal(vs30):
-    """
-    Calculate z1.0 using ASK14 relationship for California. 
-
-    :param vs30:
-        Numpy array of Vs30 values in m/s. 
-    :returns: 
-        Numpy array of z1.0 in m.  
-
-    """
-    # ASK14 define units as km, but implemented as m in OQ
-    z1 = np.exp(-(7.67 / 4.0) *
-                np.log((vs30**4.0 + 610.**4) / (1360**4.0 + 610.**4)))
-    return z1
-
-
-def _z2pt5_from_vs30_cb14_cal(vs30):
-    """
-    Calculate z2.5 using CB14 relationship for California. 
-
-    :param vs30:
-        Numpy array of Vs30 values in m/s.
-    :returns:
-        Numpy array of z2.5 in m. *NOTE*: OQ's CampbellBozorgnia2014 class
-        expects z2.5 to be in km!
-    """
-    z2p5 = 1000 * np.exp(7.089 - 1.144 * np.log(vs30))
-    return z2p5
-
-
-def _z1pt0_from_vs30_cy08(vs30):
-    """
-    Chiou and Youngs (2008) z1.0 equation.
-
-    :param vs30:
-        Numpy array of Vs30 values in m/s.
-    :returns:
-        Numpy array of z1.0 in m.
-    """
-    z1pt0 = np.exp(28.5 - (3.82/8.0)*np.log(vs30**8 + 378.7**8))
-    return z1pt0
-
-
-def _z2pt5_from_z1pt0_cb07(z1pt0):
-    """
-    Equations are from 2007 PEER report by Campbell and Bozorgnia. 
-
-    :param z1pt0:
-        Numpy array of z1.0 in m. 
-    :returns:
-        Numpy array of z2.5 in m. 
-    """
-    z2pt5 = 519.0 + z1pt0 * 3.595
-    return z2pt5
-
-
 class Sites(object):
     """
     An object to encapsulate information used to generate a GEM 
@@ -159,17 +53,22 @@ class Sites(object):
         self._lats = np.linspace(self._GeoDict.ymin,
                                  self._GeoDict.ymax,
                                  self._GeoDict.ny)
-        self._z1pt0_cy14_cal = _z1pt0_from_vs30_cy14_cal(self._Vs30.getData())
-        self._z1pt0_ask14_cal = _z1pt0_from_vs30_ask14_cal(self._Vs30.getData())
-        self._z2pt5_cb14_cal = _z2pt5_from_vs30_cb14_cal(self._Vs30.getData())/1000.0
-        self._z1pt0_cy08 = _z1pt0_from_vs30_cy08(self._Vs30.getData())
+        self._z1pt0_cy14_cal =\
+            self._z1pt0_from_vs30_cy14_cal(self._Vs30.getData())
+        self._z1pt0_ask14_cal =\
+            self._z1pt0_from_vs30_ask14_cal(self._Vs30.getData())
+        self._z2pt5_cb14_cal =\
+            self._z2pt5_from_vs30_cb14_cal(self._Vs30.getData())/1000.0
+        self._z1pt0_cy08 =\
+            self._z1pt0_from_vs30_cy08(self._Vs30.getData())
         # Use cy08 z1pt0?
-        self._z2pt5_cb07 = _z2pt5_from_z1pt0_cb07(self._z1pt0_cy08)
+        self._z2pt5_cb07 =\
+            self._z2pt5_from_z1pt0_cb07(self._z1pt0_cy08)
 
     @classmethod
     def _create(cls, geodict, defaultVs30, vs30File, padding, resample):
         if vs30File is not None:
-            fgeodict = _getFileGeoDict(vs30File)
+            fgeodict = cls._getFileGeoDict(vs30File)
             if not resample:
                 if not padding:
                     # we want something that is within and aligned
@@ -178,9 +77,9 @@ class Sites(object):
                     # we want something that is just aligned, since we're
                     # padding edges
                     geodict = fgeodict.getAligned(geodict)
-            vs30grid = _load(vs30File, samplegeodict=geodict,
-                             resample=resample, method='linear',
-                             doPadding=padding, padValue=defaultVs30)
+            vs30grid = cls._load(vs30File, samplegeodict=geodict,
+                                 resample=resample, method='linear',
+                                 doPadding=padding, padValue=defaultVs30)
 
         return vs30grid
 
@@ -280,113 +179,88 @@ class Sites(object):
         return cls(vs30grid, vs30measured_grid=vs30measured_grid,
                    backarc=backarc, defaultVs30=defaultVs30)
 
-    def getSitesContextFromLatLon(self, lats, lons, vs30measured_grid=None):
+    def getSitesContext(self, lldict=None, rock_vs30=None):
         """
         Create a SitesContext object by sampling the current Sites object.
 
-        :param lats:
-            Sequence of latitudes.
+        :param lldict:
+            Either
 
-        :param lons:
-            Sequence of longitudes.
-
-        :param vs30measured_grid:
-            Sequence of booleans of the same shape as lats/lons indicating 
-            whether the vs30 values are measured or inferred.
-
-        :returns:
-            SitesContext object where data are sampled from the current Sites
-            object.
-
-        :raises ShakeMapException:
-             When lat/lon input sequences do not share dimensionality.
-
-        """
-        lats = np.array(lats)
-        lons = np.array(lons)
-        latshape = lats.shape
-        lonshape = lons.shape
-        if latshape != lonshape:
-            msg = 'Input lat/lon arrays must have the same dimensions'
-            raise ShakeMapException(msg)
-
-        site = SitesContext()
-        # use default vs30 if outside grid
-        site.vs30 = self._Vs30.getValue(lats, lons, default=self._defaultVs30)
-        site.lats = lats
-        site.lons = lons
-        site.z1pt0_cy14_cal = _z1pt0_from_vs30_cy14_cal(site.vs30)
-        site.z1pt0_ask14_cal = _z1pt0_from_vs30_ask14_cal(site.vs30)
-        site.z2pt5_cb14_cal = _z2pt5_from_vs30_cb14_cal(site.vs30)/1000.0
-        site.z1pt0_cy08 = _z1pt0_from_vs30_cy08(site.vs30)
-        # Use cy08 z1pt0?
-        self._z2pt5_cb07 = _z2pt5_from_z1pt0_cb07(site.z1pt0_cy08)
-        
-        if vs30measured_grid is None:  # If we don't know, then use false
-            site.vs30measured = np.zeros_like(lons, dtype=bool)
-        else:
-            site.vs30measured = vs30measured_grid
-
-        # Backarc should be a numpy array
-        backarcgrid = Grid2D(self._backarc, self._Vs30.getGeoDict())
-        site.backarc = backarcgrid.getValue(lats, lons, default=self._defaultVs30)
-
-        return site
-
-    def getRockSitesContextFromLatLon(self, lats, lons,
-                                      rock_vs30 = 760.0,
-                                      vs30measured_grid=None):
-        """
-        Create a SitesContext object by sampling the current Sites object.
-
-        :param lats:
-            Sequence of latitudes.
-
-        :param lons:
-            Sequence of longitudes.
+                - None, in which case the SitesContext for the complete Sites
+                  grid is returned, or 
+                - A location dictionary (elements are 'lats' and 'lons' and each
+                  is a numpy array). Each element must have the same shape. In
+                  this case the SitesContext for these locaitons is returned.
 
         :param rock_vs30:
-            Vs30 in m/s for rock grid; default is 760 m/s. 
+            Either
 
-        :param vs30measured_grid:
-            Sequence of booleans of the same shape as lats/lons indicating 
-            whether the vs30 values are measured or inferred.
+                - None, in which case the SitesContext will reflect the Vs30
+                  grid in the Sites instance, or 
+                - A float for the rock Vs30 value, in which case the 
+                  SitesContext will be constructed for this constant Vs30 value.
 
         :returns:
-            SitesContext object where data are sampled from the current Sites
-            object.
+            SitesContext object. 
 
         :raises ShakeMapException:
              When lat/lon input sequences do not share dimensionality.
 
         """
-        lats = np.array(lats)
-        lons = np.array(lons)
-        latshape = lats.shape
-        lonshape = lons.shape
-        if latshape != lonshape:
-            msg = 'Input lat/lon arrays must have the same dimensions'
-            raise ShakeMapException(msg)
 
         sctx = SitesContext()
-        # use default vs30 if outside grid
-        sctx.vs30 = np.ones_like(self._Vs30.getValue(lats, lons))*rock_vs30
-        sctx.lats = lats
-        sctx.lons = lons
-        sctx.z1pt0_cy14_cal = _z1pt0_from_vs30_cy14_cal(sctx.vs30)
-        sctx.z1pt0_ask14_cal = _z1pt0_from_vs30_ask14_cal(sctx.vs30)
-        sctx.z2pt5_cb14_cal = _z2pt5_from_vs30_cb14_cal(sctx.vs30)/1000.0
-        sctx.z1pt0_cy08 = _z1pt0_from_vs30_cy08(sctx.vs30)
-        sctx._z2pt5_cb07 = _z2pt5_from_z1pt0_cb07(sctx.z1pt0_cy08)
-        
-        if vs30measured_grid is None:  # If we don't know, then use false
-            sctx.vs30measured = np.zeros_like(lons, dtype=bool)
+
+        if lldict is not None:
+            lats = lldict['lats']
+            lons = lldict['lons']
+            latshape = lats.shape
+            lonshape = lons.shape
+            if latshape != lonshape:
+                msg = 'Input lat/lon arrays must have the same dimensions'
+                raise ShakeMapException(msg)
+
+            if rock_vs30 is not None:
+                tmp = self._Vs30.getValue(
+                    lats, lons, default=self._defaultVs30)
+                sctx.vs30 = np.ones_like(tmp) * rock_vs30
+            else:
+                sctx.vs30 = self._Vs30.getValue(
+                    lats, lons, default=self._defaultVs30)
+            sctx.lats = lats
+            sctx.lons = lons
+            sctx.z1pt0_cy14_cal =\
+                self._z1pt0_from_vs30_cy14_cal(sctx.vs30)
+            sctx.z1pt0_ask14_cal =\
+                self._z1pt0_from_vs30_ask14_cal(sctx.vs30)
+            sctx.z2pt5_cb14_cal =\
+                self._z2pt5_from_vs30_cb14_cal(sctx.vs30)/1000.0
+            sctx.z1pt0_cy08 =\
+                self._z1pt0_from_vs30_cy08(sctx.vs30)
+            sctx._z2pt5_cb07 =\
+                self._z2pt5_from_z1pt0_cb07(sctx.z1pt0_cy08)
         else:
-            sctx.vs30measured = vs30measured_grid
+            sctx.lats = self._lats.copy()
+            sctx.lons = self._lons.copy()
+            if rock_vs30 is not None:
+                sctx.vs30 = np.ones_like(self._Vs30.getData()) * rock_vs30
+            else:
+                sctx.vs30 = self._Vs30.getData().copy()
+            sctx.z1pt0_cy14_cal = self._z1pt0_cy14_cal
+            sctx.z1pt0_ask14_cal = self._z1pt0_ask14_cal
+            sctx.z2pt5_cb14_cal = self._z2pt5_cb14_cal
+            sctx.z1pt0_cy08 = self._z1pt0_cy08
+            sctx.z2pt5_cb07 = self._z2pt5_cb07
+            
+        
+        # For ShakeMap purposes, vs30 measured is always Fales
+        sctx.vs30measured = np.zeros_like(sctx.vs30, dtype=bool)
 
         # Backarc should be a numpy array
-        backarcgrid = Grid2D(self._backarc, self._Vs30.getGeoDict())
-        sctx.backarc = backarcgrid.getValue(lats, lons, default=self._defaultVs30)
+        if lldict is not None:
+            backarcgrid = Grid2D(self._backarc, self._Vs30.getGeoDict())
+            sctx.backarc = backarcgrid.getValue(lats, lons, default=False)
+        else:
+            sctx.backarc = self._backarc.copy()
 
         return sctx
 
@@ -397,55 +271,115 @@ class Sites(object):
         """
         return self._Vs30
 
-    def getSitesContext(self):
+    @staticmethod
+    def _load(vs30File, samplegeodict=None, resample=False, method='linear',
+              doPadding=False, padValue=np.nan):
+        try:
+            vs30grid = GMTGrid.load(vs30File, samplegeodict=samplegeodict,
+                                    resample=resample, method=method,
+                                    doPadding=doPadding, padValue=padValue)
+        except Exception as msg1:
+            try:
+                vs30grid = GDALGrid.load(vs30File, samplegeodict=samplegeodict,
+                                         resample=resample, method=method,
+                                         doPadding=doPadding, padValue=padValue)
+            except Exception as msg2:
+                msg = 'Load failure of %s - error messages: "%s"\n "%s"' % (
+                    vs30File, str(msg1), str(msg2))
+                raise ShakeMapException(msg)
+
+        if vs30grid.getData().dtype != np.float64:
+            vs30grid.setData(vs30grid.getData().astype(np.float64))
+
+        return vs30grid
+
+    @staticmethod
+    def _getFileGeoDict(fname):
+        geodict = None
+        try:
+            geodict = GMTGrid.getFileGeoDict(fname)
+        except Exception as msg1:
+            try:
+                geodict = GDALGrid.getFileGeoDict(fname)
+            except Exception as msg2:
+                msg = 'File geodict failure with %s - error messages: "%s"\n "%s"' % (
+                    fname, str(msg1), str(msg2))
+                raise ShakeMapException(msg)
+        return geodict
+
+
+    @staticmethod
+    def _z1pt0_from_vs30_cy14_cal(vs30):
         """
+        Compute z1.0 using CY14 relationship for California. 
+
+        :param vs30:
+            Numpy array of Vs30 values in m/s. 
+        :returns: 
+            Numpy array of z1.0 in m.  
+        """
+        z1 = np.exp(-(7.15 / 4.0) *
+                    np.log((vs30**4.0 + 571.**4) / (1360**4.0 + 571.**4)))
+        return z1
+
+
+    @staticmethod
+    def _z1pt0_from_vs30_ask14_cal(vs30):
+        """
+        Calculate z1.0 using ASK14 relationship for California. 
+
+        :param vs30:
+            Numpy array of Vs30 values in m/s. 
+        :returns: 
+            Numpy array of z1.0 in m.  
+
+        """
+        # ASK14 define units as km, but implemented as m in OQ
+        z1 = np.exp(-(7.67 / 4.0) *
+                    np.log((vs30**4.0 + 610.**4) / (1360**4.0 + 610.**4)))
+        return z1
+
+
+    @staticmethod
+    def _z2pt5_from_vs30_cb14_cal(vs30):
+        """
+        Calculate z2.5 using CB14 relationship for California. 
+
+        :param vs30:
+            Numpy array of Vs30 values in m/s.
         :returns:
-            SitesContext object.
+            Numpy array of z2.5 in m. *NOTE*: OQ's CampbellBozorgnia2014 class
+            expects z2.5 to be in km!
         """
-        sctx = SitesContext()
-        sctx.vs30 = self._Vs30.getData().copy()
+        z2p5 = 1000 * np.exp(7.089 - 1.144 * np.log(vs30))
+        return z2p5
 
-        # Leave out z*pt* slots because they need to be filled in based on
-        # selected GMPE later
-        sctx.z1pt0_cy14_cal = self._z1pt0_cy14_cal
-        sctx.z1pt0_ask14_cal = self._z1pt0_ask14_cal
-        sctx.z2pt5_cb14_cal = self._z2pt5_cb14_cal
-        sctx.z1pt0_cy08 = self._z1pt0_cy08
-        sctx.z2pt5_cb07 = self._z2pt5_cb07
 
-        sctx.backarc = self._backarc  # zoneconfig might have this info
-        if self._vs30measured_grid is None:  # If we don't know, then use false
-            sctx.vs30measured = np.zeros_like(
-                sctx.vs30, dtype=bool)
-        else:
-            sctx.vs30measured = self._vs30measured_grid
-        sctx.lons = self._lons
-        sctx.lats = self._lats
-        return sctx
-
-    def getRockSitesContext(self, rock_vs30 = 760.0):
+    @staticmethod
+    def _z1pt0_from_vs30_cy08(vs30):
         """
-        Returns a site context with Vs30 values for reference rock conditions. 
+        Chiou and Youngs (2008) z1.0 equation.
 
-        :param rock_vs30:
-            Vs30 in m/s for rock grid; default is 760 m/s. 
-
+        :param vs30:
+            Numpy array of Vs30 values in m/s.
         :returns:
-            SitesContext object.
+            Numpy array of z1.0 in m.
         """
-        sctx = SitesContext()
-        sctx.vs30 = np.ones_like(self._Vs30.getData()) * rock_vs30
+        z1pt0 = np.exp(28.5 - (3.82/8.0)*np.log(vs30**8 + 378.7**8))
+        return z1pt0
 
-        # Leave out z*pt* slots because they need to be filled in based on
-        # selected GMPE later
-        sctx.z1pt0_cy14_cal = _z1pt0_from_vs30_cy14_cal(sctx.vs30)
-        sctx.z1pt0_ask14_cal = _z1pt0_from_vs30_ask14_cal(sctx.vs30)
-        sctx.z2pt5_cb14_cal = _z2pt5_from_vs30_cb14_cal(sctx.vs30)/1000.0
-        sctx.z1pt0_cy08 = _z1pt0_from_vs30_cy08(sctx.vs30)
-        sctx.z2pt5_cb07 = _z2pt5_from_z1pt0_cb07(sctx.z1pt0_cy08)
 
-        sctx.backarc = self._backarc  # zoneconfig might have this info
-        sctx.vs30measured = np.zeros_like(sctx.vs30, dtype=bool)
-        sctx.lons = self._lons
-        sctx.lats = self._lats
-        return sctx
+    @staticmethod
+    def _z2pt5_from_z1pt0_cb07(z1pt0):
+        """
+        Equations are from 2007 PEER report by Campbell and Bozorgnia. 
+
+        :param z1pt0:
+            Numpy array of z1.0 in m. 
+        :returns:
+            Numpy array of z2.5 in m. 
+        """
+        z2pt5 = 519.0 + z1pt0 * 3.595
+        return z2pt5
+
+
