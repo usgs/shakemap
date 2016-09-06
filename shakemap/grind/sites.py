@@ -58,7 +58,7 @@ class Sites(object):
         self._z1pt0_ask14_cal =\
             self._z1pt0_from_vs30_ask14_cal(self._Vs30.getData())
         self._z2pt5_cb14_cal =\
-            self._z2pt5_from_vs30_cb14_cal(self._Vs30.getData())/1000.0
+            self._z2pt5_from_vs30_cb14_cal(self._Vs30.getData()) / 1000.0
         self._z1pt0_cy08 =\
             self._z1pt0_from_vs30_cy08(self._Vs30.getData())
         # Use cy08 z1pt0?
@@ -233,7 +233,7 @@ class Sites(object):
             sctx.z1pt0_ask14_cal =\
                 self._z1pt0_from_vs30_ask14_cal(sctx.vs30)
             sctx.z2pt5_cb14_cal =\
-                self._z2pt5_from_vs30_cb14_cal(sctx.vs30)/1000.0
+                self._z2pt5_from_vs30_cb14_cal(sctx.vs30) / 1000.0
             sctx.z1pt0_cy08 =\
                 self._z1pt0_from_vs30_cy08(sctx.vs30)
             sctx._z2pt5_cb07 =\
@@ -250,8 +250,7 @@ class Sites(object):
             sctx.z2pt5_cb14_cal = self._z2pt5_cb14_cal
             sctx.z1pt0_cy08 = self._z1pt0_cy08
             sctx.z2pt5_cb07 = self._z2pt5_cb07
-            
-        
+
         # For ShakeMap purposes, vs30 measured is always Fales
         sctx.vs30measured = np.zeros_like(sctx.vs30, dtype=bool)
 
@@ -307,7 +306,6 @@ class Sites(object):
                 raise ShakeMapException(msg)
         return geodict
 
-
     @staticmethod
     def _z1pt0_from_vs30_cy14_cal(vs30):
         """
@@ -321,7 +319,6 @@ class Sites(object):
         z1 = np.exp(-(7.15 / 4.0) *
                     np.log((vs30**4.0 + 571.**4) / (1360**4.0 + 571.**4)))
         return z1
-
 
     @staticmethod
     def _z1pt0_from_vs30_ask14_cal(vs30):
@@ -339,7 +336,6 @@ class Sites(object):
                     np.log((vs30**4.0 + 610.**4) / (1360**4.0 + 610.**4)))
         return z1
 
-
     @staticmethod
     def _z2pt5_from_vs30_cb14_cal(vs30):
         """
@@ -354,7 +350,6 @@ class Sites(object):
         z2p5 = 1000 * np.exp(7.089 - 1.144 * np.log(vs30))
         return z2p5
 
-
     @staticmethod
     def _z1pt0_from_vs30_cy08(vs30):
         """
@@ -365,9 +360,8 @@ class Sites(object):
         :returns:
             Numpy array of z1.0 in m.
         """
-        z1pt0 = np.exp(28.5 - (3.82/8.0)*np.log(vs30**8 + 378.7**8))
+        z1pt0 = np.exp(28.5 - (3.82 / 8.0) * np.log(vs30**8 + 378.7**8))
         return z1pt0
-
 
     @staticmethod
     def _z2pt5_from_z1pt0_cb07(z1pt0):
@@ -381,5 +375,3 @@ class Sites(object):
         """
         z2pt5 = 519.0 + z1pt0 * 3.595
         return z2pt5
-
-
