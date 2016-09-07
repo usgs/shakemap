@@ -82,7 +82,7 @@ class WGRW12(object):
         if dists is not None and mag is not None:
             doresid = True
             ldd = np.log10(np.clip(dists, 10, 300))
-            lmm = np.clip(mag, 3.0, 7.0)
+            lmm = np.clip(mag, 3.0, 7.3)
         else:
             doresid = False
 
@@ -142,7 +142,7 @@ class WGRW12(object):
         if dists is not None and mag is not None:
             doresid = True
             ldd = np.log10(np.clip(dists, 10, 300))
-            lmm = np.clip(mag, 3.0, 7.0)
+            lmm = np.clip(mag, 3.0, 7.3)
         else:
             doresid = False
 
