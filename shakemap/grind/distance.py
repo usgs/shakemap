@@ -166,6 +166,17 @@ class Distance(object):
 
         return context
 
+def get_distance_measures():
+    """
+    Returns a list of strings specifying the distance measure types 
+    (e.g. "repi", "rhypo") available for the "methods" argument to 
+    get_diistance().
+
+    :returns:
+        A list of strings.
+    """
+
+    return ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T']
 
 def get_distance(methods, lat, lon, dep, source,
                  use_median_distance=True):
@@ -216,7 +227,11 @@ def get_distance(methods, lat, lon, dep, source,
         availalbe. Default is True, meaning that point-source distances are
         adjusted based on magnitude to get the median fault distance.
     :returns:
-       dictionary of numpy array of distances, size of lon.shape
+       dictionary of numpy arrays of distances, size of lon.shape
+       IMPORTANT: If a finite fault is not supplied, and the distance
+       measures requested include rx, ry, ry0, U, or T, then zeros will
+       be returned; if rjb is requested, repi will be returned; if rrup
+       is requested, rhypo will be returned.
     """
     fault = source.getFault()
     hypo = source.getHypo()
@@ -231,8 +246,7 @@ def get_distance(methods, lat, lon, dep, source,
     if not isinstance(methods, list):
         methods = [methods]
 
-    methods_available = set(
-        ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T'])
+    methods_available = set(get_distance_measures())
     if not set(methods).issubset(methods_available):
         raise NotImplementedError(
             'One or more requested distance method is not '
@@ -636,7 +650,7 @@ def get_distance(methods, lat, lon, dep, source,
                 distdict['rjbvar'] = rjbvar
             else:
                 warnings.warn('No fault; Replacing rjb with repi')
-                distdict['rjb'] = distdict['repi']
+                distdict['rjb'] = distdict['repi'].copy()
         if 'rrup' in methods:
             if use_median_distance:
                 warnings.warn(
@@ -741,16 +755,22 @@ def get_distance(methods, lat, lon, dep, source,
                 distdict['rrupvar'] = rrupvar
             else:
                 warnings.warn('No fault; Replacing rrup with rhypo')
-                distdict['rrup'] = distdict['rhypo']
+                distdict['rrup'] = distdict['rhypo'].copy()
         if 'rx' in methods:
             warnings.warn('No fault; Setting Rx to zero.')
             distdict['rx'] = np.zeros_like(distdict['repi'])
         if 'ry0' in methods:
-            warnings.warn('No fault; Replacing ry0 with repi')
-            distdict['ry0'] = distdict['repi']
+            warnings.warn('No fault; Setting ry0 to zero')
+            distdict['ry0'] = np.zeros_like(distdict['repi'])
         if 'ry' in methods:
-            warnings.warn('No fault; Replacing ry with repi')
-            distdict['ry'] = distdict['repi']
+            warnings.warn('No fault; Setting ry to zero')
+            distdict['ry'] = np.zeros_like(distdict['repi'])
+        if 'U' in methods:
+            warnings.warn('No fault; Setting U to zero')
+            distdict['U'] = np.zeros_like(distdict['repi'])
+        if 'T' in methods:
+            warnings.warn('No fault; Setting T to zero')
+            distdict['T'] = np.zeros_like(distdict['repi'])
 
     return distdict
 
