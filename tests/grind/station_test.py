@@ -3,10 +3,8 @@
 # stdlib modules
 import sys
 import os.path
-
-import tempfile
-import time
-from datetime import datetime
+#import tempfile
+import time as time
 
 # third party modules
 
@@ -20,74 +18,77 @@ sys.path.insert(0, shakedir)
 # local imports
 from shakemap.grind.station import StationList
 from shakemap.grind.source import Source
+from shakemap.grind.multigmpe import MultiGMPE
+from shakemap.grind.sites import Sites
+from shakemap.grind.gmice.wgrw12 import WGRW12
+from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
+from openquake.hazardlib.gsim.allen_2012_ipe import AllenEtAl2012
 
 
-def _test():
-
-    tmp, dbfile = tempfile.mkstemp()
-    os.close(tmp)
-    os.remove(dbfile)
+def test_station(tmpdir):
 
     homedir = os.path.dirname(os.path.abspath(__file__))
-    xmlfile = os.path.abspath(os.path.join(homedir, '..', 'data', 'eventdata',
-                                           'northridge', 'northridge_stations.xml'))
-    stationfile = os.path.abspath(os.path.join(homedir, '..', 'data', 'eventdata',
-                                               'northridge', 'northridge_stations.db'))
-    eventdict = {'lat': 34.213, 'lon': -118.537, 'depth': 18.2,
-                 'mag': 6.7, 'time': datetime(1994, 1, 17, 12, 30, 55),
-                 'mech': 'ALL', 'dip': 45, 'rake': 90}
+    datadir = os.path.abspath(os.path.join(homedir, '..', 'data', 
+            'eventdata', 'Calexico', 'input'))
 
-    try:
-        print('Testing load from XML format...')
-        t1 = time.time()
-        stations1 = StationList.loadFromXML([xmlfile], dbfile)
-        t2 = time.time()
-        print('Passed load from XML format %i stations in %.2f seconds.' %
-              (len(stations1), t2 - t1))
+    #
+    # Read the event, source, and fault files and produce a Source object
+    #
+    inputfile = os.path.join(datadir, 'stationlist_dat.xml')
+    dyfifile = os.path.join(datadir, 'ciim3_dat.xml')
+    eventfile = os.path.join(datadir, 'event.xml')
+    faultfile = os.path.join(datadir, 'wei_fault.txt')
 
-        print('Testing filling in distance and derived MMI/PGM values...')
-        source = Source(eventdict)
-        stations1.fillTables(source)
-        print('Passed filling in distance and derived MMI/PGM values...')
+    source_obj = Source.readFromFile(eventfile, faultfile=faultfile)
 
-        print('Testing retrieval of MMI data from StationList object...')
-        t1 = time.time()
-        mmidf1 = stations1.getMMIStations()
-        t2 = time.time()
-        print('Passed retrieval of %i MMI data in %.2f seconds from StationList object.' % (
-            len(mmidf1), t2 - t1))
+    #
+    # Set up the GMPE, IPE, and GMICE
+    #
+    gmpe_cy14 = ChiouYoungs2014()
 
-        print('Testing retrieval of instrumented data from StationList object...')
-        t1 = time.time()
-        imtdf1 = stations1.getInstrumentedStations()
-        t2 = time.time()
-        print('Passed retrieval of %i instrumented data in %.2f seconds from StationList object.' % (
-            len(imtdf1), t2 - t1))
+    gmpe = MultiGMPE.from_list([gmpe_cy14], [1.0])
 
-        print('Testing load from sqlite format...')
-        t1 = time.time()
-        stations2 = StationList(stationfile)
-        t2 = time.time()
-        print('Passed load from sqlite format %i stations in %.2f seconds.' %
-              (len(stations1), t2 - t1))
+    gmice = WGRW12()
 
-        print('Testing retrieval of MMI data from StationList object...')
-        t1 = time.time()
-        mmidf2 = stations2.getMMIStations()
-        t2 = time.time()
-        print('Passed retrieval of %i MMI data in %.2f seconds from StationList object.' % (
-            len(mmidf2), t2 - t1))
+    ipe = AllenEtAl2012()
 
-        print('Testing retrieval of instrumented data from StationList object...')
-        t1 = time.time()
-        imtdf2 = stations2.getInstrumentedStations()
-        t2 = time.time()
-        print('Passed retrieval of %i instrumented data in %.2f seconds from StationList object.' % (
-            len(imtdf1), t2 - t1))
+    #
+    # 
+    #
+    rupture_ctx = source_obj.getRuptureContext([gmpe])
 
-        assert(len(stations1) == len(stations2))
+    smdx = 0.0083333333
+    smdy = 0.0083333333
+    lonspan = 6.0
+    latspan = 4.0
+    vs30filename = os.path.join(datadir, '..', 'vs30', 'vs30.grd')
 
-    except Exception as msg:
-        print('Error caught: %s' % str(msg))
-    if os.path.isfile(dbfile):
-        os.remove(dbfile)
+    sites_obj_grid = Sites.createFromCenter(
+            rupture_ctx.hypo_lon, rupture_ctx.hypo_lat, lonspan, latspan, smdx, 
+            smdy, defaultVs30=760.0, vs30File=vs30filename, vs30measured_grid=None, 
+            padding=False, resample=False
+        )
+
+    xmlfiles = [inputfile, dyfifile]
+    dbfile = str(tmpdir.join('stations.db'))
+
+    t1 = time.time()
+    stations = StationList.loadFromXML(xmlfiles, dbfile)
+    t2 = time.time()
+    print('%i stations loaded in %.2f seconds' % (len(stations),t2-t1))
+
+    t1 = time.time()
+    stations.fillTables(source_obj, sites_obj_grid, gmpe, ipe, gmice)
+    t2 = time.time()
+    print('Tables filled in %.2f seconds' % (t2-t1))
+
+    t1 = time.time()
+    df1 = stations.getStationDataframe(1, sort=True)
+    t2 = time.time()
+    print('Data frame retrieved in %.2f seconds' % (t2-t1))
+
+    t1 = time.time()
+    df2 = stations.getStationDataframe(0, sort=False)
+    t2 = time.time()
+    print('Data frame retrieved in %.2f seconds' % (t2-t1))
+
