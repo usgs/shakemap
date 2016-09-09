@@ -1,5 +1,8 @@
 language: python
-cache: pip
+cache:
+  pip
+  directories:
+  - /home/travis/miniconda/envs/shake/
 python:
     - "3.5"
     
