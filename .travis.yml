@@ -1,6 +1,5 @@
 language: python
 cache:
-  pip
   directories:
   - /home/travis/miniconda/envs/shake/
 python:
