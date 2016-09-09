@@ -8,7 +8,7 @@ if [ "$#" -le 1 ]; then
     source deactivate
     
     # remove any previous virtual environments called shake
-    conda remove --name shake --all -y
+#    conda remove --name shake --all -y
     
     # create a new virtual environment called shake with the below list of dependencies installed into it
     conda create --name shake --yes --channel conda-forge python=3.5 $DEPS -y
