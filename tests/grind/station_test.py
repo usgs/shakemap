@@ -64,31 +64,23 @@ def test_station(tmpdir):
     vs30filename = os.path.join(datadir, '..', 'vs30', 'vs30.grd')
 
     sites_obj_grid = Sites.createFromCenter(
-            rupture_ctx.hypo_lon, rupture_ctx.hypo_lat, lonspan, latspan, smdx, 
-            smdy, defaultVs30=760.0, vs30File=vs30filename, vs30measured_grid=None, 
-            padding=False, resample=False
+            rupture_ctx.hypo_lon, rupture_ctx.hypo_lat, lonspan, latspan, 
+            smdx, smdy, defaultVs30=760.0, vs30File=vs30filename, 
+            vs30measured_grid=None, padding=False, resample=False
         )
 
     xmlfiles = [inputfile, dyfifile]
     dbfile = str(tmpdir.join('stations.db'))
 
-    t1 = time.time()
-    stations = StationList.loadFromXML(xmlfiles, dbfile)
-    t2 = time.time()
-    print('%i stations loaded in %.2f seconds' % (len(stations),t2-t1))
+    stations = StationList.fromXML(xmlfiles, dbfile, source_obj, 
+            sites_obj_grid, gmpe, ipe, gmice)
 
-    t1 = time.time()
-    stations.fillTables(source_obj, sites_obj_grid, gmpe, ipe, gmice)
-    t2 = time.time()
-    print('Tables filled in %.2f seconds' % (t2-t1))
-
-    t1 = time.time()
     df1 = stations.getStationDataframe(1, sort=True)
-    t2 = time.time()
-    print('Data frame retrieved in %.2f seconds' % (t2-t1))
 
-    t1 = time.time()
     df2 = stations.getStationDataframe(0, sort=False)
-    t2 = time.time()
-    print('Data frame retrieved in %.2f seconds' % (t2-t1))
+
+    #
+    # We should probably check these dataframes against some established
+    # set, and also check the database against a known database. 
+    #
 

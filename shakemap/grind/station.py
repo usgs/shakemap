@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # stdlib imports
 import sqlite3
 from xml.dom import minidom
@@ -116,17 +114,28 @@ DISTANCES = get_distance_measures()
 
 class StationList(object):
     """
-    A class to facilitate reading peak amplitude and MMI XML files, and 
+    A class to facilitate reading ShakeMap formatted XML fies of peak 
+    amplitudes and MMI, and 
     produce tables of station data. Seismic stations are considered to
     be 'instrumented'; MMI data is not instrumented and is indicated 
-    in the station XML with a 'netid' attribute of "DYFI," "MMI,"
+    in the ShakeMap XML with a ``netid`` attribute of "DYFI," "MMI,"
     "INTENSITY," or "CIIM."
+
+    .. note::
+      Typically the user will call :meth:`fromXML` the first time 
+      a set of station files are processed. (Or, as an alternative,
+      the user can call :meth:`loadFromXML` and :meth:`fillTables`
+      sequentially.)
+      This will create a database at the location specified by the 
+      ``dbfile`` parameter to :meth:`fromXML`. Subsequent programs 
+      can use the default constructor to simply load ``dbfile``.
+
     """
 
     #
     # These are the netid's that indicate MMI data
     #
-    CIIM_TUPLE = ('dyfi', 'mmi', 'intensity', 'ciim')
+    __CIIM_TUPLE = ('dyfi', 'mmi', 'intensity', 'ciim')
 
     def __init__(self, dbfile):
         """
@@ -134,7 +143,9 @@ class StationList(object):
         station data. 
 
         :param dbfile:
-            A SQLite database containing pre-processed station data.
+            A SQLite database file containing pre-processed station data.
+        :type dbfile:
+            string
 
         :returns:
             A StationList object.
@@ -161,6 +172,53 @@ class StationList(object):
 
 
     @classmethod
+    def fromXML(cls, xmlfiles, dbfile, source, sites, gmpe, ipe, gmice):
+        """
+        Create a StationList object by reading one or more ShakeMap XML 
+        input files and populate database tables with derived MMI/PGM 
+        values and distances. This is a convenience method that calls 
+        :meth:`loadFromXML` and :meth:`fillTables`.
+
+        :param xmlfiles:
+            Sequence of ShakeMap XML input files to read.
+        :type xmlfiles:
+            sequence of strings
+
+        :param dbfile:
+            Path to a file into which to write the SQLite database.
+        :type dbfile:
+            string
+
+        :param source:
+            ShakeMap Source object containing information about the 
+            origin and source of the earthquake.
+        
+        :param sites:
+            ShakeMap Sites object containing grid of Vs30 values for the 
+            region in question.
+
+        :param gmpe:
+            A GMPE object to use for predicting 
+            ground motions at the station locations.
+
+        :param ipe:
+            A GMPE object to use for predicting 
+            macroseismic intensities at the station locations.
+
+        :param gmice:
+            A GMICE object to use for converting ground motions to
+            macroseismic intensities.
+
+        :returns:
+            StationList object
+        """
+    
+        this = cls.loadFromXML(xmlfiles, dbfile)
+        this.fillTables(source, sites, gmpe, ipe, gmice)
+        return this
+
+
+    @classmethod
     def loadFromXML(cls, xmlfiles, dbfile):
         """
         Create a StationList object by reading one or more ShakeMap XML input 
@@ -171,7 +229,7 @@ class StationList(object):
         :type xmlfiles:
             sequence of strings
 
-        :param dbfile;
+        :param dbfile:
             Path to a file into which to write the SQLite database.
         :type dbfile:
             string
@@ -235,7 +293,7 @@ class StationList(object):
                 # How to determine a station is instrumented?
                 #
                 instrumented = int(station_attributes['netid'].lower() 
-                                   not in cls.CIIM_TUPLE)
+                                   not in cls.__CIIM_TUPLE)
                 station_rows.append((sid, network, code, name, lat, lon, 
                                      instrumented))
 
@@ -274,7 +332,7 @@ class StationList(object):
     def fillTables(self, source, sites, gmpe, ipe, gmice):
         """
         Populate database tables with derived MMI/PGM values and distances.
-        This method should be called after loadFromXML().
+        This method should be called after :meth:`loadFromXML`.
 
         :param source:
             ShakeMap Source object containing information about the 
@@ -493,10 +551,11 @@ class StationList(object):
 
     def getStationDataframe(self, instrumented, sort=False):
         """
-        Return a dataframe of the instrumented or non-instrumented stations.
+        Return a Pandas dataframe of the instrumented or non-instrumented 
+        stations.
 
         For the standard set of ShakeMap IMTs (mmi, pga, pgv, psa03, psa10,
-        psa30), the columns would be:
+        psa30), the columns in the dataframe would be:
 
         'id', 'lat', 'lon', 'code', 'network', 'vs30', 'repi', 'rhypo', 'rjb',
         'rrup', 'rx', 'ry', 'ry0', 'U', 'T', 'mmi', 'mmi_unc', 'pga', 'pga_unc',
@@ -532,10 +591,13 @@ class StationList(object):
         'psa10_site_factor', 'psa30_predicted', 'psa30_predicted_unc_total',
         'psa30_predicted_unc_intra', 'psa30_site_factor', 'name'
 
-        The 'name' column is 'network' and 'code' concatenated with a '.'.
-        'unc' means uncertainty. All ground motion, site, and uncertainty 
+        The **name** column is **network** and **code** concatenated with a 
+        period (".") between them.
+        The **unc** in column names means uncertainty. All ground motion, 
+        site, and uncertainty 
         units are natural log units. Distances are in km. The intra-event 
-        uncertainty will be np.nan if the GMPE or IPE doesn't define 
+        uncertainty (**<param>_predicted_unc_intra**) will be **np.nan** if 
+        the GMPE or IPE doesn't define 
         separate inter- and intra-event terms.
         
 
@@ -547,7 +609,8 @@ class StationList(object):
             integer
 
         :param sort:
-            If True, the dataframe will be sorted by the 'name' column.
+            If True, the dataframe will be sorted by the **name** column. 
+            The default if False (unsorted).
         :type sort:
             bool
         """
@@ -843,22 +906,3 @@ class StationList(object):
             soilquery = 'INSERT INTO soiltype (soil_type, id) VALUES ("%s", %d)' % (soiltype, sid)
             cursor.execute(soilquery)
             db.commit()
-
-
-if __name__ == '__main__':
-    xmlfiles = sys.argv[1:]
-    dbfile = 'stations.db'
-    if os.path.isfile(dbfile):
-        os.remove(dbfile)
-    t1 = time.time()
-    stations = StationList.loadFromXML(dbfile, xmlfiles)
-    t2 = time.time()
-    print('%i stations loaded in %.2f seconds' % (len(stations), t2 - t1))
-    mmidf = stations.getMMIStations()
-    t3 = time.time()
-    print('%i intensity observations retrieved in %.2f seconds' %
-          (len(mmidf), t3 - t2))
-    imtdf = stations.getInstrumentedStations()
-    t4 = time.time()
-    print('%i instrumental measurements retrieved in %.2f seconds' %
-          (len(imtdf), t4 - t3))
