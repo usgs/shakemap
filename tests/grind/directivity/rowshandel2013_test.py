@@ -112,7 +112,7 @@ def test_fromSites():
     dy = 0.0083
     xspan = 0.0083 * 5
     yspan = 0.0083 * 5
-    mysite = Sites.createFromCenter(cx, cy, xspan, yspan, dx, dy,
+    mysite = Sites.fromCenter(cx, cy, xspan, yspan, dx, dy,
                                     vs30File=vs30file, padding=True,
                                     resample=False)
 

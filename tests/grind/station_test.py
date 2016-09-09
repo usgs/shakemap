@@ -39,7 +39,7 @@ def test_station(tmpdir):
     eventfile = os.path.join(datadir, 'event.xml')
     faultfile = os.path.join(datadir, 'wei_fault.txt')
 
-    source_obj = Source.readFromFile(eventfile, faultfile=faultfile)
+    source_obj = Source.fromFile(eventfile, faultfile=faultfile)
 
     #
     # Set up the GMPE, IPE, and GMICE
@@ -63,7 +63,7 @@ def test_station(tmpdir):
     latspan = 4.0
     vs30filename = os.path.join(datadir, '..', 'vs30', 'vs30.grd')
 
-    sites_obj_grid = Sites.createFromCenter(
+    sites_obj_grid = Sites.fromCenter(
             rupture_ctx.hypo_lon, rupture_ctx.hypo_lat, lonspan, latspan, 
             smdx, smdy, defaultVs30=760.0, vs30File=vs30filename, 
             vs30measured_grid=None, padding=False, resample=False

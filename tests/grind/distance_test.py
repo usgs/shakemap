@@ -149,7 +149,7 @@ def test_exceptions():
     dy = 0.0083
     xspan = 0.0083 * 5
     yspan = 0.0083 * 5
-    site = Sites.createFromCenter(cx, cy, xspan, yspan, dx, dy,
+    site = Sites.fromCenter(cx, cy, xspan, yspan, dx, dy,
                                   vs30File=vs30file,
                                   padding=True, resample=False)
     # Make souce instance
@@ -195,7 +195,7 @@ def test_distance_no_fault():
     dy = 0.0083
     xspan = 0.0083 * 5
     yspan = 0.0083 * 5
-    site = Sites.createFromCenter(cx, cy, xspan, yspan, dx, dy,
+    site = Sites.fromCenter(cx, cy, xspan, yspan, dx, dy,
                                   vs30File=vs30file,
                                   padding=True, resample=False)
     # Make souce instance
@@ -715,7 +715,7 @@ def test_distance_from_sites_source():
     dy = 0.0083
     xspan = 0.0083 * 5
     yspan = 0.0083 * 5
-    site = Sites.createFromCenter(cx, cy, xspan, yspan, dx, dy,
+    site = Sites.fromCenter(cx, cy, xspan, yspan, dx, dy,
                                   vs30File=vs30file,
                                   padding=True, resample=False)
     # Make souce instance

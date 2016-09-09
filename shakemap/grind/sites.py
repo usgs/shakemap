@@ -73,7 +73,7 @@ class Sites(object):
         return vs30grid
 
     @classmethod
-    def createFromBounds(cls, xmin, xmax, ymin, ymax, dx, dy, defaultVs30=686.0,
+    def fromBounds(cls, xmin, xmax, ymin, ymax, dx, dy, defaultVs30=686.0,
                          vs30File=None, vs30measured_grid=None,
                          backarc=None, padding=False, resample=False):
         """
@@ -121,7 +121,7 @@ class Sites(object):
                    backarc=backarc, defaultVs30=defaultVs30)
 
     @classmethod
-    def createFromCenter(cls, cx, cy, xspan, yspan, dx, dy, defaultVs30=686.0,
+    def fromCenter(cls, cx, cy, xspan, yspan, dx, dy, defaultVs30=686.0,
                          vs30File=None, vs30measured_grid=None,
                          backarc=None, padding=False, resample=False):
         """

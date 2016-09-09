@@ -168,7 +168,7 @@ class Source(object):
         self._event_dict = event.copy()
 
     @classmethod
-    def readFromFile(cls, eventxmlfile, faultfile=None, sourcefile=None):
+    def fromFile(cls, eventxmlfile, faultfile=None, sourcefile=None):
         """
         Class method to create a Source object by specifying an event.xml file,
         a fault file, and a source.txt file.
