@@ -184,6 +184,7 @@ def main(args):
 
     # This line is needed to inclue __init__ methods in documentation
     f.write("autoclass_content = 'both'\n")
+    f.write("autodoc_member_order = 'bysource'\n")
     f.write("html_show_copyright = False\n")
     f.close()
 
@@ -196,9 +197,9 @@ def main(args):
     tmpmake = '%s/Makefile_save' %API_DIR
     os.rename(oldmake, tmpmake)
 
-    # move files inot API directory; this should raise exceptions if any
+    # move files into API directory; this should raise exceptions if any
     # files will get overwritten. 
-    copy_tree(DOC_DIR, API_DIR)
+    copy_tree(DOC_DIR, API_DIR, update=1)
 
     # put Makefile back
     os.rename(tmpmake, oldmake)
