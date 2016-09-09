@@ -53,17 +53,6 @@ class Sites(object):
         self._lats = np.linspace(self._GeoDict.ymin,
                                  self._GeoDict.ymax,
                                  self._GeoDict.ny)
-        self._z1pt0_cy14_cal =\
-            self._z1pt0_from_vs30_cy14_cal(self._Vs30.getData())
-        self._z1pt0_ask14_cal =\
-            self._z1pt0_from_vs30_ask14_cal(self._Vs30.getData())
-        self._z2pt5_cb14_cal =\
-            self._z2pt5_from_vs30_cb14_cal(self._Vs30.getData()) / 1000.0
-        self._z1pt0_cy08 =\
-            self._z1pt0_from_vs30_cy08(self._Vs30.getData())
-        # Use cy08 z1pt0?
-        self._z2pt5_cb07 =\
-            self._z2pt5_from_z1pt0_cb07(self._z1pt0_cy08)
 
     @classmethod
     def _create(cls, geodict, defaultVs30, vs30File, padding, resample):
@@ -228,16 +217,6 @@ class Sites(object):
                     lats, lons, default=self._defaultVs30)
             sctx.lats = lats
             sctx.lons = lons
-            sctx.z1pt0_cy14_cal =\
-                self._z1pt0_from_vs30_cy14_cal(sctx.vs30)
-            sctx.z1pt0_ask14_cal =\
-                self._z1pt0_from_vs30_ask14_cal(sctx.vs30)
-            sctx.z2pt5_cb14_cal =\
-                self._z2pt5_from_vs30_cb14_cal(sctx.vs30) / 1000.0
-            sctx.z1pt0_cy08 =\
-                self._z1pt0_from_vs30_cy08(sctx.vs30)
-            sctx._z2pt5_cb07 =\
-                self._z2pt5_from_z1pt0_cb07(sctx.z1pt0_cy08)
         else:
             sctx.lats = self._lats.copy()
             sctx.lons = self._lons.copy()
@@ -245,11 +224,8 @@ class Sites(object):
                 sctx.vs30 = np.ones_like(self._Vs30.getData()) * rock_vs30
             else:
                 sctx.vs30 = self._Vs30.getData().copy()
-            sctx.z1pt0_cy14_cal = self._z1pt0_cy14_cal
-            sctx.z1pt0_ask14_cal = self._z1pt0_ask14_cal
-            sctx.z2pt5_cb14_cal = self._z2pt5_cb14_cal
-            sctx.z1pt0_cy08 = self._z1pt0_cy08
-            sctx.z2pt5_cb07 = self._z2pt5_cb07
+
+        sctx = Sites._addDepthParameters(sctx)
 
         # For ShakeMap purposes, vs30 measured is always Fales
         sctx.vs30measured = np.zeros_like(sctx.vs30, dtype=bool)
@@ -305,6 +281,25 @@ class Sites(object):
                     fname, str(msg1), str(msg2))
                 raise ShakeMapException(msg)
         return geodict
+
+    @staticmethod
+    def _addDepthParameters(sctx):
+        """
+        Add the different depth parameters to a sites context from 
+        Vs30 values. 
+
+        :param sctx:
+            A sites context. 
+        :returns:
+            A sites context with the depth parameters set.
+        """
+        sctx.z1pt0_cy14_cal = Sites._z1pt0_from_vs30_cy14_cal(sctx.vs30)
+        sctx.z1pt0_ask14_cal = Sites._z1pt0_from_vs30_ask14_cal(sctx.vs30)
+        sctx.z2pt5_cb14_cal = Sites._z2pt5_from_vs30_cb14_cal(sctx.vs30) / 1000.0
+        sctx.z1pt0_cy08 = Sites._z1pt0_from_vs30_cy08(sctx.vs30)
+        sctx.z2pt5_cb07 = Sites._z2pt5_from_z1pt0_cb07(sctx.z1pt0_cy08)
+
+        return sctx
 
     @staticmethod
     def _z1pt0_from_vs30_cy14_cal(vs30):
