@@ -465,22 +465,3 @@ class Bayless2013(object):
             self.SlipCategory = 'SS'
         if (arake >= 60) and (arake <= 120):
             self.SlipCategory = 'DS'
-
-
-def _rotation_matrix(axis, theta):
-    """
-    Return the rotation matrix associated with counterclockwise rotation about
-    the given axis by theta radians.
-    Source: Response by 'unutbu' in this thread:
-    http://stackoverflow.com/questions/6802577/python-rotation-of-3d-vector
-    """
-    axis = np.asarray(axis)
-    theta = np.asarray(theta)
-    axis = axis / np.sqrt(np.dot(axis, axis))
-    a = np.cos(theta / 2)
-    b, c, d = -axis * np.sin(theta / 2)
-    aa, bb, cc, dd = a * a, b * b, c * c, d * d
-    bc, ad, ac, ab, bd, cd = b * c, a * d, a * c, a * b, b * d, c * d
-    return np.array([[aa + bb - cc - dd, 2 * (bc + ad), 2 * (bd - ac)],
-                     [2 * (bc - ad), aa + cc - bb - dd, 2 * (cd + ab)],
-                     [2 * (bd + ac), 2 * (cd - ab), aa + dd - bb - cc]])
