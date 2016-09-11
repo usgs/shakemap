@@ -704,7 +704,7 @@ def test_multigmpe():
     dy = 0.0083
     xspan = 0.0083 * 5
     yspan = 0.0083 * 5
-    site = Sites.createFromCenter(cx, cy, xspan, yspan, dx, dy,
+    site = Sites.fromCenter(cx, cy, xspan, yspan, dx, dy,
                                   vs30File=vs30file,
                                   padding=True, resample=False)
     sctx = site.getSitesContext()

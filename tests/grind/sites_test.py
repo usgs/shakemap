@@ -55,7 +55,7 @@ def test_sites(vs30file=None):
     dy = 0.0083
     xspan = 0.0083 * 5
     yspan = 0.0083 * 5
-    mysite = Sites.createFromCenter(cx, cy, xspan, yspan, dx, dy,
+    mysite = Sites.fromCenter(cx, cy, xspan, yspan, dx, dy,
                                     vs30File=vs30file, padding=True,
                                     resample=False)
     grd = mysite.getVs30Grid().getData()
@@ -327,7 +327,7 @@ def test_sites(vs30file=None):
             np.array([34.1, 34.111, 34.5]),
             np.array([-118.2, -118.222]))
 
-    mysite = Sites.createFromCenter(cx, cy, xspan, yspan, dx, dy,
+    mysite = Sites.fromCenter(cx, cy, xspan, yspan, dx, dy,
                                     vs30File=None, padding=True,
                                     resample=False)
     grd = mysite.getVs30Grid().getData()
@@ -346,7 +346,7 @@ def test_sites(vs30file=None):
     ymax = 34.1
     dx = 0.0083
     dy = 0.0083
-    mysite = Sites.createFromBounds(xmin, xmax, ymin, ymax, dx, dy,
+    mysite = Sites.fromBounds(xmin, xmax, ymin, ymax, dx, dy,
                                     vs30File=vs30file, padding=False,
                                     resample=False)
     grd = mysite.getVs30Grid().getData()
@@ -380,7 +380,7 @@ def test_sites(vs30file=None):
          424.72061157,  431.52270508,  432.84347534]])
     np.testing.assert_allclose(grd, grd_target)
 
-    mysite = Sites.createFromBounds(xmin, xmax, ymin, ymax, dx, dy,
+    mysite = Sites.fromBounds(xmin, xmax, ymin, ymax, dx, dy,
                                     vs30File=None, padding=False,
                                     resample=False)
     grd = mysite.getVs30Grid().getData()
