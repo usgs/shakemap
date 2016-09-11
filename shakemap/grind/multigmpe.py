@@ -66,7 +66,7 @@ class MultiGMPE(GMPE):
                 # If IMT is PGV and PGV is not given by the GMPE, then
                 # convert from PSA10.
                 #---------------------------------------------------------------
-                if self.HAS_SITE[i]:
+                if self.HAS_SITE[i] is True:
                     psa10, psa10sd = gmpe.get_mean_and_stddevs(
                         sites, rup, dists, SA(1.0), stddev_types)
                 else:
@@ -78,7 +78,7 @@ class MultiGMPE(GMPE):
 
                 lmean, lsd = NewmarkHall1982.psa102pgv(psa10, psa10sd[0])
             else:
-                if self.HAS_SITE[i]:
+                if self.HAS_SITE[i] is True:
                     lmean, lsd = gmpe.get_mean_and_stddevs(
                         sites, rup, dists, imt, stddev_types)
                 else:

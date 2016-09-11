@@ -309,6 +309,182 @@ def test_ss3():
     np.testing.assert_allclose(
         fd, fd_test, rtol=1e-4)
 
+def test_ss3_m6():
+    magnitude = 6.0
+    dip = np.array([90])
+    rake = 180.0
+    width = np.array([15])
+    fltx = np.array([0, 0])
+    flty = np.array([0, 80])
+    zp = np.array([0])
+    epix = np.array([0])
+    epiy = np.array([0.2 * flty[1]])
+
+    # Convert to lat/lon
+    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    tlon, tlat = proj(fltx, flty, reverse=True)
+    epilon, epilat = proj(epix, epiy, reverse=True)
+
+    flt = fault.Fault.fromTrace(np.array([tlon[0]]), np.array([tlat[0]]),
+                                np.array([tlon[1]]), np.array([tlat[1]]),
+                                zp, width, dip, reference='ss3')
+
+    event = {'lat': epilat[0],
+             'lon': epilon[0],
+             'depth': 10,
+             'mag': magnitude,
+             'id': 'ss3',
+             'locstring': 'test',
+             'type': 'SS',
+             'timezone': 'UTC'}
+    event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+    event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+
+    x = np.linspace(0, 20, 6)
+    y = np.linspace(0, 90, 11)
+    site_x, site_y = np.meshgrid(x, y)
+    slon, slat = proj(site_x, site_y, reverse=True)
+    deps = np.zeros_like(slon)
+    source = Source(event, flt)
+    source.setEventParam('rake', rake)
+
+    test1 = Bayless2013(source, slat, slon, deps, T=1.0)
+
+    # Test fd
+    fd = test1.getFd()
+    fd_test = np.array(
+      [[ 0.05853668,  0.05032323,  0.0306438 ,  0.00839635, -0.01102162,
+        -0.02621319],
+       [ 0.01720501, -0.00687296, -0.03804823, -0.05547473, -0.0644932 ,
+        -0.06947135],
+       [-0.03000065, -0.07006634, -0.07708165, -0.07865941, -0.0792369 ,
+        -0.07950887],
+       [ 0.0398062 ,  0.02571145, -0.0018651 , -0.0255418 , -0.04176278,
+        -0.05235095],
+       [ 0.0696989 ,  0.06389524,  0.04890304,  0.02983134,  0.01098535,
+        -0.00545921],
+       [ 0.088278  ,  0.08511069,  0.07628596,  0.06350294,  0.04875897,
+         0.03373495],
+       [ 0.10179334,  0.09978475,  0.09401676,  0.0851842 ,  0.07422509,
+         0.06210369],
+       [ 0.11242209,  0.11102701,  0.10696056,  0.10055471,  0.09229027,
+         0.08271454],
+       [ 0.12118279,  0.12015315,  0.11712653,  0.11228058,  0.10588323,
+         0.09825795],
+       [ 0.12785957,  0.12706892,  0.12473264,  0.12095384,  0.11589197,
+         0.10974684],
+       [ 0.12785908,  0.12724852,  0.12543819,  0.12249026,  0.11850249,
+         0.11360047]])
+    np.testing.assert_allclose(
+        fd, fd_test, rtol=1e-4)
+
+#def test_ss3_move_hypo1():
+#    magnitude = 7.2
+#    dip = np.array([90])
+#    rake = 180.0
+#    width = np.array([15])
+#    fltx = np.array([0, 0])
+#    flty = np.array([0, 80])
+#    zp = np.array([-1.0]) # positive down
+#    epix = np.array([3.0])
+#    epiy = np.array([0.2 * flty[1]])
+
+#    # Convert to lat/lon
+#    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+#    tlon, tlat = proj(fltx, flty, reverse=True)
+#    epilon, epilat = proj(epix, epiy, reverse=True)
+
+#    flt = fault.Fault.fromTrace(np.array([tlon[0]]), np.array([tlat[0]]),
+#                                np.array([tlon[1]]), np.array([tlat[1]]),
+#                                zp, width, dip, reference='ss3')
+
+#    event = {'lat': epilat[0],
+#             'lon': epilon[0],
+#             'depth': 10,
+#             'mag': magnitude,
+#             'id': 'ss3',
+#             'locstring': 'test',
+#             'type': 'SS',
+#             'timezone': 'UTC'}
+#    event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+#    event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+
+#    x = np.linspace(0, 20, 6)
+#    y = np.linspace(0, 90, 11)
+#    site_x, site_y = np.meshgrid(x, y)
+#    slon, slat = proj(site_x, site_y, reverse=True)
+#    deps = np.zeros_like(slon)
+#    source = Source(event, flt)
+#    source.setEventParam('rake', rake)
+
+#    test1 = Bayless2013(source, slat, slon, deps, T=1.0)
+
+#    # Test fd
+#    fd = test1.getFd()
+#    fd_test = np.array(
+#    np.testing.assert_allclose(
+#        fd, fd_test, rtol=1e-4)
+
+
+def test_ss3_m4p5():
+    magnitude = 4.5
+    dip = np.array([90])
+    rake = 180.0
+    width = np.array([15])
+    fltx = np.array([0, 0])
+    flty = np.array([0, 80])
+    zp = np.array([0])
+    epix = np.array([0])
+    epiy = np.array([0.2 * flty[1]])
+
+    # Convert to lat/lon
+    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    tlon, tlat = proj(fltx, flty, reverse=True)
+    epilon, epilat = proj(epix, epiy, reverse=True)
+
+    flt = fault.Fault.fromTrace(np.array([tlon[0]]), np.array([tlat[0]]),
+                                np.array([tlon[1]]), np.array([tlat[1]]),
+                                zp, width, dip, reference='ss3')
+
+    event = {'lat': epilat[0],
+             'lon': epilon[0],
+             'depth': 10,
+             'mag': magnitude,
+             'id': 'ss3',
+             'locstring': 'test',
+             'type': 'SS',
+             'timezone': 'UTC'}
+    event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+    event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+
+    x = np.linspace(0, 20, 6)
+    y = np.linspace(0, 90, 11)
+    site_x, site_y = np.meshgrid(x, y)
+    slon, slat = proj(site_x, site_y, reverse=True)
+    deps = np.zeros_like(slon)
+    source = Source(event, flt)
+    source.setEventParam('rake', rake)
+
+    test1 = Bayless2013(source, slat, slon, deps, T=1.0)
+
+    # Test fd
+    fd = test1.getFd()
+    fd_test = np.array(
+      [[ 0.,  0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.,  0.],
+       [ 0.,  0.,  0.,  0.,  0.,  0.]])
+    np.testing.assert_allclose(
+        fd, fd_test, rtol=1e-4)
+
+
 
 def test_rv4():
     magnitude = 7.0
