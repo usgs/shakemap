@@ -38,7 +38,37 @@ class MultiGMPE(GMPE):
         See superclass `method <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs>`__. 
         """
 
+        #-----------------------------------------------------------------------
+        # Sort out shapes of sites and dists elements
+        #-----------------------------------------------------------------------
+
+        shapes = []
+        for k, v in sites.__dict__.items():
+            if (k is not 'lons') and (k is not 'lats'):
+                shapes.append(v.shape)
+        for k, v in dists.__dict__.items():
+            if (k is not 'lons') and (k is not 'lats'):
+                shapes.append(v.shape)
+
+        shapeset = set(shapes)
+        if len(shapeset) != 1:
+            raise Exception('All sites and dists elements must have same shape.')
+        else:
+            orig_shape = list(shapeset)[0]
+
+        # Need to turn all 2D arrays into 1D arrays because of
+        # inconsistencies in how arrays are handled in OpenQuake.
+        for k, v in dists.__dict__.items():
+            if (k is not 'lons') and (k is not 'lats'):
+                dists.__dict__[k] = np.reshape(dists.__dict__[k], (-1,))
+        for k, v in sites.__dict__.items():
+            if (k is not 'lons') and (k is not 'lats'):
+                sites.__dict__[k] = np.reshape(sites.__dict__[k], (-1,))
+
+
+        #-----------------------------------------------------------------------
         # These are arrays to hold the weighted combination of the GMPEs
+        #-----------------------------------------------------------------------
         lnmu = np.zeros_like(sites.vs30)
         sd_avail = self.DEFINED_FOR_STANDARD_DEVIATION_TYPES
         if not sd_avail.issuperset(set(stddev_types)):
@@ -114,6 +144,19 @@ class MultiGMPE(GMPE):
             lnsd2[j] = lnsd2[j] - lnmu**2
 
         lnsd = [np.sqrt(a) for a in lnsd2]
+
+        # Undo reshapes of inputs
+        for k, v in dists.__dict__.items():
+            if (k is not 'lons') and (k is not 'lats'):
+                dists.__dict__[k] = np.reshape(dists.__dict__[k], orig_shape)
+        for k, v in sites.__dict__.items():
+            if (k is not 'lons') and (k is not 'lats'):
+                sites.__dict__[k] = np.reshape(sites.__dict__[k], orig_shape)
+
+        # Reshape output
+        lnmu = np.reshape(lnmu, orig_shape)
+        for i in range(len(lnsd)):
+            lnsd[i] = np.reshape(lnsd[i], orig_shape)
 
         return lnmu, lnsd
 

@@ -403,18 +403,6 @@ def main(args):
     # note: function gives z2pt5 in m, but CB14 expect km.
 
     #----------------------------------------------------
-    # Reshape meshes
-    #----------------------------------------------------
-    # Need to turn all 2D arrays into 1D arrays because of
-    # inconsistencies in how arrays are handled in OpenQuake.
-    orig_shape = np.shape(sites.vs30)
-
-    for k, v in dctx.__dict__.items():
-        dctx.__dict__[k] = np.reshape(dctx.__dict__[k], (-1,))
-    for k, v in sites.__dict__.items():
-        sites.__dict__[k] = np.reshape(sites.__dict__[k], (-1,))
-
-    #----------------------------------------------------
     # Intensity measure calculation
     #----------------------------------------------------
 
@@ -446,10 +434,6 @@ def main(args):
         mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
         lnmu, lnsd = mgmpe.get_mean_and_stddevs(
             sites, rupt, dctx, iimt, stddev_types)
-
-        # Reshape the result:
-        lnmu = np.reshape(lnmu, orig_shape)
-        lnsd = np.reshape(lnsd, orig_shape)
 
         # Handle directivity factors
         # NOTE: currently, the Rowshandel model does not provide
