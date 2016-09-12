@@ -4,12 +4,7 @@
 import os.path
 import sys
 import time as time
-
-# hack the path so that I can debug these functions if I need to
-homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..','..','..'))
-# put this at the front of the system path, ignoring any installed mapio stuff
-sys.path.insert(0, shakedir)
+import copy
 
 import numpy as np
 
@@ -22,6 +17,12 @@ from shakemap.grind.directivity.bayless2013 import Bayless2013
 from shakemap.utils.timeutils import ShakeDateTime
 from shakemap.utils.vector import Vector
 from shakemap.utils.ecef import ecef2latlon
+
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..','..','..'))
+sys.path.insert(0, shakedir)
+
+
 
 def test_ss3():
     magnitude = 7.2
@@ -306,8 +307,7 @@ def test_ss3():
              6.35932476e-02, 4.85026462e-02, 3.27888240e-02,
              1.71162845e-02, 2.06213867e-03, 0.00000000e+00]]
     )
-    np.testing.assert_allclose(
-        fd, fd_test, rtol=1e-4)
+    np.testing.assert_allclose(fd, fd_test, rtol=1e-4)
 
 def test_ss3_m6():
     magnitude = 6.0
@@ -378,52 +378,118 @@ def test_ss3_m6():
     np.testing.assert_allclose(
         fd, fd_test, rtol=1e-4)
 
-#def test_ss3_move_hypo1():
-#    magnitude = 7.2
-#    dip = np.array([90])
-#    rake = 180.0
-#    width = np.array([15])
-#    fltx = np.array([0, 0])
-#    flty = np.array([0, 80])
-#    zp = np.array([-1.0]) # positive down
-#    epix = np.array([3.0])
-#    epiy = np.array([0.2 * flty[1]])
+def test_ss3_move_hypo1():
+    magnitude = 7.2
+    dip = np.array([90])
+    rake = 180.0
+    width = np.array([15])
+    fltx = np.array([0, 0])
+    flty = np.array([0, 80])
+    zp = np.array([0.0])
+    epix = np.array([1.0])
+    epiy = np.array([-1.0])
 
-#    # Convert to lat/lon
-#    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
-#    tlon, tlat = proj(fltx, flty, reverse=True)
-#    epilon, epilat = proj(epix, epiy, reverse=True)
+    # Convert to lat/lon
+    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    tlon, tlat = proj(fltx, flty, reverse=True)
+    epilon, epilat = proj(epix, epiy, reverse=True)
 
-#    flt = fault.Fault.fromTrace(np.array([tlon[0]]), np.array([tlat[0]]),
-#                                np.array([tlon[1]]), np.array([tlat[1]]),
-#                                zp, width, dip, reference='ss3')
+    flt = fault.Fault.fromTrace(np.array([tlon[0]]), np.array([tlat[0]]),
+                                np.array([tlon[1]]), np.array([tlat[1]]),
+                                zp, width, dip, reference='ss3')
 
-#    event = {'lat': epilat[0],
-#             'lon': epilon[0],
-#             'depth': 10,
-#             'mag': magnitude,
-#             'id': 'ss3',
-#             'locstring': 'test',
-#             'type': 'SS',
-#             'timezone': 'UTC'}
-#    event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
-#    event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+    event = {'lat': epilat[0],
+             'lon': epilon[0],
+             'depth': -1.0,
+             'mag': magnitude,
+             'id': 'ss3',
+             'locstring': 'test',
+             'type': 'SS',
+             'timezone': 'UTC'}
+    event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+    event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
 
-#    x = np.linspace(0, 20, 6)
-#    y = np.linspace(0, 90, 11)
-#    site_x, site_y = np.meshgrid(x, y)
-#    slon, slat = proj(site_x, site_y, reverse=True)
-#    deps = np.zeros_like(slon)
-#    source = Source(event, flt)
-#    source.setEventParam('rake', rake)
+    x = np.linspace(0, 20, 6)
+    y = np.linspace(0, 90, 11)
+    site_x, site_y = np.meshgrid(x, y)
+    slon, slat = proj(site_x, site_y, reverse=True)
+    deps = np.zeros_like(slon)
+    source = Source(event, flt)
+    source.setEventParam('rake', rake)
 
-#    test1 = Bayless2013(source, slat, slon, deps, T=1.0)
+    test1 = Bayless2013(source, slat, slon, deps, T=1.0)
+    phyp = copy.deepcopy(test1.phyp[0])
+    plat, plon, pdep = ecef2latlon(phyp.x, phyp.y, phyp.z)
 
-#    # Test fd
-#    fd = test1.getFd()
-#    fd_test = np.array(
-#    np.testing.assert_allclose(
-#        fd, fd_test, rtol=1e-4)
+    px, py = proj(plon, plat, reverse=False)
+
+    np.testing.assert_allclose(plat, 38.004233219183604, rtol=1e-4)
+    np.testing.assert_allclose(plon, -120.98636122402166, rtol=1e-4)
+    np.testing.assert_allclose(pdep, 7.4999999989205968, rtol=1e-4)
+
+    #---------------------------------------------------------------------------
+    # Also for multiple segments
+    #---------------------------------------------------------------------------
+    dip = np.array([90., 90., 90.])
+    rake = 180.0
+    width = np.array([15., 15., 10.])
+    fltx = np.array([0., 0., 10., 20.])
+    flty = np.array([0., 20., 60., 80.])
+    zp = np.array([0., 0., 0.])
+    epix = np.array([0.])
+    epiy = np.array([0.])
+
+    # Convert to lat/lon
+    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    tlon, tlat = proj(fltx, flty, reverse=True)
+    epilon, epilat = proj(epix, epiy, reverse=True)
+
+    flt = fault.Fault.fromTrace(np.array(tlon[0:3]), np.array(tlat[0:3]),
+                                np.array(tlon[1:4]), np.array(tlat[1:4]),
+                                zp, width, dip, reference='')
+
+    event = {'lat': epilat[0],
+             'lon': epilon[0],
+             'depth': 1.0,
+             'mag': magnitude,
+             'id': '',
+             'locstring': 'test',
+             'type': 'SS',
+             'timezone': 'UTC'}
+    event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+    event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+    x = np.linspace(0, 20, 6)
+    y = np.linspace(0, 90, 11)
+    site_x, site_y = np.meshgrid(x, y)
+    slon, slat = proj(site_x, site_y, reverse=True)
+    deps = np.zeros_like(slon)
+    source = Source(event, flt)
+    source.setEventParam('rake', rake)
+    test1 = Bayless2013(source, slat, slon, deps, T=1.0)
+
+    # 1st pseudo-hyp
+    phyp = copy.deepcopy(test1.phyp[0])
+    plat, plon, pdep = ecef2latlon(phyp.x, phyp.y, phyp.z)
+    px, py = proj(plon, plat, reverse=False)
+    np.testing.assert_allclose(plat, 38.004233219183604, rtol=1e-4)
+    np.testing.assert_allclose(plon, -120.98636122402166, rtol=1e-4)
+    np.testing.assert_allclose(pdep, 7.4999999989205968, rtol=1e-4)
+
+    # 2nd pseudo-hyp
+    phyp = copy.deepcopy(test1.phyp[1])
+    plat, plon, pdep = ecef2latlon(phyp.x, phyp.y, phyp.z)
+    px, py = proj(plon, plat, reverse=False)
+    np.testing.assert_allclose(plat, 38.184097835787796, rtol=1e-4)
+    np.testing.assert_allclose(plon, -120.98636122402166, rtol=1e-4)
+    np.testing.assert_allclose(pdep, 7.4999999989103525, rtol=1e-4)
+
+    # 3rd pseudo-hyp
+    phyp = copy.deepcopy(test1.phyp[2])
+    plat, plon, pdep = ecef2latlon(phyp.x, phyp.y, phyp.z)
+    px, py = proj(plon, plat, reverse=False)
+    np.testing.assert_allclose(plat, 38.543778594535752, rtol=1e-4)
+    np.testing.assert_allclose(plon, -120.87137783362499, rtol=1e-4)
+    np.testing.assert_allclose(pdep, 4.9999999995063993, rtol=1e-4)
 
 
 def test_ss3_m4p5():

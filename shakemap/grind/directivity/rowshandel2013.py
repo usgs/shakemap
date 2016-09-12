@@ -289,9 +289,6 @@ with warnings.catch_warnings():
         """
         hypo_ecef = Vector.fromPoint(geo.point.Point(
             self._hyp.longitude, self._hyp.latitude, self._hyp.depth))
-        epi_ll = Vector(self._hyp.longitude, self._hyp.latitude, 0)
-        epi_ecef = Vector.fromPoint(geo.point.Point(
-            epi_ll.x, epi_ll.y, 0))
 
         slat = self._lat
         slon = self._lon
@@ -333,13 +330,8 @@ with warnings.catch_warnings():
                                 [rpnv.y],
                                 [rpnv.z]])
 
-            # Strike vector (ECEF coords)
-            strike_vec = fault.get_quad_strike_vector(q)
-            strike_vec_col = np.array([[strike_vec.x], [strike_vec.y], [
-                                      strike_vec.z]])  # convert to column vector
-
             # Make 3x(i*j) matrix of cp
-            ni, nj = mesh['llx'].shape
+            nj = mesh['llx'].shape[1]
 
             cp_mat = np.array([np.reshape(mesh['cpx'], (-1,)),
                                np.reshape(mesh['cpy'], (-1,)),
@@ -601,7 +593,7 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
         of the unit slip vector in ECEF space.
     """
     # Get quad vertices, strike, dip
-    P0, P1, P2 = q[0:3]
+    P0, P1 = q[0:2]
     strike = P0.azimuth(P1)
     dip = fault.get_quad_dip(q)
 

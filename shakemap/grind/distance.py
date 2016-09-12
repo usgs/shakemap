@@ -823,7 +823,6 @@ def _distance_sq_to_segment(p0, p1):
     nr, nc = p0.shape
     t1 = c1 / c2
     t1.shape = (nr, 1)
-    t2 = np.tile(t1, 3)
     tmp = p0 + (v * t1)
     dist[idx_other] = tmp[idx_other, 0]**2 + \
         tmp[idx_other, 1]**2 + tmp[idx_other, 2]**2

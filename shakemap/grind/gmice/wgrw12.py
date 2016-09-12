@@ -196,28 +196,32 @@ class WGRW12(object):
                 'psa10': 10**self.__constants['psa10']['SPGM'],
                 'psa30': 10**self.__constants['psa30']['SPGM']}
 
-    def getName(self):
+    @staticmethod
+    def getName():
         """
         :returns:
             Name of GMICE. 
         """
         return 'Worden et al. (2012)'
 
-    def getScale(self):
+    @staticmethod
+    def getScale():
         """
         :returns:
             Name of GMICE scale file.
         """
         return 'scale_wgrw12.ps'
 
-    def getMinMax(self):
+    @staticmethod
+    def getMinMax():
         """
         :returns: 
             Tuple of min and max values of GMICE.
         """
         return (1.0, 10.0)
 
-    def getDistanceType(self):
+    @staticmethod
+    def getDistanceType():
         return 'rrup'
 
     def __getConsts(self, imt):
