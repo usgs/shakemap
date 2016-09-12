@@ -123,7 +123,6 @@ class Fault(object):
 
         # projected coordinates are in km
         proj = get_orthographic_projection(west, east, north, south)
-        surfaces = []
         xp2 = np.zeros_like(xp0)
         xp3 = np.zeros_like(xp0)
         yp2 = np.zeros_like(xp0)
@@ -505,7 +504,8 @@ class Fault(object):
             lengths[i] = (p1 - p0).mag() / 1000.0
         return lengths
 
-    def _getTrapMeanLength(self, p0, p1, p2, p3):
+    @staticmethod
+    def _getTrapMeanLength(p0, p1, p2, p3):
         """
         Return the sqrt of the area of a quadrilateral (used for QA of fault 
         plane).
@@ -530,7 +530,8 @@ class Fault(object):
         length = np.sqrt(A)
         return length
 
-    def getDistanceToPlane(self, planepoints, otherpoint):
+    @staticmethod
+    def getDistanceToPlane(planepoints, otherpoint):
         """
         Calculate a point's distance to a plane.  Used to figure out if a
         quadrilateral points are all co-planar.
@@ -570,7 +571,8 @@ class Fault(object):
             dist = 0
         return dist
 
-    def _isPointToRight(self, P0, P1, P2):
+    @staticmethod
+    def _isPointToRight(P0, P1, P2):
         eps = 1e-6
         p0 = Vector.fromPoint(P0)  # fromPoint converts to ECEF
         p1 = Vector.fromPoint(P1)
@@ -680,7 +682,7 @@ class Fault(object):
         self._depth = np.array(self._depth)
         inan = np.isnan(self._lon)
         numnans = len(self._lon[inan])
-        numsegments = numnans + 1
+
         # requirements:
         # 1) Coordinate arrays must be same length
         # 2) Polygons must be quadrilaterals
@@ -717,19 +719,13 @@ class Fault(object):
                 topLeft = point.Point(lonseg[startidx], latseg[startidx],
                                       depthseg[startidx])
                 topRight = point.Point(
-                    lonseg[
-                        startidx + 1],
-                    latseg[
-                        startidx + 1],
-                    depthseg[
-                        startidx + 1])
+                    lonseg[startidx + 1],
+                    latseg[startidx + 1],
+                    depthseg[startidx + 1])
                 bottomRight = point.Point(
-                    lonseg[
-                        endidx - 1],
-                    latseg[
-                        endidx - 1],
-                    depthseg[
-                        endidx - 1])
+                    lonseg[endidx - 1],
+                    latseg[endidx - 1],
+                    depthseg[endidx - 1])
                 bottomLeft = point.Point(lonseg[endidx], latseg[endidx],
                                          depthseg[endidx])
                 surface = self._validateQuad(topLeft, topRight, bottomRight,

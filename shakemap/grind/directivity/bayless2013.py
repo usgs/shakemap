@@ -5,6 +5,7 @@ import openquake.hazardlib.geo as geo
 import copy
 
 from shakemap.grind.distance import get_distance
+from shakemap.grind.distance import _distance_sq_to_segment
 import shakemap.utils.ecef as ecef
 from shakemap.utils.vector import Vector
 
@@ -130,7 +131,6 @@ class Bayless2013(object):
             self.i = i
 
             # Compute some genral stuff that is required for all mechanisms
-            qlist = [self._flt.getQuadrilaterals()[self.i]]
             dtypes = ['rrup', 'rx', 'ry0']
             dists = get_distance(dtypes, self._lat, self._lon, self._dep,
                                  self._source)
@@ -211,9 +211,11 @@ class Bayless2013(object):
             n2 = Vector.cross(p3 - p2, hpnp)
             n3 = Vector.cross(p0 - p3, hpnp)
 
+            #-------------------------------------------------------------------
             # Is the hypocenter inside the projected rectangle?
             # Dot products show which side the origin is on.
             # If origin is on same side of all the planes, then it is 'inside'
+            #-------------------------------------------------------------------
 
             sgn0 = np.signbit(Vector.dot(n0, p0 - hyp_ecef))
             sgn1 = np.signbit(Vector.dot(n1, p1 - hyp_ecef))
@@ -235,9 +237,8 @@ class Bayless2013(object):
                 p1p = np.reshape(p1.getArray() - hyp_ecef.getArray(), [1, 3])
                 p2p = np.reshape(p2.getArray() - hyp_ecef.getArray(), [1, 3])
                 p3p = np.reshape(p3.getArray() - hyp_ecef.getArray(), [1, 3])
-                s1 = dist2_to_segment(p1p, p2p)
-                s2 = dist2_to_segment(p2p, p3p)
-                s3 = dist2_to_segment(p3p, p0p)
+                s1 = _distance_sq_to_segment(p1p, p2p)
+                s3 = _distance_sq_to_segment(p3p, p0p)
 
                 # Assuming that the fault is segmented along strike and not
                 # updip (as described by Bayless and somerville), we only
@@ -259,27 +260,15 @@ class Bayless2013(object):
         self.__computeD(self.i)
 
         # Geometric directivity predictor:
-        RxoverW = (
-            self.__Rx /
-            self._W[
-                self.i]).clip(
-            min=-
-            np.pi /
-            2.0,
-            max=2.0 *
-            np.pi /
-            3.0)
+        RxoverW = (self.__Rx /
+            self._W[self.i]).clip(
+                min=-np.pi / 2.0, max=2.0 * np.pi / 3.0)
         f_geom = np.log(self.d) * np.cos(RxoverW)
 
         # Distance taper
         T_CD = np.ones_like(self._lat)
-        ix = [
-            (self.__Rrup /
-             self._W[
-                 self.i] > 1.5) & (
-                self.__Rrup /
-                self._W[
-                    self.i] < 2.0)]
+        ix = [(self.__Rrup / self._W[self.i] > 1.5) &
+              (self.__Rrup / self._W[self.i] < 2.0)]
         T_CD[ix] = 1.0 - (self.__Rrup[ix] / self._W[self.i] - 1.5) / 0.5
         T_CD[self.__Rrup / self._W[self.i] >= 2.0] = 0.0
 
@@ -342,7 +331,7 @@ class Bayless2013(object):
         hyp_col = np.array([[hyp_ecef.x], [hyp_ecef.y], [hyp_ecef.z]])
 
         # First compute "updip" vector
-        P0, P1, P2, P3 = self._flt.getQuadrilaterals()[i]
+        P0, P1, P2 = self._flt.getQuadrilaterals()[i][0:3]
         p1 = Vector.fromPoint(P1)  # convert to ECEF
         p2 = Vector.fromPoint(P2)
         e21 = p1 - p2

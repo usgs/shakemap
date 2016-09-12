@@ -152,6 +152,20 @@ class BeyerBommer2006(object):
         return sigma_out
 
     @staticmethod
+    def __checkIMC(imc):
+        """
+        Check that the requested IMC is available.
+        """
+        if imc != const.IMC.GREATER_OF_TWO_HORIZONTAL and \
+           imc != const.IMC.MEDIAN_HORIZONTAL and \
+           imc != const.IMC.GMRotI50 and \
+           imc != const.IMC.RotD50 and \
+           imc != const.IMC.RANDOM_HORIZONTAL and \
+           imc != const.IMC.HORIZONTAL:
+            raise ValueError('unknown IMC %r' % imc)
+
+
+    @staticmethod
     def __GM2other(imt, imc):
         """
         Helper function to extract coefficients from the parameters for 
@@ -171,13 +185,8 @@ class BeyerBommer2006(object):
             # geometric mean)
             return 1.
 
-        if imc != const.IMC.GREATER_OF_TWO_HORIZONTAL and \
-                imc != const.IMC.MEDIAN_HORIZONTAL and \
-                imc != const.IMC.GMRotI50 and \
-                imc != const.IMC.RotD50 and \
-                imc != const.IMC.RANDOM_HORIZONTAL and \
-                imc != const.IMC.HORIZONTAL:
-            raise ValueError('unknown IMC %r' % imc)
+        BeyerBommer2006.__checkIMC(imc)
+
 
         if 'PGA' in imt:
             return BeyerBommer2006.__pga_dict[imc]['c12']
@@ -219,13 +228,7 @@ class BeyerBommer2006(object):
             # geometric mean)
             return 1., 0.
 
-        if imc != const.IMC.GREATER_OF_TWO_HORIZONTAL and \
-                imc != const.IMC.MEDIAN_HORIZONTAL and \
-                imc != const.IMC.GMRotI50 and \
-                imc != const.IMC.RotD50 and \
-                imc != const.IMC.RANDOM_HORIZONTAL and \
-                imc != const.IMC.HORIZONTAL:
-            raise ValueError('unknown IMC %r' % imc)
+        BeyerBommer2006.__checkIMC(imc)
 
         if 'PGA' in imt:
             return BeyerBommer2006.__pga_dict[imc]['R'], BeyerBommer2006.__pga_dict[imc]['c34']

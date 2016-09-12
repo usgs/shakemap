@@ -2,9 +2,7 @@
 import sqlite3
 from xml.dom import minidom
 import os.path
-import sys
 import copy
-import time
 from collections import OrderedDict
 
 # third party imports
@@ -15,7 +13,7 @@ from openquake.hazardlib.gsim import base
 
 # local imports
 from .distance import get_distance, get_distance_measures
-import shakemap.grind.sites as sites
+
 
 TABLES = {'station':
           {'id': 'integer primary key',
