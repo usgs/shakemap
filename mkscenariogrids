@@ -59,11 +59,11 @@ import shakemap.grind.fault as fault
 from shakemap.grind.source import Source
 from shakemap.grind.distance import Distance
 from shakemap.grind.sites import Sites
-import shakemap.grind.multigmpe as mg
+from shakemap.grind.multigmpe import MultiGMPE
 from shakemap.grind.directivity.rowshandel2013 import Rowshandel2013
 from shakemap.utils.timeutils import ShakeDateTime
 from shakemap.grind.gmice.wgrw12 import WGRW12
-from shakemap.utils.misc import get_command_output
+from impactutils.io.cmd import get_command_output
 
 #----------------------------------------------------
 # Function to compute extent from source
@@ -357,7 +357,8 @@ def main(args):
     bounds = (west, east, south, north)
 
     # Sites object
-    sites_object = Sites(vs30grid)
+    sites = Sites(vs30grid)
+    sx = sites.getSitesContext()
 
     #----------------------------------------------------
     # Standard deviation stuff
@@ -386,21 +387,7 @@ def main(args):
 
     # Compute distances and site parameters on mesh.
     dist = Distance(gmpes, source, lat, lon, dep)
-    dctx = dist.getDistanceContext()
-    # Sites context
-    sites = SitesContext()
-    sites.vs30 = vs30grid._data
-
-    # Clip Vs30 do avoid out-of-bounds error:
-    sites.vs30 = np.clip(sites.vs30, 0, 2000)
-
-    sites.vs30measured = np.ones_like(sites.vs30, dtype=bool)
-
-    # Add z1 and z2.5
-    sites.z1pt0cy14 = mg._z1_from_vs30_cy14_cal(sites.vs30)
-    sites.z1pt0ask14 = mg._z1_from_vs30_ask14_cal(sites.vs30)
-    sites.z2pt5 = mg._z2p5_from_vs30_cb14_cal(sites.vs30) / 1000.0
-    # note: function gives z2pt5 in m, but CB14 expect km.
+    dx = dist.getDistanceContext()
 
     #----------------------------------------------------
     # Intensity measure calculation
@@ -409,6 +396,7 @@ def main(args):
     # Make a dictionary to store intensity measure(s) and
     # their sigmas.
 
+    orig_shape = sx.vs30.shape
     imdict = {'pga': {'mean': np.zeros(orig_shape), 'sigma': np.zeros(orig_shape)},
               'pgv': {'mean': np.zeros(orig_shape), 'sigma': np.zeros(orig_shape)},
               'psa03': {'mean': np.zeros(orig_shape), 'sigma': np.zeros(orig_shape)},
@@ -420,7 +408,7 @@ def main(args):
     #----------------------------------------------------
     if Directivity:
         R13 = Rowshandel2013.fromSites(
-            source, sites_object, dx=1.0, T=[1.0, 3.0],
+            source, sites, dx=1.0, T=[1.0, 3.0],
             a_weight=0.5, mtype=1)
         fd1 = R13.getFd()[0]
         fd3 = R13.getFd()[1]
@@ -431,9 +419,9 @@ def main(args):
     for key, val in imt_dict.items():
         iimt = imt.from_string(val)
 
-        mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
+        mgmpe = MultiGMPE.from_list(gmpes, wts)
         lnmu, lnsd = mgmpe.get_mean_and_stddevs(
-            sites, rupt, dctx, iimt, stddev_types)
+            sx, rupt, dx, iimt, stddev_types)
 
         # Handle directivity factors
         # NOTE: currently, the Rowshandel model does not provide
@@ -453,7 +441,7 @@ def main(args):
 
         # Put into intensity measure dictionary
         imdict[key]['mean'] = lnmu
-        imdict[key]['sigma'] = lnsd
+        imdict[key]['sigma'] = lnsd[0]
 
         #----------------------------------------------------
         # Write files
@@ -481,15 +469,15 @@ def main(args):
 
         # MMI - get from PGV
         gmice = WGRW12()
-        tmp_pgv = np.reshape(imdict['pgv']['mean'], (-1,))
+        pgv = imdict['pgv']['mean']
 
         # Use rrup if available, otherwise rhypo
-        if hasattr(dctx, 'rrup'):
-            dist4gmice = dctx.rrup
+        if hasattr(dx, 'rrup'):
+            dist4gmice = dx.rrup
         else:
-            dist4gmice = dctx.rhypo
+            dist4gmice = dx.rhypo
 
-        mmi = gmice.getMIfromGM(np.exp(tmp_pgv), 'PGV',
+        mmi = gmice.getMIfromGM(np.exp(pgv), 'PGV',
                                 dists=dist4gmice,
                                 mag=rupt.mag)
         GM2MIsd = gmice.getGM2MIsd()['pgv']  # in 'intensity' units
@@ -503,11 +491,9 @@ def main(args):
         dmmi_damp[idx] = c['C4']
 
         # convert to log10
-        amp_sd = np.reshape(imdict['pgv']['sigma'], (-1,)) / np.log(10)
+        amp_sd = imdict['pgv']['sigma'] / np.log(10)
         additional_var = dmmi_damp**2 * (amp_sd**2)
         mmi_sd = np.sqrt(GM2MIsd**2 + additional_var)
-        mmi = np.reshape(mmi, orig_shape)
-        mmi_sd = np.reshape(mmi_sd, orig_shape)
         mgrid = GMTGrid(mmi, smdict)
         sgrid = GMTGrid(mmi_sd, smdict)
         mgrid.save(os.path.join(input_dir, 'mi_estimates.grd'))
