@@ -186,6 +186,9 @@ def main(args):
     f.write("autoclass_content = 'both'\n")
     f.write("autodoc_member_order = 'bysource'\n")
     f.write("html_show_copyright = False\n")
+    f.write("extensions = extensions + [ 'sphinx.ext.napoleon', 'sphinx.ext.todo' ] \n")
+    f.write("napoleon_include_special_with_doc = False\n")
+    f.write("todo_include_todos = True\n")
     f.close()
 
     #-------------------------------------------------------------

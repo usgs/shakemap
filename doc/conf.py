@@ -30,6 +30,8 @@ sys.path.insert(0, os.path.abspath('.'))
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.todo',
     'sphinx.ext.doctest',
     'sphinx.ext.intersphinx',
     'sphinx.ext.todo',
@@ -343,3 +345,9 @@ epub_exclude_files = ['search.html']
 intersphinx_mapping = {'http://docs.python.org/': None}
 
 number_figures = True
+
+# Set class documentation to include both the class and __init__() docstrings.
+autoclass_content = 'both'
+
+# Order the functions and methods in a module by source order rather than alphabetical.
+autodoc_member_order = 'bysource'
