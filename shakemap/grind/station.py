@@ -120,7 +120,8 @@ class StationList(object):
     "INTENSITY," or "CIIM."
 
     .. note::
-      Typically the user will call :meth:`fromXML` the first time 
+      Typically the user will call the class method :meth:`fromXML` 
+      to create a :class:`StationList` object the first time 
       a set of station files are processed. (Or, as an alternative,
       the user can call :meth:`loadFromXML` and :meth:`fillTables`
       sequentially.)
@@ -140,13 +141,14 @@ class StationList(object):
         The default constructor reads a pre-built SQLite database of
         station data. 
 
-        :param dbfile:
-            A SQLite database file containing pre-processed station data.
-        :type dbfile:
-            string
+        Args:
+            dbfile (str): 
+                A SQLite database file containing pre-processed
+                station data.
 
-        :returns:
-            A StationList object.
+        Returns:
+            A :class:`StationList` object.
+
         """
         self.db = sqlite3.connect(dbfile)
         self.cursor = self.db.cursor()
@@ -177,38 +179,29 @@ class StationList(object):
         values and distances. This is a convenience method that calls 
         :meth:`loadFromXML` and :meth:`fillTables`.
 
-        :param xmlfiles:
-            Sequence of ShakeMap XML input files to read.
-        :type xmlfiles:
-            sequence of strings
+        Args:
+            xmlfiles (sequence of strings):
+                Sequence of ShakeMap XML input files to read.
+            dbfile (string): 
+                Path to a file into which to write the SQLite database.
+            source:
+                ShakeMap Source object containing information about the 
+                origin and source of the earthquake.
+            sites:
+                ShakeMap Sites object containing grid of Vs30 values for the 
+                region in question.
+            gmpe:
+                A GMPE object to use for predicting 
+                ground motions at the station locations.
+            ipe:
+                A GMPE object to use for predicting 
+                macroseismic intensities at the station locations.
+            gmice:
+                A GMICE object to use for converting ground motions to
+                macroseismic intensities.
 
-        :param dbfile:
-            Path to a file into which to write the SQLite database.
-        :type dbfile:
-            string
-
-        :param source:
-            ShakeMap Source object containing information about the 
-            origin and source of the earthquake.
-        
-        :param sites:
-            ShakeMap Sites object containing grid of Vs30 values for the 
-            region in question.
-
-        :param gmpe:
-            A GMPE object to use for predicting 
-            ground motions at the station locations.
-
-        :param ipe:
-            A GMPE object to use for predicting 
-            macroseismic intensities at the station locations.
-
-        :param gmice:
-            A GMICE object to use for converting ground motions to
-            macroseismic intensities.
-
-        :returns:
-            StationList object
+        Returns:
+            :class:`StationList` object
         """
     
         this = cls.loadFromXML(xmlfiles, dbfile)
@@ -222,18 +215,15 @@ class StationList(object):
         Create a StationList object by reading one or more ShakeMap XML input 
         files.
 
-        :param xmlfiles:
-            Sequence of ShakeMap XML input files to read.
-        :type xmlfiles:
-            sequence of strings
+        Args:
+            xmlfiles (sequence of str):
+                Sequence of ShakeMap XML input files to read.
+            dbfile (str):
+                Path to a file into which to write the SQLite database.
 
-        :param dbfile:
-            Path to a file into which to write the SQLite database.
-        :type dbfile:
-            string
+        Returns:
+            :class:`StationList` object
 
-        :returns:
-            StationList object
         """
 
         stationdictlist = []
@@ -249,18 +239,14 @@ class StationList(object):
         Internal method to turn the station dictionary created from the
         ShakeMap XML input files into a SQLite database.
 
-        :param stationdictlist:
-            A list of station dictionaries returned by _filter_station().
-        :type stationdictlist:
-            list of stationdicts
+        Args:
+            stationdictlist (list of stationdicts):
+                A list of station dictionaries returned by _filter_station().
+            dbfile (string):
+                The path to which the SQLite database will be written.
 
-        :param dbfile:
-            The path to which the SQLite database will be written.
-        :type dbfile:
-            string
-
-        :returns:
-            StationList object
+        Returns:
+            :class:`StationList` object
         """
         do_create = False
         if not os.path.isfile(dbfile):
@@ -332,25 +318,25 @@ class StationList(object):
         Populate database tables with derived MMI/PGM values and distances.
         This method should be called after :meth:`loadFromXML`.
 
-        :param source:
-            ShakeMap Source object containing information about the 
-            origin and source of the earthquake.
-        
-        :param sites:
-            ShakeMap Sites object containing grid of Vs30 values for the 
-            region in question.
+        Args:
+            source:
+                ShakeMap Source object containing information about the 
+                origin and source of the earthquake.
+            sites:
+                ShakeMap Sites object containing grid of Vs30 values for the 
+                region in question.
+            gmpe:
+                A GMPE object to use for predicting 
+                ground motions at the station locations.
+            ipe:
+                A GMPE object to use for predicting 
+                macroseismic intensities at the station locations.
+            gmice:
+                A GMICE object to use for converting ground motions to
+                macroseismic intensities.
 
-        :param gmpe:
-            A GMPE object to use for predicting 
-            ground motions at the station locations.
-
-        :param ipe:
-            A GMPE object to use for predicting 
-            macroseismic intensities at the station locations.
-
-        :param gmice:
-            A GMICE object to use for converting ground motions to
-            macroseismic intensities.
+        Returns:
+            nothing
         """
         emag = source.getEventDict()['mag']
         #
@@ -367,15 +353,15 @@ class StationList(object):
         lats = np.empty((nrows))
         lons = np.empty((nrows))
         depths = np.zeros((nrows))
-        for irow in range(nrows):
-            lats[irow] = station_rows[irow][1]
-            lons[irow] = station_rows[irow][2]
+        for irow, row in enumerate(station_rows):
+            lats[irow] = row[1]
+            lons[irow] = row[2]
         ddict = get_distance(DISTANCES, lats, lons, depths, source)
         dist_rows = []
-        for irow in range(nrows):
+        for irow, row in enumerate(station_rows):
             dist_rows.append(
                     tuple(ddict[dt][irow] for dt in DISTANCES) + 
-                    (station_rows[irow][0],)
+                    (row[0],)
                 )
 
         query = 'UPDATE station set '
@@ -410,18 +396,18 @@ class StationList(object):
             amps = np.empty((nrows))
             dists = np.empty((nrows))
             emags = np.zeros((nrows)) + emag
-            for irow in range(nrows):
-                amps[irow] = rows[irow][3]
-                dists[irow] = rows[irow][4]
+            for irow, row in enumerate(rows):
+                amps[irow] = row[3]
+                dists[irow] = row[4]
 
             gemimt = GEM_IMT.from_string(GEM_IMT_MAP[imt])
             dmmi = gmice.getMIfromGM(amps, gemimt, dists=dists, mag=emags)
 
             derived_imtid = IMT_TYPES["mmi_from_" + imt]
 
-            for irow in range(nrows):
-                amp_rows.append((rows[irow][5], derived_imtid, rows[irow][0],
-                                 rows[irow][1], dmmi[irow], 0.0))
+            for irow, row in enumerate(rows):
+                amp_rows.append((row[5], derived_imtid, row[0],
+                                 row[1], dmmi[irow], 0.0))
 
         self.cursor.executemany(
             'INSERT INTO amp (station_id, imt_id, original_channel, '
@@ -445,9 +431,9 @@ class StationList(object):
         mmi = np.empty((nrows))
         dists = np.empty((nrows))
         emags = np.zeros((nrows)) + emag
-        for irow in range(nrows):
-            mmi[irow] = rows[irow][1]
-            dists[irow] = rows[irow][2]
+        for irow, row in enumerate(rows):
+            mmi[irow] = row[1]
+            dists[irow] = row[2]
 
         amp_rows = []
         for imt, imtid in IMT_TYPES_ORDERED.items():
@@ -459,9 +445,8 @@ class StationList(object):
 
             derived_imtid = IMT_TYPES[imt + "_from_mmi"]
 
-            for irow in range(nrows):
-                amp_rows.append((rows[irow][3], derived_imtid, dmmi[irow], 
-                                 0.0))
+            for irow, row in enumerate(rows):
+                amp_rows.append((row[3], derived_imtid, dmmi[irow], 0.0))
 
         self.cursor.executemany(
             'INSERT INTO amp (station_id, imt_id, amp, uncertainty, flag) '
@@ -486,7 +471,6 @@ class StationList(object):
         pred_rows = []
         siteamp_rows = []
         vs30_rows = []
-        nrows = len(station_rows)
         for imt in BASE_IMTS:
             gemimt = GEM_IMT.from_string(GEM_IMT_MAP[imt])
             if imt == 'mmi':
@@ -508,31 +492,29 @@ class StationList(object):
             amp_facts = pred_soil - pred_rock
 
             if len(stddev_types) == 3:
-                for irow in range(nrows):
+                for irow, row in enumerate(station_rows):
                     pred_rows.append(
-                            (station_rows[irow][0], IMT_TYPES[imt], 
+                            (row[0], IMT_TYPES[imt], 
                             SOIL_TYPES['rock'], pred_rock[irow], 
                             pred_stdev[0][irow], pred_stdev[1][irow], 
                             pred_stdev[2][irow])
                         )
                     siteamp_rows.append(
-                            (station_rows[irow][0], IMT_TYPES[imt], 
-                            amp_facts[irow])
+                            (row[0], IMT_TYPES[imt], amp_facts[irow])
                         )
             else:
-                for irow in range(nrows):
+                for irow, row in enumerate(station_rows):
                     pred_rows.append(
-                            (station_rows[irow][0], IMT_TYPES[imt], 
+                            (row[0], IMT_TYPES[imt], 
                             SOIL_TYPES['rock'], pred_rock[irow], 
                             pred_stdev[0][irow], 'NULL', 'NULL')
                         )
                     siteamp_rows.append(
-                            (station_rows[irow][0], IMT_TYPES[imt], 
-                            amp_facts[irow])
+                            (row[0], IMT_TYPES[imt], amp_facts[irow])
                         )
 
-        for irow in range(nrows):
-            vs30_rows.append((sx_soil.vs30[irow], station_rows[irow][0]))
+        for irow, row in enumerate(station_rows):
+            vs30_rows.append((sx_soil.vs30[irow], row[0]))
             
         self.cursor.executemany(
             'INSERT INTO predicted (station_id, imt_id, soiltype_id, amp, '
@@ -599,18 +581,17 @@ class StationList(object):
         separate inter- and intra-event terms.
         
 
-        :param instrumented:
-            Set to 1 (one) if the dataframe is to contain the instrumented
-            stations, or to 0 (zero) if the dataframe is to contain the 
-            non-instrumented (MMI) stations.
-        :type instrumented:
-            integer
+        Args:
+            instrumented (integer):
+                Set to 1 (one) if the dataframe is to contain the instrumented
+                stations, or to 0 (zero) if the dataframe is to contain the 
+                non-instrumented (MMI) stations.
+            sort (bool):
+                If True, the dataframe will be sorted by the **name** column. 
+                The default if False (unsorted).
 
-        :param sort:
-            If True, the dataframe will be sorted by the **name** column. 
-            The default if False (unsorted).
-        :type sort:
-            bool
+        Returns:
+            A Pandas dataframe.
         """
 
         dstr = ''
@@ -768,11 +749,14 @@ class StationList(object):
         """
         Return a character representing the orientation of a channel.
 
-        :param orig_channel:
-            String representing the seed channel (e.g. 'HNZ'). The final character
-            is assumed to be the (uppercase) orientation.
-        :type orig_channel:
-            string
+        Args:
+            orig_channel (string):
+                String representing the seed channel (e.g. 'HNZ'). The 
+                final character is assumed to be the (uppercase) orientation.
+
+        Returns:
+            Character representing the channel orientation. One of 'N',
+            'E', 'Z', or 'U' (for unknown).
         """
         if orig_channel[-1] in ('N', 'E', 'Z'):
             orientation = orig_channel[-1]
@@ -831,13 +815,12 @@ class StationList(object):
         """
         Filter individual xmlfile into a stationdict data structure.
 
-        :param xmlfile:
-            Path to ShakeMap XML input file (or file-like object) 
-            containing station data.
-        :type xmlfile:
-            string
+        Args:
+            xmlfile (string):
+                Path to ShakeMap XML input file (or file-like object) 
+                containing station data.
 
-        :returns:
+        Returns:
             stationdict data structure
         """
         stationdict = {}
