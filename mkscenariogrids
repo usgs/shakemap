@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-
 import os
 import subprocess
 import xml.etree.ElementTree as ET
@@ -10,14 +9,14 @@ import warnings
 
 import numpy as np
 
-#--------------------------------------------------
+#-------------------------------------------------------------------------------
 # WUS GMPEs
 from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
 from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
 from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import CampbellBozorgnia2014
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 
-#--------------------------------------------------
+#-------------------------------------------------------------------------------
 # CEUS GMPEs
 from openquake.hazardlib.gsim.frankel_1996 import FrankelEtAl1996MwNSHMP2008
 # Note: the Toro implementation includes the 2002 update.
@@ -30,7 +29,7 @@ from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011
 from openquake.hazardlib.gsim.boore_atkinson_2011 import Atkinson2008prime
 from openquake.hazardlib.gsim.somerville_2001 import SomervilleEtAl2001NSHMP2008
 
-#--------------------------------------------------
+#-------------------------------------------------------------------------------
 # SZ/interface GMPEs
 # Note: do not use the "NSHMP" veresions of the subduction zone gmpes because they fix
 #       hypocentral depth at 20 km.
@@ -45,7 +44,7 @@ from openquake.hazardlib.gsim.atkinson_boore_2003 import AtkinsonBoore2003SSlabC
 from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006SSlab
 from openquake.hazardlib.gsim.abrahamson_2015 import AbrahamsonEtAl2015SSlab
 
-#--------------------------------------------------
+#-------------------------------------------------------------------------------
 # Openquake utilities
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib import imt, const
@@ -59,15 +58,16 @@ import shakemap.grind.fault as fault
 from shakemap.grind.source import Source
 from shakemap.grind.distance import Distance
 from shakemap.grind.sites import Sites
-import shakemap.grind.multigmpe as mg
+from shakemap.grind.multigmpe import MultiGMPE
 from shakemap.grind.directivity.rowshandel2013 import Rowshandel2013
 from shakemap.utils.timeutils import ShakeDateTime
 from shakemap.grind.gmice.wgrw12 import WGRW12
-from shakemap.utils.misc import get_command_output
+from impactutils.io.cmd import get_command_output
 
-#----------------------------------------------------
+
+#-------------------------------------------------------------------------------
 # Function to compute extent from source
-#----------------------------------------------------
+#-------------------------------------------------------------------------------
 def get_extent(source):
     # Note: currently written assuming source has a fault
     flt = source.getFault()
@@ -79,10 +79,12 @@ def get_extent(source):
     if mag < 6.48:
         mindist_km = 100.
     else:
+        #-----------------------------------------------------------------------
         # Note: This is an approximate equation developed for ACR/WUS.
-        #       Probably should redo for SCR/CEUS.
+        #       Need to redo for SCR/CEUS.
         #       Would be useful to have tectonic environment stored in
         #       source object.
+        #-----------------------------------------------------------------------
         mindist_km = 27.24 * mag**2 - 250.4 * mag + 579.1
     # Projection
     proj = get_orthographic_projection(clon - 4, clon + 4, clat + 4, clat - 4)
@@ -123,9 +125,9 @@ def main(args):
     input_dir = os.path.join(evt_dir, 'input')
     xml_file = os.path.join(input_dir, 'event.xml')
 
-    #------------------
+    #---------------------------------------------------------------------------
     # Read in event.xml
-    #------------------
+    #---------------------------------------------------------------------------
     eventtree = ET.parse(xml_file)
     eventroot = eventtree.getroot()
     for eq in eventroot.iter('earthquake'):
@@ -147,9 +149,9 @@ def main(args):
 
     sdt = ShakeDateTime(year, month, day, hour, minute, second, int(0))
 
-    #------------------------------------------
+    #---------------------------------------------------------------------------
     # Read in rupture and make event dictionary
-    #------------------------------------------
+    #---------------------------------------------------------------------------
     cmd = 'ls %s/*fault-for-calc.txt' % (input_dir)
     rc, so, se = get_command_output(cmd)
 
@@ -168,21 +170,21 @@ def main(args):
              'time': sdt.strftime('%Y-%m-%dT%H:%M:%SZ'),
              'timezone': 'UTC'}
 
-    #------------------
+    #---------------------------------------------------------------------------
     # Get list of GMPEs
-    #------------------
+    #---------------------------------------------------------------------------
     if args.gmpe == 'NSHMP14acr':
         gmpes = [AbrahamsonEtAl2014(), BooreEtAl2014(),
                  CampbellBozorgnia2014(), ChiouYoungs2014()]
         wts = [0.25, 0.25, 0.25, 0.25]
-        #----------------------------------------------------
+        #-----------------------------------------------------------------------
         # Note: we are not using Idriss' eqns for a few reasons:
-        #      1) Does not include coefficients to compute PGV so we would need to use
-        #         a conversion equation from another IM.
+        #      1) Does not include coefficients to compute PGV so we would need
+        #         to use a conversion equation from another IM.
         #      2) His equations are not valid for Vs30 < 450 m/s.
         #      3) He does not seprate inter- and intra-event errors.
         #      4) The NHSMP will no longer be using it in the future.
-        #----------------------------------------------------
+        #-----------------------------------------------------------------------
     elif args.gmpe == 'NSHMP14scr_rlme':
         gmpes = [FrankelEtAl1996MwNSHMP2008(),
                  ToroEtAl1997MwNSHMP2008(),
@@ -281,9 +283,9 @@ def main(args):
     else:
         raise Exception('Specified an unsupported GMPE.')
 
-    #----------------------------------------
+    #---------------------------------------------------------------------------
     # Make source instance and compute extent
-    #----------------------------------------
+    #---------------------------------------------------------------------------
     source = Source(event, flt)
 
     lonmin, lonmax, latmin, latmax = get_extent(source)
@@ -303,8 +305,8 @@ def main(args):
     nmax = args.max
     if ncell > nmax:
         res = (-(latspan + lonspan) -
-               np.sqrt(latspan**2 + lonspan**2 + 2 * latspan * lonspan * (2 * nmax - 1))) /\
-              (2 * (1 - nmax))
+               np.sqrt(latspan**2 + lonspan**2 + 2 * latspan * lonspan *\
+                       (2 * nmax - 1))) /(2 * (1 - nmax))
         warnings.warn(
             'resolution adjusted due to max number of cells allowed.')
         nx = np.floor(lonspan / res) + 1
@@ -339,14 +341,14 @@ def main(args):
                'nx': nx, 'ny': ny}
     smdict = GeoDict(tmpdict, adjust='bounds')
 
-    #---------------------
+    #---------------------------------------------------------------------------
     # Make rupture context
-    #---------------------
+    #---------------------------------------------------------------------------
     rupt = source.getRuptureContext(gmpes)
 
-    #--------------------------------
+    #---------------------------------------------------------------------------
     # Vs30 stuff
-    #--------------------------------
+    #---------------------------------------------------------------------------
     vs30filename = args.vs30
     vs30grid = GMTGrid.load(vs30filename, smdict, resample=True)
     vs30geodict = vs30grid.getGeoDict()
@@ -357,19 +359,20 @@ def main(args):
     bounds = (west, east, south, north)
 
     # Sites object
-    sites_object = Sites(vs30grid)
+    sites = Sites(vs30grid)
+    sx = sites.getSitesContext()
 
-    #----------------------------------------------------
+    #---------------------------------------------------------------------------
     # Standard deviation stuff
-    #----------------------------------------------------
+    #---------------------------------------------------------------------------
 
     # Only use total standard deviation for scenarios since
     # we never had data to get bias.
     stddev_types = [const.StdDev.TOTAL]
 
-    #----------------------------------------------------
+    #---------------------------------------------------------------------------
     # Intensity measures
-    #----------------------------------------------------
+    #---------------------------------------------------------------------------
 
     # Mapping between the IM notation in ShakeMap and the
     # OpenQuake notation for the IMs taht we want
@@ -377,7 +380,9 @@ def main(args):
                 'psa10': 'SA(1.0)', 'psa30': 'SA(3.0)'}
 
     #----------------------------------------------------
+    #---------------------------------------------------------------------------
     # Mesh calculations
+    #---------------------------------------------------------------------------
     #----------------------------------------------------
     lats = np.linspace(north, south, smny)
     lons = np.linspace(west, east, smnx)
@@ -386,60 +391,49 @@ def main(args):
 
     # Compute distances and site parameters on mesh.
     dist = Distance(gmpes, source, lat, lon, dep)
-    dctx = dist.getDistanceContext()
-    # Sites context
-    sites = SitesContext()
-    sites.vs30 = vs30grid._data
+    dx = dist.getDistanceContext()
 
-    # Clip Vs30 do avoid out-of-bounds error:
-    sites.vs30 = np.clip(sites.vs30, 0, 2000)
-
-    sites.vs30measured = np.ones_like(sites.vs30, dtype=bool)
-
-    # Add z1 and z2.5
-    sites.z1pt0cy14 = mg._z1_from_vs30_cy14_cal(sites.vs30)
-    sites.z1pt0ask14 = mg._z1_from_vs30_ask14_cal(sites.vs30)
-    sites.z2pt5 = mg._z2p5_from_vs30_cb14_cal(sites.vs30) / 1000.0
-    # note: function gives z2pt5 in m, but CB14 expect km.
-
-    #----------------------------------------------------
+    #---------------------------------------------------------------------------
     # Intensity measure calculation
-    #----------------------------------------------------
+    #---------------------------------------------------------------------------
 
     # Make a dictionary to store intensity measure(s) and
     # their sigmas.
 
+    orig_shape = sx.vs30.shape
     imdict = {'pga': {'mean': np.zeros(orig_shape), 'sigma': np.zeros(orig_shape)},
               'pgv': {'mean': np.zeros(orig_shape), 'sigma': np.zeros(orig_shape)},
               'psa03': {'mean': np.zeros(orig_shape), 'sigma': np.zeros(orig_shape)},
               'psa10': {'mean': np.zeros(orig_shape), 'sigma': np.zeros(orig_shape)},
               'psa30': {'mean': np.zeros(orig_shape), 'sigma': np.zeros(orig_shape)}}
 
-    #----------------------------------------------------
+    #---------------------------------------------------------------------------
     # Directivity
-    #----------------------------------------------------
+    #---------------------------------------------------------------------------
     if Directivity:
         R13 = Rowshandel2013.fromSites(
-            source, sites_object, dx=1.0, T=[1.0, 3.0],
+            source, sites, dx=1.0, T=[1.0, 3.0],
             a_weight=0.5, mtype=1)
         fd1 = R13.getFd()[0]
         fd3 = R13.getFd()[1]
 
-    #----------------
+    #---------------------------------------------------------------------------
     # Evaluarte GMPEs
-    #----------------
+    #---------------------------------------------------------------------------
     for key, val in imt_dict.items():
         iimt = imt.from_string(val)
 
-        mgmpe = mg.MultiGMPE.from_list(gmpes, wts)
+        mgmpe = MultiGMPE.from_list(gmpes, wts)
         lnmu, lnsd = mgmpe.get_mean_and_stddevs(
-            sites, rupt, dctx, iimt, stddev_types)
+            sx, rupt, dx, iimt, stddev_types)
 
+        #-----------------------------------------------------------------------
         # Handle directivity factors
         # NOTE: currently, the Rowshandel model does not provide
         #       equations for adjusting sigma. Asssuming these are
         #       eventually available, need to move the sigma
         #       adjustment into this if-statement.
+        #-----------------------------------------------------------------------
         if Directivity:
             if (key == 'pgv') | (key == 'psa10'):
                 fd = fd1
@@ -453,11 +447,11 @@ def main(args):
 
         # Put into intensity measure dictionary
         imdict[key]['mean'] = lnmu
-        imdict[key]['sigma'] = lnsd
+        imdict[key]['sigma'] = lnsd[0]
 
-        #----------------------------------------------------
+        #-----------------------------------------------------------------------
         # Write files
-        #----------------------------------------------------
+        #-----------------------------------------------------------------------
 
         # Loop over intensity dictionary (PGA PGV, PSA03, PSA10, PSA30)
         for key, val in imdict.items():
@@ -481,15 +475,15 @@ def main(args):
 
         # MMI - get from PGV
         gmice = WGRW12()
-        tmp_pgv = np.reshape(imdict['pgv']['mean'], (-1,))
+        pgv = imdict['pgv']['mean']
 
         # Use rrup if available, otherwise rhypo
-        if hasattr(dctx, 'rrup'):
-            dist4gmice = dctx.rrup
+        if hasattr(dx, 'rrup'):
+            dist4gmice = dx.rrup
         else:
-            dist4gmice = dctx.rhypo
+            dist4gmice = dx.rhypo
 
-        mmi = gmice.getMIfromGM(np.exp(tmp_pgv), 'PGV',
+        mmi = gmice.getMIfromGM(np.exp(pgv), 'PGV',
                                 dists=dist4gmice,
                                 mag=rupt.mag)
         GM2MIsd = gmice.getGM2MIsd()['pgv']  # in 'intensity' units
@@ -503,11 +497,9 @@ def main(args):
         dmmi_damp[idx] = c['C4']
 
         # convert to log10
-        amp_sd = np.reshape(imdict['pgv']['sigma'], (-1,)) / np.log(10)
+        amp_sd = imdict['pgv']['sigma'] / np.log(10)
         additional_var = dmmi_damp**2 * (amp_sd**2)
         mmi_sd = np.sqrt(GM2MIsd**2 + additional_var)
-        mmi = np.reshape(mmi, orig_shape)
-        mmi_sd = np.reshape(mmi_sd, orig_shape)
         mgrid = GMTGrid(mmi, smdict)
         sgrid = GMTGrid(mmi_sd, smdict)
         mgrid.save(os.path.join(input_dir, 'mi_estimates.grd'))

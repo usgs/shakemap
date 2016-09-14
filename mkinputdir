@@ -16,9 +16,10 @@ from shakemap.utils.vector import Vector
 from shakemap.utils.timeutils import ShakeDateTime
 
 
-#----------------------------------------------------
+#-------------------------------------------------------------------------------
 # Converts rake to mechanism type
-#----------------------------------------------------
+#-------------------------------------------------------------------------------
+
 def rake_to_type(rake):
     type = 'ALL'
     if (rake >= -180 and rake <= -150) or \
@@ -31,10 +32,9 @@ def rake_to_type(rake):
         type = 'RS'
     return type
 
-#----------------------------------------------------
+#-------------------------------------------------------------------------------
 # Convert average fault strike to quadrant
-#----------------------------------------------------
-
+#-------------------------------------------------------------------------------
 
 def strike_to_quadrant(strike):
     # assuming strike is between -180 and 180 (since it is
@@ -60,9 +60,10 @@ def strike_to_quadrant(strike):
     return q
 
 
-#----------------------------------------------------
+#-------------------------------------------------------------------------------
 # Sort out event id and associated variables
-#----------------------------------------------------
+#-------------------------------------------------------------------------------
+
 def get_event_id(event_name, mag, Directivity, iDir, quads):
     event_legal = "".join(x for x in event_name if x.isalnum())
     mag_str = str(mag).strip("0")
@@ -129,20 +130,15 @@ def get_event_id(event_name, mag, Directivity, iDir, quads):
     eventsourcecode = eventsourcecode.lower()
     return id_str, eventsourcecode, real_desc, selquad
 
-
-def main(args):
-    if args.shakehome:
-        shakehome = args.shakehome
-    else:
-        shakehome = os.path.join(os.path.expanduser('~'), 'ShakeMap')
-
+def read_ucerf(args):
     rfile = args.file
     with open(rfile) as f:
         ucerf = json.load(f)
         nrup = len(ucerf['events'])
         print('Total number of ruptures: %d' % nrup)
 
-    # only use first entry for testing:
+    rlist = []
+
     if args.index:
         iter = args.index
         iter = map(int, iter)
@@ -220,6 +216,7 @@ def main(args):
                  'lon': 0,
                  'depth': 0,
                  'mag': magnitude,
+                 'rake':rake,
                  'id': id_str,
                  'locstring': event_name,
                  'type': 'U',  # overwrite later
@@ -227,9 +224,9 @@ def main(args):
         event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
         event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
 
-        #---------------------
+        #-----------------------------------------------------------------------
         # Hypocenter placement
-        #---------------------
+        #-----------------------------------------------------------------------
         # top left
         pp0 = Vector.fromPoint(geo.point.Point(
             selquad[0].longitude, selquad[0].latitude, selquad[0].depth))
@@ -253,10 +250,10 @@ def main(args):
         event['lon'] = hlon
         event['depth'] = hdepth
 
-        #----------------------------------------------------
+        #-----------------------------------------------------------------------
         # For map display get trace of top/bottom edges and
         # put them in order.
-        #----------------------------------------------------
+        #-----------------------------------------------------------------------
 
         qds = flt.getQuadrilaterals()
         nq = len(qds)
@@ -306,9 +303,40 @@ def main(args):
         bot = geo.line.Line(botp)
         edges = [top, bot]
 
-        #----------------------------------------------------
+        rdict = {'fault':flt,
+                 'event':event,
+                 'edges':edges,
+                 'id_str':id_str,
+                 'short_name':short_name,
+                 'real_desc':real_desc
+                }
+        rlist.append(rdict)
+
+    return rlist
+    
+
+def main(args):
+    if args.shakehome:
+        shakehome = args.shakehome
+    else:
+        shakehome = os.path.join(os.path.expanduser('~'), 'ShakeMap')
+
+    rlist = read_ucerf(args)
+    nrup = len(rlist)
+
+    for i in range(nrup):
+
+        rdict = rlist[i]
+        flt = rdict['fault']
+        event = rdict['event']
+        edges = rdict['edges']
+        id_str = rdict['id_str']
+        short_name = rdict['short_name']
+        real_desc = rdict['real_desc']
+
+        #-----------------------------------------------------------------------
         # Write files
-        #----------------------------------------------------
+        #-----------------------------------------------------------------------
 
         # Create base directory if it doesn't exist
         datdir = os.path.join(shakehome, 'data')
@@ -326,12 +354,24 @@ def main(args):
         if os.path.isdir(input_dir) == False:
             os.mkdir(input_dir)
 
+        #-----------------------------------------------------------------------
         # Write fault files -- use top edge/bottom edges for maps because
         # UCERF3 subsections are so small and basically black out the full
         # surface projection of the fault.
+        #-----------------------------------------------------------------------
         flt.writeFaultFile(os.path.join(
             input_dir, input_dir, id_str + '-fault-for-calc.txt'))
         ff = open(os.path.join(input_dir, id_str + '_for-map_fault.txt'), 'wt')
+
+        top = edges[0]
+        bot = edges[1]
+        top_lat = [p.latitude for p in top.points]
+        top_lon = [p.longitude for p in top.points]
+        top_dep = [p.depth for p in top.points]
+        bot_lat = [p.latitude for p in bot.points]
+        bot_lon = [p.longitude for p in bot.points]
+        bot_dep = [p.depth for p in bot.points]
+
         nl = len(top_lon)
         for i in range(0, nl):  # top edge
             ff.write('%.4f %.4f %.4f\n' % (top_lat[i], top_lon[i], top_dep[i]))
@@ -348,9 +388,9 @@ def main(args):
         xml_file = os.path.join(input_dir, 'event.xml')
         root = etree.Element('earthquake')
         root.set('id', id_str)
-        root.set('lat', str(hlat))
-        root.set('lon', str(hlon))
-        root.set('mag', str(magnitude))
+        root.set('lat', str(event['lat']))
+        root.set('lon', str(event['lon']))
+        root.set('mag', str(event['mag']))
         root.set('year', time.strftime('%Y', evtime))
         root.set('month', time.strftime('%m', evtime))
         root.set('day', time.strftime('%d', evtime))
@@ -358,15 +398,15 @@ def main(args):
         root.set('minute', time.strftime('%M', evtime))
         root.set('second', time.strftime('%S', evtime))
         root.set('timezone', 'UTC')
-        root.set('depth', str(hdepth))
+        root.set('depth', str(event['depth']))
         root.set('locstring', short_name)
         root.set('description', real_desc)
         root.set('created', '')
         root.set('otime', '')
-        root.set('type', rake_to_type(rake))
+        root.set('type', rake_to_type(event['rake']))
         root.set('network', '')
         root.set('reference', flt.getReference())
-        root.set('rake', str(rake))
+        root.set('rake', str(event['rake']))
         root.set('directivity', str(args.directivity))
 
         et = etree.ElementTree(root)
@@ -386,17 +426,24 @@ if __name__ == '__main__':
       * prompt for minimal info if file is not provided
     '''
     parser = argparse.ArgumentParser(description=desc)
-    fh = 'File with rupture information; currently only BSSC2014 JSON format; Future: USGS NSHM xml format and Excel rupture template.'
+    fh = 'File with rupture information; currently only BSSC2014 JSON format; '\
+         'Future: USGS NSHM xml format and Excel rupture template.'
     parser.add_argument('-f', '--file', help=fh)
     parser.add_argument('-r', '--reference', help='Reference for rupture source.',
                         default='')
-    parser.add_argument('-d', '--dirind', help='Directivity; -1 for no directivity (default); 0 and 2 are the two opposing unilateral directions, 1 is for bilateral.',
+    parser.add_argument('-d', '--dirind',
+                        help='Directivity; -1 for no directivity (default); 0 '\
+                        'and 2 are the two opposing unilateral directions, 1 '\
+                        'is for bilateral.',
                         default=-1, type=int, choices=[-1, 0, 1, 2])
-    parser.add_argument('-i', '--index', help='List of rupture indices to run. Useful if you do not want to run all ruptures in the file.',
+    parser.add_argument('-i', '--index',
+                        help='List of rupture indices to run. Useful if you do '\
+                        'not want to run all ruptures in the file.',
                         nargs='*')
     shakehome = os.path.join(os.path.expanduser('~'), 'ShakeMap')
     parser.add_argument(
-        '-s', '--shakehome', help='the location of ShakeMap install; default is %s.' % shakehome)
+        '-s', '--shakehome',
+        help='the location of ShakeMap install; default is %s.' % shakehome)
     args = parser.parse_args()
     if args.dirind == -1:
         args.directivity = False
