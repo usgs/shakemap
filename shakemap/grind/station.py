@@ -10,6 +10,7 @@ import pandas as pd
 import numpy as np
 from openquake.hazardlib import imt as GEM_IMT
 from openquake.hazardlib.gsim import base
+import openquake.hazardlib.const as oqconst
 
 # local imports
 from .distance import get_distance, get_distance_measures
@@ -410,9 +411,9 @@ class StationList(object):
                                  row[1], dmmi[irow], 0.0))
 
         self.cursor.executemany(
-            'INSERT INTO amp (station_id, imt_id, original_channel, '
-            'orientation, amp, uncertainty, flag) VALUES '
-            '(?, ?, ?, ?, ?, ?, "0")', amp_rows)
+                'INSERT INTO amp (station_id, imt_id, original_channel, '
+                'orientation, amp, uncertainty, flag) VALUES '
+                '(?, ?, ?, ?, ?, ?, "0")', amp_rows)
 
         # 
         # Use the GMICE to get the estimated ground motions from the 
@@ -449,8 +450,8 @@ class StationList(object):
                 amp_rows.append((row[3], derived_imtid, dmmi[irow], 0.0))
 
         self.cursor.executemany(
-            'INSERT INTO amp (station_id, imt_id, amp, uncertainty, flag) '
-            'VALUES (?, ?, ?, ?, "0")', amp_rows)
+                'INSERT INTO amp (station_id, imt_id, amp, uncertainty, flag) '
+                'VALUES (?, ?, ?, ?, "0")', amp_rows)
         self.db.commit()
 
         #
@@ -471,60 +472,62 @@ class StationList(object):
         pred_rows = []
         siteamp_rows = []
         vs30_rows = []
+        sd_total = oqconst.StdDev.TOTAL
+        sd_inter = oqconst.StdDev.INTER_EVENT
+        sd_intra = oqconst.StdDev.INTRA_EVENT
+        gmpe_stddev_types = gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        gmpe_sd_col_dict = dict(zip(gmpe_stddev_types, range(len(gmpe_stddev_types))))
+        ipe_stddev_types = ipe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        ipe_sd_col_dict = dict(zip(ipe_stddev_types, range(len(ipe_stddev_types))))
         for imt in BASE_IMTS:
             gemimt = GEM_IMT.from_string(GEM_IMT_MAP[imt])
             if imt == 'mmi':
-                stddev_types = ipe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
-                pred_soil, pred_stdev = ipe.get_mean_and_stddevs(
-                        sx_soil, rx, dx, gemimt, stddev_types)
+                pe = ipe
+                stddev_types = ipe_stddev_types
+                sd_col_dict = ipe_sd_col_dict
             else:
-                stddev_types = gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
-                pred_soil, pred_stdev = gmpe.get_mean_and_stddevs(
-                        sx_soil, rx, dx, gemimt, stddev_types)
+                pe = gmpe
+                stddev_types = gmpe_stddev_types
+                sd_col_dict = gmpe_sd_col_dict
+
+            pred_soil, dummy = pe.get_mean_and_stddevs(
+                    sx_soil, rx, dx, gemimt, stddev_types)
             
-            if imt == 'mmi':
-                pred_rock, junk = ipe.get_mean_and_stddevs(
-                        sx_rock, rx, dx, gemimt, stddev_types)
-            else:
-                pred_rock, junk = gmpe.get_mean_and_stddevs(
-                        sx_rock, rx, dx, gemimt, stddev_types)
+            pred_rock, pred_stdev = pe.get_mean_and_stddevs(
+                    sx_rock, rx, dx, gemimt, stddev_types)
             
             amp_facts = pred_soil - pred_rock
 
-            if len(stddev_types) == 3:
-                for irow, row in enumerate(station_rows):
-                    pred_rows.append(
-                            (row[0], IMT_TYPES[imt], 
-                            SOIL_TYPES['rock'], pred_rock[irow], 
-                            pred_stdev[0][irow], pred_stdev[1][irow], 
-                            pred_stdev[2][irow])
-                        )
-                    siteamp_rows.append(
-                            (row[0], IMT_TYPES[imt], amp_facts[irow])
-                        )
-            else:
-                for irow, row in enumerate(station_rows):
-                    pred_rows.append(
-                            (row[0], IMT_TYPES[imt], 
-                            SOIL_TYPES['rock'], pred_rock[irow], 
-                            pred_stdev[0][irow], 'NULL', 'NULL')
-                        )
-                    siteamp_rows.append(
-                            (row[0], IMT_TYPES[imt], amp_facts[irow])
-                        )
+            if len(stddev_types) != 3:
+                pred_stdev.append(['NULL'] * len(station_rows))
+                pred_stdev.append(pred_stdev[1])
+                sd_col_dict[sd_inter] = 1
+                sd_col_dict[sd_intra] = 2
+
+            for irow, row in enumerate(station_rows):
+                pred_rows.append(
+                        (row[0], IMT_TYPES[imt], SOIL_TYPES['rock'],
+                        pred_rock[irow], 
+                        pred_stdev[sd_col_dict[sd_total]][irow], 
+                        pred_stdev[sd_col_dict[sd_inter]][irow], 
+                        pred_stdev[sd_col_dict[sd_intra]][irow])
+                    )
+                siteamp_rows.append(
+                        (row[0], IMT_TYPES[imt], amp_facts[irow])
+                    )
 
         for irow, row in enumerate(station_rows):
             vs30_rows.append((sx_soil.vs30[irow], row[0]))
             
         self.cursor.executemany(
-            'INSERT INTO predicted (station_id, imt_id, soiltype_id, amp, '
-            'uncertainty_total, uncertainty_inter, uncertainty_intra) '
-            'VALUES (?, ?, ?, ?, ?, ?, ?)', pred_rows)
+                'INSERT INTO predicted (station_id, imt_id, soiltype_id, amp, '
+                'uncertainty_total, uncertainty_inter, uncertainty_intra) '
+                'VALUES (?, ?, ?, ?, ?, ?, ?)', pred_rows)
         self.cursor.executemany(
-            'INSERT INTO siteamp (station_id, imt_id, amp_factor) '
-            'VALUES (?, ?, ?)', siteamp_rows)
+                'INSERT INTO siteamp (station_id, imt_id, amp_factor) '
+                'VALUES (?, ?, ?)', siteamp_rows)
         self.cursor.executemany(
-            'UPDATE station SET vs30=? WHERE id=?', vs30_rows)
+                'UPDATE station SET vs30=? WHERE id=?', vs30_rows)
 
         self.db.commit()
 
@@ -637,10 +640,10 @@ class StationList(object):
         # orientation
         #
         self.cursor.execute(
-            'SELECT a.amp, a.uncertainty, a.imt_id, a.station_id FROM '\
-            'amp a, station s WHERE a.flag = "0" AND s.id = a.station_id '\
-            'AND s.instrumented = %d AND a.orientation NOT IN ("Z", "U") '\
-            'AND a.amp IS NOT NULL' % (instrumented)
+                'SELECT a.amp, a.uncertainty, a.imt_id, a.station_id FROM '
+                'amp a, station s WHERE a.flag = "0" AND s.id = a.station_id '
+                'AND s.instrumented = %d AND a.orientation NOT IN ("Z", "U") '
+                'AND a.amp IS NOT NULL' % (instrumented)
             )
         amp_rows = self.cursor.fetchall()
 
@@ -686,10 +689,10 @@ class StationList(object):
         id_dict = dict(zip(df['id'], range(nstation_rows)))
 
         self.cursor.execute(
-            'SELECT p.amp, p.uncertainty_total, p.uncertainty_intra, '\
-                   'p.imt_id, p.station_id FROM predicted p, station s '\
-                   'WHERE s.id = p.station_id AND s.instrumented = %d AND '\
-                   'p.amp IS NOT NULL' % (instrumented)
+                'SELECT p.amp, p.uncertainty_total, p.uncertainty_intra, '
+                'p.imt_id, p.station_id FROM predicted p, station s '
+                'WHERE s.id = p.station_id AND s.instrumented = %d AND '
+                'p.amp IS NOT NULL' % (instrumented)
             )
         pred_rows = self.cursor.fetchall()
 
@@ -881,9 +884,11 @@ class StationList(object):
         rows = []
         for imt_type, imt_id in IMT_TYPES.items():
             rows.append((imt_id, imt_type))
-        cursor.executemany('INSERT INTO imt (id, imt_type) VALUES (?, ?)', rows)
-        db.commit()
+        cursor.executemany('INSERT INTO imt (id, imt_type) VALUES (?, ?)', 
+                rows)
         for soiltype, sid in SOIL_TYPES.items():
-            soilquery = 'INSERT INTO soiltype (soil_type, id) VALUES ("%s", %d)' % (soiltype, sid)
-            cursor.execute(soilquery)
-            db.commit()
+            cursor.execute(
+                    'INSERT INTO soiltype (soil_type, id) VALUES '
+                    '("%s", %d)' % (soiltype, sid)
+                )
+        db.commit()
