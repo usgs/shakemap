@@ -5,8 +5,10 @@ import sys
 import os.path
 #import tempfile
 import time as time
+import shutil
 
 # third party modules
+import pandas.util.testing as pdt
 
 # hack the path so that I can debug these functions if I need to
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
@@ -76,11 +78,34 @@ def test_station(tmpdir):
             sites_obj_grid, gmpe, ipe, gmice)
 
     df1 = stations.getStationDataframe(1, sort=True)
+    df2 = stations.getStationDataframe(0, sort=True)
 
-    df2 = stations.getStationDataframe(0, sort=False)
+
+    #
+    # In case the test starts failing because of some minor change
+    # in one of the prediction or conversion equations (or roundoff
+    # or whatever), but the code is running correctly, uncomment 
+    # these lines and re-run the test. Then, copy the new stations.db
+    # file into tests/data/eventdata/Calexico/database/. Then
+    # recomment these lines and rerun the test. It should succeed.
+    #
+#    shutil.copy(dbfile,'./stations.db')
+#    print(os.getcwd())
 
     #
     # We should probably check these dataframes against some established
     # set, and also check the database against a known database. 
     #
 
+    ref_dbfile = os.path.join(datadir, '..', 'database', 'stations.db')
+
+    stations2 = StationList(ref_dbfile)
+
+    ref_df1 = stations2.getStationDataframe(1, sort=True)
+    ref_df2 = stations2.getStationDataframe(0, sort=True)
+
+#    assert ref_df1.equals(df1)
+#    assert ref_df2.equals(df2)
+
+    pdt.assert_frame_equal(df1, ref_df1)
+    pdt.assert_frame_equal(df2, ref_df2)
