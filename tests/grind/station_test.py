@@ -103,6 +103,16 @@ def test_station(tmpdir):
     ref_df1 = stations2.getStationDataframe(1, sort=True)
     ref_df2 = stations2.getStationDataframe(0, sort=True)
 
-    assert ref_df1.equals(df1)
-    assert ref_df2.equals(df2)
+#    assert ref_df1.equals(df1)
+#    assert ref_df2.equals(df2)
+
+    if not ref_df1.equals(df1):
+        print(df1.iloc[0])
+        print(ref_df1.iloc[0])
+        assert 0
+
+    if not ref_df2.equals(df2):
+        print(df2.iloc[0])
+        print(ref_df2.iloc[0])
+        assert 0
 
