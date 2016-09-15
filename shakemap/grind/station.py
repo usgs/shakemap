@@ -25,7 +25,7 @@ TABLES = {'station':
            'lon': 'float',
            'elev': 'float',
            'vs30': 'float',
-           'instrumented': 'int'}, 
+           'instrumented': 'int'},
           'imt':
           {'id': 'integer primary key',
            'imt_type': 'str'},
@@ -64,22 +64,22 @@ BASE_IMTS = ['mmi',
              'psa10',
              'psa30']
 
-IMT_TYPES = {'mmi': 0, 
-             'pga': 1, 
-             'pgv': 2, 
-             'psa03': 3, 
-             'psa10': 4, 
+IMT_TYPES = {'mmi': 0,
+             'pga': 1,
+             'pgv': 2,
+             'psa03': 3,
+             'psa10': 4,
              'psa30': 5,
-             'mmi_from_pga': 6, 
-             'mmi_from_pgv': 7, 
-             'mmi_from_psa03': 8, 
-             'mmi_from_psa10': 9, 
+             'mmi_from_pga': 6,
+             'mmi_from_pgv': 7,
+             'mmi_from_psa03': 8,
+             'mmi_from_psa10': 9,
              'mmi_from_psa30': 10,
-             'pga_from_mmi': 11, 
-             'pgv_from_mmi': 12, 
-             'psa03_from_mmi': 13, 
-             'psa10_from_mmi': 14, 
-             'psa30_from_mmi': 15 }
+             'pga_from_mmi': 11,
+             'pgv_from_mmi': 12,
+             'psa03_from_mmi': 13,
+             'psa10_from_mmi': 14,
+             'psa30_from_mmi': 15}
 
 #
 # This is an ordered version of IMT_TYPES just to help make the tables
@@ -90,7 +90,7 @@ IMT_TYPES_ORDERED = OrderedDict(sorted(IMT_TYPES.items(), key=lambda t: t[1]))
 #
 # This flips the key/value pairs in the IMT_TYPES dictionary
 #
-IMT_LOOKUP = { value: key for key, value in IMT_TYPES.items() }
+IMT_LOOKUP = {value: key for key, value in IMT_TYPES.items()}
 
 # dictionary of our imt type strings to the kind that GEM needs to create
 # IMT objects.
@@ -113,21 +113,21 @@ DISTANCES = get_distance_measures()
 
 class StationList(object):
     """
-    A class to facilitate reading ShakeMap formatted XML fies of peak 
-    amplitudes and MMI, and 
+    A class to facilitate reading ShakeMap formatted XML fies of peak
+    amplitudes and MMI, and
     produce tables of station data. Seismic stations are considered to
-    be 'instrumented'; MMI data is not instrumented and is indicated 
+    be 'instrumented'; MMI data is not instrumented and is indicated
     in the ShakeMap XML with a ``netid`` attribute of "DYFI," "MMI,"
     "INTENSITY," or "CIIM."
 
     .. note::
-      Typically the user will call the class method :meth:`fromXML` 
-      to create a :class:`StationList` object the first time 
+      Typically the user will call the class method :meth:`fromXML`
+      to create a :class:`StationList` object the first time
       a set of station files are processed. (Or, as an alternative,
       the user can call :meth:`loadFromXML` and :meth:`fillTables`
       sequentially.)
-      This will create a database at the location specified by the 
-      ``dbfile`` parameter to :meth:`fromXML`. Subsequent programs 
+      This will create a database at the location specified by the
+      ``dbfile`` parameter to :meth:`fromXML`. Subsequent programs
       can use the default constructor to simply load ``dbfile``.
 
     """
@@ -140,10 +140,10 @@ class StationList(object):
     def __init__(self, dbfile):
         """
         The default constructor reads a pre-built SQLite database of
-        station data. 
+        station data.
 
         Args:
-            dbfile (str): 
+            dbfile (str):
                 A SQLite database file containing pre-processed
                 station data.
 
@@ -168,6 +168,7 @@ class StationList(object):
         """
         Closes out the database when the object is destroyed.
         """
+        self.db.commit()
         self.cursor.close()
         self.db.close()
 
@@ -175,27 +176,27 @@ class StationList(object):
     @classmethod
     def fromXML(cls, xmlfiles, dbfile, source, sites, gmpe, ipe, gmice):
         """
-        Create a StationList object by reading one or more ShakeMap XML 
-        input files and populate database tables with derived MMI/PGM 
-        values and distances. This is a convenience method that calls 
+        Create a StationList object by reading one or more ShakeMap XML
+        input files and populate database tables with derived MMI/PGM
+        values and distances. This is a convenience method that calls
         :meth:`loadFromXML` and :meth:`fillTables`.
 
         Args:
             xmlfiles (sequence of strings):
                 Sequence of ShakeMap XML input files to read.
-            dbfile (string): 
+            dbfile (string):
                 Path to a file into which to write the SQLite database.
             source:
-                ShakeMap Source object containing information about the 
+                ShakeMap Source object containing information about the
                 origin and source of the earthquake.
             sites:
-                ShakeMap Sites object containing grid of Vs30 values for the 
+                ShakeMap Sites object containing grid of Vs30 values for the
                 region in question.
             gmpe:
-                A GMPE object to use for predicting 
+                A GMPE object to use for predicting
                 ground motions at the station locations.
             ipe:
-                A GMPE object to use for predicting 
+                A GMPE object to use for predicting
                 macroseismic intensities at the station locations.
             gmice:
                 A GMICE object to use for converting ground motions to
@@ -204,7 +205,7 @@ class StationList(object):
         Returns:
             :class:`StationList` object
         """
-    
+
         this = cls.loadFromXML(xmlfiles, dbfile)
         this.fillTables(source, sites, gmpe, ipe, gmice)
         return this
@@ -213,7 +214,7 @@ class StationList(object):
     @classmethod
     def loadFromXML(cls, xmlfiles, dbfile):
         """
-        Create a StationList object by reading one or more ShakeMap XML input 
+        Create a StationList object by reading one or more ShakeMap XML input
         files.
 
         Args:
@@ -277,9 +278,9 @@ class StationList(object):
                 #
                 # How to determine a station is instrumented?
                 #
-                instrumented = int(station_attributes['netid'].lower() 
+                instrumented = int(station_attributes['netid'].lower()
                                    not in cls.__CIIM_TUPLE)
-                station_rows.append((sid, network, code, name, lat, lon, 
+                station_rows.append((sid, network, code, name, lat, lon,
                                      instrumented))
 
                 for original_channel, pgm_dict in comp_dict.items():
@@ -295,7 +296,7 @@ class StationList(object):
 
                         if np.isnan(amp):
                             amp = 'NULL'
-                        amp_rows.append((sid, imtid, original_channel, 
+                        amp_rows.append((sid, imtid, original_channel,
                                          orientation, amp, flag))
                 sid += 1
 
@@ -321,16 +322,16 @@ class StationList(object):
 
         Args:
             source:
-                ShakeMap Source object containing information about the 
+                ShakeMap Source object containing information about the
                 origin and source of the earthquake.
             sites:
-                ShakeMap Sites object containing grid of Vs30 values for the 
+                ShakeMap Sites object containing grid of Vs30 values for the
                 region in question.
             gmpe:
-                A GMPE object to use for predicting 
+                A GMPE object to use for predicting
                 ground motions at the station locations.
             ipe:
-                A GMPE object to use for predicting 
+                A GMPE object to use for predicting
                 macroseismic intensities at the station locations.
             gmice:
                 A GMICE object to use for converting ground motions to
@@ -361,7 +362,7 @@ class StationList(object):
         dist_rows = []
         for irow, row in enumerate(station_rows):
             dist_rows.append(
-                    tuple(ddict[dt][irow] for dt in DISTANCES) + 
+                    tuple(ddict[dt][irow] for dt in DISTANCES) +
                     (row[0],)
                 )
 
@@ -376,8 +377,8 @@ class StationList(object):
         self.cursor.executemany(query, dist_rows)
         self.db.commit()
 
-        # 
-        # Use the GMICE to get the estimated MMIs from the various 
+        #
+        # Use the GMICE to get the estimated MMIs from the various
         # ground motion parameters from the instrumented stations.
         # These values will fill the rows like 'mmi_from_pgm'
         #
@@ -415,8 +416,8 @@ class StationList(object):
                 'orientation, amp, uncertainty, flag) VALUES '
                 '(?, ?, ?, ?, ?, ?, "0")', amp_rows)
 
-        # 
-        # Use the GMICE to get the estimated ground motions from the 
+        #
+        # Use the GMICE to get the estimated ground motions from the
         # mmi from the non-instrumented stations.
         # These will appeara in columns named like 'pgm_from_mmi'
         #
@@ -465,7 +466,7 @@ class StationList(object):
         dx = base.DistancesContext()
         for method in DISTANCES:
             (dx.__dict__)[method] = ddict[method]
-        lldict = { 'lats': lats, 'lons': lons }
+        lldict = {'lats': lats, 'lons': lons}
         sx_soil = sites.getSitesContext(lldict)
         sx_rock = sites.getSitesContext(lldict, rock_vs30=760.0)
 
@@ -476,9 +477,11 @@ class StationList(object):
         sd_inter = oqconst.StdDev.INTER_EVENT
         sd_intra = oqconst.StdDev.INTRA_EVENT
         gmpe_stddev_types = gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
-        gmpe_sd_col_dict = dict(zip(gmpe_stddev_types, range(len(gmpe_stddev_types))))
+        gmpe_sd_col_dict = dict(zip(gmpe_stddev_types,
+                range(len(gmpe_stddev_types))))
         ipe_stddev_types = ipe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
-        ipe_sd_col_dict = dict(zip(ipe_stddev_types, range(len(ipe_stddev_types))))
+        ipe_sd_col_dict = dict(zip(ipe_stddev_types,
+                range(len(ipe_stddev_types))))
         for imt in BASE_IMTS:
             gemimt = GEM_IMT.from_string(GEM_IMT_MAP[imt])
             if imt == 'mmi':
@@ -492,12 +495,16 @@ class StationList(object):
 
             pred_soil, dummy = pe.get_mean_and_stddevs(
                     sx_soil, rx, dx, gemimt, stddev_types)
-            
+
             pred_rock, pred_stdev = pe.get_mean_and_stddevs(
                     sx_rock, rx, dx, gemimt, stddev_types)
-            
+
             amp_facts = pred_soil - pred_rock
 
+            #
+            # If only total std dev is available, fill out the pred_stdev
+            # array with NULLs for for the inter and intra columns
+            #
             if len(stddev_types) != 3:
                 pred_stdev.append(['NULL'] * len(station_rows))
                 pred_stdev.append(pred_stdev[1])
@@ -507,9 +514,9 @@ class StationList(object):
             for irow, row in enumerate(station_rows):
                 pred_rows.append(
                         (row[0], IMT_TYPES[imt], SOIL_TYPES['rock'],
-                        pred_rock[irow], 
-                        pred_stdev[sd_col_dict[sd_total]][irow], 
-                        pred_stdev[sd_col_dict[sd_inter]][irow], 
+                        pred_rock[irow],
+                        pred_stdev[sd_col_dict[sd_total]][irow],
+                        pred_stdev[sd_col_dict[sd_inter]][irow],
                         pred_stdev[sd_col_dict[sd_intra]][irow])
                     )
                 siteamp_rows.append(
@@ -518,7 +525,7 @@ class StationList(object):
 
         for irow, row in enumerate(station_rows):
             vs30_rows.append((sx_soil.vs30[irow], row[0]))
-            
+
         self.cursor.executemany(
                 'INSERT INTO predicted (station_id, imt_id, soiltype_id, amp, '
                 'uncertainty_total, uncertainty_inter, uncertainty_intra) '
@@ -534,7 +541,7 @@ class StationList(object):
 
     def getStationDataframe(self, instrumented, sort=False):
         """
-        Return a Pandas dataframe of the instrumented or non-instrumented 
+        Return a Pandas dataframe of the instrumented or non-instrumented
         stations.
 
         For the standard set of ShakeMap IMTs (mmi, pga, pgv, psa03, psa10,
@@ -574,23 +581,23 @@ class StationList(object):
         'psa10_site_factor', 'psa30_predicted', 'psa30_predicted_unc_total',
         'psa30_predicted_unc_intra', 'psa30_site_factor', 'name'
 
-        The **name** column is **network** and **code** concatenated with a 
+        The **name** column is **network** and **code** concatenated with a
         period (".") between them.
-        The **unc** in column names means uncertainty. All ground motion, 
-        site, and uncertainty 
-        units are natural log units. Distances are in km. The intra-event 
-        uncertainty (**<param>_predicted_unc_intra**) will be **np.nan** if 
-        the GMPE or IPE doesn't define 
+        The **unc** in column names means uncertainty. All ground motion,
+        site, and uncertainty
+        units are natural log units. Distances are in km. The intra-event
+        uncertainty (**<param>_predicted_unc_intra**) will be **np.nan** if
+        the GMPE or IPE doesn't define
         separate inter- and intra-event terms.
-        
+
 
         Args:
             instrumented (integer):
                 Set to 1 (one) if the dataframe is to contain the instrumented
-                stations, or to 0 (zero) if the dataframe is to contain the 
+                stations, or to 0 (zero) if the dataframe is to contain the
                 non-instrumented (MMI) stations.
             sort (bool):
-                If True, the dataframe will be sorted by the **name** column. 
+                If True, the dataframe will be sorted by the **name** column.
                 The default if False (unsorted).
 
         Returns:
@@ -611,7 +618,7 @@ class StationList(object):
                 'SELECT %s FROM station where instrumented = %d' %
                 (dstr, instrumented)
             )
-        
+
         station_rows = self.cursor.fetchall()
         nstation_rows = len(station_rows)
         try:
@@ -648,7 +655,7 @@ class StationList(object):
         amp_rows = self.cursor.fetchall()
 
         #
-        # Go through all the instrumented amps and put them into the data 
+        # Go through all the instrumented amps and put them into the data
         # frame
         #
         for this_row in amp_rows:
@@ -697,7 +704,7 @@ class StationList(object):
         pred_rows = self.cursor.fetchall()
 
         #
-        # Go through all the predicted amps and put them into the data 
+        # Go through all the predicted amps and put them into the data
         # frame
         #
         for this_row in pred_rows:
@@ -707,20 +714,22 @@ class StationList(object):
             imt = IMT_LOOKUP[imt_id]
             rowidx = id_dict[this_row[4]]
             pred_arr[rowidx, col_dict[imt + '_predicted']] = this_row[0]
-            pred_arr[rowidx, col_dict[imt + '_predicted_unc_total']] = this_row[1]
+            pred_arr[rowidx, col_dict[imt + '_predicted_unc_total']] = \
+                    this_row[1]
             if this_row[2] != 'NULL':
-                pred_arr[rowidx, col_dict[imt + '_predicted_unc_intra']] = this_row[2]
+                pred_arr[rowidx, col_dict[imt + '_predicted_unc_intra']] = \
+                        this_row[2]
 
         del pred_rows
 
         #
-        # Go through all the site amplicication factors and put them 
+        # Go through all the site amplicication factors and put them
         # into the data frame
         #
         self.cursor.execute(
                 'SELECT p.amp_factor, p.imt_id, p.station_id FROM siteamp p, '
                 'station s WHERE s.id = p.station_id AND '
-                's.instrumented = %d AND p.amp_factor IS NOT NULL' % 
+                's.instrumented = %d AND p.amp_factor IS NOT NULL' %
                 (instrumented)
             )
         siteamp_rows = self.cursor.fetchall()
@@ -754,7 +763,7 @@ class StationList(object):
 
         Args:
             orig_channel (string):
-                String representing the seed channel (e.g. 'HNZ'). The 
+                String representing the seed channel (e.g. 'HNZ'). The
                 final character is assumed to be the (uppercase) orientation.
 
         Returns:
@@ -771,9 +780,9 @@ class StationList(object):
     @staticmethod
     def _getGroundMotions(comp):
         """
-        Get a dictionary of peak ground motions (values and flags).  
+        Get a dictionary of peak ground motions (values and flags).
         Output keys are one of: [pga,pgv,psa03,psa10,psa30]
-        Even if flags are not specified in the input, they will 
+        Even if flags are not specified in the input, they will
         be guaranteed to at least have a flag of '0'.
         """
         pgmdict = {}
@@ -820,13 +829,13 @@ class StationList(object):
 
         Args:
             xmlfile (string):
-                Path to ShakeMap XML input file (or file-like object) 
+                Path to ShakeMap XML input file (or file-like object)
                 containing station data.
 
         Returns:
             stationdict data structure
         """
-        stationdict = {}
+        stationdict = OrderedDict()
         dom = minidom.parse(xmlfile)
         for root in dom.childNodes:
             if not isinstance(root, minidom.DocumentType):
@@ -848,8 +857,8 @@ class StationList(object):
                 else:
                     pgmdict = {}
                 pgmdict.update(tpgmdict)
-                # copy the VALUES, not REFERENCES, of the component list into our
-                # growing dictionary
+                # copy the VALUES, not REFERENCES, of the component list into
+                # our growing dictionary
                 compdict[compname] = copy.deepcopy(pgmdict)
             if 'intensity' in list(attributes.keys()):
                 compdict[compname]['mmi'] = {
@@ -884,7 +893,7 @@ class StationList(object):
         rows = []
         for imt_type, imt_id in IMT_TYPES.items():
             rows.append((imt_id, imt_type))
-        cursor.executemany('INSERT INTO imt (id, imt_type) VALUES (?, ?)', 
+        cursor.executemany('INSERT INTO imt (id, imt_type) VALUES (?, ?)',
                 rows)
         for soiltype, sid in SOIL_TYPES.items():
             cursor.execute(
