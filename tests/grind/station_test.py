@@ -8,6 +8,7 @@ import time as time
 import shutil
 
 # third party modules
+import pandas.util.testing as pdt
 
 # hack the path so that I can debug these functions if I need to
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
@@ -106,13 +107,5 @@ def test_station(tmpdir):
 #    assert ref_df1.equals(df1)
 #    assert ref_df2.equals(df2)
 
-    if not ref_df1.equals(df1):
-        print(df1.iloc[0])
-        print(ref_df1.iloc[0])
-        assert 0
-
-    if not ref_df2.equals(df2):
-        print(df2.iloc[0])
-        print(ref_df2.iloc[0])
-        assert 0
-
+    pdt.assert_frame_equal(df1, ref_df1)
+    pdt.assert_frame_equal(df2, ref_df2)
