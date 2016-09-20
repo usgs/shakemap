@@ -130,14 +130,84 @@ def get_event_id(event_name, mag, Directivity, iDir, quads):
     eventsourcecode = eventsourcecode.lower()
     return id_str, eventsourcecode, real_desc, selquad
 
-def read_ucerf(args):
-    rfile = args.file
-    with open(rfile) as f:
-        ucerf = json.load(f)
-        nrup = len(ucerf['events'])
-        print('Total number of ruptures: %d' % nrup)
 
+def get_fault_edges(q, rev = None):
+    """
+    Return a list of the top and bottom edges of the fault. This is
+    useful as a simplified visual representation of the fault but not
+    used for calculaitons. 
+
+    :param q: 
+        list of quads.
+    :param rev:
+        optional boolean list of whether or not the quad is reversed.
+    :returns:
+        A list of two line objects; the first is the top edge and the 
+        second is the bottom edge. 
+    """
+    nq = len(q)
+
+    if rev is None:
+        rev = np.zeros(nq, dtype = bool)
+
+    top_lat = np.array([[]])
+    top_lon = np.array([[]])
+    top_dep = np.array([[]])
+    bot_lat = np.array([[]])
+    bot_lon = np.array([[]])
+    bot_dep = np.array([[]])
+    for j in range(0, nq):
+        if rev[j] == True:
+            top_lat = np.append(top_lat, q[j][1].latitude)
+            top_lat = np.append(top_lat, q[j][0].latitude)
+            top_lon = np.append(top_lon, q[j][1].longitude)
+            top_lon = np.append(top_lon, q[j][0].longitude)
+            top_dep = np.append(top_dep, q[j][1].depth)
+            top_dep = np.append(top_dep, q[j][0].depth)
+            bot_lat = np.append(bot_lat, q[j][2].latitude)
+            bot_lat = np.append(bot_lat, q[j][3].latitude)
+            bot_lon = np.append(bot_lon, q[j][2].longitude)
+            bot_lon = np.append(bot_lon, q[j][3].longitude)
+            bot_dep = np.append(bot_dep, q[j][2].depth)
+            bot_dep = np.append(bot_dep, q[j][3].depth)
+        else:
+            top_lat = np.append(top_lat, q[j][0].latitude)
+            top_lat = np.append(top_lat, q[j][1].latitude)
+            top_lon = np.append(top_lon, q[j][0].longitude)
+            top_lon = np.append(top_lon, q[j][1].longitude)
+            top_dep = np.append(top_dep, q[j][0].depth)
+            top_dep = np.append(top_dep, q[j][1].depth)
+            bot_lat = np.append(bot_lat, q[j][3].latitude)
+            bot_lat = np.append(bot_lat, q[j][2].latitude)
+            bot_lon = np.append(bot_lon, q[j][3].longitude)
+            bot_lon = np.append(bot_lon, q[j][2].longitude)
+            bot_dep = np.append(bot_dep, q[j][3].depth)
+            bot_dep = np.append(bot_dep, q[j][2].depth)
+            # Make edges into line objects
+    nl = len(top_lon)
+    topp = botp = [None] * nl
+    for i in range(0, nl):
+        topp[i] = geo.point.Point(top_lon[i], top_lat[i], top_dep[i])
+        botp[i] = geo.point.Point(bot_lon[i], bot_lat[i], bot_dep[i])
+    top = geo.line.Line(topp)
+    bot = geo.line.Line(botp)
+    edges = [top, bot]
+    return edges
+
+def parse_bssc2014_ucerf(rupts, args):
+    """
+    This function is to parse the UCERF3 json file format. The ruptures in 
+    UCERF3 are very complex and so we don't exepct to get other rupture lists
+    in this format. 
+    :param rupts:
+        Python translation of json using json.load. 
+    :param args:
+        argparse object. 
+    :returns:
+        Dictionary of rupture information.
+    """
     rlist = []
+    nrup = len(rupts['events'])
 
     if args.index:
         iter = args.index
@@ -146,15 +216,15 @@ def read_ucerf(args):
         iter = range(nrup)
 
     for i in iter:
-        event_name = ucerf['events'][i]['name']
+        event_name = rupts['events'][i]['name']
         short_name = event_name.split('EllB')[0].split(
             'Shaw09')[0].split('2011')[0].split('HB08')[0].rstrip()
-        magnitude = ucerf['events'][i]['magnitude']
-        dip = ucerf['events'][i]['dip']
-        rake = ucerf['events'][i]['rake']
-        width = ucerf['events'][i]['width']
+        magnitude = rupts['events'][i]['magnitude']
+        dip = rupts['events'][i]['dip']
+        rake = rupts['events'][i]['rake']
+        width = rupts['events'][i]['width']
 
-        sections = np.array(ucerf['events'][i]['sections'])
+        sections = np.array(rupts['events'][i]['sections'])
         nsections = len(sections)
 
         secind = 0
@@ -255,53 +325,119 @@ def read_ucerf(args):
         # put them in order.
         #-----------------------------------------------------------------------
 
-        qds = flt.getQuadrilaterals()
-        nq = len(qds)
+        edges = get_fault_edges(quads)
 
-        print('i = %i of %i, nq: %i' % (i, nrup - 1, nq))
+        rdict = {'fault':flt,
+                 'event':event,
+                 'edges':edges,
+                 'id_str':id_str,
+                 'short_name':short_name,
+                 'real_desc':real_desc
+                }
+        rlist.append(rdict)
 
-        top_lat = np.array([[]])
-        top_lon = np.array([[]])
-        top_dep = np.array([[]])
-        bot_lat = np.array([[]])
-        bot_lon = np.array([[]])
-        bot_dep = np.array([[]])
-        for j in range(0, nq):
-            if rev[j] == True:
-                top_lat = np.append(top_lat, qds[j][1].latitude)
-                top_lat = np.append(top_lat, qds[j][0].latitude)
-                top_lon = np.append(top_lon, qds[j][1].longitude)
-                top_lon = np.append(top_lon, qds[j][0].longitude)
-                top_dep = np.append(top_dep, qds[j][1].depth)
-                top_dep = np.append(top_dep, qds[j][0].depth)
-                bot_lat = np.append(bot_lat, qds[j][2].latitude)
-                bot_lat = np.append(bot_lat, qds[j][3].latitude)
-                bot_lon = np.append(bot_lon, qds[j][2].longitude)
-                bot_lon = np.append(bot_lon, qds[j][3].longitude)
-                bot_dep = np.append(bot_dep, qds[j][2].depth)
-                bot_dep = np.append(bot_dep, qds[j][3].depth)
-            else:
-                top_lat = np.append(top_lat, qds[j][0].latitude)
-                top_lat = np.append(top_lat, qds[j][1].latitude)
-                top_lon = np.append(top_lon, qds[j][0].longitude)
-                top_lon = np.append(top_lon, qds[j][1].longitude)
-                top_dep = np.append(top_dep, qds[j][0].depth)
-                top_dep = np.append(top_dep, qds[j][1].depth)
-                bot_lat = np.append(bot_lat, qds[j][3].latitude)
-                bot_lat = np.append(bot_lat, qds[j][2].latitude)
-                bot_lon = np.append(bot_lon, qds[j][3].longitude)
-                bot_lon = np.append(bot_lon, qds[j][2].longitude)
-                bot_dep = np.append(bot_dep, qds[j][3].depth)
-                bot_dep = np.append(bot_dep, qds[j][2].depth)
-        # Make edges into line objects
-        nl = len(top_lon)
-        topp = botp = [None] * nl
-        for i in range(0, nl):
-            topp[i] = geo.point.Point(top_lon[i], top_lat[i], top_dep[i])
-            botp[i] = geo.point.Point(bot_lon[i], bot_lat[i], bot_dep[i])
-        top = geo.line.Line(topp)
-        bot = geo.line.Line(botp)
-        edges = [top, bot]
+    return rlist
+    
+def parse_json(rupts, args):
+    """
+    This will hopefully be the most general json format for rutpures.
+    Assumes top of ruputure is horizontal and continuous, and that
+    there is only one segment per rupture (but multiple quads).
+    Users first and last point to get average strike, which is used
+    for all quads. 
+
+    :param rupts:
+        Python translation of json using json.load. 
+    :param args:
+        argparse object. 
+    :returns:
+        Dictionary of rupture information.
+    """
+    rlist = []
+    nrup = len(rupts['events'])
+
+    if args.index:
+        iter = args.index
+        iter = map(int, iter)
+    else:
+        iter = range(nrup)
+
+    for i in iter:
+        event_name = rupts['events'][i]['desc']
+        short_name = event_name
+        magnitude = rupts['events'][i]['mag']
+        dip = rupts['events'][i]['dip']
+        rake = rupts['events'][i]['rake']
+        width = rupts['events'][i]['width']
+        ztor = rupts['events'][i]['ztor']
+
+        lons = rupts['events'][i]['lons']
+        lats = rupts['events'][i]['lats']
+        xp0 = np.array(lons[:-1])
+        xp1 = np.array(lons[1:])
+        yp0 = np.array(lats[:-1])
+        yp1 = np.array(lats[1:])
+        zp = np.ones_like(xp0) * ztor
+        dips = np.ones_like(xp0) * dip
+        widths = np.ones_like(xp0) * width
+
+        P1 = geo.point.Point(lons[0], lats[0])
+        P2 = geo.point.Point(lons[-1], lats[-1])
+        strike = np.array([P1.azimuth(P2)])
+
+        flt = fault.Fault.fromTrace(xp0, yp0, xp1, yp1, zp,
+                                    widths, dips, strike=strike,
+                                    reference=args.reference)
+        flt._segment_index = np.zeros_like(xp0)
+
+        quads = flt.getQuadrilaterals()
+
+        id_str, eventsourcecode, real_desc, selquad = get_event_id(
+            event_name, magnitude, args.directivity, args.dirind, quads)
+
+        event = {'lat': 0,
+                 'lon': 0,
+                 'depth': 0,
+                 'mag': magnitude,
+                 'rake':rake,
+                 'id': id_str,
+                 'locstring': event_name,
+                 'type': 'U',  # overwrite later
+                 'timezone': 'UTC'}
+        event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+        event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+
+        #-----------------------------------------------------------------------
+        # Hypocenter placement
+        #-----------------------------------------------------------------------
+        # top left
+        pp0 = Vector.fromPoint(geo.point.Point(
+            selquad[0].longitude, selquad[0].latitude, selquad[0].depth))
+        # top right
+        pp1 = Vector.fromPoint(geo.point.Point(
+            selquad[1].longitude, selquad[1].latitude, selquad[1].depth))
+        # bottom right
+        pp2 = Vector.fromPoint(geo.point.Point(
+            selquad[2].longitude, selquad[2].latitude, selquad[2].depth))
+        # bottom left
+        pp3 = Vector.fromPoint(geo.point.Point(
+            selquad[3].longitude, selquad[3].latitude, selquad[3].depth))
+        dxp = 0.5
+        dyp = 0.5
+        mp0 = pp0 + (pp1 - pp0) * dxp
+        mp1 = pp3 + (pp2 - pp3) * dxp
+        rp = mp0 + (mp1 - mp0) * dyp
+        hlat, hlon, hdepth = ecef2latlon(rp.x, rp.y, rp.z)
+
+        event['lat'] = hlat
+        event['lon'] = hlon
+        event['depth'] = hdepth
+
+        #-----------------------------------------------------------------------
+        # For map display get trace of top/bottom edges and
+        # put them in order.
+        #-----------------------------------------------------------------------
+        edges = get_fault_edges(quads)
 
         rdict = {'fault':flt,
                  'event':event,
@@ -321,7 +457,24 @@ def main(args):
     else:
         shakehome = os.path.join(os.path.expanduser('~'), 'ShakeMap')
 
-    rlist = read_ucerf(args)
+    # Open rupture file
+    rfile = args.file
+    with open(rfile) as f:
+        rupts = json.load(f)
+        nrup = len(rupts['events'])
+        print('Total number of ruptures: %d' % nrup)
+
+    if rupts['name'] == '2014 NSHMP Determinisitc Event Set':
+        rlist = parse_bssc2014_ucerf(rupts, args)
+    elif (rupts['name'] == '2014 NSHMP Determinisitc Event Set WUS outside CA') or\
+         (rupts['name'] == '2014 NSHMP Determinisitc Event Set CEUS'):
+        rlist = parse_json(rupts, args)
+    elif rupts['name'] == '2014 NSHMP Determinisitc Event Set Cascadia':
+        pass
+    else:
+        raise Exception('Unknown rupture file type.')
+
+
     nrup = len(rlist)
 
     for i in range(nrup):

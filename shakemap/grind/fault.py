@@ -139,7 +139,7 @@ class Fault(object):
                 dy = p1y - p0y
                 theta = np.arctan2(dx, dy)  # theta is angle from north
             elif len(strike) == 1:
-                theta = np.radians(strike)
+                theta = np.radians(strike[0])
             else:
                 theta = np.radians(strike[i])
 
