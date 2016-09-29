@@ -332,7 +332,8 @@ def parse_bssc2014_ucerf(rupts, args):
                  'edges':edges,
                  'id_str':id_str,
                  'short_name':short_name,
-                 'real_desc':real_desc
+                 'real_desc':real_desc,
+                 'eventsourcecode':eventsourcecode
                 }
         rlist.append(rdict)
 
@@ -444,7 +445,8 @@ def parse_json(rupts, args):
                  'edges':edges,
                  'id_str':id_str,
                  'short_name':short_name,
-                 'real_desc':real_desc
+                 'real_desc':real_desc,
+                 'eventsourcecode':eventsourcecode
                 }
         rlist.append(rdict)
 
@@ -484,6 +486,7 @@ def main(args):
         event = rdict['event']
         edges = rdict['edges']
         id_str = rdict['id_str']
+        eventsourcecode = rdict['eventsourcecode']
         short_name = rdict['short_name']
         real_desc = rdict['real_desc']
 
@@ -561,6 +564,7 @@ def main(args):
         root.set('reference', flt.getReference())
         root.set('rake', str(event['rake']))
         root.set('directivity', str(args.directivity))
+        root.set('eventsourcecode', eventsourcecode)
 
         et = etree.ElementTree(root)
         et.write(xml_file, pretty_print=True, xml_declaration=True,
