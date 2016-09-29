@@ -72,7 +72,8 @@ def test_station(tmpdir):
         )
 
     xmlfiles = [inputfile, dyfifile]
-    dbfile = str(tmpdir.join('stations.db'))
+#    dbfile = str(tmpdir.join('stations.db'))
+    dbfile = os.path.join(str(tmpdir), 'stations.db')
 
     stations = StationList.fromXML(xmlfiles, dbfile, source_obj, 
             sites_obj_grid, gmpe, ipe, gmice)
@@ -109,3 +110,10 @@ def test_station(tmpdir):
 
     pdt.assert_frame_equal(df1, ref_df1)
     pdt.assert_frame_equal(df2, ref_df2)
+
+if __name__ == '__main__':
+    import tempfile
+
+    td = tempfile.TemporaryDirectory()
+    test_station(td.name)
+

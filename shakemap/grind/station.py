@@ -293,9 +293,16 @@ class StationList(object):
                         imtid = IMT_TYPES[imt_type]
                         amp = imt_dict['value']
                         flag = imt_dict['flag']
-
-                        if np.isnan(amp):
+                        if np.isnan(amp) or (amp <= 0):
                             amp = 'NULL'
+                            flag = 'G'
+                        elif imt_type == 'mmi':
+                            pass
+                        elif imt_type == 'pgv':
+                            amp = np.log(amp)
+                        else:
+                            amp = np.log(amp / 100.0)
+
                         amp_rows.append((sid, imtid, original_channel,
                                          orientation, amp, flag))
                 sid += 1
@@ -383,6 +390,7 @@ class StationList(object):
         # These values will fill the rows like 'mmi_from_pgm'
         #
         amp_rows = []
+        gm2mi_stdev = gmice.getGM2MIsd()
         for imt, imtid in IMT_TYPES_ORDERED.items():
             if imt.endswith('_mmi') or imt.startswith('mmi'):
                 continue
@@ -409,7 +417,7 @@ class StationList(object):
 
             for irow, row in enumerate(rows):
                 amp_rows.append((row[5], derived_imtid, row[0],
-                                 row[1], dmmi[irow], 0.0))
+                                 row[1], dmmi[irow], gm2mi_stdev[imt]))
 
         self.cursor.executemany(
                 'INSERT INTO amp (station_id, imt_id, original_channel, '
@@ -438,6 +446,7 @@ class StationList(object):
             dists[irow] = row[2]
 
         amp_rows = []
+        mi2gm_stdev = gmice.getMI2GMsd()
         for imt, imtid in IMT_TYPES_ORDERED.items():
             if imt.endswith('_mmi') or imt.startswith('mmi'):
                 continue
@@ -447,12 +456,14 @@ class StationList(object):
 
             derived_imtid = IMT_TYPES[imt + "_from_mmi"]
 
+            lnsd = mi2gm_stdev[imt]
             for irow, row in enumerate(rows):
-                amp_rows.append((row[3], derived_imtid, dmmi[irow], 0.0))
+                amp_rows.append((row[3], derived_imtid, dmmi[irow], lnsd))
 
         self.cursor.executemany(
-                'INSERT INTO amp (station_id, imt_id, amp, uncertainty, flag) '
-                'VALUES (?, ?, ?, ?, "0")', amp_rows)
+                'INSERT INTO amp (station_id, imt_id, amp, uncertainty, flag, '
+                'original_channel, orientation) '
+                'VALUES (?, ?, ?, ?, "0", "UNK", "H")', amp_rows)
         self.db.commit()
 
         #
@@ -643,8 +654,7 @@ class StationList(object):
         id_dict = dict(zip(df['id'], range(nstation_rows)))
 
         #
-        # Get all of the unflagged instrumented amps with the proper
-        # orientation
+        # Get all of the unflagged amps with the proper orientation
         #
         self.cursor.execute(
                 'SELECT a.amp, a.uncertainty, a.imt_id, a.station_id FROM '
@@ -655,8 +665,7 @@ class StationList(object):
         amp_rows = self.cursor.fetchall()
 
         #
-        # Go through all the instrumented amps and put them into the data
-        # frame
+        # Go through all the amps and put them into the data frame
         #
         for this_row in amp_rows:
             imt_id = this_row[2]
@@ -768,10 +777,12 @@ class StationList(object):
 
         Returns:
             Character representing the channel orientation. One of 'N',
-            'E', 'Z', or 'U' (for unknown).
+            'E', 'Z', 'H' (for horizontal), or 'U' (for unknown).
         """
         if orig_channel[-1] in ('N', 'E', 'Z'):
             orientation = orig_channel[-1]
+        elif orig_channel[-1] == "K":   # Channel is "UNK"; assume horizontal
+            orientation = 'H'
         else:
             orientation = 'U'  # this is unknown
         return orientation

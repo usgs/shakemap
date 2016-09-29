@@ -1,7 +1,4 @@
-#!/usr/bin/env python
-
 import numpy as np
-
 
 class WGRW12(object):
     """
@@ -64,18 +61,20 @@ class WGRW12(object):
         Function to compute macroseismic intensity from an instrumental
         intensity. Supported PSA are for 0.3, 1.0, and 3.0 sec periods. 
 
-        :param amps:
-            Ground motion amplitude; linear units; %g for PGA and PSA, cm/s for
-            PGV.
-        :param imt:
-            OpenQuake IMT of the input amps (must be one of PGA, PGV, or SA).
-            `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
-        :param dists: 
-            Numpy array of distances (km). 
-        :param mag:
-            Magnitude (float). 
-        :returns:
-            Macroseismic intensity. 
+        Args:
+            amps (ndarray):
+                Ground motion amplitude; natural log units; g for PGA and 
+                PSA, cm/s for PGV.
+            imt (OpenQuake IMT):
+                Type the input amps (must be one of PGA, PGV, or SA).
+                `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
+            dists (ndarray):
+                Numpy array of distances from rupture (km). 
+            mag (float):
+                Earthquake magnitude.
+
+        Returns:
+            ndarray of Modified Mercalli Intensity. 
         """
         c, c2 = self.__getConsts(imt)
 
@@ -87,14 +86,20 @@ class WGRW12(object):
             doresid = False
 
         #
-        # Convert (for accelerations) from %g to cm/s^2
+        # Convert (for accelerations) from ln(g) to cm/s^2
         # then take the log10
         #
         if 'PGV' not in imt:
-            units = 9.81
+            units = 981.0
         else:
             units = 1.0
-        lamps = np.log10(amps * units)
+        #
+        # Math: log10(981 * exp(amps)) = log10(981) + log10(exp(amps))
+        # = log10(981) + amps * log10(e)
+        # For PGV, just convert ln(amp) to log10(amp) by multiplying
+        # by log10(e)
+        #
+        lamps = np.log10(units) + amps * np.log10(np.e)
         mmi = np.zeros_like(amps)
         #
         # This is the MMI 1 to 2 range that is discussed in the paper but not
@@ -167,12 +172,12 @@ class WGRW12(object):
         idx = mmi >= c['T2']
         pgm[idx] = np.power(10, (mmi[idx] - c['C3']) / c['C4'])
         if 'PGV' not in imt:
-            units = 9.81
+            units = 981.0
         else:
             units = 1.0
         pgm /= units
 
-        return pgm
+        return np.log(pgm)
 
     def getGM2MIsd(self):
         """
@@ -190,11 +195,15 @@ class WGRW12(object):
         :returns:
             Dictionary of MI to GM sigmas (in linear PGM units). 
         """
-        return {'pga': 10**self.__constants['pga']['SPGM'],
-                'pgv': 10**self.__constants['pgv']['SPGM'],
-                'psa03': 10**self.__constants['psa03']['SPGM'],
-                'psa10': 10**self.__constants['psa10']['SPGM'],
-                'psa30': 10**self.__constants['psa30']['SPGM']}
+        #
+        # Need to convert log10 to ln units
+        #
+        lfact = np.log(10.0)
+        return {'pga': lfact * self.__constants['pga']['SPGM'],
+                'pgv': lfact * self.__constants['pgv']['SPGM'],
+                'psa03': lfact * self.__constants['psa03']['SPGM'],
+                'psa10': lfact * self.__constants['psa10']['SPGM'],
+                'psa30': lfact * self.__constants['psa30']['SPGM']}
 
     @staticmethod
     def getName():
