@@ -58,9 +58,8 @@ OQ Hazard Library
 
 One of the significant factors driving the rewrite of ShakeMap into the Python
 language was the availability of the library of Ground Motion Prediction
-Equations (GMPEs) and other tools incorporated into the OpenQuake
-([OQ](www.globalquakemodel.org/openquake/about/))
-hazard library ([oq-hazardlib](github.com/gem/oq-hazardlib)).
+Equations (GMPEs) and other tools incorporated into the OpenQuake (OQ_)
+hazard library (oq-hazardlib_).
 The OQ hazard library provided us with a broad range of
 well-tested, high performance, open source global GMPEs. Due to constraints
 imposed by the software architecture of earlier implementations of ShakeMap, the
@@ -70,4 +69,5 @@ provides a broad array of current GMPE and related hazard modules, as well as a
 framework for easily adding new modules (whether by GEM or ShakeMap staff),
 jumpstarting our efforts to re-implement ShakeMap.
 
-
+.. _OQ: www.globalquakemodel.org/openquake/about/
+.. _oq-hazardlib: github.com/gem/oq-hazardlib/
