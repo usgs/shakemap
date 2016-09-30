@@ -185,7 +185,8 @@ def get_fault_edges(q, rev = None):
             bot_dep = np.append(bot_dep, q[j][2].depth)
             # Make edges into line objects
     nl = len(top_lon)
-    topp = botp = [None] * nl
+    topp = [None] * nl
+    botp = [None] * nl
     for i in range(0, nl):
         topp[i] = geo.point.Point(top_lon[i], top_lat[i], top_dep[i])
         botp[i] = geo.point.Point(bot_lon[i], bot_lat[i], bot_dep[i])
@@ -517,6 +518,7 @@ def main(args):
         #-----------------------------------------------------------------------
         flt.writeFaultFile(os.path.join(
             input_dir, input_dir, id_str + '-fault-for-calc.txt'))
+
         ff = open(os.path.join(input_dir, id_str + '_for-map_fault.txt'), 'wt')
 
         top = edges[0]
@@ -533,8 +535,9 @@ def main(args):
             ff.write('%.4f %.4f %.4f\n' % (top_lat[i], top_lon[i], top_dep[i]))
         for i in list(reversed(range(0, nl))):  # bottom edge
             ff.write('%.4f %.4f %.4f\n' % (bot_lat[i], bot_lon[i], bot_dep[i]))
-            ff.write('%.4f %.4f %.4f\n' %
-                     (top_lat[0], top_lon[0], top_dep[0]))  # close
+        # Close the polygon loop
+        ff.write('%.4f %.4f %.4f\n' % (top_lat[0], top_lon[0], top_dep[0]))
+
         ff.close()
 
         # Need to parse 'time' for event.xml
