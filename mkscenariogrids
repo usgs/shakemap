@@ -483,7 +483,7 @@ def main(args):
         else:
             dist4gmice = dx.rhypo
 
-        mmi = gmice.getMIfromGM(np.exp(pgv), 'PGV',
+        mmi = gmice.getMIfromGM(pgv, 'PGV',
                                 dists=dist4gmice,
                                 mag=rupt.mag)
         GM2MIsd = gmice.getGM2MIsd()['pgv']  # in 'intensity' units
