@@ -22,6 +22,7 @@ from shakemap.utils.exception import ShakeMapException
 from shakemap.utils.ecef import latlon2ecef
 from shakemap.utils.vector import Vector
 from shakemap.grind.fault import get_quad_length
+from shakemap.grind.fault import reverse_quad
 from shakemap.grind.source import rake_to_mech
 
 class Distance(object):
@@ -237,6 +238,8 @@ def get_distance(methods, lat, lon, dep, source,
     hypo = source.getHypo()
     if fault is not None:
         quadlist = fault.getQuadrilaterals()
+        # Need a copy for GC2 since order of verticies/quads needs to be modivied.
+        quadgc2 = copy.deepcopy(quadlist)
     else:
         quadlist = None
 
@@ -396,9 +399,10 @@ def get_distance(methods, lat, lon, dep, source,
                 # need to sort out which one is the "origin".
                 #---------------------------------------------------------------
 
-                # Primate fixes the trend of the trial a vector.
-                primate = -1
-                while primate < 0:
+                # Goofy while-loop is to adjust the side of the fault where the
+                # origin is located
+                dummy = -1
+                while dummy < 0:
                     A0.depth = 0
                     A1.depth = 0
                     p_origin = Vector.fromPoint(A0)
@@ -428,12 +432,34 @@ def get_distance(methods, lat, lon, dep, source,
                         b.y = b.y + b_prime[j].y * dc[j]
                         b.z = b.z + b_prime[j].z * dc[j]
                     bhat = b.norm()
-                    primate = bhat.dot(ahat)
-                    if primate < 0:
+                    dummy = bhat.dot(ahat)
+                    if dummy < 0:
                         tmpA0 = copy.copy(A0)
                         tmpA1 = copy.copy(A1)
                         A0 = tmpA1
                         A1 = tmpA0
+
+                # To fix discordancy, need to flip quads and rearrange
+                # the order of quadgc2
+
+                # 1) flip quads
+                for i in range(len(quadgc2)):
+                    if dc[segind[i]] < 0: #***************U*UUUUUUUSDFUSDfkjjhakjsdhfljkhn
+                        quadgc2[i] = reverse_quad(quadgc2[i])
+
+                # 2) rearrange quadlist to remove discordancy
+                qind = np.arange(len(quadgc2))
+                segnp = np.array(segind)
+                for i in range(nseg):
+                    qsel = qind[segnp == uind[i]]
+                    if dc[i] < 0:
+                        qrev = qsel[::-1]
+                        qind[segnp == uind[i]] = qrev
+
+                quadgc2old = copy.deepcopy(quadgc2)
+                for i in range(len(qind)):
+                    quadgc2[i] = quadgc2old[qind[i]]
+
 
     if quadlist is not None:
         # Length of prior segments
@@ -441,6 +467,7 @@ def get_distance(methods, lat, lon, dep, source,
         l_i = np.zeros(len(quadlist))
         for i in range(len(quadlist)):
             P0, P1, P2, P3 = quadlist[i]
+            G0, G1, G2, G3 = quadgc2[i]
 
             if 'rrup' in methods:
                 rrupdist = _calc_rupture_distance(P0, P1, P2, P3, sites_ecef)
@@ -468,9 +495,9 @@ def get_distance(methods, lat, lon, dep, source,
                 # Spudich and Chiou (2015)
                 # http://dx.doi.org/10.3133/ofr20151028.
 
-                # Compute u_i and t_i for this segment
-                t_i = __calc_t_i(P0, P1, lat, lon, proj)
-                u_i = __calc_u_i(P0, P1, lat, lon, proj)
+                # Compute u_i and t_i for this quad
+                t_i = __calc_t_i(G0, G1, lat, lon, proj)
+                u_i = __calc_u_i(G0, G1, lat, lon, proj)
 
                 # Quad length
                 l_i[i] = get_quad_length(quadlist[i])
@@ -499,9 +526,9 @@ def get_distance(methods, lat, lon, dep, source,
                         l_kj = l_i[(segindnp == segindnp[i]) & (qind < i)]
                         s_ij_1 = np.sum(l_kj)
 
-                    p1 = Vector.fromPoint(quadlist[iq0[segind[i]]][0])
-                    s_ij_2 = ((p1 - p_origin) * dc[segind[i]]).dot(ahat) / 1000.0
-                    # This is implemented with GC2N, for GC2T use:
+                    p1 = Vector.fromPoint(quadgc2[iq0[segind[i]]][0])
+                    s_ij_2 = (p1 - p_origin).dot(np.sign(E)*ahat) / 1000.0
+                    # Above is GC2N, for GC2T use:
 #                    s_ij_2 = (p1 - p_origin).dot(bhat) / 1000.0
 
 

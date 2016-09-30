@@ -1043,6 +1043,17 @@ def get_local_unit_slip_vector_SS(strike, dip, rake):
     sz = 0.0
     return Vector(sx, sy, sz)
 
+def reverse_quad(q):
+    """
+    Reverse the verticies of a quad in the sense that the strike direction
+    is flipped. 
+
+    :param q:
+        A quadrilater (list of points). 
+    :returns: 
+        The reversed quadrilateral.
+    """
+    return [q[1], q[0], q[3], q[2]]
 
 def get_quad_slip(q, rake):
     """
