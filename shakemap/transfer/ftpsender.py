@@ -18,8 +18,9 @@ class FTPSender(Sender):
     def setup(self):
         """
         Initiate an ftp connection with properties passed to constructor.
-        :returns:
-          Instance of the ftplib.FTP class.
+
+        Returns:
+            Instance of the ftplib.FTP class.
         """
         if 'host' not in list(self.properties.keys()):
             raise NameError('"host" keyword must be supplied to send via FTP')
@@ -57,9 +58,11 @@ class FTPSender(Sender):
         return ftp
 
     def delete(self):
-        '''Delete any files and folders that have been passed to constructor.
-        :returns:
-          The number of files deleted on remote FTP server.
+        '''
+        Delete any files and folders that have been passed to constructor.
+
+        Returns:
+            The number of files deleted on remote FTP server.
         '''
         ftp = self.setup()
         nfiles = 0
@@ -94,9 +97,11 @@ class FTPSender(Sender):
         return nfiles
 
     def send(self):
-        '''Send any files or folders that have been passed to constructor.
-        :returns:
-          Number of files sent to remote SSH server.
+        '''
+        Send any files or folders that have been passed to constructor.
+
+        Returns:
+            Number of files sent to remote SSH server.
         '''
         if 'host' not in list(self.properties.keys()):
             raise NameError('"host" keyword must be supplied to send via FTP')
@@ -141,11 +146,12 @@ class FTPSender(Sender):
                 'Could not send to %s.  Error "%s"' % (host, str(obj)))
 
     def __sendfile(self, filename, ftp):
-        '''Internal function used to send a file using an FTP object.
-        :param filename:
-          Local filename
-        :param ftp:
-          Instance of FTP object.
+        '''
+        Internal function used to send a file using an FTP object.
+
+        Args:
+            filename: Local filename
+            ftp: Instance of FTP object.
         '''
         fbase, fpath = os.path.split(filename)
         cmd = "STOR " + fpath  # we don't tell the ftp server about the local path to the file

@@ -58,8 +58,9 @@ class WGRW12(object):
 
     def getMIfromGM(self, amps, imt, dists=None, mag=None):
         """ 
-        Function to compute macroseismic intensity from an instrumental
-        intensity. Supported PSA are for 0.3, 1.0, and 3.0 sec periods. 
+        Function to compute macroseismic intensity from ground-motion
+        intensity. Supported ground-motion IMTs are PGA, PGV and PSA 
+        at 0.3, 1.0, and 3.0 sec periods. 
 
         Args:
             amps (ndarray):
@@ -67,6 +68,7 @@ class WGRW12(object):
                 PSA, cm/s for PGV.
             imt (OpenQuake IMT):
                 Type the input amps (must be one of PGA, PGV, or SA).
+                Supported SA periods are 0.3, 1.0, and 3.0 sec.
                 `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
             dists (ndarray):
                 Numpy array of distances from rupture (km). 
@@ -126,21 +128,25 @@ class WGRW12(object):
 
     def getGMfromMI(self, mmi, imt, dists=None, mag=None):
         """ 
-        Function to tcompute instrumental intensity from macroseismic intensity.
-        Supported PSA are for 0.3, 1.0, and 3.0 sec periods.
+        Function to tcompute ground-motion intensity from macroseismic 
+        intensity. Supported IMTs are PGA, PGV and PSA for 0.3, 1.0, and 
+        3.0 sec periods.
 
-        :param mmi: Macroseismic intensity.
-        :param imt:
-            OpenQuake IMT of the requested instrumental intensities (must be one
-            of PGA, PGV, or SA).
-            `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
-        :param dists:
-            Numpy array of distances (km).
-        :param mag:
-            Magnitude (float).
-        :returns:
-            Ground motion amplitude; linear units; %g for PGA and PSA, cm/s for
-            PGV.
+        Args:
+            mmi (ndarray): 
+                Macroseismic intensity.
+            imt (OpenQuake IMT):
+                IMT of the requested ground-motions intensities (must be 
+                one of PGA, PGV, or SA).
+                `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
+            dists (ndarray):
+                Rupture distances (km) to the corresponding MMIs.
+            mag (float):
+                Earthquake magnitude.
+
+        Returns:
+            Ndarray of ground motion intensity in natural log of g for PGA 
+            and PSA, and natural log cm/s for PGV.
         """
         c, c2 = self.__getConsts(imt)
 
@@ -181,7 +187,10 @@ class WGRW12(object):
 
     def getGM2MIsd(self):
         """
-        :returns:
+        Return a dictionary of standard deviations for the ground-motion
+        to MMI conversion. The keys are the ground motion types.
+
+        Returns:
             Dictionary of GM to MI sigmas (in MMI units).
         """
         return {'pga': self.__constants['pga']['SMMI'],
@@ -192,8 +201,12 @@ class WGRW12(object):
 
     def getMI2GMsd(self):
         """
-        :returns:
-            Dictionary of MI to GM sigmas (in linear PGM units). 
+        Return a dictionary of standard deviations for the MMI
+        to ground-motion conversion. The keys are the ground motion 
+        types.
+
+        Returns:
+            Dictionary of MI to GM sigmas (ln(PGM) units). 
         """
         #
         # Need to convert log10 to ln units
@@ -208,15 +221,20 @@ class WGRW12(object):
     @staticmethod
     def getName():
         """
-        :returns:
-            Name of GMICE. 
+        Get the name of this GMICE.
+
+        Returns:
+            String containing name of this GMICE. 
         """
         return 'Worden et al. (2012)'
 
     @staticmethod
     def getScale():
         """
-        :returns:
+        Get the name of the PostScript file containing this GMICE's 
+        scale.
+
+        Returns:
             Name of GMICE scale file.
         """
         return 'scale_wgrw12.ps'
@@ -224,7 +242,9 @@ class WGRW12(object):
     @staticmethod
     def getMinMax():
         """
-        :returns: 
+        Get the minimum and maximum MMI values produced by this GMICE.
+
+        Returns: 
             Tuple of min and max values of GMICE.
         """
         return (1.0, 10.0)

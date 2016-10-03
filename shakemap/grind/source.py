@@ -298,6 +298,7 @@ class Source(object):
     def setEventParam(self, key, value):
         """
         Set a parameter in the internal event dictionary
+
         :param key:
             string key
         :param value:

@@ -14,15 +14,18 @@ from shakemap.utils.exception import ShakeMapException
 
 
 class SecureSender(Sender):
-    '''Class for sending and deleting files and directories via SSH.
+    '''
+    Class for sending and deleting files and directories via SSH.
     '''
     required_props1 = ['privatekey', 'remotehost', 'remotedirectory']
     required_props2 = ['username', 'password', 'remotehost', 'remotedirectory']
 
     def connect(self):
-        """Initiate an ssh connection with properties passed to constructor.
-        :returns:
-          Instance of the paramiko SSHClient class.
+        """
+        Initiate an ssh connection with properties passed to constructor.
+
+        Returns:
+            Instance of the paramiko SSHClient class.
         """
         usePrivateKey = True
         for prop in self.required_props1:
@@ -61,9 +64,11 @@ class SecureSender(Sender):
         return ssh
 
     def send(self):
-        '''Send any files or folders that have been passed to constructor.
-        :returns:
-          Number of files sent to remote FTP server.
+        '''
+        Send any files or folders that have been passed to constructor.
+
+        Returns:
+            Number of files sent to remote FTP server.
         '''
         nfiles = 0
         ssh = self.connect()
@@ -86,9 +91,11 @@ class SecureSender(Sender):
         return nfiles
 
     def delete(self):
-        '''Delete any files and folders that have been passed to constructor.
-        :returns:
-          The number of files deleted on remote SSH server.
+        '''
+        Delete any files and folders that have been passed to constructor.
+
+        Returns:
+            The number of files deleted on remote SSH server.
         '''
         ssh = self.connect()
         rfiles = []

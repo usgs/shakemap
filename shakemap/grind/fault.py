@@ -239,7 +239,7 @@ class Fault(object):
         :param faultfile:
             Path to fault file OR file-like object in GMT psxy format, where
             * Fault vertices are space separated lat,lon,depth triplets on a
-              single line.
+            single line.
             * Fault segments are separated by lines containing ">"
             * Fault segments must be closed.
             * Fault segments must be all clockwise or all counter-clockwise.

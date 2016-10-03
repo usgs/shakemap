@@ -16,9 +16,11 @@ class CopySender(Sender):
     '''
 
     def send(self):
-        '''Send any files or folders that have been passed to constructor.
-        :returns:
-          Number of files sent to local directory.
+        '''
+        Send any files or folders that have been passed to constructor.
+
+        Returns:
+            Number of files sent to local directory.
         '''
         nfiles = 0
         if 'directory' not in self.properties:
@@ -40,9 +42,11 @@ class CopySender(Sender):
         return nfiles
 
     def delete(self):
-        '''Delete any files and folders that have been passed to constructor.
-        :returns:
-          The number of files deleted from local directory.
+        '''
+        Delete any files and folders that have been passed to constructor.
+
+        Returns:
+            The number of files deleted from local directory.
         '''
         if 'directory' not in self.properties:
             raise ShakeMapException('Property "directory" not specified.')
