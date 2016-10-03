@@ -362,6 +362,9 @@ def main(args):
     sites = Sites(vs30grid)
     sx = sites.getSitesContext()
 
+    # Clip Vs30 do avoid interpolation error
+    sx.vs30 = np.clip(sx.vs30, 0, 2000)
+
     #---------------------------------------------------------------------------
     # Standard deviation stuff
     #---------------------------------------------------------------------------

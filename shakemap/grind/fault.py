@@ -624,8 +624,8 @@ class Fault(object):
         # would be ok.
 
         # Are the top and bottom edges both parallel to the surface?
-        topDepthsEqual = np.allclose(P0.depth, P1.depth, atol = 2e-3)
-        bottomDepthsEqual = np.allclose(P2.depth, P3.depth, atol = 2e-3)
+        topDepthsEqual = np.allclose(P0.depth, P1.depth, atol = 3e-3)
+        bottomDepthsEqual = np.allclose(P2.depth, P3.depth, atol = 3e-3)
         if not topDepthsEqual or not bottomDepthsEqual:
             raise ShakeMapException(
                 'Top and bottom edges of fault quadrilateral must be parallel to the surface')
