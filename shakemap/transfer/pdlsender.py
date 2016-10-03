@@ -14,16 +14,21 @@ from impactutils.io.cmd import get_command_output
 
 
 class PDLSender(Sender):
-    pdlcmd = '[JAVA] -jar [JARFILE] --send --status=[STATUS]"\
+    """
+    Class to invoke a PDL send command on a product.
+    """
+
+    __pdlcmd = '[JAVA] -jar [JARFILE] --send --status=[STATUS]"\
         " --source=[PRODUCTSOURCE] --type=[PRODUCTTYPE] --code=[PRODUCTCODE]"\
         " --eventsource=[EVENTSOURCE] --eventsourcecode=[EVENTSOURCECODE]"\
         " --privateKey=[KEYFILE]  --configFile=[CONFIGFILE] [FILE] [DIRECTORY]'
-    required_properties = ['java', 'jarfile', 'keyfile', 'configfile',
+
+    __required_properties = ['java', 'jarfile', 'keyfile', 'configfile',
                            'productsource', 'producttype', 'productcode',
                            'eventsource', 'eventsourcecode']
 
     def delete(self):
-        for prop in self.required_properties:
+        for prop in self.__required_properties:
             if prop not in list(self.properties.keys()):
                 raise ShakeMapException(
                     '"%s" property must be supplied to send via PDL')
@@ -32,7 +37,7 @@ class PDLSender(Sender):
         self.properties['status'] = 'DELETE'
         self.properties['files'] = ''
         self.properties['directories'] = ''
-        cmd = self.pdlcmd
+        cmd = self.__pdlcmd
         for propkey, propvalue in self.properties.items():
             cmd = cmd.replace('[' + propkey.upper() + ']', propvalue)
 
@@ -53,7 +58,7 @@ class PDLSender(Sender):
                 'For PDL, you may only send one directory at a time.')
 
         # make sure we have all the required properties
-        for prop in self.required_properties:
+        for prop in self.__required_properties:
             if prop not in list(self.properties.keys()):
                 raise ShakeMapException(
                     '"%s" property must be supplied to send via PDL')
@@ -69,7 +74,7 @@ class PDLSender(Sender):
             self.properties['directory'] = self.directories[0]
         else:
             self.properties['directory'] = ''
-        cmd = self.pdlcmd
+        cmd = self.__pdlcmd
         for propkey, propvalue in self.properties.items():
             cmd = cmd.replace('[' + propkey.upper() + ']', propvalue)
 

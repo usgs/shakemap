@@ -126,6 +126,9 @@ def main(args):
         # Need to run HTML to create __shakedoc/html/_static
         manualcmd = '%s latexpdf' % make_cmd
         res, stdout, stderr = get_command_output(manualcmd)
+        if args.verbose:
+            print(stdout.decode('utf-8'))
+            print(stderr.decode('utf-8'))
         if not res:
             raise Exception('Could not build the PDF version of the ShakeMap '
                             'manual - error "%s".' % stderr)
@@ -186,7 +189,8 @@ def main(args):
     f.write("autoclass_content = 'both'\n")
     f.write("autodoc_member_order = 'bysource'\n")
     f.write("html_show_copyright = False\n")
-    f.write("extensions = extensions + [ 'sphinx.ext.napoleon', 'sphinx.ext.todo' ] \n")
+#    f.write("extensions = extensions + [ 'sphinx.ext.autodoc', "\
+#            "'sphinx.ext.napoleon', 'sphinx.ext.todo' ] \n")
     f.write("napoleon_include_special_with_doc = False\n")
     f.write("todo_include_todos = True\n")
     f.close()
@@ -194,6 +198,9 @@ def main(args):
     #-------------------------------------------------------------
     # Copy the manual REST files to the API directory
     #-------------------------------------------------------------
+
+    # Get rid of the automatic conf.py so our preferred one is used
+    os.remove('%s/conf.py' % (API_DIR))
 
     # put aside Makefile so it doesn't get overwritten
     oldmake = '%s/Makefile' %API_DIR
@@ -226,6 +233,9 @@ def main(args):
     if not res:
         raise Exception('Could not build HTML for API documentation. - '
                         'error "%s"' % stderr)
+    if args.verbose:
+        print(stdout.decode('utf-8'))
+        print(stderr.decode('utf-8'))
 
     #-------------------------------------------------------------
     # Copy the generated content to the gh-pages branch we created
@@ -274,6 +284,8 @@ if __name__ == '__main__':
                              'HTML content.')
     parser.add_argument('-n', '--nopdf', action='store_true', default=False,
                         help='Suppress PDF building. ')
+    parser.add_argument('-v', '--verbose', action='store_true', default=False,
+                        help='Produce more output to the screen. ')
 
     pargs = parser.parse_args()
     main(pargs)

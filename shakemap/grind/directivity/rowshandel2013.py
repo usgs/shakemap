@@ -1,5 +1,50 @@
-#!/usr/bin/env python
+"""
+Implements the Rowshandel (2013) directivity model. Note that the report
+provides many options for computing the directivity factor and we have 
+also used some coefficients that are unpublished updates by Rowshandel. 
+Some of the implementation options are controlled by arguments (e.g., 
+mtype).
 
+Fd is the directivity function. One of the options is whether or not to
+use the 'centering' term (the argument is 'centered' and defaults to
+True). If it is True then
+
+Fd = C1 * (XiPrime - Xic) * LD * DT * WP
+
+otherwise
+
+Fd = (C1 * Xiprime + C2) * LD * DT * WP
+
+where
+
+- C1 and C2 are regression coefficients.
+- XiPrime is a factor that accounts for rupture propagation and slip
+  direction.
+- Xic is the centering term.
+- LD is the rupture length de-normalization factor.
+- DT is the distance-taper.
+- WP is the narrow-band multiplier.
+
+Note that Fd is intended to be used in GMPEs as:
+
+ln(IM_dir) = ln(IM) + Fd
+
+where
+
+- Fd is the directivity effect.
+- IM is the intensity measure predicted by the GMPE.
+- IM_dir is the directivity-adjusted IM.
+
+To do
+    - Add checks on function arguments (e.g., mtype) for valid values.
+    - Interpolate periods. 
+
+References: 
+    Rowshandel, B. (2013). Rowshandel’s NGA-West2 directivity model, 
+    Chapter 3 of PEER Report No. 2013/09, P. Spudich (Editor), Pacific 
+    Earthquake Engineering Research Center, Berkeley, CA.
+    `[link] <http://peer.berkeley.edu/publications/peer_reports/reports_2013/webPEER-2013-09-Spudich.pdf>`__
+"""
 
 import numpy as np
 import copy
@@ -16,53 +61,6 @@ from shakemap.utils.vector import Vector
 
 
 class Rowshandel2013(object):
-    """
-    Implements the Rowshandel (2013) directivity model. Note that the report
-    provides many options for computing the directivity factor and we have 
-    also used some coefficients that are unpublished updates by Rowshandel. 
-    Some of the implementation options are controlled by arguments (e.g., 
-    mtype).
-
-    Fd is the directivity function. One of the options is whether or not to
-    use the 'centering' term (the argument is 'centered' and defaults to
-    True). If it is True then
-
-    Fd = C1 * (XiPrime - Xic) * LD * DT * WP
-
-    otherwise
-
-    Fd = (C1 * Xiprime + C2) * LD * DT * WP
-
-    where
-
-    - C1 and C2 are regression coefficients.
-    - XiPrime is a factor that accounts for rupture propagation and slip
-      direction.
-    - Xic is the centering term.
-    - LD is the rupture length de-normalization factor.
-    - DT is the distance-taper.
-    - WP is the narrow-band multiplier.
-
-    Note that Fd is intended to be used in GMPEs as:
-
-    ln(IM_dir) = ln(IM) + Fd
-
-    where
-
-    - Fd is the directivity effect.
-    - IM is the intensity measure predicted by the GMPE.
-    - IM_dir is the directivity-adjusted IM.
-
-    To do
-        - Add checks on function arguments (e.g., mtype) for valid values.
-        - Interpolate periods. 
-
-    References: 
-        Rowshandel, B. (2013). Rowshandel’s NGA-West2 directivity model, 
-        Chapter 3 of PEER Report No. 2013/09, P. Spudich (Editor), Pacific 
-        Earthquake Engineering Research Center, Berkeley, CA.
-        `[link] <http://peer.berkeley.edu/publications/peer_reports/reports_2013/webPEER-2013-09-Spudich.pdf>`__
-    """
 
     __c1 = [0.35, 0.75, 0.95, 1.28, 1.60]
     __c2 = [-0.035, -0.10, -0.15, -0.26, -0.30]
@@ -78,7 +76,6 @@ class Rowshandel2013(object):
         :param lat:
             Numpy array of site latitudes.
         :param lon:
-with warnings.catch_warnings():
             Numpy array of site longitudes.
         :param dep:
             Numpy array of site depths (km); positive down.

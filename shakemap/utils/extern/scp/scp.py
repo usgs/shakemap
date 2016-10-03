@@ -18,7 +18,9 @@ _find_unsafe = re.compile(br'[^\w@%+=:,./~-]').search
 
 
 def _sh_quote(s):
-    """Return a shell-escaped version of the string `s`."""
+    """
+    Return a shell-escaped version of the string `s`.
+    """
     if not s:
         return b""
     if _find_unsafe(s) is None:
@@ -32,7 +34,8 @@ def _sh_quote(s):
 # Unicode conversion functions; assume UTF-8
 
 def asbytes(s):
-    """Turns unicode into bytes, if needed.
+    """
+    Turns unicode into bytes, if needed.
 
     Assumes UTF-8.
     """
@@ -43,7 +46,8 @@ def asbytes(s):
 
 
 def asunicode(s):
-    """Turns bytes into unicode, if needed.
+    """
+    Turns bytes into unicode, if needed.
 
     Uses UTF-8.
     """
@@ -61,7 +65,8 @@ bytes_sep = asbytes(os.path.sep)
 # Used to convert local paths if the local machine is Windows
 
 def asunicode_win(s):
-    """Turns bytes into unicode, if needed.
+    """
+    Turns bytes into unicode, if needed.
     """
     if isinstance(s, bytes):
         return s.decode(locale.getpreferredencoding())
@@ -70,7 +75,8 @@ def asunicode_win(s):
 
 
 class SCPClient(object):
-    """An scp1 implementation, compatible with openssh scp.
+    """
+    An scp1 implementation, compatible with openssh scp.
     Raises SCPException for all transport related errors. Local filesystem
     and OS errors pass through.
 
@@ -88,17 +94,15 @@ class SCPClient(object):
         """
         Create an scp1 client.
 
-        @param transport: an existing paramiko L{Transport}
-        @type transport: L{Transport}
-        @param buff_size: size of the scp send buffer.
-        @type buff_size: int
-        @param socket_timeout: channel socket timeout in seconds
-        @type socket_timeout: float
-        @param progress: callback - called with (filename, size, sent) during
-            transfers
-        @param sanitize: function - called with filename, should return
-            safe or escaped string.  Uses _sh_quote by default.
-        @type progress: function(string, int, int)
+        Args:
+            transport (L{Transport}): an existing paramiko L{Transport}
+            buff_size (int): size of the scp send buffer.
+            socket_timeout (float): channel socket timeout in seconds
+            progress: callback - called with (filename, size, sent) during
+                transfers
+            sanitize: function - called with filename, should return
+                safe or escaped string.  Uses _sh_quote by default.
+            progress: function(string, int, int)
         """
         self.transport = transport
         self.buff_size = buff_size
@@ -121,15 +125,17 @@ class SCPClient(object):
 
     def put(self, files, remote_path=b'.',
             recursive=False, preserve_times=False):
-        """Transfer files to remote host.
+        """
+        Transfer files to remote host.
 
-        :param files: A single path, or a list of paths to be transfered.
-            recursive must be True to transfer directories.
-        :param remote_path: path in which to receive the files on the remote
-            host. defaults to '.'
-        :param recursive: boolean transfer files and directories recursively
-        :param preserve_times: boolean preserve mtime and atime of transfered files
-            and directories.
+        Args:
+            files: A single path, or a list of paths to be transfered.
+                recursive must be True to transfer directories.
+            remote_path: path in which to receive the files on the remote
+                host. defaults to '.'
+            recursive: boolean transfer files and directories recursively
+                preserve_times: boolean preserve mtime and atime of transfered files
+                and directories.
         """
         self.preserve_times = preserve_times
         self.channel = self._open()
@@ -152,15 +158,17 @@ class SCPClient(object):
 
     def get(self, remote_path, local_path='',
             recursive=False, preserve_times=False):
-        """Transfer files from remote host to localhost.
+        """
+        Transfer files from remote host to localhost.
 
-        :param remote_path: path to retreive from remote host. since this is
-            evaluated by scp on the remote host, shell wildcards and
-            environment variables may be used.
-        :param local_path: path in which to receive files locally
-        :param recursive: boolean transfer files and directories recursively
-        :param preserve_times: boolean preserve mtime and atime of transfered files
-            and directories.
+        Args:
+            remote_path: path to retreive from remote host. since this is
+                evaluated by scp on the remote host, shell wildcards and
+                environment variables may be used.
+            local_path: path in which to receive files locally
+            recursive: boolean transfer files and directories recursively
+            preserve_times: boolean preserve mtime and atime of transfered files
+                and directories.
         """
         if not isinstance(remote_path, (list, tuple)):
             remote_path = [remote_path]
@@ -189,20 +197,26 @@ class SCPClient(object):
         self.close()
 
     def _open(self):
-        """open a scp channel"""
+        """
+        open a scp channel
+        """
         if self.channel is None:
             self.channel = self.transport.open_session()
 
         return self.channel
 
     def close(self):
-        """close scp channel"""
+        """
+        close scp channel
+        """
         if self.channel is not None:
             self.channel.close()
             self.channel = None
 
     def _read_stats(self, name):
-        """return just the file stats needed for scp"""
+        """
+        return just the file stats needed for scp
+        """
         if os.name == 'nt':
             name = asunicode(name)
         stats = os.stat(name)
@@ -456,5 +470,7 @@ class SCPClient(object):
 
 
 class SCPException(Exception):
-    """SCP exception class"""
+    """
+    SCP exception class
+    """
     pass
