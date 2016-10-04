@@ -64,7 +64,7 @@ def strike_to_quadrant(strike):
 # Sort out event id and associated variables
 #-------------------------------------------------------------------------------
 
-def get_event_id(event_name, mag, Directivity, iDir, quads):
+def get_event_id(event_name, mag, Directivity, iDir, quads, id = None):
     event_legal = "".join(x for x in event_name if x.isalnum())
     mag_str = str(mag).strip("0")
     # PDL requrement: no ".", so replace with "p"
@@ -118,11 +118,17 @@ def get_event_id(event_name, mag, Directivity, iDir, quads):
             ddes = "Eastern directivity"
 
     if Directivity:
-        id_str = "%s_M%s_se~%s" % (event_legal[:20], mag_str, dirtag)
+        if id is None:
+            id_str = "%s_M%s_se~%s" % (event_legal[:20], mag_str, dirtag)
+        else:
+            id_str = "%s_M%s_se~%s" % (id[:20], mag_str, dirtag)
         id_str = id_str.lower()
         real_desc = ddes
     else:
-        id_str = "%s_M%s_se" % (event_legal[:20], mag_str)
+        if id is None:
+            id_str = "%s_M%s_se" % (event_legal[:20], mag_str)
+        else:
+            id_str = "%s_M%s_se" % (id[:20], mag_str)
         id_str = id_str.lower()
         real_desc = 'Median ground motions'
 
@@ -372,6 +378,7 @@ def parse_json(rupts, args):
     for i in iter:
         event_name = rupts['events'][i]['desc']
         short_name = event_name
+        id = rupts['events'][i]['id']
         magnitude = rupts['events'][i]['mag']
         dip = rupts['events'][i]['dip']
         rake = rupts['events'][i]['rake']
@@ -400,7 +407,8 @@ def parse_json(rupts, args):
         quads = flt.getQuadrilaterals()
 
         id_str, eventsourcecode, real_desc, selquad = get_event_id(
-            event_name, magnitude, args.directivity, args.dirind, quads)
+            event_name, magnitude, args.directivity, args.dirind,
+            quads, id = id)
 
         event = {'lat': 0,
                  'lon': 0,
