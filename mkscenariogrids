@@ -188,8 +188,9 @@ def main(args):
         #-----------------------------------------------------------------------
     elif args.gmpe == 'NSHMP14scr_rlme':
         # No Frankel because no 3-sec coefficients and can't interpolate.
+        # Ditto for Toro. 
         gmpes = [#FrankelEtAl1996MwNSHMP2008(),
-                 ToroEtAl1997MwNSHMP2008(),
+                 #ToroEtAl1997MwNSHMP2008(),
                  SilvaEtAl2002MwNSHMP2008(),
                  Campbell2003MwNSHMP2008(),
                  TavakoliPezeshk2005MwNSHMP2008(),
@@ -197,14 +198,14 @@ def main(args):
                  PezeshkEtAl2011(),
                  Atkinson2008prime(),
                  SomervilleEtAl2001NSHMP2008()]
-        wts = np.array([0.11, 0.06, 0.11, 0.11, 0.22, 0.15, 0.08, 0.1])
+        wts = np.array([0.06, 0.11, 0.11, 0.22, 0.15, 0.08, 0.1])
         wts = wts/np.sum(wts)
-        wts_largeR = np.array([0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0])
+        wts_largeR = np.array([0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0])
         wts_largeR = wts_largeR/np.sum(wts_largeR)
         site_gmpes = [AtkinsonBoore2006Modified2011()]
     elif args.gmpe == 'NSHMP14scr_grd':
         gmpes = [#FrankelEtAl1996MwNSHMP2008(),
-                 ToroEtAl1997MwNSHMP2008(),
+                 #ToroEtAl1997MwNSHMP2008(),
                  SilvaEtAl2002MwNSHMP2008(),
                  Campbell2003MwNSHMP2008(),
                  TavakoliPezeshk2005MwNSHMP2008(),
@@ -212,8 +213,8 @@ def main(args):
                  PezeshkEtAl2011(),
                  Atkinson2008prime(),
                  SomervilleEtAl2001NSHMP2008()]
-        wts = [0.06, 0.13, 0.06, 0.13, 0.13, 0.25, 0.16, 0.08, 0.0]
-        wts_largeR = [0.16, 0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0]
+        wts = [0.06, 0.13, 0.13, 0.25, 0.16, 0.08, 0.0]
+        wts_largeR = [0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0]
         site_gmpes = [AtkinsonBoore2006Modified2011()]
     elif args.gmpe == 'NSHMPsub_i':
         gmpes = [AtkinsonBoore2003SInter(), ZhaoEtAl2006SInter(),
