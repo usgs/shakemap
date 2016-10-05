@@ -173,6 +173,7 @@ def main(args):
     #---------------------------------------------------------------------------
     # Get list of GMPEs
     #---------------------------------------------------------------------------
+    site_gmpes = None
     if args.gmpe == 'NSHMP14acr':
         gmpes = [AbrahamsonEtAl2014(), BooreEtAl2014(),
                  CampbellBozorgnia2014(), ChiouYoungs2014()]
@@ -186,7 +187,8 @@ def main(args):
         #      4) The NHSMP will no longer be using it in the future.
         #-----------------------------------------------------------------------
     elif args.gmpe == 'NSHMP14scr_rlme':
-        gmpes = [FrankelEtAl1996MwNSHMP2008(),
+        # No Frankel because no 3-sec coefficients and can't interpolate.
+        gmpes = [#FrankelEtAl1996MwNSHMP2008(),
                  ToroEtAl1997MwNSHMP2008(),
                  SilvaEtAl2002MwNSHMP2008(),
                  Campbell2003MwNSHMP2008(),
@@ -195,10 +197,13 @@ def main(args):
                  PezeshkEtAl2011(),
                  Atkinson2008prime(),
                  SomervilleEtAl2001NSHMP2008()]
-        wts = [0.06, 0.11, 0.06, 0.11, 0.11, 0.22, 0.15, 0.08, 0.1]
-        wts_largeR = [0.16, 0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0]
+        wts = np.array([0.11, 0.06, 0.11, 0.11, 0.22, 0.15, 0.08, 0.1])
+        wts = wts/np.sum(wts)
+        wts_largeR = np.array([0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0])
+        wts_largeR = wts_largeR/np.sum(wts_largeR)
+        site_gmpes = [AtkinsonBoore2006Modified2011()]
     elif args.gmpe == 'NSHMP14scr_grd':
-        gmpes = [FrankelEtAl1996MwNSHMP2008(),
+        gmpes = [#FrankelEtAl1996MwNSHMP2008(),
                  ToroEtAl1997MwNSHMP2008(),
                  SilvaEtAl2002MwNSHMP2008(),
                  Campbell2003MwNSHMP2008(),
@@ -209,6 +214,7 @@ def main(args):
                  SomervilleEtAl2001NSHMP2008()]
         wts = [0.06, 0.13, 0.06, 0.13, 0.13, 0.25, 0.16, 0.08, 0.0]
         wts_largeR = [0.16, 0.0, 0.0, 0.17, 0.17, 0.3, 0.2, 0.0, 0.0]
+        site_gmpes = [AtkinsonBoore2006Modified2011()]
     elif args.gmpe == 'NSHMPsub_i':
         gmpes = [AtkinsonBoore2003SInter(), ZhaoEtAl2006SInter(),
                  AtkinsonMacias2009(), AbrahamsonEtAl2015SInter()]
@@ -426,7 +432,8 @@ def main(args):
     for key, val in imt_dict.items():
         iimt = imt.from_string(val)
 
-        mgmpe = MultiGMPE.from_list(gmpes, wts)
+        mgmpe = MultiGMPE.from_list(gmpes, wts,
+                                    default_gmpes_for_site = site_gmpes)
         lnmu, lnsd = mgmpe.get_mean_and_stddevs(
             sx, rupt, dx, iimt, stddev_types)
 
