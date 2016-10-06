@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-ShakeMap Manual 2.0
+ShakeMap 3.5 Manual
 ===========================================
 
 .. only:: html

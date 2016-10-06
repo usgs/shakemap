@@ -411,13 +411,14 @@ class StationList(object):
                 dists[irow] = row[4]
 
             gemimt = GEM_IMT.from_string(GEM_IMT_MAP[imt])
-            dmmi = gmice.getMIfromGM(amps, gemimt, dists=dists, mag=emags)
+            dmmi, junk = gmice.getMIfromGM(amps, gemimt, dists=dists, 
+                    mag=emags)
 
             derived_imtid = IMT_TYPES["mmi_from_" + imt]
 
             for irow, row in enumerate(rows):
                 amp_rows.append((row[5], derived_imtid, row[0],
-                                 row[1], dmmi[irow], gm2mi_stdev[imt]))
+                                 row[1], dmmi[irow], gm2mi_stdev[gemimt]))
 
         self.cursor.executemany(
                 'INSERT INTO amp (station_id, imt_id, original_channel, '
@@ -452,11 +453,12 @@ class StationList(object):
                 continue
 
             gemimt = GEM_IMT.from_string(GEM_IMT_MAP[imt])
-            dmmi = gmice.getGMfromMI(mmi, gemimt, dists=dists, mag=emags)
+            dmmi, junk = gmice.getGMfromMI(mmi, gemimt, dists=dists, 
+                    mag=emags)
 
             derived_imtid = IMT_TYPES[imt + "_from_mmi"]
 
-            lnsd = mi2gm_stdev[imt]
+            lnsd = mi2gm_stdev[gemimt]
             for irow, row in enumerate(rows):
                 amp_rows.append((row[3], derived_imtid, dmmi[irow], lnsd))
 
