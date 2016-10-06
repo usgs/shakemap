@@ -3,7 +3,6 @@
 # stdlib modules
 import sys
 import os.path
-#import tempfile
 import time as time
 import shutil
 
