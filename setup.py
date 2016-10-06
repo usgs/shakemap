@@ -27,5 +27,5 @@ setup(name='shakemap',
       package_data={'shakemap': [os.path.join('tests', 'data', '*'),
                                  os.path.join('utils', 'configspec.ini'),
                                  os.path.join('grind', 'data', 'ps2ff', '*.csv')]},
-      scripts=['runscenarios', 'mkfault', 'mkinputdir', 'mkscenariogrids'],
+      scripts=['mkfault'],
       )

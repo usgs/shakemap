@@ -211,7 +211,7 @@ class MultiGMPE(GMPE):
         # Check that GMPE weights sum to 1.0:
         #-----------------------------------------------------------------------
 
-        if np.sum(weights) != 1.0:
+        if np.abs(np.sum(weights) - 1.0) > 1e-7:
             raise Exception('Weights must sum to one.')
 
         #-----------------------------------------------------------------------
