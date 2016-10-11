@@ -16,13 +16,15 @@ cd $HOME;
 conda remove --name $VENV --all -y
 cd $CWD
 
-conda create --name shake --yes --channel conda-forge python=3.5 ${DEPARRAY[*]} -y
+conda create --name $VENV --yes --channel conda-forge python=$PYVER ${DEPARRAY[*]} -y
 
 # activate the new environment
 source activate shake
 
 # do pip installs of those things that are not available via conda.
-pip -v install https://github.com/gem/oq-hazardlib/archive/v0.20.0.zip
+#grab the bleeding edge for GEM hazardlib.  They have actual releases
+#we can resort to if this becomes a problem.
+pip -v install https://github.com/gem/oq-hazardlib/archive/master.zip
 pip -v install https://github.com/usgs/MapIO/archive/master.zip
 pip -v install https://github.com/usgs/earthquake-impact-utils/archive/master.zip
 pip install sphinx_rtd_theme
