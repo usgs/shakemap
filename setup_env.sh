@@ -1,28 +1,32 @@
 #!/bin/bash
 echo $PATH
 
-DEPS="numpy scipy matplotlib jupyter rasterio fiona xlrd xlwt pandas pytables basemap basemap-data-hires shapely h5py basemap-data-hires gdal==1.11.4 descartes paramiko pycrypto sphinx configobj pyproj pytest pytest-cov pytest-mpl psutil lxml flake8 pep8-naming"
+VENV=shake
+PYVER=3.5
 
-if [ "$#" -le 1 ]; then
-    # turn off whatever other virtual environment user might be in
-    source deactivate
-    
-    # remove any previous virtual environments called shake
-#    conda remove --name shake --all -y
-    
-    # create a new virtual environment called shake with the below list of dependencies installed into it
-    conda create --name shake --yes --channel conda-forge python=3.5 $DEPS -y
-else
-    conda install --yes --channel conda-forge python=3.5 $DEPS -y
-fi
+
+DEPARRAY=(numpy scipy matplotlib jupyter rasterio fiona xlrd xlwt pandas pytables basemap basemap-data-hires shapely h5py gdal descartes paramiko pycrypto sphinx configobj pyproj pytest pytest-cov pytest-mpl psutil lxml flake8 pep8-naming)
+
+# turn off whatever other virtual environment user might be in
+source deactivate
+
+#remove any previous virtual environments called pager
+CWD=`pwd`
+cd $HOME;
+conda remove --name $VENV --all -y
+cd $CWD
+
+conda create --name $VENV --yes --channel conda-forge python=$PYVER ${DEPARRAY[*]} -y
 
 # activate the new environment
 source activate shake
 
 # do pip installs of those things that are not available via conda.
-pip -v install git+git://github.com/gem/oq-hazardlib.git
-pip install git+git://github.com/usgs/MapIO.git
-pip install git+git://github.com/usgs/earthquake-impact-utils.git
+#grab the bleeding edge for GEM hazardlib.  They have actual releases
+#we can resort to if this becomes a problem.
+pip -v install https://github.com/gem/oq-hazardlib/archive/master.zip
+pip -v install https://github.com/usgs/MapIO/archive/master.zip
+pip -v install https://github.com/usgs/earthquake-impact-utils/archive/master.zip
 pip install sphinx_rtd_theme
 
 # tell the user they have to activate this environment
