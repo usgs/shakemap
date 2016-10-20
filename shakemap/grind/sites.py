@@ -272,10 +272,10 @@ class Sites(object):
     def _getFileGeoDict(fname):
         geodict = None
         try:
-            geodict = GMTGrid.getFileGeoDict(fname)
+            geodict,t = GMTGrid.getFileGeoDict(fname)
         except Exception as msg1:
             try:
-                geodict = GDALGrid.getFileGeoDict(fname)
+                geodict,t = GDALGrid.getFileGeoDict(fname)
             except Exception as msg2:
                 msg = 'File geodict failure with %s - error messages: "%s"\n "%s"' % (
                     fname, str(msg1), str(msg2))
