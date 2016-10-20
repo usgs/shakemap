@@ -89,8 +89,8 @@ def test_station(tmpdir):
     # file into tests/data/eventdata/Calexico/database/. Then
     # recomment these lines and rerun the test. It should succeed.
     #
-#    shutil.copy(dbfile,'./stations.db')
-#    print(os.getcwd())
+    #shutil.copy(dbfile,'./stations.db')
+    #print(os.getcwd())
 
     #
     # We should probably check these dataframes against some established
