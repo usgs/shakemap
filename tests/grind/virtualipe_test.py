@@ -100,7 +100,8 @@ def test_virtualipe():
 #    print(mmi_variable_vs30)
 #    print(mmi_sd_variable_vs30)
 
-    sd_types = [oqconst.StdDev.INTRA_EVENT]
+    sd_types = [oqconst.StdDev.TOTAL, oqconst.StdDev.INTRA_EVENT, 
+                oqconst.StdDev.INTER_EVENT]
     mmi_variable_vs30_intra, mmi_sd_variable_vs30_intra = \
             ipe.get_mean_and_stddevs(sx, rx, dx, MMI(), sd_types)
 
@@ -164,36 +165,47 @@ def test_virtualipe():
     if remake_save:
         np.savez_compressed(savefile,
                 mmi_const_vs30 = mmi_const_vs30,
-                mmi_sd_const_vs30 = mmi_sd_const_vs30,
+                mmi_sd_const_vs30 = mmi_sd_const_vs30[0],
                 mmi_variable_vs30 = mmi_variable_vs30,
-                mmi_sd_variable_vs30 = mmi_sd_variable_vs30,
+                mmi_sd_variable_vs30 = mmi_sd_variable_vs30[0],
                 mmi_variable_vs30_intra = mmi_variable_vs30_intra,
-                mmi_sd_variable_vs30_intra = mmi_sd_variable_vs30_intra,
+                mmi_sd_variable_vs30_total = mmi_sd_variable_vs30_intra[0],
+                mmi_sd_variable_vs30_intra = mmi_sd_variable_vs30_intra[1],
+                mmi_sd_variable_vs30_inter = mmi_sd_variable_vs30_intra[2],
                 mmi_pga = mmi_pga,
-                mmi_sd_pga = mmi_sd_pga,
+                mmi_sd_pga = mmi_sd_pga[0],
                 mmi_psa = mmi_psa,
-                mmi_sd_psa = mmi_sd_psa,
+                mmi_sd_psa = mmi_sd_psa[0],
                 mmi_rjb = mmi_rjb,
-                mmi_sd_rjb = mmi_sd_rjb)
+                mmi_sd_rjb = mmi_sd_rjb[0])
 
     td = np.load(savefile)
 
     assert(np.allclose(td['mmi_const_vs30'], mmi_const_vs30))
-    assert(np.allclose(td['mmi_sd_const_vs30'], mmi_sd_const_vs30))
+    assert(np.allclose(td['mmi_sd_const_vs30'], mmi_sd_const_vs30[0]))
     assert(np.allclose(td['mmi_variable_vs30'], mmi_variable_vs30))
-    assert(np.allclose(td['mmi_sd_variable_vs30'], mmi_sd_variable_vs30))
+    assert(np.allclose(td['mmi_sd_variable_vs30'], mmi_sd_variable_vs30[0]))
     assert(np.allclose(td['mmi_variable_vs30_intra'], mmi_variable_vs30_intra))
+    assert(np.allclose(td['mmi_sd_variable_vs30_total'], 
+        mmi_sd_variable_vs30_intra[0]))
     assert(np.allclose(td['mmi_sd_variable_vs30_intra'], 
-        mmi_sd_variable_vs30_intra))
+        mmi_sd_variable_vs30_intra[1]))
+    assert(np.allclose(td['mmi_sd_variable_vs30_inter'], 
+        mmi_sd_variable_vs30_intra[2]))
     assert(np.allclose(td['mmi_pga'], mmi_pga))
-    assert(np.allclose(td['mmi_sd_pga'], mmi_sd_pga))
+    assert(np.allclose(td['mmi_sd_pga'], mmi_sd_pga[0]))
     assert(np.allclose(td['mmi_psa'], mmi_psa))
-    assert(np.allclose(td['mmi_sd_psa'], mmi_sd_psa))
+    assert(np.allclose(td['mmi_sd_psa'], mmi_sd_psa[0]))
     assert(np.allclose(td['mmi_rjb'], mmi_rjb))
-    assert(np.allclose(td['mmi_sd_rjb'], mmi_sd_rjb))
+    assert(np.allclose(td['mmi_sd_rjb'], mmi_sd_rjb[0]))
 
     # The total uncertainties should be greater than the intra-event
-    assert(np.all(mmi_sd_variable_vs30 > mmi_sd_variable_vs30_intra))
+    assert(np.all(mmi_sd_variable_vs30[0] > mmi_sd_variable_vs30_intra[1]))
+
+    # The combined intra and inter-event uncertainty should be equal
+    # to the total
+    tot = np.sqrt(mmi_sd_variable_vs30_intra[1]**2 + mmi_sd_variable_vs30_intra[2]**2)
+    assert(np.allclose(tot, mmi_sd_variable_vs30_intra[0], rtol=1e-2))
     
 if __name__ == '__main__':
 
