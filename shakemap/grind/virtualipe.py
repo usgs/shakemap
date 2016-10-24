@@ -2,6 +2,7 @@ import numpy as np
 
 from openquake.hazardlib.gsim.base import GMPE
 from openquake.hazardlib.imt import PGA, PGV, SA, MMI
+from openquake.hazardlib import const
 
 from shakemap.utils.exception import ShakeMapException
 
@@ -9,7 +10,21 @@ class VirtualIPE(GMPE):
     """
     Implements a virtual IPE that is the combination of a MultiGMPE
     and a GMICE. Will first attempt to use PGV for the intensities,
-    and then will try PGA, and then will bail out.
+    and then will try PGA, and then SA(1.0), and then will bail out.
+
+    Uncertainty is computed by combining the uncertainty of the GMPE
+    with the uncertainty of the GMICE. Standard error propagation
+    techniques are used (see the ShakeMap manual for a detailed 
+    explanation). For the intra- and inter-event components of total
+    uncertainty, we assign all of GMICE uncertaninty to the intra-event
+    term, and none to the inter-event term. This choice is conservative,
+    and seems appropriate until GMICE are produced with separate inter- 
+    and intra-event terms.
+
+    Note that the combined inter- and intra-event uncertainties will 
+    only approximately equal the total uncertainty because the GMPEs
+    will only produce combined uncertainties that are approximately
+    equal to their total uncertainty.
 
     """
 
@@ -24,6 +39,9 @@ class VirtualIPE(GMPE):
     @classmethod
     def fromFuncs(cls, gmpe, gmice):
         """
+        Creates a new VirtualIPE object with the specified MultiGMPE and
+        GMICE. There is no default constructor, you must use this method.
+
         Args:
             gmpe: An instance of the MultiGMPE object.
             gmice: An instance of a GMICE object.
@@ -53,7 +71,19 @@ class VirtualIPE(GMPE):
 
     def get_mean_and_stddevs(self, sx, rx, dx, imt, stddev_types):
         """
-        See superclass `method <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs>`__. 
+        See superclass `method <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs>`__
+        for parameter definitions. The only acceptable IMT is MMI. 
+
+        Returns:
+            mmi (ndarray): Ground motions predicted by the MultiGMPE using
+                the supplied parameters are converted to MMI using the
+                GMICE.
+            mmi_sd (list of ndarrays): The uncertainty of the combined 
+                prediction/conversion process. The prediction uncertainty
+                will typically be either OpenQuake's TOTAL or INTRA_EVENT. 
+                But can be any set that the MultiGMPE supports. See the
+                ShakeMap manual for a detailed discussion of the way the
+                uncertainty is computed.
         """
 
         if imt != MMI():
@@ -76,9 +106,18 @@ class VirtualIPE(GMPE):
 
         #
         # Compute the uncertainty of the combined prediction/conversion
+        # Total and intra-event uncertanty are inflated by the uncertainty
+        # of the conversion; inter-event uncertainty is not.
         #
-        gm2mi_sd = self.gmice.getGM2MIsd()[self.imt]
-        gm_var_in_mmi = dmda**2 * sdev[0]**2
-        mmi_sd = np.sqrt(gm2mi_sd**2 + gm_var_in_mmi)
+        nsd = len(sdev)
+        mmi_sd = [None] * nsd
+        gm2mi_var = (self.gmice.getGM2MIsd()[self.imt])**2
+        dmda *= dmda
+        for i in range(nsd):
+            gm_var_in_mmi = dmda * sdev[i]**2
+            if stddev_types[i] == const.StdDev.INTER_EVENT:
+                mmi_sd[i] = np.sqrt(gm_var_in_mmi)
+            else:
+                mmi_sd[i] = np.sqrt(gm2mi_var + gm_var_in_mmi)
         
         return mmi, mmi_sd
