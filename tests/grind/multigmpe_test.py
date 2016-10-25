@@ -1,4 +1,5 @@
 import os
+import sys
 import time as time
 import copy
 
@@ -28,6 +29,10 @@ from shakemap.grind.source import Source
 from shakemap.grind.fault import Fault
 from shakemap.grind.distance import Distance
 from shakemap.utils.timeutils import ShakeDateTime
+
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+sys.path.insert(0, shakedir)
 
 
 @pytest.mark.mpl_image_compare

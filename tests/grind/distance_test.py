@@ -5,10 +5,6 @@ import os.path
 import sys
 import time as time
 
-homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
-sys.path.insert(0, shakedir)
-
 # third party
 import numpy as np
 import pandas as pd
@@ -25,6 +21,10 @@ from shakemap.grind.source import Source
 from shakemap.grind.sites import Sites
 from shakemap.grind.distance import Distance
 from shakemap.grind.distance import get_distance
+
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+sys.path.insert(0, shakedir)
 
 
 def test_san_fernando():
@@ -46,13 +46,15 @@ def test_san_fernando():
 
     epilat = 34.44000
     epilon = -118.41000
-    proj = geo.utils.get_orthographic_projection(epilon-1, epilon+1, epilat+1, epilat-1)
+    proj = geo.utils.get_orthographic_projection(
+        epilon-1, epilon+1, epilat+1, epilat-1)
     lon0,lat0 = proj(x0, y0, reverse = True)
     lon1,lat1 = proj(x1, y1, reverse = True)
     lon2,lat2 = proj(x2, y2, reverse = True)
     lon3,lat3 = proj(x3, y3, reverse = True)
 
-    flt = Fault.fromVertices(lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3)
+    flt = Fault.fromVertices(
+        lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3)
     flt._segment_index = [0, 1]
     # Make a source object; most of the 'event' values don't matter
     event = {'lat': 0,  'lon': 0, 'depth':0, 'mag': 6.61, 
@@ -1077,6 +1079,8 @@ def test_chichi_with_get_distance():
 
 
 if __name__ == "__main__":
+    test_san_fernando()
+    test_exceptions()
     test_distance_no_fault()
     test_distance_from_sites_source()
     test_chichi_with_get_distance()

@@ -15,13 +15,6 @@ import openquake.hazardlib.const as oqconst
 from openquake.hazardlib.imt import MMI, PGA, PGV, SA
 import pytest
 
-# hack the path so that I can debug these functions if I need to
-homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
-# put this at the front of the system path, ignoring any installed
-# shakemap stuff
-sys.path.insert(0, shakedir)
-
 # local imports
 from shakemap.grind.virtualipe import VirtualIPE
 from shakemap.grind.gmice.wgrw12 import WGRW12
@@ -30,6 +23,11 @@ from shakemap.grind.distance import Distance
 from shakemap.grind.sites import Sites
 from shakemap.grind.source import Source
 from shakemap.utils.exception import ShakeMapException
+
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+sys.path.insert(0, shakedir)
+
 
 def test_virtualipe():
 
