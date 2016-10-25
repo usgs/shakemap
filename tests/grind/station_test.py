@@ -9,13 +9,6 @@ import shutil
 # third party modules
 import pandas.util.testing as pdt
 
-# hack the path so that I can debug these functions if I need to
-homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
-# put this at the front of the system path, ignoring any installed
-# shakemap stuff
-sys.path.insert(0, shakedir)
-
 # local imports
 from shakemap.grind.station import StationList
 from shakemap.grind.source import Source
@@ -24,6 +17,10 @@ from shakemap.grind.sites import Sites
 from shakemap.grind.gmice.wgrw12 import WGRW12
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 from openquake.hazardlib.gsim.allen_2012_ipe import AllenEtAl2012
+
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+sys.path.insert(0, shakedir)
 
 
 def test_station(tmpdir):

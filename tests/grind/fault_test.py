@@ -10,15 +10,15 @@ import io
 import numpy as np
 import pytest
 
-homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
-sys.path.insert(0, shakedir)
-
 from shakemap.grind.fault import Fault
 from shakemap.utils.exception import ShakeMapException
 from impactutils.io.cmd import get_command_output
 from shakemap.grind.fault import get_local_unit_slip_vector
 from shakemap.grind.fault import get_quad_slip
+
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+sys.path.insert(0, shakedir)
 
 
 def test_misc():
@@ -243,3 +243,13 @@ def test_fromTrace():
     dips = [30.0, 45.0]
     fault = Fault.fromTrace(xp0, yp0, xp1, yp1, zp, widths,
                             dips, reference='From J Smith, (personal communication)')
+
+
+if __name__ == "__main__":
+    test_misc()
+    test_slip()
+    test_northridge()
+    parse_complicated_fault()
+    test_incorrect()
+    test_fromTrace()
+    

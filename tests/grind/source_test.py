@@ -5,10 +5,6 @@ import os.path
 import sys
 import io
 
-homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
-sys.path.insert(0, shakedir)
-
 # third party
 from openquake.hazardlib.gsim import abrahamson_2014
 import numpy as np
@@ -16,6 +12,10 @@ import pytest
 
 # local imports
 from shakemap.grind.source import Source
+
+homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+sys.path.insert(0, shakedir)
 
 
 def test_source():
@@ -66,3 +66,6 @@ def test_source():
         source.setMechanism('ALL', dip=110)
     with pytest.raises(Exception) as e_info:
         source.setMechanism('ALL', rake=620)
+
+if __name__ == "__main__":
+    test_source()
