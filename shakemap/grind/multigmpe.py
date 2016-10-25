@@ -259,6 +259,14 @@ class MultiGMPE(GMPE):
         self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set.union(*imts)
 
         #-----------------------------------------------------------------------
+        # For VirtualIPE class, we also want to know if ALL of the GMPEs are
+        # defined for PGV, in which case we will convert from PGV to MI,
+        # otherwise use PGA or Sa.
+        #-----------------------------------------------------------------------
+        haspgv = [PGV in g.DEFINED_FOR_INTENSITY_MEASURE_TYPES for g in gmpes]
+        self.ALL_GMPES_HAVE_PGV = all(haspgv)
+
+        #-----------------------------------------------------------------------
         # Store intensity measure types for conversion in get_mean_and_stddevs.
         #---------------------------------------------------------
         self.IMCs = [g.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT for g in gmpes]

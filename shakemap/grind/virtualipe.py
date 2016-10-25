@@ -53,7 +53,7 @@ class VirtualIPE(GMPE):
         self.gmpe = gmpe
         self.gmice = gmice
 
-        if (PGV in gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES and
+        if (gmpe.ALL_GMPES_HAVE_PGV is True and
             PGV in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES):
             self.imt = PGV()
         elif (PGA in gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES and

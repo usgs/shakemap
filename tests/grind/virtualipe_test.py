@@ -111,6 +111,7 @@ def test_virtualipe():
     # Try with PGA
     #
     gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES.remove(PGV)
+    gmpe.ALL_GMPES_HAVE_PGV = False
     ipe = VirtualIPE.fromFuncs(gmpe, gmice)
     mmi_pga, mmi_sd_pga = \
             ipe.get_mean_and_stddevs(sx, rx, dx, MMI(), sd_types)
