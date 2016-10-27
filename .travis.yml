@@ -1,11 +1,11 @@
 language: python
-cache:
-  directories:
-  - /home/travis/miniconda/envs/
-  - /home/travis/virtualenv/python3.5.2/lib/python3.5/site-packages
+#cache:
+#  directories:
+#  - /home/travis/miniconda/envs/
+#  - /home/travis/virtualenv/python3.5.2/lib/python3.5/site-packages
 python:
     - "3.5"
-    
+
 install:
     #------------------
     # Base requirements
