@@ -1,4 +1,5 @@
 language: python
+sudo: false
 #cache:
 #  directories:
 #  - /home/travis/miniconda/envs/
