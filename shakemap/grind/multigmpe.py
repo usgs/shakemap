@@ -13,6 +13,7 @@ from shakemap.grind.conversions.imt.newmark_hall_1982 import NewmarkHall1982
 from shakemap.grind.conversions.imc.beyer_bommer_2006 import BeyerBommer2006
 from shakemap.grind.sites import Sites
 
+
 class MultiGMPE(GMPE):
     """
     Implements a GMPE that is the combination of multiple GMPEs.
@@ -439,3 +440,6 @@ class MultiGMPE(GMPE):
             sites.z2pt5 = sites.z2pt5_cb07
 
         return sites
+
+
+def 
