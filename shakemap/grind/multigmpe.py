@@ -442,4 +442,3 @@ class MultiGMPE(GMPE):
         return sites
 
 
-def 
