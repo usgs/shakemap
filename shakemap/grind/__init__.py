@@ -1,1 +1,1 @@
-__all__ = ["conversions", "correlation", "directivity","gmice"]
+__all__ = ["conversions", "correlation", "directivity","gmice","gmpe_sets"]
