@@ -19,8 +19,10 @@ REQUIRED_KEYS = ['lat', 'lon', 'depth', 'time', 'mag']
 OPTIONAL_KEYS = ['id', 'timezone', 'locstring', 'type', 'created']
 DEG2RAD = 180. / np.pi
 RAKEDICT = {'SS': 0.0, 'NM': -90.0, 'RS': 90.0, 'ALL': None}
+DEFAULT_MECH = 'ALL'
 DEFAULT_STRIKE = 0.0
 DEFAULT_DIP = 90.0
+DEFAULT_RAKE = 45.0
 DEFAULT_WIDTH = 0.0
 DEFAULT_ZTOR = 0.0
 
@@ -59,7 +61,9 @@ def read_event_file(eventxml):
     # fill in default values for mechanism, rake and dip
     # these may be overriden by values in event.xml, source.txt, or by values
     # passed in after reading input data.
-    event = {'mech': 'ALL', 'rake': 45.0, 'dip': 90.0}
+    event = {'mech': DEFAULT_MECH,
+             'rake': DEFAULT_RAKE,
+             'dip': DEFAULT_DIP}
     if isinstance(eventxml, str):
         root = minidom.parse(eventxml)
     else:
