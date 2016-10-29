@@ -228,7 +228,7 @@ class Source(object):
             rup.width = self._fault.getWidth()
         else:
             rup.strike = DEFAULT_STRIKE
-            rup.dip = self.getEventParam('dip')
+            rup.dip = DEFAULT_DIP
             rup.ztor = DEFAULT_ZTOR
             rup.width = DEFAULT_WIDTH
 
