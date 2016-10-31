@@ -23,6 +23,7 @@ from openquake.hazardlib.gsim.base import DistancesContext
 from openquake.hazardlib.gsim.base import SitesContext
 
 from shakemap.grind.multigmpe import MultiGMPE
+from shakemap.grind.multigmpe import DualDistanceWeights
 import shakemap.grind.sites as sites
 from shakemap.grind.sites import Sites
 from shakemap.grind.source import Source
@@ -944,6 +945,104 @@ def test_multigmpe_get_mean_stddevs():
 
     np.testing.assert_allclose(lnmu, lnmud)
     np.testing.assert_allclose(lnsd[0], lnsdd)
+
+
+def test_dualdistsanceweights_get_mean_stddevs():
+    # Note: this tests that nshmp14_arc gives same as MuitiGMPE w/ from_list.
+    # Test data should remain the same as in test_multigmpe_get_mean_stddevs
+    
+    #---------------------------------------------------------------------------
+    # Define gmpes and their weights
+    #---------------------------------------------------------------------------
+    set_name = 'nshmp14_acr'
+    ddw = DualDistanceWeights.from_set_name(set_name)
+    gmpes = ddw.mgmpe_small.GMPES
+
+    #---------------------------------------------------------------------------
+    # Make sites instance
+    #---------------------------------------------------------------------------
+    vs30file = os.path.join('tests', 'data', 'Vs30_test.grd')
+    cx = -118.2
+    cy = 34.1
+    dx = 0.0083
+    dy = 0.0083
+    xspan = 0.0083 * 5
+    yspan = 0.0083 * 5
+    site = Sites.fromCenter(cx, cy, xspan, yspan, dx, dy,
+                                  vs30File=vs30file,
+                                  padding=True, resample=False)
+    sctx = site.getSitesContext()
+
+    #---------------------------------------------------------------------------
+    # Make souce instance
+    #---------------------------------------------------------------------------
+    lat0 = np.array([34.1])
+    lon0 = np.array([-118.2])
+    lat1 = np.array([34.2])
+    lon1 = np.array([-118.15])
+    z = np.array([1.0])
+    W = np.array([3.0])
+    dip = np.array([30.])
+
+    flt = Fault.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
+             'id': '', 'locstring': '', 'rake': 30.3,
+             'time': ShakeDateTime.utcfromtimestamp(int(time.time())),
+             'timezone': 'UTC'}
+    source = Source(event, flt)
+
+    #---------------------------------------------------------------------------
+    # Make a rupture context
+    #---------------------------------------------------------------------------
+    rupt = source.getRuptureContext(gmpes)
+
+    #---------------------------------------------------------------------------
+    # Make a distance context
+    #---------------------------------------------------------------------------
+    dctx = Distance.fromSites(gmpes, source, site).getDistanceContext()
+
+    #---------------------------------------------------------------------------
+    # Compute weighted GMPE
+    #---------------------------------------------------------------------------
+    iimt = imt.PGV()
+    stddev_types = [const.StdDev.TOTAL]
+    lnmu, lnsd = ddw.get_mean_and_stddevs(
+        sctx, rupt, dctx, iimt, stddev_types)
+
+    lnmud = np.array([[ 3.53816879,  3.6486898 ,  3.67058155,  3.72223342,  3.75403094,
+         3.7931503 ,  3.7987149 ],
+       [ 3.57531437,  3.64441687,  3.69915981,  3.74491289,  3.78931598,
+         3.80957827,  3.80870753],
+       [ 3.60764647,  3.66894024,  3.72148551,  3.75742965,  3.8216466 ,
+         3.86341308,  3.87171115],
+       [ 3.61835381,  3.68166249,  3.7338161 ,  3.82454214,  3.81543928,
+         3.81507658,  3.80006803],
+       [ 3.71324776,  3.70389969,  3.77034752,  3.78259432,  3.78677497,
+         3.79838465,  3.79050287],
+       [ 3.67813977,  3.71754876,  3.65520574,  3.69463436,  3.72516445,
+         3.7457098 ,  3.74672185],
+       [ 3.61907294,  3.58790363,  3.58068716,  3.61177983,  3.64349327,
+         3.66698467,  3.67129901]])
+
+    lnsdd = np.array([[ 0.63677975,  0.63715381,  0.64040366,  0.64404005,  0.64782624,
+         0.6476325 ,  0.64509458],
+       [ 0.63727968,  0.63899462,  0.64205578,  0.64604037,  0.64815296,
+         0.64609948,  0.64402734],
+       [ 0.63806041,  0.64043609,  0.64406094,  0.64776777,  0.64717195,
+         0.64297191,  0.64011346],
+       [ 0.63864151,  0.64163093,  0.64588687,  0.64714873,  0.64603694,
+         0.64397734,  0.64217431],
+       [ 0.63127469,  0.63961477,  0.64097303,  0.6442055 ,  0.64376449,
+         0.64273526,  0.64112115],
+       [ 0.6291859 ,  0.63180644,  0.6394421 ,  0.63946545,  0.63947169,
+         0.63935499,  0.63832598],
+       [ 0.62755689,  0.63523274,  0.63663489,  0.63631586,  0.63616589,
+         0.63597828,  0.63542126]])
+
+    np.testing.assert_allclose(lnmu, lnmud)
+    np.testing.assert_allclose(lnsd[0], lnsdd)
+
+
 
 def test_multigmpe_exceptions():
     gmpes = [AbrahamsonEtAl2014(), BooreEtAl2014(),
