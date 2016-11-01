@@ -61,12 +61,17 @@ class VirtualIPE(GMPE):
             self.imt = PGA()
         elif (SA in gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES and
               SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES):
-                 self.imt = SA(1.0)
+            self.imt = SA(1.0)
         else:
             raise ShakeMapException(
                     'The supplied GMPE and GMICE do not use a common IMT'
                 )
         
+        self.DEFINED_FOR_STANDARD_DEVIATION_TYPES = \
+                gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES.copy()
+
+        self.REQUIRES_DISTANCES = gmpe.REQUIRES_DISTANCES.copy()
+
         return self
 
     def get_mean_and_stddevs(self, sx, rx, dx, imt, stddev_types):
