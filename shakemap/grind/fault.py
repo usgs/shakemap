@@ -748,7 +748,7 @@ class Fault(object):
 
     def getLats(self):
         """
-        Return a copy of the array of latitude points for the fault.
+        Return a copy of the array of latitudes for the fault verticies.
 
         :returns:
             Numpy array of latitude values.
@@ -757,12 +757,21 @@ class Fault(object):
 
     def getLons(self):
         """
-        Return a copy of the array of longitude points for the fault.
+        Return a copy of the array of longitudes for the fault verticies.
 
         :returns:
             Numpy array of latitude values.
         """
         return self._lon.copy()
+
+    def getDeps(self):
+        """
+        Return a copy of the array of depths for the fault verticies.
+
+        :returns:
+            Numpy array of latitude values.
+        """
+        return self._depth.copy()
 
     def getReference(self):
         """
