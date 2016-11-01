@@ -11,7 +11,7 @@ homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 sys.path.insert(0, shakedir)
 
-@pytest.mark.mpl_image_compare
+@pytest.mark.mpl_image_compare(tolerance=4)
 def test_plot_fault_wire3d():
     ff = os.path.join(shakedir,
         "tests/data/eventdata/hayward_RC_HN_HS_HE_Shaw09Mod_GEOL.txt")
