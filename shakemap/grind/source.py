@@ -22,7 +22,7 @@ RAKEDICT = {'SS': 0.0, 'NM': -90.0, 'RS': 90.0, 'ALL': None}
 DEFAULT_MECH = 'ALL'
 DEFAULT_STRIKE = 0.0
 DEFAULT_DIP = 90.0
-DEFAULT_RAKE = 45.0
+DEFAULT_RAKE = 0.0
 DEFAULT_WIDTH = 0.0
 DEFAULT_ZTOR = 0.0
 
@@ -247,6 +247,10 @@ class Source(object):
         rup.hypo_lat = self.getEventParam('lat')
         rup.hypo_lon = self.getEventParam('lon')
         rup.hypo_depth = self.getEventParam('depth')
+
+        if rup.rake is None:
+            rup.rake = DEFAULT_RAKE
+
         return rup
 
     def getFault(self):
@@ -422,12 +426,13 @@ def rake_to_mech(rake):
         Rake angle in degrees. 
     """
     mech = 'ALL'
-    if (rake >= -180 and rake <= -150) or \
-       (rake >= -30  and rake <= 30) or \
-       (rake >= 150 and rake <= 180):
-        mech = 'SS'
-    if rake >= -120 and rake <= -60:
-        mech = 'NM'
-    if rake >= 60 and rake <= 120:
-        mech = 'RS'
+    if rake is not None:
+        if (rake >= -180 and rake <= -150) or \
+           (rake >= -30  and rake <= 30) or \
+           (rake >= 150 and rake <= 180):
+            mech = 'SS'
+        if rake >= -120 and rake <= -60:
+            mech = 'NM'
+        if rake >= 60 and rake <= 120:
+            mech = 'RS'
     return mech
