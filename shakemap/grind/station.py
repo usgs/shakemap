@@ -489,10 +489,10 @@ class StationList(object):
         sd_total = oqconst.StdDev.TOTAL
         sd_inter = oqconst.StdDev.INTER_EVENT
         sd_intra = oqconst.StdDev.INTRA_EVENT
-        gmpe_stddev_types = gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        gmpe_stddev_types = list(gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES)
         gmpe_sd_col_dict = dict(zip(gmpe_stddev_types,
                 range(len(gmpe_stddev_types))))
-        ipe_stddev_types = ipe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        ipe_stddev_types = list(ipe.DEFINED_FOR_STANDARD_DEVIATION_TYPES)
         ipe_sd_col_dict = dict(zip(ipe_stddev_types,
                 range(len(ipe_stddev_types))))
         for imt in BASE_IMTS:
