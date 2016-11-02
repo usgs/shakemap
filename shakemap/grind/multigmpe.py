@@ -72,6 +72,7 @@ class DualDistanceWeights(GMPE):
         """
 
         self = cls()
+        self.set_name = set_name
 
         if set_name == 'nshmp14_acr':
             gmpes, wts, wts_large_dist, dist_cutoff, site_gmpes = \
