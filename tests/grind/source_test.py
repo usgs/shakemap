@@ -42,7 +42,7 @@ def test_source():
     testdict = {'mag': 7.9,
                 'strike': -133.083550974,
                 'dip': 49.8524115024,
-                'rake': 45.0,
+                'rake': 0.0,
                 'ztor': 0.999999999995,
                 'hypo_lon': 103.3639,
                 'hypo_lat': 30.9858,

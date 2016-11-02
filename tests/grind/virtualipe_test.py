@@ -56,6 +56,7 @@ def test_virtualipe():
 
     source_obj = Source.fromFile(eventfile, faultfile=faultfile)
     rx = source_obj.getRuptureContext([gmpe])
+    rx.rake = 45.
 
     smdx = 0.0083333333
     smdy = 0.0083333333
@@ -143,6 +144,7 @@ def test_virtualipe():
     gmpe = MultiGMPE.from_list([gmpe_ba14], [1.0])
     ipe = VirtualIPE.fromFuncs(gmpe, gmice)
     rx = source_obj.getRuptureContext([gmpe])
+    rx.rake = 45.
     dobj = Distance(gmpe, source_obj, lats, lons, depths)
     dx = dobj.getDistanceContext()
 
