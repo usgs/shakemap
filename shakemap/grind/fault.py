@@ -877,7 +877,7 @@ def get_quad_width(p0, p1, p3):
 
 def get_quad_mesh(q, dx):
     """
-    Length of top eduge of a quadrilateral.
+    Create a mesh from a quadrilateal. 
 
     :param q:
         A quadrilateral.
