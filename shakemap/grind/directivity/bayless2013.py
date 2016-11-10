@@ -98,7 +98,7 @@ class Bayless2013(object):
             0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 7.5, 10. 
         """
         self._source = source
-        self._flt = source.getFault()
+        self._flt = source.getRupture()
         self._rake = source.getEventParam('rake')
         self._M = source.getEventParam('mag')
         self._hyp = source.getHypo()
@@ -107,17 +107,17 @@ class Bayless2013(object):
         self._dep = depth
         self._T = T
 
-        # Lists of widths and lengths for each quad in the fault
+        # Lists of widths and lengths for each quad in the rupture
         self._W = self._flt.getIndividualWidths()
         self._L = self._flt.getIndividualTopLengths()
 
         # Number of quads
         self._nq = len(self._W)
 
-        # Currently assuming that the rake is the same on all subfaults .
+        # Currently assuming that the rake is the same on all subruptures .
         self.__getSlipCategory()
 
-        # Fault weights are supposed to be based on seismic moment.
+        # Rupture weights are supposed to be based on seismic moment.
         # Since moment is proportional to area, lets just use area
         # for now
         area = self._W * self._L
@@ -142,7 +142,7 @@ class Bayless2013(object):
             #       calculation of these distances each time.
 
             # Az is the NGA definition of source-to-site azimuth for a finite
-            # fault. See Kaklamanos et al. (2011) Figure 2 for illustration.
+            # rupture. See Kaklamanos et al. (2011) Figure 2 for illustration.
 
             self.__computeAz()  # uses Rx and Ry, which are for the i-th quad.
 
@@ -186,10 +186,10 @@ class Bayless2013(object):
         From Bayless and Somerville:
 
         "Define the pseudo-hypocenter for rupture of successive segments as
-        the point on the side edge of the fault segment that is closest to
+        the point on the side edge of the rupture segment that is closest to
         the side edge of the previous segment, and that lies half way
-        between the top and bottom of the fault. We assume that the fault is
-        segmented along strike, not updip. All geometric parameters are
+        between the top and bottom of the rupture. We assume that the rupture
+        is segmented along strike, not updip. All geometric parameters are
         computed relative to the pseudo-hypocenter."
         """
         hyp_ecef = Vector.fromPoint(geo.point.Point(
@@ -240,7 +240,7 @@ class Bayless2013(object):
                 s1 = _distance_sq_to_segment(p1p, p2p)
                 s3 = _distance_sq_to_segment(p3p, p0p)
 
-                # Assuming that the fault is segmented along strike and not
+                # Assuming that the rupture is segmented along strike and not
                 # updip (as described by Bayless and somerville), we only
                 # need to consider s1 and s3:
                 if s1 > s3:
@@ -255,7 +255,7 @@ class Bayless2013(object):
                     self.phyp[i] = p2 + e21norm * (0.5 * mag)
 
     def __computeDS(self):
-        # d is the length of dipping fault rupturing toward site;
+        # d is the length of dipping rupture rupturing toward site;
         # Note: max[(Y*W),exp(0)] -- just apply a min of 1?
         self.__computeD(self.i)
 

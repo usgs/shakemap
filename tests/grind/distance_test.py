@@ -15,7 +15,7 @@ from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
 from openquake.hazardlib.gsim.berge_thierry_2003 import BergeThierryEtAl2003SIGMA
 import openquake.hazardlib.geo as geo
 
-from shakemap.grind.fault import Fault
+from shakemap.grind.rupture import QuadRupture
 from shakemap.utils.timeutils import ShakeDateTime
 from shakemap.grind.source import Source
 from shakemap.grind.sites import Sites
@@ -28,9 +28,9 @@ sys.path.insert(0, shakedir)
 
 
 def test_san_fernando():
-    # This is a challenging fault due to overlapping and discordant
+    # This is a challenging rupture due to overlapping and discordant
     # segments, as brought up by Graeme Weatherill. Our initial
-    # implementation put the origin on the wrong side of the fault.
+    # implementation put the origin on the wrong side of the rupture.
     x0 = np.array([7.1845, 7.8693])
     y0 = np.array([-10.3793, -16.2096])
     z0 = np.array([3.0000, 0.0000])
@@ -53,7 +53,7 @@ def test_san_fernando():
     lon2,lat2 = proj(x2, y2, reverse = True)
     lon3,lat3 = proj(x3, y3, reverse = True)
 
-    flt = Fault.fromVertices(
+    flt = QuadRupture.fromVertices(
         lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3)
     flt._segment_index = [0, 1]
     # Make a source object; most of the 'event' values don't matter
@@ -163,7 +163,7 @@ def test_exceptions():
     W = np.array([3.0])
     dip = np.array([30.])
 
-    flt = Fault.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    flt = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
              'id': '', 'locstring': '', 'type': 'U', 'mech':'RS',
              'rake':90,
@@ -188,7 +188,7 @@ def test_exceptions():
                              np.zeros_like(sctx.lons), source)
 
 
-def test_distance_no_fault():
+def test_distance_no_rupture():
     # Make sites instance
     vs30file = os.path.join(shakedir, 'tests/data/Vs30_test.grd')
     cx = -118.2
@@ -654,7 +654,7 @@ def test_distance_from_sites_source():
     W = np.array([3.0])
     dip = np.array([30.])
 
-    flt = Fault.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    flt = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
              'id': '', 'locstring': '', 'type': 'U',
              'time': ShakeDateTime.utcfromtimestamp(int(time.time())),
@@ -780,7 +780,7 @@ def test_distance_from_sites_source():
 
 
 def test_chichi_with_get_distance():
-    # read in fault file
+    # read in rupture file
     f = os.path.join(shakedir, 'tests/data/0137A.POL')
     i0 = np.arange(0, 9 * 11 * 3, 11)
     i1 = i0 + 10
@@ -811,7 +811,7 @@ def test_chichi_with_get_distance():
     lon1, lat1 = proj(x1, y1, reverse=True)
     lon2, lat2 = proj(x2, y2, reverse=True)
     lon3, lat3 = proj(x3, y3, reverse=True)
-    flt = Fault.fromVertices(
+    flt = QuadRupture.fromVertices(
         lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3)
     # event information doesn't matter except hypocenter
     event = {'lat': 23.85, 'lon': 120.82, 'depth': 8, 'mag': 7.62,
@@ -1081,7 +1081,7 @@ def test_chichi_with_get_distance():
 if __name__ == "__main__":
     test_san_fernando()
     test_exceptions()
-    test_distance_no_fault()
+    test_distance_no_rupture()
     test_distance_from_sites_source()
     test_chichi_with_get_distance()
     

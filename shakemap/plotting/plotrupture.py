@@ -3,15 +3,15 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 
 # Temporary function for plotting maps.
-# The idea is to separate plotting methods from modules like fault.
+# The idea is to separate plotting methods from modules like rupture.
 
-def plot_fault_wire3d(fault, ax = None):
+def plot_rupture_wire3d(rupture, ax = None):
     """
-    Method for making a simple representation of a Fault instance. 
+    Method for making a simple representation of a Rupture instance. 
     This method draws the outline of each quadrilateral in 3D. 
 
-    :param fault:
-        A Fault instance. 
+    :param rupture:
+        A Rupture instance. 
     :param ax:
         A matplotlib axis (optional). 
     :returns:
@@ -25,7 +25,7 @@ def plot_fault_wire3d(fault, ax = None):
         if 'xlim3d' not in list(ax.properties().keys()):
             raise ShakeMapException(
                 'Non-3d axes object passed to plot() method.')
-    for quad in fault.getQuadrilaterals():
+    for quad in rupture.getQuadrilaterals():
         x = [p.longitude for p in quad]
         x.append(x[0])
         y = [p.latitude for p in quad]

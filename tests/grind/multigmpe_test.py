@@ -27,7 +27,7 @@ from shakemap.grind.multigmpe import DualDistanceWeights
 import shakemap.grind.sites as sites
 from shakemap.grind.sites import Sites
 from shakemap.grind.source import Source
-from shakemap.grind.fault import Fault
+from shakemap.grind.rupture import QuadRupture
 from shakemap.grind.distance import Distance
 from shakemap.utils.timeutils import ShakeDateTime
 
@@ -51,7 +51,7 @@ def test_nga_w2_m8():
     rctx.dip = 90.0 # assumed for 'strike slip'
     rctx.ztor = 0.0 # given
     rctx.mag = 8.0 # given
-    rctx.width = 10.0 # req by CB14 but not used for vertical fault.
+    rctx.width = 10.0 # req by CB14 but not used for vertical rupture.
     rctx.hypo_depth = 8.0 # given
 
     dctx.rjb = np.logspace(0, np.log10(300), 100)
@@ -327,7 +327,7 @@ def test_nga_w2_m6():
     rctx.dip = 90.0 # assumed for 'strike slip'
     rctx.ztor = 3.0 # given
     rctx.mag = 6.0 # given
-    rctx.width = 10.0 # req by CB14 but not used for vertical fault.
+    rctx.width = 10.0 # req by CB14 but not used for vertical rupture.
     rctx.hypo_depth = 8.0 # given
 
     dctx.rjb = np.logspace(0, np.log10(300), 100)
@@ -800,7 +800,7 @@ def test_multigmpe_get_mean_stddevs():
     W = np.array([3.0])
     dip = np.array([30.])
 
-    flt = Fault.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    flt = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
              'id': '', 'locstring': '', 'rake': 30.3,
              'time': ShakeDateTime.utcfromtimestamp(int(time.time())),
@@ -984,7 +984,7 @@ def test_dualdistsanceweights_get_mean_stddevs():
     W = np.array([3.0])
     dip = np.array([30.])
 
-    flt = Fault.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    flt = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
              'id': '', 'locstring': '', 'rake': 30.3,
              'time': ShakeDateTime.utcfromtimestamp(int(time.time())),

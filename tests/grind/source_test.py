@@ -35,7 +35,7 @@ def test_source():
     ffile = io.StringIO(fault_text)
     efile = io.StringIO(event_text)
     sfile = io.StringIO(source_text)
-    source = Source.fromFile(efile, faultfile=ffile, sourcefile=sfile)
+    source = Source.fromFile(efile, rupturefile=ffile, sourcefile=sfile)
 
     gmpe = abrahamson_2014.AbrahamsonEtAl2014()
     rupture = source.getRuptureContext([gmpe])

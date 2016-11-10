@@ -21,24 +21,26 @@ from shakemap.utils.exception import ShakeMapException
 OFFPLANE_TOLERANCE = 0.05
 
 
-class Fault(object):
+class QuadRupture(object):
     """
-    Class to handle fault files of various types and output fault data in 
-    various ways.
+    Rupture class that represents the rupture surface as a combination of 
+    quadrilaterals. Each quadrilateral must have horizontal top and bottom
+    edges. This restriction makes the computation of rupture distances 
+    more efficient. 
     """
 
     def __init__(self, lon, lat, depth, reference):
         """
-        Constructor for Fault class.
+        Constructor for QuadRupture class.
 
         :param lon:
-            Sequence of fault longitude vertices in clockwise order.
+            Sequence of rupture longitude vertices in clockwise order.
         :param lat:
-            Sequence of fault latitude vertices in clockwise order.
+            Sequence of rupture latitude vertices in clockwise order.
         :param depth:
-            Sequence of fault depth vertices in clockwise order.
+            Sequence of rupture depth vertices in clockwise order.
         :param reference:
-            String citeable reference for Fault.
+            String citeable reference for Rupture.
         """
         self._lon = lon
         self._lat = lat
@@ -51,12 +53,13 @@ class Fault(object):
     def fromTrace(cls, xp0, yp0, xp1, yp1, zp, widths, dips, strike=None,
                   reference=None):
         """
-        Create a fault object from a set of vertices that define the top of the
-        fault, and an array of widths/dips.
+        Create a QuadRupture instance from a set of vertices that define the top
+        of the rupture, and an array of widths/dips.
 
-        These top of rupture points are defined by specifying the x and y
-        coordinates of each of the two vertices, and then specifying an array of
-        depths,widths, and dips for each rectangle.
+        Each rupture quadrilaterial is defined by specifying the latitude,
+        longitude, and depth of the two vertices on the top edges, which must
+        have the dame depths. The other verticies are then constructed from
+        the top edges and the width and dip of the quadrilateral. 
 
         :param xp0:
             Array of longitude coordinates for the first (top of rupture) vertex
@@ -83,10 +86,11 @@ class Fault(object):
             the trace coordinates then it specifies the strike for each 
             quadrilateral.
         :param reference:
-            String explaining where the fault definition came from (publication
+            String explaining where the rupture definition came from (publication
             style reference, etc.)
         :returns:
-            Fault object, where the fault is modeled as a series of rectangles.
+            QuadRupture instance.
+
         """
         if len(xp0) == len(yp0) == len(xp1) == len(
                 yp1) == len(zp) == len(dips) == len(widths):
@@ -183,7 +187,7 @@ class Fault(object):
             yp3[i] = lat3
             zpdown[i] = zp[i] + dz
 
-        # assemble the vertices as the Fault constructor needs them...
+        # assemble the vertices as the constructor needs them...
         # which is: for each rectangle, there should be the four corners, the
         # first corner repeated, and then a nan.
         nrects = len(zp)
@@ -207,18 +211,18 @@ class Fault(object):
 
         return cls(lon, lat, dep, reference)
 
-    def writeFaultFile(self, faultfile):
+    def writeRuptureFile(self, rupturefile):
         """
-        Write fault data to fault file format as defined in ShakeMap Software
+        Write rupture data to rupture file format as defined in ShakeMap Software
         Guide.
 
-        :param faultfile:
+        :param rupturefile:
             Filename of output data file OR file-like object.
         """
-        if not hasattr(faultfile, 'read'):
-            f = open(faultfile, 'wt')
+        if not hasattr(rupturefile, 'read'):
+            f = open(rupturefile, 'wt')
         else:
-            f = faultfile  # just a reference to the input file-like object
+            f = rupturefile  # just a reference to the input file-like object
         f.write('#%s\n' % self._reference)
         for quad in self.getQuadrilaterals():
             P0, P1, P2, P3 = quad
@@ -228,23 +232,23 @@ class Fault(object):
             f.write('%.4f %.4f %.4f\n' % (P3.latitude, P3.longitude, P3.depth))
             f.write('%.4f %.4f %.4f\n' % (P0.latitude, P0.longitude, P0.depth))
             f.write(u'>\n')
-        if not hasattr(faultfile, 'read'):
+        if not hasattr(rupturefile, 'read'):
             f.close()
 
     @classmethod
-    def readFaultFile(cls, faultfile):
+    def readRuptureFile(cls, rupturefile):
         """
-        Read fault file format as defined in ShakeMap Software Guide.
+        Read rupture file format as defined in ShakeMap 3.5 Software Guide.
 
-        :param faultfile:
-            Path to fault file OR file-like object in GMT psxy format, where
-            * Fault vertices are space separated lat,lon,depth triplets on a
+        :param rupturefile:
+            Path to rupture file OR file-like object in GMT psxy format, where
+            * Rupture vertices are space separated lat,lon,depth triplets on a
             single line.
-            * Fault segments are separated by lines containing ">"
-            * Fault segments must be closed.
-            * Fault segments must be all clockwise or all counter-clockwise.
+            * Rupture segments are separated by lines containing ">"
+            * Rupture segments must be closed.
+            * Rupture segments must be all clockwise or all counter-clockwise.
         :returns:
-           Fault object.
+           QuadRupture object.
         :raises ShakeMapException:
             when any of above conditions are not met.
         """
@@ -252,14 +256,14 @@ class Fault(object):
         y = []
         z = []
         isFile = False
-        if isinstance(faultfile, str):
+        if isinstance(rupturefile, str):
             isFile = True
-            faultfile = open(faultfile, 'rt')
-            faultlines = faultfile.readlines()
+            rupturefile = open(rupturefile, 'rt')
+            rupturelines = rupturefile.readlines()
         else:
-            faultlines = faultfile.readlines()
+            rupturelines = rupturefile.readlines()
         reference = ''
-        for line in faultlines:
+        for line in rupturelines:
             sline = line.strip()
             if sline.startswith('#'):
                 reference += sline
@@ -277,13 +281,13 @@ class Fault(object):
             parts = sline.split()
             if len(parts) < 3:
                 raise ShakeMapException(
-                    'Finite fault file %s has no depth values.' %
-                    faultfile)
+                    'Finite rupture file %s has no depth values.' %
+                    rupturefile)
             y.append(float(parts[0]))
             x.append(float(parts[1]))
             z.append(float(parts[2]))
         if isFile:
-            faultfile.close()
+            rupturefile.close()
         if np.isnan(x[-1]):
             x = x[0:-1]
             y = y[0:-1]
@@ -297,8 +301,9 @@ class Fault(object):
                      xp2, yp2, zp2, xp3, yp3, zp3,
                      reference=None):
         """
-        Create a fault object from the vector of vertices that fully define the
-        quadrilaterals. The points p0, ..., p3 are labeled below for a trapezoid:
+        Create a QuadDrupture instance from the vector of vertices that fully
+        define the quadrilaterals. The points p0, ..., p3 are labeled below for
+        a trapezoid:
 
         ::
 
@@ -334,16 +339,18 @@ class Fault(object):
         :param zp3:
             Vector of depths of p3 (positive down).
         :param reference:
-            String explaining where the fault definition came from (publication
-            style reference, etc.)
+            String explaining where the rupture definition came from 
+            (publication style reference, etc.)
         :returns:
-            Fault object, where the fault is modeled as a series of trapezoids.
+            QuadRupture object, where the rupture is modeled as a series of
+            trapezoids.
+
         """
         if len(xp0) == len(yp0) == len(zp0) == len(xp1) == len(yp1) == len(zp1) == \
            len(xp2) == len(yp2) == len(zp2) == len(xp3) == len(yp3) == len(zp3):
             pass
         else:
-            raise ShakeMapException('All vectors specifying quadrilateral '
+            raise ShakeMapException('All vectors specifying quadrilateral '\
                                     'vertices must have the same length.')
 
         nq = len(xp0)
@@ -361,7 +368,7 @@ class Fault(object):
         yp3 = np.array(yp3, dtype='d')
         zp3 = np.array(zp3, dtype='d')
 
-        # assemble the vertices as the Fault constructor needs them...
+        # assemble the vertices as the constructor needs them...
         # which is: for each rectangle, there should be the four corners, the
         # first corner repeated, and then a nan.
         anan = np.ones_like(xp0) * np.nan
@@ -374,12 +381,12 @@ class Fault(object):
 
         return cls(lon, lat, dep, reference)
 
-    def getFaultLength(self):
+    def getRuptureLength(self):
         """
-        Compute lenght of fault based on top edge.
+        Compute lenght of rupture based on top edge.
 
         :returns:
-            Length of fault.
+            Length of rupture.
         """
         flength = 0
         for quad in self._quadrilaterals:
@@ -398,9 +405,9 @@ class Fault(object):
 
     def getStrike(self):
         """
-        Return strike angle. If fault consists of multiple quadrilaterals, the
+        Return strike angle. If rupture consists of multiple quadrilaterals, the
         average strike angle, weighted by quad length, is returned.
-        Note: for faults with quads where the strike angle changes by 180 deg
+        Note: for ruptures with quads where the strike angle changes by 180 deg
         due to reverses in dip direction are problematic and not handeled well
         by this algorithm.
 
@@ -423,7 +430,7 @@ class Fault(object):
 
     def getTopOfRupture(self):
         """
-        Determine shallowest vertex of entire fault.
+        Determine shallowest vertex of entire rupture.
 
         :returns:
             Shallowest depth of all vertices (float).
@@ -438,7 +445,7 @@ class Fault(object):
 
     def getDip(self):
         """
-        Return average dip of all quadrilaterals in the fault.
+        Return average dip of all quadrilaterals in the rupture.
 
         :returns:
            Average dip in degrees (float).
@@ -453,11 +460,11 @@ class Fault(object):
 
     def getWidth(self):
         """
-        Return the average fault width (km) for all quadrilaterals defined for
-        the fault.
+        Return the average rupture width (km) for all quadrilaterals defined for
+        the rupture.
 
         :returns:
-            Average width in km of all fault quadrilaterals (float).
+            Average width in km of all rupture quadrilaterals (float).
         """
         wsum = 0.0
         for quad in self._quadrilaterals:
@@ -471,11 +478,11 @@ class Fault(object):
 
     def getIndividualWidths(self):
         """
-        Return an array of fault widths (km), one for each quadrilateral defined
-        for the fault.
+        Return an array of rupture widths (km), one for each quadrilateral
+        defined for the rupture.
 
         :returns:
-            Array of quad widths in km of all fault quadrilaterals.
+            Array of quad widths in km of all rupture quadrilaterals.
         """
         nquad = self.getNumQuads()
         widths = np.zeros(nquad)
@@ -489,8 +496,8 @@ class Fault(object):
 
     def getIndividualTopLengths(self):
         """
-        Return an array of fault lengths along top edge (km),
-        one for each quadrilateral defined for the fault.
+        Return an array of rupture lengths along top edge (km),
+        one for each quadrilateral defined for the rupture.
 
         :returns:
             Array of lengths in km of top edge of quadrilaterals.
@@ -507,7 +514,7 @@ class Fault(object):
     @staticmethod
     def _getTrapMeanLength(p0, p1, p2, p3):
         """
-        Return the sqrt of the area of a quadrilateral (used for QA of fault 
+        Return the sqrt of the area of a quadrilateral (used for QA of rupture 
         plane).
 
         :param p0:
@@ -625,28 +632,37 @@ class Fault(object):
 
         # Are the top and bottom edges both parallel to the surface?
         topDepthsEqual = np.allclose(P0.depth, P1.depth, atol = 3e-3)
-        bottomDepthsEqual = np.allclose(P2.depth, P3.depth, atol = 5e-2, rtol = 1e-4)
+        bottomDepthsEqual = np.allclose(
+            P2.depth, P3.depth, atol = 5e-2, rtol = 1e-4)
         if not topDepthsEqual or not bottomDepthsEqual:
             raise ShakeMapException(
-                'Top and bottom edges of fault quadrilateral must be parallel to the surface')
+                'Top and bottom edges of rupture quadrilateral '\
+                'must be parallel to the surface')
+
         # Is top edge defined by first two vertices?
         if P1.depth > P2.depth:
             raise ShakeMapException(
-                'Top edge of a quadrilateral must be defined by the first two vertices')
+                'Top edge of a quadrilateral must be defined by '\
+                'the first two vertices')
+
         # Is dip angle clockwise and btw 0-90 degrees?
         if not self._isPointToRight(P0, P1, P2):
             P0, P1, P2, P3 = self._reverseQuad(P0, P1, P2, P3)
             print('Reversing quad where dip not between 0 and 90 degrees.')
+
         # Are all 4 points (reasonably) co-planar?
         # Translate vertices to ECEF
         p0 = Vector.fromPoint(P0)
         p1 = Vector.fromPoint(P1)
         p2 = Vector.fromPoint(P2)
         p3 = Vector.fromPoint(P3)
+
         # Calculate normalized vector along top edge
         v0 = (p1 - p0).norm()
+
         # Calculate distance btw p3 and p2
         d = (p3 - p2).mag()
+
         # get the new P2 value
         v1 = v0 * d
         newp2 = p3 + v1
@@ -666,8 +682,8 @@ class Fault(object):
         """
         Create internal list of N quadrilaterals.
         """
-        # Fault QA rules
-        # 1) Fault must consist of 1 or more quadrilaterals, where each quad
+        # QuadRupture QA rules
+        # 1) Rupture must consist of 1 or more quadrilaterals, where each quad
         #    top/bottom edges are parallel to the surface
         # 2) The strike angle of each quadrilateral is defined by the first two
         #    vertices of that quad
@@ -748,7 +764,7 @@ class Fault(object):
 
     def getLats(self):
         """
-        Return a copy of the array of latitudes for the fault verticies.
+        Return a copy of the array of latitudes for the rupture verticies.
 
         :returns:
             Numpy array of latitude values.
@@ -757,7 +773,7 @@ class Fault(object):
 
     def getLons(self):
         """
-        Return a copy of the array of longitudes for the fault verticies.
+        Return a copy of the array of longitudes for the rupture verticies.
 
         :returns:
             Numpy array of latitude values.
@@ -766,7 +782,7 @@ class Fault(object):
 
     def getDeps(self):
         """
-        Return a copy of the array of depths for the fault verticies.
+        Return a copy of the array of depths for the rupture verticies.
 
         :returns:
             Numpy array of latitude values.
@@ -775,7 +791,7 @@ class Fault(object):
 
     def getReference(self):
         """
-        Return whatever reference information was contained in fault file.
+        Return whatever reference information was contained in rupture file.
 
         :returns:
             string citeable reference
@@ -784,41 +800,41 @@ class Fault(object):
 
     def getNumSegments(self):
         """
-        Return a count of the number of fault segments.
+        Return a count of the number of rupture segments.
 
         :returns:
-            number of fault segments
+            number of rupture segments
         """
         return len(np.where(np.isnan(self._lon))[0]) + 1
 
     def getNumQuads(self):
         """
-        Return a count of the number of fault quadrilaterals.
+        Return a count of the number of rupture quadrilaterals.
 
         :returns:
-            number of fault quadrilaterals.
+            number of rupture quadrilaterals.
         """
         return len(self._quadrilaterals)
 
-    def getFaultAsArrays(self):
+    def getRuptureAsArrays(self):
         """
         Return a 3-tuple of numpy arrays indicating X, Y, Z (lon,lat,depth)
-        coordinates. Fault segments are separated by numpy.NaN values.
+        coordinates. Rupture segments are separated by numpy.NaN values.
 
         :returns:
             3-tuple of numpy arrays indicating X,Y,Z (lon,lat,depth) coordinates.
         """
         return (np.array(self._lon), np.array(self._lat), np.array(self._depth))
 
-    def getFaultAsMesh(self):
+    def getRuptureAsMesh(self):
         """
-        Return fault segments as a OQ-Hazardlib Mesh object.
+        Return rupture segments as a OQ-Hazardlib Mesh object.
 
         :returns:
             Mesh (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)
         """
-        fault = mesh.Mesh(self._lon, self._lat, self._depth)
-        return fault
+        rupture = mesh.Mesh(self._lon, self._lat, self._depth)
+        return rupture
 
     def _validate(self):
         """
@@ -833,7 +849,7 @@ class Fault(object):
             self._lat) or len(
             self._lon) != len(
                 self._depth):
-            raise ShakeMapException("Fault coordinates don't match")
+            raise ShakeMapException("Rupture coordinates don't match")
         inan = np.where(np.isnan(self._lon))[0]
         if not len(inan):
             return
@@ -850,7 +866,7 @@ class Fault(object):
             z2 = self._depth[iend]
             if x1 != x2 or y1 != y2 or z1 != z2:
                 raise ShakeMapException(
-                    'Unclosed segments exist in fault file.')
+                    'Unclosed segments exist in rupture file.')
             istart = inan[i] + 1
 
 
@@ -883,7 +899,7 @@ def get_quad_mesh(q, dx):
         A quadrilateral.
     :param dx:
         Target dx in km; used to get nx and ny of mesh, but mesh snaps
-        to edges of fault so actual dx/dy will not actually equal this
+        to edges of rupture so actual dx/dy will not actually equal this
         value in general.
     :returns:
         Mesh dictionary, which includes numpy arrays:
@@ -941,11 +957,11 @@ def get_quad_mesh(q, dx):
     mesh['cpy'] = np.zeros_like(mesh['llx'])
     mesh['cpz'] = np.zeros_like(mesh['llx'])
 
-    # i and j are indices over subfaults
+    # i and j are indices over subruptures
     ni, nj = mesh['llx'].shape
     for i in range(0, ni):
         for j in range(0, nj):
-            # Fault corner points
+            # Rupture corner points
             pp0 = Vector(
                 mesh['ulx'][
                     i, j], mesh['uly'][
@@ -982,9 +998,9 @@ def get_local_unit_slip_vector(strike, dip, rake):
 
     :param strike:
         Clockwise angle (deg) from north of the line at the intersection
-        of the fault plane and the horizontal plane.
+        of the rupture plane and the horizontal plane.
     :param dip:
-        Angle (deg) between fault plane and the horizontal plane normal
+        Angle (deg) between rupture plane and the horizontal plane normal
         to the strike (0-90 using right hand rule).
     :param rake:
         Direction of motion of the hanging wall relative to the
@@ -1009,9 +1025,9 @@ def get_local_unit_slip_vector_DS(strike, dip, rake):
 
     :param strike:
         Clockwise angle (deg) from north of the line at the intersection
-        of the fault plane and the horizontal plane.
+        of the rupture plane and the horizontal plane.
     :param dip:
-        Angle (deg) between fault plane and the horizontal plane normal
+        Angle (deg) between rupture plane and the horizontal plane normal
         to the strike (0-90 using right hand rule).
     :param rake:
         Direction of motion of the hanging wall relative to the
@@ -1034,9 +1050,9 @@ def get_local_unit_slip_vector_SS(strike, dip, rake):
 
     :param strike:
         Clockwise angle (deg) from north of the line at the intersection
-        of the fault plane and the horizontal plane.
+        of the rupture plane and the horizontal plane.
     :param dip:
-        Angle (deg) between fault plane and the horizontal plane normal
+        Angle (deg) between rupture plane and the horizontal plane normal
         to the strike (0-90 using right hand rule).
     :param rake:
         Direction of motion of the hanging wall relative to the
