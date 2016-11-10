@@ -2,6 +2,9 @@
 
 # stdlib modules
 import copy
+from abc import ABC
+from abc import abstractmethod
+import json
 
 # third party imports
 import numpy as np
@@ -20,13 +23,139 @@ from shakemap.utils.exception import ShakeMapException
 # 4th point can be before being considered non-co-planar?
 OFFPLANE_TOLERANCE = 0.05
 
+class Rupture(ABC):
+    """
+    Abstract base class for ruptures.
+    """
 
-class QuadRupture(object):
+    def getReference(self):
+        """
+        Return rupture reference.
+
+        Returns:
+            string: Citeable reference.
+
+        """
+        return copy.deepcopy(self._reference)
+
+
+    @abstractmethod
+    def getRuptureLength(self):
+        pass
+
+    @abstractmethod
+    def getQuadrilaterals(self):
+        pass
+
+    @abstractmethod
+    def getStrike(self):
+        pass
+
+    @abstractmethod
+    def getTopOfRupture(self):
+        pass
+
+    @abstractmethod
+    def getDip(self):
+        pass
+
+    @abstractmethod
+    def getWidth(self):
+        pass
+
+    @abstractmethod
+    def getIndividualWidths(self):
+        pass
+
+    @abstractmethod
+    def getIndividualTopLengths(self):
+        pass
+
+    @abstractmethod
+    def getLats(self):
+        pass
+
+    @abstractmethod
+    def getLons(self):
+        pass
+
+    @abstractmethod
+    def getDeps(self):
+        pass
+
+    @abstractmethod
+    def getNumSegments(self):
+        pass
+
+    @abstractmethod
+    def getNumQuads(self):
+        pass
+
+
+class EdgeRupture(Rupture):
+    """
+    Rupture class that representst the rupture surface by specifying the top
+    edge and the bottom edges. These edges do not need to be horizontal. The
+    freedom to allow for non-horizontal edges (as compared to QuadRupture)
+    comes at the cost of slower distance calculations. This is because the 
+    rupture must be discretized and then the distances are compued in a brute
+    force fashion based on this mesh, which can be quite large. 
+    """
+
+    def readRuptureFile(self):
+        pass
+
+    def writeRuptureFile(self):
+        pass
+
+    def getRuptureLength(self):
+        pass
+
+    def getQuadrilaterals(self):
+        pass
+
+    def getStrike(self):
+        pass
+
+    def getTopOfRupture(self):
+        pass
+
+    def getDip(self):
+        pass
+
+    def getWidth(self):
+        pass
+
+    def getIndividualWidths(self):
+        pass
+
+    def getIndividualTopLengths(self):
+        pass
+
+    def getLats(self):
+        pass
+
+    def getLons(self):
+        pass
+
+    def getDeps(self):
+        pass
+
+    def getNumSegments(self):
+        pass
+
+    def getNumQuads(self):
+        pass
+
+
+
+class QuadRupture(Rupture):
     """
     Rupture class that represents the rupture surface as a combination of 
     quadrilaterals. Each quadrilateral must have horizontal top and bottom
     edges. This restriction makes the computation of rupture distances 
-    more efficient. 
+    more efficient. The number of points in the top edges must match the 
+    number of points in the bottom edge. 
     """
 
     def __init__(self, lon, lat, depth, reference):
@@ -211,7 +340,7 @@ class QuadRupture(object):
 
         return cls(lon, lat, dep, reference)
 
-    def writeRuptureFile(self, rupturefile):
+    def writeTextFile(self, rupturefile):
         """
         Write rupture data to rupture file format as defined in ShakeMap Software
         Guide.
@@ -236,7 +365,7 @@ class QuadRupture(object):
             f.close()
 
     @classmethod
-    def readRuptureFile(cls, rupturefile):
+    def readTextFile(cls, rupturefile):
         """
         Read rupture file format as defined in ShakeMap 3.5 Software Guide.
 
@@ -789,15 +918,6 @@ class QuadRupture(object):
         """
         return self._depth.copy()
 
-    def getReference(self):
-        """
-        Return whatever reference information was contained in rupture file.
-
-        :returns:
-            string citeable reference
-        """
-        return copy.deepcopy(self._reference)
-
     def getNumSegments(self):
         """
         Return a count of the number of rupture segments.
@@ -868,6 +988,26 @@ class QuadRupture(object):
                 raise ShakeMapException(
                     'Unclosed segments exist in rupture file.')
             istart = inan[i] + 1
+
+
+def read_rupture_file(file):
+    """
+    This is a module-level function to read in a rupture file. This allows for
+    the ShakeMap 3 text file specification or the ShakeMap 4 JSON rupture format.
+    The ShakeMap 3 (".txt" extension) only supports QuadRupture style rupture
+    representation and so this method will always return a QuadRupture instance. 
+    The ShakeMap 4 JSON format supports QuadRupture and EdgeRupture
+    represenations and so this method detects the rupture class and returns the
+    appropriate Rupture subclass instance.
+    """
+    try:
+        rupt = json.loads(str(file))
+    except json.JSONDecodeError:
+        try:
+            rupt = QuadRupture.readTextFile(file)
+        except:
+            raise Exception("Unknown rupture file format.")
+    return rupt
 
 
 def get_quad_width(p0, p1, p3):

@@ -10,7 +10,7 @@ from openquake.hazardlib.geo import point
 from openquake.hazardlib.gsim import base
 from openquake.hazardlib.const import TRT
 from ..utils.timeutils import ShakeDateTime
-from .rupture import QuadRupture
+from .rupture import read_rupture_file
 
 # local imports
 from shakemap.utils.exception import ShakeMapException
@@ -188,7 +188,7 @@ class Source(object):
         """
         event = read_event_file(eventxmlfile)
         if rupturefile is not None:
-            rupture = QuadRupture.readRuptureFile(rupturefile)
+            rupture = read_rupture_file(rupturefile)
         else:
             rupture = None
         params = None

@@ -11,6 +11,7 @@ import numpy as np
 import pytest
 
 from shakemap.grind.rupture import QuadRupture
+from shakemap.grind.rupture import read_rupture_file
 from shakemap.utils.exception import ShakeMapException
 from impactutils.io.cmd import get_command_output
 from shakemap.grind.rupture import get_local_unit_slip_vector
@@ -66,7 +67,7 @@ def test_northridge():
     34.315 -118.421 5.000
     """
     cbuf = io.StringIO(rupture_text)
-    rupture = QuadRupture.readRuptureFile(cbuf)
+    rupture = read_rupture_file(cbuf)
     strike = rupture.getStrike()
     np.testing.assert_allclose(strike, 122.06408, atol=0.001)
     dip = rupture.getDip()
@@ -144,7 +145,7 @@ def parse_complicated_rupture():
     40.80199 30.94688 0"""
 
     cbuf = io.StringIO(rupture_text)
-    rupture = QuadRupture.readRuptureFile(cbuf)
+    rupture = read_rupture_file(cbuf)
     strike = rupture.getStrike()
     np.testing.assert_allclose(strike, -100.464330, atol=0.001)
     dip = rupture.getDip()
@@ -216,8 +217,8 @@ def test_incorrect():
     23.60400 120.97200	17"""
 
     cbuf = io.StringIO(rupture_text)
-    with pytest.raises(ShakeMapException):
-        rupture = QuadRupture.readRuptureFile(cbuf)
+    with pytest.raises(Exception):
+        rupture = read_rupture_file(cbuf)
 
 
 def test_fromTrace():
@@ -233,7 +234,7 @@ def test_fromTrace():
         xp0, yp0, xp1, yp1, zp, widths,
         dips, reference='From J Smith, (personal communication)')
     fstr = io.StringIO()
-    rupture.writeRuptureFile(fstr)
+    rupture.writeTextFile(fstr)
 
     xp0 = [-121.81529, -121.82298]
     xp1 = [-121.82298, -121.83068]
