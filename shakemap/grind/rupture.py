@@ -102,8 +102,74 @@ class EdgeRupture(Rupture):
     force fashion based on this mesh, which can be quite large. 
     """
 
-    def readRuptureFile(self):
-        pass
+
+    def __init__(self, toplons, toplats, topdeps, botlons, botlats, botdeps,
+                 segment_index = None, reference = ''):
+        """
+        Constructor for EdgeRupture class. 
+
+        Args:
+            toplons (ndarray): Array of top edge longitudes.
+            toplats (ndarray): Array of top edge latitudes. 
+            topdeps (ndarray): Array of top edge depths (km).
+            botlons (ndarray): Array of bot edge longitudes.
+            botlats (ndarray): Array of bot edge latitudes. 
+            botdeps (ndarray): Array of bot edge depths (km).
+            segment_index (ndarray): Optional array of segment index. 
+                If None, then assume only single segment. 
+            reference (str): Citable reference for rupture. 
+ 
+        Returns: 
+            EdgeRupture instance.
+
+        """
+        self._toplons = toplons
+        self._toplats = toplats
+        self._topdeps = topdeps
+        self._botlons = botlons
+        self._botlats = botlats
+        self._botdeps = botdeps
+        if segment_index is not None:
+            self._segment_index = segment_index
+        else:
+            self._segment_index = np.zeros_like(toplons)
+        self._reference = reference
+        # TODO: add validation
+        #      - Check that arrays are the same length
+        #      - Check that if segment index is supplied that it makes sens
+        #        (integers, sequential, etc)
+        #      - ???
+
+
+    @classmethod
+    def readJsonFile(cls, filename):
+        """
+        Method for reading a JSON file that specifies the top and bottom edges
+        of the rupture. 
+
+        Args: 
+            filename (str): Name of JSON file. 
+
+        Returns: 
+            EdgeRupture instance.
+
+        """
+        with open(filename) as f:
+            rj = json.load(f)
+        toplats = np.array(rj['toplats'])
+        toplons = np.array(rj['toplons'])
+        topdeps = np.array(rj['topdeps'])
+        botlats = np.array(rj['botlats'])
+        botlons = np.array(rj['botlons'])
+        botdeps = np.array(rj['botdeps'])
+        reference = rj['reference']
+        if 'segment index' in rj.keys():
+            segment_index = rj['segment index']
+        else:
+            segment_index = np.zeros_like(toplats)
+
+        return cls(toplons, toplats, topdeps, botlons, botlats, botdeps,
+                   segment_index = segment_index, reference = reference)
 
     def writeRuptureFile(self):
         pass
@@ -158,7 +224,7 @@ class QuadRupture(Rupture):
     number of points in the bottom edge. 
     """
 
-    def __init__(self, lon, lat, depth, reference):
+    def __init__(self, lon, lat, depth, reference = ''):
         """
         Constructor for QuadRupture class.
 
@@ -1001,7 +1067,15 @@ def read_rupture_file(file):
     appropriate Rupture subclass instance.
     """
     try:
-        rupt = json.loads(str(file))
+        if isinstance(file, str):
+            with open(file) as f:
+                rj = json.load(f)
+        else:
+            rj = json.loads(str(file))
+        if rj['rupture type'] == 'EdgeRupture':
+            rupt = EdgeRupture.readJsonFile(file)
+        else:
+            rupt = QuadRupture.readJsonFile(file)
     except json.JSONDecodeError:
         try:
             rupt = QuadRupture.readTextFile(file)
