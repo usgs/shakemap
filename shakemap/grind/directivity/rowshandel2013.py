@@ -52,7 +52,7 @@ import copy
 import openquake.hazardlib.geo as geo
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 
-import shakemap.grind.fault as fault
+import shakemap.grind.rupture as rupture
 from shakemap.grind.distance import _calc_rupture_distance
 from shakemap.grind.distance import get_distance
 from shakemap.utils.ecef import latlon2ecef
@@ -80,7 +80,7 @@ class Rowshandel2013(object):
         :param dep:
             Numpy array of site depths (km); positive down.
         :param dx:
-            Float for target mesh spacing for subfaults in km. The mesh
+            Float for target mesh spacing for subruptures in km. The mesh
             snaps to the edges of the quadrilaterals so the actual mesh spacing
             will not equal this exactly; spacing in x and y will not be equal.
         :param T:
@@ -99,7 +99,7 @@ class Rowshandel2013(object):
             Boolean; should the centered directivity parameter be used.
         """
         self._source = source
-        self._flt = source.getFault()
+        self._flt = source.getRupture()
         self._hyp = source.getHypo()
         self._lat = lat
         self._lon = lon
@@ -143,7 +143,7 @@ class Rowshandel2013(object):
         :param sites:
             Sites object. 
         :param dx:
-            Float for target mesh spacing for subfaults in km. The mesh
+            Float for target mesh spacing for subruptures in km. The mesh
             snaps to the edges of the quadrilaterals so the actual mesh spacing
             will not equal this exactly; spacing in x and y will not be equal.
         :param T:
@@ -239,13 +239,13 @@ class Rowshandel2013(object):
 
     def __computeWrup(self):
         """
-        Compute the the portion (in km) of the width of the fault which ruptures
-        up-dip from the hypocenter to the top of the fault.
+        Compute the the portion (in km) of the width of the rupture which
+        ruptures up-dip from the hypocenter to the top of the rupture.
 
-        Wrup is the portion (in km) of the width of the fault which
-        ruptures up-dip from the hypocenter to the top of the fault.
+        Wrup is the portion (in km) of the width of the rupture which
+        ruptures up-dip from the hypocenter to the top of the rupture.
 
-        * This is ambiguous for faults with varible top of rupture (not
+        * This is ambiguous for ruptures with varible top of rupture (not
           allowed in NGA). For now, lets just compute this for the
           quad where the hypocenter is located.
         * Alternative is to compute max Wrup for the different quads.
@@ -277,7 +277,7 @@ class Rowshandel2013(object):
         hyp_ecef = Vector.fromPoint(geo.point.Point(
             self._hyp.longitude, self._hyp.latitude, self._hyp.depth))
         hp0 = hyp_ecef - pp0
-        ddv = fault.get_quad_down_dip_vector(q)
+        ddv = rupture.get_quad_down_dip_vector(q)
         self._Wrup = Vector.dot(ddv, hp0) / 1000
 
     def __computeXiPrime(self):
@@ -305,8 +305,8 @@ class Rowshandel2013(object):
 
         xi_prime_unscaled = np.zeros_like(slat)
 
-        # Normalize by total number of subfaults. For mtype == 1, the number
-        # of subfaults will vary with site and be different for xi_s and
+        # Normalize by total number of subruptures. For mtype == 1, the number
+        # of subruptures will vary with site and be different for xi_s and
         # xi_p, so keep two variables and sum them for each quad.
         nsubs = np.zeros(np.product(slat.shape))
         nsubp = np.zeros(np.product(slat.shape))
@@ -319,10 +319,10 @@ class Rowshandel2013(object):
             q = self._flt.getQuadrilaterals()[k]
 
             # Quad mesh (ECEF coords)
-            mesh = fault.get_quad_mesh(q, self._dx)
+            mesh = rupture.get_quad_mesh(q, self._dx)
 
             # Rupture plane normal vector (ECEF coords)
-            rpnv = fault.get_quad_normal(q)
+            rpnv = rupture.get_quad_normal(q)
             rpnvcol = np.array([[rpnv.x],
                                 [rpnv.y],
                                 [rpnv.z]])
@@ -384,7 +384,7 @@ class Rowshandel2013(object):
                 sdotqraw = np.sum(slpmatnorm * qmatnorm, axis=0)
 
                 if self._mtype == 1:
-                    # Only sum over (+) directivity effect subfaults
+                    # Only sum over (+) directivity effect subruptures
 
                     # xi_p_prime
                     pdotq = pdotqraw.clip(min=0)
@@ -395,7 +395,7 @@ class Rowshandel2013(object):
                     nsubs[i] = nsubs[i] + np.sum(sdotq > 0)
 
                 elif self._mtype == 2:
-                    # Sum over contributing subfaults
+                    # Sum over contributing subruptures
 
                     # xi_p_prime
                     pdotq = pdotqraw
@@ -405,7 +405,7 @@ class Rowshandel2013(object):
                     sdotq = sdotqraw
                     nsubs[i] = nsubs[i] + cp_mat.shape[1]
 
-                # Normalize by n sub faults later
+                # Normalize by n sub ruptures later
                 xi_prime_s[i] = xi_prime_s[i] + np.sum(sdotq)
                 xi_prime_p[i] = xi_prime_p[i] + np.sum(pdotq)
 
@@ -447,7 +447,7 @@ class Rowshandel2013(object):
         # Get epi projection
         epi_x, epi_y = proj(self._hyp.longitude, self._hyp.latitude)
 
-        # Get the lines for the top edge of the fault
+        # Get the lines for the top edge of the rupture
         qds = self._flt.getQuadrilaterals()
         nq = len(qds)
         top_lat = np.array([[]])
@@ -543,7 +543,7 @@ class Rowshandel2013(object):
         self._DT = DT
 
     def __getCenteringTerm(self):
-        L = self._flt.getFaultLength()
+        L = self._flt.getRuptureLength()
         CSSLP = -0.32 + 0.15 * np.log(L)
         CTRST = -0.20 + 0.09 * np.log(L)
         CNRML = -0.20 + 0.08 * np.log(L)
@@ -580,11 +580,11 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
         Direction of motion of the hanging wall relative to the
         foot wall, as measured by the angle (deg) from the strike vector.
     :param cp:
-        A 3x(n sub fault) array giving center points of each sub fault
+        A 3x(n sub rupture) array giving center points of each sub rupture
         in ECEF coords.
     :param p:
-        A 3x(n sub fault) array giving the unit vectors of the propagation
-        vector on each sub fault in ECEF coords.
+        A 3x(n sub rupture) array giving the unit vectors of the propagation
+        vector on each sub rupture in ECEF coords.
     :returns:
         List of dip slip and strike slip components (each is a matrix)
         of the unit slip vector in ECEF space.
@@ -592,11 +592,11 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
     # Get quad vertices, strike, dip
     P0, P1 = q[0:2]
     strike = P0.azimuth(P1)
-    dip = fault.get_quad_dip(q)
+    dip = rupture.get_quad_dip(q)
 
     # Slip unit vectors in 'local' (i.e., z-up, x-east) coordinates
-    d1_local = fault.get_local_unit_slip_vector_DS(strike, dip, rake)
-    s1_local = fault.get_local_unit_slip_vector_SS(strike, dip, rake)
+    d1_local = rupture.get_local_unit_slip_vector_DS(strike, dip, rake)
+    s1_local = rupture.get_local_unit_slip_vector_SS(strike, dip, rake)
 
     # Convert to a column array
     d1_col = np.array([[d1_local.x],

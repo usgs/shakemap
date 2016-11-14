@@ -11,7 +11,7 @@ from openquake.hazardlib.geo import point
 
 from shakemap.grind.source import Source
 from shakemap.grind.sites import Sites
-import shakemap.grind.fault as fault
+import shakemap.grind.rupture as rupture
 from shakemap.grind.directivity.rowshandel2013 import Rowshandel2013
 from shakemap.utils.timeutils import ShakeDateTime
 from shakemap.utils.vector import Vector
@@ -38,9 +38,10 @@ def test_exceptions():
     tlon, tlat = proj(fltx, flty, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
-    flt = fault.Fault.fromTrace(np.array([tlon[0]]), np.array([tlat[0]]),
-                                np.array([tlon[1]]), np.array([tlat[1]]),
-                                zp, width, dip, reference='ss3')
+    flt = rupture.QuadRupture.fromTrace(
+        np.array([tlon[0]]), np.array([tlat[0]]),
+        np.array([tlon[1]]), np.array([tlat[1]]),
+        zp, width, dip, reference='ss3')
 
     event = {'lat': epilat[0],
              'lon': epilon[0],
@@ -87,9 +88,10 @@ def test_fromSites():
     tlon, tlat = proj(fltx, flty, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
-    flt = fault.Fault.fromTrace(np.array([tlon[0]]), np.array([tlat[0]]),
-                                np.array([tlon[1]]), np.array([tlat[1]]),
-                                zp, width, dip, reference='ss3')
+    flt = rupture.QuadRupture.fromTrace(
+        np.array([tlon[0]]), np.array([tlat[0]]),
+        np.array([tlon[1]]), np.array([tlat[1]]),
+        zp, width, dip, reference='ss3')
 
     event = {'lat': epilat[0],
              'lon': epilon[0],
@@ -152,9 +154,10 @@ def test_ss3():
     tlon, tlat = proj(fltx, flty, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
-    flt = fault.Fault.fromTrace(np.array([tlon[0]]), np.array([tlat[0]]),
-                                np.array([tlon[1]]), np.array([tlat[1]]),
-                                zp, width, dip, reference='ss3')
+    flt = rupture.QuadRupture.fromTrace(
+        np.array([tlon[0]]), np.array([tlat[0]]),
+        np.array([tlon[1]]), np.array([tlat[1]]),
+        zp, width, dip, reference='ss3')
 
     event = {'lat': epilat[0],
              'lon': epilon[0],
@@ -1879,10 +1882,11 @@ def test_rv4():
     proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
     tlon, tlat = proj(fltx, flty, reverse=True)
 
-    flt = fault.Fault.fromTrace(np.array([tlon[0]]), np.array([tlat[0]]),
-                                np.array([tlon[1]]), np.array([tlat[1]]),
-                                zp, width, dip, reference='')
-    L = flt.getFaultLength()
+    flt = rupture.QuadRupture.fromTrace(
+        np.array([tlon[0]]), np.array([tlat[0]]),
+        np.array([tlon[1]]), np.array([tlat[1]]),
+        zp, width, dip, reference='')
+    L = flt.getRuptureLength()
 
     # Try to figure out epicenter
     tmp = flt.getQuadrilaterals()[0]
@@ -1977,9 +1981,10 @@ def test_so6():
     # Convert to lat/lon
     proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
     tlon,tlat = proj(fltx, flty, reverse = True)
-    flt = fault.Fault.fromTrace(np.array([tlon[0]]), np.array([tlat[0]]), 
-                                np.array([tlon[1]]), np.array([tlat[1]]),
-                                zp, width, dip, reference = 'rv4')
+    flt = rupture.QuadRupture.fromTrace(
+        np.array([tlon[0]]), np.array([tlat[0]]), 
+        np.array([tlon[1]]), np.array([tlat[1]]),
+        zp, width, dip, reference = 'rv4')
     x = np.linspace(-80, 80, 21)
     y = np.linspace(-50, 130, 21)
     site_x,site_y = np.meshgrid(x, y)

@@ -21,8 +21,8 @@ from openquake.hazardlib.gsim import base
 from shakemap.utils.exception import ShakeMapException
 from shakemap.utils.ecef import latlon2ecef
 from shakemap.utils.vector import Vector
-from shakemap.grind.fault import get_quad_length
-from shakemap.grind.fault import reverse_quad
+from shakemap.grind.rupture import get_quad_length
+from shakemap.grind.rupture import reverse_quad
 from shakemap.grind.source import rake_to_mech
 
 class Distance(object):
@@ -46,14 +46,14 @@ class Distance(object):
             `[link] <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#built-in-gsims>`__;
             can be individual instance or list of instances.
         :param source:
-            Shakemap Source instance. For point-source distances (Repi, Rhyp) the
-            hypocenter is taken from the source instance. The finite-fault 
-            distances (Rrup, Rjb, ...), are based on the fault representation in
-            the source instance if available. If a Fault instance is unavailalbe, 
-            the finite-fault distances are computed from point-source distances, 
-            in which case the earthquake manitude from the Source instance is 
-            required for median distance corrections if use_median_distance is 
-            True.
+            Shakemap Source instance. For point-source distances (Repi, Rhyp)
+            the hypocenter is taken from the source instance. The finite-rupture
+            distances (Rrup, Rjb, ...), are based on the rupture representation
+            in the source instance if available. If a Rupture instance is
+            unavailalbe, the finite-rupture distances are computed from 
+            point-source distances, in which case the earthquake manitude from
+            the Source instance is required for median distance corrections if
+            use_median_distance is True.
         :param lat:
             A numpy array of site latitudes.
         :param lon:
@@ -61,9 +61,10 @@ class Distance(object):
         :param dep:
             A numpy array of site depths (km); down is positive. 
         :param use_median_distance:
-            Boolean; only used if GMPE requests fault distances and not fault is
-            availalbe. Default is True, meaning that point-source distances are
-            adjusted based on magnitude to get the median fault distance.
+            Boolean; only used if GMPE requests rupture distances and not
+            rupture is availalbe. Default is True, meaning that point-source
+            distances are adjusted based on magnitude to get the median rupture
+            distance.
         :returns:
             Distance object.
         """
@@ -75,7 +76,8 @@ class Distance(object):
     @classmethod
     def fromSites(cls, gmpe, source, sites, use_median_distance=True):
         """
-        Convenience class method to construct a Distance object from a sites object.
+        Convenience class method to construct a Distance object from a sites
+        object.
 
         :param gmpe:
             Concrete subclass of GMPE
@@ -86,9 +88,9 @@ class Distance(object):
         :param sites:
             Shakemap Sites object.
         :param use_median_distance:
-            Boolean; only used if GMPE requests fault distances and not fault is
-            availalbe. Default is True, meaning that point-source distances are
-            adjusted based on magnitude to get the median fault distance.
+            Boolean; only used if GMPE requests rupture distances and not rupture
+            is availalbe. Default is True, meaning that point-source distances
+            are adjusted based on magnitude to get the median rupture distance.
         :returns:
             Distance object.
         """
@@ -136,13 +138,14 @@ class Distance(object):
         :param dep:
             Numpy array of depths (km).
         :param use_median_distance:
-            Boolean; only used if GMPE requests fault distances and not fault is
-            availalbe. Default is True, meaning that point-source distances are
-            adjusted based on magnitude to get the median fault distance.
+            Boolean; only used if GMPE requests rupture distances and not rupture
+            is availalbe. Default is True, meaning that point-source distances
+            are adjusted based on magnitude to get the median rupture distance.
         :returns:
-            DistancesContext object with distance grids required by input gmpe(s).
+            DistancesContext object with distance grids required by input 
+            gmpe(s).
         :raises TypeError:
-            if gmpe is not a subclass of GMPE
+            If gmpe is not a subclass of GMPE. 
         """
         if not isinstance(gmpe, list):
             gmpe = [gmpe]
@@ -224,20 +227,20 @@ def get_distance(methods, lat, lon, dep, source,
     :param source:
        source instance.
     :param use_median_distance:
-        Boolean; only used if GMPE requests fault distances and not fault is
+        Boolean; only used if GMPE requests rupture distances and not rupture is
         availalbe. Default is True, meaning that point-source distances are
-        adjusted based on magnitude to get the median fault distance.
+        adjusted based on magnitude to get the median rupture distance.
     :returns:
        dictionary of numpy arrays of distances, size of lon.shape
-       IMPORTANT: If a finite fault is not supplied, and the distance
+       IMPORTANT: If a finite rupture is not supplied, and the distance
        measures requested include rx, ry, ry0, U, or T, then zeros will
        be returned; if rjb is requested, repi will be returned; if rrup
        is requested, rhypo will be returned.
     """
-    fault = source.getFault()
+    rupture = source.getRupture()
     hypo = source.getHypo()
-    if fault is not None:
-        quadlist = fault.getQuadrilaterals()
+    if rupture is not None:
+        quadlist = rupture.getQuadrilaterals()
         # Need a copy for GC2 since order of verticies/quads needs to be modivied.
         quadgc2 = copy.deepcopy(quadlist)
     else:
@@ -274,13 +277,13 @@ def get_distance(methods, lat, lon, dep, source,
         z.shape = newshape
         sites_ecef = np.hstack((x, y, z))
 
-    # Define a projection that spands sites and fault
-    if fault is None:
+    # Define a projection that spands sites and rupture
+    if rupture is None:
         all_lat = lat
         all_lon = lon
     else:
-        all_lat = np.append(lat, fault.getLats())
-        all_lon = np.append(lon, fault.getLons())
+        all_lat = np.append(lat, rupture.getLats())
+        all_lon = np.append(lon, rupture.getLons())
 
     west = np.nanmin(all_lon)
     east = np.nanmax(all_lon)
@@ -340,7 +343,7 @@ def get_distance(methods, lat, lon, dep, source,
             # one segment.
             #-----------------------------------------------------------------
 
-            segind = fault._getSegmentIndex()
+            segind = rupture._getSegmentIndex()
             segindnp = np.array(segind)
             uind = np.unique(segind)
             nseg = len(uind)
@@ -399,7 +402,7 @@ def get_distance(methods, lat, lon, dep, source,
                 # need to sort out which one is the "origin".
                 #---------------------------------------------------------------
 
-                # Goofy while-loop is to adjust the side of the fault where the
+                # Goofy while-loop is to adjust the side of the rupture where the
                 # origin is located
                 dummy = -1
                 while dummy < 0:
@@ -489,7 +492,7 @@ def get_distance(methods, lat, lon, dep, source,
                ('ry0' in methods) or ('U' in methods) or ('T' in methods):
                 # Rx, Ry, and Ry0 are all computed if one is requested since
                 # they all require similar information for the weights. This
-                # isn't necessary for a single segment fault though.
+                # isn't necessary for a single segment rupture though.
                 # Note, we are basing these calculations on GC2 coordinates U
                 # and T as described in:
                 # Spudich and Chiou (2015)
@@ -578,7 +581,7 @@ def get_distance(methods, lat, lon, dep, source,
         if 'rjb' in methods:
             if use_median_distance:
                 warnings.warn(
-                    'No fault; Replacing rjb with median rjb given M and repi.')
+                    'No rupture; Replacing rjb with median rjb given M and repi.')
                 cdir, tmp = os.path.split(__file__)
 
                 # -------------------
@@ -676,12 +679,12 @@ def get_distance(methods, lat, lon, dep, source,
                 rjbvar = repi2rjbvar_obj.ev(np.log(repis), mags)
                 distdict['rjbvar'] = rjbvar
             else:
-                warnings.warn('No fault; Replacing rjb with repi')
+                warnings.warn('No rupture; Replacing rjb with repi')
                 distdict['rjb'] = distdict['repi'].copy()
         if 'rrup' in methods:
             if use_median_distance:
                 warnings.warn(
-                    'No fault; Replacing rrup with median rrup given M and repi.')
+                    'No rupture; Replacing rrup with median rrup given M and repi.')
                 cdir, tmp = os.path.split(__file__)
 
                 # -------------------
@@ -781,22 +784,22 @@ def get_distance(methods, lat, lon, dep, source,
                 rrupvar = repi2rrupvar_obj.ev(np.log(repis), mags)
                 distdict['rrupvar'] = rrupvar
             else:
-                warnings.warn('No fault; Replacing rrup with rhypo')
+                warnings.warn('No rupture; Replacing rrup with rhypo')
                 distdict['rrup'] = distdict['rhypo'].copy()
         if 'rx' in methods:
-            warnings.warn('No fault; Setting Rx to zero.')
+            warnings.warn('No rupture; Setting Rx to zero.')
             distdict['rx'] = np.zeros_like(distdict['repi'])
         if 'ry0' in methods:
-            warnings.warn('No fault; Setting ry0 to zero')
+            warnings.warn('No rupture; Setting ry0 to zero')
             distdict['ry0'] = np.zeros_like(distdict['repi'])
         if 'ry' in methods:
-            warnings.warn('No fault; Setting ry to zero')
+            warnings.warn('No rupture; Setting ry to zero')
             distdict['ry'] = np.zeros_like(distdict['repi'])
         if 'U' in methods:
-            warnings.warn('No fault; Setting U to zero')
+            warnings.warn('No rupture; Setting U to zero')
             distdict['U'] = np.zeros_like(distdict['repi'])
         if 'T' in methods:
-            warnings.warn('No fault; Setting T to zero')
+            warnings.warn('No rupture; Setting T to zero')
             distdict['T'] = np.zeros_like(distdict['repi'])
 
     return distdict
@@ -864,17 +867,22 @@ def _calc_rupture_distance(P0, P1, P2, P3, points):
     Calculate the shortest distance from a set of points to a rupture surface.
 
     :param P0:
-        Point object, representing the first top-edge vertex of a fault quadrilateral.
+        Point object, representing the first top-edge vertex of a rupture
+        quadrilateral.
     :param P1:
-        Point object, representing the second top-edge vertex of a fault quadrilateral.
+        Point object, representing the second top-edge vertex of a rupture
+        quadrilateral.
     :param P2:
-        Point object, representing the first bottom-edge vertex of a fault quadrilateral.
+        Point object, representing the first bottom-edge vertex of a rupture
+        quadrilateral.
     :param P3:
-        Point object, representing the second bottom-edge vertex of a fault quadrilateral.
+        Point object, representing the second bottom-edge vertex of a rupture
+        quadrilateral.
     :param points:
         Numpy array Nx3 of points (ECEF) to calculate distance from.
     :returns:
-        Array of size N of distances (in km) from input points to rupture surface.
+        Array of size N of distances (in km) from input points to rupture
+        surface.
     """
     # Convert to ecef
     p0 = Vector.fromPoint(P0)
@@ -927,13 +935,15 @@ def _calc_rupture_distance(P0, P1, P2, P3, points):
 
 def __calc_u_i(P0, P1, lat, lon, proj):
     """
-    Calculate u_i distance. See Spudich and Chiou OFR 2015-1028. This is the distance
-    along strike from the first vertex (P0) of the i-th segment.
+    Calculate u_i distance. See Spudich and Chiou OFR 2015-1028. This is the 
+    distance along strike from the first vertex (P0) of the i-th segment.
 
     :param P0:
-        Point object, representing the first top-edge vertex of a fault quadrilateral.
+        Point object, representing the first top-edge vertex of a rupture 
+        quadrilateral.
     :param P1:
-        Point object, representing the second top-edge vertex of a fault quadrilateral.
+        Point object, representing the second top-edge vertex of a rupture 
+        quadrilateral.
     :param lat:
         A numpy array of latitude.
     :param lon:
@@ -974,14 +984,16 @@ def __calc_u_i(P0, P1, lat, lon, proj):
 
 def __calc_t_i(P0, P1, lat, lon, proj):
     """
-    Calculate t_i distance. See Spudich and Chiou OFR 2015-1028. This is the distance
-    measured normal to strike from the i-th segment. Values on the hanging-wall are
-    positive and those on the foot-wall are negative.
+    Calculate t_i distance. See Spudich and Chiou OFR 2015-1028. This is the
+    distance measured normal to strike from the i-th segment. Values on the
+    hanging-wall are positive and those on the foot-wall are negative.
 
     :param P0:
-        Point object, representing the first top-edge vertex of a fault quadrilateral.
+        Point object, representing the first top-edge vertex of a rupture
+        quadrilateral.
     :param P1:
-        Point object, representing the second top-edge vertex of a fault quadrilateral.
+        Point object, representing the second top-edge vertex of a rupture
+        quadrilateral.
     :param lat:
         A numpy array of latitudes.
     :param lon:
@@ -990,7 +1002,8 @@ def __calc_t_i(P0, P1, lat, lon, proj):
         An orthographic projection from 
         openquake.hazardlib.geo.utils.get_orthographic_projection. 
     :returns:
-        Array of size N of distances (in km) from input points to rupture surface.
+        Array of size N of distances (in km) from input points to rupture
+        surface.
     """
 
     # projected coordinates are in km

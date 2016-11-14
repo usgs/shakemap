@@ -10,7 +10,7 @@ from openquake.hazardlib.geo import point
 from openquake.hazardlib.gsim import base
 from openquake.hazardlib.const import TRT
 from ..utils.timeutils import ShakeDateTime
-from .fault import Fault
+from .rupture import read_rupture_file
 
 # local imports
 from shakemap.utils.exception import ShakeMapException
@@ -150,14 +150,14 @@ class Source(object):
     `RuptureContext <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.RuptureContext>`__. 
     """
 
-    def __init__(self, event, fault=None):
+    def __init__(self, event, rupture=None):
         """
         Construct a Source object.
 
         :param event:
             Dictionary of values (see read_event_file() and read_source())
-        :param fault:
-            A Fault object.
+        :param rupture:
+            A Rupture instance.
         :returns:
             Source object.
         """
@@ -168,34 +168,34 @@ class Source(object):
         if len(missing):
             raise NameError('Input event dictionary is missing the following '
                             'required keys: "%s"' % (','.join(missing)))
-        self._fault = fault
+        self._rupture = rupture
         self._event_dict = event.copy()
 
     @classmethod
-    def fromFile(cls, eventxmlfile, faultfile=None, sourcefile=None):
+    def fromFile(cls, eventxmlfile, rupturefile=None, sourcefile=None):
         """
         Class method to create a Source object by specifying an event.xml file,
-        a fault file, and a source.txt file.
+        a rupture file, and a source.txt file.
 
         :param eventxmlfile:
             Event xml file (see read_event_file())
-        :param faultfile:
-            Fault text file (see fault.py)
+        :param rupturefile:
+            Rupture text file (see rupture.py)
         :param sourcefile:
             source.txt file (see read_source())
         :returns:
             Source object
         """
         event = read_event_file(eventxmlfile)
-        if faultfile is not None:
-            fault = Fault.readFaultFile(faultfile)
+        if rupturefile is not None:
+            rupture = read_rupture_file(rupturefile)
         else:
-            fault = None
+            rupture = None
         params = None
         if sourcefile is not None:
             params = read_source(sourcefile)
             event.update(params)
-        return cls(event, fault=fault)
+        return cls(event, rupture=rupture)
 
     def getRuptureContext(self, gmpelist):
         """
@@ -203,9 +203,9 @@ class Source(object):
         `RuptureContext <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.RuptureContext>`__
         suitable for any GMPE (except for those requiring hypo_loc).
 
-        If Source does not contain a Fault, strike, dip, ztor, and width will be
-        filled with default values. Rake may not be known, or may be estimated
-        from a focal mechanism.
+        If Source does not contain a Rupture, then strike, dip, ztor, and width
+        will be filled with default values. Rake may not be known, or may be
+        estimated from a focal mechanism.
 
         :param gmpelist:
             Sequence of hazardlib GMPE objects.
@@ -225,11 +225,11 @@ class Source(object):
 
         rup = base.RuptureContext()
         rup.mag = self.getEventParam('mag')
-        if self._fault is not None:
-            rup.strike = self._fault.getStrike()
-            rup.dip = self._fault.getDip()
-            rup.ztor = self._fault.getTopOfRupture()
-            rup.width = self._fault.getWidth()
+        if self._rupture is not None:
+            rup.strike = self._rupture.getStrike()
+            rup.dip = self._rupture.getDip()
+            rup.ztor = self._rupture.getTopOfRupture()
+            rup.width = self._rupture.getWidth()
         else:
             rup.strike = DEFAULT_STRIKE
             rup.dip = DEFAULT_DIP
@@ -253,12 +253,12 @@ class Source(object):
 
         return rup
 
-    def getFault(self):
+    def getRupture(self):
         """
         :returns:
-           Fault instance
+           Rupture instance.
         """
-        return copy.deepcopy(self._fault)
+        return copy.deepcopy(self._rupture)
 
     def getHypo(self):
         """
@@ -390,32 +390,32 @@ class Source(object):
         # e.g. self._event_dict.get(key)
         return copy.deepcopy(self._event_dict[key])
 
-    def setFaultReference(self, reference):
+    def setRuptureReference(self, reference):
         """
-        Set the citeable reference for the fault.
+        Set the citeable reference for the rupture.
 
         :param reference:
             String citeable reference. 
         """
-        self._fault.setReference(reference)
+        self._rupture.setReference(reference)
 
-    def getFaultReference(self):
+    def getRuptureReference(self):
         """
-        Get the citeable reference for the fault. 
+        Get the citeable reference for the rupture. 
 
         :returns:
             String citeable reference. 
         """
-        return self._fault.getReference()
+        return self._rupture.getReference()
 
     def getQuadrilaterals(self):
         """
-        Get the list of quadrilaterals defining the fault.
+        Get the list of quadrilaterals defining the rupture.
 
         :returns:
             List of quadrilateral tuples (4 Point objects each). 
         """
-        return self._fault.getQuadrilaterals()
+        return self._rupture.getQuadrilaterals()
 
 
 def rake_to_mech(rake):

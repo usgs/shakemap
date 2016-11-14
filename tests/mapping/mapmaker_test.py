@@ -20,7 +20,7 @@ from mapio.shake import ShakeGrid
 
 # local imports
 from shakemap.grind.station import StationList
-from shakemap.grind.fault import Fault
+from shakemap.grind.rupture import QuadRupture
 from shakemap.grind.source import Source
 
 
@@ -30,7 +30,7 @@ def _test_intensity():
         homedir, '..', 'data', 'eventdata', 'northridge'))
     shakefile = os.path.join(datadir, 'northridge_grid.xml')
     topofile = os.path.join(datadir, 'northridge_topo.grd')
-    faultfile = os.path.join(datadir, 'northridge_fault.txt')
+    rupturefile = os.path.join(datadir, 'northridge_fault.txt')
     cityfile = os.path.join(datadir, 'northridge_cities.txt')
     coastfile = os.path.join(datadir, 'northridge_coastline.json')
     countryfile = os.path.join(datadir, 'northridge_countries.json')
@@ -55,16 +55,16 @@ def _test_intensity():
     cities = BasemapCities.loadFromCSV(cityfile)
     shakemap = ShakeGrid.load(shakefile, adjust='res')
     stations = StationList(stationfile)
-    fault = Fault.readFaultFile(faultfile)
+    rupture = QuadRupture.readRuptureFile(rupturefile)
     edict = shakemap.getEventDict()
     eventdict = {'lat': edict['lat'],
                  'lon': edict['lon'],
                  'depth': edict['depth'],
                  'mag': edict['magnitude'],
                  'time': edict['event_timestamp']}
-    source = Source(eventdict, fault)
+    source = Source(eventdict, rupture)
     maker = MapMaker(shakemap, topofile, stations,
-                     fault, layerdict, source, cities)
+                     rupture, layerdict, source, cities)
 
     # draw intensity map
     outfolder = os.path.expanduser('~')

@@ -47,14 +47,14 @@ def test_virtualipe():
             'eventdata', 'Calexico', 'input'))
 
     #
-    # Read the event, source, and fault files and produce a Source object
+    # Read the event, source, and rupture files and produce a Source object
     #
     inputfile = os.path.join(datadir, 'stationlist_dat.xml')
     dyfifile = os.path.join(datadir, 'ciim3_dat.xml')
     eventfile = os.path.join(datadir, 'event.xml')
-    faultfile = os.path.join(datadir, 'wei_fault.txt')
+    rupturefile = os.path.join(datadir, 'wei_fault.txt')
 
-    source_obj = Source.fromFile(eventfile, faultfile=faultfile)
+    source_obj = Source.fromFile(eventfile, rupturefile=rupturefile)
     rx = source_obj.getRuptureContext([gmpe])
     rx.rake = 45.
 
