@@ -14,9 +14,7 @@ from shakemap.grind.station import StationList
 from shakemap.grind.source import Source
 from shakemap.grind.multigmpe import MultiGMPE
 from shakemap.grind.sites import Sites
-from shakemap.grind.gmice.wgrw12 import WGRW12
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
-from openquake.hazardlib.gsim.allen_2012_ipe import AllenEtAl2012
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
@@ -40,15 +38,11 @@ def test_station(tmpdir):
     source_obj = Source.fromFile(eventfile, rupturefile=rupturefile)
 
     #
-    # Set up the GMPE, IPE, and GMICE
+    # Set up the GMPE
     #
     gmpe_cy14 = ChiouYoungs2014()
 
     gmpe = MultiGMPE.from_list([gmpe_cy14], [1.0])
-
-    gmice = WGRW12()
-
-    ipe = AllenEtAl2012()
 
     #
     # 
@@ -68,11 +62,10 @@ def test_station(tmpdir):
         )
 
     xmlfiles = [inputfile, dyfifile]
-#    dbfile = str(tmpdir.join('stations.db'))
     dbfile = os.path.join(str(tmpdir), 'stations.db')
 
     stations = StationList.fromXML(xmlfiles, dbfile, source_obj, 
-            sites_obj_grid, gmpe, ipe, gmice)
+            sites_obj_grid)
 
     df1 = stations.getStationDataframe(1, sort=True)
     df2 = stations.getStationDataframe(0, sort=True)
