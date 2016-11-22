@@ -785,7 +785,7 @@ C.B. Worden, M. Hearne, D.J. Wald, and M. Pagani (2016). Complimentary Component
 .. _worden2016b:
 
 Worden, C.B. and D.J. Wald (2016). ShakeMap Manual Online: technical manual, user's guide, and software guide, 
-U. S. Geological Survey. usgs.github.io/shakemap. DOI: 10.1234/012345678.
+U. S. Geological Survey. usgs.github.io/shakemap. DOI: 10.5066/F7D21VPQ.
 \
 
 .. _yamakawa1998:
