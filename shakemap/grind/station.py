@@ -178,7 +178,7 @@ class StationList(object):
         #
         # We're creating a new database from the XML inputs, so
         # delete the existing dbfile if it exsits (yes, I can imagine
-        # use cases where you might want to add to an existing 
+        # use cases where you might want to add to an existing
         # database, but we don't support that because our indexing
         # scheme doesn't currently allow it.)
         #
@@ -670,7 +670,7 @@ class StationList(object):
             cursor.execute('ALTER TABLE station ADD COLUMN %s float' % (col))
         db.commit()
 
-        # IMT types 
+        # IMT types
         rows = []
         for imt_id, imt_type in enumerate(imtset):
             rows.append((imt_id, imt_type))
@@ -686,7 +686,7 @@ class StationList(object):
         db.commit()
 
 def get_imt_period(imt):
-        
+
     p = re.search('(?<=psa)\d+', imt)
     return float(p.group(0)[:-1] + '.' + p.group(0)[-1])
 
