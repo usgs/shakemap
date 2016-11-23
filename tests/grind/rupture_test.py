@@ -34,10 +34,10 @@ def test_misc():
     z = np.array([1.0])
     W = np.array([3.0])
     dip = np.array([30.])
-    flt = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
-    fm = flt.getRuptureAsMesh()
-    fa = flt.getRuptureAsArrays()
-    ref = flt.getReference()
+    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    fm = rup.getRuptureAsMesh()
+    fa = rup.getRuptureAsArrays()
+
 
 
 def test_slip():
@@ -49,9 +49,9 @@ def test_slip():
     z = np.array([1.0])
     W = np.array([3.0])
     dip = np.array([30.])
-    flt = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
 
-    slp = get_quad_slip(flt.getQuadrilaterals()[0], 30).getArray()
+    slp = get_quad_slip(rup.getQuadrilaterals()[0], 30).getArray()
     slpd = np.array([0.80816457,  0.25350787,  0.53160491])
     np.testing.assert_allclose(slp, slpd)
 

@@ -28,23 +28,8 @@ class Rupture(ABC):
     Abstract base class for ruptures.
     """
 
-    def getReference(self):
-        """
-        Return rupture reference.
-
-        Returns:
-            string: Citeable reference.
-
-        """
-        return copy.deepcopy(self._reference)
-
-
     @abstractmethod
     def getRuptureLength(self):
-        pass
-
-    @abstractmethod
-    def getQuadrilaterals(self):
         pass
 
     @abstractmethod
@@ -63,33 +48,59 @@ class Rupture(ABC):
     def getWidth(self):
         pass
 
-    @abstractmethod
-    def getIndividualWidths(self):
-        pass
+    ## Does this need to be an abstract method?? 
+    def getRuptureContext(self, gmpelist):
+        """
+        Return an Openquake 
+        `RuptureContext <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.RuptureContext>`__.
 
-    @abstractmethod
-    def getIndividualTopLengths(self):
-        pass
+        If Origin does not contain a Rupture, then strike, dip, ztor, and width
+        will be filled with default values. Rake may not be known, or may be
+        estimated from a focal mechanism.
 
-    @abstractmethod
-    def getLats(self):
-        pass
+        Args:
+            gmpelist (list): List of hazardlib GMPE objects.
 
-    @abstractmethod
-    def getLons(self):
-        pass
+        Returns:
+            RuptureContext object with all known parameters filled in.
 
-    @abstractmethod
-    def getDeps(self):
-        pass
+        """
+        # rupturecontext constructor inputs:
+        # 'mag', 'strike', 'dip', 'rake', 'ztor', 'hypo_lon', 'hypo_lat',
+        # 'hypo_depth', 'width', 'hypo_loc'
 
-    @abstractmethod
-    def getNumSegments(self):
-        pass
 
-    @abstractmethod
-    def getNumQuads(self):
-        pass
+        rup = base.RuptureContext()
+        rup.mag = self.getEventParam('mag')
+        if self._rupture is not None:
+            rup.strike = self._rupture.getStrike()
+            rup.dip = self._rupture.getDip()
+            rup.ztor = self._rupture.getTopOfRupture()
+            rup.width = self._rupture.getWidth()
+        else:
+            rup.strike = DEFAULT_STRIKE
+            rup.dip = DEFAULT_DIP
+            rup.ztor = DEFAULT_ZTOR
+            rup.width = DEFAULT_WIDTH
+
+        if 'rake' in self._event_dict:
+            rup.rake = self.getEventParam('rake')
+        elif 'mech' in self._event_dict:
+            mech = self._event_dict['mech']
+            rup.rake = RAKEDICT[mech]
+        else:
+            rup.rake = RAKEDICT['ALL']
+
+        rup.hypo_lat = self.getEventParam('lat')
+        rup.hypo_lon = self.getEventParam('lon')
+        rup.hypo_depth = self.getEventParam('depth')
+
+        if rup.rake is None:
+            rup.rake = DEFAULT_RAKE
+
+        return rup
+    
+
 
 
 class EdgeRupture(Rupture):
@@ -228,14 +239,14 @@ class QuadRupture(Rupture):
         """
         Constructor for QuadRupture class.
 
-        :param lon:
-            Sequence of rupture longitude vertices in clockwise order.
-        :param lat:
-            Sequence of rupture latitude vertices in clockwise order.
-        :param depth:
-            Sequence of rupture depth vertices in clockwise order.
-        :param reference:
-            String citeable reference for Rupture.
+        Args:
+            lon (array): Sequence of rupture longitude vertices in clockwise 
+                order.
+            lat (array): Sequence of rupture latitude vertices in clockwise 
+                order.
+            depth (array): Sequence of rupture depth vertices in clockwise order.
+            reference (str): String citeable reference for Rupture.
+
         """
         self._lon = lon
         self._lat = lat
@@ -256,34 +267,24 @@ class QuadRupture(Rupture):
         have the dame depths. The other verticies are then constructed from
         the top edges and the width and dip of the quadrilateral. 
 
-        :param xp0:
-            Array of longitude coordinates for the first (top of rupture) vertex
-            of each rectangle (decimal degrees).
-        :param yp0:
-            Array of latitude coordinates for the first (top of rupture) vertex
-            of each rectangle (decimal degrees).
-        :param xp1:
-            Array of longitude coordinates for the second (top of rupture) vertex
-            of each rectangle (decimal degrees).
-        :param yp1:
-            Array of latitude coordinates for the second (top of rupture) vertex
-            of each rectangle (decimal degrees).
-        :param zp:
-            Array of depths for each of the top of rupture rectangles (km).
-        :param widths:
-            Array of widths for each of rectangle (km).
-        :param dips:
-            Array of dips for each of rectangle (degrees).
-        :param strike:
-            If None then strike is computed from verticies of top edge of each
-            quadrilateral. If a scalar, then all quadrilaterals are constructed
-            assuming this strike direction. If a vector with the same length as
-            the trace coordinates then it specifies the strike for each 
-            quadrilateral.
-        :param reference:
-            String explaining where the rupture definition came from (publication
-            style reference, etc.)
-        :returns:
+        Args:
+            xp0 (array): Array or list of longitudes (floats) of p0.
+            yp0 (array): Array or list of latitudes (floats) of p0.
+            xp1 (array): Array or list of longitudes (floats) of p1.
+            yp1 (array): Array or list of latitudes (floats) of p1.
+            zp (array): Array or list of depths for each of the top of rupture
+                rectangles (km).
+            widths (array): Array of widths for each of rectangle (km).
+            dips (array): Array of dips for each of rectangle (degrees).
+            strike (array): If None then strike is computed from verticies of
+                top edge of each quadrilateral. If a scalar, then all
+                quadrilaterals are constructed assuming this strike direction.
+                If an array with the same length as the trace coordinates then
+                it specifies the strike for each quadrilateral.
+            reference (str): String explaining where the rupture definition came
+                from (publication style reference, etc.).
+
+        Returns:
             QuadRupture instance.
 
         """
@@ -408,11 +409,12 @@ class QuadRupture(Rupture):
 
     def writeTextFile(self, rupturefile):
         """
-        Write rupture data to rupture file format as defined in ShakeMap Software
-        Guide.
+        Write rupture data to rupture file format as defined in ShakeMap 
+        Software Guide.
 
-        :param rupturefile:
-            Filename of output data file OR file-like object.
+        Args:
+            Rupturefile (str): Filename of output data file OR file-like object.
+
         """
         if not hasattr(rupturefile, 'read'):
             f = open(rupturefile, 'wt')
@@ -435,17 +437,20 @@ class QuadRupture(Rupture):
         """
         Read rupture file format as defined in ShakeMap 3.5 Software Guide.
 
-        :param rupturefile:
-            Path to rupture file OR file-like object in GMT psxy format, where
-            * Rupture vertices are space separated lat,lon,depth triplets on a
-            single line.
-            * Rupture segments are separated by lines containing ">"
-            * Rupture segments must be closed.
-            * Rupture segments must be all clockwise or all counter-clockwise.
-        :returns:
+        Args:
+            rupturefile (srt): Path to rupture file OR file-like object in GMT
+                psxy format, where:
+
+                * Rupture vertices are space separated lat,lon,depth triplets on
+                  a single line.
+                * Rupture segments are separated by lines containing ">"
+                * Rupture segments must be closed.
+                * Rupture segments must be all clockwise or all 
+                  counter-clockwise.
+
+        Returns:
            QuadRupture object.
-        :raises ShakeMapException:
-            when any of above conditions are not met.
+
         """
         x = []
         y = []
@@ -509,36 +514,25 @@ class QuadRupture(Rupture):
 
         All of the following vector arguments must have the same length.
 
-        :param xp0:
-            Vector of longitudes of p0.
-        :param yp0:
-            Vector of latitudes of p0.
-        :param zp0:
-            Vector of depths of p0 (positive down).
-        :param xp1:
-            Vector of longitudes of p1.
-        :param yp1:
-            Vector of latitudes of p1.
-        :param zp1:
-            Vector of depths of p1 (positive down).
-        :param xp2:
-            Vector of longitudes of p2.
-        :param yp2:
-            Vector of latitudes of p2.
-        :param zp2:
-            Vector of depths of p2 (positive down).
-        :param xp3:
-            Vector of longitudes of p3.
-        :param yp3:
-            Vector of latitudes of p3.
-        :param zp3:
-            Vector of depths of p3 (positive down).
-        :param reference:
-            String explaining where the rupture definition came from 
-            (publication style reference, etc.)
-        :returns:
+        Args: 
+            xp0 (array): Array or list of longitudes (floats) of p0.
+            yp0 (array): Array or list of latitudes (floats) of p0.
+            zp0 (array): Array or list of depths (floats) of p0.
+            xp1 (array): Array or list of longitudes (floats) of p1.
+            yp1 (array): Array or list of latitudes (floats) of p1.
+            zp1 (array): Array or list of depths (floats) of p1.
+            xp2 (array): Array or list of longitudes (floats) of p2.
+            yp2 (array): Array or list of latitudes (floats) of p2.
+            zp2 (array): Array or list of depths (floats) of p2.
+            xp3 (array): Array or list of longitudes (floats) of p3.
+            yp3 (array): Array or list of latitudes (floats) of p3.
+            zp3 (array): Array or list of depths (floats) of p3.
+            reference (str): String explaining where the rupture definition came
+                from (publication style reference, etc.)
+
+        Returns:
             QuadRupture object, where the rupture is modeled as a series of
-            trapezoids.
+                trapezoids.
 
         """
         if len(xp0) == len(yp0) == len(zp0) == len(xp1) == len(yp1) == len(zp1) == \
@@ -578,10 +572,11 @@ class QuadRupture(Rupture):
 
     def getRuptureLength(self):
         """
-        Compute lenght of rupture based on top edge.
+        Compute lenght of rupture based on top edge in km.
 
-        :returns:
-            Length of rupture.
+        Returns:
+            float: Length of rupture (km).
+
         """
         flength = 0
         for quad in self._quadrilaterals:
@@ -592,9 +587,10 @@ class QuadRupture(Rupture):
         """
         Return a list of quadrilaterals.
 
-        :returns:
-            Each quad is a tuple of four Point objects
-            (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py)
+        Returns:
+            list: List of quadrilaterals where each quad is a tuple of four
+                `Point <https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py>`__
+                objects.
         """
         return copy.deepcopy(self._quadrilaterals)
 
@@ -606,8 +602,9 @@ class QuadRupture(Rupture):
         due to reverses in dip direction are problematic and not handeled well
         by this algorithm.
 
-        :returns:
-            Strike angle (float). 
+        Returns:
+            float: Strike angle.
+
         """
         nq = len(self._quadrilaterals)
         strikes = np.zeros(nq)
@@ -1065,6 +1062,13 @@ def read_rupture_file(file):
     The ShakeMap 4 JSON format supports QuadRupture and EdgeRupture
     represenations and so this method detects the rupture class and returns the
     appropriate Rupture subclass instance.
+
+    Args:
+        file (srt): Path to rupture file.
+    
+    Returns:
+        Rupture subclass instance. 
+
     """
     try:
         if isinstance(file, str):
@@ -1089,14 +1093,16 @@ def get_quad_width(p0, p1, p3):
     Return width of an individual planar trapezoid, where the p0-p1 distance
     represents the long side.
 
-    :param p0:
-        ECEF x,y,z point representing the first vertex of a quadrilateral.
-    :param p1:
-        ECEF x,y,z point representing the second vertex of a quadrilateral.
-    :param p3:
-        ECEF x,y,z point representing the fourth vertex of a quadrilateral.
-    :returns:
-        Width of planar trapezoid (float).
+    Args:
+        p0 (point): ECEF x,y,z point representing the first vertex of a 
+            quadrilateral.
+        p1 (point): ECEF x,y,z point representing the second vertex of a 
+            quadrilateral.
+        p3 (point):  ECEF x,y,z point representing the fourth vertex of a 
+            quadrilateral.
+
+    Returns:
+        float: Width of planar trapezoid.
     """
     AB = p0 - p1
     AC = p0 - p3
@@ -1109,20 +1115,21 @@ def get_quad_mesh(q, dx):
     """
     Create a mesh from a quadrilateal. 
 
-    :param q:
-        A quadrilateral.
-    :param dx:
-        Target dx in km; used to get nx and ny of mesh, but mesh snaps
-        to edges of rupture so actual dx/dy will not actually equal this
+    Args:
+        q (list): A quadrilateral; list of four points. 
+        dx (float):  Target dx in km; used to get nx and ny of mesh, but mesh
+            snaps to edges of rupture so actual dx/dy will not actually equal this
         value in general.
-    :returns:
-        Mesh dictionary, which includes numpy arrays:
+
+    Returns:
+        dict: Mesh dictionary, which includes numpy arrays:
 
         - llx: lower left x coordinate in ECEF coords.
         - lly: lower left y coordinate in ECEF coords.
         - llz: lower left z coordinate in ECEF coords.
         - ulx: upper left x coordinate in ECEF coords.
         - etc.
+
     """
     P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0)  # fromPoint converts to ECEF
@@ -1177,25 +1184,13 @@ def get_quad_mesh(q, dx):
         for j in range(0, nj):
             # Rupture corner points
             pp0 = Vector(
-                mesh['ulx'][
-                    i, j], mesh['uly'][
-                    i, j], mesh['ulz'][
-                    i, j])
+                mesh['ulx'][i, j], mesh['uly'][i, j], mesh['ulz'][i, j])
             pp1 = Vector(
-                mesh['urx'][
-                    i, j], mesh['ury'][
-                    i, j], mesh['urz'][
-                    i, j])
+                mesh['urx'][i, j], mesh['ury'][i, j], mesh['urz'][i, j])
             pp2 = Vector(
-                mesh['lrx'][
-                    i, j], mesh['lry'][
-                    i, j], mesh['lrz'][
-                    i, j])
+                mesh['lrx'][i, j], mesh['lry'][i, j], mesh['lrz'][i, j])
             pp3 = Vector(
-                mesh['llx'][
-                    i, j], mesh['lly'][
-                    i, j], mesh['llz'][
-                    i, j])
+                mesh['llx'][i, j], mesh['lly'][i, j], mesh['llz'][i, j])
             # Find center of quad
             mp0 = pp0 + (pp1 - pp0) * 0.5
             mp1 = pp3 + (pp2 - pp3) * 0.5
@@ -1210,17 +1205,17 @@ def get_local_unit_slip_vector(strike, dip, rake):
     """
     Compute the components of a unit slip vector.
 
-    :param strike:
-        Clockwise angle (deg) from north of the line at the intersection
-        of the rupture plane and the horizontal plane.
-    :param dip:
-        Angle (deg) between rupture plane and the horizontal plane normal
-        to the strike (0-90 using right hand rule).
-    :param rake:
-        Direction of motion of the hanging wall relative to the
-        foot wall, as measured by the angle (deg) from the strike vector.
-    :returns:
-        Unit slip vector in 'local' N-S, E-W, U-D coordinates.
+    Args:
+        strike (float): Clockwise angle (deg) from north of the line at the
+            intersection of the rupture plane and the horizontal plane.
+        dip (float): Angle (deg) between rupture plane and the horizontal plane
+            normal to the strike (0-90 using right hand rule).
+        rake (float): Direction of motion of the hanging wall relative to the
+            foot wall, as measured by the angle (deg) from the strike vector.
+
+    Returns:
+        Vector: Unit slip vector in 'local' N-S, E-W, U-D coordinates.
+
     """
     strike = np.radians(strike)
     dip = np.radians(dip)
@@ -1237,17 +1232,17 @@ def get_local_unit_slip_vector_DS(strike, dip, rake):
     """
     Compute the DIP SLIP components of a unit slip vector.
 
-    :param strike:
-        Clockwise angle (deg) from north of the line at the intersection
-        of the rupture plane and the horizontal plane.
-    :param dip:
-        Angle (deg) between rupture plane and the horizontal plane normal
-        to the strike (0-90 using right hand rule).
-    :param rake:
-        Direction of motion of the hanging wall relative to the
-        foot wall, as measured by the angle (deg) from the strike vector.
-    :returns:
-        Unit slip vector in 'local' N-S, E-W, U-D coordinates.
+    Args:
+        strike (float): Clockwise angle (deg) from north of the line at the
+            intersection of the rupture plane and the horizontal plane.
+        dip (float): Angle (degrees) between rupture plane and the horizontal
+            plane normal to the strike (0-90 using right hand rule).
+        rake (float): Direction of motion of the hanging wall relative to the
+            foot wall, as measured by the angle (deg) from the strike vector.
+
+    Returns:
+        Vector: Unit slip vector in 'local' N-S, E-W, U-D coordinates.
+
     """
     strike = np.radians(strike)
     dip = np.radians(dip)
@@ -1262,17 +1257,17 @@ def get_local_unit_slip_vector_SS(strike, dip, rake):
     """
     Compute the STRIKE SLIP components of a unit slip vector.
 
-    :param strike:
-        Clockwise angle (deg) from north of the line at the intersection
-        of the rupture plane and the horizontal plane.
-    :param dip:
-        Angle (deg) between rupture plane and the horizontal plane normal
-        to the strike (0-90 using right hand rule).
-    :param rake:
-        Direction of motion of the hanging wall relative to the
-        foot wall, as measured by the angle (deg) from the strike vector.
-    :returns:
-        Unit slip vector in 'local' N-S, E-W, U-D coordinates.
+    Args:
+        strike (float): Clockwise angle (deg) from north of the line at the
+            intersection of the rupture plane and the horizontal plane.
+        dip (float): Angle (degrees) between rupture plane and the horizontal
+            plane normal to the strike (0-90 using right hand rule).
+        rake (float): Direction of motion of the hanging wall relative to the
+            foot wall, as measured by the angle (deg) from the strike vector.
+
+    Returns:
+        Vector: Unit slip vector in 'local' N-S, E-W, U-D coordinates.
+
     """
     strike = np.radians(strike)
     dip = np.radians(dip)
@@ -1287,10 +1282,12 @@ def reverse_quad(q):
     Reverse the verticies of a quad in the sense that the strike direction
     is flipped. 
 
-    :param q:
-        A quadrilater (list of points). 
-    :returns: 
-        The reversed quadrilateral.
+    Args:
+        q (list): A quadrilateral; list of four points.
+
+    Returns: 
+        list: Reversed quadrilateral.
+
     """
     return [q[1], q[0], q[3], q[2]]
 
@@ -1298,13 +1295,14 @@ def get_quad_slip(q, rake):
     """
     Compute the unit slip vector in ECEF space for a quad and rake angle.
 
-    :param q:
-        A quadrilateral.
-    :param rake:
-        Direction of motion of the hanging wall relative to the
-        foot wall, as measured by the angle (deg) from the strike vector.
-    :returns:
-        Unit slip vector in ECEF space.
+    Args:
+        q (list): A quadrilateral; list of four points.
+        rake (float): Direction of motion of the hanging wall relative to
+        the foot wall, as measured by the angle (deg) from the strike vector.
+
+    Returns:
+        Vector: Unit slip vector in ECEF space.
+
     """
     P0, P1, P2 = q[0:3]
     strike = P0.azimuth(P1)
@@ -1327,10 +1325,12 @@ def get_quad_length(q):
     """
     Length of top eduge of a quadrilateral.
 
-    :param q:
-        A quadrilateral.
-    :returns:
-        Length in km.
+    Args:
+        q (list): A quadrilateral; list of four points.
+
+    Returns:
+        float: Length of quadrilateral in km.
+
     """
     P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0)  # fromPoint converts to ECEF
@@ -1343,10 +1343,12 @@ def get_quad_dip(q):
     """
     Dip of a quadrilateral.
 
-    :param q:
-        A quadrilateral.
-    :returns:
-        Dip in degrees.
+    Args:
+        q (list): A quadrilateral; list of four points.
+
+    Returns:
+        float: Dip in degrees.
+
     """
     N = get_quad_normal(q)
     V = get_vertical_vector(q)
@@ -1359,10 +1361,11 @@ def get_quad_normal(q):
     Compute the unit normal vector for a quadrilateral in
     ECEF coordinates.
 
-    :param q:
-        A quadrilateral.
-    :returns:
-        Normalized normal vector for the quadrilateral in ECEF coords.
+    Args:
+        q (list): A quadrilateral; list of four points.
+
+    Returns:
+        Vector: Normalized normal vector for the quadrilateral in ECEF coords.
     """
     P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0)  # fromPoint converts to ECEF
@@ -1379,10 +1382,11 @@ def get_quad_strike_vector(q):
     Compute the unit vector pointing in the direction of strike for a
     quadrilateral in ECEF coordinates. Top edge assumed to be horizontal.
 
-    :param q:
-        A quadrilateral.
-    :returns:
-        The unit vector pointing in strike direction in ECEF coords.
+    Args:
+        q (list): A quadrilateral; list of four points.
+
+    Returns:
+        Vector: The unit vector pointing in strike direction in ECEF coords.
     """
     P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0)  # fromPoint converts to ECEF
@@ -1396,10 +1400,12 @@ def get_quad_down_dip_vector(q):
     Compute the unit vector pointing down dip for a quadrilateral in
     ECEF coordinates.
 
-    :param q:
-        A quadrilateral.
-    :returns:
-        The unit vector pointing down dip in ECEF coords.
+    Args:
+        q (list): A quadrilateral; list of four points.
+
+    Returns:
+        Vector: The unit vector pointing down dip in ECEF coords.
+
     """
     P0, P1, P2, P3 = q
     p0 = Vector.fromPoint(P0)  # fromPoint converts to ECEF
@@ -1415,10 +1421,11 @@ def get_vertical_vector(q):
     Compute the vertical unit vector for a quadrilateral
     in ECEF coordinates.
 
-    :param q:
-        A quadrilateral.
-    :returns:
-        Normalized vertical vector for the quadrilateral in ECEF coords.
+    Args:
+        q (list): A quadrilateral; list of four points.
+
+    Returns:
+        Vector: Normalized vertical vector for the quadrilateral in ECEF coords.
     """
     P0, P1, P2, P3 = q
     P0_up = copy.deepcopy(P0)
