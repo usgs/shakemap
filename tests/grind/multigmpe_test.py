@@ -26,7 +26,7 @@ from shakemap.grind.multigmpe import MultiGMPE
 from shakemap.grind.multigmpe import DualDistanceWeights
 import shakemap.grind.sites as sites
 from shakemap.grind.sites import Sites
-from shakemap.grind.source import Source
+from shakemap.grind.origin import Origin
 from shakemap.grind.rupture import QuadRupture
 from shakemap.grind.distance import Distance
 from shakemap.utils.timeutils import ShakeDateTime
@@ -800,22 +800,22 @@ def test_multigmpe_get_mean_stddevs():
     W = np.array([3.0])
     dip = np.array([30.])
 
-    flt = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
              'id': '', 'locstring': '', 'rake': 30.3,
              'time': ShakeDateTime.utcfromtimestamp(int(time.time())),
              'timezone': 'UTC'}
-    source = Source(event, flt)
+    origin = Origin(event)
 
     #---------------------------------------------------------------------------
     # Make a rupture context
     #---------------------------------------------------------------------------
-    rupt = source.getRuptureContext(gmpes)
+    rx = rup.getRuptureContext(gmpes, origin)
 
     #---------------------------------------------------------------------------
     # Make a distance context
     #---------------------------------------------------------------------------
-    dctx = Distance.fromSites(gmpes, source, site).getDistanceContext()
+    dctx = Distance.fromSites(gmpes, origin, site, rup).getDistanceContext()
 
     #---------------------------------------------------------------------------
     # Compute weighted GMPE
@@ -824,7 +824,7 @@ def test_multigmpe_get_mean_stddevs():
     stddev_types = [const.StdDev.TOTAL]
     mgmpe = MultiGMPE.from_list(gmpes, wts)
     lnmu, lnsd = mgmpe.get_mean_and_stddevs(
-        sctx, rupt, dctx, iimt, stddev_types)
+        sctx, rx, dctx, iimt, stddev_types)
 
     lnmud = np.array([[ 3.53816879,  3.6486898 ,  3.67058155,  3.72223342,  3.75403094,
          3.7931503 ,  3.7987149 ],
@@ -868,7 +868,7 @@ def test_multigmpe_get_mean_stddevs():
     mgmpe = MultiGMPE.from_list(
         gmpes, wts, default_gmpes_for_site = [AtkinsonBoore2006()])
     lnmu, lnsd = mgmpe.get_mean_and_stddevs(
-        sctx, rupt, dctx, iimt, stddev_types)
+        sctx, rx, dctx, iimt, stddev_types)
 
     lnmud = np.array([[ 3.58496124,  3.68331076,  3.67432197,  3.7042443 ,  3.72017426,
          3.7169565 ,  3.69907643],
@@ -911,7 +911,7 @@ def test_multigmpe_get_mean_stddevs():
     wts = [1.0]
     mgmpe = MultiGMPE.from_list(gmpes, wts)
     lnmu, lnsd = mgmpe.get_mean_and_stddevs(
-        sctx, rupt, dctx, iimt, stddev_types)
+        sctx, rx, dctx, iimt, stddev_types)
 
     lnmud = np.array([[ 3.28349394,  3.42997155,  3.59333458,  3.76646938,  3.90641707,
          3.90610989,  3.78652442],
@@ -984,22 +984,21 @@ def test_dualdistsanceweights_get_mean_stddevs():
     W = np.array([3.0])
     dip = np.array([30.])
 
-    flt = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
              'id': '', 'locstring': '', 'rake': 30.3,
-             'time': ShakeDateTime.utcfromtimestamp(int(time.time())),
              'timezone': 'UTC'}
-    source = Source(event, flt)
+    origin = Origin(event)
 
     #---------------------------------------------------------------------------
     # Make a rupture context
     #---------------------------------------------------------------------------
-    rupt = source.getRuptureContext(gmpes)
+    rx = rup.getRuptureContext(gmpes, origin)
 
     #---------------------------------------------------------------------------
     # Make a distance context
     #---------------------------------------------------------------------------
-    dctx = Distance.fromSites(gmpes, source, site).getDistanceContext()
+    dctx = Distance.fromSites(gmpes, origin, site, rup).getDistanceContext()
 
     #---------------------------------------------------------------------------
     # Compute weighted GMPE
@@ -1007,7 +1006,7 @@ def test_dualdistsanceweights_get_mean_stddevs():
     iimt = imt.PGV()
     stddev_types = [const.StdDev.TOTAL]
     lnmu, lnsd = ddw.get_mean_and_stddevs(
-        sctx, rupt, dctx, iimt, stddev_types)
+        sctx, rx, dctx, iimt, stddev_types)
 
     lnmud = np.array([[ 3.53816879,  3.6486898 ,  3.67058155,  3.72223342,  3.75403094,
          3.7931503 ,  3.7987149 ],
@@ -1078,7 +1077,7 @@ def test_multigmpe_exceptions():
         mgmpe = MultiGMPE.from_list(gmpes, wts)
         stddev_types = [const.StdDev.INTER_EVENT]
         lnmu, lnsd = mgmpe.get_mean_and_stddevs(
-            sctx, rupt, dctx, iimt, stddev_types)
+            sctx, rx, dctx, iimt, stddev_types)
 
     # Check exception for GMPE instance of default_gmpes_for_site
     with pytest.raises(Exception) as a:

@@ -3,6 +3,7 @@
 # stdlib imports
 from xml.dom import minidom
 import copy
+import time as time
 
 # third party
 import numpy as np
@@ -15,9 +16,8 @@ from .rupture import read_rupture_file
 # local imports
 from shakemap.utils.exception import ShakeMapException
 
-REQUIRED_KEYS = ['id', 'created', 'lat', 'lon', 'depth', 'locstring', 'mag',
-                 'mech', 'year', 'month', 'day', 'hour', 'minute', 'second',
-                 'timezone']
+REQUIRED_KEYS = ['lat', 'lon', 'depth', 'mag']
+
 RAKEDICT = {'SS': 0.0, 'NM': -90.0, 'RS': 90.0, 'ALL': None}
 DEFAULT_MECH = 'ALL'
 DEFAULT_STRIKE = 0.0
@@ -30,13 +30,13 @@ DEFAULT_ZTOR = 0.0
 class Origin(object):
     """
     The purpose of this class is to read/store event origin information, which 
-    is usually derived from an xmp file called "event.xml". There is also a
+    is usually derived from an xml file called "event.xml". There is also a
     mechanism to overwrite information in event.xml with a file in the input
     directory called "source.txt". 
 
     Note that this class is generally contained within a Rupture instance.
 
-    Required values are: 
+    Event values are: 
 
         - id: the event id. 
         - created: file creation time (Unix epoch -- seconds since Jan 1, 1970). 
@@ -52,9 +52,6 @@ class Origin(object):
         - minute: 0-59.
         - second: 0-59.
         - timezone: abbreviation (i.e., GMT, PST, PDT).
-
-    A key optional parameter is:
-
         - mech: a string specifying the rupture mechanism; the accepted types
           are RS, SS, NM, and ALL, for reverse slip, strike slip, normal, and 
           unspecified ruptures, respectively.
@@ -109,7 +106,7 @@ class Origin(object):
             if not event['mech'] in RAKEDICT.keys():
                 raise Exception('mech must be SS, NM, RS, or ALL.')
         elif 'type' in event.keys():
-            event['mech'] == event['type']
+            event['mech'] = event['type']
             if event['mech'] == '':
                 event['mech'] = DEFAULT_MECH
             if not event['mech'] in RAKEDICT.keys():
@@ -120,22 +117,38 @@ class Origin(object):
         #-----------------------------------------------------------------------
         # Special handling of time
         #-----------------------------------------------------------------------
-        year = int(event['year'])
-        month = int(event['month'])
-        day = int(event['day'])
-        hour = int(event['hour'])
-        minute = int(event['minute'])
-        second = float(event['second'])
-        msec = int((second - int(second)) * 1e6) # microsec
-        second = int(second)
-        event['time'] = ShakeDateTime(
-            year, month, day, hour, minute, second, msec)
+        if ('year' in event.keys()) and \
+           ('month' in event.keys()) and \
+           ('day' in event.keys()) and \
+           ('hour' in event.keys()) and \
+           ('second' in event.keys()) and \
+           ('msec' in event.keys()):
+            year = int(event['year'])
+            month = int(event['month'])
+            day = int(event['day'])
+            hour = int(event['hour'])
+            minute = int(event['minute'])
+            second = float(event['second'])
+            msec = int((second - int(second)) * 1e6) # microsec
+            second = int(second)
+            event['time'] = ShakeDateTime(
+                year, month, day, hour, minute, second, msec)
+        else:
+            event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
 
         #-----------------------------------------------------------------------
-        # Add keys at class attribute
+        # Add keys as class attributes
         #-----------------------------------------------------------------------
         for k, v in event.items():
             setattr(self, k, v)
+
+        # What about rake?
+        if not hasattr(self, 'rake'):
+            if hasattr(self, 'mech'):
+                mech = self.mech
+                self.rake = RAKEDICT[mech]
+            else:
+                self.rake = RAKEDICT['ALL']
 
 
 

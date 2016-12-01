@@ -81,12 +81,14 @@ class Bayless2013(object):
     __c1ds = np.array([0.0, 0.0, 0.0, 0.0, 0.034, 0.093, 0.128, 0.15,
                        0.165, 0.179])
 
-    def __init__(self, source, lat, lon, depth, T):
+    def __init__(self, origin, rup, lat, lon, depth, T):
         """
         Constructor for bayless2013.
 
-        :param source:
-            Shakemap Source object.
+        :param origin:
+            Shakemap Origin object.
+        :param rup:
+            Shakemap Rupture object.
         :param lat:
             Numpy array of latitudes. 
         :param lon:
@@ -97,19 +99,19 @@ class Bayless2013(object):
             Period; Currently, only acceptable values are 
             0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 7.5, 10. 
         """
-        self._source = source
-        self._flt = source.getRupture()
-        self._rake = source.getEventParam('rake')
-        self._M = source.getEventParam('mag')
-        self._hyp = source.getHypo()
+        self._origin = origin
+        self._rup = rup
+        self._rake = origin.rake
+        self._M = origin.mag
+        self._hyp = origin.getHypo()
         self._lon = lon
         self._lat = lat
         self._dep = depth
         self._T = T
 
         # Lists of widths and lengths for each quad in the rupture
-        self._W = self._flt.getIndividualWidths()
-        self._L = self._flt.getIndividualTopLengths()
+        self._W = self._rup.getIndividualWidths()
+        self._L = self._rup.getIndividualTopLengths()
 
         # Number of quads
         self._nq = len(self._W)
@@ -133,7 +135,7 @@ class Bayless2013(object):
             # Compute some genral stuff that is required for all mechanisms
             dtypes = ['rrup', 'rx', 'ry0']
             dists = get_distance(dtypes, self._lat, self._lon, self._dep,
-                                 self._source)
+                                 self._origin, self._rup)
             self.__Rrup = np.reshape(dists['rrup'], self._lat.shape)
             self.__Rx = np.reshape(dists['rx'], self._lat.shape)
             self.__Ry = np.reshape(dists['ry0'], self._lat.shape)
@@ -197,7 +199,7 @@ class Bayless2013(object):
         # Loop over each quad
         self.phyp = [None] * self._nq
         for i in range(self._nq):
-            P0, P1, P2, P3 = self._flt.getQuadrilaterals()[i]
+            P0, P1, P2, P3 = self._rup.getQuadrilaterals()[i]
             p0 = Vector.fromPoint(P0)  # convert to ECEF
             p1 = Vector.fromPoint(P1)
             p2 = Vector.fromPoint(P2)
@@ -331,7 +333,7 @@ class Bayless2013(object):
         hyp_col = np.array([[hyp_ecef.x], [hyp_ecef.y], [hyp_ecef.z]])
 
         # First compute "updip" vector
-        P0, P1, P2 = self._flt.getQuadrilaterals()[i][0:3]
+        P0, P1, P2 = self._rup.getQuadrilaterals()[i][0:3]
         p1 = Vector.fromPoint(P1)  # convert to ECEF
         p2 = Vector.fromPoint(P2)
         e21 = p1 - p2
@@ -379,7 +381,7 @@ class Bayless2013(object):
         epi_col = np.array([[epi_ecef.x], [epi_ecef.y], [epi_ecef.z]])
 
         # First compute along strike vector
-        P0, P1, P2, P3 = self._flt.getQuadrilaterals()[i]
+        P0, P1, P2, P3 = self._rup.getQuadrilaterals()[i]
         p0 = Vector.fromPoint(P0)  # convert to ECEF
         p1 = Vector.fromPoint(P1)
         e01 = p1 - p0

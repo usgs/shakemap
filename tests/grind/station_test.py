@@ -11,9 +11,10 @@ import pandas.util.testing as pdt
 
 # local imports
 from shakemap.grind.station import StationList
-from shakemap.grind.source import Source
+from shakemap.grind.origin import Origin
 from shakemap.grind.multigmpe import MultiGMPE
 from shakemap.grind.sites import Sites
+from shakemap.grind.rupture import read_rupture_file
 from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
@@ -28,14 +29,16 @@ def test_station(tmpdir):
             'eventdata', 'Calexico', 'input'))
 
     #
-    # Read the event, source, and rupture files and produce a Source object
+    # Read the event, origin, and rupture files and produce Origin Rupture
+    # objects
     #
     inputfile = os.path.join(datadir, 'stationlist_dat.xml')
     dyfifile = os.path.join(datadir, 'ciim3_dat.xml')
     eventfile = os.path.join(datadir, 'event.xml')
     rupturefile = os.path.join(datadir, 'wei_fault.txt')
 
-    source_obj = Source.fromFile(eventfile, rupturefile=rupturefile)
+    origin_obj = Origin.fromFile(eventfile)
+    rupture_obj = read_rupture_file(rupturefile)
 
     #
     # Set up the GMPE
@@ -47,7 +50,7 @@ def test_station(tmpdir):
     #
     # 
     #
-    rupture_ctx = source_obj.getRuptureContext([gmpe])
+    rupture_ctx = rupture_obj.getRuptureContext([gmpe], origin_obj)
 
     smdx = 0.0083333333
     smdy = 0.0083333333
@@ -64,8 +67,8 @@ def test_station(tmpdir):
     xmlfiles = [inputfile, dyfifile]
     dbfile = os.path.join(str(tmpdir), 'stations.db')
 
-    stations = StationList.fromXML(xmlfiles, dbfile, source_obj, 
-            sites_obj_grid)
+    stations = StationList.fromXML(xmlfiles, dbfile, origin_obj, 
+                                   sites_obj_grid, rupture_obj)
 
     df1 = stations.getStationDataframe(1, sort=True)
     df2 = stations.getStationDataframe(0, sort=True)

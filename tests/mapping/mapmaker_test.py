@@ -21,7 +21,7 @@ from mapio.shake import ShakeGrid
 # local imports
 from shakemap.grind.station import StationList
 from shakemap.grind.rupture import QuadRupture
-from shakemap.grind.source import Source
+from shakemap.grind.origin import Origin
 
 
 def _test_intensity():
@@ -62,9 +62,9 @@ def _test_intensity():
                  'depth': edict['depth'],
                  'mag': edict['magnitude'],
                  'time': edict['event_timestamp']}
-    source = Source(eventdict, rupture)
+    origin = Origin(eventdict)
     maker = MapMaker(shakemap, topofile, stations,
-                     rupture, layerdict, source, cities)
+                     rupture, layerdict, origin, cities)
 
     # draw intensity map
     outfolder = os.path.expanduser('~')
