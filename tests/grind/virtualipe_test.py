@@ -21,7 +21,8 @@ from shakemap.grind.gmice.wgrw12 import WGRW12
 from shakemap.grind.multigmpe import MultiGMPE
 from shakemap.grind.distance import Distance
 from shakemap.grind.sites import Sites
-from shakemap.grind.source import Source
+from shakemap.grind.origin import Origin
+from shakemap.grind.rupture import read_rupture_file
 from shakemap.utils.exception import ShakeMapException
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
@@ -47,15 +48,17 @@ def test_virtualipe():
             'eventdata', 'Calexico', 'input'))
 
     #
-    # Read the event, source, and rupture files and produce a Source object
+    # Read the event, origin, and rupture files and produce Rupture and Origin
+    # objects
     #
     inputfile = os.path.join(datadir, 'stationlist_dat.xml')
     dyfifile = os.path.join(datadir, 'ciim3_dat.xml')
     eventfile = os.path.join(datadir, 'event.xml')
     rupturefile = os.path.join(datadir, 'wei_fault.txt')
 
-    source_obj = Source.fromFile(eventfile, rupturefile=rupturefile)
-    rx = source_obj.getRuptureContext([gmpe])
+    origin_obj = Origin.fromFile(eventfile)
+    rupture_obj = read_rupture_file(rupturefile)
+    rx = rupture_obj.getRuptureContext([gmpe], origin_obj)
     rx.rake = 45.
 
     smdx = 0.0083333333
@@ -81,7 +84,7 @@ def test_virtualipe():
 
     sx = sites_obj_grid.getSitesContext(lldict=lldict, rock_vs30=760.0)
 
-    dobj = Distance(gmpe, source_obj, lats, lons, depths)
+    dobj = Distance(gmpe, origin_obj, rupture_obj, lats, lons, depths)
     dx = dobj.getDistanceContext()
 
     sd_types = [oqconst.StdDev.TOTAL]
@@ -143,9 +146,9 @@ def test_virtualipe():
     gmpe_ba14 = BooreEtAl2014()
     gmpe = MultiGMPE.from_list([gmpe_ba14], [1.0])
     ipe = VirtualIPE.fromFuncs(gmpe, gmice)
-    rx = source_obj.getRuptureContext([gmpe])
+    rx = rupture_obj.getRuptureContext([gmpe], origin_obj)
     rx.rake = 45.
-    dobj = Distance(gmpe, source_obj, lats, lons, depths)
+    dobj = Distance(gmpe, origin_obj, rupture_obj, lats, lons, depths)
     dx = dobj.getDistanceContext()
 
     mmi_rjb, mmi_sd_rjb = \

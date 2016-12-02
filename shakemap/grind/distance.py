@@ -23,7 +23,7 @@ from shakemap.utils.ecef import latlon2ecef
 from shakemap.utils.vector import Vector
 from shakemap.grind.rupture import get_quad_length
 from shakemap.grind.rupture import reverse_quad
-from shakemap.grind.source import rake_to_mech
+from shakemap.grind.origin import rake_to_mech
 
 class Distance(object):
     """
@@ -39,20 +39,20 @@ class Distance(object):
         Report 2015-1028, 20 p., http://dx.doi.org/10.3133/ofr20151028.
     """
 
-    def __init__(self, gmpe, source, lat, lon, dep, use_median_distance=True):
+    def __init__(self, gmpe, origin, rup, lat, lon, dep, use_median_distance=True):
         """
         :param gmpe:
             Concrete subclass of GMPE
             `[link] <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#built-in-gsims>`__;
             can be individual instance or list of instances.
-        :param source:
-            Shakemap Source instance. For point-source distances (Repi, Rhyp)
-            the hypocenter is taken from the source instance. The finite-rupture
+        :param origin:
+            Shakemap Origin instance. For point-source distances (Repi, Rhyp)
+            the hypocenter is taken from the origin instance. The finite-rupture
             distances (Rrup, Rjb, ...), are based on the rupture representation
             in the source instance if available. If a Rupture instance is
             unavailalbe, the finite-rupture distances are computed from 
             point-source distances, in which case the earthquake manitude from
-            the Source instance is required for median distance corrections if
+            the Origin instance is required for median distance corrections if
             use_median_distance is True.
         :param lat:
             A numpy array of site latitudes.
@@ -68,13 +68,14 @@ class Distance(object):
         :returns:
             Distance object.
         """
-        self._source = source
+        self._origin = origin
+        self._rup = rup
 
         self._distance_context = self._calcDistanceContext(
             gmpe, lat, lon, dep, use_median_distance)
 
     @classmethod
-    def fromSites(cls, gmpe, source, sites, use_median_distance=True):
+    def fromSites(cls, gmpe, origin, sites, rup = None, use_median_distance=True):
         """
         Convenience class method to construct a Distance object from a sites
         object.
@@ -83,8 +84,8 @@ class Distance(object):
             Concrete subclass of GMPE
             `[link] <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#built-in-gsims>`__;
             can be individual instance or list of instances.
-        :param source:
-            Shakeamp Source object.
+        :param origin:
+            Shakeamp Origin object.
         :param sites:
             Shakemap Sites object.
         :param use_median_distance:
@@ -105,7 +106,7 @@ class Distance(object):
         lons = np.linspace(west, east, nx)
         lon, lat = np.meshgrid(lons, lats)
         dep = np.zeros_like(lon)
-        return cls(gmpe, source, lat, lon, dep, use_median_distance)
+        return cls(gmpe, origin, rup, lat, lon, dep, use_median_distance)
 
     def getDistanceContext(self):
         """
@@ -115,12 +116,12 @@ class Distance(object):
         """
         return copy.deepcopy(self._distance_context)
 
-    def getSource(self):
+    def getOrigin(self):
         """
         :returns:
-            Shakemap Source object. 
+            Shakemap Origin object. 
         """
-        return copy.deepcopy(self._source)
+        return copy.deepcopy(self._origin)
 
     def _calcDistanceContext(self, gmpe, lat, lon, dep,
                              use_median_distance=True):
@@ -162,8 +163,8 @@ class Distance(object):
 
         context = base.DistancesContext()
 
-        ddict = get_distance(list(requires), lat, lon, dep, self._source,
-                             use_median_distance=use_median_distance)
+        ddict = get_distance(list(requires), lat, lon, dep, self._origin,
+                             self._rup, use_median_distance=use_median_distance)
 
         for method in requires:
             (context.__dict__)[method] = ddict[method]
@@ -182,7 +183,7 @@ def get_distance_measures():
 
     return ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T']
 
-def get_distance(methods, lat, lon, dep, source,
+def get_distance(methods, lat, lon, dep, origin, rup = None, 
                  use_median_distance=True):
     """
     Calculate distance using any one of a number of distance measures.
@@ -224,8 +225,8 @@ def get_distance(methods, lat, lon, dep, source,
        A numpy array of longidues.
     :param dep:
        A numpy array of depths (km).
-    :param source:
-       source instance.
+    :param origin:
+       origin instance.
     :param use_median_distance:
         Boolean; only used if GMPE requests rupture distances and not rupture is
         availalbe. Default is True, meaning that point-source distances are
@@ -237,8 +238,8 @@ def get_distance(methods, lat, lon, dep, source,
        be returned; if rjb is requested, repi will be returned; if rrup
        is requested, rhypo will be returned.
     """
-    rupture = source.getRupture()
-    hypo = source.getHypo()
+    rupture = rup
+    hypo = origin.getHypo()
     if rupture is not None:
         quadlist = rupture.getQuadrilaterals()
         # Need a copy for GC2 since order of verticies/quads needs to be modivied.
@@ -303,8 +304,8 @@ def get_distance(methods, lat, lon, dep, source,
        (('T' in methods) and (quadlist is None)) or \
        (('U' in methods) and (quadlist is None)):
         # I don't think this error check makes sense any more because hypo
-        # is assigned above with source.getHypo() that constructs it from
-        # source._event_dict entries. 
+        # is assigned above with origin.getHypo() that constructs it from
+        # origin values. 
         if hypo is None:
             raise ShakeMapException('Cannot calculate epicentral distance '
                                     'without a point object')
@@ -343,7 +344,7 @@ def get_distance(methods, lat, lon, dep, source,
             # one segment.
             #-----------------------------------------------------------------
 
-            segind = rupture._getSegmentIndex()
+            segind = rupture._getGroupIndex()
             segindnp = np.array(segind)
             uind = np.unique(segind)
             nseg = len(uind)
@@ -587,13 +588,13 @@ def get_distance(methods, lat, lon, dep, source,
                 # -------------------
                 # Sort out file names
                 # -------------------
-                mech = source.getEventParam('mech')
-                if not hasattr(source, '_tectonic_region'):
+                mech = origin.mech
+                if not hasattr(origin, '_tectonic_region'):
                     rf = os.path.join(
                         cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p0_seis0_20_Ratios.csv")
                     vf = os.path.join(
                         cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p0_seis0_20_Var.csv")
-                elif source._tectonic_region == 'Active Shallow Crust':
+                elif origin._tectonic_region == 'Active Shallow Crust':
                     if mech == 'ALL':
                         rf = os.path.join(
                             cdir, "data", "ps2ff", "Rjb_WC94_mechA_ar1p7_seis0_20_Ratios.csv")
@@ -614,7 +615,7 @@ def get_distance(methods, lat, lon, dep, source,
                             cdir, "data", "ps2ff", "Rjb_WC94_mechSS_ar1p7_seis0_20_Ratios.csv")
                         vf = os.path.join(
                             cdir, "data", "ps2ff", "Rjb_WC94_mechSS_ar1p7_seis0_20_Var.csv")
-                elif source._tectonic_region == 'Stable Shallow Crust':
+                elif origin._tectonic_region == 'Stable Shallow Crust':
                     if mech == 'ALL':
                         rf = os.path.join(
                             cdir, "data", "ps2ff", "Rjb_S14_mechA_ar1p0_seis0_15_Ratios.csv")
@@ -666,7 +667,7 @@ def get_distance(methods, lat, lon, dep, source,
                     rjb = repi * ratio
                     return rjb
                 repis = distdict['repi']
-                mags = np.ones_like(repis) * source.getEventParam('mag')
+                mags = np.ones_like(repis) * origin.mag
                 rjb_hat = repi2rjb_tbl(repis, mags)
                 distdict['rjb'] = rjb_hat
                 # -------------------
@@ -690,14 +691,14 @@ def get_distance(methods, lat, lon, dep, source,
                 # -------------------
                 # Sort out file names
                 # -------------------
-                rake = source._event_dict.get('rake')
+                rake = origin.rake
                 mech = rake_to_mech(rake)
-                if not hasattr(source, '_tectonic_region'):
+                if not hasattr(origin, '_tectonic_region'):
                     rf = os.path.join(
                         cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p0_seis0-20_Ratios.csv")
                     vf = os.path.join(
                         cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p0_seis0-20_Var.csv")
-                elif source._tectonic_region == 'Active Shallow Crust':
+                elif origin._tectonic_region == 'Active Shallow Crust':
                     if mech == 'ALL':
                         rf = os.path.join(
                             cdir, "data", "ps2ff", "Rrup_WC94_mechA_ar1p7_seis0-20_Ratios.csv")
@@ -718,7 +719,7 @@ def get_distance(methods, lat, lon, dep, source,
                             cdir, "data", "ps2ff", "Rrup_WC94_mechSS_ar1p7_seis0-20_Ratios.csv")
                         vf = os.path.join(
                             cdir, "data", "ps2ff", "Rrup_WC94_mechSS_ar1p7_seis0-20_Var.csv")
-                elif source._tectonic_region == 'Stable Shallow Crust':
+                elif origin._tectonic_region == 'Stable Shallow Crust':
                     if mech == 'ALL':
                         rf = os.path.join(
                             cdir, "data", "ps2ff", "Rrup_S14_mechA_ar1p0_seis0-15_Ratios.csv")
@@ -770,7 +771,7 @@ def get_distance(methods, lat, lon, dep, source,
                     rrup = repi * ratio
                     return rrup
                 repis = distdict['repi']
-                mags = np.ones_like(repis) * source.getEventParam('mag')
+                mags = np.ones_like(repis) * origin.mag
                 rrup_hat = repi2rrup_tbl(repis, mags)
                 distdict['rrup'] = rrup_hat
 

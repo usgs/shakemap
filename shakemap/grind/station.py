@@ -151,7 +151,7 @@ class StationList(object):
 
 
     @classmethod
-    def fromXML(cls, xmlfiles, dbfile, source, sites):
+    def fromXML(cls, xmlfiles, dbfile, origin, sites, rupture):
         """
         Create a StationList object by reading one or more ShakeMap XML
         input files and populate database tables with derived MMI/PGM
@@ -164,12 +164,14 @@ class StationList(object):
             dbfile (string):
                 Path to a file into which to write the SQLite database. If
                 the file exists, it will first be deleted.
-            source:
-                ShakeMap Source object containing information about the
+            origin:
+                ShakeMap Origin object containing information about the
                 origin and source of the earthquake.
             sites:
                 ShakeMap Sites object containing grid of Vs30 values for the
                 region in question.
+            rupture:
+                ShakeMap Rupture object.
 
         Returns:
             :class:`StationList` object
@@ -188,7 +190,7 @@ class StationList(object):
             pass
 
         this = cls.loadFromXML(xmlfiles, dbfile)
-        this.fillTables(source, sites)
+        this.fillTables(origin, sites, rupture)
         return this
 
 
@@ -312,23 +314,25 @@ class StationList(object):
         return cls(dbfile)
 
 
-    def fillTables(self, source, sites):
+    def fillTables(self, origin, sites, rupture):
         """
         Populate database tables with derived MMI/PGM values and distances.
         This method should be called after :meth:`loadFromXML`.
 
         Args:
-            source:
-                ShakeMap Source object containing information about the
+            origin:
+                ShakeMap Origin object containing information about the
                 origin and source of the earthquake.
             sites:
                 ShakeMap Sites object containing grid of Vs30 values for the
                 region in question.
+            rupture:
+                ShakeMap Rupture object.
 
         Returns:
             nothing
         """
-        emag = source.getEventDict()['mag']
+        emag = origin.mag
         #
         # Get a list of stations
         #
@@ -346,7 +350,7 @@ class StationList(object):
         for irow, row in enumerate(station_rows):
             lats[irow] = row[1]
             lons[irow] = row[2]
-        ddict = get_distance(DISTANCES, lats, lons, depths, source)
+        ddict = get_distance(DISTANCES, lats, lons, depths, origin, rupture)
         dist_rows = []
         for irow, row in enumerate(station_rows):
             dist_rows.append(

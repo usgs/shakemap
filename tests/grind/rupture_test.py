@@ -11,11 +11,13 @@ import numpy as np
 import pytest
 
 from shakemap.grind.rupture import QuadRupture
+from shakemap.grind.rupture import EdgeRupture
 from shakemap.grind.rupture import read_rupture_file
 from shakemap.utils.exception import ShakeMapException
 from impactutils.io.cmd import get_command_output
 from shakemap.grind.rupture import get_local_unit_slip_vector
 from shakemap.grind.rupture import get_quad_slip
+from shakemap.grind.rupture import text_to_json
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
@@ -23,7 +25,47 @@ sys.path.insert(0, shakedir)
 
 def test_EdgeRupture():
     file = 'tests/data/cascadia.json'
-    casc = read_rupture_file(file)
+    rup = read_rupture_file(file)
+
+    # Force read Northridge as EdgeRupture
+    file = 'tests/data/eventdata/northridge/northridge_fault.txt'
+    d = text_to_json(file)
+    rupt = EdgeRupture.fromJson(d)
+    strike = rupt.getStrike()
+    np.testing.assert_allclose(strike, 121.97, atol=0.01)
+    dip = rupt.getDip()
+    np.testing.assert_allclose(dip, 40.12, atol=0.01)
+    L = rupt.getLength()
+    np.testing.assert_allclose(L, 17.99, atol=0.01)
+    W = rupt.getWidth()
+    np.testing.assert_allclose(W, 23.92, atol=0.01)
+    ztor = rupt.getDepthToTop()
+    np.testing.assert_allclose(ztor, 5, atol=0.01)
+
+    # And again for the same vertices but reversed order
+    file = 'tests/data/eventdata/northridge/northridge_fixed_fault.txt'
+    d = text_to_json(file)
+    rupt = EdgeRupture.fromJson(d)
+    strike = rupt.getStrike()
+    np.testing.assert_allclose(strike, 121.97, atol=0.01)
+    dip = rupt.getDip()
+    np.testing.assert_allclose(dip, 40.12, atol=0.01)
+    L = rupt.getLength()
+    np.testing.assert_allclose(L, 17.99, atol=0.01)
+    W = rupt.getWidth()
+    np.testing.assert_allclose(W, 23.92, atol=0.01)
+    ztor = rupt.getDepthToTop()
+    np.testing.assert_allclose(ztor, 5, atol=0.01)
+
+
+def test_QuadRupture():
+    # First with json file
+    file = 'tests/data/izmit.json'
+    rupj = read_rupture_file(file)
+    # Then with text file:
+    file = 'tests/data/Barkaetal02_fault.txt'
+    rupt = read_rupture_file(file)
+
 
 def test_misc():
     # Make a rupture
@@ -34,10 +76,10 @@ def test_misc():
     z = np.array([1.0])
     W = np.array([3.0])
     dip = np.array([30.])
-    flt = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
-    fm = flt.getRuptureAsMesh()
-    fa = flt.getRuptureAsArrays()
-    ref = flt.getReference()
+    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    fm = rup.getRuptureAsMesh()
+    fa = rup.getRuptureAsArrays()
+
 
 
 def test_slip():
@@ -49,9 +91,9 @@ def test_slip():
     z = np.array([1.0])
     W = np.array([3.0])
     dip = np.array([30.])
-    flt = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
 
-    slp = get_quad_slip(flt.getQuadrilaterals()[0], 30).getArray()
+    slp = get_quad_slip(rup.getQuadrilaterals()[0], 30).getArray()
     slpd = np.array([0.80816457,  0.25350787,  0.53160491])
     np.testing.assert_allclose(slp, slpd)
 
@@ -72,30 +114,30 @@ def test_northridge():
     cbuf = io.StringIO(rupture_text)
     rupture = read_rupture_file(cbuf)
     strike = rupture.getStrike()
-    np.testing.assert_allclose(strike, 122.06408, atol=0.001)
+    np.testing.assert_allclose(strike, 122.06, atol=0.01)
     dip = rupture.getDip()
-    np.testing.assert_allclose(dip, 40.20979, atol=0.001)
-    L = rupture.getRuptureLength()
-    np.testing.assert_allclose(L, 17.99198, atol=0.001)
+    np.testing.assert_allclose(dip, 40.21, atol=0.01)
+    L = rupture.getLength()
+    np.testing.assert_allclose(L, 17.99, atol=0.01)
     W = rupture.getWidth()
-    np.testing.assert_allclose(W, 23.93699, atol=0.001)
+    np.testing.assert_allclose(W, 23.94, atol=0.01)
     nq = rupture.getNumQuads()
     np.testing.assert_allclose(nq, 1)
-    ns = rupture.getNumSegments()
-    np.testing.assert_allclose(ns, 1)
-    sind = rupture._getSegmentIndex()
+    ng = rupture.getNumGroups()
+    np.testing.assert_allclose(ng, 1)
+    sind = rupture._getGroupIndex()
     np.testing.assert_allclose(sind, [0])
-    ztor = rupture.getTopOfRupture()
-    np.testing.assert_allclose(ztor, 5, atol=0.001)
+    ztor = rupture.getDepthToTop()
+    np.testing.assert_allclose(ztor, 5, atol=0.01)
     itl = rupture.getIndividualTopLengths()
-    np.testing.assert_allclose(itl, 17.9919846, atol=0.001)
+    np.testing.assert_allclose(itl, 17.99, atol=0.01)
     iw = rupture.getIndividualWidths()
-    np.testing.assert_allclose(iw, 23.93699668, atol=0.001)
+    np.testing.assert_allclose(iw, 23.94, atol=0.01)
     lats = rupture.getLats()
-    lats_d = np.array([34.315,  34.401,  34.261,  34.175,  34.315])
+    lats_d = np.array([34.315,  34.401,  34.261,  34.175,  np.nan])
     np.testing.assert_allclose(lats, lats_d, atol=0.001)
     lons = rupture.getLons()
-    lons_d = np.array([-118.421, -118.587, -118.693, -118.527, -118.421])
+    lons_d = np.array([-118.421, -118.587, -118.693, -118.527, np.nan])
     np.testing.assert_allclose(lons, lons_d, atol=0.001)
 
 
@@ -150,52 +192,50 @@ def parse_complicated_rupture():
     cbuf = io.StringIO(rupture_text)
     rupture = read_rupture_file(cbuf)
     strike = rupture.getStrike()
-    np.testing.assert_allclose(strike, -100.464330, atol=0.001)
+    np.testing.assert_allclose(strike, -100.46, atol=0.01)
     dip = rupture.getDip()
-    np.testing.assert_allclose(dip, 89.3985, atol=0.001)
-    L = rupture.getRuptureLength()
-    np.testing.assert_allclose(L, 119.5578, atol=0.001)
+    np.testing.assert_allclose(dip, 89.40, atol=0.01)
+    L = rupture.getLength()
+    np.testing.assert_allclose(L, 119.56, atol=0.01)
     W = rupture.getWidth()
-    np.testing.assert_allclose(W, 20.001, atol=0.001)
+    np.testing.assert_allclose(W, 20.0, atol=0.01)
     nq = rupture.getNumQuads()
     np.testing.assert_allclose(nq, 9)
-    ns = rupture.getNumSegments()
-    np.testing.assert_allclose(ns, 7)
-    sind = rupture._getSegmentIndex()
+    ng = rupture.getNumGroups()
+    np.testing.assert_allclose(ng, 7)
+    sind = rupture._getGroupIndex()
     np.testing.assert_allclose(sind, [0, 1, 2, 2, 3, 3, 4, 5, 6])
-    ztor = rupture.getTopOfRupture()
-    np.testing.assert_allclose(ztor, 0, atol=0.001)
+    ztor = rupture.getDepthToTop()
+    np.testing.assert_allclose(ztor, 0, atol=0.01)
     itl = rupture.getIndividualTopLengths()
     itl_d = np.array([15.13750778,  22.80237887,  18.98053425,   6.98263853,
                       13.55978731,   8.43444811,   5.41399812,  20.57788056,
                       7.66869463])
-    np.testing.assert_allclose(itl, itl_d, atol=0.001)
+    np.testing.assert_allclose(itl, itl_d, atol=0.01)
     iw = rupture.getIndividualWidths()
     iw_d = np.array([20.00122876,  20.00122608,  20.00120173,  20.00121028,
                      20.00121513,  20.00121568,  20.00107293,  20.00105498,
                      20.00083348])
-    np.testing.assert_allclose(iw, iw_d, atol=0.001)
+    np.testing.assert_allclose(iw, iw_d, atol=0.01)
     lats = rupture.getLats()
-    lats_d = np.array([40.70985, 40.72733, 40.72933, 40.71185, 40.70985,
-                       np.nan, 40.70513, 40.74903, 40.75103, 40.70713,
-                       40.70513, np.nan, 40.72582, 40.72336, 40.73432,
-                       40.73632, 40.72536, 40.72782, 40.72582, np.nan,
-                       40.7121, 40.71081, 40.70739, 40.70939, 40.71281,
-                       40.7141, 40.7121, np.nan, 40.71621, 40.70068,
-                       40.70268, 40.71821, 40.71621, np.nan, 40.69947,
-                       40.79654, 40.79854, 40.70147, 40.69947, np.nan,
-                       40.80199, 40.84501, 40.84701, 40.80399, 40.80199])
+    lats_d = np.array([
+        40.70985,  40.72733,  40.72933,  40.71185,       np.nan,  40.70513,
+        40.74903,  40.75103,  40.70713,       np.nan,  40.72582,  40.72336,
+        40.73432,  40.73632,  40.72536,  40.72782,       np.nan,  40.7121 ,
+        40.71081,  40.70739,  40.70939,  40.71281,  40.7141 ,       np.nan,
+        40.71621,  40.70068,  40.70268,  40.71821,       np.nan,  40.69947,
+        40.79654,  40.79854,  40.70147,       np.nan,  40.80199,  40.84501,
+        40.84701,  40.80399,       np.nan])
     np.testing.assert_allclose(lats, lats_d, atol=0.001)
     lons = rupture.getLons()
-    lons_d = np.array([29.3376, 29.51528, 29.51528, 29.3376, 29.3376,
-                       np.nan, 29.61152, 29.87519, 29.87519, 29.61152,
-                       29.61152, np.nan, 29.88662, 30.11126, 30.19265,
-                       30.19265, 30.11126, 29.88662, 29.88662, np.nan,
-                       30.30494, 30.4654, 30.56511, 30.56511, 30.4654,
-                       30.30494, 30.30494, np.nan, 30.57658, 30.63731,
-                       30.63731, 30.57658, 30.57658, np.nan, 30.729,
-                       30.93655, 30.93655, 30.729, 30.729, np.nan,
-                       30.94688,  31.01799, 31.01799, 30.94688, 30.94688])
+    lons_d = np.array([
+        29.3376 ,  29.51528,  29.51528,  29.3376 ,       np.nan,  29.61152,
+        29.87519,  29.87519,  29.61152,       np.nan,  29.88662,  30.11126,
+        30.19265,  30.19265,  30.11126,  29.88662,       np.nan,  30.30494,
+        30.4654 ,  30.56511,  30.56511,  30.4654 ,  30.30494,       np.nan,
+        30.57658,  30.63731,  30.63731,  30.57658,       np.nan,  30.729  ,
+        30.93655,  30.93655,  30.729  ,       np.nan,  30.94688,  31.01799,
+        31.01799,  30.94688,       np.nan])
     np.testing.assert_allclose(lons, lons_d, atol=0.001)
 
 
@@ -204,6 +244,7 @@ def test_incorrect():
     24.27980 120.72300	0 
     24.05000 121.00000	17
     24.07190 121.09300	17
+    24.33120 121.04300	17
     24.33120 121.04300	17
     24.27980 120.72300	0 
     >   

@@ -6,19 +6,18 @@ import sys
 import io
 
 # third party
-from openquake.hazardlib.gsim import abrahamson_2014
 import numpy as np
 import pytest
 
 # local imports
-from shakemap.grind.source import Source
+from shakemap.grind.origin import Origin
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 sys.path.insert(0, shakedir)
 
 
-def test_source():
+def test_origin():
     fault_text = """30.979788       103.454422      1
 31.691615       104.419160      1
 31.723569       104.374760      1
@@ -35,37 +34,22 @@ def test_source():
     ffile = io.StringIO(fault_text)
     efile = io.StringIO(event_text)
     sfile = io.StringIO(source_text)
-    source = Source.fromFile(efile, rupturefile=ffile, sourcefile=sfile)
+    origin = Origin.fromFile(efile, sourcefile=sfile)
 
-    gmpe = abrahamson_2014.AbrahamsonEtAl2014()
-    rupture = source.getRuptureContext([gmpe])
     testdict = {'mag': 7.9,
-                'strike': -133.083550974,
-                'dip': 49.8524115024,
-                'rake': 0.0,
-                'ztor': 0.999999999995,
-                'hypo_lon': 103.3639,
-                'hypo_lat': 30.9858,
-                'hypo_depth': 19.0,
-                'width': 27.8623813381}
+                'id': '2008ryan',
+                'locstring': 'EASTERN SICHUAN, CHINA',
+                'mech': 'RS',
+                'lon': 103.3639,
+                'lat': 30.9858,
+                'depth': 19.0}
     for key in testdict.keys():
-        value = eval('rupture.%s' % key)
-        np.testing.assert_almost_equal(testdict[key], value)
+        value = eval('origin.%s' % key)
+        if type(value) is str:
+            assert testdict[key] == value
+        if type(value) is float:
+            np.testing.assert_almost_equal(testdict[key], value)
 
-    mech = 'RS'
-    exp_dip = 40
-    exp_rake = 90
-    source.setMechanism(mech)
-    assert source.getEventParam('dip') == exp_dip
-    assert source.getEventParam('rake') == exp_rake
-    source.setMechanism('ALL', dip=45, rake=315)
-    assert source.getEventParam('rake') == -45
-
-    # this should raise an exception
-    with pytest.raises(Exception) as e_info:
-        source.setMechanism('ALL', dip=110)
-    with pytest.raises(Exception) as e_info:
-        source.setMechanism('ALL', rake=620)
 
 if __name__ == "__main__":
-    test_source()
+    test_origin()

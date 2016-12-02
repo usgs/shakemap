@@ -66,13 +66,15 @@ class Rowshandel2013(object):
     __c2 = [-0.035, -0.10, -0.15, -0.26, -0.30]
     __periods = [1.0, 3.0, 5.0, 7.5, 10.0]
 
-    def __init__(self, source, lat, lon, dep, dx, T, a_weight=0.5,
+    def __init__(self, origin, rup, lat, lon, dep, dx, T, a_weight=0.5,
                  mtype=1, simpleDT=False, centered=True):
         """
         Constructor for rowshandel2013.
 
-        :param source:
-            Source instance.
+        :param origin:
+            Origin instance.
+        :param rup:
+            Rupture instance.
         :param lat:
             Numpy array of site latitudes.
         :param lon:
@@ -98,15 +100,15 @@ class Rowshandel2013(object):
         :param centered:
             Boolean; should the centered directivity parameter be used.
         """
-        self._source = source
-        self._flt = source.getRupture()
-        self._hyp = source.getHypo()
+        self._origin = origin
+        self._rup = rup
+        self._hyp = origin.getHypo()
         self._lat = lat
         self._lon = lon
         self._dep = dep
-        self._rake = source.getEventParam('rake')
+        self._rake = origin.rake
         self._dx = dx
-        self._M = source.getEventParam('mag')
+        self._M = origin.mag
 #        if np.all(T != np.array([1, 2, 3, 4, 5, 7.5])):
 #            raise IndexError('Invalid T value. Interpolation not yet supported.')
         if isinstance(T, float):
@@ -131,15 +133,17 @@ class Rowshandel2013(object):
         self.__computeFd()
 
     @classmethod
-    def fromSites(cls, source, sites, dx, T, a_weight=0.5,
+    def fromSites(cls, origin, rup, sites, dx, T, a_weight=0.5,
                   mtype=1, simpleDT=False, centered=True):
         """Construct a rowshandel2013 instance from a sites instance.
 
         Class method for constructing a rowshandel2013 instance from
         a sites instance.
 
-        :param source:
-            Source instance.
+        :param origin:
+            Origin instance.
+        :param rup:
+            Rupture instance.
         :param sites:
             Sites object. 
         :param dx:
@@ -171,7 +175,7 @@ class Rowshandel2013(object):
         lons = np.linspace(west, east, nx)
         lon, lat = np.meshgrid(lons, lats)
         dep = np.zeros_like(lon)
-        return cls(source, lat, lon, dep, dx, T,
+        return cls(origin, rup, lat, lon, dep, dx, T,
                    a_weight, mtype, simpleDT, centered)
 
     def getFd(self):
@@ -251,7 +255,7 @@ class Rowshandel2013(object):
         * Alternative is to compute max Wrup for the different quads.
 
         """
-        nquad = len(self._flt._quadrilaterals)
+        nquad = len(self._rup._quadrilaterals)
 
         #-------------------------------------------
         # First find which quad the hypocenter is on
@@ -262,11 +266,11 @@ class Rowshandel2013(object):
         hyp_ecef = np.array([[x, y, z]])
         qdist = np.zeros(nquad)
         for i in range(0, nquad):
-            P0, P1, P2, P3 = self._flt.getQuadrilaterals()[i]
+            P0, P1, P2, P3 = self._rup.getQuadrilaterals()[i]
             qdist[i] = _calc_rupture_distance(P0, P1, P2, P3, hyp_ecef)
         ind = int(np.where(qdist == np.min(qdist))[0])
         # *** check that this doesn't break with more than one quad
-        q = self._flt.getQuadrilaterals()[ind]
+        q = self._rup.getQuadrilaterals()[ind]
 
         #--------------------------
         # Compute Wrup on that quad
@@ -314,9 +318,9 @@ class Rowshandel2013(object):
         xi_prime_s = np.zeros(np.product(slat.shape))
         xi_prime_p = np.zeros(np.product(slat.shape))
 
-        for k in range(len(self._flt._quadrilaterals)):
+        for k in range(len(self._rup._quadrilaterals)):
             # Select a quad
-            q = self._flt.getQuadrilaterals()[k]
+            q = self._rup.getQuadrilaterals()[k]
 
             # Quad mesh (ECEF coords)
             mesh = rupture.get_quad_mesh(q, self._dx)
@@ -448,7 +452,7 @@ class Rowshandel2013(object):
         epi_x, epi_y = proj(self._hyp.longitude, self._hyp.latitude)
 
         # Get the lines for the top edge of the rupture
-        qds = self._flt.getQuadrilaterals()
+        qds = self._rup.getQuadrilaterals()
         nq = len(qds)
         top_lat = np.array([[]])
         top_lon = np.array([[]])
@@ -512,7 +516,7 @@ class Rowshandel2013(object):
         slat = self._lat
         slon = self._lon
         site_z = np.zeros_like(slat)
-        ddict = get_distance('rrup', slat, slon, site_z, self._source)
+        ddict = get_distance('rrup', slat, slon, site_z, self._origin, self._rup)
         Rrup = np.reshape(ddict['rrup'], (-1, ))
         nsite = len(Rrup)
 
@@ -543,7 +547,7 @@ class Rowshandel2013(object):
         self._DT = DT
 
     def __getCenteringTerm(self):
-        L = self._flt.getRuptureLength()
+        L = self._rup.getLength()
         CSSLP = -0.32 + 0.15 * np.log(L)
         CTRST = -0.20 + 0.09 * np.log(L)
         CNRML = -0.20 + 0.08 * np.log(L)
