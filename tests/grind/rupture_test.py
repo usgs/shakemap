@@ -133,12 +133,12 @@ def test_northridge():
     np.testing.assert_allclose(itl, 17.99, atol=0.01)
     iw = rupture.getIndividualWidths()
     np.testing.assert_allclose(iw, 23.94, atol=0.01)
-    lats = rupture.getLats()
-    lats_d = np.array([34.315,  34.401,  34.261,  34.175,  np.nan])
-    np.testing.assert_allclose(lats, lats_d, atol=0.001)
-    lons = rupture.getLons()
-    lons_d = np.array([-118.421, -118.587, -118.693, -118.527, np.nan])
-    np.testing.assert_allclose(lons, lons_d, atol=0.001)
+    lats = rupture.lats
+    lats_d = np.array([34.401, 34.315, 34.175, 34.261, 34.401, np.nan])
+    np.testing.assert_allclose(lats, lats_d, atol=0.01)
+    lons = rupture.lons
+    lons_d = np.array([-118.587, -118.421, -118.527, -118.693, -118.587, np.nan])
+    np.testing.assert_allclose(lons, lons_d, atol=0.01)
 
 
 def parse_complicated_rupture():
@@ -217,7 +217,7 @@ def parse_complicated_rupture():
                      20.00121513,  20.00121568,  20.00107293,  20.00105498,
                      20.00083348])
     np.testing.assert_allclose(iw, iw_d, atol=0.01)
-    lats = rupture.getLats()
+    lats = rupture.lats
     lats_d = np.array([
         40.70985,  40.72733,  40.72933,  40.71185,       np.nan,  40.70513,
         40.74903,  40.75103,  40.70713,       np.nan,  40.72582,  40.72336,
@@ -227,7 +227,7 @@ def parse_complicated_rupture():
         40.79654,  40.79854,  40.70147,       np.nan,  40.80199,  40.84501,
         40.84701,  40.80399,       np.nan])
     np.testing.assert_allclose(lats, lats_d, atol=0.001)
-    lons = rupture.getLons()
+    lons = rupture.lons
     lons_d = np.array([
         29.3376 ,  29.51528,  29.51528,  29.3376 ,       np.nan,  29.61152,
         29.87519,  29.87519,  29.61152,       np.nan,  29.88662,  30.11126,

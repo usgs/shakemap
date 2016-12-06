@@ -5,7 +5,7 @@ import openquake.hazardlib.geo as geo
 import copy
 
 from shakemap.grind.distance import get_distance
-from shakemap.grind.distance import _distance_sq_to_segment
+from shakemap.grind.rupture import _distance_sq_to_segment
 import shakemap.utils.ecef as ecef
 from shakemap.utils.vector import Vector
 

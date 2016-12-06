@@ -84,7 +84,7 @@ def test_virtualipe():
 
     sx = sites_obj_grid.getSitesContext(lldict=lldict, rock_vs30=760.0)
 
-    dobj = Distance(gmpe, origin_obj, rupture_obj, lats, lons, depths)
+    dobj = Distance(gmpe, lons, lats, depths, origin_obj, rupture_obj)
     dx = dobj.getDistanceContext()
 
     sd_types = [oqconst.StdDev.TOTAL]
@@ -148,7 +148,7 @@ def test_virtualipe():
     ipe = VirtualIPE.fromFuncs(gmpe, gmice)
     rx = rupture_obj.getRuptureContext([gmpe], origin_obj)
     rx.rake = 45.
-    dobj = Distance(gmpe, origin_obj, rupture_obj, lats, lons, depths)
+    dobj = Distance(gmpe, lons, lats, depths, origin_obj, rupture_obj)
     dx = dobj.getDistanceContext()
 
     mmi_rjb, mmi_sd_rjb = \

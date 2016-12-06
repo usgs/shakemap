@@ -1,28 +1,34 @@
 #!/usr/bin/env python
 
 # stdlib modules
+import os
 import copy
+import warnings
 from abc import ABC
 from abc import abstractmethod
 import json
+import itertools as it
+import re
 
 # third party imports
 import numpy as np
+import pandas as pd
+import scipy.interpolate as spint
 from openquake.hazardlib.geo.mesh import Mesh
 from openquake.hazardlib.geo.point import Point
 from openquake.hazardlib.geo.utils import get_orthographic_projection
+from openquake.hazardlib.geo import geodetic
 from openquake.hazardlib.gsim import base
 
-from ..utils.ecef import latlon2ecef
-from ..utils.ecef import ecef2latlon
-from ..utils.vector import Vector
-
-# local imports
+from shakemap.utils.ecef import latlon2ecef
+from shakemap.utils.ecef import ecef2latlon
+from shakemap.utils.vector import Vector
 from shakemap.utils.exception import ShakeMapException
 
 
+
 #-------------------------------------------------------------------------------
-# CONSTANTS
+# CONSTANTS and DEFAULTS
 
 # Depth tolerance in km (for determining if top and bottom edges are horizontal)
 DEPTH_TOL = 0.05
@@ -33,6 +39,14 @@ DEPTH_TOL = 0.05
 OFFPLANE_TOLERANCE = 0.05
 
 RAKEDICT = {'SS': 0.0, 'NM': -90.0, 'RS': 90.0, 'ALL': None}
+
+DEFAULT_MECH = 'ALL'
+DEFAULT_STRIKE = 0.0
+DEFAULT_DIP = 90.0
+DEFAULT_RAKE = 0.0
+DEFAULT_WIDTH = 0.0
+DEFAULT_ZTOR = 0.0
+
 #-------------------------------------------------------------------------------
 
 
@@ -66,7 +80,7 @@ class Rupture(ABC):
 #        Write the rupture/origin info to a GeoJson file.
 #
 #        Args:
-#            origin (Origin): Instance of ShakeMap Origin class. 
+#            origin (Origin): Optional ShakeMap Origin class.
 #
 #        """
 #        pass
@@ -123,6 +137,22 @@ class Rupture(ABC):
         """
         pass
 
+    @abstractmethod
+    def getQuadrilaterals(self):
+        """
+        Method to return rupture quadrilaterals. Returns None for
+        PointRupture.
+        """
+        pass
+
+    def getReference(self):
+        """
+        Returns:
+           float: Average dip in degrees.
+
+        """
+        return self._reference
+
     @classmethod
     @abstractmethod
     def fromJson(cls, d):
@@ -161,10 +191,6 @@ class Rupture(ABC):
         rx.dip = self.getDip()
         rx.ztor = self.getDepthToTop()
         rx.width = self.getWidth()
-#            rup.strike = DEFAULT_STRIKE
-#            rup.dip = DEFAULT_DIP
-#            rup.ztor = DEFAULT_ZTOR
-#            rup.width = DEFAULT_WIDTH
 
         if hasattr(origin, 'rake'):
             rx.rake = origin.rake
@@ -179,8 +205,416 @@ class Rupture(ABC):
         rx.hypo_depth = origin.depth
 
         return rx
-    
 
+    @abstractmethod
+    def computeRjb(self, lon, lat, depth):
+        """
+        Method for computing Joyner-Boore distance. 
+
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+
+        Returns:
+           array: Joyner-Boore distance (km).
+
+        """
+        pass
+
+    @abstractmethod
+    def computeRrup(self, lon, lat, depth):
+        """
+        Method for computing rupture distance. 
+
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+
+        Returns:
+           array: Rupture distance (km).
+
+        """
+        pass
+
+    @abstractmethod
+    def computeGC2(self, lon, lat, depth):
+        """
+        Method for computing version 2 of the Generalized Coordinate system 
+        (GC2) by Spudich and Chiou OFR 2015-1028. 
+        
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+
+        Returns:
+            dict: Dictionary with keys for each of the GC2-related distances,
+                which include 'rx', 'ry', 'ry0', 'U', 'T'. 
+        """
+        pass
+
+class PointRupture(Rupture):
+    """
+    Rupture class for point sources. The purpose is to gracefully handle:
+
+        - Requests for rupture distances when no rupture is available. 
+        - Provide reasonable default values for rupture parameters. 
+    """
+
+    def __init__(self, reference = ""):
+        self._reference = reference
+
+    def getLength(self):
+        """
+        Rupture length, which is None for a PointRupture.
+        Could potentially put in a default value based on magnitude, and add
+        an Origin argument.
+        """
+        return None
+
+    def getWidth(self):
+        """
+        Rupture width.
+        Could potentially put in a default value based on magnitude, and add
+        an Origin argument.
+        """
+        return DEFAULT_WIDTH
+
+    def getArea(self):
+        """
+        Rupture area, which is None for a PointRupture.
+        Could potentially put in a default value based on magnitude, and add
+        an Origin argument.
+        """
+        return None
+
+    def getStrike(self):
+        """
+        Strike, which is None. 
+        Could potentially get from strec or something?
+        """
+        return DEFAULT_STRIKE
+
+    def getDip(self):
+        """
+        Dip, which is None.
+        Could potentially get from strec or something?
+        """
+        return DEFAULT_DIP
+
+    def getDepthToTop(self):
+        """
+        Depth to top of rupture.
+        Could get from hypo/magnitude?
+        """
+        return DEFAULT_ZTOR
+
+    def getQuadrilaterals(self):
+        return None
+
+    @classmethod
+    def fromJson(cls, d):
+        """
+        This abstract method is not really useful for this subclass.
+        """
+        pass
+
+    def computeRjb(self, lon, lat, depth, origin):
+        """
+        Convert point-distances to Joyner-Boore distances based on magnitude.
+
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+            origin (Origin): A ShakeMap Origin object.
+
+        Returns:
+            tuple: Array of predicted Rjb values and an array of the variance
+                of those predictions.
+        """
+        cdir, tmp = os.path.split(__file__)
+
+        # -------------------
+        # Sort out file names
+        # -------------------
+        mech = origin.mech
+        if not hasattr(origin, '_tectonic_region'):
+            rf = os.path.join(
+                cdir, "data", "ps2ff",
+                "Rjb_WC94_mechA_ar1p0_seis0_20_Ratios.csv")
+            vf = os.path.join(
+                cdir, "data", "ps2ff",
+                "Rjb_WC94_mechA_ar1p0_seis0_20_Var.csv")
+        elif origin._tectonic_region == 'Active Shallow Crust':
+            if mech == 'ALL':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_WC94_mechA_ar1p7_seis0_20_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_WC94_mechA_ar1p7_seis0_20_Var.csv")
+            elif mech == 'RS':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_WC94_mechR_ar1p7_seis0_20_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_WC94_mechR_ar1p7_seis0_20_Var.csv")
+            elif mech == 'NM':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_WC94_mechN_ar1p7_seis0_20_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_WC94_mechN_ar1p7_seis0_20_Var.csv")
+            elif mech == 'SS':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_WC94_mechSS_ar1p7_seis0_20_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_WC94_mechSS_ar1p7_seis0_20_Var.csv")
+        elif origin._tectonic_region == 'Stable Shallow Crust':
+            if mech == 'ALL':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_S14_mechA_ar1p0_seis0_15_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_S14_mechA_ar1p0_seis0_15_Var.csv")
+            elif mech == 'RS':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_S14_mechR_ar1p0_seis0_15_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_S14_mechR_ar1p0_seis0_15_Var.csv")
+            elif mech == 'NM':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_S14_mechN_ar1p0_seis0_15_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_S14_mechN_ar1p0_seis0_15_Var.csv")
+            elif mech == 'SS':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_S14_mechSS_ar1p0_seis0_15_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rjb_S14_mechSS_ar1p0_seis0_15_Var.csv")
+        else:
+            warnings.warn(
+                'Unsupported tectonic region; using coefficients for unknown'
+                'tectonic region.')
+            rf = os.path.join(
+                cdir, "data", "ps2ff",
+                "Rjb_WC94_mechA_ar1p0_seis0_20_Ratios.csv")
+            vf = os.path.join(
+                cdir, "data", "ps2ff",
+                "Rjb_WC94_mechA_ar1p0_seis0_20_Var.csv")
+
+        # -----------------
+        # Start with ratios
+        # -----------------
+        repi2rjb_ratios_tbl = pd.read_csv(rf, comment='#')
+        r2rrt_cols = repi2rjb_ratios_tbl.columns[1:]
+        mag_list = []
+        for column in (r2rrt_cols):
+            if re.search('R\d+\.*\d*', column):
+                magnitude = float(re.findall(
+                    'R(\d+\.*\d*)', column)[0])
+                mag_list.append(magnitude)
+        mag_list = np.array(mag_list)
+        dist_list = np.log(np.array(repi2rjb_ratios_tbl['Repi_km']))
+        repi2rjb_grid = repi2rjb_ratios_tbl.values[:, 1:]
+        repi2rjb_obj = spint.RectBivariateSpline(
+            dist_list, mag_list, repi2rjb_grid, kx=1, ky=1)
+
+        def repi2rjb_tbl(repi, M):
+            ratio = repi2rjb_obj.ev(np.log(repi), M)
+            rjb = repi * ratio
+            return rjb
+
+        repis = origin.computeRepi(lon, lat, depth)
+        mags = np.ones_like(repis) * origin.mag
+        rjb_hat = repi2rjb_tbl(repis, mags)
+
+        # -------------------
+        # Additional Variance
+        # -------------------
+        repi2rjbvar_ratios_tbl = pd.read_csv(vf, comment='#')
+        repi2rjbvar_grid = repi2rjbvar_ratios_tbl.values[:, 1:]
+        repi2rjbvar_obj = spint.RectBivariateSpline(
+            dist_list, mag_list, repi2rjbvar_grid, kx=1, ky=1)
+        rjbvar = repi2rjbvar_obj.ev(np.log(repis), mags)
+
+        return (rjb_hat, rjbvar)
+
+
+
+
+    def computeRrup(self, lon, lat, depth, origin):
+        """
+        Convert point-distances to rupture distances based on magnitude.
+
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+            origin (Origin): A ShakeMap Origin object.
+
+        Returns:
+            tuple: Array of predicted Rrup values and an array of the variance
+                of those predictions.
+        """
+        cdir, tmp = os.path.split(__file__)
+
+        # -------------------
+        # Sort out file names
+        # -------------------
+        rake = origin.rake
+        mech = rake_to_mech(rake)
+        if not hasattr(origin, '_tectonic_region'):
+            rf = os.path.join(
+                cdir, "data", "ps2ff",
+                "Rrup_WC94_mechA_ar1p0_seis0-20_Ratios.csv")
+            vf = os.path.join(
+                cdir, "data", "ps2ff",
+                "Rrup_WC94_mechA_ar1p0_seis0-20_Var.csv")
+        elif origin._tectonic_region == 'Active Shallow Crust':
+            if mech == 'ALL':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_WC94_mechA_ar1p7_seis0-20_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_WC94_mechA_ar1p7_seis0-20_Var.csv")
+            elif mech == 'RS':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_WC94_mechR_ar1p7_seis0-20_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_WC94_mechR_ar1p7_seis0-20_Var.csv")
+            elif mech == 'NM':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_WC94_mechN_ar1p7_seis0-20_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_WC94_mechN_ar1p7_seis0-20_Var.csv")
+            elif mech == 'SS':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_WC94_mechSS_ar1p7_seis0-20_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_WC94_mechSS_ar1p7_seis0-20_Var.csv")
+        elif origin._tectonic_region == 'Stable Shallow Crust':
+            if mech == 'ALL':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_S14_mechA_ar1p0_seis0-15_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_S14_mechA_ar1p0_seis0-15_Var.csv")
+            elif mech == 'RS':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_S14_mechR_ar1p0_seis0-15_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_S14_mechR_ar1p0_seis0-15_Var.csv")
+            elif mech == 'NM':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_S14_mechN_ar1p0_seis0-15_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_S14_mechN_ar1p0_seis0-15_Var.csv")
+            elif mech == 'SS':
+                rf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_S14_mechSS_ar1p0_seis0-15_Ratios.csv")
+                vf = os.path.join(
+                    cdir, "data", "ps2ff",
+                    "Rrup_S14_mechSS_ar1p0_seis0-15_Var.csv")
+        else:
+            warnings.warn(
+                'Unsupported tectonic region; using coefficients for unknown'
+                'tectonic region.')
+            rf = os.path.join(
+                cdir, "data", "ps2ff",
+                "Rrup_WC94_mechA_ar1p0_seis0-20_Ratios.csv")
+            vf = os.path.join(
+                cdir, "data", "ps2ff",
+                "Rrup_WC94_mechA_ar1p0_seis0-20_Var.csv")
+
+        # -----------------
+        # Start with ratios
+        # -----------------
+        repi2rrup_ratios_tbl = pd.read_csv(rf, comment='#')
+        r2rrt_cols = repi2rrup_ratios_tbl.columns[1:]
+        mag_list = []
+        for column in (r2rrt_cols):
+            if re.search('R\d+\.*\d*', column):
+                magnitude = float(re.findall(
+                    'R(\d+\.*\d*)', column)[0])
+                mag_list.append(magnitude)
+        mag_list = np.array(mag_list)
+        dist_list = np.log(np.array(repi2rrup_ratios_tbl['Repi_km']))
+        repi2rrup_grid = repi2rrup_ratios_tbl.values[:, 1:]
+        repi2rrup_obj = spint.RectBivariateSpline(
+            dist_list, mag_list, repi2rrup_grid, kx=1, ky=1)
+
+        def repi2rrup_tbl(repi, M):
+            ratio = repi2rrup_obj.ev(np.log(repi), M)
+            rrup = repi * ratio
+            return rrup
+
+        repis = origin.computeRepi(lon, lat, depth)
+        mags = np.ones_like(repis) * origin.mag
+        rrup_hat = repi2rrup_tbl(repis, mags)
+
+        # -------------------
+        # Additional Variance
+        # -------------------
+        repi2rrupvar_ratios_tbl = pd.read_csv(vf, comment='#')
+        repi2rrupvar_grid = repi2rrupvar_ratios_tbl.values[:, 1:]
+        repi2rrupvar_obj = spint.RectBivariateSpline(
+            dist_list, mag_list, repi2rrupvar_grid, kx=1, ky=1)
+        rrupvar = repi2rrupvar_obj.ev(np.log(repis), mags)
+
+        return (rrup_hat, rrupvar)
+
+    def computeGC2(self, lon, lat, depth):
+        """
+        Method for computing version 2 of the Generalized Coordinate system 
+        (GC2) by Spudich and Chiou OFR 2015-1028. 
+        
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+
+        Returns:
+            dict: Dictionary with keys for each of the GC2-related distances,
+                which include 'rx', 'ry', 'ry0', 'U', 'T'. 
+        """
+        # This just returns defaults of zero, which will hopefully behave gracefully
+        # as used in GMPEs.
+        dict = {"rx":np.zeros_like(lon),
+                "ry":np.zeros_like(lon),
+                "ry0":np.zeros_like(lon),
+                "U":np.zeros_like(lon),
+                "T":np.zeros_like(lon) 
+                }
+        return dict
+        
 
 class EdgeRupture(Rupture):
     """
@@ -207,7 +641,7 @@ class EdgeRupture(Rupture):
             botdeps (ndarray): Array of bot edge depths (km).
             group_index (ndarray): Optional array of group index. 
                 If None, then assume only single group. 
-            reference (str): Citable reference for rupture. 
+            reference (str): Citable reference for rupture.
  
         Returns: 
             EdgeRupture instance.
@@ -546,7 +980,179 @@ class EdgeRupture(Rupture):
 
         return qlist
 
+    def computeRrup(self, lon, lat, depth, mesh_dx = 0.5):
+        """
+        Method for computing rupture distance. 
 
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+            mesh_dx (float): Target spacing (in km) for rupture discretization.
+
+        Returns:
+           array: Rupture distance (km).
+
+        """
+
+        #-----------------------------------------------------------------------
+        # Sort out sites
+        #-----------------------------------------------------------------------
+        oldshape = lon.shape
+
+        if len(oldshape) == 2:
+            newshape = (oldshape[0] * oldshape[1], 1)
+        else:
+            newshape = (oldshape[0], 1)
+
+        x, y, z = latlon2ecef(lat, lon, depth)
+        x.shape = newshape
+        y.shape = newshape
+        z.shape = newshape
+        sites_ecef = np.hstack((x, y, z))
+
+        #-----------------------------------------------------------------------
+        # Get mesh
+        #-----------------------------------------------------------------------
+        mx = []
+        my = []
+        mz = []
+        u_groups = np.unique(self._group_index)
+        n_groups = len(u_groups)
+        for j in range(n_groups):
+            g_ind = np.where(u_groups[j] == self._group_index)[0]
+            nq = len(self._toplats[g_ind]) - 1
+            for i in range(nq):
+                q = [Point(self._toplons[g_ind[i]],
+                           self._toplats[g_ind[i]],
+                           self._topdeps[g_ind[i]]), 
+                     Point(self._toplons[g_ind[i+1]],
+                           self._toplats[g_ind[i+1]],
+                           self._topdeps[g_ind[i+1]]),
+                     Point(self._botlons[g_ind[i+1]],
+                           self._botlats[g_ind[i+1]],
+                           self._botdeps[g_ind[i+1]]),
+                     Point(self._botlons[g_ind[i]],
+                           self._botlats[g_ind[i]],
+                           self._botdeps[g_ind[i]])
+                     ]
+                mesh = get_quad_mesh(q, dx = mesh_dx)
+                mx.extend(list(np.reshape(mesh['x'], (-1,)) ))
+                my.extend(list(np.reshape(mesh['y'], (-1,)) ))
+                mz.extend(list(np.reshape(mesh['z'], (-1,)) ))
+        mesh_mat = np.array([np.array(mx), np.array(my), np.array(mz)])
+
+        #-----------------------------------------------------------------------
+        # Compute distance
+        #-----------------------------------------------------------------------
+        dist = np.zeros_like(x)
+        for i in range(len(x)):
+            sitecol = sites_ecef[i,:].reshape([3, 1])
+            dif = sitecol - mesh_mat
+            distarray = np.sqrt(np.sum(dif * dif, axis=0))
+            dist[i] = np.min(distarray)/1000.0 # convert to km
+
+        dist = np.reshape(dist, oldshape)
+
+        return dist
+
+
+    def computeRjb(self, lon, lat, depth, mesh_dx = 0.5):
+        """
+        Method for computing Joyner-Boore distance. 
+
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+            mesh_dx (float): Target spacing (in km) for rupture discretization. 
+
+        Returns:
+           array: Joyner-Boore distance (km).
+
+        """
+
+        #-----------------------------------------------------------------------
+        # Sort out sites
+        #-----------------------------------------------------------------------
+        oldshape = lon.shape
+
+        if len(oldshape) == 2:
+            newshape = (oldshape[0] * oldshape[1], 1)
+        else:
+            newshape = (oldshape[0], 1)
+
+        x, y, z = latlon2ecef(lat, lon, depth)
+        x.shape = newshape
+        y.shape = newshape
+        z.shape = newshape
+        sites_ecef = np.hstack((x, y, z))
+
+        #-----------------------------------------------------------------------
+        # Get mesh
+        #-----------------------------------------------------------------------
+        mx = []
+        my = []
+        mz = []
+        u_groups = np.unique(self._group_index)
+        n_groups = len(u_groups)
+        for j in range(n_groups):
+            g_ind = np.where(u_groups[j] == self._group_index)[0]
+            nq = len(self._toplats[g_ind]) - 1
+            for i in range(nq):
+                q = [Point(self._toplons[g_ind[i]],
+                           self._toplats[g_ind[i]],
+                           0),
+                     Point(self._toplons[g_ind[i+1]],
+                           self._toplats[g_ind[i+1]],
+                           0),
+                     Point(self._botlons[g_ind[i+1]],
+                           self._botlats[g_ind[i+1]],
+                           0),
+                     Point(self._botlons[g_ind[i]],
+                           self._botlats[g_ind[i]],
+                           0)
+                     ]
+                mesh = get_quad_mesh(q, dx = mesh_dx)
+                mx.extend(list(np.reshape(mesh['x'], (-1,)) ))
+                my.extend(list(np.reshape(mesh['y'], (-1,)) ))
+                mz.extend(list(np.reshape(mesh['z'], (-1,)) ))
+        mesh_mat = np.array([np.array(mx), np.array(my), np.array(mz)])
+
+        #-----------------------------------------------------------------------
+        # Compute distance
+        #-----------------------------------------------------------------------
+        dist = np.zeros_like(x)
+        for i in range(len(x)):
+            sitecol = sites_ecef[i,:].reshape([3, 1])
+            dif = sitecol - mesh_mat
+            distarray = np.sqrt(np.sum(dif * dif, axis=0))
+            dist[i] = np.min(distarray)/1000.0 # convert to km
+
+        dist = np.reshape(dist, oldshape)
+
+        return dist
+
+    def computeGC2(self, lon, lat, depth):
+        """
+        Method for computing version 2 of the Generalized Coordinate system 
+        (GC2) by Spudich and Chiou OFR 2015-1028. 
+        
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+
+        Returns:
+            dict: Dictionary with keys for each of the GC2-related distances,
+                which include 'rx', 'ry', 'ry0', 'U', 'T'. 
+        """
+        # This just hands off to the module-level method
+        # NOTE: Not sure if the non-horizontal top edges of EdgeRupture will
+        #       case problems. Should do some checking. It might be okay to
+        #       bring quad vertices up to the surface in this case. 
+        dict = _computeGC2(self, lon, lat, depth)
+        return dict
 
 
 class QuadRupture(Rupture):
@@ -638,8 +1244,7 @@ class QuadRupture(Rupture):
         #     For each group, where a group consists of N connected quads:
         #       1) N+1 vertices along the top edge
         #       2) N+1 vertices along the bottom edge
-        #       3) First vertex repeated
-        #       4) A nan (to separate groups)
+        #       3) A nan (to separate groups)
         #-----------------------------------------------------------------------
 
 
@@ -706,7 +1311,8 @@ class QuadRupture(Rupture):
                 pass
             else:
                 raise ShakeMapException(
-                    'Strike must be None, scalar, or same length as trace coordinates.')
+                    'Strike must be None, scalar, or same length as '\
+                    'trace coordinates.')
 
         # Convert dips to radians
         dips = np.radians(dips)
@@ -793,8 +1399,7 @@ class QuadRupture(Rupture):
         #     For each group, where a group consists of N connected quads:
         #       1) N+1 vertices along the top edge
         #       2) N+1 vertices along the bottom edge
-        #       3) First vertex repeated
-        #       4) A nan (to separate groups)
+        #       3) A nan (to separate groups)
         #-----------------------------------------------------------------------
         nrects = len(zp)
         anan = np.ones_like(xp0) * np.nan
@@ -843,7 +1448,7 @@ class QuadRupture(Rupture):
     def fromVertices(cls,
                      xp0, yp0, zp0, xp1, yp1, zp1,
                      xp2, yp2, zp2, xp3, yp3, zp3,
-                     reference=None):
+                     group_index = None, reference=None):
         """
         Create a QuadDrupture instance from the vector of vertices that fully
         define the quadrilaterals. The points p0, ..., p3 are labeled below for
@@ -871,6 +1476,10 @@ class QuadRupture(Rupture):
             xp3 (array): Array or list of longitudes (floats) of p3.
             yp3 (array): Array or list of latitudes (floats) of p3.
             zp3 (array): Array or list of depths (floats) of p3.
+            group_index (list): List of integers to indicate group index. If
+                None then each quadrilateral is assumed to be in a different
+                group since there is no guarantee that any of them are 
+                continuous.
             reference (str): String explaining where the rupture definition came
                 from (publication style reference, etc.)
 
@@ -887,6 +1496,11 @@ class QuadRupture(Rupture):
                                     'vertices must have the same length.')
 
         nq = len(xp0)
+        if group_index is not None:
+            if len(group_index) != nq:
+                raise Exception("group_index must have same length as vertices.")
+        else:
+            group_index = list(range(nq))
 
         xp0 = np.array(xp0, dtype='d')
         yp0 = np.array(yp0, dtype='d')
@@ -906,19 +1520,45 @@ class QuadRupture(Rupture):
         #     For each group, where a group consists of N connected quads:
         #       1) N+1 vertices along the top edge
         #       2) N+1 vertices along the bottom edge
-        #       3) First vertex repeated
-        #       4) A nan (to separate groups)
+        #       3) A nan (to separate groups)
         #-----------------------------------------------------------------------
 
-        anan = np.ones_like(xp0) * np.nan
-        lon = np.array(list(zip(xp0, xp1, xp2, xp3, anan))
-                       ).reshape((nq, 5)).flatten(order='C')
-        lat = np.array(list(zip(yp0, yp1, yp2, yp3, anan))
-                       ).reshape((nq, 5)).flatten(order='C')
-        dep = np.array(list(zip(zp0, zp1, zp2, zp3, anan))
-                       ).reshape((nq, 5)).flatten(order='C')
 
-        return cls(lon, lat, dep, reference)
+        lats = []
+        lons = []
+        deps = []
+        u_group = np.unique(group_index)
+        n_group = len(u_group)
+        for i in range(n_group):
+            q_ind = np.where(group_index == u_group[i])[0]
+            nq = len(q_ind)
+            top_lats = []
+            bot_lats = []
+            top_lons = []
+            bot_lons = []
+            top_deps = []
+            bot_deps = []
+            for j in range(nq):
+                if j == 0:
+                    bot_dep0 = [zp3[q_ind[j]]]
+                    top_lats = top_lats + [yp0[q_ind[j]]]
+                    top_lons = top_lons + [xp0[q_ind[j]]]
+                    top_deps = top_deps + [zp0[q_ind[j]]]
+                    bot_lats = bot_lats + [yp3[q_ind[j]]]
+                    bot_lons = bot_lons + [xp3[q_ind[j]]]
+                    bot_deps = bot_deps + [zp3[q_ind[j]]]
+                top_lats = top_lats + [yp1[q_ind[j]]]
+                top_lons = top_lons + [xp1[q_ind[j]]]
+                top_deps = top_deps + [zp1[q_ind[j]]]
+                bot_lats = bot_lats + [yp2[q_ind[j]]]
+                bot_lons = bot_lons + [xp2[q_ind[j]]]
+                bot_deps = bot_deps + [zp2[q_ind[j]]]
+            lats = lats + top_lats + bot_lats[::-1] + [np.nan]
+            lons = lons + top_lons + bot_lons[::-1] + [np.nan]
+            deps = deps + top_deps + bot_deps[::-1] + [np.nan]
+        
+
+        return cls(lons, lats, deps, reference)
 
 
     def getQuadrilaterals(self):
@@ -1125,27 +1765,75 @@ class QuadRupture(Rupture):
         Return a list of segment indexes.
 
         Returns:
-            list: Segment indexes; lenght equals the number of quadrilaterals.
+            list: Segment indexes; length equals the number of quadrilaterals.
         """
         return copy.deepcopy(self._group_index)
 
-    def getLats(self):
+    @property
+    def lats(self):
         """
-        Return a copy of the array of latitudes for the rupture verticies.
+        Return an array of latitudes for the rupture verticies arranged for
+        plotting purposes; will give an outline of each group connected 
+        segments.
 
         Returns:
-            array: Numpy array of latitude values.
+            array: Numpy array of closed-loop latitude values; disconnected
+                segments are separated by nans. 
         """
-        return self._lat.copy()
+        lats = []
+        quads = self.getQuadrilaterals()
+        groups = self._getGroupIndex()
+        u_groups = np.unique(groups)
+        ng = len(u_groups)
+        for i in range(ng):
+            q_ind = np.where(groups == u_groups[i])[0]
+            nq = len(q_ind)
+            top_lats = []
+            bot_lats = []
+            for j in range(nq):
+                if j == 0:
+                    top0 = [quads[q_ind[j]][0].latitude]
+                    bot0 = [quads[q_ind[j]][3].latitude]
+                    top_lats = top_lats + top0
+                    bot_lats = bot_lats + bot0
+                top_lats = top_lats + [quads[q_ind[j]][1].latitude]
+                bot_lats = bot_lats + [quads[q_ind[j]][2].latitude]
+            lats = lats + top_lats + bot_lats[::-1] + top0 + [np.nan]
+        
+        return np.array(lats)
 
-    def getLons(self):
+    @property
+    def lons(self):
         """
-        Return a copy of the array of longitudes for the rupture verticies.
+        Return an array of longitudes for the rupture verticies arranged for
+        plotting purposes; will give an outline of each group connected 
+        segments.
 
         Returns:
-            array: Numpy array of latitude values.
+            array: Numpy array of closed-loop longitude values; disconnected
+                segments are separated by nans. 
         """
-        return self._lon.copy()
+        lons = []
+        quads = self.getQuadrilaterals()
+        groups = self._getGroupIndex()
+        u_groups = np.unique(groups)
+        ng = len(u_groups)
+        for i in range(ng):
+            q_ind = np.where(groups == u_groups[i])[0]
+            nq = len(q_ind)
+            top_lons = []
+            bot_lons = []
+            for j in range(nq):
+                if j == 0:
+                    top0 = [quads[q_ind[j]][0].longitude]
+                    bot0 = [quads[q_ind[j]][3].longitude]
+                    top_lons = top_lons + top0
+                    bot_lons = bot_lons + bot0
+                top_lons = top_lons + [quads[q_ind[j]][1].longitude]
+                bot_lons = bot_lons + [quads[q_ind[j]][2].longitude]
+            lons = lons + top_lons + bot_lons[::-1] + top0 + [np.nan]
+        return np.array(lons)
+
 
     def getDeps(self):
         """
@@ -1196,6 +1884,372 @@ class QuadRupture(Rupture):
         rupture = Mesh(self._lon, self._lat, self._depth)
         return rupture
 
+    def computeRjb(self, lon, lat, depth):
+        """
+        Method for computing Joyner-Boore distance. 
+
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+
+        Returns:
+           array: Joyner-Boore distance (km).
+
+        """
+
+        #-----------------------------------------------------------------------
+        # Sort out sites
+        #-----------------------------------------------------------------------
+        oldshape = lon.shape
+
+        if len(oldshape) == 2:
+            newshape = (oldshape[0] * oldshape[1], 1)
+        else:
+            newshape = (oldshape[0], 1)
+
+        x, y, z = latlon2ecef(lat, lon, depth)
+        x.shape = newshape
+        y.shape = newshape
+        z.shape = newshape
+        sites_ecef = np.hstack((x, y, z))
+        
+        minrjb = np.ones(newshape, dtype=lon.dtype) * 1e16
+        quads = self.getQuadrilaterals()
+
+        for i in range(len(quads)):
+            P0, P1, P2, P3 = quads[i]
+            S0 = copy.deepcopy(P0)
+            S1 = copy.deepcopy(P1)
+            S2 = copy.deepcopy(P2)
+            S3 = copy.deepcopy(P3)
+            S0.depth = 0.0
+            S1.depth = 0.0
+            S2.depth = 0.0
+            S3.depth = 0.0
+            squad = [S0, S1, S2, S3]
+            rjbdist = _quad_distance(squad, sites_ecef)
+            minrjb = np.minimum(minrjb, rjbdist)
+
+        minrjb = minrjb.reshape(oldshape)
+        return minrjb
+
+
+    def computeRrup(self, lon, lat, depth):
+        """
+        Method for computing rupture distance. 
+
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+
+        Returns:
+           array: Rupture distance (km).
+
+        """
+
+        #-----------------------------------------------------------------------
+        # Sort out sites
+        #-----------------------------------------------------------------------
+        oldshape = lon.shape
+
+        if len(oldshape) == 2:
+            newshape = (oldshape[0] * oldshape[1], 1)
+        else:
+            newshape = (oldshape[0], 1)
+
+        x, y, z = latlon2ecef(lat, lon, depth)
+        x.shape = newshape
+        y.shape = newshape
+        z.shape = newshape
+        sites_ecef = np.hstack((x, y, z))
+        
+        minrrup = np.ones(newshape, dtype=lon.dtype) * 1e16
+        quads = self.getQuadrilaterals()
+
+        for i in range(len(quads)):
+            rrupdist = _quad_distance(quads[i], sites_ecef)
+            minrrup = np.minimum(minrrup, rrupdist)
+
+        minrrup = minrrup.reshape(oldshape)
+        return minrrup
+
+    def computeGC2(self, lon, lat, depth):
+        """
+        Method for computing version 2 of the Generalized Coordinate system 
+        (GC2) by Spudich and Chiou OFR 2015-1028. 
+
+        Args:
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+
+        Returns:
+            dict: Dictionary with keys for each of the GC2-related distances,
+                which include 'rx', 'ry', 'ry0', 'U', 'T'. 
+        """
+        # This just hands off to the module-level method
+        dict = _computeGC2(self, lon, lat, depth)
+        return dict
+
+
+
+def _computeGC2(rupture, lon, lat, depth):
+    """
+    Method for computing GC2 from a ShakeMap Rupture instance.
+
+    Args:
+        rupture (Rupture): ShakeMap rupture object.
+        lon (array): Numpy array of site longitudes.
+        lat (array): Numpy array of site latitudes.
+        depth (array): Numpy array of site depths.
+
+    Returns: 
+        dict: Dictionary of GC2 distances. Keys include "T", "U", "rx" 
+            "ry", "ry0". 
+    """
+
+    quadlist = rupture.getQuadrilaterals()
+    quadgc2 = copy.deepcopy(quadlist)
+
+    oldshape = lon.shape
+
+    if len(oldshape) == 2:
+        newshape = (oldshape[0] * oldshape[1], 1)
+    else:
+        newshape = (oldshape[0], 1)
+
+    #---------------------------------------------------------------------------
+    # Define a projection that spans sites and rupture
+    #---------------------------------------------------------------------------
+
+    all_lat = np.append(lat, rupture.lats)
+    all_lon = np.append(lon, rupture.lons)
+
+    west = np.nanmin(all_lon)
+    east = np.nanmax(all_lon)
+    south = np.nanmin(all_lat)
+    north = np.nanmax(all_lat)
+    proj = get_orthographic_projection(west, east, north, south)
+
+    totweight = np.zeros(newshape, dtype=lon.dtype)
+    GC2T = np.zeros(newshape, dtype=lon.dtype)
+    GC2U = np.zeros(newshape, dtype=lon.dtype)
+
+    #---------------------------------------------------------------------------
+    # First sort out strike discordance and nominal strike prior to
+    # starting the loop if there is more than one group/trace.
+    #---------------------------------------------------------------------------
+    group_ind = rupture._getGroupIndex()
+    uind = np.unique(np.array(group_ind))
+    n_groups = len(uind)
+
+    if n_groups > 1:
+        #-----------------------------------------------------------------------
+        # The first thing we need to worry about is finding the coordinate
+        # shift. U's origin is "selected from the two endpoints most
+        # distant from each other." 
+        #-----------------------------------------------------------------------
+
+        # Need to get index of first and last quad
+        # for each segment
+        iq0 = np.zeros(n_groups, dtype='int16')
+        iq1 = np.zeros(n_groups, dtype='int16')
+        for k in uind:
+            ii = [i for i, j in enumerate(group_ind) if j == uind[k]]
+            iq0[k] = int(np.min(ii))
+            iq1[k] = int(np.max(ii))
+
+        #---------------------------------------------------------------
+        # This is an iterator for each possible combination of segments
+        # including segment orientations (i.e., flipped). 
+        #---------------------------------------------------------------
+
+        it_seg = it.product(it.combinations(uind, 2),
+                            it.product([0, 1], [0, 1]))
+
+        # Placeholder for the segment pair/orientation that gives the
+        # largest distance. 
+        dist_save = 0
+
+        for k in it_seg:
+            s0ind = k[0][0]
+            s1ind = k[0][1]
+            p0ind = k[1][0]
+            p1ind = k[1][1]
+            if p0ind == 0:
+                P0 = quadlist[iq0[s0ind]][0]
+            else:
+                P0 = quadlist[iq1[s0ind]][1]
+            if p1ind == 0:
+                P1 = quadlist[iq1[s1ind]][0]
+            else:
+                P1 = quadlist[iq0[s1ind]][1]
+
+            dist = geodetic.distance(P0.longitude, P0.latitude, 0.0,
+                                     P1.longitude, P1.latitude, 0.0)
+            if dist > dist_save:
+                dist_save = dist
+                A0 = P0
+                A1 = P1
+
+        #-----------------------------------------------------------------------
+        # A0 and A1 are the furthest two segment endpoints, but we still
+        # need to sort out which one is the "origin".
+        #-----------------------------------------------------------------------
+
+        # Goofy while-loop is to adjust the side of the rupture where the
+        # origin is located
+        dummy = -1
+        while dummy < 0:
+            A0.depth = 0
+            A1.depth = 0
+            p_origin = Vector.fromPoint(A0)
+            a0 = Vector.fromPoint(A0)
+            a1 = Vector.fromPoint(A1)
+            ahat = (a1 - a0).norm()
+
+            # Loop over traces
+            e_j = np.zeros(n_groups)
+            b_prime = [None] * n_groups
+            for j in range(n_groups):
+                P0 = quadlist[iq0[j]][0]
+                P1 = quadlist[iq1[j]][1]
+                P0.depth = 0
+                P1.depth = 0
+                p0 = Vector.fromPoint(P0)
+                p1 = Vector.fromPoint(P1)
+                b_prime[j] = p1 - p0
+                e_j[j] = ahat.dot(b_prime[j])
+            E = np.sum(e_j)
+
+            # List of discordancy
+            dc = [np.sign(a) * np.sign(E) for a in e_j]
+            b = Vector(0, 0, 0)
+            for j in range(n_groups):
+                b.x = b.x + b_prime[j].x * dc[j]
+                b.y = b.y + b_prime[j].y * dc[j]
+                b.z = b.z + b_prime[j].z * dc[j]
+            bhat = b.norm()
+            dummy = bhat.dot(ahat)
+            if dummy < 0:
+                tmpA0 = copy.deepcopy(A0)
+                tmpA1 = copy.deepcopy(A1)
+                A0 = tmpA1
+                A1 = tmpA0
+
+        #-----------------------------------------------------------------------
+        # To fix discordancy, need to flip quads and rearrange
+        # the order of quadgc2
+        #-----------------------------------------------------------------------
+
+        # 1) flip quads
+        for i in range(len(quadgc2)):
+            if dc[group_ind[i]] < 0:
+                quadgc2[i] = reverse_quad(quadgc2[i])
+
+        # 2) rearrange quadlist order
+        qind = np.arange(len(quadgc2))
+        segnp = np.array(group_ind)
+        for i in range(n_groups):
+            qsel = qind[segnp == uind[i]]
+            if dc[i] < 0:
+                qrev = qsel[::-1]
+                qind[segnp == uind[i]] = qrev
+
+        quadgc2old = copy.deepcopy(quadgc2)
+        for i in range(len(qind)):
+            quadgc2[i] = quadgc2old[qind[i]]
+
+        # End of if-statement for adjusting group discordancy
+
+    s_i = 0.0
+    l_i = np.zeros(len(quadgc2))
+
+    for i in range(len(quadgc2)):
+        G0, G1, G2, G3 = quadgc2[i]
+
+        # Compute u_i and t_i for this quad
+        t_i = __calc_t_i(G0, G1, lat, lon, proj)
+        u_i = __calc_u_i(G0, G1, lat, lon, proj)
+
+        # Quad length (top edge)
+        l_i[i] = get_quad_length(quadgc2[i])
+
+        #-----------------------------------------------------------------------
+        # Weight of segment, three cases
+        #-----------------------------------------------------------------------
+
+        # Case 3: t_i == 0 and 0 <= u_i <= l_i
+        w_i = np.zeros_like(t_i)
+
+        # Case 1:
+        ix = t_i != 0
+        w_i[ix] = (1.0 / t_i[ix]) * (np.arctan((l_i[i] -
+            u_i[ix]) / t_i[ix]) - np.arctan(-u_i[ix] / t_i[ix]))
+
+        # Case 2:
+        ix = (t_i == 0) & ((u_i < 0) | (u_i > l_i[i]))
+        w_i[ix] = 1 / (u_i[ix] - l_i[i]) - 1 / u_i[ix]
+
+        totweight = totweight + w_i
+        GC2T = GC2T + w_i * t_i
+
+        if n_groups == 1:
+            GC2U = GC2U + w_i * (u_i + s_i)
+        else:
+            if i == 0:
+                qind = np.array(range(len(quadgc2)))
+                l_kj = 0
+                s_ij_1 = 0
+            else:
+                l_kj = l_i[(group_ind == group_ind[i]) & (qind < i)]
+                s_ij_1 = np.sum(l_kj)
+
+            # First endpoint in the current 'group' (or 'trace' in GC2 terms)
+            p1 = Vector.fromPoint(quadgc2[iq0[group_ind[i]]][0])
+            s_ij_2 = (p1 - p_origin).dot(np.sign(E)*ahat) / 1000.0
+
+            # Above is GC2N, for GC2T use:
+            #s_ij_2 = (p1 - p_origin).dot(bhat) / 1000.0
+
+            s_ij = s_ij_1 + s_ij_2
+            GC2U = GC2U + w_i * (u_i + s_ij)
+
+        s_i = s_i + l_i[i]
+
+    GC2T = GC2T / totweight
+    GC2U = GC2U / totweight
+
+    # Dictionary for holding the distances
+    distdict = dict()
+    
+    distdict['T'] = copy.deepcopy(GC2T).reshape(oldshape)
+    distdict['U'] = copy.deepcopy(GC2U).reshape(oldshape)
+
+    # Take care of Rx
+    Rx = copy.deepcopy(GC2T)  # preserve sign (no absolute value)
+    Rx = Rx.reshape(oldshape)
+    distdict['rx'] = Rx
+
+    # Ry
+    Ry = GC2U - s_i / 2.0
+    Ry = Ry.reshape(oldshape)
+    distdict['ry'] = Ry
+
+    # Ry0
+    Ry0 = np.zeros_like(GC2U)
+    ix = GC2U < 0
+    Ry0[ix] = np.abs(GC2U[ix])
+    if n_groups > 1:
+        s_i = s_ij + l_i[-1]
+    ix = GC2U > s_i
+    Ry0[ix] = GC2U[ix] - s_i
+    Ry0 = Ry0.reshape(oldshape)
+    distdict['ry0'] = Ry0
+
+    return distdict
 
 def read_rupture_file(file):
     """
@@ -1557,7 +2611,7 @@ def get_quad_mesh(q, dx):
         q (list): A quadrilateral; list of four points. 
         dx (float):  Target dx in km; used to get nx and ny of mesh, but mesh
             snaps to edges of rupture so actual dx/dy will not actually equal this
-        value in general.
+            value in general.
 
     Returns:
         dict: Mesh dictionary, which includes numpy arrays:
@@ -1574,6 +2628,7 @@ def get_quad_mesh(q, dx):
     p1 = Vector.fromPoint(P1)
     p2 = Vector.fromPoint(P2)
     p3 = Vector.fromPoint(P3)
+
     # Get nx based on length of top edge, minimum allowed is 2
     toplen_km = get_quad_length(q)
     nx = int(np.max([round(toplen_km / dx, 0) + 1, 2]))
@@ -1873,6 +2928,69 @@ def get_vertical_vector(q):
     v1 = (p1 - p0).norm()
     return v1
 
+def _quad_distance(q, points):
+    """
+    Calculate the shortest distance from a set of points to a rupture surface.
+
+    Args:
+        q (list): A quadrilateral; list of four points.
+        points (array): Numpy array Nx3 of points (ECEF) to calculate distance 
+            from.
+
+    Returns:
+        float: Array of size N of distances (in km) from input points to rupture
+            surface.
+    """
+    P0, P1, P2, P3 = q
+
+    # Convert to ecef
+    p0 = Vector.fromPoint(P0)
+    p1 = Vector.fromPoint(P1)
+    p2 = Vector.fromPoint(P2)
+    p3 = Vector.fromPoint(P3)
+
+    # Make a unit vector normal to the plane
+    normalVector = (p1 - p0).cross(p2 - p0).norm()
+
+    dist = np.ones_like(points[:, 0]) * np.nan
+
+    p0d = p0.getArray() - points
+    p1d = p1.getArray() - points
+    p2d = p2.getArray() - points
+    p3d = p3.getArray() - points
+
+    # Create 4 planes with normals pointing outside rectangle
+    n0 = (p1 - p0).cross(normalVector).getArray()
+    n1 = (p2 - p1).cross(normalVector).getArray()
+    n2 = (p3 - p2).cross(normalVector).getArray()
+    n3 = (p0 - p3).cross(normalVector).getArray()
+
+    sgn0 = np.signbit(np.sum(n0 * p0d, axis=1))
+    sgn1 = np.signbit(np.sum(n1 * p1d, axis=1))
+    sgn2 = np.signbit(np.sum(n2 * p2d, axis=1))
+    sgn3 = np.signbit(np.sum(n3 * p3d, axis=1))
+
+    inside_idx = (sgn0 == sgn1) & (sgn1 == sgn2) & (sgn2 == sgn3)
+    dist[inside_idx] = np.power(np.abs(
+        np.sum(p0d[inside_idx, :] * normalVector.getArray(), axis=1)), 2)
+
+    outside_idx = np.logical_not(inside_idx)
+    s0 = _distance_sq_to_segment(p0d, p1d)
+    s1 = _distance_sq_to_segment(p1d, p2d)
+    s2 = _distance_sq_to_segment(p2d, p3d)
+    s3 = _distance_sq_to_segment(p3d, p0d)
+
+    smin = np.minimum(np.minimum(s0, s1), np.minimum(s2, s3))
+    dist[outside_idx] = smin[outside_idx]
+    dist = np.sqrt(dist) / 1000.0
+    shp = dist.shape
+    if len(shp) == 1:
+        dist.shape = (shp[0], 1)
+    if np.any(np.isnan(dist)):
+        raise ShakeMapException("Could not calculate some distances!")
+    dist = np.fliplr(dist)
+    return dist
+
 
 def get_distance_to_plane(planepoints, otherpoint):
     """
@@ -1913,5 +3031,172 @@ def get_distance_to_plane(planepoints, otherpoint):
         dist = 0
     return dist
 
+def __calc_u_i(P0, P1, lat, lon, proj):
+    """
+    Calculate u_i distance. See Spudich and Chiou OFR 2015-1028. This is the 
+    distance along strike from the first vertex (P0) of the i-th segment.
+
+    Args:
+        P0 (point): OQ Point object, representing the first top-edge vertex of 
+            a rupture quadrilateral.
+        P1 (point): OQ Point object, representing the second top-edge vertex of 
+            a rupture quadrilateral.
+        lat (array): A numpy array of latitudes.
+        lon (array): A numpy array of longitudes.
+        proj (object): An orthographic projection from 
+            openquake.hazardlib.geo.utils.get_orthographic_projection.
+
+    Returns:
+        array: Array of size N of distances (in km) from input points to rupture
+            surface.
+
+    """
+
+    # projected coordinates are in km
+    p0x, p0y = proj(P0.x, P0.y)
+    p1x, p1y = proj(P1.x, P1.y)
+
+    # Unit vector pointing along strike
+    u_i_hat = Vector(p1x - p0x, p1y - p0y, 0).norm()
+
+    # Convert sites to Cartesian
+    sx, sy = proj(lon, lat)
+    sx1d = np.reshape(sx, (-1,))
+    sy1d = np.reshape(sy, (-1,))
+
+    # Vectors from P0 to sites
+    r = np.zeros([len(sx1d), 2])
+    r[:, 0] = sx1d - p0x
+    r[:, 1] = sy1d - p0y
+
+    # Dot product gives u_i
+    u_i = np.sum(u_i_hat.getArray()[0:2] * r, axis=1)
+    shp = u_i.shape
+    if len(shp) == 1:
+        u_i.shape = (shp[0], 1)
+    u_i = np.fliplr(u_i)
+
+    return u_i
+
+def __calc_t_i(P0, P1, lat, lon, proj):
+    """
+    Calculate t_i distance. See Spudich and Chiou OFR 2015-1028. This is the
+    distance measured normal to strike from the i-th segment. Values on the
+    hanging-wall are positive and those on the foot-wall are negative.
+
+    Args:
+        P0 (point): OQ Point object, representing the first top-edge vertex of 
+            a rupture quadrilateral.
+        P1 (point): OQ Point object, representing the second top-edge vertex of 
+            a rupture quadrilateral.
+        lat (array): A numpy array of latitudes.
+        lon (array): A numpy array of longitudes.
+        proj (object): An orthographic projection from 
+            openquake.hazardlib.geo.utils.get_orthographic_projection.
+
+    Returns:
+        array: Array of size N of distances (in km) from input points to rupture
+            surface.
+    """
+
+    # projected coordinates are in km
+    p0x, p0y = proj(P0.x, P0.y)
+    p1x, p1y = proj(P1.x, P1.y)
+
+    # Unit vector pointing normal to strike
+    t_i_hat = Vector(p1y - p0y, -(p1x - p0x), 0).norm()
+
+    # Convert sites to Cartesian
+    sx, sy = proj(lon, lat)
+    sx1d = np.reshape(sx, (-1,))
+    sy1d = np.reshape(sy, (-1,))
+
+    # Vectors from P0 to sites
+    r = np.zeros([len(sx1d), 2])
+    r[:, 0] = sx1d - p0x
+    r[:, 1] = sy1d - p0y
+
+    # Dot product gives t_i
+    t_i = np.sum(t_i_hat.getArray()[0:2] * r, axis=1)
+    shp = t_i.shape
+    if len(shp) == 1:
+        t_i.shape = (shp[0], 1)
+    t_i = np.fliplr(t_i)
+    return t_i
 
 
+def _distance_sq_to_segment(p0, p1):
+    """
+    Calculate the distance^2 from the origin to a segment defined by two vectors
+
+    Args:
+        p0 (array): Numpy array Nx3 (ECEF).
+        p1 (array): Numpy array Nx3 (ECEF).
+    
+    Returns:
+        float: The squared distance from the origin to a segment.
+    """
+    # /*
+    #  * This algorithm is from (Vince's) CS1 class.
+    #  * It returns the distance^2 from the origin to a segment defined
+    #  * by two vectors
+    #  */
+
+    dist = np.zeros_like(p1[:, 0])
+    # /* Are the two points equal? */
+    idx_equal = (p0[:, 0] == p1[:, 0]) & (
+        p0[:, 1] == p1[:, 1]) & (p0[:, 2] == p1[:, 2])
+    dist[idx_equal] = np.sqrt(p0[idx_equal, 0]**2 +
+                              p0[idx_equal, 1]**2 + p0[idx_equal, 2]**2)
+
+    v = p1 - p0
+
+    # /*
+    #  * C1 = c1/|v| is the projection of the origin O on line (P0,P1).
+    #  * If C1 is negative, then O is outside the segment and
+    #  * closer to the P0 side.
+    #  * If C1 is positive and >V then O is on the other side.
+    #  * If C1 is positive and <V then O is inside.
+    #  */
+
+    c1 = -1 * np.sum(p0 * v, axis=1)
+    idx_neg = c1 <= 0
+    dist[idx_neg] = p0[idx_neg, 0]**2 + p0[idx_neg, 1]**2 + p0[idx_neg, 2]**2
+
+    c2 = np.sum(v * v, axis=1)
+    idx_less_c1 = c2 <= c1
+    dist[idx_less_c1] = p1[idx_less_c1, 0]**2 + \
+        p1[idx_less_c1, 1]**2 + p1[idx_less_c1, 2]**2
+
+    idx_other = np.logical_not(idx_neg | idx_equal | idx_less_c1)
+
+    nr, nc = p0.shape
+    t1 = c1 / c2
+    t1.shape = (nr, 1)
+    tmp = p0 + (v * t1)
+    dist[idx_other] = tmp[idx_other, 0]**2 + \
+        tmp[idx_other, 1]**2 + tmp[idx_other, 2]**2
+
+    return dist
+
+def rake_to_mech(rake):
+    """
+    Convert rake to mechanism.
+
+    Args:
+        rake (float): Rake angle in degrees.
+
+    Returns:
+        str: Mechanism.
+    """
+    mech = 'ALL'
+    if rake is not None:
+        if (rake >= -180 and rake <= -150) or \
+           (rake >= -30  and rake <= 30) or \
+           (rake >= 150 and rake <= 180):
+            mech = 'SS'
+        if rake >= -120 and rake <= -60:
+            mech = 'NM'
+        if rake >= 60 and rake <= 120:
+            mech = 'RS'
+    return mech
