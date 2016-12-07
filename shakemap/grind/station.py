@@ -350,7 +350,7 @@ class StationList(object):
         for irow, row in enumerate(station_rows):
             lats[irow] = row[1]
             lons[irow] = row[2]
-        ddict = get_distance(DISTANCES, lats, lons, depths, origin, rupture)
+        ddict = get_distance(DISTANCES, lats, lons, depths, rupture)
         dist_rows = []
         for irow, row in enumerate(station_rows):
             dist_rows.append(

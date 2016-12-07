@@ -10,6 +10,7 @@ import io
 import numpy as np
 import pytest
 
+from shakemap.grind.origin import Origin
 from shakemap.grind.rupture import QuadRupture
 from shakemap.grind.rupture import EdgeRupture
 from shakemap.grind.rupture import read_rupture_file
@@ -24,13 +25,16 @@ shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 sys.path.insert(0, shakedir)
 
 def test_EdgeRupture():
+    # Rupture requires an origin even when not used:
+    origin = Origin({'id':'test','lat':0,'lon':0,'depth':5.0,'mag':7.0})
+
     file = 'tests/data/cascadia.json'
-    rup = read_rupture_file(file)
+    rup = read_rupture_file(origin, file)
 
     # Force read Northridge as EdgeRupture
     file = 'tests/data/eventdata/northridge/northridge_fault.txt'
     d = text_to_json(file)
-    rupt = EdgeRupture.fromJson(d)
+    rupt = EdgeRupture.fromJson(d, origin)
     strike = rupt.getStrike()
     np.testing.assert_allclose(strike, 121.97, atol=0.01)
     dip = rupt.getDip()
@@ -45,7 +49,7 @@ def test_EdgeRupture():
     # And again for the same vertices but reversed order
     file = 'tests/data/eventdata/northridge/northridge_fixed_fault.txt'
     d = text_to_json(file)
-    rupt = EdgeRupture.fromJson(d)
+    rupt = EdgeRupture.fromJson(d, origin)
     strike = rupt.getStrike()
     np.testing.assert_allclose(strike, 121.97, atol=0.01)
     dip = rupt.getDip()
@@ -59,30 +63,23 @@ def test_EdgeRupture():
 
 
 def test_QuadRupture():
+    # Rupture requires an origin even when not used:
+    origin = Origin({'id':'test','lat':0,'lon':0,'depth':5.0,'mag':7.0})
+    
     # First with json file
     file = 'tests/data/izmit.json'
-    rupj = read_rupture_file(file)
+    rupj = read_rupture_file(origin, file)
     # Then with text file:
     file = 'tests/data/Barkaetal02_fault.txt'
-    rupt = read_rupture_file(file)
+    rupt = read_rupture_file(origin, file)
 
-
-def test_misc():
-    # Make a rupture
-    lat0 = np.array([34.1])
-    lon0 = np.array([-118.2])
-    lat1 = np.array([34.2])
-    lon1 = np.array([-118.15])
-    z = np.array([1.0])
-    W = np.array([3.0])
-    dip = np.array([30.])
-    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
-    fm = rup.getRuptureAsMesh()
-    fa = rup.getRuptureAsArrays()
-
-
+    np.testing.assert_allclose(rupj.lats, rupt.lats, atol=1e-5)
+    np.testing.assert_allclose(rupj.lons, rupt.lons, atol=1e-5)
+    np.testing.assert_allclose(rupj._depth, rupt._depth, atol=1e-5)
 
 def test_slip():
+    # Rupture requires an origin even when not used:
+    origin = Origin({'id':'test','lat':0,'lon':0,'depth':5.0,'mag':7.0})
     # Make a rupture
     lat0 = np.array([34.1])
     lon0 = np.array([-118.2])
@@ -91,7 +88,7 @@ def test_slip():
     z = np.array([1.0])
     W = np.array([3.0])
     dip = np.array([30.])
-    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip, origin)
 
     slp = get_quad_slip(rup.getQuadrilaterals()[0], 30).getArray()
     slpd = np.array([0.80816457,  0.25350787,  0.53160491])
@@ -111,8 +108,11 @@ def test_northridge():
     34.175 -118.527 20.427
     34.315 -118.421 5.000
     """
+
+    # Rupture requires an origin even when not used:
+    origin = Origin({'id':'test','lat':0,'lon':0,'depth':5.0,'mag':7.0})
     cbuf = io.StringIO(rupture_text)
-    rupture = read_rupture_file(cbuf)
+    rupture = read_rupture_file(origin, cbuf)
     strike = rupture.getStrike()
     np.testing.assert_allclose(strike, 122.06, atol=0.01)
     dip = rupture.getDip()
@@ -133,12 +133,12 @@ def test_northridge():
     np.testing.assert_allclose(itl, 17.99, atol=0.01)
     iw = rupture.getIndividualWidths()
     np.testing.assert_allclose(iw, 23.94, atol=0.01)
-    lats = rupture.getLats()
-    lats_d = np.array([34.315,  34.401,  34.261,  34.175,  np.nan])
-    np.testing.assert_allclose(lats, lats_d, atol=0.001)
-    lons = rupture.getLons()
-    lons_d = np.array([-118.421, -118.587, -118.693, -118.527, np.nan])
-    np.testing.assert_allclose(lons, lons_d, atol=0.001)
+    lats = rupture.lats
+    lats_d = np.array([34.401, 34.315, 34.175, 34.261, 34.401, np.nan])
+    np.testing.assert_allclose(lats, lats_d, atol=0.01)
+    lons = rupture.lons
+    lons_d = np.array([-118.587, -118.421, -118.527, -118.693, -118.587, np.nan])
+    np.testing.assert_allclose(lons, lons_d, atol=0.01)
 
 
 def parse_complicated_rupture():
@@ -189,8 +189,10 @@ def parse_complicated_rupture():
     40.80399 30.94688 20
     40.80199 30.94688 0"""
 
+    # Rupture requires an origin even when not used:
+    origin = Origin({'id':'test','lat':0,'lon':0,'depth':5.0,'mag':7.0})
     cbuf = io.StringIO(rupture_text)
-    rupture = read_rupture_file(cbuf)
+    rupture = read_rupture_file(origin, cbuf)
     strike = rupture.getStrike()
     np.testing.assert_allclose(strike, -100.46, atol=0.01)
     dip = rupture.getDip()
@@ -217,7 +219,7 @@ def parse_complicated_rupture():
                      20.00121513,  20.00121568,  20.00107293,  20.00105498,
                      20.00083348])
     np.testing.assert_allclose(iw, iw_d, atol=0.01)
-    lats = rupture.getLats()
+    lats = rupture.lats
     lats_d = np.array([
         40.70985,  40.72733,  40.72933,  40.71185,       np.nan,  40.70513,
         40.74903,  40.75103,  40.70713,       np.nan,  40.72582,  40.72336,
@@ -227,7 +229,7 @@ def parse_complicated_rupture():
         40.79654,  40.79854,  40.70147,       np.nan,  40.80199,  40.84501,
         40.84701,  40.80399,       np.nan])
     np.testing.assert_allclose(lats, lats_d, atol=0.001)
-    lons = rupture.getLons()
+    lons = rupture.lons
     lons_d = np.array([
         29.3376 ,  29.51528,  29.51528,  29.3376 ,       np.nan,  29.61152,
         29.87519,  29.87519,  29.61152,       np.nan,  29.88662,  30.11126,
@@ -260,9 +262,11 @@ def test_incorrect():
     23.40240 120.78900	17
     23.60400 120.97200	17"""
 
+    # Rupture requires an origin even when not used:
+    origin = Origin({'id':'test','lat':0,'lon':0,'depth':5.0,'mag':7.0})
     cbuf = io.StringIO(rupture_text)
     with pytest.raises(Exception):
-        rupture = read_rupture_file(cbuf)
+        rupture = read_rupture_file(origin, cbuf)
 
 
 def test_fromTrace():
@@ -274,9 +278,12 @@ def test_fromTrace():
     widths = [10.0]
     dips = [45.0]
 
+    # Rupture requires an origin even when not used:
+    origin = Origin({'id':'test','lat':0,'lon':0,'depth':5.0,'mag':7.0})
     rupture = QuadRupture.fromTrace(
         xp0, yp0, xp1, yp1, zp, widths,
-        dips, reference='From J Smith, (personal communication)')
+        dips, origin,
+        reference='From J Smith, (personal communication)')
     fstr = io.StringIO()
     rupture.writeTextFile(fstr)
 
@@ -289,7 +296,8 @@ def test_fromTrace():
     dips = [30.0, 45.0]
     rupture = QuadRupture.fromTrace(
         xp0, yp0, xp1, yp1, zp, widths,
-        dips, reference='From J Smith, (personal communication)')
+        dips, origin, 
+        reference='From J Smith, (personal communication)')
 
 
 if __name__ == "__main__":

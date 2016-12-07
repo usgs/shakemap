@@ -57,8 +57,8 @@ def test_virtualipe():
     rupturefile = os.path.join(datadir, 'wei_fault.txt')
 
     origin_obj = Origin.fromFile(eventfile)
-    rupture_obj = read_rupture_file(rupturefile)
-    rx = rupture_obj.getRuptureContext([gmpe], origin_obj)
+    rupture_obj = read_rupture_file(origin_obj, rupturefile)
+    rx = rupture_obj.getRuptureContext([gmpe])
     rx.rake = 45.
 
     smdx = 0.0083333333
@@ -84,7 +84,7 @@ def test_virtualipe():
 
     sx = sites_obj_grid.getSitesContext(lldict=lldict, rock_vs30=760.0)
 
-    dobj = Distance(gmpe, origin_obj, rupture_obj, lats, lons, depths)
+    dobj = Distance(gmpe, lons, lats, depths, rupture_obj)
     dx = dobj.getDistanceContext()
 
     sd_types = [oqconst.StdDev.TOTAL]
@@ -146,9 +146,9 @@ def test_virtualipe():
     gmpe_ba14 = BooreEtAl2014()
     gmpe = MultiGMPE.from_list([gmpe_ba14], [1.0])
     ipe = VirtualIPE.fromFuncs(gmpe, gmice)
-    rx = rupture_obj.getRuptureContext([gmpe], origin_obj)
+    rx = rupture_obj.getRuptureContext([gmpe])
     rx.rake = 45.
-    dobj = Distance(gmpe, origin_obj, rupture_obj, lats, lons, depths)
+    dobj = Distance(gmpe, lons, lats, depths, rupture_obj)
     dx = dobj.getDistanceContext()
 
     mmi_rjb, mmi_sd_rjb = \

@@ -790,7 +790,7 @@ def test_multigmpe_get_mean_stddevs():
     sctx = site.getSitesContext()
 
     #---------------------------------------------------------------------------
-    # Make souce instance
+    # Make rupture instance
     #---------------------------------------------------------------------------
     lat0 = np.array([34.1])
     lon0 = np.array([-118.2])
@@ -800,22 +800,23 @@ def test_multigmpe_get_mean_stddevs():
     W = np.array([3.0])
     dip = np.array([30.])
 
-    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
              'id': '', 'locstring': '', 'rake': 30.3,
              'time': ShakeDateTime.utcfromtimestamp(int(time.time())),
              'timezone': 'UTC'}
     origin = Origin(event)
+    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip, origin)
+
 
     #---------------------------------------------------------------------------
     # Make a rupture context
     #---------------------------------------------------------------------------
-    rx = rup.getRuptureContext(gmpes, origin)
+    rx = rup.getRuptureContext(gmpes)
 
     #---------------------------------------------------------------------------
     # Make a distance context
     #---------------------------------------------------------------------------
-    dctx = Distance.fromSites(gmpes, origin, site, rup).getDistanceContext()
+    dctx = Distance.fromSites(gmpes, site, rup).getDistanceContext()
 
     #---------------------------------------------------------------------------
     # Compute weighted GMPE
@@ -974,7 +975,7 @@ def test_dualdistsanceweights_get_mean_stddevs():
     sctx = site.getSitesContext()
 
     #---------------------------------------------------------------------------
-    # Make souce instance
+    # Make rupture
     #---------------------------------------------------------------------------
     lat0 = np.array([34.1])
     lon0 = np.array([-118.2])
@@ -984,21 +985,21 @@ def test_dualdistsanceweights_get_mean_stddevs():
     W = np.array([3.0])
     dip = np.array([30.])
 
-    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
              'id': '', 'locstring': '', 'rake': 30.3,
              'timezone': 'UTC'}
     origin = Origin(event)
+    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip, origin)
 
     #---------------------------------------------------------------------------
     # Make a rupture context
     #---------------------------------------------------------------------------
-    rx = rup.getRuptureContext(gmpes, origin)
+    rx = rup.getRuptureContext(gmpes)
 
     #---------------------------------------------------------------------------
     # Make a distance context
     #---------------------------------------------------------------------------
-    dctx = Distance.fromSites(gmpes, origin, site, rup).getDistanceContext()
+    dctx = Distance.fromSites(gmpes, site, rup).getDistanceContext()
 
     #---------------------------------------------------------------------------
     # Compute weighted GMPE

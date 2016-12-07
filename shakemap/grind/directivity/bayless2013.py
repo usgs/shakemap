@@ -5,7 +5,7 @@ import openquake.hazardlib.geo as geo
 import copy
 
 from shakemap.grind.distance import get_distance
-from shakemap.grind.distance import _distance_sq_to_segment
+from shakemap.grind.rupture import _distance_sq_to_segment
 import shakemap.utils.ecef as ecef
 from shakemap.utils.vector import Vector
 
@@ -135,7 +135,7 @@ class Bayless2013(object):
             # Compute some genral stuff that is required for all mechanisms
             dtypes = ['rrup', 'rx', 'ry0']
             dists = get_distance(dtypes, self._lat, self._lon, self._dep,
-                                 self._origin, self._rup)
+                                 self._rup)
             self.__Rrup = np.reshape(dists['rrup'], self._lat.shape)
             self.__Rx = np.reshape(dists['rx'], self._lat.shape)
             self.__Ry = np.reshape(dists['ry0'], self._lat.shape)

@@ -38,7 +38,7 @@ def test_station(tmpdir):
     rupturefile = os.path.join(datadir, 'wei_fault.txt')
 
     origin_obj = Origin.fromFile(eventfile)
-    rupture_obj = read_rupture_file(rupturefile)
+    rupture_obj = read_rupture_file(origin_obj, rupturefile)
 
     #
     # Set up the GMPE
@@ -50,7 +50,7 @@ def test_station(tmpdir):
     #
     # 
     #
-    rupture_ctx = rupture_obj.getRuptureContext([gmpe], origin_obj)
+    rupture_ctx = rupture_obj.getRuptureContext([gmpe])
 
     smdx = 0.0083333333
     smdy = 0.0083333333

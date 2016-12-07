@@ -7,16 +7,17 @@ import time as time
 
 # third party
 import numpy as np
+from openquake.hazardlib.geo import geodetic
 from openquake.hazardlib.geo import point
 from openquake.hazardlib.gsim import base
 from openquake.hazardlib.const import TRT
-from ..utils.timeutils import ShakeDateTime
-from .rupture import read_rupture_file
 
-# local imports
+from shakemap.utils.timeutils import ShakeDateTime
+from shakemap.grind.rupture import read_rupture_file
 from shakemap.utils.exception import ShakeMapException
 
-REQUIRED_KEYS = ['lat', 'lon', 'depth', 'mag']
+
+REQUIRED_KEYS = ['lat', 'lon', 'depth', 'mag', 'id']
 
 RAKEDICT = {'SS': 0.0, 'NM': -90.0, 'RS': 90.0, 'ALL': None}
 DEFAULT_MECH = 'ALL'
@@ -97,8 +98,6 @@ class Origin(object):
         if (event['lon'] > 180) or (event['lon'] < -180):
             raise Exception('lat must be between -180 and 180 degrees.')
         event['depth'] = float(event['depth'])
-        if not type(event['locstring']) is str:
-            raise Exception('locstring must be a string.')
         event['mag'] = float(event['mag'])
         if 'mech' in event.keys():
             if event['mech'] == '':
@@ -276,7 +275,7 @@ def read_event_file(eventxml):
     .. code-block:: xml
 
          <earthquake 
-             id="2008ryan" 
+             id="2008ryan "
              lat="30.9858" 
              lon="103.3639" 
              mag="7.9" 
@@ -360,22 +359,3 @@ def read_source(sourcefile):
     return params
 
 
-
-def rake_to_mech(rake):
-    """
-    Convert rake to mechanism. 
-
-    :param rake: 
-        Rake angle in degrees. 
-    """
-    mech = 'ALL'
-    if rake is not None:
-        if (rake >= -180 and rake <= -150) or \
-           (rake >= -30  and rake <= 30) or \
-           (rake >= 150 and rake <= 180):
-            mech = 'SS'
-        if rake >= -120 and rake <= -60:
-            mech = 'NM'
-        if rake >= 60 and rake <= 120:
-            mech = 'RS'
-    return mech
