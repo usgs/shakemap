@@ -6,6 +6,7 @@ import copy
 import warnings
 from abc import ABC
 from abc import abstractmethod
+from abc import abstractproperty
 import json
 import itertools as it
 import re
@@ -24,6 +25,8 @@ from shakemap.utils.ecef import latlon2ecef
 from shakemap.utils.ecef import ecef2latlon
 from shakemap.utils.vector import Vector
 from shakemap.utils.exception import ShakeMapException
+from shakemap.plotting.plotrupture import plot_rupture_wire3d
+from shakemap.plotting.plotrupture import map_rupture
 
 
 
@@ -152,6 +155,18 @@ class Rupture(ABC):
 
         """
         return self._reference
+
+    @abstractproperty
+    def lats(self):
+        pass
+
+    @abstractproperty
+    def lons(self):
+        pass
+
+    @abstractproperty
+    def depths(self):
+        pass
 
     @classmethod
     @abstractmethod
@@ -308,6 +323,19 @@ class Rupture(ABC):
         """
         pass
 
+    def plot3d(self):
+        """
+        Method for making a quick 3D wireframe plot of rupture.
+        """
+        plot_rupture_wire3d(self)
+
+    def map(self):
+        """
+        Method for making a quick map of the fault.
+        """
+        map_rupture(self)
+
+
 class PointRupture(Rupture):
     """
     Rupture class for point sources. The purpose is to gracefully handle:
@@ -377,6 +405,29 @@ class PointRupture(Rupture):
 
     def getQuadrilaterals(self):
         return None
+
+    @property
+    def lats(self):
+        """
+        Returns rupture latitudes, which is just the hypocenter for a PointRupture.
+        """
+        return self._origin.lat
+
+    @property
+    def lons(self):
+        """
+        Returns rupture longitudes, which is just the hypocenter for a PointRupture.
+        """
+        return self._origin.lon
+
+    @property
+    def depths(self):
+        """
+        Returns rupture depths, which is just the hypocenter for a PointRupture.
+        """
+        return self._origin.depth
+
+
 
     @classmethod
     def fromJson(cls, d, origin):
@@ -726,15 +777,15 @@ class EdgeRupture(Rupture):
             EdgeRupture instance.
 
         """
-        self._toplons = toplons
-        self._toplats = toplats
-        self._topdeps = topdeps
-        self._botlons = botlons
-        self._botlats = botlats
-        self._botdeps = botdeps
+        self._toplons = np.array(toplons)
+        self._toplats = np.array(toplats)
+        self._topdeps = np.array(topdeps)
+        self._botlons = np.array(botlons)
+        self._botlats = np.array(botlats)
+        self._botdeps = np.array(botdeps)
         self._origin = origin
         if group_index is not None:
-            self._group_index = group_index
+            self._group_index = np.array(group_index)
         else:
             self._group_index = np.zeros_like(toplons)
         self._mesh_dx = mesh_dx
@@ -856,6 +907,85 @@ class EdgeRupture(Rupture):
             float: dip angle in degrees.
         """
         return self._dip
+
+    @property
+    def lats(self):
+        """
+        Return an array of latitudes for the rupture verticies arranged for
+        plotting purposes; will give an outline of each group connected
+        segments.
+
+        Returns:
+            array: Numpy array of closed-loop latitude values; disconnected
+                segments are separated by nans.
+        """
+        lats = np.empty(shape=(0,))
+        groups = self._group_index
+        u_groups = np.unique(groups)
+        ng = len(u_groups)
+        nan = np.array(np.nan).reshape(1,)
+        for i in range(ng):
+            top_lats = self._toplats[groups == u_groups[i]]
+            top0 = top_lats[0].reshape((1,))
+            bot_lats = self._botlats[groups == u_groups[i]]
+            lats = np.concatenate((lats, top_lats, bot_lats[::-1], top0, nan))
+        return np.array(lats)
+
+    @property
+    def lons(self):
+        """
+        Return an array of longitudes for the rupture verticies arranged for
+        plotting purposes; will give an outline of each group connected
+        segments.
+
+        Returns:
+            array: Numpy array of closed-loop longitude values; disconnected
+                segments are separated by nans.
+        """
+        lons = np.empty(shape=(0,))
+        groups = self._group_index
+        u_groups = np.unique(groups)
+        ng = len(u_groups)
+        nan = np.array(np.nan).reshape(1,)
+        for i in range(ng):
+            top_lons = self._toplons[groups == u_groups[i]]
+            top0 = top_lons[0].reshape((1,))
+            bot_lons = self._botlons[groups == u_groups[i]]
+            lons = np.concatenate((lons, top_lons, bot_lons[::-1], top0, nan))
+        return np.array(lons)
+
+    @property
+    def depths(self):
+        """
+        Return an array of depths for the rupture verticies arranged for
+        plotting purposes; will give an outline of each group connected
+        segments.
+
+        Returns:
+            array: Numpy array of closed-loop latitude values; disconnected
+                segments are separated by nans.
+        """
+        deps = np.empty(shape=(0,))
+        groups = self._group_index
+        u_groups = np.unique(groups)
+        ng = len(u_groups)
+        nan = np.array(np.nan).reshape(1,)
+        for i in range(ng):
+            top_deps = self._topdeps[groups == u_groups[i]]
+            top0 = top_deps[0].reshape((1,))
+            bot_deps = self._botdeps[groups == u_groups[i]]
+            deps = np.concatenate((deps, top_deps, bot_deps[::-1], top0, nan))
+        return np.array(deps)
+
+    def _getGroupIndex(self):
+        """
+        Return a list of segment group indexes.
+
+        Returns:
+            list: Segment group indexes; length equals the number of quadrilaterals.
+        """
+        return copy.deepcopy(self._group_index)
+
 
     def _computeStikeDip(self):
         """
@@ -1858,10 +1988,10 @@ class QuadRupture(Rupture):
 
     def _getGroupIndex(self):
         """
-        Return a list of segment indexes.
+        Return a list of segment group indexes.
 
         Returns:
-            list: Segment indexes; length equals the number of quadrilaterals.
+            list: Segment group indexes; length equals the number of quadrilaterals.
         """
         return copy.deepcopy(self._group_index)
 
@@ -1930,6 +2060,38 @@ class QuadRupture(Rupture):
             lons = lons + top_lons + bot_lons[::-1] + top0 + [np.nan]
         return np.array(lons)
 
+    @property
+    def depths(self):
+        """
+        Return an array of depths for the rupture verticies arranged for
+        plotting purposes; will give an outline of each group connected 
+        segments.
+
+        Returns:
+            array: Numpy array of closed-loop depths; disconnected
+                segments are separated by nans. 
+        """
+        deps = []
+        quads = self.getQuadrilaterals()
+        groups = self._getGroupIndex()
+        u_groups = np.unique(groups)
+        ng = len(u_groups)
+        for i in range(ng):
+            q_ind = np.where(groups == u_groups[i])[0]
+            nq = len(q_ind)
+            top_deps = []
+            bot_deps = []
+            for j in range(nq):
+                if j == 0:
+                    top0 = [quads[q_ind[j]][0].depitude]
+                    bot0 = [quads[q_ind[j]][3].depitude]
+                    top_deps = top_deps + top0
+                    bot_deps = bot_deps + bot0
+                top_deps = top_deps + [quads[q_ind[j]][1].depitude]
+                bot_deps = bot_deps + [quads[q_ind[j]][2].depitude]
+            deps = deps + top_deps + bot_deps[::-1] + top0 + [np.nan]
+        
+        return np.array(deps)
 
     def getDeps(self):
         """
