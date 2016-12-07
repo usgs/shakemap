@@ -42,7 +42,7 @@ class Distance(object):
         Report 2015-1028, 20 p., http://dx.doi.org/10.3133/ofr20151028.
     """
 
-    def __init__(self, gmpe, lon, lat, dep, origin = None, rupture = None):
+    def __init__(self, gmpe, lon, lat, dep, rupture = None):
         """
         Constructor for Distance class. 
 
@@ -53,24 +53,19 @@ class Distance(object):
             lon (array): A numpy array of site longitudes.
             lat (array): A numpy array of site latitudes.
             dep (array): A numpy array of site depths (km); down is positive. 
-            origin (Origin): Shakemap Origin instance. For point-source 
-                distances (Repi, Rhyp) the hypocenter is taken from the origin
-                instance. The finite-rupture distances (Rrup, Rjb, ...), are
-                based on the rupture representation in the source instance if
-                available.
             rupture (Rupture): A Shakemap Rupture instance.
 
         Returns:
             Distance object.
         """
-        self._origin = origin
+
         self._rupture = rupture
 
         self._distance_context = self._calcDistanceContext(
             gmpe, lat, lon, dep)
 
     @classmethod
-    def fromSites(cls, gmpe, origin, sites, rup = None):
+    def fromSites(cls, gmpe, sites, rup):
         """
         Convenience class method to construct a Distance object from a sites
         object.
@@ -79,8 +74,8 @@ class Distance(object):
             gmpe (GMPE): Concrete subclass of GMPE
                 `[link] <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#built-in-gsims>`__;
                 can be individual instance or list of instances.
-            origin (Origin): A Shakeamp Origin object.
             sites (Sites): A Shakemap Sites object.
+            rup (Rupture): A Shakemap Rupture object.
 
         Returns:
             Distance object.
@@ -96,7 +91,7 @@ class Distance(object):
         lons = np.linspace(west, east, nx)
         lon, lat = np.meshgrid(lons, lats)
         dep = np.zeros_like(lon)
-        return cls(gmpe, lon, lat, dep, origin, rup)
+        return cls(gmpe, lon, lat, dep, rup)
 
     def getDistanceContext(self):
         """
@@ -106,12 +101,6 @@ class Distance(object):
         """
         return copy.deepcopy(self._distance_context)
 
-    def getOrigin(self):
-        """
-        Returns:
-            Shakemap Origin object. 
-        """
-        return copy.deepcopy(self._origin)
 
     def _calcDistanceContext(self, gmpe, lat, lon, dep):
         """
@@ -147,8 +136,7 @@ class Distance(object):
 
         context = base.DistancesContext()
 
-        ddict = get_distance(list(requires), lat, lon, dep, self._origin,
-                             self._rupture)
+        ddict = get_distance(list(requires), lat, lon, dep, self._rupture)
 
         for method in requires:
             (context.__dict__)[method] = ddict[method]
@@ -167,8 +155,7 @@ def get_distance_measures():
 
     return ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T']
 
-def get_distance(methods, lat, lon, dep, origin = None, rupture = None, 
-                 mesh_dx = 0.5):
+def get_distance(methods, lat, lon, dep, rupture):
     """
     Calculate distance using any one of a number of distance measures.
     One of quadlist OR hypo must be specified. The following table gives
@@ -206,18 +193,10 @@ def get_distance(methods, lat, lon, dep, origin = None, rupture = None,
         lat (array): A numpy array of latitudes.
         lon (array): A numpy array of longidues.
         dep (array): A numpy array of depths (km).
-        origin (Origin): A ShakeMap Origin instance.
         rupture (Rupture): A ShakeMap Rupture instance.
-        mesh_dx (float): Mesh spacing in km. Only used if rupture is an EdgeRupture
-            instance (meaning that distances are computed based on meshing the 
-            rupture surface). 
 
     Returns:
        dict: dictionary of numpy arrays of distances, size of lon.shape.
-
-    Note that magnitude-based median rupture distances are computed if a PointRupture
-    is provided for the 'rupture' argument. If no rupture is provided and rupture
-    distances are requested then Rhypo is substituded for Rrup and Repi for Rjb. 
     """
 
     # Dictionary for holding/returning the requested distances
@@ -242,62 +221,25 @@ def get_distance(methods, lat, lon, dep, origin = None, rupture = None,
     # Point distances
     #---------------------------------------------------------------------------
     if 'rhypo' in methods:
-        if origin is not None:
-            distdict['rhypo'] = origin.computeRhyp(lon, lat, dep)
-        else:
-            raise Exception('Origin required for Rhypo.')
+        distdict['rhypo'] = rupture.computeRhyp(lon, lat, dep)
 
     if 'repi' in methods:
-        if origin is not None:
-            distdict['repi'] = origin.computeRepi(lon, lat, dep)
-        else:
-            raise Exception('Origin required for Repi.')
+        distdict['repi'] = rupture.computeRepi(lon, lat, dep)
 
     #---------------------------------------------------------------------------
     # Rupture distances
     #---------------------------------------------------------------------------
     gc2_distances = set(['rx', 'ry', 'ry0', 'U', 'T'])
-    if rupture is not None:
-        if 'rrup' in methods:
-            # Question: would it be better to have all the computeR* methods
-            # have the same arguments (but some unused)? Benefit would be 
-            # avoiding these annoying if-statements. 
-            if isinstance(rupture, QuadRupture):
-                distdict['rrup'] = rupture.computeRrup(lon, lat, dep)
-            elif isinstance(rupture, EdgeRupture):
-                distdict['rrup'] = rupture.computeRrup(lon, lat, dep, mesh_dx)
-            elif isinstance(rupture, PointRupture):
-                tmp = rupture.computeRrup(lon, lat, dep, origin)
-                distdict['rrup'] = tmp[0]
-                distdict['rrup_var'] = tmp[1]
-        if 'rjb' in methods:
-            if isinstance(rupture, QuadRupture):
-                distdict['rjb'] = rupture.computeRjb(lon, lat, dep)
-            elif isinstance(rupture, EdgeRupture):
-                distdict['rjb'] = rupture.computeRjb(lon, lat, dep, mesh_dx)
-            elif isinstance(rupture, PointRupture):
-                tmp = rupture.computeRjb(lon, lat, dep, origin)
-                distdict['rjb'] = tmp[0]
-                distdict['rjb_var'] = tmp[1]
+    if 'rrup' in methods:
+        distdict['rrup'] = rupture.computeRrup(lon, lat, dep)
 
-        # If any of the GC2-related distances are requested, may as well do all
-        if len(set(methods).intersection(gc2_distances)) > 0: 
-            distdict.update(rupture.computeGC2(lon, lat, dep))
-    else:
-        if origin is not None:
-            if 'rrup' in methods:
-                distdict['rrup'] = origin.computeRhyp(lon, lat, dep)
-            if 'rjb' in methods:
-                distdict['rjb'] = origin.computeRepi(lon, lat, dep)
-        else:
-            raise Exception('An Origin or Rupture is required..')
+    if 'rjb' in methods:
+        distdict['rjb'] = rupture.computeRjb(lon, lat, dep)
 
-        # If an origin is provided but no rupture AND a GC2 distance is 
-        # requested, then a sensible thing to do is to return the GC2
-        # default values in a PointRupture
-        if len(set(methods).intersection(gc2_distances)) > 0:
-            tmp_point_rupture = PointRupture()
-            distdict.update(tmp_point_rupture.computeGC2(lon, lat, dep))
+    # If any of the GC2-related distances are requested, may as well do all
+    if len(set(methods).intersection(gc2_distances)) > 0: 
+        distdict.update(rupture.computeGC2(lon, lat, dep))
+
     return distdict
 
 

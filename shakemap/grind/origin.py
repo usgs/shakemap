@@ -17,7 +17,7 @@ from shakemap.grind.rupture import read_rupture_file
 from shakemap.utils.exception import ShakeMapException
 
 
-REQUIRED_KEYS = ['lat', 'lon', 'depth', 'mag']
+REQUIRED_KEYS = ['lat', 'lon', 'depth', 'mag', 'id']
 
 RAKEDICT = {'SS': 0.0, 'NM': -90.0, 'RS': 90.0, 'ALL': None}
 DEFAULT_MECH = 'ALL'
@@ -98,8 +98,6 @@ class Origin(object):
         if (event['lon'] > 180) or (event['lon'] < -180):
             raise Exception('lat must be between -180 and 180 degrees.')
         event['depth'] = float(event['depth'])
-        if not type(event['locstring']) is str:
-            raise Exception('locstring must be a string.')
         event['mag'] = float(event['mag'])
         if 'mech' in event.keys():
             if event['mech'] == '':
@@ -268,56 +266,6 @@ class Origin(object):
         self.rake = rake
         self.mech = mech
 
-
-    def computeRepi(self, lon, lat, depth):
-        """
-        Compute epicentral distance (km). 
-
-        Args:
-            lon (array): Numpy array of longitudes.
-            lat (array): Numpy array of latitudes.
-            depth (array): Numpy array of depths (km; positive down).
-
-        Returns:
-            array: Epicentral distance (km).
-
-        """
-        oldshape = lon.shape
-
-        if len(oldshape) == 2:
-            newshape = (oldshape[0] * oldshape[1], 1)
-        else:
-            newshape = (oldshape[0], 1)
-
-        repi = geodetic.distance(self.lon, self.lat, 0.0,
-                                 lon, lat, depth)
-        repi = repi.reshape(oldshape)
-        return repi
-
-    def computeRhyp(self, lon, lat, depth):
-        """
-        Compute hypocentral distance (km). 
-
-        Args:
-            lon (array): Numpy array of longitudes.
-            lat (array): Numpy array of latitudes.
-            depth (array): Numpy array of depths (km; positive down).
-
-        Returns:
-            array: Hypocentral distance (km).
-
-        """
-        oldshape = lon.shape
-
-        if len(oldshape) == 2:
-            newshape = (oldshape[0] * oldshape[1], 1)
-        else:
-            newshape = (oldshape[0], 1)
-
-        rhyp = geodetic.distance(self.lon, self.lat, self.depth,
-                                 lon, lat, depth)
-        rhyp = rhyp.reshape(oldshape)
-        return rhyp
 
 def read_event_file(eventxml):
     """

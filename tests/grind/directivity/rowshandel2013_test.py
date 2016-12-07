@@ -38,29 +38,26 @@ def test_exceptions():
     tlon, tlat = proj(rupx, rupy, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
+    # Origin
+    origin = Origin({'lat':epilat[0],
+                     'lon':epilon[0],
+                     'depth':10,
+                     'mag':magnitude,
+                     'id':'ss3',
+                     'rake':rake})
+
+    # Rupture
     rup = rupture.QuadRupture.fromTrace(
         np.array([tlon[0]]), np.array([tlat[0]]),
         np.array([tlon[1]]), np.array([tlat[1]]),
-        zp, width, dip, reference='ss3')
+        zp, width, dip, origin, reference='ss3')
 
-    event = {'lat': epilat[0],
-             'lon': epilon[0],
-             'depth': 10,
-             'mag': magnitude,
-             'id': 'ss3',
-             'locstring': 'test',
-             'type': 'SS',
-             'timezone': 'UTC'}
-    event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
-    event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
-
+    # Sites
     x = np.linspace(-60, 60, 21)
     y = np.linspace(-60, 138, 34)
     site_x, site_y = np.meshgrid(x, y)
     slon, slat = proj(site_x, site_y, reverse=True)
     deps = np.zeros_like(slon)
-    origin = Origin(event)
-    origin.rake = rake
 
     with pytest.raises(Exception) as e:
         test1 = Rowshandel2013(origin, rup, slat, slon, deps, dx=1, T=[1.0, 3.0],
@@ -88,24 +85,20 @@ def test_fromSites():
     tlon, tlat = proj(rupx, rupy, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
+    # Origin
+    origin = Origin({'lat':epilat[0],
+                     'lon':epilon[0],
+                     'depth':10,
+                     'mag':magnitude,
+                     'id':'',
+                     'rake':rake})
+
+    # Rupture
     rup = rupture.QuadRupture.fromTrace(
         np.array([tlon[0]]), np.array([tlat[0]]),
         np.array([tlon[1]]), np.array([tlat[1]]),
-        zp, width, dip, reference='ss3')
+        zp, width, dip, origin, reference='ss3')
 
-    event = {'lat': epilat[0],
-             'lon': epilon[0],
-             'depth': 10,
-             'mag': magnitude,
-             'id': '',
-             'locstring': 'test',
-             'type': 'SS',
-             'timezone': 'UTC'}
-    event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
-    event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
-
-    origin = Origin(event)
-    origin.rake = rake
 
     vs30file = os.path.join(shakedir, 'tests/data/Vs30_test.grd')
     cx = -118.2
@@ -115,11 +108,11 @@ def test_fromSites():
     xspan = 0.0083 * 5
     yspan = 0.0083 * 5
     mysite = Sites.fromCenter(cx, cy, xspan, yspan, dx, dy,
-                                    vs30File=vs30file, padding=True,
-                                    resample=False)
+                              vs30File=vs30file, padding=True,
+                              resample=False)
 
     test1 = Rowshandel2013.fromSites(origin, rup, mysite, dx=1, T=[5.0],
-                           a_weight=0.5, mtype=1)
+                                     a_weight=0.5, mtype=1)
 
     targetFd = np.array([[ 0.10991596,  0.11007528,  0.11018762,  0.11023397,  0.11018809,
          0.11007606,  0.10991697],
@@ -154,29 +147,27 @@ def test_ss3():
     tlon, tlat = proj(rupx, rupy, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
+    # Origin
+    origin = Origin({'lat':epilat[0],
+                     'lon':epilon[0],
+                     'depth':10,
+                     'mag':magnitude,
+                     'id':'ss3',
+                     'rake':rake})
+
+    # Rupture
     rup = rupture.QuadRupture.fromTrace(
         np.array([tlon[0]]), np.array([tlat[0]]),
         np.array([tlon[1]]), np.array([tlat[1]]),
-        zp, width, dip, reference='ss3')
+        zp, width, dip, origin, reference='ss3')
 
-    event = {'lat': epilat[0],
-             'lon': epilon[0],
-             'depth': 10,
-             'mag': magnitude,
-             'id': 'ss3',
-             'locstring': 'test',
-             'type': 'SS',
-             'timezone': 'UTC'}
-    event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
-    event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
-
+    # Sites
     x = np.linspace(-60, 60, 21)
     y = np.linspace(-60, 138, 34)
     site_x, site_y = np.meshgrid(x, y)
     slon, slat = proj(site_x, site_y, reverse=True)
     deps = np.zeros_like(slon)
-    origin = Origin(event)
-    origin.rake = rake
+
 
     test1 = Rowshandel2013(origin, rup, slat, slon, deps, dx=1, T=[1.0, 3.0],
                            a_weight=0.5, mtype=1)
@@ -1882,22 +1873,31 @@ def test_rv4():
     proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
 
+    # Dummy Origin
+    origin = Origin({'lat':0,
+                     'lon':0,
+                     'depth':0,
+                     'mag':0,
+                     'id':'',
+                     'rake':rake})
+
+    # Rupture
     rup = rupture.QuadRupture.fromTrace(
         np.array([tlon[0]]), np.array([tlat[0]]),
         np.array([tlon[1]]), np.array([tlat[1]]),
-        zp, width, dip, reference='')
+        zp, width, dip, origin, reference='')
     L = rup.getLength()
 
-    # Try to figure out epicenter
+    # Figure out epicenter
     tmp = rup.getQuadrilaterals()[0]
-    pp0 = Vector.fromPoint(point.Point(tmp[0].longitude, tmp[0].latitude,
-                                       tmp[0].depth))
-    pp1 = Vector.fromPoint(point.Point(tmp[1].longitude, tmp[1].latitude,
-                                       tmp[1].depth))
-    pp2 = Vector.fromPoint(point.Point(tmp[2].longitude, tmp[2].latitude,
-                                       tmp[2].depth))
-    pp3 = Vector.fromPoint(point.Point(tmp[3].longitude, tmp[3].latitude,
-                                       tmp[3].depth))
+    pp0 = Vector.fromPoint(point.Point(
+            tmp[0].longitude, tmp[0].latitude, tmp[0].depth))
+    pp1 = Vector.fromPoint(point.Point(
+            tmp[1].longitude, tmp[1].latitude, tmp[1].depth))
+    pp2 = Vector.fromPoint(point.Point(
+            tmp[2].longitude, tmp[2].latitude, tmp[2].depth))
+    pp3 = Vector.fromPoint(point.Point(
+            tmp[3].longitude, tmp[3].latitude, tmp[3].depth))
     dxp = 6/L
     dyp = (width-8)/width
     mp0 = pp0 + (pp1 - pp0)*dxp
@@ -1905,24 +1905,21 @@ def test_rv4():
     rp = mp0 + (mp1 - mp0)*dyp
     epilat,epilon,epidepth = ecef2latlon(rp.x, rp.y, rp.z)
 
-    event = {'lat': epilat,
-             'lon': epilon,
-             'depth': epidepth,
-             'mag': magnitude,
-             'id': 'test',
-             'locstring': 'rv4',
-             'type': 'RS',
-             'timezone': 'UTC'}
-    event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
-    event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+    # Fix origin
+    origin = Origin({'lat':epilat,
+                     'lon':epilon,
+                     'depth':epidepth,
+                     'mag':magnitude,
+                     'id':'rv4',
+                     'rake':rake})
 
+    # Sites
     x = np.linspace(-50, 50, 11)
     y = np.linspace(-50, 50, 11)
     site_x, site_y = np.meshgrid(x, y)
     slon, slat = proj(site_x, site_y, reverse=True)
     deps = np.zeros_like(slon)
-    origin = Origin(event)
-    origin.rake = rake
+
 
     test1 = Rowshandel2013(origin, rup, slat, slon, deps, dx=1, T=5.0,
                            a_weight=0.5, mtype=1)
@@ -1978,18 +1975,33 @@ def test_so6():
     rupx = np.array([0, 0])
     rupy = np.array([0, L])
     zp = np.array([0])
+
     # Convert to lat/lon
     proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
     tlon,tlat = proj(rupx, rupy, reverse = True)
+
+    # Dummy Origin
+    origin = Origin({'lat':0,
+                     'lon':0,
+                     'depth':0,
+                     'mag':0,
+                     'id':'so6',
+                     'rake':rake})
+
+    # Rupture
     rup = rupture.QuadRupture.fromTrace(
         np.array([tlon[0]]), np.array([tlat[0]]), 
         np.array([tlon[1]]), np.array([tlat[1]]),
-        zp, width, dip, reference = 'rv4')
+        zp, width, dip, origin, reference = 'rv4')
+
+    # Sites
     x = np.linspace(-80, 80, 21)
     y = np.linspace(-50, 130, 21)
     site_x,site_y = np.meshgrid(x, y)
     slon,slat = proj(site_x, site_y, reverse = True)
     sdepth = np.zeros_like(slon)
+
+    # Figure out hypocenter
     tmp = rup.getQuadrilaterals()[0]
     pp0 = Vector.fromPoint(point.Point(tmp[0].longitude, tmp[0].latitude, tmp[0].depth))
     pp1 = Vector.fromPoint(point.Point(tmp[1].longitude, tmp[1].latitude, tmp[1].depth))
@@ -2002,23 +2014,22 @@ def test_so6():
     rp = mp0 + (mp1 - mp0)*dyp
     epilat,epilon,epidepth = ecef2latlon(rp.x, rp.y, rp.z)
     epix,epiy = proj(epilon, epilat, reverse = False)
-    event = {'lat': epilat, 
-             'lon': epilon, 
-             'depth':epidepth, 
-             'mag': magnitude, 
-             'id':'so6',
-             'locstring':'so6',
-             'type':'RS',
-             'timezone':'UTC'}
-    event['time'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
-    event['created'] = ShakeDateTime.utcfromtimestamp(int(time.time()))
+
+    # Fix origin
+    origin = Origin({'lat':epilat,
+                     'lon':epilon,
+                     'depth':epidepth,
+                     'mag':magnitude,
+                     'id':'so6',
+                     'rake':rake})
+
     ruplat = [a.latitude for a in rup.getQuadrilaterals()[0]]
     ruplon = [a.longitude for a in rup.getQuadrilaterals()[0]]
     ruplat = np.append(ruplat, ruplat[0])
     ruplon = np.append(ruplon, ruplon[0])
     rupx,rupy = proj(ruplon, ruplat, reverse = False)
-    origin = Origin(event)
-    origin.rake = rake
+
+
     test1 = Rowshandel2013(origin, rup, slat, slon, sdepth, dx=1, T=5.0,
                            a_weight=0.5, mtype=1)
     fd = test1.getFd()[0]

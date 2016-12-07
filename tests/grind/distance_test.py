@@ -56,8 +56,11 @@ def test_san_fernando():
     lon2,lat2 = proj(x2, y2, reverse = True)
     lon3,lat3 = proj(x3, y3, reverse = True)
 
+    # Rupture requires an origin even when not used:
+    origin = Origin({'id':'test','lat':0,'lon':0,'depth':5.0,'mag':7.0})
     rup = QuadRupture.fromVertices(
-        lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3)
+        lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3,
+        origin)
     # Make a origin object; most of the 'event' values don't matter
     event = {'lat': 0,  'lon': 0, 'depth':0, 'mag': 6.61, 
              'id':'', 'locstring':'', 'type':'ALL', 
@@ -76,7 +79,7 @@ def test_san_fernando():
 
     # Calculate U and T
     dtypes = ['U', 'T']
-    dists = get_distance(dtypes, lats, lons, dep, origin, rup)
+    dists = get_distance(dtypes, lats, lons, dep, rup)
 
     # new method:
     from shakemap.grind.rupture import _computeGC2
@@ -169,7 +172,11 @@ def test_exceptions():
     W = np.array([3.0])
     dip = np.array([30.])
 
-    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
+    # Rupture requires an origin even when not used:
+    origin = Origin({'id':'test','lat':0,'lon':0,'depth':5.0,'mag':7.0})
+    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip, 
+                                origin)
+
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
              'id': '', 'locstring': '', 'type': 'U', 'mech':'RS',
              'rake':90, 'timezone': 'UTC'}
@@ -184,15 +191,19 @@ def test_exceptions():
     dist_types = ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'V']
     with pytest.raises(Exception) as e:
         dists = get_distance(dist_types, sctx.lats, sctx.lons,
-                             np.zeros_like(sctx.lons), origin, rup)
+                             np.zeros_like(sctx.lons), rup)
 
     dist_types = ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T']
     with pytest.raises(Exception) as e:
         dists = get_distance(dist_types, sctx.lats, sctx.lons[0:4,],
-                             np.zeros_like(sctx.lons), origin, rup)
+                             np.zeros_like(sctx.lons), rup)
 
 
 def test_distance_no_rupture():
+    event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
+             'id': '', 'locstring': '', 'timezone': 'UTC'}
+    origin = Origin(event)
+    origin.setMechanism('ALL')
     # Make sites instance
     vs30file = os.path.join(shakedir, 'tests/data/Vs30_test.grd')
     cx = -118.2
@@ -207,13 +218,10 @@ def test_distance_no_rupture():
     # Make souce instance
     #  - Unknown/no tectonic region
     #  - Mech is ALL
-    event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
-             'id': '', 'locstring': '', 'timezone': 'UTC'}
-    origin = Origin(event)
-    origin.setMechanism('ALL')
+
     gmpe = AbrahamsonEtAl2014()
-    rupture = PointRupture()
-    dists = Distance.fromSites(gmpe, origin, site, rupture)
+    rupture = PointRupture(origin)
+    dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
     rjb = np.array([[ 1.03475736,  0.82507289,  0.69891123,  0.6553167 ,  0.69891123,
@@ -256,7 +264,7 @@ def test_distance_no_rupture():
     #  - Tectonic region unsupported
     #  - Mech is ALL
     origin._tectonic_region = 'Volcano'
-    dists = Distance.fromSites(gmpe, origin, site, rupture)
+    dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
     rjbt = np.array([[ 1.03475736,  0.82507289,  0.69891123,  0.6553167 ,  0.69891123,
          0.82507289,  1.03475736],
@@ -281,7 +289,7 @@ def test_distance_no_rupture():
 
     origin.setMechanism('ALL')
     origin._tectonic_region = 'Active Shallow Crust'
-    dists = Distance.fromSites(gmpe, origin, site, rupture)
+    dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
     rjb = np.array([[ 1.10115976,  0.88331216,  0.75077594,  0.70491937,  0.75077594,
@@ -326,7 +334,7 @@ def test_distance_no_rupture():
 
     origin.setMechanism('RS')
     origin._tectonic_region = 'Active Shallow Crust'
-    dists = Distance.fromSites(gmpe, origin, site, rupture)
+    dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
     rjb = np.array([[ 0.94405696,  0.73298036,  0.61025288,  0.56806407,  0.61025288,
@@ -371,7 +379,7 @@ def test_distance_no_rupture():
 
     origin.setMechanism('NM')
     origin._tectonic_region = 'Active Shallow Crust'
-    dists = Distance.fromSites(gmpe, origin, site, rupture)
+    dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
     rjb = np.array([[ 0.7899535 ,  0.61128249,  0.50843465,  0.47310349,  0.50843465,
@@ -416,7 +424,7 @@ def test_distance_no_rupture():
 
     origin.setMechanism('SS')
     origin._tectonic_region = 'Active Shallow Crust'
-    dists = Distance.fromSites(gmpe, origin, site, rupture)
+    dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
     rjb = np.array([[ 2.00333625,  1.69987873,  1.49778447,  1.42682201,  1.49778447,
@@ -461,7 +469,7 @@ def test_distance_no_rupture():
 
     origin.setMechanism('ALL')
     origin._tectonic_region = 'Stable Shallow Crust'
-    dists = Distance.fromSites(gmpe, origin, site, rupture)
+    dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
     rjb = np.array([[ 1.25490086,  1.00456938,  0.85266727,  0.80013341,  0.85266727,
@@ -506,7 +514,7 @@ def test_distance_no_rupture():
 
     origin.setMechanism('RS')
     origin._tectonic_region = 'Stable Shallow Crust'
-    dists = Distance.fromSites(gmpe, origin, site, rupture)
+    dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
     rjb = np.array([[ 1.06775489,  0.83169032,  0.69344486,  0.645892  ,  0.69344486,
@@ -551,7 +559,7 @@ def test_distance_no_rupture():
 
     origin.setMechanism('NM')
     origin._tectonic_region = 'Stable Shallow Crust'
-    dists = Distance.fromSites(gmpe, origin, site, rupture)
+    dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
     rjb = np.array([[ 1.11595412,  0.87047978,  0.72608143,  0.6763976 ,  0.72608143,
@@ -596,7 +604,7 @@ def test_distance_no_rupture():
 
     origin.setMechanism('SS')
     origin._tectonic_region = 'Stable Shallow Crust'
-    dists = Distance.fromSites(gmpe, origin, site, rupture)
+    dists = Distance.fromSites(gmpe, site, rupture)
     dctx = dists.getDistanceContext()
 
     rjb = np.array([[ 1.7978181 ,  1.48474703,  1.28392745,  1.21396452,  1.28392745,
@@ -646,8 +654,8 @@ def test_distance_from_sites_origin():
     xspan = 0.0083 * 5
     yspan = 0.0083 * 5
     site = Sites.fromCenter(cx, cy, xspan, yspan, dx, dy,
-                                  vs30File=vs30file,
-                                  padding=True, resample=False)
+                            vs30File=vs30file,
+                            padding=True, resample=False)
     # Make souce instance
     lat0 = np.array([34.1])
     lon0 = np.array([-118.2])
@@ -657,13 +665,14 @@ def test_distance_from_sites_origin():
     W = np.array([3.0])
     dip = np.array([30.])
 
-    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip)
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
              'id': '', 'locstring': '', 'type': 'ALL',
              'timezone': 'UTC'}
     origin = Origin(event)
+
+    rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip, origin)
     gmpelist = [AbrahamsonEtAl2014(), BergeThierryEtAl2003SIGMA()]
-    dists = Distance.fromSites(gmpelist, origin, site, rup)
+    dists = Distance.fromSites(gmpelist, site, rup)
     dctx = dists.getDistanceContext()
 
     rhypo = np.array([[ 3.74498133,  3.32896405,  3.05225679,  2.95426722,  3.05225679,
@@ -776,10 +785,6 @@ def test_distance_from_sites_origin():
     np.testing.assert_allclose(
         rrup, dctx.rrup, rtol=0, atol=0.01)
 
-    # Test getOrigin
-    src = dists.getOrigin()
-    assert isinstance(src, Origin) == True
-
 
 def test_chichi_with_get_distance():
     # read in rupture file
@@ -813,13 +818,14 @@ def test_chichi_with_get_distance():
     lon1, lat1 = proj(x1, y1, reverse=True)
     lon2, lat2 = proj(x2, y2, reverse=True)
     lon3, lat3 = proj(x3, y3, reverse=True)
-    rup = QuadRupture.fromVertices(
-        lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3)
     # event information doesn't matter except hypocenter
     event = {'lat': 23.85, 'lon': 120.82, 'depth': 8, 'mag': 7.62,
              'id': '', 'locstring': '', 'type': 'ALL',
              'timezone': 'UTC'}
     origin = Origin(event)
+    rup = QuadRupture.fromVertices(
+        lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3,
+        origin)
 
     # Get NGA distances
     distfile = os.path.join(shakedir, 'tests/data/NGAW2_distances.csv')
@@ -1049,7 +1055,7 @@ def test_chichi_with_get_distance():
         32.06748228, 0., 0., 0.])
 
     dist_types = ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T']
-    dists = get_distance(dist_types, slat, slon, sdep, origin, rup)
+    dists = get_distance(dist_types, slat, slon, sdep, rup)
 
     np.testing.assert_allclose(
         nga_repi, dists['repi'], rtol=0, atol=2)

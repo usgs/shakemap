@@ -515,7 +515,7 @@ class Rowshandel2013(object):
         slat = self._lat
         slon = self._lon
         site_z = np.zeros_like(slat)
-        ddict = get_distance('rrup', slat, slon, site_z, self._origin, self._rup)
+        ddict = get_distance('rrup', slat, slon, site_z, self._rup)
         Rrup = np.reshape(ddict['rrup'], (-1, ))
         nsite = len(Rrup)
 
