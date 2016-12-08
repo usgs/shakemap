@@ -64,7 +64,7 @@ class Origin(object):
 
     def __init__(self, event):
         """
-        Construct a Origin object.
+        Construct an Origin object.
 
         Args:
             event (dict): Dictionary of values. See list above for required keys.

@@ -23,7 +23,6 @@ from shakemap.grind.origin import Origin
 from shakemap.grind.sites import Sites
 from shakemap.grind.distance import Distance
 from shakemap.grind.distance import get_distance
-from shakemap.grind.rupture import QuadRupture
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))

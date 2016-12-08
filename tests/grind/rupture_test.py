@@ -34,7 +34,7 @@ def test_EdgeRupture():
     # Force read Northridge as EdgeRupture
     file = 'tests/data/eventdata/northridge/northridge_fault.txt'
     d = text_to_json(file)
-    rupt = EdgeRupture.fromJson(d, origin)
+    rupt = EdgeRupture(d, origin)
     strike = rupt.getStrike()
     np.testing.assert_allclose(strike, 121.97, atol=0.01)
     dip = rupt.getDip()
@@ -49,7 +49,7 @@ def test_EdgeRupture():
     # And again for the same vertices but reversed order
     file = 'tests/data/eventdata/northridge/northridge_fixed_fault.txt'
     d = text_to_json(file)
-    rupt = EdgeRupture.fromJson(d, origin)
+    rupt = EdgeRupture(d, origin)
     strike = rupt.getStrike()
     np.testing.assert_allclose(strike, 121.97, atol=0.01)
     dip = rupt.getDip()
