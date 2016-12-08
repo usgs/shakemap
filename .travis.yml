@@ -31,7 +31,7 @@ before_script:
     - sleep 3 # give xvfb some time to start
 script:
     - export PYTHONPATH="."
-    - py.test --mpl --cov=shakemap
+    - py.test --cov=shakemap
     - echo `sphinx-build --version`
     #- flake8 shakemap
 after_success:

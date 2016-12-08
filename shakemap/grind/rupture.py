@@ -549,12 +549,12 @@ class Rupture(ABC):
         rx.width = self.getWidth()
 
         if hasattr(origin, 'rake'):
-            rx.rake = origin.rake
+            rx.rake = float(origin.rake)
         elif hasattr(origin, 'mech'):
             mech = origin.mech
-            rx.rake = RAKEDICT[mech]
+            rx.rake = float(RAKEDICT[mech])
         else:
-            rx.rake = RAKEDICT['ALL']
+            rx.rake = float(RAKEDICT['ALL'])
 
         rx.hypo_lat = origin.lat
         rx.hypo_lon = origin.lon
@@ -960,7 +960,7 @@ class PointRupture(Rupture):
         # -------------------
         # Sort out file names
         # -------------------
-        rake = origin.rake
+        rake = float(origin.rake)
         mech = rake_to_mech(rake)
         if not hasattr(origin, '_tectonic_region'):
             rf = os.path.join(
