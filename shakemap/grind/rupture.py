@@ -549,12 +549,12 @@ class Rupture(ABC):
         rx.width = self.getWidth()
 
         if hasattr(origin, 'rake'):
-            rx.rake = float(origin.rake)
+            rx.rake = origin.rake
         elif hasattr(origin, 'mech'):
             mech = origin.mech
-            rx.rake = float(RAKEDICT[mech])
+            rx.rake = RAKEDICT[mech]
         else:
-            rx.rake = float(RAKEDICT['ALL'])
+            rx.rake = RAKEDICT['ALL']
 
         rx.hypo_lat = origin.lat
         rx.hypo_lon = origin.lon
