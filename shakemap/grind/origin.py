@@ -64,7 +64,7 @@ class Origin(object):
 
     def __init__(self, event):
         """
-        Construct a Origin object.
+        Construct an Origin object.
 
         Args:
             event (dict): Dictionary of values. See list above for required keys.
@@ -139,7 +139,10 @@ class Origin(object):
         # Add keys as class attributes
         #-----------------------------------------------------------------------
         for k, v in event.items():
-            setattr(self, k, v)
+            if k == 'rake':
+                setattr(self, k, float(v))
+            else:
+                setattr(self, k, v)
 
         # What about rake?
         if not hasattr(self, 'rake'):

@@ -346,8 +346,9 @@ def test_EdgeRupture_vs_QuadRupture():
     botdeps = np.array([15.0000, 14.9998, 18.8558, 18.8559])
     group_index = [0, 0, 1, 1]
 
-    erup = EdgeRupture(toplons, toplats, topdeps, botlons, botlats, botdeps,
-                       origin, group_index)
+    erup = EdgeRupture.fromArrays(
+        toplons, toplats, topdeps, botlons, botlats, botdeps,
+        origin, group_index)
     rrup_e = erup.computeRrup(lon, lat, dep)
     rjb_e = erup.computeRjb(lon, lat, dep)
 

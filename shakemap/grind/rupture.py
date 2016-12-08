@@ -54,6 +54,358 @@ DEFAULT_ZTOR = 0.0
 
 
 
+
+def read_rupture_file(origin, file = None, mesh_dx = 0.5):
+    """
+    This is a module-level function to read in a rupture file. This allows for
+    the ShakeMap 3 text file specification or the ShakeMap 4 JSON rupture format.
+    The ShakeMap 3 (".txt" extension) only supports QuadRupture style rupture
+    representation and so this method will always return a QuadRupture instance. 
+    The ShakeMap 4 JSON format supports QuadRupture and EdgeRupture
+    represenations and so this method detects the rupture class and returns the
+    appropriate Rupture subclass instance.
+
+    If file is None (default) then it returns a PointRupture.
+
+    Args:
+        origin (Origin): A ShakeMap origin instance; required because 
+            hypocentral/epicentral distances are computed from the Rupture
+            class.
+        file (srt): Path to rupture file (optional).
+        mesh_dx (float): Target spacing (in km) for rupture discretization;
+            default is 0.5 km and it is only used if the rupture file is an 
+            EdgeRupture.
+
+    Returns:
+        Rupture subclass instance. 
+
+    """
+    if file is not None:
+        try:
+            #-----------------------------------------------------------------------
+            # First, try to read as a json file
+            #-----------------------------------------------------------------------
+            if isinstance(file, str):
+                with open(file) as f:
+                    d = json.load(f)
+            else:
+                d = json.loads(str(file))
+
+            rupt = json_to_rupture(d, origin, mesh_dx = mesh_dx)
+
+        except json.JSONDecodeError:
+            #-----------------------------------------------------------------------
+            # Reading as json failed, so hopefully it is a ShakeMap 3 text file
+            #-----------------------------------------------------------------------
+            try:
+                d = text_to_json(file)
+                rupt = json_to_rupture(d, origin, mesh_dx = mesh_dx)
+            except:
+                raise Exception("Unknown rupture file format.")
+    else:
+        if origin is None:
+            raise Exception("Origin requred if no rupture file is provided.")
+        rupt = PointRupture(origin)
+    return rupt
+
+
+
+
+def json_to_rupture(d, origin, mesh_dx = 0.5):
+    """
+    Method returns either a QuadRupture or EdgeRupture object based on a 
+    GeoJSON dictionary. 
+
+    Args: 
+        d (dict): Rupture GeoJSON dictionary.
+        origin (Origin): A ShakeMap origin object.
+        mesh_dx (float): Target spacing (in km) for rupture discretization;
+            default is 0.5 km and it is only used if the rupture file is an
+            EdgeRupture.
+
+    Returns:
+        a Rupture subclass.
+
+    """
+    validate_json(d)
+
+    # Is this a QuadRupture or an EdgeRupture?
+    valid_quads = is_quadrupture_class(d)
+
+    if valid_quads is True:
+        rupt = QuadRupture(d, origin)
+    else:
+        rupt = EdgeRupture(d, origin, mesh_dx = mesh_dx)
+
+    return rupt
+
+
+def text_to_json(file):
+    """
+    Read in old ShakeMap 3 textfile rupture format and convert to GeoJSON. 
+
+    Args:
+        rupturefile (srt): Path to rupture file OR file-like object in GMT
+            psxy format, where:
+
+                * Rupture vertices are space separated lat, lon, depth triplets 
+                  on a single line.
+                * Rupture groups are separated by lines containing ">"
+                * Rupture groups must be closed.
+                * Verticies within a rupture group must start along the top edge
+                  and move in the strike direction then move to the bottom edge
+                  and move back in the opposite direction.
+
+    Returns:
+        dict: GeoJSON rupture dictionary.
+
+    """
+
+    #---------------------------------------------------------------------------
+    # First read in the data
+    #---------------------------------------------------------------------------
+    x = []
+    y = []
+    z = []
+    isFile = False
+    if isinstance(file, str):
+        isFile = True
+        file = open(file, 'rt')
+        lines = file.readlines()
+    else:
+        lines = file.readlines()
+    reference = ''
+    for line in lines:
+        sline = line.strip()
+        if sline.startswith('#'):
+            reference += sline
+            continue
+        if sline.startswith('>'):
+            if len(x):  # start of new line segment
+                x.append(np.nan)
+                y.append(np.nan)
+                z.append(np.nan)
+                continue
+            else:  # start of file
+                continue
+        if not len(sline.strip()):
+            continue
+        parts = sline.split()
+        if len(parts) < 3:
+            raise ShakeMapException(
+                'Rupture file %s has no depth values.' % file)
+        y.append(float(parts[0]))
+        x.append(float(parts[1]))
+        z.append(float(parts[2]))
+    if isFile:
+        file.close()
+
+    # Construct GeoJSON dictionary, note that some things like eventid and
+    # metadata are available in the old file so these will be empty.
+    # We could add an optional argument to include an Origin object, which
+    # would be used to fill in these values.
+
+    coords = []
+    poly = []
+    for lon, lat, dep in zip(x, y, z):
+        if np.isnan(lon):
+            coords.append(poly)
+            poly = []
+        else:
+            poly.append([lon, lat, dep])
+    if poly != []:
+        coords.append(poly)
+
+    d = {
+        "type": "FeatureCollection",
+        "metadata": {
+            "magnitude": None,
+            "eventtime": "",
+            "eventid": "",
+            "title": ""
+        },
+        "features":[
+            {
+                "type": "Feature",
+                "properties": {
+                    "rupture type": "rupture extent",
+		    "reference": reference
+                },
+                "geometry": {
+	            "type": "MultiPolygon",
+	            "coordinates":[coords]
+                }
+            }
+        ]
+    }
+    return d
+
+
+
+def validate_json(d):
+    """
+    Check that the JSON format is acceptable. This is only for requirements that
+    are common to both QuadRupture and EdgeRupture.
+
+    Args:
+        d (dict): Rupture JSON dictionary.
+    """
+    if d['type'] != 'FeatureCollection':
+        raise Exception('JSON file is not a \"FeatureColleciton\".')
+
+    if 'eventid' not in d['metadata'].keys():
+        raise Exception('\"eventid\" not in metadata.')
+
+    if len(d['features']) != 1:
+        raise Exception('JSON file should contain excactly one feature.')
+
+    f = d['features'][0]
+
+    if 'reference' not in f['properties'].keys():
+        raise Exception('Feature property dictionary should contain '\
+                        '\"referencey\" key.')
+
+    if f['type'] != 'Feature':
+        raise Exception('Feature type should be \"Feature\".')
+
+    geom = f['geometry']
+
+    if geom['type'] != 'MultiPolygon':
+        raise Exception('Geometry type should be \"MultiPolygon\".')
+
+    if 'coordinates' not in geom.keys():
+        raise Exception('Geometry dictionary should contain \"coordinates\" '\
+                        'key.')
+
+    polygons = geom['coordinates'][0]
+
+    n_polygons = len(polygons)
+    for i in range(n_polygons):
+        p = polygons[i]
+        n_points = len(p)
+        if n_points % 2 == 0:
+            raise Exception('Number of points in polyon must be odd.')
+
+        if p[0] != p[-1]:
+            raise Exception('First and last points in polygon must be '\
+                            'identical.')
+
+        n_pairs = int((n_points - 1)/2)
+        for j in range(n_pairs):
+            #-------------------------------------------------------------------
+            # Points are paired and in each pair the top is first, as in:
+            #
+            #      _.-P1-._
+            #   P0'        'P2---P3
+            #   |                  \
+            #   P7---P6----P5-------P4
+            #
+            # Pairs: P0-P7, P1-P6, P2-P5, P3-P4
+            #-------------------------------------------------------------------
+            top_depth = p[j][2]
+            bot_depth = p[-(j+2)][2]
+            if top_depth > bot_depth:
+                raise Exception('Top points must be ordered before bottom points.')
+
+
+def is_quadrupture_class(d):
+    """
+    Check if JSON file fulfills QuadRupture class criteria:
+    
+        - Are top and bottom edges horizontal?
+        - Are the four points in each quad coplanar?
+
+    Args:
+        d (dict): Rupture JSON dictionary.
+
+    Returns:
+        bool: Can the rupture be represented in the QuadRupture class?
+    """
+    isQuad = True
+
+    f = d['features'][0]
+    geom = f['geometry']
+    polygons = geom['coordinates'][0]
+    n_polygons = len(polygons)
+    for i in range(n_polygons):
+        p = polygons[i]
+        n_points = len(p)
+        n_pairs = int((n_points - 1)/2)
+
+        # Within each polygon, top and bottom edges must be horizontal
+        depths = [pt[2] for pt in p]
+        tops = np.array(depths[0:n_pairs])
+        if not np.isclose(tops[0], tops, rtol = 0, atol = DEPTH_TOL).all():
+            isQuad = False
+        bots = np.array(depths[(n_pairs):-1])
+        if not np.isclose(bots[0], bots, rtol = 0, atol = DEPTH_TOL).all():
+            isQuad = False
+
+        n_quads = n_pairs - 1
+        for j in range(n_quads):
+            # Four points of each quad should be co-planar within a tolerance
+            quad = [Point(p[j][0], p[j][1], p[j][2]),
+                    Point(p[j+1][0], p[j+1][1], p[j+1][2]),
+                    Point(p[-(j+3)][0], p[-(j+3)][1], p[-(j+3)][2]),
+                    Point(p[-(j+2)][0], p[-(j+2)][1], p[-(j+2)][2])]
+
+            test = is_quad(quad)
+            if test[0] is False:
+                isQuad = False
+
+    return isQuad
+
+
+def is_quad(q):
+    """
+    Checks that an individual quad is coplanar. 
+
+    Args: 
+        q (list): A quadrilateral; list of four OQ Points.
+
+    Returns:
+        tuple: Bool for whether or not the points are planar within tolerance;
+            and also the corrected quad where p2 is adjusted to be on the same
+            plane as the other points.
+    """
+    P0, P1, P2, P3 = q
+
+    # Convert points to ECEF
+    p0 = Vector.fromPoint(P0)
+    p1 = Vector.fromPoint(P1)
+    p2 = Vector.fromPoint(P2)
+    p3 = Vector.fromPoint(P3)
+
+    # Unit vector along top edge
+    v0 = (p1 - p0).norm()
+
+    # Distance along bottom edge
+    d = (p3 - p2).mag()
+
+    # New location for p2 by extending from p3 the same distance and
+    # direction that p1 is from p0:
+    new_p2 = p3 + v0*d
+
+    # How far off of the plane is the origin p2?
+    planepoints = [p0, p1, p2]
+    dist = get_distance_to_plane(planepoints, p2)
+
+    # Is it close enough?
+    if dist / d > OFFPLANE_TOLERANCE:
+        on_plane = False
+    else:
+        on_plane = True
+
+    # Fixed quad
+    fquad = [p0.toPoint(),
+             p1.toPoint(),
+             new_p2.toPoint(),
+             p3.toPoint()]
+
+    return (on_plane, fquad)
+
+
+
 class Rupture(ABC):
     """
     Abstract base class for ruptures.
@@ -77,16 +429,17 @@ class Rupture(ABC):
 
     """
 
-#    @abstractmethod
-#    def writeGeoJson(self, origin):
-#        """
-#        Write the rupture/origin info to a GeoJson file.
-#
-#        Args:
-#            origin (Origin): Optional ShakeMap Origin class.
-#
-#        """
-#        pass
+
+    def writeGeoJson(self, file):
+        """
+        Write the rupture to a GeoJson file.
+
+        Args:
+            file (str): Name of file. 
+        """
+        with open(file, 'w') as f:
+            json.dump(self._geojson, f)
+
 
     @abstractmethod
     def getLength(self):
@@ -167,20 +520,6 @@ class Rupture(ABC):
     @abstractproperty
     def depths(self):
         pass
-
-    @classmethod
-    @abstractmethod
-    def fromJson(cls, d):
-        """
-        Args:
-           d (dict): Rupture GeoJSON dictionary.
-
-        Returns:
-           Rupture subclass instance
-
-        """
-        pass
-
 
     def getRuptureContext(self, gmpelist):
         """
@@ -358,6 +697,34 @@ class PointRupture(Rupture):
         self._origin = origin
         self._reference = reference
 
+        coords = [origin.lon, origin.lat, origin.depth]
+
+        d = {"type":"FeatureCollection", 
+             "metadata":{},
+             "features":[{
+                    "type":"Feature",
+                    "properties":{
+                        "rupture type":"rupture extent",
+                        "reference":reference,
+                        },
+                    "geometry":{
+                        "type":"Point",
+                        "coordinates":coords
+                        }
+            }]}
+
+
+        # Add origin information to metadata
+        odict = origin.__dict__
+        for k, v in odict.items():
+            if k == 'time':
+                d['metadata']['time'] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+            else:
+                d['metadata'][k] = v
+
+        self._geojson = d
+
+
     def getLength(self):
         """
         Rupture length, which is None for a PointRupture.
@@ -428,14 +795,6 @@ class PointRupture(Rupture):
         return self._origin.depth
 
 
-
-    @classmethod
-    def fromJson(cls, d, origin):
-        """
-        This abstract method is not really useful for the PointRupture subclass
-        because the constructor basically only needs the origin.
-        """
-        return cls(origin)
 
     def computeRjb(self, lon, lat, depth, var = False):
         """
@@ -601,7 +960,7 @@ class PointRupture(Rupture):
         # -------------------
         # Sort out file names
         # -------------------
-        rake = origin.rake
+        rake = float(origin.rake)
         mech = rake_to_mech(rake)
         if not hasattr(origin, '_tectonic_region'):
             rf = os.path.join(
@@ -754,11 +1113,80 @@ class EdgeRupture(Rupture):
     force fashion based on this mesh, which can be quite large. 
     """
 
-
-    def __init__(self, toplons, toplats, topdeps, botlons, botlats, botdeps,
-                 origin, group_index = None, mesh_dx = 0.5, reference = ''):
+    def __init__(self, d, origin, mesh_dx = 0.5):
         """
-        Constructor for EdgeRupture class. 
+        Initialization of an EdgeRupture from a GeoJSON dictionary and an Origin.
+
+        Args: 
+            d (dict): Rupture GeoJSON dictionary.
+            origin (Origin): Reference to a ShakeMap Origin object.
+            mesh_dx (float): Target spacing (in km) for rupture discretization;
+                default is 0.5 km and it is only used if the rupture file is an
+                EdgeRupture.
+
+        Returns: 
+            EdgeRupture instance.
+
+        """
+        polys = d['features'][0]['geometry']['coordinates'][0]
+        n_polygons = len(polys)
+        toplons = np.empty(shape=(0, 0))
+        toplats = np.empty(shape=(0, 0))
+        topdeps = np.empty(shape=(0, 0))
+        botlons = np.empty(shape=(0, 0))
+        botlats = np.empty(shape=(0, 0))
+        botdeps = np.empty(shape=(0, 0))
+        g_ind = 0
+        group_index = []
+        for i in range(n_polygons):
+            p = polys[i]
+            n_points = len(p)
+            n_pairs = int((n_points - 1)/2)
+            
+            p_lons = [pt[0] for pt in p][0:-1]
+            p_lats = [pt[1] for pt in p][0:-1]
+            p_depths = [pt[2] for pt in p][0:-1]
+
+            tlon = np.array(p_lons[0:n_pairs])
+            blon = np.array(p_lons[(n_pairs):])[::-1]
+            tlat = np.array(p_lats[0:n_pairs])
+            blat = np.array(p_lats[(n_pairs):])[::-1]
+            tdep = np.array(p_depths[0:n_pairs])
+            bdep = np.array(p_depths[(n_pairs):])[::-1]
+            
+            toplons = np.append(toplons, tlon)
+            toplats = np.append(toplats, tlat)
+            topdeps = np.append(topdeps, tdep)
+            botlons = np.append(botlons, blon)
+            botlats = np.append(botlats, blat)
+            botdeps = np.append(botdeps, bdep)
+
+            group_index.extend([g_ind]*n_pairs)
+            g_ind = g_ind + 1
+
+        reference = d['features'][0]['properties']['reference']
+
+        self._geojson = d
+
+        self._toplons = np.array(toplons)
+        self._toplats = np.array(toplats)
+        self._topdeps = np.array(topdeps)
+        self._botlons = np.array(botlons)
+        self._botlats = np.array(botlats)
+        self._botdeps = np.array(botdeps)
+        self._origin = origin
+        self._group_index = np.array(group_index)
+        self._mesh_dx = mesh_dx
+        self._reference = reference
+        self._computeStikeDip()
+
+
+    @classmethod
+    def fromArrays(cls, toplons, toplats, topdeps, botlons, botlats, botdeps,
+                   origin, group_index = None, mesh_dx = 0.5, reference = ''):
+        """
+        Class method to initialize an EdgeRupture class from arrays of 
+        longitude, latitude, and depth along the top and bottom edges. 
 
         Args:
             toplons (ndarray): Array of top edge longitudes.
@@ -777,21 +1205,56 @@ class EdgeRupture(Rupture):
             EdgeRupture instance.
 
         """
-        self._toplons = np.array(toplons)
-        self._toplats = np.array(toplats)
-        self._topdeps = np.array(topdeps)
-        self._botlons = np.array(botlons)
-        self._botlats = np.array(botlats)
-        self._botdeps = np.array(botdeps)
-        self._origin = origin
+        toplons = np.array(toplons)
+        toplats = np.array(toplats)
+        topdeps = np.array(topdeps)
+        botlons = np.array(botlons)
+        botlats = np.array(botlats)
+        botdeps = np.array(botdeps)
         if group_index is not None:
-            self._group_index = np.array(group_index)
+            group_index = np.array(group_index)
         else:
-            self._group_index = np.zeros_like(toplons)
-        self._mesh_dx = mesh_dx
-        self._reference = reference
-        self._computeStikeDip()
-        
+            group_index = np.zeros_like(toplons)
+
+        coords = []
+        u_groups = np.unique(group_index)
+        n_groups = len(u_groups)
+        for i in range(n_groups):
+            ind = np.where(u_groups[i] == group_index)[0]
+            lons = np.concatenate([toplons[ind], botlons[ind][::-1],
+                                   toplons[ind][0].reshape((1,))])
+            lats = np.concatenate([toplats[ind], botlats[ind][::-1],
+                                   toplats[ind][0].reshape((1,))])
+            deps = np.concatenate([topdeps[ind], botdeps[ind][::-1],
+                                   topdeps[ind][0].reshape((1,))])
+            poly = []
+            for lon,lat,dep in zip(lons, lats, deps):
+                poly.append([lon, lat, dep])
+            coords.append(poly)
+
+        d = {"type":"FeatureCollection", 
+             "metadata":{},
+             "features":[{
+                    "type":"Feature",
+                    "properties":{
+                        "rupture type":"rupture extent",
+                        "reference":reference,
+                        },
+                    "geometry":{
+                        "type":"MultiPolygon",
+                        "coordinates":[coords]
+                        }
+            }]}
+
+        # Add origin information to metadata
+        odict = origin.__dict__
+        for k, v in odict.items():
+            if k == 'time':
+                d['metadata']['time'] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+            else:
+                d['metadata'][k] = v
+
+        return cls(d, origin, mesh_dx)
 
 
     def getLength(self):
@@ -1102,63 +1565,7 @@ class EdgeRupture(Rupture):
         """
         return np.min(self._topdeps)
 
-    @classmethod
-    def fromJson(cls, d, origin, mesh_dx = 0.5):
-        """
-        Class method for constructing an EdgeRupture from a GeoJSON dictionary.
 
-        Args: 
-            d (dict): Rupture GeoJSON dictionary.
-            origin (Origin): Reference to a ShakeMap Origin object.
-            mesh_dx (float): Target spacing (in km) for rupture discretization;
-                default is 0.5 km and it is only used if the rupture file is an
-                EdgeRupture.
-
-        Returns: 
-            EdgeRupture instance.
-
-        """
-        polys = d['features'][0]['geometry']['coordinates'][0]
-        n_polygons = len(polys)
-        toplons = np.empty(shape=(0, 0))
-        toplats = np.empty(shape=(0, 0))
-        topdeps = np.empty(shape=(0, 0))
-        botlons = np.empty(shape=(0, 0))
-        botlats = np.empty(shape=(0, 0))
-        botdeps = np.empty(shape=(0, 0))
-        g_ind = 0
-        group_index = []
-        for i in range(n_polygons):
-            p = polys[i]
-            n_points = len(p)
-            n_pairs = int((n_points - 1)/2)
-            
-            p_lons = [pt[0] for pt in p][0:-1]
-            p_lats = [pt[1] for pt in p][0:-1]
-            p_depths = [pt[2] for pt in p][0:-1]
-
-            tlon = np.array(p_lons[0:n_pairs])
-            blon = np.array(p_lons[(n_pairs):])[::-1]
-            tlat = np.array(p_lats[0:n_pairs])
-            blat = np.array(p_lats[(n_pairs):])[::-1]
-            tdep = np.array(p_depths[0:n_pairs])
-            bdep = np.array(p_depths[(n_pairs):])[::-1]
-            
-            toplons = np.append(toplons, tlon)
-            toplats = np.append(toplats, tlat)
-            topdeps = np.append(topdeps, tdep)
-            botlons = np.append(botlons, blon)
-            botlats = np.append(botlats, blat)
-            botdeps = np.append(botdeps, bdep)
-
-            group_index.extend([g_ind]*n_pairs)
-            g_ind = g_ind + 1
-
-        reference = d['features'][0]['properties']['reference']
-
-        return cls(toplons, toplats, topdeps, botlons, botlats, botdeps,
-                   origin, group_index = group_index, mesh_dx = mesh_dx, 
-                   reference = reference)
 
     def writeGeoJson(self):
         pass
@@ -1382,9 +1789,50 @@ class QuadRupture(Rupture):
     must match the number of points in the bottom edge. 
     """
 
-    def __init__(self, lon, lat, depth, origin, reference = ''):
+    def __init__(self, d, origin):
         """
-        Constructor for QuadRupture class.
+        Create a QuadRupture instance from a GeoJSON dictionary and an Origin.
+
+        Args:
+           d (dict): Rupture GeoJSON dictionary.
+           origin (Origin): Reference to a ShakeMap Origin object.
+
+        Returns:
+            QuadRupture instance.
+
+        """
+
+        polys = d['features'][0]['geometry']['coordinates'][0]
+        n_polygons = len(polys)
+        lon = []
+        lat = []
+        dep = []
+        for i in range(n_polygons):
+            p = polys[i]
+            p_lons = [pt[0] for pt in p][0:-1]
+            p_lats = [pt[1] for pt in p][0:-1]
+            p_depths = [pt[2] for pt in p][0:-1]
+            lon = lon + p_lons + [np.nan]
+            lat = lat + p_lats + [np.nan]
+            dep = dep + p_depths + [np.nan]
+
+        self._geojson = d
+        self._lon = lon
+        self._lat = lat
+        self._depth = dep
+        self._origin = origin
+        self._reference = d['features'][0]['properties']['reference']
+        self._setQuadrilaterals()
+
+
+    @classmethod
+    def fromArrays(cls, lon, lat, depth, origin, reference = ''):
+        """
+        Class method for constructing a QuadRupture from arrays of longitude
+        latitude, and depth. The arrays should start on the top and move in the 
+        strike direction, then down to the bottom and move back (without 
+        closing) followed by a nan. 
+
 
         Args:
             lon (array): Sequence of rupture longitude vertices in clockwise 
@@ -1396,12 +1844,12 @@ class QuadRupture(Rupture):
             reference (str): String citeable reference for Rupture.
 
         """
-        self._lon = lon
-        self._lat = lat
-        self._depth = depth
-        self._origin = origin
-        self._reference = reference
-        self._setQuadrilaterals()
+        pass
+        
+
+#        return cls(d, origin)
+
+
 
     def getLength(self):
         """
@@ -1446,50 +1894,11 @@ class QuadRupture(Rupture):
         return asum
         
 
-    @classmethod
-    def fromJson(cls, d, origin):
-        """
-        Create a QuadRupture instance from a GeoJSON dictionary.
-
-        Args:
-           d (dict): Rupture GeoJSON dictionary.
-           origin (Origin): Reference to a ShakeMap Origin object.
-
-        Returns:
-            QuadRupture instance.
-
-        """
-
-        #-----------------------------------------------------------------------
-        # Assemble the vertices as the constructor needs them:
-        #     For each group, where a group consists of N connected quads:
-        #       1) N+1 vertices along the top edge
-        #       2) N+1 vertices along the bottom edge
-        #       3) A nan (to separate groups)
-        #-----------------------------------------------------------------------
-
-
-        polys = d['features'][0]['geometry']['coordinates'][0]
-        n_polygons = len(polys)
-        lon = []
-        lat = []
-        dep = []
-        for i in range(n_polygons):
-            p = polys[i]
-            p_lons = [pt[0] for pt in p][0:-1]
-            p_lats = [pt[1] for pt in p][0:-1]
-            p_depths = [pt[2] for pt in p][0:-1]
-            lon = lon + p_lons + [np.nan]
-            lat = lat + p_lats + [np.nan]
-            dep = dep + p_depths + [np.nan]
-
             
-        return cls(lon, lat, dep, origin,
-                   d['features'][0]['properties']['reference'])
 
     @classmethod
-    def fromTrace(cls, xp0, yp0, xp1, yp1, zp, widths, dips, 
-                  origin, strike=None, reference=None):
+    def fromTrace(cls, xp0, yp0, xp1, yp1, zp, widths, dips, origin,
+                  strike=None, group_index = None, reference=""):
         """
         Create a QuadRupture instance from a set of vertices that define the top
         of the rupture, and an array of widths/dips.
@@ -1514,6 +1923,10 @@ class QuadRupture(Rupture):
                 quadrilaterals are constructed assuming this strike direction.
                 If an array with the same length as the trace coordinates then
                 it specifies the strike for each quadrilateral.
+            group_index (list): List of integers to indicate group index. If
+                None then each quadrilateral is assumed to be in a different
+                group since there is no guarantee that any of them are
+                continuous.
             reference (str): String explaining where the rupture definition came
                 from (publication style reference, etc.).
 
@@ -1536,6 +1949,9 @@ class QuadRupture(Rupture):
                 raise ShakeMapException(
                     'Strike must be None, scalar, or same length as '\
                     'trace coordinates.')
+
+        if group_index is None:
+            group_index = np.array(range(len(xp0)))
 
         # Convert dips to radians
         dips = np.radians(dips)
@@ -1618,28 +2034,52 @@ class QuadRupture(Rupture):
             zpdown[i] = zp[i] + dz
 
         #-----------------------------------------------------------------------
-        # Assemble the vertices as the constructor needs them:
-        #     For each group, where a group consists of N connected quads:
-        #       1) N+1 vertices along the top edge
-        #       2) N+1 vertices along the bottom edge
-        #       3) A nan (to separate groups)
+        # Create GeoJSON object
         #-----------------------------------------------------------------------
-        nrects = len(zp)
-        anan = np.ones_like(xp0) * np.nan
-        lon = np.array(list(zip(xp0, xp1, xp2, xp3, anan))
-                       ).reshape((nrects, 5)).flatten(order='C')
-        lat = np.array(list(zip(yp0, yp1, yp2, yp3, anan))
-                       ).reshape((nrects, 5)).flatten(order='C')
 
-        # we need an array of depths, but we need to double each zp and zpdown
-        # element we have
-        dep = []
-        for i in range(0, nrects):
-            dep += [zp[i], zp[i], zpdown[i], zpdown[i],  np.nan]
-        dep = np.array(dep)
+        coords = []
+        u_groups = np.unique(group_index)
+        n_groups = len(u_groups)
+        for i in range(n_groups):
+            ind = np.where(u_groups[i] == group_index)[0]
+            lons = np.concatenate([ xp0[ind[0]].reshape((1,)), xp1[ind], 
+                                    xp2[ind][::-1], xp3[ind][::-1][-1].reshape((1,)), 
+                                    xp0[ind[0]].reshape((1,)) ])
+            lats = np.concatenate([ yp0[ind[0]].reshape((1,)), yp1[ind], 
+                                    yp2[ind][::-1], yp3[ind][::-1][-1].reshape((1,)), 
+                                    yp0[ind[0]].reshape((1,)) ])
+            deps = np.concatenate([ zp[ind[0]].reshape((1,)), zp[ind],
+                                    zpdown[ind][::-1], zpdown[ind][::-1][-1].reshape((1,)),
+                                    zp[ind[0]].reshape((1,)) ])
+            
+            poly = []
+            for lon,lat,dep in zip(lons, lats, deps):
+                poly.append([lon, lat, dep])
+            coords.append(poly)
+            
+        d = {"type":"FeatureCollection", 
+             "metadata":{},
+             "features":[{
+                    "type":"Feature",
+                    "properties":{
+                        "rupture type":"rupture extent",
+                        "reference":reference,
+                        },
+                    "geometry":{
+                        "type":"MultiPolygon",
+                        "coordinates":[coords]
+                        }
+            }]}
 
+        # Add origin information to metadata
+        odict = origin.__dict__
+        for k, v in odict.items():
+            if k == 'time':
+                d['metadata']['time'] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+            else:
+                d['metadata'][k] = v
 
-        return cls(lon, lat, dep, origin, reference)
+        return cls(d, origin)
 
     def writeTextFile(self, rupturefile):
         """
@@ -1647,7 +2087,7 @@ class QuadRupture(Rupture):
         Software Guide.
 
         Args:
-            Rupturefile (str): Filename of output data file OR file-like object.
+            rupturefile (str): Filename of output data file OR file-like object.
 
         """
         if not hasattr(rupturefile, 'read'):
@@ -1726,7 +2166,7 @@ class QuadRupture(Rupture):
             if len(group_index) != nq:
                 raise Exception("group_index must have same length as vertices.")
         else:
-            group_index = list(range(nq))
+            group_index = np.array(range(nq))
 
         xp0 = np.array(xp0, dtype='d')
         yp0 = np.array(yp0, dtype='d')
@@ -1742,49 +2182,56 @@ class QuadRupture(Rupture):
         zp3 = np.array(zp3, dtype='d')
 
         #-----------------------------------------------------------------------
-        # Assemble the vertices as the constructor needs them:
-        #     For each group, where a group consists of N connected quads:
-        #       1) N+1 vertices along the top edge
-        #       2) N+1 vertices along the bottom edge
-        #       3) A nan (to separate groups)
+        # Create GeoJSON object
         #-----------------------------------------------------------------------
 
+        coords = []
+        u_groups = np.unique(group_index)
+        n_groups = len(u_groups)
+        for i in range(n_groups):
+            ind = np.where(u_groups[i] == group_index)[0]
+            lons = np.concatenate([ xp0[ind[0]].reshape((1,)), xp1[ind],
+                                    xp2[ind][::-1], xp3[ind][::-1][-1].reshape((1,)),
+                                    xp0[ind[0]].reshape((1,)) ])
+            lats = np.concatenate([ yp0[ind[0]].reshape((1,)), yp1[ind],
+                                    yp2[ind][::-1], yp3[ind][::-1][-1].reshape((1,)),
+                                    yp0[ind[0]].reshape((1,)) ])
+            deps = np.concatenate([ zp0[ind[0]].reshape((1,)), zp1[ind],
+                                    zp2[ind][::-1], zp3[ind][::-1][-1].reshape((1,)),
+                                    zp0[ind[0]].reshape((1,)) ])
 
-        lats = []
-        lons = []
-        deps = []
-        u_group = np.unique(group_index)
-        n_group = len(u_group)
-        for i in range(n_group):
-            q_ind = np.where(group_index == u_group[i])[0]
-            nq = len(q_ind)
-            top_lats = []
-            bot_lats = []
-            top_lons = []
-            bot_lons = []
-            top_deps = []
-            bot_deps = []
-            for j in range(nq):
-                if j == 0:
-                    bot_dep0 = [zp3[q_ind[j]]]
-                    top_lats = top_lats + [yp0[q_ind[j]]]
-                    top_lons = top_lons + [xp0[q_ind[j]]]
-                    top_deps = top_deps + [zp0[q_ind[j]]]
-                    bot_lats = bot_lats + [yp3[q_ind[j]]]
-                    bot_lons = bot_lons + [xp3[q_ind[j]]]
-                    bot_deps = bot_deps + [zp3[q_ind[j]]]
-                top_lats = top_lats + [yp1[q_ind[j]]]
-                top_lons = top_lons + [xp1[q_ind[j]]]
-                top_deps = top_deps + [zp1[q_ind[j]]]
-                bot_lats = bot_lats + [yp2[q_ind[j]]]
-                bot_lons = bot_lons + [xp2[q_ind[j]]]
-                bot_deps = bot_deps + [zp2[q_ind[j]]]
-            lats = lats + top_lats + bot_lats[::-1] + [np.nan]
-            lons = lons + top_lons + bot_lons[::-1] + [np.nan]
-            deps = deps + top_deps + bot_deps[::-1] + [np.nan]
-        
+            poly = []
+            for lon,lat,dep in zip(lons, lats, deps):
+                poly.append([lon, lat, dep])
+            coords.append(poly)
 
-        return cls(lons, lats, deps, origin, reference)
+
+        d = {"type":"FeatureCollection", 
+             "metadata":{},
+             "features":[{
+                    "type":"Feature",
+                    "properties":{
+                        "rupture type":"rupture extent",
+                        "reference":reference,
+                        },
+                    "geometry":{
+                        "type":"MultiPolygon",
+                        "coordinates":[coords]
+                        }
+            }]}
+
+        # Add origin information to metadata
+        odict = origin.__dict__
+        for k, v in odict.items():
+            if k == 'time':
+                d['metadata']['time'] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+            else:
+                d['metadata'][k] = v
+        if hasattr(origin, 'id'):
+            d['metadata']['eventid'] = origin.id
+
+        return cls(d, origin)
+
 
 
     def getQuadrilaterals(self):
@@ -2322,15 +2769,15 @@ def _computeGC2(rupture, lon, lat, depth):
             iq0[k] = int(np.min(ii))
             iq1[k] = int(np.max(ii))
 
-        #---------------------------------------------------------------
-        # This is an iterator for each possible combination of segments
-        # including segment orientations (i.e., flipped). 
-        #---------------------------------------------------------------
+        #-----------------------------------------------------------------------
+        # This is an iterator for each possible combination of traces
+        # including trace orientations (i.e., flipped). 
+        #-----------------------------------------------------------------------
 
         it_seg = it.product(it.combinations(uind, 2),
                             it.product([0, 1], [0, 1]))
 
-        # Placeholder for the segment pair/orientation that gives the
+        # Placeholder for the trace pair/orientation that gives the
         # largest distance. 
         dist_save = 0
 
@@ -2360,7 +2807,7 @@ def _computeGC2(rupture, lon, lat, depth):
         # need to sort out which one is the "origin".
         #-----------------------------------------------------------------------
 
-        # Goofy while-loop is to adjust the side of the rupture where the
+        # This goofy while-loop is to adjust the side of the rupture where the
         # origin is located
         dummy = -1
         while dummy < 0:
@@ -2511,351 +2958,8 @@ def _computeGC2(rupture, lon, lat, depth):
 
     return distdict
 
-def read_rupture_file(origin, file = None, mesh_dx = 0.5):
-    """
-    This is a module-level function to read in a rupture file. This allows for
-    the ShakeMap 3 text file specification or the ShakeMap 4 JSON rupture format.
-    The ShakeMap 3 (".txt" extension) only supports QuadRupture style rupture
-    representation and so this method will always return a QuadRupture instance. 
-    The ShakeMap 4 JSON format supports QuadRupture and EdgeRupture
-    represenations and so this method detects the rupture class and returns the
-    appropriate Rupture subclass instance.
-
-    If file is None (default) then it returns a PointRupture.
-
-    Args:
-        origin (Origin): A ShakeMap origin instance; required because 
-            hypocentral/epicentral distances are computed from the Rupture
-            class.
-        file (srt): Path to rupture file (optional).
-        mesh_dx (float): Target spacing (in km) for rupture discretization;
-            default is 0.5 km and it is only used if the rupture file is an 
-            EdgeRupture.
-
-    Returns:
-        Rupture subclass instance. 
-
-    """
-    if file is not None:
-        try:
-            #-----------------------------------------------------------------------
-            # First, try to read as a json file
-            #-----------------------------------------------------------------------
-            if isinstance(file, str):
-                with open(file) as f:
-                    d = json.load(f)
-            else:
-                d = json.loads(str(file))
-
-            rupt = json_to_rupture(d, origin, mesh_dx = mesh_dx)
-
-        except json.JSONDecodeError:
-            #-----------------------------------------------------------------------
-            # Reading as json failed, so hopefully it is a ShakeMap 3 text file
-            #-----------------------------------------------------------------------
-            try:
-                d = text_to_json(file)
-                rupt = json_to_rupture(d, origin, mesh_dx = mesh_dx)
-            except:
-                raise Exception("Unknown rupture file format.")
-    else:
-        if origin is None:
-            raise Exception("Origin requred if no rupture file is provided.")
-        rupt = PointRupture(origin)
-    return rupt
 
 
-def json_to_rupture(d, origin, mesh_dx = 0.5):
-    """
-    Method returns either a QuadRupture or EdgeRupture object based on a 
-    GeoJSON dictionary. 
-
-    Args: 
-        d (dict): Rupture GeoJSON dictionary.
-        origin (Origin): A ShakeMap origin object.
-        mesh_dx (float): Target spacing (in km) for rupture discretization;
-            default is 0.5 km and it is only used if the rupture file is an
-            EdgeRupture.
-
-    Returns:
-        a Rupture subclass.
-
-    """
-    validate_json(d)
-
-    # Is this a QuadRupture or an EdgeRupture?
-    valid_quads = is_quadrupture_class(d)
-
-    if valid_quads is True:
-        rupt = QuadRupture.fromJson(d, origin)
-    else:
-        rupt = EdgeRupture.fromJson(d, origin, mesh_dx = mesh_dx)
-
-    return rupt
-
-
-def text_to_json(file):
-    """
-    Read in old ShakeMap 3 textfile rupture format and convert to GeoJSON. 
-
-    Args:
-        rupturefile (srt): Path to rupture file OR file-like object in GMT
-            psxy format, where:
-
-                * Rupture vertices are space separated lat, lon, depth triplets 
-                  on a single line.
-                * Rupture groups are separated by lines containing ">"
-                * Rupture groups must be closed.
-                * Verticies within a rupture group must start along the top edge
-                  and move in the strike direction then move to the bottom edge
-                  and move back in the opposite direction.
-
-    Returns:
-        dict: GeoJSON rupture dictionary.
-
-    """
-
-    #---------------------------------------------------------------------------
-    # First read in the data
-    #---------------------------------------------------------------------------
-    x = []
-    y = []
-    z = []
-    isFile = False
-    if isinstance(file, str):
-        isFile = True
-        file = open(file, 'rt')
-        lines = file.readlines()
-    else:
-        lines = file.readlines()
-    reference = ''
-    for line in lines:
-        sline = line.strip()
-        if sline.startswith('#'):
-            reference += sline
-            continue
-        if sline.startswith('>'):
-            if len(x):  # start of new line segment
-                x.append(np.nan)
-                y.append(np.nan)
-                z.append(np.nan)
-                continue
-            else:  # start of file
-                continue
-        if not len(sline.strip()):
-            continue
-        parts = sline.split()
-        if len(parts) < 3:
-            raise ShakeMapException(
-                'Rupture file %s has no depth values.' % file)
-        y.append(float(parts[0]))
-        x.append(float(parts[1]))
-        z.append(float(parts[2]))
-    if isFile:
-        file.close()
-
-    # Construct GeoJSON dictionary, note that some things like eventid and
-    # metadata are available in the old file so these will be empty.
-    # We could add an optional argument to include an Origin object, which
-    # would be used to fill in these values.
-
-    coords = []
-    poly = []
-    for lon, lat, dep in zip(x, y, z):
-        if np.isnan(lon):
-            coords.append(poly)
-            poly = []
-        else:
-            poly.append([lon, lat, dep])
-    if poly != []:
-        coords.append(poly)
-
-    d = {
-        "type": "FeatureCollection",
-        "metadata": {
-            "magnitude": None,
-            "eventtime": "",
-            "eventid": "",
-            "title": ""
-        },
-        "features":[
-            {
-                "type": "Feature",
-                "properties": {
-                    "rupture type": "rupture extent",
-		    "reference": reference
-                },
-                "geometry": {
-	            "type": "MultiPolygon",
-	            "coordinates":[coords]
-                }
-            }
-        ]
-    }
-    return d
-
-
-def validate_json(d):
-    """
-    Check that the JSON format is acceptable. This is only for requirements that
-    are common to both QuadRupture and EdgeRupture.
-
-    Args:
-        d (dict): Rupture JSON dictionary.
-    """
-    if d['type'] != 'FeatureCollection':
-        raise Exception('JSON file is not a \"FeatureColleciton\".')
-
-    if 'eventid' not in d['metadata'].keys():
-        raise Exception('\"eventid\" not in metadata.')
-
-    if len(d['features']) != 1:
-        raise Exception('JSON file should contain excactly one feature.')
-
-    f = d['features'][0]
-
-    if 'reference' not in f['properties'].keys():
-        raise Exception('Feature property dictionary should contain '\
-                        '\"referencey\" key.')
-
-    if f['type'] != 'Feature':
-        raise Exception('Feature type should be \"Feature\".')
-
-    geom = f['geometry']
-
-    if geom['type'] != 'MultiPolygon':
-        raise Exception('Geometry type should be \"MultiPolygon\".')
-
-    if 'coordinates' not in geom.keys():
-        raise Exception('Geometry dictionary should contain \"coordinates\" '\
-                        'key.')
-
-    polygons = geom['coordinates'][0]
-
-    n_polygons = len(polygons)
-    for i in range(n_polygons):
-        p = polygons[i]
-        n_points = len(p)
-        if n_points % 2 == 0:
-            raise Exception('Number of points in polyon must be odd.')
-
-        if p[0] != p[-1]:
-            raise Exception('First and last points in polygon must be '\
-                            'identical.')
-
-        n_pairs = int((n_points - 1)/2)
-        for j in range(n_pairs):
-            #-------------------------------------------------------------------
-            # Points are paired and in each pair the top is first, as in:
-            #
-            #      _.-P1-._
-            #   P0'        'P2---P3
-            #   |                  \
-            #   P7---P6----P5-------P4
-            #
-            # Pairs: P0-P7, P1-P6, P2-P5, P3-P4
-            #-------------------------------------------------------------------
-            top_depth = p[j][2]
-            bot_depth = p[-(j+2)][2]
-            if top_depth > bot_depth:
-                raise Exception('Top points must be ordered before bottom points.')
-
-
-def is_quadrupture_class(d):
-    """
-    Check if JSON file fulfills QuadRupture class criteria:
-    
-        - Are top and bottom edges horizontal?
-        - Are the four points in each quad coplanar?
-
-    Args:
-        d (dict): Rupture JSON dictionary.
-
-    Returns:
-        bool: Can the rupture be represented in the QuadRupture class?
-    """
-    isQuad = True
-
-    f = d['features'][0]
-    geom = f['geometry']
-    polygons = geom['coordinates'][0]
-    n_polygons = len(polygons)
-    for i in range(n_polygons):
-        p = polygons[i]
-        n_points = len(p)
-        n_pairs = int((n_points - 1)/2)
-
-        # Within each polygon, top and bottom edges must be horizontal
-        depths = [pt[2] for pt in p]
-        tops = np.array(depths[0:n_pairs])
-        if not np.isclose(tops[0], tops, rtol = 0, atol = DEPTH_TOL).all():
-            isQuad = False
-        bots = np.array(depths[(n_pairs):-1])
-        if not np.isclose(bots[0], bots, rtol = 0, atol = DEPTH_TOL).all():
-            isQuad = False
-
-        n_quads = n_pairs - 1
-        for j in range(n_quads):
-            # Four points of each quad should be co-planar within a tolerance
-            quad = [Point(p[j][0], p[j][1], p[j][2]),
-                    Point(p[j+1][0], p[j+1][1], p[j+1][2]),
-                    Point(p[-(j+3)][0], p[-(j+3)][1], p[-(j+3)][2]),
-                    Point(p[-(j+2)][0], p[-(j+2)][1], p[-(j+2)][2])]
-
-            test = is_quad(quad)
-            if test[0] is False:
-                isQuad = False
-
-    return isQuad
-
-
-def is_quad(q):
-    """
-    Checks that an individual quad is coplanar. 
-
-    Args: 
-        q (list): A quadrilateral; list of four OQ Points.
-
-    Returns:
-        tuple: Bool for whether or not the points are planar within tolerance;
-            and also the corrected quad where p2 is adjusted to be on the same
-            plane as the other points.
-    """
-    P0, P1, P2, P3 = q
-
-    # Convert points to ECEF
-    p0 = Vector.fromPoint(P0)
-    p1 = Vector.fromPoint(P1)
-    p2 = Vector.fromPoint(P2)
-    p3 = Vector.fromPoint(P3)
-
-    # Unit vector along top edge
-    v0 = (p1 - p0).norm()
-
-    # Distance along bottom edge
-    d = (p3 - p2).mag()
-
-    # New location for p2 by extending from p3 the same distance and
-    # direction that p1 is from p0:
-    new_p2 = p3 + v0*d
-
-    # How far off of the plane is the origin p2?
-    planepoints = [p0, p1, p2]
-    dist = get_distance_to_plane(planepoints, p2)
-
-    # Is it close enough?
-    if dist / d > OFFPLANE_TOLERANCE:
-        on_plane = False
-    else:
-        on_plane = True
-
-    # Fixed quad
-    fquad = [p0.toPoint(),
-             p1.toPoint(),
-             new_p2.toPoint(),
-             p3.toPoint()]
-
-    return (on_plane, fquad)
 
 
 def get_quad_width(q):
