@@ -201,10 +201,7 @@ def text_to_json(file):
     if isFile:
         file.close()
 
-    # Construct GeoJSON dictionary, note that some things like eventid and
-    # metadata are available in the old file so these will be empty.
-    # We could add an optional argument to include an Origin object, which
-    # would be used to fill in these values.
+    # Construct GeoJSON dictionary
 
     coords = []
     poly = []
@@ -219,12 +216,7 @@ def text_to_json(file):
 
     d = {
         "type": "FeatureCollection",
-        "metadata": {
-            "magnitude": None,
-            "eventtime": "",
-            "eventid": "",
-            "title": ""
-        },
+        "metadata": {},
         "features":[
             {
                 "type": "Feature",
@@ -253,9 +245,6 @@ def validate_json(d):
     """
     if d['type'] != 'FeatureCollection':
         raise Exception('JSON file is not a \"FeatureColleciton\".')
-
-    if 'eventid' not in d['metadata'].keys():
-        raise Exception('\"eventid\" not in metadata.')
 
     if len(d['features']) != 1:
         raise Exception('JSON file should contain excactly one feature.')
