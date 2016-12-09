@@ -24,6 +24,7 @@ from openquake.hazardlib.gsim import base
 from shakemap.utils.ecef import latlon2ecef
 from shakemap.utils.ecef import ecef2latlon
 from shakemap.utils.vector import Vector
+from shakemap.utils.timeutils import ShakeDateTime
 from shakemap.utils.exception import ShakeMapException
 from shakemap.plotting.plotrupture import plot_rupture_wire3d
 from shakemap.plotting.plotrupture import map_rupture
@@ -717,8 +718,8 @@ class PointRupture(Rupture):
         # Add origin information to metadata
         odict = origin.__dict__
         for k, v in odict.items():
-            if k == 'time':
-                d['metadata']['time'] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+            if isinstance(v, ShakeDateTime):
+                d['metadata'][k] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
             else:
                 d['metadata'][k] = v
 
@@ -1249,8 +1250,8 @@ class EdgeRupture(Rupture):
         # Add origin information to metadata
         odict = origin.__dict__
         for k, v in odict.items():
-            if k == 'time':
-                d['metadata']['time'] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+            if isinstance(v, ShakeDateTime):
+                d['metadata'][k] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
             else:
                 d['metadata'][k] = v
 
@@ -2074,8 +2075,8 @@ class QuadRupture(Rupture):
         # Add origin information to metadata
         odict = origin.__dict__
         for k, v in odict.items():
-            if k == 'time':
-                d['metadata']['time'] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+            if isinstance(v, ShakeDateTime):
+                d['metadata'][k] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
             else:
                 d['metadata'][k] = v
 
@@ -2085,6 +2086,9 @@ class QuadRupture(Rupture):
         """
         Write rupture data to rupture file format as defined in ShakeMap 
         Software Guide.
+
+        Note that this currently treats each quadrilateral as a separate
+        polygon. This needs to be udpated. 
 
         Args:
             rupturefile (str): Filename of output data file OR file-like object.
@@ -2223,8 +2227,8 @@ class QuadRupture(Rupture):
         # Add origin information to metadata
         odict = origin.__dict__
         for k, v in odict.items():
-            if k == 'time':
-                d['metadata']['time'] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+            if isinstance(v, ShakeDateTime):
+                d['metadata'][k] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
             else:
                 d['metadata'][k] = v
         if hasattr(origin, 'id'):

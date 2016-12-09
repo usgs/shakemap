@@ -28,8 +28,9 @@ def test_origin():
 31.290105       103.284388      20
 30.979788       103.454422      1"""
     event_text = """<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
-<earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9" year="2008" month="05" day="12" hour="06" minute="28" second="01" timezone="GMT" depth="19.0" locstring="EASTERN SICHUAN, CHINA" created="1211173621" otime="1210573681" type="" />
-    """
+<earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9" year="2008" 
+month="05" day="12" hour="06" minute="28" second="01" timezone="GMT" depth="19.0" 
+locstring="EASTERN SICHUAN, CHINA" created="1211173621" otime="1210573681" type="" />"""
     source_text = "mech=RS"
     ffile = io.StringIO(fault_text)
     efile = io.StringIO(event_text)
