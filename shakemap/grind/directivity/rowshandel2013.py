@@ -197,16 +197,16 @@ class Rowshandel2013(object):
     def getDT(self):
         """
         :returns:
-           Numpy array of the distance taper factor.
+           List of numpy arrays of the distance taper factor. Length is the number of periods.
         """
-        return copy.deepcopy(self._DT)
+        return copy.deepcopy(self._DTlist)
 
     def getWP(self):
         """
         :returns:
-            Numpy array of the narrow-band multiplier. 
+            List of numpy array of the narrow-band multiplier. Length is the number of periods.
         """
-        return copy.deepcopy(self._WP)
+        return copy.deepcopy(self._WPlist)
 
     def getLD(self):
         """
@@ -226,6 +226,8 @@ class Rowshandel2013(object):
 
         # fd is a list with same length as T
         self._fd = [None] * len(self._T)
+        self._DTlist = [None] * len(self._T)
+        self._WPlist = [None] * len(self._T)
         for i in range(len(self._T)):
             period = self._T[i]
             c1sel = self.__c1[self.__periods == period]
@@ -234,6 +236,9 @@ class Rowshandel2013(object):
             # Period dependent parameters
             self.__computeWP(period)
             self.__computeDT(period)
+
+            self._DTlist[i] = copy.deepcopy(self._DT)
+            self._WPlist[i] = copy.deepcopy(self._WP)
 
             if self._centered:
                 self._fd[i] = c1sel * self._WP * self._DT * xcipc
@@ -255,7 +260,7 @@ class Rowshandel2013(object):
         * Alternative is to compute max Wrup for the different quads.
 
         """
-        nquad = len(self._rup._quadrilaterals)
+        nquad = len(self._rup.getQuadrilaterals())
 
         #-------------------------------------------
         # First find which quad the hypocenter is on
@@ -267,7 +272,7 @@ class Rowshandel2013(object):
         qdist = np.zeros(nquad)
         for i in range(0, nquad):
             qdist[i] = _quad_distance(self._rup.getQuadrilaterals()[i], hyp_ecef)
-        ind = int(np.where(qdist == np.min(qdist))[0])
+        ind = int(np.where(qdist == np.min(qdist))[0][0])
         # *** check that this doesn't break with more than one quad
         q = self._rup.getQuadrilaterals()[ind]
 
@@ -317,7 +322,7 @@ class Rowshandel2013(object):
         xi_prime_s = np.zeros(np.product(slat.shape))
         xi_prime_p = np.zeros(np.product(slat.shape))
 
-        for k in range(len(self._rup._quadrilaterals)):
+        for k in range(len(self._rup.getQuadrilaterals())):
             # Select a quad
             q = self._rup.getQuadrilaterals()[k]
 
