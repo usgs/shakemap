@@ -839,7 +839,7 @@ def test_ss3():
         fd3, fd3_test, rtol=1e-5)
 
     # Test DT
-    DT = test1.getDT()
+    DT = test1.getDT()[1]
     targetDT = np.array(
       [[ 0.        ,  0.        ,  0.        ,  0.        ,  0.        ,
          0.        ,  0.        ,  0.        ,  0.02859751,  0.05747187,
@@ -1014,7 +1014,7 @@ def test_ss3():
     np.testing.assert_allclose(DT, targetDT, atol = 1e-5)
 
     # Test WP
-    WP = test1.getWP()
+    WP = test1.getWP()[1]
     targetWP = np.array(0.95383064594222977)
     np.testing.assert_allclose(WP, targetWP)
 
