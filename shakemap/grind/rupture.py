@@ -1556,10 +1556,6 @@ class EdgeRupture(Rupture):
         return np.min(self._topdeps)
 
 
-
-    def writeGeoJson(self):
-        pass
-
     def getQuadrilaterals(self):
         """
         Return a list of quadrilaterals. Unlike QuadRupture, these
