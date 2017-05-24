@@ -29,7 +29,13 @@ def get_weights():
 
     # Note:
     #    - No distance-depenent weights
-    # TODO:
-    #    - Figure out site GMPEs. 
 
-    return gmpes, wts, None, None, None
+
+    # Site decisions:
+    #    - Abrahamson et al. (2015) includes site, indluding nonlinear
+    #    - Zhao et al. (2006) does not include nonlinearity
+    #    - Atkinson and Macias (2009) is for B/C site condition
+    #    - Atkinson and Boore (2003) includes both linear and nonlinear factors
+    site_gmpes = [AbrahamsonEtAl2015SInter(), AtkinsonBoore2003SInter()]
+
+    return gmpes, wts, None, None, site_gmpes

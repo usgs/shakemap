@@ -136,8 +136,11 @@ class Distance(object):
 
         context = base.DistancesContext()
 
-        ddict = get_distance(list(requires), lat, lon, dep, self._rupture)
-
+        if isinstance(self._rupture, EdgeRupture):
+            ddict = get_distance(list(requires), lat, lon, dep, self._rupture,
+                                 dx=self._rupture._mesh_dx)
+        else:
+            ddict = get_distance(list(requires), lat, lon, dep, self._rupture)
         for method in requires:
             (context.__dict__)[method] = ddict[method]
 
@@ -155,7 +158,7 @@ def get_distance_measures():
 
     return ['repi', 'rhypo', 'rjb', 'rrup', 'rx', 'ry', 'ry0', 'U', 'T']
 
-def get_distance(methods, lat, lon, dep, rupture):
+def get_distance(methods, lat, lon, dep, rupture, dx=0.5):
     """
     Calculate distance using any one of a number of distance measures.
     One of quadlist OR hypo must be specified. The following table gives
@@ -189,15 +192,19 @@ def get_distance(methods, lat, lon, dep, rupture):
     +--------+----------------------------------------------------------+
 
     Args:
-        methods (list): List of strings (or just a string) of distances to compute.
+        methods (list): List of strings (or just a string) of distances to
+            compute.
         lat (array): A numpy array of latitudes.
         lon (array): A numpy array of longidues.
         dep (array): A numpy array of depths (km).
         rupture (Rupture): A ShakeMap Rupture instance.
+        dx (float): Mesh spacing for rupture; only used if rupture is an 
+            EdgeRupture subclass.
 
     Returns:
        dict: dictionary of numpy arrays of distances, size of lon.shape.
     """
+    rupture._mesh_dx = dx
 
     # Dictionary for holding/returning the requested distances
     distdict = dict()

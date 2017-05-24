@@ -568,13 +568,15 @@ def filter_gmpe_list(gmpes, wts, imt):
     per_max = [np.max(get_gmpe_sa_periods(g)) for g in gmpes]
     per_min = [np.min(get_gmpe_sa_periods(g)) for g in gmpes]
     if imt == PGA():
-        sgmpe = [g for g in gmpes if imt in g.COEFFS.non_sa_coeffs]
-        swts = [w for g, w in zip(gmpes, wts) if imt in g.COEFFS.non_sa_coeffs]
+        sgmpe = [g for g in gmpes if imt in 
+                 get_gmpe_coef_table(g).non_sa_coeffs]
+        swts = [w for g, w in zip(gmpes, wts) if imt in 
+                get_gmpe_coef_table(g).non_sa_coeffs]
     elif(imt == PGV()):
         sgmpe = []
         swts = []
         for i in range(len(gmpes)):
-            if (imt in gmpes[i].COEFFS.non_sa_coeffs) or\
+            if (imt in get_gmpe_coef_table(gmpes[i]).non_sa_coeffs) or\
                (per_max[i] >= 1.0 and per_min[i] <= 1.0):
                sgmpe.append(gmpes[i])
                swts.append(wts[i])
@@ -609,9 +611,32 @@ def get_gmpe_sa_periods(gmpe):
         list: List of periods. 
 
     """
-
-    ctab = gmpe.COEFFS.sa_coeffs
+    ctab = get_gmpe_coef_table(gmpe).sa_coeffs
     ilist = list(ctab.keys())
     per = [i.period for i in ilist]
     return per
+
+def get_gmpe_coef_table(gmpe):
+    """
+    Method for finding the (or "a") GMPE table. If there are more than
+    one, then the first one found is returned. This is okay when using
+    check for the presence of PGA/PGV or the range of spectral periods
+    because presumably this is consistent across all tables for a given 
+    GMPE. 
+
+    Notes:
+
+      *  The reason for the complexity here is that some of the 
+         OQ GMPE classes do not use the COEFFS attribute name
+         for the table. So we have to look for it. We 
+      *  We are also assuming that if there are more than one 
+         coefficient table, the range of periods will be the 
+         same across all of the tables. 
+    """
+    stuff = gmpe.__dir__()
+    coef_stuff = [s for s in stuff if 'COEFFS' in s]
+    coef_stuff = coef_stuff[0]
+
+    cobj = getattr(gmpe, coef_stuff)
+    return cobj
 
