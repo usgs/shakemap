@@ -74,10 +74,14 @@ class VirtualIPE(GMPE):
 
         return self
 
-    def get_mean_and_stddevs(self, sx, rx, dx, imt, stddev_types):
+    def get_mean_and_stddevs(self, sx, rx, dx, imt, stddev_types, fd=None):
         """
         See superclass `method <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs>`__
         for parameter definitions. The only acceptable IMT is MMI. 
+
+        Additional subclass argument is "fd", which is the directivity amplification 
+        factor in natural log units. This is optional, and must be a numpy array with 
+        the same dimentions as the sites and is added
 
         Returns:
             mmi (ndarray): Ground motions predicted by the MultiGMPE using
@@ -98,6 +102,9 @@ class VirtualIPE(GMPE):
         #
         mgm, sdev = self.gmpe.get_mean_and_stddevs(sx, rx, dx, self.imt, 
                 stddev_types)
+
+        if fd is not None:
+            mgm = mgm + fd
 
         #
         # Get the MMI and the dMMI/dPGM from the GMICE
