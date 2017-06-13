@@ -5,7 +5,7 @@ VENV=shake
 PYVER=3.5
 
 
-DEPARRAY=(numpy scipy matplotlib jupyter rasterio fiona xlrd xlwt pandas pytables basemap basemap-data-hires shapely h5py gdal descartes paramiko pycrypto sphinx configobj pyproj pytest pytest-cov pytest-mpl psutil lxml flake8 pep8-naming)
+DEPARRAY=(numpy scipy matplotlib jupyter rasterio fiona xlrd xlwt pandas pytables cartopy shapely h5py gdal descartes sphinx configobj pyproj pytest pytest-cov pytest-mpl psutil lxml flake8 pep8-naming openpyxl)
 
 # turn off whatever other virtual environment user might be in
 source deactivate

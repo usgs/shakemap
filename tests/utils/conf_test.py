@@ -1,15 +1,20 @@
+#!/usr/bin/env python
+
 import os.path
 import tempfile
 import textwrap
+import sys
 
 from configobj import ConfigObj
+
+homedir = os.path.dirname(os.path.abspath(__file__))
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 
 from shakemap.utils.conf import validate
 from shakemap.utils.conf import whatIs
 from shakemap.utils.conf import create_default_config
 
-homedir = os.path.dirname(os.path.abspath(__file__))
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+
 
 
 def test_conf():
@@ -102,7 +107,7 @@ def test_conf():
 
 if __name__ == '__main__':
     test_conf()
-    sys.exit(0)
+    #sys.exit(0)
     # where is this script?
     homedir = os.path.dirname(os.path.abspath(__file__))
     configspec = os.path.join(homedir, 'configspec.ini')

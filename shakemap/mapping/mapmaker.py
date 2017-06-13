@@ -27,8 +27,8 @@ from scipy.ndimage import gaussian_filter
 import pyproj
 
 # local imports
-from shakemap.utils.exception import ShakeMapException
-from shakemap.grind.gmice.wgrw12 import WGRW12
+from shakelib.utils.exception import ShakeLibException
+from shakelib.grind.gmice.wgrw12 import WGRW12
 
 
 CITY_COLS = 2
