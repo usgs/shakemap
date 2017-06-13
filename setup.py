@@ -15,7 +15,7 @@ setup(name='shakemap',
                 'shakemap.mapping',
                 'shakemap.plotting',
                 'shakemap.utils',
-                'shakemap.utils.extern.scp',]
+                'shakemap.utils.extern.scp'],
       package_data={'shakemap': [os.path.join('tests', 'data', '*'),
                                  os.path.join('utils', 'configspec.ini'),
                                  ]},
