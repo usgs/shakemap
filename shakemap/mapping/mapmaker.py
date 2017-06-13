@@ -7,7 +7,7 @@ from functools import partial
 from collections import OrderedDict
 
 # third party
-from mapio.basemapcity import BasemapCities
+#from mapio.basemapcity import BasemapCities
 from mapio.gmt import GMTGrid
 import fiona
 from matplotlib.patches import Polygon
@@ -20,7 +20,7 @@ from shapely.geometry import GeometryCollection
 from shapely.geometry import Polygon as sPolygon
 from shapely.geometry import shape as sShape
 from shapely.geometry import mapping
-from mpl_toolkits.basemap import Basemap
+#from mpl_toolkits.basemap import Basemap
 import numpy as np
 from descartes import PolygonPatch
 from scipy.ndimage import gaussian_filter
