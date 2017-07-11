@@ -1,0 +1,6 @@
+# Source: Wald, D. J., T. H. Heaton, and K. W. Hudnut (1996). The Slip History of the 1994 Northridge, California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling Data, Bull. Seism. Soc. Am. 86, S49-S70.
+34.315	-118.421	5.000
+34.401	-118.587	5.000
+34.261	-118.693	20.427
+34.175	-118.527	20.427
+34.315	-118.421	5.000

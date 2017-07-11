@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+
+#stdlib imports
+import sys
+import os.path
+import argparse
+import glob
+
+#third party imports
+import configobj
+from shakelib.grind.container import InputContainer
+from shakemap.utils.config import get_config_paths
+
+def main(args):
+    install_path,data_path = get_config_paths()
+    datadir = os.path.join(data_path,args.eventid)
+    if not os.path.isdir(datadir):
+        print('%s is not a valid directory.' % datadir)
+        sys.exit(1)
+
+    eventxml = os.path.join(datadir,'event.xml')
+    print('Looking for event.xml file...')
+    if not os.path.isfile(eventxml):
+        print('%s does not exist.' % eventxml)
+        sys.exit(1)
+
+    #someday these files will be in the global config directory, not
+    #in the event data directory
+    print('Looking for configuration files...')
+    gmpe_modules = configobj.ConfigObj(os.path.join(datadir,'gmpe_modules.conf'))
+    gmpe_sets = configobj.ConfigObj(os.path.join(datadir,'gmpe_sets.conf'))
+    global_grind = configobj.ConfigObj(os.path.join(datadir,'grind.conf'))
+
+    #this is the event specific grind.conf (may not be present)
+    event_grind_file = os.path.join(datadir,'grind_zc.conf')
+    if os.path.isfile(event_grind_file):
+        event_grind = configobj.ConfigObj()
+    else:
+        event_grind = configobj.ConfigObj()
+
+    #start merging event_grind
+    global_grind.merge(event_grind)
+    global_grind.merge(gmpe_modules)
+    global_grind.merge(gmpe_sets)
+
+    config = global_grind.dict()
+
+    print('Looking for data files...')
+    datafiles = glob.glob(os.path.join(datadir,'*_dat.xml'))
+    print('Looking for rupture files...')
+    rupturefiles = glob.glob(os.path.join(datadir,'*_fault.txt'))
+    rupturefile = None
+    if len(rupturefiles):
+        rupturefile = rupturefiles[0]
+
+    hdf_file = os.path.join(datadir,'shake_data.hdf')
+
+    print('Creating input container...')
+    shake_data = InputContainer.loadFromInput(hdf_file,config,eventxml,rupturefile,datafiles=datafiles)
+    print('Created HDF5 input container in %s' % shake_data.getFileName())
+    shake_data.close()
+
+if __name__ == '__main__':
+    description = '''Assemble ShakeMap input data into an HDF package.
+The only argument is a ShakeMap event ID, which should correspond to a directory in 
+the ShakeMap data directory. The output will be an HDF5 data file called shake_data.hdf
+in that same event data directory.
+'''
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('eventid', 
+                    help='Path to ShakeMap data directory containing event.xml, grind_zc.conf')
+    pargs = parser.parse_args()
+    main(pargs)
