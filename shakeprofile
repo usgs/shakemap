@@ -1,0 +1,206 @@
+#!/usr/bin/env python
+
+#stdlib imports
+import argparse
+from configobj import ConfigObj
+import os.path
+import sys
+import shutil
+import pprint
+
+#shakemap imports
+from shakemap.utils.config import get_data_path
+
+current_markers = {True:'**Current Profile**',False:''}
+
+class ShakeProfile(object):
+    def __init__(self,name,indict,is_current=False):
+        self.name = name
+        self.install_path = indict['install_path']
+        self.data_path = indict['data_path']
+        self.current_marker = current_markers[is_current]
+
+    def __repr__(self):
+        fmt = 'Profile: %s %s\n\tInstall Path: %s\n\tData Path: %s'
+        tpl = (self.name,self.current_marker,self.install_path,self.data_path)
+        return fmt % tpl
+
+def make_dir(pathstr,default):
+    max_tries = 3
+    ntries = 1
+    make_ok = False
+    ppath = ''
+    while not make_ok:
+        ppath = input('Please enter the %s: [%s] ' % (default,pathstr))
+        if not len(ppath.strip()):
+            ppath = default
+        try:
+            os.makedirs(ppath,exist_ok=True)
+            make_ok = True
+        except OSError as error:
+            msg = 'Cannot make install_folder %s.  Please try again (%i of % tries).'
+            print(msg % (ppath,ntries,max_tries))
+            ntries += 1
+        if ntries >= max_tries:
+            break
+    return (ppath,make_ok)
+    
+def create(configfile,profile,progname):
+    data_path = get_data_path()
+    module_file = os.path.join(data_path,'gmpe_modules.conf')
+    sets_file = os.path.join(data_path,'gmpe_sets.conf')
+    grind_file = os.path.join(data_path,'grind.conf')
+    data_file = os.path.join(data_path,'northridge_dat.xml')
+    event_file = os.path.join(data_path,'northridge_event.xml')
+    rupture_file = os.path.join(data_path,'northridge_fault.txt')
+    event_grind_file = os.path.join(data_path,'northridge_grind.conf')
+    if not os.path.isfile(configfile):
+        config = ConfigObj(indent_type='  ')
+        config['profiles'] = {}
+    else:
+        config = ConfigObj(configfile)
+
+    if profile in config['profiles']:
+        msg = 'Profile %s already in %s.  Run %s -l to see available profiles.'
+        print(msg % (profile,configfile,progname))
+        sys.exit(1)
+
+    profile_path = os.path.join(os.path.expanduser('~'),'ShakeMap',profile)
+    default_install = os.path.join(profile_path,'install')
+    default_data = os.path.join(profile_path,'data')
+    print('You will be prompted to supply two directories for this ShakeMap profile:')
+    print(' - An *installation* path, under which will be created directories for system')
+    print('   configuration, (cfg), logging (log), and support data (lib).')
+    print(' - A *data* path, under which will be created directories for each')
+    print('   event processed.\n')
+    install_path,install_ok = make_dir('install path',default_install)
+    if not install_ok:
+        print('Please try to find a path that can be created on this system and then try again.  Exiting.')
+        sys.exit(1)
+    data_path,data_ok = make_dir('data path',default_data)
+    if not data_ok:
+        print('Please try to find a path that can be created on this system and then try again.  Exiting.')
+        shutil.rmtree(install_path)
+        sys.exit(1)
+
+    #put the default config files in the install path
+    config_path = os.path.join(install_path,'config')
+    os.mkdir(config_path)
+
+    shutil.copy(module_file,config_path)
+    shutil.copy(sets_file,config_path)
+    shutil.copy(grind_file,config_path)
+
+    #put northridge in the data directory
+    event_path = os.path.join(data_path,'us19940117123055')
+    os.mkdir(event_path)
+
+    #copy files over
+    data_event_file = os.path.join(event_path,'event.xml')
+    data_grind_file = os.path.join(event_path,'grind_zc.conf')
+    shutil.copy(data_file,event_path)
+    shutil.copyfile(event_file,data_event_file)
+    shutil.copy(rupture_file,event_path)
+    shutil.copyfile(event_grind_file,data_grind_file)
+        
+    config['profiles'][profile] = {'install_path':install_path,'data_path':data_path}
+    config.filename = configfile
+    config['profile'] = profile
+    config.write()
+    sprofile = ShakeProfile(profile,config['profiles'][profile])
+    print('\nCreated profile: %s' % (sprofile))
+        
+def main(pparser,args):
+    configfile = os.path.join(os.path.expanduser('~'),'.shakemap','profiles.conf')
+    if not args.create and not os.path.isfile(configfile):
+        print('You must run %s -c to create a config file with at least one profile in it.' % pparser.prog)
+        sys.exit(1)
+        
+    if args.create:
+        create(configfile,args.create,pparser.prog)
+        sys.exit(0)
+        
+    if args.list:
+        config = ConfigObj(configfile)
+        profiles = config['profiles']
+        current = config['profile']
+        for profname,profdict in profiles.items():
+            is_current = False
+            if profname == current:
+                is_current = True
+            sprofile = ShakeProfile(profname,profdict,is_current=is_current)
+            print('\n'+str(sprofile)+'\n')
+        sys.exit(0)
+        
+    if args.switch:
+        newprofile = args.switch
+        config = ConfigObj(configfile)
+        oldprofile = config['profile']
+        if newprofile not in config['profiles']:
+            msg = 'Profile %s not in %s.  Run %(prog)s -l to see available profiles.'
+            print(msg % (profile,configfile))
+            sys.exit(1)
+        config['profile'] = newprofile
+        config.filename = configfile
+        config.write()
+        sp = ShakeProfile(newprofile,config['profiles'][newprofile],is_current=True)
+        print('\nSwitched to profile: \n%s\n' % (str(sp)))
+        sys.exit(0)
+
+    if args.delete:
+        profile = args.delete
+        config = ConfigObj(configfile)
+        if profile not in config['profiles']:
+            msg = 'Profile %s not in %s.  Run %s -l to available profiles.'
+            print(msg % (profile,configfile,pparser.prog))
+            sys.exit(1)
+
+        install_path = config['profiles'][profile]['install_path']
+        data_path = config['profiles'][profile]['data_path']
+        shutil.rmtree(install_path,ignore_errors=True)
+        shutil.rmtree(install_path,ignore_errors=True)
+                
+        del config['profiles'][profile]
+
+        default = config['profiles'].keys()[0]
+        config['profile'] = default
+        
+        config.filename = configfile
+        config.write()
+        print('Deleted profile %s:' % profile)
+        print('\tDeleted install directory %s:' % install_path)
+        print('\tDeleted data directory %s:' % data_path)
+
+        print('\nSet to new profile:\n')
+        newprofile = ShakeProfile(default,config['profiles'][default])
+        print(newprofile)
+        sys.exit(0)
+
+    config = ConfigObj(configfile)
+    profile = config['profile']
+    profiles = config['profiles']
+    if profile not in profiles:
+        msg = 'Current profile %s not in %s.  Edit your profiles.conf file to match the specification.'
+        print(msg % (profile,configfile))
+        sys.exit(1)
+    print(profiles[profile])
+    sys.exit(0)
+    
+        
+if __name__ == '__main__':
+    desc = '''Manage ShakeMap profiles.
+These ShakeMap profiles allow one user to have multiple ShakeMap profiles (installations)
+on the same machine.  These profiles can all be configured differently, if desired.
+'''
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument('-s','--switch', metavar='PROFILE',
+                        help='Switch from current profile to PROFILE.')
+    parser.add_argument('-l','--list', action='store_true',
+                        help='List all configured profiles.')
+    parser.add_argument('-c','--create', metavar='PROFILE',
+                        help='Create new profile PROFILE and switch to it.')
+    parser.add_argument('-d','--delete', metavar='PROFILE',
+                        help='Delete existing profile PROFILE.')
+    pargs = parser.parse_args()
+    main(parser,pargs)
+    
