@@ -1,0 +1,949 @@
+#!/usr/bin/env python
+
+import os.path
+import copy as copy
+import time as time
+import tempfile
+
+import numpy as np
+import numexpr as ne
+
+from openquake.hazardlib import imt
+import openquake.hazardlib.const as oqconst
+import openquake.hazardlib.gsim.base as oqbase
+
+from shakelib.grind.origin import Origin
+from shakelib.grind.rupture import read_rupture_file, PointRupture
+from shakelib.grind.sites import Sites
+from shakelib.grind.distance import Distance
+from shakelib.grind.station import StationList
+from shakelib.grind.multigmpe import MultiGMPE
+from shakelib.grind.virtualipe import VirtualIPE
+#from shakemap.grind.correlation.goda_atkinson_2010 import GodaAtkinson2010
+from shakelib.grind.distance import get_distance_measures
+from shakelib.grind.correlation.loth_baker_2010 import LothBaker2010
+
+from mapio.gmt import GMTGrid
+from mapio.geodict import GeoDict
+
+#%%
+def get_imts_from_df(df):
+    for col in df.columns:
+        if col == 'PGA' or col == 'PGV' or col == 'MMI' or 'SA(' in col:
+            yield col
+
+def imt_iter(df_dict):
+    for ndf, sdf in df_dict.items():
+        if len(sdf) <= 0:
+            continue
+        for imtstr in get_imts_from_df(sdf):
+            yield ndf, sdf, imtstr
+
+#
+# Get the mean and standard deviation(s) of the appropriate type
+# using the IPE or GMPE
+#
+def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
+    if 'MMI' in oqimt:
+        pe = ipe
+    else:
+        pe = gmpe
+    return pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
+
+#
+# Compute the sum of the normalized errors for a given magnitude
+#
+def bias_mfunc(mag, params):
+    
+    rx = copy.copy(params['rx'])
+    rx.mag = mag
+    err_sum = 0
+    for ndf, sdf, imtstr in imt_iter(params['dfd']):
+        inrange = sdf['rrup'] <= params['range']
+        pmean, psd = gmas(params['ipe'], params['gmpe'], params['sxd'][ndf], 
+                          rx, params['dxd'][ndf], imt.from_string(imtstr), 
+                          params['stddev'])
+        norm_err = (sdf[imtstr] - pmean) / psd[0]
+        if params['norm'] == 'l1':
+            err_sum += np.nansum(np.abs(norm_err[inrange]))
+        else:
+            err_sum += np.nansum(norm_err[inrange]**2)
+    return err_sum
+
+def get_amp(amps, sidx, imtstr):
+    #
+    # Here is where we do some clever stuff with interperiod correlation
+    # but for now we just get the amp and throw an error if it's not
+    # there.
+    #
+    zdsigma = 0 # zero-distance sigma
+    if imtstr not in amps:
+        #
+        # Use interperiod correlation model to convert to the IMT
+        #
+#        raise KeyError('Unknown IMT in get amp: %s' % (imtstr))
+        return np.nan, np.nan
+    else:
+        if imtstr == 'MMI':
+            if 'MMI_sd' in amps:
+                zdsigma = amps['MMI_sd'][sidx]
+            else:
+                zdsigma = 0.3
+        elif (imtstr + '_sd') in amps:
+            zdsigma = amps[imtstr + '_sd'][sidx]
+        else:
+            zdsigma = 0.0
+        return amps[imtstr + '_corrected'][sidx], zdsigma
+
+def get_bias(imtstr, dx_dict, ampdict, pmean1, psd1, pmean2, psd2,
+             outliers, bias_max_range, bias_max_dsigma, odl, flagging=True):
+    
+    inrange1 = dx_dict['df1'].rrup <= bias_max_range
+    inrange2 = dx_dict['df2'].rrup <= bias_max_range
+    nsta = 0
+    if imtstr in ampdict['df1']:
+        v1 = inrange1 & ~np.isnan(ampdict['df1'][imtstr])
+        nsta += np.sum(v1)
+    if imtstr in ampdict['df2']:
+        v2 = inrange2 & ~np.isnan(ampdict['df2'][imtstr])
+        nsta += np.sum(v2)
+    if nsta >= bias_min_stations:
+        bsum1 = bsum2 = wsum1 = wsum2 = 0
+        if imtstr in ampdict['df1']:
+            weights1 = 1.0 / (psd1[0]**2 + ampdict['df1'][imtstr + '_sd']**2)
+            bsum1 = np.sum(((ampdict['df1'][imtstr] - pmean1) * weights1)[v1])
+            wsum1 = np.sum(weights1[v1])
+        if imtstr in ampdict['df2']:
+            weights2 = 1.0 / (psd2[0]**2 + ampdict['df2'][imtstr + '_sd']**2)
+            bsum2 = np.sum(((ampdict['df2'][imtstr] - pmean2) * weights2)[v2])
+            wsum2 = np.sum(weights2[v2])
+        bias = (bsum1 + bsum2) / (wsum1 + wsum2)
+    else:
+        print("Insufficient stations to compute bias for %s" % (imtstr))
+        bias = 0.0
+    #
+    # Make sure the total bias does not exceed the specified amount
+    #
+    net_bias1 = np.array([], dtype=bool)
+    net_bias2 = np.array([], dtype=bool)
+    if imtstr in ampdict['df1']:
+        net_bias1 = (pmean1 + bias - 
+                ampdict['df1'][imtstr + '_pred_unbiased']) / \
+                ampdict['df1'][imtstr + '_pred_unbiased_sd']
+    if imtstr in ampdict['df2']:
+        net_bias2 = (pmean2 + bias - 
+                ampdict['df2'][imtstr + '_pred_unbiased']) / \
+                ampdict['df2'][imtstr + '_pred_unbiased_sd']
+    if np.any(np.abs(net_bias1) > bias_max_dsigma) or \
+        np.any(np.abs(net_bias2) > bias_max_dsigma):
+        print("Bias for %s exceeds bias_max_dsigma; setting to 0" % (imtstr))
+        bias = 0.0    
+    #
+    # Find and flag outliers
+    #
+    nnew = 0
+    if flagging is True:
+        newout1 = np.full(len(df1), False, dtype=bool)
+        newout2 = np.full(len(df2), False, dtype=bool)
+        if real_mag < outlier_max_mag or \
+           not isinstance(rupture_obj, PointRupture):
+            if imtstr in ampdict['df1']:
+                dsig1 = (ampdict['df1'][imtstr] - pmean1 + bias) / psd1[0]
+                newout1 = dsig1 > odl
+            if imtstr in ampdict['df2']:
+                dsig2 = (ampdict['df2'][imtstr] - pmean2 + bias) / psd2[0]
+                newout2 = dsig2 > odl
+        print("%s: flagged %d" % (imtstr, np.sum(newout1[inrange1]) + 
+                                    np.sum(newout2[inrange2])))
+        outliers['df1'] |= newout1
+        outliers['df2'] |= newout2
+        nnew = np.sum(newout1[inrange1]) + np.sum(newout2[inrange2])
+    return bias, nnew
+
+#: Earth radius in km.
+EARTH_RADIUS = 6371.0
+
+def geodetic_distance(lons1, lats1, lons2, lats2, diameter=2*EARTH_RADIUS):
+#    lons1 = np.radians(lons1)
+#    lats1 = np.radians(lats1)
+#    assert lons1.shape == lats1.shape
+#    lons2 = np.radians(lons2)
+#    lats2 = np.radians(lats2)
+#    assert lons2.shape == lats2.shape
+
+#    distance = ne.evaluate("arcsin(sqrt("
+#        "sin((lats1 - lats2) / 2.0) ** 2.0"
+#        "+ cos(lats1) * cos(lats2)"
+#        "* sin((lons1 - lons2) / 2.0) ** 2.0"
+#    "))")
+#    return diameter * distance
+    d = ne.evaluate("EARTH_RADIUS * sqrt(((lons1 - lons2) * cos(0.5 * " \
+                    "(lats1 + lats2)))**2.0 + (lats1 - lats2)**2.0)")
+#    y = ne.evaluate("lats1 - lats2")
+#    d = ne.evaluate("2.0 * EARTH_RADIUS * sqrt(x**2.0 + y**2.0)")
+    return d
+
+#%%
+#
+# Import the GMPE. In general we'll want to get the GMPE(s) from a
+# config file and import on the fly. Not sure how this mechanism
+# will work since the package and class names are both needed.
+#
+
+from shakelib.grind.gmice.wgrw12 import WGRW12 
+
+# from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014NoSOF
+# from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
+# from openquake.hazardlib.gsim.chiou_youngs_2008 import ChiouYoungs2008
+from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
+# from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
+
+gmpe_cy14 = ChiouYoungs2014()
+gmpe = MultiGMPE.from_list([gmpe_cy14], [1.0])
+gmice = WGRW12()
+
+ipe = None
+#
+# if statement goes here to determine whether an IPE was specified
+# and, if so, set ipe with its constructor
+#
+if ipe == None:
+    ipe = VirtualIPE.fromFuncs(gmpe, gmice)
+
+#
+# Figure out how to specify the spatial correlation function
+scf = LothBaker2010()
+
+#%%
+#
+# Stuff we shoud get from the config or the command line
+#
+event = 'Calexico'
+#event = 'northridge'
+#event = 'wenchuan'
+
+smdx = 0.0083333333
+smdy = 0.0083333333
+lonspan = 6.0
+latspan = 4.0
+
+#
+# Bias parameters
+#
+bias_norm         = 'l1'
+bias_max_range    = 120
+bias_min_stations = 6
+bias_max_mag      = 7.7
+bias_max_bias     = 2.0
+bias_min_bias     = -2.0
+bias_max_dsigma   = 1.5
+
+outlier_deviation_level = 3.0
+outlier_max_mag = 7.0
+
+#
+# These are the maps we want to make
+#
+imt_out_set_string = set(['PGA', 'PGV', 'MMI', 'SA(0.3)', 'SA(1.0)', 
+                   'SA(2.0)', 'SA(3.0)'])
+imt_out_set = [imt.from_string(x) for x in imt_out_set_string]
+
+#
+# How are we going to construct the user's data directory
+# path?
+#
+datadir = '/Users/cbworden/Unix/python/shakemap/tests/data/eventdata'
+datadir = os.path.abspath(os.path.join(datadir, event, 'input'))
+
+#
+# Parse the event's input directory to get a list of input files,
+# fault file, etc.
+#
+
+if event == 'Calexico':
+    inputfile = os.path.join(datadir, 'stationlist_dat.xml')
+    dyfifile = os.path.join(datadir, 'ciim3_dat.xml')
+    eventfile = os.path.join(datadir, 'event.xml')
+    rupturefile = os.path.join(datadir, 'wei_fault.txt')
+    xmlfiles = [inputfile, dyfifile]
+elif event == 'northridge':
+    eventfile = os.path.join(datadir, 'event.xml')
+    inputfile = os.path.join(datadir, 'hist_dat.xml')
+    dyfifile = os.path.join(datadir, 'dyfi_dat.xml')
+    rupturefile = os.path.join(datadir, 'northridge_fault.txt')
+    xmlfiles = [inputfile, dyfifile]
+elif event == 'wenchuan':
+    eventfile = os.path.join(datadir, 'event.xml')
+    inputfile = os.path.join(datadir, 'stationlist.xml')
+    rupturefile = os.path.join(datadir, 'Hartzell11_fault.txt')
+    xmlfiles = [inputfile]
+    
+#xmlfiles = [dyfifile]
+#xmlfiles = []
+
+#
+# Make a place to put stations.db; here we just creat a temp
+# dir, but when we have a config, we'll put it in the output
+# directory
+#
+
+tmpdir = tempfile.TemporaryDirectory()
+dbfile = os.path.join(tmpdir.name, 'stations.db')
+#dbdir = os.path.join(datadir, '..', 'grind')
+#os.makedirs(dbdir, exist_ok=True)
+#dbfile = os.path.join(dbdir, 'stations.db')
+#try:
+#    os.remove(dbfile)
+#except OSError:
+#    pass
+
+
+#
+# This has to be replaced by the Vs30 that comes from the config
+#
+vs30filename = os.path.join(datadir, '..', 'vs30', 'vs30.grd')
+
+# vs30filename = '/Users/cbworden/Unix/ShakeMap/GlobalVs30/global_vs30_ca_waor_ut_jp_tw.grd'
+
+origin_obj = Origin.fromFile(eventfile)
+rupture_obj = read_rupture_file(origin_obj, rupturefile)
+
+rx = rupture_obj.getRuptureContext([gmpe])
+if rx.rake == None:
+    rx.rake = 0
+real_mag = rx.mag
+
+sites_obj_grid = Sites.fromCenter(
+        rx.hypo_lon, rx.hypo_lat, lonspan, latspan,
+        smdx, smdy, defaultVs30=760.0, vs30File=vs30filename,
+        vs30measured_grid=None, padding=False, resample=False
+    )
+
+smnx, smny = sites_obj_grid.getNxNy()
+
+t1 = time.time()
+stations = StationList.loadFromXML(xmlfiles, dbfile)
+
+
+
+#datadir = '/Users/cbworden/Unix/python/shakemap/tests/data/eventdata'
+#datadir = os.path.abspath(os.path.join(datadir, 'northridge', 'input'))
+#inputfile = os.path.join(datadir, 'hist_dat.xml')
+#dyfifile = os.path.join(datadir, 'dyfi_dat.xml')
+#xmlfiles = [inputfile, dyfifile]
+#
+#stations = stations.addData(xmlfiles)
+
+
+
+t2 = time.time()
+print('parse xml %f seconds' % (t2 - t1))
+#
+# df1 holds the instrumented data (PGA, PGV, SA)
+# df2 holds the non-instrumented data (MMI)
+#
+df1 = stations.getStationDataframe(1)
+df2 = stations.getStationDataframe(0)
+
+df_dict = {'df1' : df1, 'df2' : df2}
+
+#
+# Store the amps we're going to manipulate in a dictionary
+#
+# Ultimately for the amps in each data frame, the dictionary will hold:
+#   imt                   observed, converted, or derived amps
+#   imt_sd                uncertainty of the amps; zero for direct measurments, 
+#                         non-zero for others
+#   imt_pred              predicted amp on rock, bias applied
+#   imt_pred_sd           uncertainty of the predicted amp
+#   imt_pred_soil         predicted amp on soil, bias applied
+#   imt_pred_unbiased     predicted amp on soil, no bias
+#   imt_pred_unbiased_sd  uncertainty of the unbiased amp
+#   imt_site_amps         site amplification 
+#   imt_corrected         amp with the site amplification removed
+#
+# Also, get a list of the input IMTs
+#
+#ampdict = {'df1' : {}, 'df2' : {}}
+#imt_in_set = set()
+#for ndf, sdf, imtstr in imt_iter(df_dict):
+#    ampdict[ndf][imtstr] = np.array(sdf[imtstr])
+#    if imtstr == 'MMI':
+#        sdval = 0.3
+#    else:
+#        sdval = 0.0
+#    ampdict[ndf][imtstr + '_sd'] = np.full_like(ampdict[ndf][imtstr], sdval)
+#    imt_in_set.add(imtstr)
+
+#%%
+#
+# Set up the distance and site contexts for calling the GMPE and IPE
+#
+DISTANCES = get_distance_measures()
+
+stddev_types = [oqconst.StdDev.TOTAL]
+
+dx_dict = {'df1' : oqbase.DistancesContext(),
+           'df2' : oqbase.DistancesContext()}
+           
+sx_dict = {'rock' : {}, 'soil' : {}}
+rx.mag = real_mag
+
+for ndf, sdf in df_dict.items():
+#    if len(sdf) <= 0:
+#        continue
+    for method in DISTANCES:
+        (dx_dict[ndf].__dict__)[method] = np.array(sdf[method])
+    lldict = {'lats': np.array(sdf['lat']), 'lons': np.array(sdf['lon'])}
+    sx_dict['rock'][ndf] = sites_obj_grid.getSitesContext(lldict, 
+            rock_vs30=760.0)
+    sx_dict['soil'][ndf] = sites_obj_grid.getSitesContext(lldict)
+#%%
+#
+# Make all the derived pgms you can from MMI
+#
+if len(df2) > 0:
+    for gmice_imt in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
+        if imt.SA == gmice_imt:
+            iterlist = gmice.DEFINED_FOR_SA_PERIODS
+        else:
+            iterlist = [None]
+        for period in iterlist:
+            oqimt = gmice_imt(period)
+            ampdict['df2'][str(oqimt)], dummy = gmice.getGMfromMI(
+                    ampdict['df2']['MMI'], oqimt,
+                    dists=df2['rrup'], mag=real_mag)
+            ampdict['df2'][str(oqimt)][ampdict['df2']['MMI'] < 4.0] = np.nan
+            ampdict['df2'][str(oqimt) + '_sd'] = np.full(len(df2), 
+                   gmice.getMI2GMsd()[oqimt])
+            imt_in_set.add(str(oqimt))
+
+##
+## Now make derived MMI from the best available PGM; This is ugly and it
+## would be nice to have a more deterministic way of doing it
+##
+#imtstr = None
+#if 'PGV' in ampdict['df1'] and imt.PGV in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
+#    imtstr = 'PGV'
+#elif 'PGA' in ampdict['df1'] and imt.PGA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
+#    imtstr = 'PGA'
+#elif 'SA(1.0)' in ampdict['df1'] and imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES \
+#        and 1.0 in gmice.DEFINED_FOR_SA_PERIODS:
+#    imtstr = 'SA(1.0)'
+#elif 'SA(0.3)' in ampdict['df1'] and imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES \
+#        and 0.3 in gmice.DEFINED_FOR_SA_PERIODS:
+#    imtstr = 'SA(0.3)'
+#elif 'SA(3.0)' in ampdict['df1'] and imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES \
+#        and 3.0 in gmice.DEFINED_FOR_SA_PERIODS:
+#    imtstr = 'SA(3.0)'
+#
+#if imtstr is not None:
+#    oqimt = imt.from_string(imtstr)
+#    ampdict['df1']['MMI'], dummy = \
+#                      gmice.getMIfromGM(ampdict['df1'][imtstr], oqimt,
+#                      dists=df1['rrup'], mag=real_mag)
+#    ampdict['df1']['MMI_sd'] = np.full(len(df1), gmice.getGM2MIsd()[oqimt])
+#    imt_in_set.add('MMI')
+
+#
+# Get the unbiased predictions for all of the input imts 
+#
+rx.mag = real_mag
+for ndf, ampd in ampdict.items():
+    for imtstr in imt_in_set:
+        if imtstr not in ampd:
+            continue
+        oqimt = imt.from_string(imtstr)
+        pmean, psd = gmas(ipe, gmpe, sx_dict['soil'][ndf], rx, dx_dict[ndf], 
+                oqimt, stddev_types)
+        ampd[imtstr + '_pred_unbiased'] = pmean
+        ampd[imtstr + '_pred_unbiased_sd'] = psd[0]
+        
+    
+#%%
+#
+# Compute bias
+#
+eps6 = 1e-6
+
+bias_min = max(1.0, real_mag + bias_min_bias)
+bias_max = min(9.9, real_mag + bias_max_bias)
+
+outliers = {'df1' : np.full(len(df1), False, dtype=bool),
+            'df2' : np.full(len(df2), False, dtype=bool)}
+
+#
+# Store some parameters for the error function
+#
+bias_params = {'norm'  : bias_norm,
+               'range' : bias_max_range,
+               'dfd'   : df_dict,
+               'dxd'   : dx_dict,
+               'rx'    : rx,
+               'sxd'   : sx_dict['soil'],
+               'gmpe'  : gmpe,
+               'ipe'   : ipe,
+               'stddev': [oqconst.StdDev.TOTAL]
+              }
+
+#
+# Compute the bias; repeat until no new outliers are flagged
+#
+while True:   
+    #
+    # Get the (max) number of GM and MMI stations; here we only use the
+    # direct observations, not converted
+    #
+    mmi_nsta = 0
+    pgm_nsta = 0
+    for ndf, sdf, imtstr in imt_iter(df_dict):
+        inrange = np.array(sdf['rrup'] <= bias_max_range)
+        nsta = np.sum(~np.isnan(ampdict[ndf][imtstr][inrange]))
+        if imtstr == 'MMI':
+            mmi_nsta = nsta
+        else:
+            if nsta > pgm_nsta:
+                pgm_nsta = nsta    
+    #
+    # If there are sufficient stations, compute the magnitude bias
+    # This is implemented as a grid search in steps of 0.1 magnitude
+    # Here we only use the primary observations (not converted)
+    #    
+    if mmi_nsta + pgm_nsta >= bias_min_stations:
+        min_err = np.finfo(float).max
+        bias_mag = bias_min
+        
+        for bias in np.arange(bias_min, bias_max+eps6, 0.1):
+            err = bias_mfunc(bias, bias_params)
+            if err < min_err:
+                min_err = err
+                bias_mag = bias
+        if bias_mag > bias_min and bias_mag < bias_max:
+            isbiased = True
+        else:
+            print("Magnitude bias exceeded limits. Bias disabled.")
+            isbiased = False
+            bias_mag = real_mag
+    else:
+        print("Not enough stations to compute magnitude bias")
+        isbiased = False
+        bias_mag = real_mag
+    
+    print("Magnitude bias = %f" % (bias_mag - real_mag))
+    
+    #
+    # Do the bias for the individual IMTs
+    # Here we use both the primary and converted observations (if any),
+    # and weight them according to uncertainty (primary observations
+    # are given the nominal uncertainty of a prediction, converted
+    # observations are given the combined uncertainty of prediction plus
+    # conversion)
+    #
+    rx.mag = bias_mag    
+    bias = {}
+    net_pred_bias = {}
+    nnew = 0
+    for imtstr in imt_in_set:
+        oqimt = imt.from_string(imtstr)
+        pmean1, psd1 = gmas(ipe, gmpe, sx_dict['soil']['df1'], rx, 
+                dx_dict['df1'], oqimt, stddev_types)
+        pmean2, psd2 = gmas(ipe, gmpe, sx_dict['soil']['df2'], rx, 
+                dx_dict['df2'], oqimt, stddev_types)
+        bias[imtstr], tnnew = get_bias(imtstr, dx_dict, ampdict, pmean1, psd1,
+                pmean2, psd2, outliers, bias_max_range, bias_max_dsigma,
+                outlier_deviation_level, flagging=True)
+        nnew += tnnew
+        print("%s bias: %f" %(imtstr, bias[imtstr]))
+    #
+    # Now that we have a complete list of outlier stations,
+    # zap the outlying amps
+    #
+    for imtstr in imt_in_set:
+        if imtstr in ampdict['df1']:
+            ampdict['df1'][imtstr][outliers['df1']] = np.nan
+        if imtstr in ampdict['df2']:
+            ampdict['df2'][imtstr][outliers['df2']] = np.nan
+    #
+    # If there are no new flagged stations, then we're done
+    #
+    if nnew == 0:
+        break
+
+#%%
+#
+# Compute the site amplifications from the biased GMPE
+# Also collect up the predictions and stddev
+#
+if isbiased is True:
+    stddev_types = [oqconst.StdDev.INTRA_EVENT]
+else:
+    stddev_types = [oqconst.StdDev.TOTAL]
+
+rx.mag = bias_mag
+for imtstr in imt_in_set:
+    oqimt = imt.from_string(imtstr)
+    for ndf, sdf in df_dict.items():
+        if imtstr not in ampdict[ndf]:
+            continue
+        pmean_rock, psd = gmas(ipe, gmpe, sx_dict['rock'][ndf], rx, 
+                dx_dict[ndf], oqimt, stddev_types)
+        pmean_soil, psd = gmas(ipe, gmpe, sx_dict['soil'][ndf], rx, 
+                dx_dict[ndf], oqimt, stddev_types)
+        ampdict[ndf][imtstr + '_pred'] = pmean_rock + bias[imtstr]
+        ampdict[ndf][imtstr + '_pred_sd'] = psd[0]
+        ampdict[ndf][imtstr + '_pred_soil'] = pmean_soil + bias[imtstr]
+        ampdict[ndf][imtstr + '_site_amps'] = pmean_soil - pmean_rock
+        ampdict[ndf][imtstr + '_corrected'] = ampdict[ndf][imtstr] - \
+                ampdict[ndf][imtstr + '_site_amps']
+
+#%%
+#
+# Sort out the input and output SA periods and make any necessary data
+# using Jack Baker's Conditional Mean Spectrum modified for multiple
+# conditioning periods (T*) as described in the ShakeMap documentation
+#
+time4 = time.time()
+input_sa = { x : imt.from_string(x).period 
+            for x in filter(lambda x:'SA' in x, imt_in_set) }
+output_sa = { x : imt.from_string(x).period 
+             for x in filter(lambda x:'SA' in x, imt_out_set) }
+input_sa_set = set(input_sa.keys())
+output_sa_set = set(output_sa.keys())
+t_i_set = output_sa_set - input_sa_set
+t_i_sa = { x : imt.from_string(x).period 
+          for x in filter(lambda x:'SA' in x, t_i_set) }
+
+input_sa_ix = {}
+for ix, imtt in enumerate(input_sa_set):
+    input_sa_ix[imtt] = ix
+t_i_ix = {}
+for ix, imtt in enumerate(t_i_set):
+    t_i_ix[imtt] = ix
+
+n_tstar = len(input_sa)
+n_ti = len(t_i_set)
+
+#if n_ti > 0:
+#    sigma22 = np.empty((n_tstar, n_tstar))
+#    sigma12 = np.empty((n_ti, n_tstar))
+#    
+#    sigma22_corr = np.empty((n_tstar, n_tstar))
+#    sigma12_corr = np.empty((n_ti, n_tstar))
+#    
+#    for imtstar, tstar in input_sa.items():
+#        for imt2, t2 in input_sa.items():
+#            sigma22_corr[input_sa_ix[imt2], input_sa_ix[imtstar]] = \
+#                    baker_jayaram_correlation(tstar, t2)
+#        for imt2, t2 in t_i_sa.items():
+#            sigma12_corr[t_i_ix[imt2], input_sa_ix[imtstar]] = \
+#                    baker_jayaram_correlation(tstar, t2)
+#        
+#    mu_bar = {}
+#    sigma_bar = {}
+#    t_star_obs = {}
+#    t_star_pred = {}
+#    t_star_sigma = {}
+#    t_star_extra_sigma = {}
+#    t_i_pred = {}
+#    t_i_sigma = {}
+#    
+#    for ndf, ampd in ampdict.items():
+#        nx = len(sx_dict['rock'][ndf].vs30)
+#        mu_bar[ndf] = np.empty((n_ti, nx))
+#        sigma_bar[ndf] = np.empty((n_ti, nx))
+#        t_star_obs[ndf] = np.empty((n_tstar, nx))
+#        t_star_pred[ndf] = np.empty((n_tstar, nx))
+#        t_star_sigma[ndf] = np.empty((n_tstar, nx))
+#        t_star_extra_sigma[ndf] = np.empty((n_tstar, nx))
+#        t_i_pred[ndf] = np.empty((n_ti, nx))
+#        t_i_sigma[ndf] = np.empty((n_ti, nx))
+#        
+#    if isbiased is True:
+#        stddev_types = [oqconst.StdDev.INTRA_EVENT]
+#    else:
+#        stddev_types = [oqconst.StdDev.TOTAL]
+#    
+#    for imtstr, period in input_sa.items():
+#        for ndf, ampd in ampdict.items():
+#            if imtstr in ampd:
+#                t_star_obs[ndf][input_sa_ix[imtstr], :] = ampd[imtstr]
+#                t_star_pred[ndf][input_sa_ix[imtstr], :] = ampd[imtstr + '_pred_soil']
+#                t_star_sigma[ndf][input_sa_ix[imtstr], :] = ampd[imtstr + '_pred_sd']
+#                t_star_extra_sigma[ndf][input_sa_ix[imtstr], :] = ampd[imtstr + '_sd']
+#    
+#    for imtstr, period in t_i_sa.items():
+#        oqimt = imt.from_string(imtstr)
+#        for ndf, ampd in ampdict.items():
+#            #
+#            # Get the predicted amps for the new spectral period
+#            #
+#            rx.mag = real_mag
+#            pmu_unbiased, sigma_unbiased = gmas(ipe, gmpe, sx_dict['soil'][ndf], rx, 
+#                    dx_dict[ndf], oqimt, stddev_types)
+#            rx.mag = bias_mag
+#            pmu_rock, sigma = gmas(ipe, gmpe, sx_dict['rock'][ndf], rx, 
+#                    dx_dict[ndf], oqimt, stddev_types)
+#            pmu, sigma = gmas(ipe, gmpe, sx_dict['soil'][ndf], rx, 
+#                    dx_dict[ndf], oqimt, stddev_types)
+#            #
+#            # The usual stuff we need for the interpolation
+#            #
+#            ampd[imtstr + '_pred'] = pmu_rock
+#            ampd[imtstr + '_pred_sd'] = sigma[0]
+#            ampd[imtstr + '_pred_soil'] = pmu
+#            ampd[imtstr + '_pred_unbiased'] = pmu_unbiased
+#            ampd[imtstr + '_pred_unbiased_sd'] = sigma_unbiased[0]
+#            ampd[imtstr + '_site_amps'] = pmu - pmu_rock
+#            
+#            t_i_pred[ndf][t_i_ix[imtstr], :] = ampd[imtstr + '_pred_soil']
+#            t_i_sigma[ndf][t_i_ix[imtstr], :] = ampd[imtstr + '_pred_sd']
+#
+#    for ndf, ampd in ampdict.items():
+#        nx = len(sx_dict['rock'][ndf].vs30)
+#        for ig in range(nx):
+#            total_sta_sigma = np.sqrt(t_star_sigma[ndf][:, ig]**2 + 
+#                                      t_star_extra_sigma[ndf][:, ig]**2)
+#            corr_adjustment = t_star_sigma[ndf][:, ig] / total_sta_sigma
+#            corr_adjustment22 = corr_adjustment * corr_adjustment.reshape(-1, 1)
+#            np.fill_diagonal(corr_adjustment22, 1.0)
+#            temp_psigma = np.ones_like(sigma12)
+#            corr_adjustment12 = temp_psigma * corr_adjustment
+#            sigma22 = (t_star_sigma[ndf][:, ig] * t_star_sigma[ndf][:, ig].transpose()) \
+#                       * sigma22_corr * corr_adjustment22
+#            sigma12 = (t_i_sigma[ndf][:, ig] * t_star_sigma[ndf][:, ig].transpose()) \
+#                       * sigma12_corr * corr_adjustment12
+#            sigma22inv = np.linalg.pinv(sigma22)
+#            reg_mtx = sigma12.dot(sigma22inv)
+#            if np.any(np.isnan(t_star_obs[ndf][:, ig])):
+#                mu_bar[ndf][:, ig] = np.nan
+#                sigma_bar[ndf][:, ig] = np.nan
+#                continue
+#            mu_bar[ndf][:, ig] = t_i_pred[ndf][:, ig] + \
+#                    reg_mtx.dot(t_star_obs[ndf][:, ig] - t_star_pred[ndf][:, ig])
+#            sigma_bar[ndf][:, ig] = np.sqrt(
+#                    t_i_sigma[ndf][:, ig]**2 - np.diag(reg_mtx.dot(sigma12.transpose())))
+#                       
+#    for imtstr, period in t_i_sa.items():
+#        for ndf, ampd in ampdict.items():
+#            ampd[imtstr] = mu_bar[ndf][t_i_ix[imtstr], :]
+#            ampd[imtstr + '_corrected'] = ampd[imtstr] - ampd[imtstr + '_site_amps']
+#            ampd[imtstr + '_sd'] = sigma_bar[ndf][t_i_ix[imtstr], :]
+#    
+#    #
+#    # Find the bias of the derived amps; we don't flag any outliers here
+#    # because these are all derived from pre-flagged amps
+#    #
+#    for imtstr, period in t_i_sa.items():
+#        bias[imtstr], tnnew = get_bias(imtstr, dx_dict, ampdict, 
+#            ampdict['df1'][imtstr + '_pred_soil'] if imtstr in ampdict['df1'] else [], 
+#            ampdict['df1'][imtstr + '_pred_sd'] if imtstr in ampdict['df1'] else [],
+#            ampdict['df2'][imtstr + '_pred_soil'] if imtstr in ampdict['df2'] else [], 
+#            ampdict['df2'][imtstr + '_pred_sd'] if imtstr in ampdict['df2'] else [], 
+#            outliers, bias_max_range, bias_max_dsigma,
+#            outlier_deviation_level, flagging=False)
+#        for ndf, ampd in ampdict.items():
+#            if imtstr not in ampd:
+#                continue
+#            ampd[imtstr + '_pred'] += bias[imtstr]
+#            ampd[imtstr + '_pred_soil'] += bias[imtstr]
+#            
+#        print("%s bias: %f" %(imtstr, bias[imtstr]))
+# 
+#print('Time for CMS=%f' % (time.time() - time4))
+
+#%%
+#
+# Interpolate using the Conditioned Multivariate Normal Distribution
+#
+sx_grid_soil = sites_obj_grid.getSitesContext()
+sx_grid_rock = sites_obj_grid.getSitesContext(rock_vs30=760.0)
+lons, lats = np.meshgrid(sx_grid_rock.lons, sx_grid_rock.lats)
+lons = np.flipud(lons)
+lats = np.flipud(lats)
+depths = np.zeros_like(lats)
+
+lons_rad = np.radians(lons)
+lats_rad = np.radians(lats)
+
+time1 = time.time()
+
+dist_obj_grid = Distance.fromSites(gmpe, sites_obj_grid, rupture_obj)
+dx_grid = dist_obj_grid.getDistanceContext()
+
+print('time for distance computation=%f' % (time.time() - time1))
+
+rx.mag = bias_mag
+
+if isbiased is True:
+    stddev_types = [oqconst.StdDev.INTRA_EVENT]
+else:
+    stddev_types = [oqconst.StdDev.TOTAL]
+
+outgrid = {}
+outsd = {}
+outgrid_rock = {}
+
+# Find sigma22
+
+for imtstr in ['SA(1.0)', 'SA(2.0)', 'PGA', 'MMI']:
+#for imtstr in imt_out_set:
+#for imtstr in ['MMI']:
+    time1 = time.time()
+    ptime = time.time()
+    oqimt = imt.from_string(imtstr)
+    if 'PGA' in oqimt:
+        outperiod = 0.011
+    elif 'PGV' in oqimt or 'MMI' in oqimt:
+        outperiod = 1.0
+    else:
+        outperiod = oqimt.period
+    #
+    # Compute the predicted grid for this IMT on soil and
+    # rock, and compute the site amplifications
+    #
+    pgrid_mean_soil, pgrid_sd = gmas(ipe, gmpe, sx_grid_soil, rx, 
+                                     dx_grid, oqimt, stddev_types)
+    pgrid_mean_rock, pgrid_sd = gmas(ipe, gmpe, sx_grid_rock, rx, 
+                                     dx_grid, oqimt, stddev_types)
+    site_amps_grid = pgrid_mean_soil - pgrid_mean_rock
+    pgrid_sd = pgrid_sd[0]
+    pgrid_sd2 = np.power(pgrid_sd, 2.0)
+    #
+    # Initialize the output grids with the predictions/weights
+    #
+    if imtstr in bias:
+        pgrid_mean_rock += bias[imtstr]
+    ampgrid = np.zeros_like(pgrid_mean_rock)
+    sdgrid = np.zeros_like(pgrid_mean_rock)
+    sta_lons = []
+    sta_lats = []
+    sta_resids = []
+    sta_sigs = []
+    sta_sigs_total = []
+    sta_period = []
+    for ndf, sdf in df_dict.items():
+        for imtin in imt_in_set:
+            if imtin not in ampdict[ndf]:
+                continue
+            oqimtin = imt.from_string(imtin)
+            if 'PGA' in oqimtin:
+                inperiod = 0.011
+            elif 'PGV' in oqimtin or 'MMI' in oqimtin:
+                inperiod = 1.0
+            else:
+                inperiod = oqimtin.period
+            sidx = 0
+            for dfidx, row in sdf.iterrows():
+                amp, zdsig = get_amp(ampdict[ndf], sidx, imtin)
+                if not np.isfinite(amp):
+                    sidx += 1
+                    continue
+                sta_lons.append(row['lon'])
+                sta_lats.append(row['lat'])
+                sta_resids.append(amp - ampdict[ndf][imtin + '_pred'][sidx])
+                sta_sigs.append(ampdict[ndf][imtin + '_pred_sd'][sidx])
+                sta_sigs_total.append(np.sqrt(ampdict[ndf][imtin + '_pred_sd'][sidx]**2 + zdsig**2))
+                sta_period.append(inperiod)
+                sidx += 1
+    if len(sta_lons) == 0:
+        outgrid[imtstr] = pgrid_mean_soil
+        outgrid_rock[imtstr] = pgrid_mean_rock
+        outsd[imtstr] = pgrid_sd
+        continue
+
+    sta_lons = np.array(sta_lons).reshape((-1, 1))
+    sta_lats = np.array(sta_lats).reshape((-1, 1))
+    sta_sigs = np.array(sta_sigs).reshape((-1, 1))
+    sta_sigs_total = np.array(sta_sigs_total).reshape((-1, 1))
+    sta_resids = np.array(sta_resids).reshape((-1, 1))
+    sta_period = np.array(sta_period).reshape((-1, 1))
+    sta_lons_rad = np.radians(sta_lons)
+    sta_lats_rad = np.radians(sta_lats)
+    corr_adjustment = (sta_sigs / sta_sigs_total)
+    corr_adjustment12 = corr_adjustment * np.ones((1, smnx))
+    corr_adjustment22 = corr_adjustment * corr_adjustment.transpose()
+    np.fill_diagonal(corr_adjustment22, 1.0)
+    dist22 = geodetic_distance(sta_lons_rad, sta_lats_rad, 
+            np.transpose(sta_lons_rad), np.transpose(sta_lats_rad))
+    d22_rows, d22_cols = np.shape(dist22)
+    t1_22 = np.tile(sta_period, (1, d22_cols))
+    t2_22 = np.tile(sta_period.transpose(), (d22_rows, 1))
+    corr22 = scf.getCorrelation(t1_22, t2_22, dist22) * corr_adjustment22
+    sigma22 = corr22 * (sta_sigs * np.transpose(sta_sigs))
+    sigma22inv = np.linalg.pinv(sigma22)
+    dtime = 0
+    mtime = 0
+    ddtime = 0
+    ctime = stime = atime = 0
+    print('prep time =%f' % (time.time() - ptime))
+    for iy in range(smny):
+        time4 = time.time()
+        dist12 = geodetic_distance(lons_rad[iy, :], lats_rad[iy, :],
+                                   sta_lons_rad, sta_lats_rad)  # 0.82 sec
+        d12_rows, d12_cols = np.shape(dist12)
+        t1_12 = np.tile(sta_period, (1, d12_cols))
+        t2_12 = np.full_like(dist12, outperiod)
+        ddtime += time.time() - time4
+        time4 = time.time()
+        corr12 = scf.getCorrelation(t1_12, t2_12, dist12)   # 1.16 sec
+        ctime += time.time() - time4
+        time4 = time.time()
+        psd = pgrid_sd[iy, :]
+        sigma12 =  ne.evaluate("corr12 * corr_adjustment12 * (sta_sigs * psd)").transpose() # 0.46 sec
+        stime += time.time() - time4
+        
+        time4 = time.time()
+        rcmatrix = sigma12.dot(sigma22inv) # 2.52 sec
+        dtime += time.time() - time4
+      
+        time4 = time.time()
+        ampgrid[iy, :] = pgrid_mean_rock[iy, :] + \
+                ((corr_adjustment12.transpose() * rcmatrix).dot(sta_resids)).reshape((-1,)) # 0.07 sec
+        atime += time.time() - time4
+        time4 = time.time()
+#        sdgrid[iy, :] = pgrid_sd2[iy, :] - np.diag(rcmatrix.dot(sigma12))  # 2.66 sec
+        sdgrid[iy, :] = pgrid_sd2[iy, :] - \
+                np.sum(rcmatrix * sigma12, axis=1)  # 0.80 sec
+        mtime += time.time() - time4
+        
+    outgrid[imtstr] = ampgrid + site_amps_grid
+    outgrid_rock[imtstr] = ampgrid
+    sdgrid[sdgrid < 0] = 0
+    outsd[imtstr] = np.sqrt(sdgrid)
+    print('time for %s distance=%f' % (imtstr, ddtime))
+    print('time for %s correlation=%f' % (imtstr, ctime))
+    print('time for %s sigma=%f' % (imtstr, stime))
+    print('time for %s rcmatrix=%f' % (imtstr, dtime))
+    print('time for %s amp calc=%f' % (imtstr, atime))
+    print('time for %s sd calc=%f' % (imtstr, mtime))
+    print('total time for %s=%f' % (imtstr, time.time() - time1))
+    
+    gmtgrd = GMTGrid(outgrid_rock[imtstr], sites_obj_grid.getVs30Grid().getGeoDict())
+    gmtgrd.save('/Users/cbworden/Unix/python/shakemap/data/%s_%s_rock.grd' % (event, imtstr))
+    
+    gmtgrd = GMTGrid(outgrid[imtstr], sites_obj_grid.getVs30Grid().getGeoDict())
+    gmtgrd.save('/Users/cbworden/Unix/python/shakemap/data/%s_%s.grd' % (event, imtstr))
+    
+    gmtgrd = GMTGrid(outsd[imtstr], sites_obj_grid.getVs30Grid().getGeoDict())
+    gmtgrd.save('/Users/cbworden/Unix/python/shakemap/data/%s_%s_sd.grd' % (event, imtstr))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    

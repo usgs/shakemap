@@ -1,0 +1,1720 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE stationlist [
+<!ELEMENT stationlist (station+)>
+<!ATTLIST stationlist
+  created	CDATA	#REQUIRED
+>
+
+<!ELEMENT station (comp+)>
+<!ATTLIST station
+  code		CDATA 			#REQUIRED
+  name		CDATA 			#REQUIRED
+  insttype	CDATA 			#REQUIRED
+  lat		CDATA 			#REQUIRED
+  lon		CDATA 			#REQUIRED
+  source	(SCSN|CGS|NSMP) 	'SCSN'
+  commtype	(DIG|ANA) 		'DIG'
+  dist          CDATA                   '10.0'
+  loc		CDATA			''
+>
+
+<!ELEMENT comp (acc,vel,psa*)>
+<!ATTLIST comp
+  name          CDATA  #REQUIRED
+  originalname  CDATA  #IMPLIED
+>
+
+<!ELEMENT acc EMPTY>
+<!ELEMENT vel EMPTY>
+<!ELEMENT psa03 EMPTY>
+<!ELEMENT psa10 EMPTY>
+<!ELEMENT psa30 EMPTY>
+<!ATTLIST acc
+  value  CDATA         #REQUIRED
+  flag   CDATA        ''
+>
+<!ATTLIST vel
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa03
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa10
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa30
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+]>
+<stationlist created="1056046245">
+<station code="12A" name="ELIZABETH LAKE" insttype="UNK" lat="34.571" lon="-118.56" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="25.7635"/>
+<vel value="11.5680" />
+<psa03 value="39.1546"/>
+<psa10 value="7.9478" />
+<psa30 value="3.0082" />
+</comp>
+</station>
+<station code="AHM" name="ANAHEIM" insttype="UNK" lat="33.817" lon="-117.95" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.8151" />
+<vel value="7.8600" />
+<psa03 value="26.7447" />
+<psa10 value="11.9419" />
+<psa30 value="1.8547" />
+</comp>
+</station>
+<station code="ALF" name="ALHAMBRA" insttype="UNK" lat="34.070" lon="-118.15" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.0995" />
+<vel value="10.8040" />
+<psa03 value="18.1406" />
+<psa10 value="13.4125" />
+<psa30 value="2.2415" />
+</comp>
+</station>
+<station code="ANB" name="ANTELOPE BUTTES" insttype="UNK" lat="34.758" lon="-118.36" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="6.8251" />
+<vel value="3.9785" />
+<psa03 value="11.6458" />
+<psa10 value="5.1073" />
+<psa30 value="1.3681" />
+</comp>
+</station>
+<station code="ANI" name="ANACAPA ISLAND" insttype="UNK" lat="34.016" lon="-119.36" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="6.7218" />
+<vel value="3.2388" />
+<psa03 value="17.2751" />
+<psa10 value="3.4342" />
+<psa30 value="0.3575" />
+</comp>
+</station>
+<station code="ANV" name="ANAVERDE VALLEY" insttype="UNK" lat="34.580" lon="-118.20" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="6.0271" />
+<vel value="5.4765" />
+<psa03 value="16.5173" />
+<psa10 value="14.8905" />
+<psa30 value="1.7284" />
+</comp>
+</station>
+<station code="ARC" name="ARCADIA" insttype="UNK" lat="34.130" lon="-118.04" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="12.3700" />
+<vel value="7.6848" />
+<psa03 value="45.9408" />
+<psa10 value="13.8033" />
+<psa30 value="3.7179" />
+</comp>
+</station>
+<station code="BAD" name="BREA DAM" insttype="UNK" lat="33.890" lon="-117.93" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="24.5953" />
+<vel value="16.4790" />
+<psa03 value="60.0760" />
+<psa10 value="13.1455" />
+<psa30 value="1.6233" />
+</comp>
+</station>
+<station code="BAP" name="BUENA PARK" insttype="UNK" lat="33.847" lon="-118.02" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="15.6279" />
+<vel value="10.0580" />
+<psa03 value="34.1726" />
+<psa10 value="13.6166" />
+<psa30 value="2.4669" />
+</comp>
+</station>
+<station code="BCY" name="BURBANK" insttype="UNK" lat="34.204" lon="-118.30" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="16.6524" />
+<vel value="11.1880" />
+<psa03 value="51.2835" />
+<psa10 value="8.9669" />
+<psa30 value="2.2972" />
+</comp>
+</station>
+<station code="BGC" name="BELL GARDENS" insttype="UNK" lat="33.965" lon="-118.16" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.5729" />
+<vel value="8.4260" />
+<psa03 value="20.7441" />
+<psa10 value="16.8193" />
+<psa30 value="2.5660" />
+</comp>
+</station>
+<station code="BHA" name="LOS ANGELES" insttype="UNK" lat="34.009" lon="-118.36" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="23.8716" />
+<vel value="17.4430" />
+<psa03 value="66.7434" />
+<psa10 value="16.4307" />
+<psa30 value="6.9722" />
+</comp>
+</station>
+<station code="BPK" name="BALDWIN PARK" insttype="UNK" lat="34.100" lon="-117.97" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="14.1835" />
+<vel value="6.7115" />
+<psa03 value="24.3732" />
+<psa10 value="5.8310" />
+<psa30 value="1.6922" />
+</comp>
+</station>
+<station code="BTS" name="BIG TUJUNGA STATION" insttype="UNK" lat="34.286" lon="-118.22" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="26.4495" />
+<vel value="13.6010" />
+<psa03 value="61.0987" />
+<psa10 value="18.4470" />
+<psa30 value="1.0856" />
+</comp>
+</station>
+<station code="CAS" name="CARSON" insttype="UNK" lat="33.812" lon="-118.27" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.1572" />
+<vel value="8.3202" />
+<psa03 value="19.3949" />
+<psa10 value="5.6941" />
+<psa30 value="1.5546" />
+</comp>
+</station>
+<station code="CBP" name="COVINA" insttype="UNK" lat="34.087" lon="-117.92" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.9052" />
+<vel value="7.3732" />
+<psa03 value="23.4730" />
+<psa10 value="9.8629" />
+<psa30 value="1.9781" />
+</comp>
+</station>
+<station code="CCS" name="COVINA" insttype="UNK" lat="34.078" lon="-117.87" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.7069" />
+<vel value="7.1771" />
+<psa03 value="23.6142" />
+<psa10 value="8.3454" />
+<psa30 value="2.0958" />
+</comp>
+</station>
+<station code="CCY" name="CANYON COUNTRY" insttype="UNK" lat="34.419" lon="-118.43" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="49.2069" />
+<vel value="46.4060" />
+<psa03 value="120.5522" />
+<psa10 value="67.2938" />
+<psa30 value="10.7753" />
+</comp>
+</station>
+<station code="CDA" name="CARSON" insttype="UNK" lat="33.836" lon="-118.24" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="9.4851" />
+<vel value="8.6261" />
+<psa03 value="29.9490" />
+<psa10 value="12.5068" />
+<psa30 value="2.7190" />
+</comp>
+</station>
+<station code="CMO" name="CAMARILLO" insttype="UNK" lat="34.208" lon="-119.08" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="12.4608" />
+<vel value="11.6200" />
+<psa03 value="30.3176" />
+<psa10 value="19.1582" />
+<psa30 value="6.6858" />
+</comp>
+</station>
+<station code="CND" name="CARBON CANYON DAM" insttype="UNK" lat="33.914" lon="-117.84" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="18.6035" />
+<vel value="15.0680" />
+<psa03 value="41.1010" />
+<psa10 value="13.2834" />
+<psa30 value="0.9619" />
+</comp>
+</station>
+<station code="COM" name="COMPTON" insttype="UNK" lat="33.899" lon="-118.20" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="13.0204" />
+<vel value="8.8038" />
+<psa03 value="31.9070" />
+<psa10 value="10.2298" />
+<psa30 value="3.1216" />
+</comp>
+</station>
+<station code="CPC" name="CANOGA PARK" insttype="UNK" lat="34.212" lon="-118.61" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="41.2314" />
+<vel value="65.8160" />
+<psa03 value="111.3202" />
+<psa10 value="51.5932" />
+<psa30 value="14.4351" />
+</comp>
+</station>
+<station code="DOW" name="DOWNEY" insttype="UNK" lat="33.924" lon="-118.17" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="22.2671" />
+<vel value="12.7030" />
+<psa03 value="64.3617" />
+<psa10 value="15.3448" />
+<psa30 value="3.1532" />
+</comp>
+</station>
+<station code="DUA" name="DUARTE" insttype="UNK" lat="34.150" lon="-117.94" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="8.3211" />
+<vel value="3.8546" />
+<psa03 value="15.6149" />
+<psa10 value="4.1001" />
+<psa30 value="1.4704" />
+</comp>
+</station>
+<station code="DWY" name="DOWNEY" insttype="UNK" lat="33.920" lon="-118.14" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="16.9684" />
+<vel value="11.4780" />
+<psa03 value="40.9515" />
+<psa10 value="11.9542" />
+<psa30 value="2.7083" />
+</comp>
+</station>
+<station code="ECC" name="NONE" insttype="UNK" lat="34.260" lon="-118.34" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="21.7920" />
+<vel value="25.0210" />
+<psa03 value="60.6416" />
+<psa10 value="40.9646" />
+<psa30 value="5.3483" />
+</comp>
+</station>
+<station code="ELD" name="NONE" insttype="UNK" lat="34.560" lon="-118.63" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="34.9888" />
+<vel value="28.3910" />
+<psa03 value="147.3299" />
+<psa10 value="25.2063" />
+<psa30 value="6.8669" />
+</comp>
+</station>
+<station code="ELZ" name="ELIZABETH LAKE" insttype="UNK" lat="34.662" lon="-118.39" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="15.4771" />
+<vel value="7.9809" />
+<psa03 value="47.3919" />
+<psa10 value="11.1900" />
+<psa30 value="1.7038" />
+</comp>
+</station>
+<station code="EMC" name="EL MONTE" insttype="UNK" lat="34.093" lon="-118.02" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="16.5270" />
+<vel value="11.7280" />
+<psa03 value="41.2851" />
+<psa10 value="11.0339" />
+<psa30 value="6.3820" />
+</comp>
+</station>
+<station code="ENC" name="ENCINO" insttype="UNK" lat="34.150" lon="-118.51" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="20.1662" />
+<vel value="22.2690" />
+<psa03 value="104.2883" />
+<psa10 value="19.6701" />
+<psa30 value="4.5301" />
+</comp>
+</station>
+<station code="FYP" name="FEATHERLY PARK" insttype="UNK" lat="33.869" lon="-117.71" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.4149" />
+<vel value="7.6620" />
+<psa03 value="33.6975" />
+<psa10 value="9.6510" />
+<psa30 value="0.7526" />
+</comp>
+</station>
+<station code="GGS" name="GARDEN GROVE" insttype="UNK" lat="33.790" lon="-118.01" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="11.0999" />
+<vel value="12.8010" />
+<psa03 value="56.8889" />
+<psa10 value="13.2894" />
+<psa30 value="3.7701" />
+</comp>
+</station>
+<station code="GLF" name="GLENDALE" insttype="UNK" lat="34.200" lon="-118.23" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="39.5331" />
+<vel value="11.2050" />
+<psa03 value="74.4439" />
+<psa10 value="6.4306" />
+<psa30 value="1.6691" />
+</comp>
+</station>
+<station code="GMC" name="GLENDORA" insttype="UNK" lat="34.137" lon="-117.88" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="9.7720" />
+<vel value="4.7704" />
+<psa03 value="27.1383" />
+<psa10 value="6.2382" />
+<psa30 value="1.3167" />
+</comp>
+</station>
+<station code="GPK" name="LOS ANGELES" insttype="UNK" lat="34.118" lon="-118.30" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="28.7166" />
+<vel value="26.3460" />
+<psa03 value="52.0791" />
+<psa10 value="36.1781" />
+<psa30 value="2.6409" />
+</comp>
+</station>
+<station code="GVR" name="GARVEY RESERVOIR" insttype="UNK" lat="34.050" lon="-118.11" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="17.7859" />
+<vel value="10.4980" />
+<psa03 value="70.5883" />
+<psa10 value="10.8669" />
+<psa30 value="1.6278" />
+</comp>
+</station>
+<station code="HBL" name="HUNTINGTON BEACH" insttype="UNK" lat="33.662" lon="-118.00" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="9.0611" />
+<vel value="5.6300" />
+<psa03 value="22.1169" />
+<psa10 value="8.8146" />
+<psa30 value="2.1164" />
+</comp>
+</station>
+<station code="HBS" name="HUNTINGTON BEACH" insttype="UNK" lat="33.727" lon="-118.04" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="9.3909" />
+<vel value="7.8989" />
+<psa03 value="20.9056" />
+<psa10 value="6.7158" />
+<psa30 value="3.0442" />
+</comp>
+</station>
+<station code="HLC" name="HOLLYWOOD" insttype="UNK" lat="34.088" lon="-118.36" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="26.2650" />
+<vel value="28.5010" />
+<psa03 value="48.5239" />
+<psa10 value="59.9133" />
+<psa30 value="5.3975" />
+</comp>
+</station>
+<station code="HRA" name="HEMET" insttype="UNK" lat="33.731" lon="-117.02" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="6.3769" />
+<vel value="4.7148" />
+<psa03 value="18.1346" />
+<psa10 value="4.0218" />
+<psa30 value="0.3796" />
+</comp>
+</station>
+<station code="HSL" name="LOS ANGELES" insttype="UNK" lat="34.090" lon="-118.34" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="38.8777" />
+<vel value="22.2590" />
+<psa03 value="69.3399" />
+<psa10 value="45.4153" />
+<psa30 value="5.3323" />
+</comp>
+</station>
+<station code="HUB" name="HUNTINGTON BEACH" insttype="UNK" lat="33.697" lon="-118.02" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="11.9694" />
+<vel value="11.3610" />
+<psa03 value="34.0119" />
+<psa10 value="11.8056" />
+<psa30 value="2.2634" />
+</comp>
+</station>
+<station code="IGU" name="INGLEWOOD" insttype="UNK" lat="33.905" lon="-118.28" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.1113" />
+<vel value="10.2130" />
+<psa03 value="21.3048" />
+<psa10 value="12.7699" />
+<psa30 value="2.9153" />
+</comp>
+</station>
+<station code="IRM" name="IRVINE" insttype="UNK" lat="33.682" lon="-117.84" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.4302" />
+<vel value="6.6519" />
+<psa03 value="23.5328" />
+<psa10 value="8.0866" />
+<psa30 value="2.2559" />
+</comp>
+</station>
+<station code="IRV" name="IRVINE" insttype="UNK" lat="33.656" lon="-117.86" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="6.2781" />
+<vel value="5.1163" />
+<psa03 value="14.4845" />
+<psa10 value="7.4774" />
+<psa30 value="1.2159" />
+</comp>
+</station>
+<station code="JFP" name="JENSEN FILTER PLANT" insttype="UNK" lat="34.309" lon="-118.50" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="84.2283" />
+<vel value="83.9950" />
+<psa03 value="186.4919" />
+<psa10 value="150.3137" />
+<psa30 value="35.6260" />
+</comp>
+</station>
+<station code="L01" name="LAKE HUGHES STA 1" insttype="UNK" lat="34.674" lon="-118.43" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="8.6526" />
+<vel value="9.3378" />
+<psa03 value="25.0578" />
+<psa10 value="23.3116" />
+<psa30 value="1.5965" />
+</comp>
+</station>
+<station code="L09" name="LAKE HUGHES STA 9A" insttype="UNK" lat="34.608" lon="-118.56" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="22.5505" />
+<vel value="13.1550" />
+<psa03 value="47.0708" />
+<psa10 value="3.2533" />
+<psa30 value="1.9816" />
+</comp>
+</station>
+<station code="L4N" name="LAKE HUGHES" insttype="UNK" lat="34.650" lon="-118.48" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="8.4034" />
+<vel value="5.9764" />
+<psa03 value="25.3881" />
+<psa10 value="8.3996" />
+<psa30 value="1.1180" />
+</comp>
+</station>
+<station code="LAD" name="NONE" insttype="UNK" lat="34.300" lon="-118.48" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="36.2752" />
+<vel value="68.5730" />
+<psa03 value="88.5440" />
+<psa10 value="70.3147" />
+<psa30 value="18.3110" />
+</comp>
+</station>
+<station code="LAS" name="LOS ANGELES" insttype="UNK" lat="33.929" lon="-118.26" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="19.7890" />
+<vel value="15.6690" />
+<psa03 value="30.5894" />
+<psa10 value="15.1689" />
+<psa30 value="3.3085" />
+</comp>
+</station>
+<station code="LBG" name="LONG BEACH" insttype="UNK" lat="33.768" lon="-118.20" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="5.1112" />
+<vel value="4.9672" />
+<psa03 value="15.5026" />
+<psa10 value="6.4881" />
+<psa30 value="2.4889" />
+</comp>
+</station>
+<station code="LBL" name="LONG BEACH" insttype="UNK" lat="33.840" lon="-118.19" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="6.9260" />
+<vel value="8.1153" />
+<psa03 value="21.8249" />
+<psa10 value="11.4370" />
+<psa30 value="2.4108" />
+</comp>
+</station>
+<station code="LBM" name="LOS ANGELES" insttype="UNK" lat="33.996" lon="-118.16" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="26.5280" />
+<vel value="17.1610" />
+<psa03 value="76.2389" />
+<psa10 value="15.1260" />
+<psa30 value="1.7500" />
+</comp>
+</station>
+<station code="LCA" name="LA CRESCENTA" insttype="UNK" lat="34.238" lon="-118.25" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="23.1794" />
+<vel value="13.4970" />
+<psa03 value="36.2886" />
+<psa10 value="14.4162" />
+<psa30 value="1.2194" />
+</comp>
+</station>
+<station code="LCE" name="LOS ANGELES" insttype="UNK" lat="33.946" lon="-118.39" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="18.2273" />
+<vel value="38.4820" />
+<psa03 value="32.1034" />
+<psa10 value="26.1365" />
+<psa30 value="14.9395" />
+</comp>
+</station>
+<station code="LCI" name="LOS ANGELES" insttype="UNK" lat="34.053" lon="-118.17" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="31.6116" />
+<vel value="14.0270" />
+<psa03 value="73.2341" />
+<psa10 value="16.7558" />
+<psa30 value="2.2036" />
+</comp>
+</station>
+<station code="LCN" name="LOS ANGELES" insttype="UNK" lat="34.063" lon="-118.42" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="25.5515" />
+<vel value="25.0400" />
+<psa03 value="59.1259" />
+<psa10 value="42.4032" />
+<psa30 value="8.1861" />
+</comp>
+</station>
+<station code="LCT" name="LOS ANGELES" insttype="UNK" lat="34.063" lon="-118.42" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="21.9755" />
+<vel value="28.1080" />
+<psa03 value="46.0911" />
+<psa10 value="35.6286" />
+<psa30 value="5.6123" />
+</comp>
+</station>
+<station code="LDH" name="NONE" insttype="UNK" lat="34.082" lon="-118.30" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="44.8389" />
+<vel value="24.8930" />
+<psa03 value="119.0191" />
+<psa10 value="20.1915" />
+<psa30 value="2.2087" />
+</comp>
+</station>
+<station code="LDS" name="LOS ANGELES" insttype="UNK" lat="34.088" lon="-118.22" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="22.4567" />
+<vel value="16.3350" />
+<psa03 value="38.5746" />
+<psa10 value="16.9704" />
+<psa30 value="1.9765" />
+</comp>
+</station>
+<station code="LF1" name="LOS ANGELES" insttype="UNK" lat="34.115" lon="-118.24" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="25.6147" />
+<vel value="25.4090" />
+<psa03 value="42.0163" />
+<psa10 value="22.7070" />
+<psa30 value="3.1154" />
+</comp>
+</station>
+<station code="LF2" name="LOS ANGELES" insttype="UNK" lat="34.111" lon="-118.19" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="17.0622" />
+<vel value="9.9555" />
+<psa03 value="32.2508" />
+<psa10 value="11.5991" />
+<psa30 value="2.0350" />
+</comp>
+</station>
+<station code="LF3" name="PACIFIC PALISADES" insttype="UNK" lat="34.042" lon="-118.55" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="49.1050" />
+<vel value="34.3610" />
+<psa03 value="125.4073" />
+<psa10 value="19.2542" />
+<psa30 value="4.4541" />
+</comp>
+</station>
+<station code="LF5" name="LOS ANGELES" insttype="UNK" lat="34.127" lon="-118.40" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="65.4404" />
+<vel value="32.8060" />
+<psa03 value="170.9613" />
+<psa10 value="36.5563" />
+<psa30 value="4.8869" />
+</comp>
+</station>
+<station code="LF6" name="LOS ANGELES" insttype="UNK" lat="34.132" lon="-118.44" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="50.7370" />
+<vel value="70.3800" />
+<psa03 value="131.2033" />
+<psa10 value="108.0578" />
+<psa30 value="11.2359" />
+</comp>
+</station>
+<station code="LHO" name="LA HABRA" insttype="UNK" lat="33.921" lon="-117.97" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="21.8186" />
+<vel value="11.2970" />
+<psa03 value="52.7902" />
+<psa10 value="13.5825" />
+<psa30 value="1.8036" />
+</comp>
+</station>
+<station code="LND" name="LAWNDALE" insttype="UNK" lat="33.896" lon="-118.38" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="18.8298" />
+<vel value="13.3980" />
+<psa03 value="31.0774" />
+<psa10 value="12.6886" />
+<psa30 value="3.6564" />
+</comp>
+</station>
+<station code="LNF" name="LANCASTER" insttype="UNK" lat="34.739" lon="-118.21" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="8.1341" />
+<vel value="7.0304" />
+<psa03 value="16.4840" />
+<psa10 value="12.3026" />
+<psa30 value="1.5510" />
+</comp>
+</station>
+<station code="LPK" name="POINT MUGU" insttype="UNK" lat="34.109" lon="-119.07" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="22.2936" />
+<vel value="18.9920" />
+<psa03 value="81.4818" />
+<psa10 value="11.1413" />
+<psa30 value="0.7694" />
+</comp>
+</station>
+<station code="LPS" name="LOS ANGELES" insttype="UNK" lat="34.043" lon="-118.27" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="18.6147" />
+<vel value="14.2370" />
+<psa03 value="23.3015" />
+<psa10 value="14.6688" />
+<psa30 value="3.4137" />
+</comp>
+</station>
+<station code="LPU" name="LOS ANGELES" insttype="UNK" lat="34.040" lon="-118.44" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="52.4047" />
+<vel value="77.3650" />
+<psa03 value="80.0669" />
+<psa10 value="145.8586" />
+<psa30 value="14.6254" />
+</comp>
+</station>
+<station code="LRB" name="LITTLEROCK" insttype="UNK" lat="34.486" lon="-117.98" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.1975" />
+<vel value="6.2798" />
+<psa03 value="18.9744" />
+<psa10 value="14.6478" />
+<psa30 value="1.5221" />
+</comp>
+</station>
+<station code="LRP" name="LITTLEROCK" insttype="UNK" lat="34.521" lon="-117.99" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="16.6718" />
+<vel value="7.8532" />
+<psa03 value="35.8092" />
+<psa10 value="21.7517" />
+<psa30 value="1.1716" />
+</comp>
+</station>
+<station code="LSS" name="LOS ANGELES" insttype="UNK" lat="34.046" lon="-118.36" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="49.0612" />
+<vel value="43.1740" />
+<psa03 value="121.7127" />
+<psa10 value="50.8829" />
+<psa30 value="4.1802" />
+</comp>
+</station>
+<station code="LST" name="LOS ANGELES" insttype="UNK" lat="34.045" lon="-118.30" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="18.2875" />
+<vel value="14.8190" />
+<psa03 value="39.8018" />
+<psa10 value="18.7653" />
+<psa30 value="4.3671" />
+</comp>
+</station>
+<station code="LTH" name="LOS ANGELES" insttype="UNK" lat="34.059" lon="-118.25" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="18.3598" />
+<vel value="20.0050" />
+<psa03 value="43.6646" />
+<psa10 value="21.4860" />
+<psa30 value="3.2210" />
+</comp>
+</station>
+<station code="LUH" name="LOS ANGELES" insttype="UNK" lat="34.062" lon="-118.20" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="49.2691" />
+<vel value="31.0570" />
+<psa03 value="100.9701" />
+<psa10 value="22.0871" />
+<psa30 value="2.0195" />
+</comp>
+</station>
+<station code="LV1" name="LEONA VALLEY STA A" insttype="UNK" lat="34.594" lon="-118.24" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="8.8857" />
+<vel value="7.8135" />
+<psa03 value="18.5680" />
+<psa10 value="14.9761" />
+<psa30 value="2.1805" />
+</comp>
+</station>
+<station code="LV2" name="LEONA VALLEY STA B" insttype="UNK" lat="34.595" lon="-118.24" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="9.1025" />
+<vel value="7.5798" />
+<psa03 value="14.0876" />
+<psa10 value="15.5387" />
+<psa30 value="2.1982" />
+</comp>
+</station>
+<station code="LV3" name="LEONA VALLEY STA C" insttype="UNK" lat="34.596" lon="-118.24" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.5831" />
+<vel value="8.5887" />
+<psa03 value="16.6304" />
+<psa10 value="17.8756" />
+<psa30 value="2.3549" />
+</comp>
+</station>
+<station code="LV4" name="LEONA VALLEY STA D" insttype="UNK" lat="34.598" lon="-118.24" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.9072" />
+<vel value="8.6531" />
+<psa03 value="15.9564" />
+<psa10 value="26.4967" />
+<psa30 value="2.9070" />
+</comp>
+</station>
+<station code="LV5" name="LEONA VALLEY STA E" insttype="UNK" lat="34.600" lon="-118.24" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="14.6432" />
+<vel value="14.8580" />
+<psa03 value="29.3737" />
+<psa10 value="36.1632" />
+<psa30 value="3.0558" />
+</comp>
+</station>
+<station code="LV6" name="LEONA VALLEY STA F" insttype="UNK" lat="34.604" lon="-118.24" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="17.7503" />
+<vel value="14.4290" />
+<psa03 value="42.9066" />
+<psa10 value="16.0220" />
+<psa30 value="2.0336" />
+</comp>
+</station>
+<station code="LVS" name="LOS ANGELES" insttype="UNK" lat="34.005" lon="-118.28" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="29.0866" />
+<vel value="26.5560" />
+<psa03 value="110.0149" />
+<psa10 value="23.9763" />
+<psa30 value="3.4943" />
+</comp>
+</station>
+<station code="LWD" name="LAKEWOOD" insttype="UNK" lat="33.846" lon="-118.10" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="13.9399" />
+<vel value="10.7330" />
+<psa03 value="41.8918" />
+<psa10 value="14.3342" />
+<psa30 value="2.5270" />
+</comp>
+</station>
+<station code="LWE" name="LOS ANGELES" insttype="UNK" lat="34.114" lon="-118.38" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="16.2691" />
+<vel value="15.2650" />
+<psa03 value="36.6495" />
+<psa10 value="18.1213" />
+<psa30 value="1.7941" />
+</comp>
+</station>
+<station code="LWS" name="LOS ANGELES" insttype="UNK" lat="34.089" lon="-118.43" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="29.8960" />
+<vel value="26.8310" />
+<psa03 value="55.5472" />
+<psa10 value="36.8770" />
+<psa30 value="2.8936" />
+</comp>
+</station>
+<station code="MBF" name="MANHATTAN BEACH" insttype="UNK" lat="33.886" lon="-118.39" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="16.1774" />
+<vel value="20.3670" />
+<psa03 value="40.5578" />
+<psa10 value="15.7718" />
+<psa30 value="5.0447" />
+</comp>
+</station>
+<station code="MBS" name="LOS ANGELES" insttype="UNK" lat="34.001" lon="-118.43" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="46.5963" />
+<vel value="28.5060" />
+<psa03 value="76.9943" />
+<psa10 value="36.4837" />
+<psa30 value="6.9547" />
+</comp>
+</station>
+<station code="MCN" name="MALIBU CANYON" insttype="UNK" lat="34.078" lon="-118.69" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="18.3904" />
+<vel value="8.0303" />
+<psa03 value="33.8319" />
+<psa10 value="11.4113" />
+<psa30 value="1.7258" />
+</comp>
+</station>
+<station code="MEC" name="MALIBU" insttype="UNK" lat="34.024" lon="-118.79" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="12.7686" />
+<vel value="11.9630" />
+<psa03 value="31.8303" />
+<psa10 value="17.0748" />
+<psa30 value="2.3622" />
+</comp>
+</station>
+<station code="MJO" name="MOJAVE" insttype="UNK" lat="35.042" lon="-118.38" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="5.9360" />
+<vel value="3.3528" />
+<psa03 value="13.9722" />
+<psa10 value="4.0894" />
+<psa30 value="0.4280" />
+</comp>
+</station>
+<station code="MJV" name="MOJAVE" insttype="UNK" lat="35.070" lon="-118.18" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="5.2722" />
+<vel value="4.5126" />
+<psa03 value="20.7029" />
+<psa10 value="13.0930" />
+<psa30 value="0.6348" />
+</comp>
+</station>
+<station code="MPK" name="MOORPARK" insttype="UNK" lat="34.288" lon="-118.88" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="29.1723" />
+<vel value="20.5300" />
+<psa03 value="68.8589" />
+<psa10 value="23.0977" />
+<psa30 value="4.2945" />
+</comp>
+</station>
+<station code="MSM" name="LOS ANGELES" insttype="UNK" lat="34.086" lon="-118.48" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="22.3772" />
+<vel value="29.6400" />
+<psa03 value="51.6263" />
+<psa10 value="33.5834" />
+<psa30 value="4.8381" />
+</comp>
+</station>
+<station code="MTB" name="MT BALDY" insttype="UNK" lat="34.233" lon="-117.66" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.9476" />
+<vel value="4.2853" />
+<psa03 value="20.8326" />
+<psa10 value="4.6881" />
+<psa30 value="0.3821" />
+</comp>
+</station>
+<station code="MTL" name="MONTEBELLO" insttype="UNK" lat="33.990" lon="-118.11" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="18.7136" />
+<vel value="11.0140" />
+<psa03 value="63.4680" />
+<psa10 value="12.3716" />
+<psa30 value="1.8349" />
+</comp>
+</station>
+<station code="MTW" name="MT WILSON" insttype="UNK" lat="34.224" lon="-118.06" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="23.2936" />
+<vel value="7.3448" />
+<psa03 value="30.6421" />
+<psa10 value="5.5708" />
+<psa30 value="0.6779" />
+</comp>
+</station>
+<station code="NBC" name="NEWPORT BEACH" insttype="UNK" lat="33.623" lon="-117.93" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.5474" />
+<vel value="7.3127" />
+<psa03 value="40.5906" />
+<psa10 value="6.8510" />
+<psa30 value="2.3832" />
+</comp>
+</station>
+<station code="NBI" name="NEWPORT BEACH" insttype="UNK" lat="33.634" lon="-117.90" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="6.0677" />
+<vel value="5.1541" />
+<psa03 value="15.9001" />
+<psa10 value="5.6116" />
+<psa30 value="2.8703" />
+</comp>
+</station>
+<station code="NEE" name="NEENACH" insttype="UNK" lat="34.848" lon="-118.54" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="6.9113" />
+<vel value="13.4060" />
+<psa03 value="14.8259" />
+<psa10 value="11.8604" />
+<psa30 value="4.8091" />
+</comp>
+</station>
+<station code="NHW" name="NORTH HOLLYWOOD" insttype="UNK" lat="34.194" lon="-118.41" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="31.9378" />
+<vel value="35.1450" />
+<psa03 value="60.9116" />
+<psa10 value="39.6953" />
+<psa30 value="10.9046" />
+</comp>
+</station>
+<station code="NIH" name="NORWALK" insttype="UNK" lat="33.920" lon="-118.07" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="13.3772" />
+<vel value="16.3160" />
+<psa03 value="26.7485" />
+<psa10 value="30.3804" />
+<psa30 value="3.4797" />
+</comp>
+</station>
+<station code="NRG" name="NORTHRIDGE" insttype="UNK" lat="34.209" lon="-118.52" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="45.2650" />
+<vel value="63.2210" />
+<psa03 value="127.1090" />
+<psa10 value="81.5101" />
+<psa30 value="11.4665" />
+</comp>
+</station>
+<station code="NWH" name="NEWHALL" insttype="UNK" lat="34.387" lon="-118.53" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="58.9368" />
+<vel value="92.5810" />
+<psa03 value="238.4878" />
+<psa10 value="116.5301" />
+<psa30 value="18.4305" />
+</comp>
+</station>
+<station code="NWK" name="NORWALK" insttype="UNK" lat="33.915" lon="-118.07" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="8.7362" />
+<vel value="7.8133" />
+<psa03 value="26.6313" />
+<psa10 value="9.1606" />
+<psa30 value="2.1209" />
+</comp>
+</station>
+<station code="NWS" name="NEWHALL" insttype="UNK" lat="34.391" lon="-118.62" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="43.7380" />
+<vel value="117.2900" />
+<psa03 value="80.1754" />
+<psa10 value="96.0109" />
+<psa30 value="39.7962" />
+</comp>
+</station>
+<station code="OBG" name="LOS ANGELES" insttype="UNK" lat="34.037" lon="-118.18" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="40.7441" />
+<vel value="30.8860" />
+<psa03 value="122.3005" />
+<psa10 value="29.0123" />
+<psa30 value="3.6799" />
+</comp>
+</station>
+<station code="OCR" name="ORANGE COUNTY RSRVR" insttype="UNK" lat="33.936" lon="-117.88" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="19.6473" />
+<vel value="11.4950" />
+<psa03 value="88.5771" />
+<psa10 value="7.5408" />
+<psa30 value="0.8783" />
+</comp>
+</station>
+<station code="ORR" name="CASTAIC" insttype="UNK" lat="34.564" lon="-118.64" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="56.7900" />
+<vel value="53.1100" />
+<psa03 value="140.6353" />
+<psa10 value="96.5978" />
+<psa30 value="9.6875" />
+</comp>
+</station>
+<station code="PAR" name="NONE" insttype="UNK" lat="34.435" lon="-118.58" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="60.7584" />
+<vel value="74.1750" />
+<psa03 value="83.9346" />
+<psa10 value="147.6342" />
+<psa30 value="24.5815" />
+</comp>
+</station>
+<station code="PAS" name="NONE" insttype="UNK" lat="34.148" lon="-118.17" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.3180" />
+<vel value="12.0140" />
+<psa03 value="22.9180" />
+<psa10 value="5.5065" />
+<psa30 value="4.0893" />
+</comp>
+</station>
+<station code="PCD" name="PACOIMA DAM" insttype="UNK" lat="34.334" lon="-118.40" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="43.3812" />
+<vel value="44.6260" />
+<psa03 value="98.0303" />
+<psa10 value="37.1455" />
+<psa30 value="7.7267" />
+</comp>
+</station>
+<station code="PDS" name="MALIBU" insttype="UNK" lat="34.013" lon="-118.80" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="12.9664" />
+<vel value="9.2420" />
+<psa03 value="36.2954" />
+<psa10 value="10.0859" />
+<psa30 value="2.5752" />
+</comp>
+</station>
+<station code="PHE" name="PHELAN" insttype="UNK" lat="34.467" lon="-117.52" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="5.7082" />
+<vel value="4.9639" />
+<psa03 value="13.2721" />
+<psa10 value="9.3595" />
+<psa30 value="1.9959" />
+</comp>
+</station>
+<station code="PHN" name="PORT HUENEME" insttype="UNK" lat="34.145" lon="-119.21" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.3099" />
+<vel value="11.2180" />
+<psa03 value="29.7128" />
+<psa10 value="15.3224" />
+<psa30 value="8.3911" />
+</comp>
+</station>
+<station code="PIR" name="NONE" insttype="UNK" lat="34.460" lon="-118.75" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="26.9949" />
+<vel value="31.5840" />
+<psa03 value="60.7527" />
+<psa10 value="31.1217" />
+<psa30 value="12.0103" />
+</comp>
+</station>
+<station code="PKC" name="PACOIMA" insttype="UNK" lat="34.288" lon="-118.38" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="43.2436" />
+<vel value="50.4850" />
+<psa03 value="95.3476" />
+<psa10 value="53.1394" />
+<psa30 value="10.8847" />
+</comp>
+</station>
+<station code="PLM" name="NONE" insttype="UNK" lat="34.581" lon="-118.14" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="6.6744" />
+<vel value="8.4454" />
+<psa03 value="18.2985" />
+<psa10 value="16.2307" />
+<psa30 value="1.4628" />
+</comp>
+</station>
+<station code="PMG" name="POINT MUGU" insttype="UNK" lat="34.113" lon="-119.12" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="17.7492" />
+<vel value="16.2020" />
+<psa03 value="69.6647" />
+<psa10 value="34.5780" />
+<psa30 value="2.0325" />
+</comp>
+</station>
+<station code="PRD" name="PRADO DAM" insttype="UNK" lat="33.890" lon="-117.64" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="13.7890" />
+<vel value="9.5771" />
+<psa03 value="46.4145" />
+<psa10 value="8.7557" />
+<psa30 value="1.1724" />
+</comp>
+</station>
+<station code="PSW" name="PASADENA" insttype="UNK" lat="34.136" lon="-118.13" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="16.4373" />
+<vel value="10.1420" />
+<psa03 value="46.7758" />
+<psa10 value="10.7881" />
+<psa30 value="2.5484" />
+</comp>
+</station>
+<station code="PVC" name="RANCHO PALOS VERDES" insttype="UNK" lat="33.746" lon="-118.40" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.2484" />
+<vel value="5.0434" />
+<psa03 value="17.3572" />
+<psa10 value="6.1605" />
+<psa30 value="0.9300" />
+</comp>
+</station>
+<station code="PVR" name="PALOS VERDES RSVR" insttype="UNK" lat="33.772" lon="-118.32" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="14.9093" />
+<vel value="14.8080" />
+<psa03 value="52.5620" />
+<psa10 value="15.3661" />
+<psa30 value="1.4070" />
+</comp>
+</station>
+<station code="RDC" name="RANCHO CUCAMONGA" insttype="UNK" lat="34.169" lon="-117.58" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.1442" />
+<vel value="5.8328" />
+<psa03 value="19.2266" />
+<psa10 value="4.7511" />
+<psa30 value="0.6519" />
+</comp>
+</station>
+<station code="RHE" name="ROLLING HILLS ESTATES" insttype="UNK" lat="33.787" lon="-118.36" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="11.5657" />
+<vel value="8.7961" />
+<psa03 value="39.5016" />
+<psa10 value="7.5604" />
+<psa30 value="1.1803" />
+</comp>
+</station>
+<station code="RIB" name="SANTA ANA" insttype="UNK" lat="33.968" lon="-117.45" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="4.8769" />
+<vel value="2.1772" />
+<psa03 value="7.9221" />
+<psa10 value="1.7848" />
+<psa30 value="0.5054" />
+</comp>
+</station>
+<station code="RNC" name="RANCHO CUCAMONGA" insttype="UNK" lat="34.104" lon="-117.57" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.2165" />
+<vel value="3.7650" />
+<psa03 value="13.1094" />
+<psa10 value="5.3181" />
+<psa30 value="0.7756" />
+</comp>
+</station>
+<station code="ROS" name="ROSAMOND" insttype="UNK" lat="34.870" lon="-118.21" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.5059" />
+<vel value="4.5821" />
+<psa03 value="26.7547" />
+<psa10 value="4.9265" />
+<psa30 value="0.8783" />
+</comp>
+</station>
+<station code="RPV" name="RANCHO PALOS VERDES" insttype="UNK" lat="33.740" lon="-118.33" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="16.2477" />
+<vel value="11.7210" />
+<psa03 value="77.6684" />
+<psa10 value="10.2074" />
+<psa30 value="0.9285" />
+</comp>
+</station>
+<station code="RRS" name="NONE" insttype="UNK" lat="34.280" lon="-118.48" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="84.1835" />
+<vel value="170.9500" />
+<psa03 value="175.1293" />
+<psa10 value="181.3967" />
+<psa30 value="26.0746" />
+</comp>
+</station>
+<station code="RSE" name="NONE" insttype="UNK" lat="34.180" lon="-118.36" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="48.0428" />
+<vel value="34.7220" />
+<psa03 value="128.7136" />
+<psa10 value="44.4974" />
+<psa30 value="5.4713" />
+</comp>
+</station>
+<station code="RVA" name="RIVERSIDE AIRPORT" insttype="UNK" lat="33.951" lon="-117.45" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="6.3545" />
+<vel value="3.1225" />
+<psa03 value="15.2683" />
+<psa10 value="2.4039" />
+<psa30 value="0.4001" />
+</comp>
+</station>
+<station code="SBC" name="NONE" insttype="UNK" lat="34.442" lon="-119.71" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="4.2402" />
+<vel value="13.7450" />
+<psa03 value="12.6594" />
+<psa10 value="9.7048" />
+<psa30 value="3.9755" />
+</comp>
+</station>
+<station code="SBE" name="SAN BERNARDINO" insttype="UNK" lat="34.065" lon="-117.29" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="9.5771" />
+<vel value="6.4830" />
+<psa03 value="25.4121" />
+<psa10 value="7.2905" />
+<psa30 value="1.4459" />
+</comp>
+</station>
+<station code="SCC" name="SEPULVEDA CANYON" insttype="UNK" lat="34.097" lon="-118.47" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="46.3201" />
+<vel value="26.5390" />
+<psa03 value="148.9909" />
+<psa10 value="30.4293" />
+<psa30 value="3.9289" />
+</comp>
+</station>
+<station code="SCR" name="NONE" insttype="UNK" lat="34.106" lon="-118.45" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="38.0622" />
+<vel value="37.7210" />
+<psa03 value="109.2731" />
+<psa10 value="31.6437" />
+<psa30 value="2.8833" />
+</comp>
+</station>
+<station code="SCS" name="NONE" insttype="UNK" lat="34.310" lon="-118.49" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="79.9052" />
+<vel value="123.1900" />
+<psa03 value="103.0942" />
+<psa10 value="160.4079" />
+<psa30 value="40.6723" />
+</comp>
+</station>
+<station code="SCSE" name="NONE" insttype="UNK" lat="34.312" lon="-118.48" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="75.0377" />
+<vel value="106.5300" />
+<psa03 value="148.7095" />
+<psa10 value="100.6277" />
+<psa30 value="33.2791" />
+</comp>
+</station>
+<station code="SCT" name="STONE CANYON RES DAM" insttype="UNK" lat="34.106" lon="-118.45" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="37.8716" />
+<vel value="37.5200" />
+<psa03 value="108.7286" />
+<psa10 value="31.4860" />
+<psa30 value="2.8691" />
+</comp>
+</station>
+<station code="SFS" name="SANTA FE SPRINGS" insttype="UNK" lat="33.944" lon="-118.09" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="13.9918" />
+<vel value="8.9406" />
+<psa03 value="49.0192" />
+<psa10 value="7.7996" />
+<psa30 value="1.9684" />
+</comp>
+</station>
+<station code="SFY" name="SAN FERNANDO VALLEY" insttype="UNK" lat="34.236" lon="-118.44" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="34.3833" />
+<vel value="38.7780" />
+<psa03 value="80.2681" />
+<psa10 value="52.4331" />
+<psa30 value="13.0628" />
+</comp>
+</station>
+<station code="SGS" name="SAN GABRIEL" insttype="UNK" lat="34.091" lon="-118.09" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="26.7421" />
+<vel value="12.4530" />
+<psa03 value="38.8409" />
+<psa10 value="15.9082" />
+<psa30 value="2.0433" />
+</comp>
+</station>
+<station code="SJF" name="SAN JACINTO" insttype="UNK" lat="33.787" lon="-116.96" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="9.8976" />
+<vel value="8.0865" />
+<psa03 value="23.4275" />
+<psa10 value="12.6991" />
+<psa30 value="2.2058" />
+</comp>
+</station>
+<station code="SJR" name="SAN JOAQUIN RESERVOIR" insttype="UNK" lat="33.620" lon="-117.84" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="14.7635" />
+<vel value="8.3077" />
+<psa03 value="48.9231" />
+<psa10 value="4.2720" />
+<psa30 value="0.9102" />
+</comp>
+</station>
+<station code="SKD" name="SKINNER DAM" insttype="UNK" lat="33.580" lon="-117.07" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.6400" />
+<vel value="5.3099" />
+<psa03 value="12.6166" />
+<psa10 value="2.7785" />
+<psa30 value="0.4594" />
+</comp>
+</station>
+<station code="SLB" name="SEAL BEACH" insttype="UNK" lat="33.757" lon="-118.08" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="8.3945" />
+<vel value="6.8316" />
+<psa03 value="27.1492" />
+<psa10 value="8.1454" />
+<psa30 value="2.5465" />
+</comp>
+</station>
+<station code="SMG" name="SANTA MONICA" insttype="UNK" lat="34.011" lon="-118.49" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="88.2722" />
+<vel value="41.6320" />
+<psa03 value="161.2949" />
+<psa10 value="34.0832" />
+<psa30 value="12.5761" />
+</comp>
+</station>
+<station code="SMI" name="SIMI VALLEY" insttype="UNK" lat="34.264" lon="-118.67" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="94.2477" />
+<vel value="47.8270" />
+<psa03 value="145.3771" />
+<psa10 value="76.1328" />
+<psa30 value="4.8102" />
+</comp>
+</station>
+<station code="SND" name="SANDBERG" insttype="UNK" lat="34.743" lon="-118.72" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="9.8383" />
+<vel value="12.3770" />
+<psa03 value="23.4454" />
+<psa10 value="19.9840" />
+<psa30 value="3.0657" />
+</comp>
+</station>
+<station code="SNM" name="SAN MARINO" insttype="UNK" lat="34.115" lon="-118.13" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="15.1040" />
+<vel value="7.8102" />
+<psa03 value="30.1693" />
+<psa10 value="12.3011" />
+<psa30 value="1.5115" />
+</comp>
+</station>
+<station code="SPP" name="SAN PEDRO" insttype="UNK" lat="33.722" lon="-118.31" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.0782" />
+<vel value="6.5733" />
+<psa03 value="42.0948" />
+<psa10 value="9.0503" />
+<psa30 value="0.7472" />
+</comp>
+</station>
+<station code="SSA" name="SANTA SUSANA;ETEC" insttype="UNK" lat="34.230" lon="-118.71" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="34.2752" />
+<vel value="18.2050" />
+<psa03 value="69.1799" />
+<psa10 value="21.6741" />
+<psa30 value="4.2528" />
+</comp>
+</station>
+<station code="SUN" name="SUNLAND" insttype="UNK" lat="34.269" lon="-118.30" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="16.4791" />
+<vel value="16.0800" />
+<psa03 value="36.9474" />
+<psa10 value="43.9255" />
+<psa30 value="3.9096" />
+</comp>
+</station>
+<station code="SVG" name="SUN VALLEY" insttype="UNK" lat="34.221" lon="-118.42" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="46.6157" />
+<vel value="43.2700" />
+<psa03 value="84.3261" />
+<psa10 value="62.9370" />
+<psa30 value="12.4849" />
+</comp>
+</station>
+<station code="SYH" name="SYLMAR" insttype="UNK" lat="34.326" lon="-118.44" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="84.2752" />
+<vel value="127.2600" />
+<psa03 value="261.4348" />
+<psa10 value="86.6613" />
+<psa30 value="34.2507" />
+</comp>
+</station>
+<station code="TMI" name="TERMINAL ISLAND" insttype="UNK" lat="33.736" lon="-118.27" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="19.5790" />
+<vel value="17.1020" />
+<psa03 value="63.4870" />
+<psa10 value="12.8559" />
+<psa30 value="2.4388" />
+</comp>
+</station>
+<station code="TOP" name="TOPANGA" insttype="UNK" lat="34.084" lon="-118.60" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="33.3191" />
+<vel value="14.9660" />
+<psa03 value="117.8445" />
+<psa10 value="11.9082" />
+<psa30 value="3.5055" />
+</comp>
+</station>
+<station code="TUS" name="TUSTIN" insttype="UNK" lat="33.728" lon="-117.82" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.3899" />
+<vel value="5.3299" />
+<psa03 value="24.9792" />
+<psa10 value="5.1178" />
+<psa30 value="0.9885" />
+</comp>
+</station>
+<station code="ULA" name="LOS ANGELES" insttype="UNK" lat="34.068" lon="-118.44" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="47.3537" />
+<vel value="21.9400" />
+<psa03 value="55.3338" />
+<psa10 value="23.8069" />
+<psa30 value="5.4292" />
+</comp>
+</station>
+<station code="USB" name="SANTA BARBARA" insttype="UNK" lat="34.422" lon="-119.85" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.7524" />
+<vel value="7.3492" />
+<psa03 value="27.0884" />
+<psa10 value="10.1158" />
+<psa30 value="1.6426" />
+</comp>
+</station>
+<station code="VCS" name="VERNON" insttype="UNK" lat="34.004" lon="-118.23" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="15.4832" />
+<vel value="12.9610" />
+<psa03 value="43.7598" />
+<psa10 value="12.5463" />
+<psa30 value="2.9873" />
+</comp>
+</station>
+<station code="VHI" name="VENTURA" insttype="UNK" lat="34.276" lon="-119.29" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.5099" />
+<vel value="11.9000" />
+<psa03 value="16.4032" />
+<psa10 value="19.5465" />
+<psa30 value="3.9359" />
+</comp>
+</station>
+<station code="VLA" name="LOS ANGELES" insttype="UNK" lat="34.063" lon="-118.46" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="18.7207" />
+<vel value="24.0500" />
+<psa03 value="32.2922" />
+<psa10 value="26.6839" />
+<psa30 value="5.0367" />
+</comp>
+</station>
+<station code="VLO" name="LONG BEACH" insttype="UNK" lat="33.778" lon="-118.12" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="13.6728" />
+<vel value="11.8750" />
+<psa03 value="16.9003" />
+<psa10 value="12.5921" />
+<psa30 value="2.2970" />
+</comp>
+</station>
+<station code="VPS" name="VILLA PARK" insttype="UNK" lat="33.821" lon="-117.82" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="4.6951" />
+<vel value="3.9362" />
+<psa03 value="13.9142" />
+<psa10 value="3.9162" />
+<psa30 value="1.4173" />
+</comp>
+</station>
+<station code="VRP" name="VASQUEZ ROCK PARK" insttype="UNK" lat="34.492" lon="-118.33" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="15.0907" />
+<vel value="18.4270" />
+<psa03 value="39.2715" />
+<psa10 value="20.4015" />
+<psa30 value="3.2183" />
+</comp>
+</station>
+<station code="VSP" name="SEPULVEDA VA HOSP" insttype="UNK" lat="34.249" lon="-118.47" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="93.9939" />
+<vel value="75.7330" />
+<psa03 value="283.7733" />
+<psa10 value="113.8368" />
+<psa30 value="25.5749" />
+</comp>
+</station>
+<station code="VWD" name="LOS ANGELES" insttype="UNK" lat="34.050" lon="-118.45" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="38.8919" />
+<vel value="32.8650" />
+<psa03 value="65.8253" />
+<psa10 value="35.1503" />
+<psa30 value="6.6376" />
+</comp>
+</station>
+<station code="WHI" name="WHITTIER" insttype="UNK" lat="33.977" lon="-118.04" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="15.3007" />
+<vel value="12.5900" />
+<psa03 value="46.6759" />
+<psa10 value="12.9484" />
+<psa30 value="1.6864" />
+</comp>
+</station>
+<station code="WIS" name="LOS ANGELES" insttype="UNK" lat="34.052" lon="-118.26" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="12.6799" />
+<vel value="11.1060" />
+<psa03 value="24.3113" />
+<psa10 value="17.0190" />
+<psa30 value="3.5221" />
+</comp>
+</station>
+<station code="WJF" name="WRIGHTWOOD" insttype="UNK" lat="34.381" lon="-117.74" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="5.6435" />
+<vel value="5.0230" />
+<psa03 value="14.8302" />
+<psa10 value="9.6103" />
+<psa30 value="0.8334" />
+</comp>
+</station>
+<station code="WNR" name="WRIGHTWOOD" insttype="UNK" lat="34.314" lon="-117.54" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="4.2045" />
+<vel value="3.1530" />
+<psa03 value="12.7675" />
+<psa10 value="3.5984" />
+<psa30 value="0.5343" />
+</comp>
+</station>
+<station code="WWS" name="WRIGHTWOOD" insttype="UNK" lat="34.369" lon="-117.66" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="5.9634" />
+<vel value="3.7368" />
+<psa03 value="26.6913" />
+<psa10 value="5.4120" />
+<psa30 value="0.4869" />
+</comp>
+</station>
+<station code="XAR" name="ARCADIA" insttype="UNK" lat="34.127" lon="-118.06" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="9.8453" />
+<vel value="11.0410" />
+<psa03 value="24.6279" />
+<psa10 value="16.4584" />
+<psa30 value="3.1720" />
+</comp>
+</station>
+<station code="XBR" name="BREA" insttype="UNK" lat="33.916" lon="-117.90" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="10.6911" />
+<vel value="7.2882" />
+<psa03 value="29.5397" />
+<psa10 value="13.6808" />
+<psa30 value="1.3979" />
+</comp>
+</station>
+<station code="XHA" name="HACIENDA HEIGHTS" insttype="UNK" lat="33.990" lon="-117.94" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.8913" />
+<vel value="6.2051" />
+<psa03 value="17.7531" />
+<psa10 value="7.5642" />
+<psa30 value="2.8565" />
+</comp>
+</station>
+<station code="XLP" name="LA PUENTE" insttype="UNK" lat="34.026" lon="-117.92" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="12.0846" />
+<vel value="9.2412" />
+<psa03 value="31.7233" />
+<psa10 value="9.1292" />
+<psa30 value="2.9502" />
+</comp>
+</station>
+<station code="XLV" name="LOS ANGELES" insttype="UNK" lat="34.022" lon="-118.29" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="14.3170" />
+<vel value="11.3900" />
+<psa03 value="35.5316" />
+<psa10 value="15.8655" />
+<psa30 value="3.0713" />
+</comp>
+</station>
+<station code="XPA" name="PASADENA" insttype="UNK" lat="34.169" lon="-118.08" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="27.2253" />
+<vel value="14.3540" />
+<psa03 value="71.8816" />
+<psa10 value="10.4356" />
+<psa30 value="2.0117" />
+</comp>
+</station>
+<station code="XPD" name="PLAYA DEL REY" insttype="UNK" lat="33.960" lon="-118.43" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="14.9715" />
+<vel value="16.0310" />
+<psa03 value="27.3454" />
+<psa10 value="19.9349" />
+<psa30 value="6.2992" />
+</comp>
+</station>
+<station code="XWA" name="WHITTIER" insttype="UNK" lat="34.015" lon="-118.03" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.8642" />
+<vel value="6.7136" />
+<psa03 value="21.7248" />
+<psa10 value="13.4188" />
+<psa30 value="0.8421" />
+</comp>
+</station>
+<station code="XWC" name="COVINA" insttype="UNK" lat="34.064" lon="-117.95" source="HIST" netid="HI" commtype="ANA">
+<comp name="UNK">
+<acc value="7.0564" />
+<vel value="7.4150" />
+<psa03 value="22.4698" />
+<psa10 value="9.9919" />
+<psa30 value="2.0137" />
+</comp>
+</station>
+
+</stationlist>
