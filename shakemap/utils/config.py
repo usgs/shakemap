@@ -1,5 +1,6 @@
 import os.path
 import io
+import sys
 
 # third party libraries
 import numpy as np
@@ -28,9 +29,18 @@ def get_custom_validator():
         'weight_list': weight_list,
         'extent_list': extent_list,
     }
-
     validator = Validator(fdict)
     return validator
+
+def config_error(config, results):
+    for (section_list, key, _) in flatten_errors(config, results):
+        if key is not None:
+            print('The "%s" key in the section "%s" failed validation' % 
+                    (key, ', '.join(section_list)))
+            sys.exit(1)
+        else:
+            print('The following section was missing:%s ' % 
+                    ', '.join(section_list))
 
 def annotatedfloat_type(value):
     try:
