@@ -7,11 +7,12 @@ import argparse
 import glob
 
 #third party imports
-import configobj
-from shakelib.grind.container import InputContainer
-from shakemap.utils.config import get_config_paths
+from configobj import ConfigObj, flatten_errors
+from validate import Validator
 
-#%%
+from shakelib.grind.container import InputContainer
+from shakemap.utils.config import get_config_paths, get_custom_validator
+
 def main(args):
     install_path, data_path = get_config_paths()
     datadir = os.path.join(data_path,args.eventid)
@@ -30,13 +31,17 @@ def main(args):
     #
     spec_file = os.path.join(os.path.expanduser('~'),
                              '.shakemap','configspec.conf')
+    validator = get_custom_validator()
     print('Looking for configuration files...')
-    gmpe_modules = configobj.ConfigObj(os.path.join(install_path, 'config',
-                                                    'gmpe_modules.conf'))
-    gmpe_sets = configobj.ConfigObj(os.path.join(install_path, 'config', 
-                                                    'gmpe_sets.conf'))
-    global_grind = configobj.ConfigObj(os.path.join(install_path, 'config', 
-                                                    'grind.conf'))
+    gmpe_modules = ConfigObj(
+            os.path.join(install_path, 'config', 'gmpe_modules.conf'),
+            configspec=spec_file)
+    gmpe_sets = ConfigObj(
+            os.path.join(install_path, 'config', 'gmpe_sets.conf'),
+            configspec=spec_file)
+    global_grind = ConfigObj(
+            os.path.join(install_path, 'config', 'grind.conf'),
+            configspec=spec_file)
     #
     # this is the event specific grind.conf (may not be present)
     # prefer grind.conf to grind_zc.conf
@@ -44,20 +49,23 @@ def main(args):
     event_grind_file = os.path.join(datadir, 'grind.conf')
     event_grind_zc_file = os.path.join(datadir, 'grind_zc.conf')
     if os.path.isfile(event_grind_file):
-        event_grind = configobj.ConfigObj(event_grind_file)
+        event_grind = ConfigObj(event_grind_file, configspec=spec_file)
     elif os.path.isfile(event_grind_zc_file):
-        event_grind = configobj.ConfigObj(event_grind_zc_file)
+        event_grind = ConfigObj(event_grind_zc_file, configspec=spec_file)
     else:
-        event_grind = configobj.ConfigObj()
+        event_grind = ConfigObj()
 
     #start merging event_grind
     global_grind.merge(event_grind)
     global_grind.merge(gmpe_modules)
     global_grind.merge(gmpe_sets)
 
-    config = global_grind.dict()
+    results = global_grind.validate(validator)
+    print(results)
+    if results != True:
+        config_error(global_grind, results)
 
-#%%
+    config = global_grind.dict()
 
     print('Looking for data files...')
     datafiles = glob.glob(os.path.join(datadir,'*_dat.xml'))
@@ -75,7 +83,16 @@ def main(args):
     print('Created HDF5 input container in %s' % shake_data.getFileName())
     shake_data.close()
 
-#%%
+def config_error(config, results):
+    for (section_list, key, _) in flatten_errors(config, results):
+        if key is not None:
+            print('The "%s" key in the section "%s" failed validation' % 
+                    (key, ', '.join(section_list)))
+            sys.exit(1)
+        else:
+            print('The following section was missing:%s ' % 
+                    ', '.join(section_list))
+
 if __name__ == '__main__':
     description = '''Assemble ShakeMap input data into an HDF package.
 The only argument is a ShakeMap event ID, which should correspond to a directory in 
