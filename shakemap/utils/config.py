@@ -4,7 +4,7 @@ import sys
 
 # third party libraries
 import numpy as np
-from configobj import ConfigObj
+from configobj import ConfigObj, flatten_errors
 from validate import Validator, ValidateError
 
 def get_data_path():
@@ -26,6 +26,7 @@ def get_custom_validator():
         'file_type': file_type,
         'directory_type': directory_type,
         'annotatedfloat_type': annotatedfloat_type,
+        'gmpe_list': gmpe_list,
         'weight_list': weight_list,
         'extent_list': extent_list,
     }
@@ -89,6 +90,18 @@ def weight_list(value, min):
         raise ValidateError()
 
     return out
+
+def gmpe_list(value, min):
+
+    if value == 'None' or value == '[]':
+        return []
+    if isinstance(value, str):
+        value = [value]
+    if not isinstance(value, list) or len(value) < int(min):
+        print("'%s' is not a list of at least %s gmpes" % (value, min))
+        raise ValidateError()
+
+    return value
 
 def extent_list(value):
 

@@ -56,7 +56,9 @@ def main(args):
     else:
         event_grind = ConfigObj()
 
-    #start merging event_grind
+    #
+    # start merging event_grind
+    #
     global_grind.merge(event_grind)
     global_grind.merge(gmpe_modules)
     global_grind.merge(gmpe_sets)
@@ -72,6 +74,7 @@ def main(args):
 
     print('Looking for data files...')
     datafiles = glob.glob(os.path.join(datadir,'*_dat.xml'))
+    print("Datafiles: ", datafiles)
     print('Looking for rupture files...')
     rupturefiles = glob.glob(os.path.join(datadir,'*_fault.txt'))
     rupturefile = None
