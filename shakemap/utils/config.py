@@ -34,14 +34,20 @@ def get_custom_validator():
     return validator
 
 def config_error(config, results):
+    errs = 0
     for (section_list, key, _) in flatten_errors(config, results):
         if key is not None:
             print('The "%s" key in the section "%s" failed validation' % 
                     (key, ', '.join(section_list)))
-            sys.exit(1)
+            errs += 1
         else:
             print('The following section was missing:%s ' % 
                     ', '.join(section_list))
+            errs += 1
+        if errs:
+            raise RuntimeError('There %s %d %s in configuration.' %
+                    ('was' if errs == 1 else 'were', errs, 
+                     'error' if errs == 1 else 'errors'))
 
 def annotatedfloat_type(value):
     try:
@@ -63,18 +69,28 @@ def annotatedfloat_type(value):
 def weight_list(value, min):
 
     if isinstance(value, str) and value == 'None':
-        return []
-    if not isinstance(value, list):
+        if int(min) == 0:
+            return []
+        else:
+            print("list must contain at least %d entr%s" %
+                  (min, "ies" if int(min) != 1 else "y"))
+            raise ValidateError()
+    if isinstance(value, str):
         if value.startswith('[') and value.endswith(']'):
             value = value.replace('[', '')
             value = value.replace(']', '')
         if not value:
-            value = []
+            if int(min) == 0:
+                value = []
+            else:
+                print("list must contain at least %d entr%s" %
+                      (min, "ies" if int(min) != 1 else "y"))
+                raise ValidateError()
         else:
             value = [value]
     if len(value) < int(min):
         print("list must contain at least %d entr%s" %
-              (minimum, "ies" if int(minimum) != 1 else "y"))
+              (min, "ies" if int(min) != 1 else "y"))
         raise ValidateError()
     try:
         out = [float(a) for a in value]
@@ -94,12 +110,16 @@ def weight_list(value, min):
 def gmpe_list(value, min):
 
     if value == 'None' or value == '[]':
-        return []
+        value = []
     if isinstance(value, str):
         value = [value]
     if not isinstance(value, list) or len(value) < int(min):
         print("'%s' is not a list of at least %s gmpes" % (value, min))
         raise ValidateError()
+    for gmpe in value:
+        if not isinstance(gmpe, str):
+            print("'%s' is not a list of strings" % (value, min))
+            raise ValidateError()
 
     return value
 
@@ -137,6 +157,8 @@ def file_type(value):
     return value
 
 def directory_type(value):
+    if not value or value == 'None':
+        return ''
     if not os.path.isdir(value):
         raise ValidateError(value)
     return value
