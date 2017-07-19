@@ -1,0 +1,153 @@
+#!/usr/bin/env python
+
+import os.path
+import copy as copy
+import time as time
+import tempfile
+import argparse
+from importlib import import_module
+
+# Not really needed
+import pprint
+
+import numpy as np
+import numexpr as ne
+
+from openquake.hazardlib import imt
+import openquake.hazardlib.const as oqconst
+import openquake.hazardlib.gsim.base as oqbase
+
+from shakelib.grind.origin import Origin
+from shakelib.grind.rupture import read_rupture_file, PointRupture
+from shakelib.grind.sites import Sites
+from shakelib.grind.distance import Distance
+from shakelib.grind.station import StationList
+from shakelib.grind.multigmpe import MultiGMPE
+from shakelib.grind.virtualipe import VirtualIPE
+from shakelib.grind.distance import get_distance_measures
+
+from shakelib.grind.container import InputContainer
+from shakemap.utils.config import get_config_paths
+
+#%%
+
+def grind(args):
+    #
+    # Find the shake_data file
+    #
+    install_path, data_path = get_config_paths()
+    datadir = os.path.join(data_path, args.eventid)
+    if not os.path.isdir(datadir):
+        print('%s is not a valid directory.' % datadir)
+        sys.exit(1)
+    datafile = os.path.join(datadir, 'shake_data.hdf')
+    if not os.path.isfile(datafile):
+        print('%s is not a valid shake data file.' % datafile)
+        sys.exit(1)
+    #
+    # Make the input container
+    #
+    ic = InputContainer.loadFromHDF(datafile)
+    #
+    # Extract the config from the input container
+    #
+    config = ic.getConfig()
+#    pprint.pprint(config)
+    #
+    # Probably should do some map extent stuff here.
+    #
+    smdx = config['grind']['prediction_location']['xres']
+    smdy = config['grind']['prediction_location']['yres']
+
+    if config['grind']['prediction_location']['file']:
+        #
+        # Open the file and get the output points
+        #
+        pass
+    else:
+        extent = config['grind']['prediction_location']['extent']
+        W = extent[0]
+        S = extent[1]
+        E = extent[2]
+        N = extent[3]
+    #
+    # What about vs30?
+    #
+
+    #
+    # Instantiate the gmpe, gmice, ipe, and ccf
+    #
+    gmpe = MultiGMPE.from_config(config)
+
+    gmice = getattr(
+            import_module(
+                config['gmice_modules'][config['grind']['gmice']][1]),
+            config['gmice_modules'][config['grind']['gmice']][0]
+        )()
+
+    if config['ipe_modules'][config['grind']['ipe']][0] == 'VirtualIPE':
+        ipe = VirtualIPE.fromFuncs(gmpe, gmice)
+    else:
+        ipe = getattr(
+                import_module(
+                    config['ipe_modules'][config['grind']['ipe']][1]),
+                config['ipe_modules'][config['grind']['ipe']][0]
+            )()
+
+    ccf = getattr(
+            import_module(
+                config['ccf_modules'][config['grind']['ccf']][1]),
+            config['ccf_modules'][config['grind']['ccf']][0]
+        )()
+    #
+    # Bias parameters
+    #
+    bias_max_range    = config['grind']['bias']['max_range']
+    bias_max_mag      = config['grind']['bias']['max_mag']
+    bias_max_dsigma   = config['grind']['bias']['max_delta_sigma']
+    #
+    # Outlier parameters
+    #
+    outlier_deviation_level = config['grind']['outlier']['max_deviation']
+    outlier_max_mag = config['grind']['outlier']['max_mag']
+    #
+    # These are the IMTs we want to make
+    #
+    imt_out_set_str = config['grind']['imt_list']
+    imt_out_set = [imt.from_string(x) for x in imt_out_set_str]
+    #
+    # Station data
+    #
+    stations = ic.getStationList()
+    #
+    # df1 holds the instrumented data (PGA, PGV, SA)
+    # df2 holds the non-instrumented data (MMI)
+    #
+    df1 = {}
+    df2 = {}
+    if stations is not None:
+        df1 = stations.getStationDataframe(1)
+        df2 = stations.getStationDataframe(0)
+
+    imt_in_set1 = set([x for x in df1.keys() if x in ('PGA', 'PGV', 'MMI')
+            or 'SA(' in x])
+    imt_in_set2 = set([x for x in df2.keys() if x in ('PGA', 'PGV', 'MMI')
+            or 'SA(' in x])
+    imt_in_set = imt_in_set1 | imt_in_set2
+    #
+    # End grind()
+    #
+    
+
+if __name__ == '__main__':
+    description = '''Process a shakemap...
+The only argument is a ShakeMap event ID, which should correspond to a 
+directory in the ShakeMap data directory of the current profile.
+'''
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('eventid', 
+                    help='Path to ShakeMap data directory containing '
+                         'input and config files.')
+    pargs = parser.parse_args()
+    grind(pargs)
+

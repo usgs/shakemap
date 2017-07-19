@@ -7,12 +7,15 @@ import argparse
 import glob
 
 #third party imports
-import configobj
+from configobj import ConfigObj, flatten_errors
+from validate import Validator
+
 from shakelib.grind.container import InputContainer
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import get_config_paths, get_custom_validator,\
+        config_error
 
 def main(args):
-    install_path,data_path = get_config_paths()
+    install_path, data_path = get_config_paths()
     datadir = os.path.join(data_path,args.eventid)
     if not os.path.isdir(datadir):
         print('%s is not a valid directory.' % datadir)
@@ -24,24 +27,48 @@ def main(args):
         print('%s does not exist.' % eventxml)
         sys.exit(1)
 
-    #someday these files will be in the global config directory, not
-    #in the event data directory
+    #
+    # Look for global configs in install_path/config
+    #
+    spec_file = os.path.join(os.path.expanduser('~'),
+                             '.shakemap','configspec.conf')
+    validator = get_custom_validator()
     print('Looking for configuration files...')
-    gmpe_modules = configobj.ConfigObj(os.path.join(datadir,'gmpe_modules.conf'))
-    gmpe_sets = configobj.ConfigObj(os.path.join(datadir,'gmpe_sets.conf'))
-    global_grind = configobj.ConfigObj(os.path.join(datadir,'grind.conf'))
-
-    #this is the event specific grind.conf (may not be present)
-    event_grind_file = os.path.join(datadir,'grind_zc.conf')
+    gmpe_modules = ConfigObj(
+            os.path.join(install_path, 'config', 'gmpe_modules.conf'),
+            configspec=spec_file)
+    gmpe_sets = ConfigObj(
+            os.path.join(install_path, 'config', 'gmpe_sets.conf'),
+            configspec=spec_file)
+    global_grind = ConfigObj(
+            os.path.join(install_path, 'config', 'grind.conf'),
+            configspec=spec_file)
+    #
+    # this is the event specific grind.conf (may not be present)
+    # prefer grind.conf to grind_zc.conf
+    #
+    event_grind_file = os.path.join(datadir, 'grind.conf')
+    event_grind_zc_file = os.path.join(datadir, 'grind_zc.conf')
     if os.path.isfile(event_grind_file):
-        event_grind = configobj.ConfigObj()
+        event_grind = ConfigObj(event_grind_file, configspec=spec_file)
+    elif os.path.isfile(event_grind_zc_file):
+        event_grind = ConfigObj(event_grind_zc_file, configspec=spec_file)
     else:
-        event_grind = configobj.ConfigObj()
+        event_grind = ConfigObj()
 
-    #start merging event_grind
+    #
+    # start merging event_grind
+    #
     global_grind.merge(event_grind)
     global_grind.merge(gmpe_modules)
     global_grind.merge(gmpe_sets)
+
+    results = global_grind.validate(validator)
+#    print(results)
+    if results != True:
+        config_error(global_grind, results)
+
+    check_config(global_grind)
 
     config = global_grind.dict()
 
@@ -56,18 +83,39 @@ def main(args):
     hdf_file = os.path.join(datadir,'shake_data.hdf')
 
     print('Creating input container...')
-    shake_data = InputContainer.loadFromInput(hdf_file,config,eventxml,rupturefile,datafiles=datafiles)
+    shake_data = InputContainer.loadFromInput(hdf_file, config, eventxml,
+                                        rupturefile, datafiles=datafiles)
     print('Created HDF5 input container in %s' % shake_data.getFileName())
     shake_data.close()
 
+def check_config(config):
+    if config['grind']['gmpe'] not in config['gmpe_sets']:
+        print('Configuration error: gmpe %s not in gmpe_sets' % 
+                (config['grind']['gmpe']))
+        sys.exit(1)
+    if config['grind']['gmice'] not in config['gmice_modules']:
+        print('Configuration error: gmice %s not in gmice_modules' % 
+                (config['grind']['gmice']))
+        sys.exit(1)
+    if config['grind']['ipe'] not in config['ipe_modules']:
+        print('Configuration error: ipe %s not in ipe_modules' % 
+                (config['grind']['ipe']))
+        sys.exit(1)
+    if config['grind']['ccf'] not in config['ccf_modules']:
+        print('Configuration error: ccf %s not in ccf_modules' % 
+                (config['grind']['ccf']))
+        sys.exit(1)
+
+
 if __name__ == '__main__':
     description = '''Assemble ShakeMap input data into an HDF package.
-The only argument is a ShakeMap event ID, which should correspond to a directory in 
-the ShakeMap data directory. The output will be an HDF5 data file called shake_data.hdf
-in that same event data directory.
+The only argument is a ShakeMap event ID, which should correspond to a 
+directory in the ShakeMap data directory. The output will be an HDF5 data 
+file called shake_data.hdf in that same event data directory.
 '''
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('eventid', 
-                    help='Path to ShakeMap data directory containing event.xml, grind_zc.conf')
+                    help='Path to ShakeMap data directory containing '
+                         'event.xml, grind_zc.conf')
     pargs = parser.parse_args()
     main(pargs)
