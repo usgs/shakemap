@@ -47,7 +47,7 @@ def make_dir(pathstr,default):
     
 def create(configfile, profile, progname):
     data_path = get_data_path()
-    module_file = os.path.join(data_path,'gmpe_modules.conf')
+    module_file = os.path.join(data_path,'modules.conf')
     sets_file = os.path.join(data_path,'gmpe_sets.conf')
     grind_file = os.path.join(data_path,'grind.conf')
     data_file = os.path.join(data_path,'northridge_dat.xml')
