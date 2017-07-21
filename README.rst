@@ -50,7 +50,7 @@ Dependencies
 - Mac OSX or Linux operating systems
 - Python 3
 - Python libraries: numpy, scipy, rasterio, fiona, xlrd, pandas, basemap,
-  basemap-data-hires, shapely, h5py, gdal, descartes, oq-hazlib, neicio,
+  basemap-data-hires, shapely, h5py, gdal, descartes, openquake.engine, neicio,
   MapIO, matplotlib, jupyter, pytables, lxml
 
 OQ Hazard Library
@@ -59,15 +59,15 @@ OQ Hazard Library
 One of the significant factors driving the rewrite of ShakeMap into the Python
 language was the availability of the library of Ground Motion Prediction
 Equations (GMPEs) and other tools incorporated into the OpenQuake (OQ_)
-hazard library (oq-hazardlib_).
+Hazard Library (openquake.hazardlib_).
 The OQ hazard library provided us with a broad range of
 well-tested, high performance, open source global GMPEs. Due to constraints
 imposed by the software architecture of earlier implementations of ShakeMap, the
 development and validation of GMPE modules is time consuming and difficult, which
-restricted the quantity and timeliness of the available modules. The oq-hazardlib
+restricted the quantity and timeliness of the available modules. The OQ Hazard Library
 provides a broad array of current GMPE and related hazard modules, as well as a
 framework for easily adding new modules (whether by GEM or ShakeMap staff),
 jumpstarting our efforts to re-implement ShakeMap.
 
-.. _OQ: www.globalquakemodel.org/openquake/about/
-.. _oq-hazardlib: github.com/gem/oq-hazardlib/
+.. _OQ: https://github.com/gem/oq-engine/#openquake-engine
+.. _openquake.hazardlib: http://docs.openquake.org/oq-engine/stable/openquake.hazardlib.html
