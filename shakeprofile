@@ -45,7 +45,7 @@ def make_dir(pathstr,default):
             break
     return (ppath,make_ok)
     
-def create(configfile,profile,progname):
+def create(configfile, profile, progname):
     data_path = get_data_path()
     module_file = os.path.join(data_path,'gmpe_modules.conf')
     sets_file = os.path.join(data_path,'gmpe_sets.conf')
@@ -54,13 +54,14 @@ def create(configfile,profile,progname):
     event_file = os.path.join(data_path,'northridge_event.xml')
     rupture_file = os.path.join(data_path,'northridge_fault.txt')
     event_grind_file = os.path.join(data_path,'northridge_grind.conf')
+    vs30_file = os.path.join(data_path,'northridge_vs30.grd')
     if not os.path.isfile(configfile):
         config = ConfigObj(indent_type='  ')
         config['profiles'] = {}
     else:
         config = ConfigObj(configfile)
 
-    if profile in config['profiles']:
+    if 'profiles' in config and profile in config['profiles']:
         msg = 'Profile %s already in %s.  Run %s -l to see available profiles.'
         print(msg % (profile,configfile,progname))
         sys.exit(1)
@@ -98,11 +99,15 @@ def create(configfile,profile,progname):
     #copy files over
     data_event_file = os.path.join(event_path,'event.xml')
     data_grind_file = os.path.join(event_path,'grind_zc.conf')
+    vs30_event_file = os.path.join(event_path,'vs30.grd')
     shutil.copy(data_file,event_path)
     shutil.copyfile(event_file,data_event_file)
     shutil.copy(rupture_file,event_path)
     shutil.copyfile(event_grind_file,data_grind_file)
+    shutil.copyfile(vs30_file, vs30_event_file)
         
+    if 'profiles' not in config:
+        config['profiles'] = {}
     config['profiles'][profile] = {'install_path':install_path,'data_path':data_path}
     config.filename = configfile
     config['profile'] = profile

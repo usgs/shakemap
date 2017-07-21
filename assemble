@@ -70,6 +70,18 @@ def main(args):
 
     check_config(global_grind)
 
+    #
+    # The vs30 file may have macros in it
+    #
+    vs30file = global_grind['grind']['vs30file']
+    if vs30file:
+        vs30file = vs30file.replace('<DATA_DIR>', data_path)
+        vs30file = vs30file.replace('<EVENT_ID>', args.eventid)
+        if not os.path.isfile(vs30file):
+            print("file '%s' is not a valid file" % vs30file)
+            sys.exit(1)
+        global_grind['grind']['vs30file'] = vs30file
+
     config = global_grind.dict()
 
     print('Looking for data files...')

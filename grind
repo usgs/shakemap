@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import sys
 import os.path
 import copy as copy
 import time as time
@@ -30,7 +31,35 @@ from shakelib.grind.container import InputContainer
 from shakemap.utils.config import get_config_paths
 
 #%%
+#
+# helper function for things (ipe, gmice, ccf) that don't have a 
+# fromConfig() constructor yet. Instantiates an instance of a 
+# class from config entry, 'name', that has a corresponding 
+# 'name'_module dictionary of class name, module path
+#
+def get_object_from_config(obj, cfg):
+    cls_abbr = cfg['grind'][obj]
+    mods = obj + '_modules'
+    (cname, mpath) = cfg[mods][cls_abbr]
+    return getattr(import_module(mpath), cname)()
+        
+def set_sx_params(sx, lons, lats, vs30):
+        
+    sx.lons            = lons
+    sx.lats            = lats
+    sx.vs30            = vs30
+    sx.z1pt0_cy14_cal  = Sites._z1pt0_from_vs30_cy14_cal(sx.vs30)
+    sx.z1pt0_ask14_cal = Sites._z1pt0_from_vs30_ask14_cal(sx.vs30)
+    sx.z2pt5_cb14_cal  = Sites._z2pt5_from_vs30_cb14_cal(sx.vs30) / 1000.0
+    sx.z1pt0_cy08      = Sites._z1pt0_from_vs30_cy08(sx.vs30)
+    sx.z2pt5_cb07      = Sites._z2pt5_from_z1pt0_cb07(sx.z1pt0_cy08)
+    sx.vs30measured    = np.zeros_like(lons)
+    sx.backarc         = np.zeros_like(lons)
+    return sx
 
+#%%
+#args = type('Dummy', (object,), {'eventid' : 'us19940117123055'})
+#if True:
 def grind(args):
     #
     # Find the shake_data file
@@ -44,80 +73,45 @@ def grind(args):
     if not os.path.isfile(datafile):
         print('%s is not a valid shake data file.' % datafile)
         sys.exit(1)
-    #
-    # Make the input container
-    #
+    #------------------------------------------------------------------
+    # Make the input container and extract the config
+    #------------------------------------------------------------------
     ic = InputContainer.loadFromHDF(datafile)
-    #
-    # Extract the config from the input container
-    #
     config = ic.getConfig()
 #    pprint.pprint(config)
-    #
-    # Probably should do some map extent stuff here.
-    #
-    smdx = config['grind']['prediction_location']['xres']
-    smdy = config['grind']['prediction_location']['yres']
-
-    if config['grind']['prediction_location']['file']:
-        #
-        # Open the file and get the output points
-        #
-        pass
-    else:
-        extent = config['grind']['prediction_location']['extent']
-        W = extent[0]
-        S = extent[1]
-        E = extent[2]
-        N = extent[3]
-    #
-    # What about vs30?
-    #
-
-    #
+#%%
+    #------------------------------------------------------------------
     # Instantiate the gmpe, gmice, ipe, and ccf
-    #
+    #------------------------------------------------------------------
     gmpe = MultiGMPE.from_config(config)
 
-    gmice = getattr(
-            import_module(
-                config['gmice_modules'][config['grind']['gmice']][1]),
-            config['gmice_modules'][config['grind']['gmice']][0]
-        )()
+    gmice = get_object_from_config('gmice', config)
 
     if config['ipe_modules'][config['grind']['ipe']][0] == 'VirtualIPE':
         ipe = VirtualIPE.fromFuncs(gmpe, gmice)
     else:
-        ipe = getattr(
-                import_module(
-                    config['ipe_modules'][config['grind']['ipe']][1]),
-                config['ipe_modules'][config['grind']['ipe']][0]
-            )()
+        ipe = get_object_from_config('ipe', config)
 
-    ccf = getattr(
-            import_module(
-                config['ccf_modules'][config['grind']['ccf']][1]),
-            config['ccf_modules'][config['grind']['ccf']][0]
-        )()
-    #
+    ccf = get_object_from_config('ccf', config)
+    #------------------------------------------------------------------
     # Bias parameters
-    #
+    #------------------------------------------------------------------
     bias_max_range    = config['grind']['bias']['max_range']
     bias_max_mag      = config['grind']['bias']['max_mag']
     bias_max_dsigma   = config['grind']['bias']['max_delta_sigma']
-    #
+    #------------------------------------------------------------------
     # Outlier parameters
-    #
+    #------------------------------------------------------------------
     outlier_deviation_level = config['grind']['outlier']['max_deviation']
     outlier_max_mag = config['grind']['outlier']['max_mag']
-    #
+    #------------------------------------------------------------------
     # These are the IMTs we want to make
-    #
+    #------------------------------------------------------------------
     imt_out_set_str = config['grind']['imt_list']
     imt_out_set = [imt.from_string(x) for x in imt_out_set_str]
-    #
+    #------------------------------------------------------------------
     # Station data
-    #
+    #------------------------------------------------------------------
     stations = ic.getStationList()
     #
     # df1 holds the instrumented data (PGA, PGV, SA)
@@ -128,17 +122,93 @@ def grind(args):
     if stations is not None:
         df1 = stations.getStationDataframe(1)
         df2 = stations.getStationDataframe(0)
-
+    #------------------------------------------------------------------
+    # Get a list of the input IMTs
+    #------------------------------------------------------------------
     imt_in_set1 = set([x for x in df1.keys() if x in ('PGA', 'PGV', 'MMI')
             or 'SA(' in x])
     imt_in_set2 = set([x for x in df2.keys() if x in ('PGA', 'PGV', 'MMI')
             or 'SA(' in x])
     imt_in_set = imt_in_set1 | imt_in_set2
-    #
-    # End grind()
-    #
-    
+    #------------------------------------------------------------------
+    # Get the rupture object
+    #------------------------------------------------------------------
+    rupture_obj = ic.getRupture()
+    #------------------------------------------------------------------
+    # Get the Vs30 file name
+    #------------------------------------------------------------------
+    vs30default = config['grind']['vs30default']
+    vs30_file = config['grind']['vs30file']
+    if not vs30_file:
+        vs30_file = None 
+    #------------------------------------------------------------------
+    # The output locations: either a grid or a list of points
+    #------------------------------------------------------------------
+    if config['grind']['prediction_location']['file']:
+        #
+        # FILE: Open the file and get the output points
+        #
+        lons, lats, idents = np.genfromtxt(
+                        config['grind']['prediction_location']['file'],
+                        autostrip=True, unpack=True)
+        depths = np.zeros_like(lats)
+        smnx = 1
+        smny = np.size(lons)
+        dist_obj_out = Distance(gmpe, lons, lats, depths, rupture_obj)
+        #
+        # Get the Vs30 from a file (could add other params here)
+        # In the future we may want to support selecting
+        # the Vs30 values from a grid
+        #
+        vs30_rock = np.full_like(lons, vs30default)
+        if vs30_file:
+            ids, vs = np.genfromtxt(vs30_file, autostrip=True, unpack=True)
+            vs30_hash = dict(zip(ids, vs))
+            vs30 = np.ndarray([vs30_hash[x] for x in idents])
+        else:
+            vs30 = vs30_rock
+        sx_out_soil = oqbase.SitesContext()
+        sx_out_rock = oqbase.SitesContext()
+        
+        sx_out_soil = set_sx_params(sx_out_soil, lons, lats, vs30)
+        sx_out_rock = set_sx_params(sx_out_rock, lons, lats, vs30_rock)    
+    else:
+        #
+        # GRID: Figure out the grid parameters and get output points
+        #
+        smdx = config['grind']['prediction_location']['xres']
+        smdy = config['grind']['prediction_location']['yres']
 
+        W, S, E, N = config['grind']['prediction_location']['extent']
+        
+        sites_obj_out = Sites.fromBounds(W, E, S, N, smdx, smdy, 
+                                         defaultVs30=vs30default, 
+                                         vs30File=vs30_file)
+        smnx, smny = sites_obj_out.getNxNy()
+        
+        sx_out_soil = sites_obj_out.getSitesContext()
+        sx_out_rock = sites_obj_out.getSitesContext(rock_vs30=vs30default)
+        lons, lats = np.meshgrid(sx_out_rock.lons, sx_out_rock.lats)
+        lons = np.flipud(lons)
+        lats = np.flipud(lats)
+        lons = lons.flatten()
+        lats = lats.flatten()
+        depths = np.zeros_like(lats)
+
+        dist_obj_out = Distance.fromSites(gmpe, sites_obj_out, rupture_obj)
+    
+    dx_out = dist_obj_out.getDistanceContext()
+        
+    lons_out_rad = np.radians(lons)
+    lats_out_rad = np.radians(lats)
+
+
+    print('done')
+    #------------------------------------------------------------------
+    # End grind()
+    #------------------------------------------------------------------
+    
+#%%
 if __name__ == '__main__':
     description = '''Process a shakemap...
 The only argument is a ShakeMap event ID, which should correspond to a 
@@ -150,4 +220,5 @@ directory in the ShakeMap data directory of the current profile.
                          'input and config files.')
     pargs = parser.parse_args()
     grind(pargs)
+
 
