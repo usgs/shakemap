@@ -64,6 +64,9 @@ def main(args):
     global_grind.merge(modules)
     global_grind.merge(gmpe_sets)
 
+    #
+    # Add dummy zone_info section and its subsections
+    #
     if 'zone_info' not in global_grind:
         global_grind['zone_info'] = {}
         global_grind['zone_info']['slab'] = {}
