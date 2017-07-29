@@ -5,6 +5,7 @@ import sys
 import os.path
 import argparse
 import glob
+import pprint
 
 #third party imports
 from configobj import ConfigObj, flatten_errors
@@ -34,8 +35,8 @@ def main(args):
                              '.shakemap','configspec.conf')
     validator = get_custom_validator()
     print('Looking for configuration files...')
-    gmpe_modules = ConfigObj(
-            os.path.join(install_path, 'config', 'gmpe_modules.conf'),
+    modules = ConfigObj(
+            os.path.join(install_path, 'config', 'modules.conf'),
             configspec=spec_file)
     gmpe_sets = ConfigObj(
             os.path.join(install_path, 'config', 'gmpe_sets.conf'),
@@ -60,15 +61,41 @@ def main(args):
     # start merging event_grind
     #
     global_grind.merge(event_grind)
-    global_grind.merge(gmpe_modules)
+    global_grind.merge(modules)
     global_grind.merge(gmpe_sets)
 
+    #
+    # Add dummy zone_info section and its subsections
+    #
+    if 'zone_info' not in global_grind:
+        global_grind['zone_info'] = {}
+        global_grind['zone_info']['slab'] = {}
+        global_grind['zone_info']['plunge_values'] = {}
+        global_grind['zone_info']['plunge_values']['taxis'] = {}
+        global_grind['zone_info']['plunge_values']['paxis'] = {}
+        global_grind['zone_info']['plunge_values']['naxis'] = {}
+        global_grind['zone_info']['plunge_values']['nodalplane1'] = {}
+        global_grind['zone_info']['plunge_values']['nodalplane2'] = {}
+        global_grind['zone_info']['equations'] = {}
+
     results = global_grind.validate(validator)
-#    print(results)
     if results != True:
         config_error(global_grind, results)
 
     check_config(global_grind)
+
+    #
+    # The vs30 file may have macros in it
+    #
+    vs30file = global_grind['grind']['vs30file']
+    if vs30file:
+        vs30file = vs30file.replace('<DATA_DIR>', data_path)
+        vs30file = vs30file.replace('<EVENT_ID>', args.eventid)
+        if not os.path.isfile(vs30file):
+            print("file '%s' is not a valid file" % vs30file)
+            sys.exit(1)
+        global_grind['grind']['vs30file'] = vs30file
+#    pprint.pprint(global_grind)
 
     config = global_grind.dict()
 

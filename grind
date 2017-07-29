@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 
+import sys
 import os.path
-import copy as copy
 import time as time
-import tempfile
 import argparse
 from importlib import import_module
+import copy
 
-# Not really needed
+# Not really needed, but handy for looking at the config
 import pprint
 
 import numpy as np
@@ -17,21 +17,71 @@ from openquake.hazardlib import imt
 import openquake.hazardlib.const as oqconst
 import openquake.hazardlib.gsim.base as oqbase
 
-from shakelib.grind.origin import Origin
-from shakelib.grind.rupture import read_rupture_file, PointRupture
+from shakelib.grind.rupture import PointRupture
 from shakelib.grind.sites import Sites
-from shakelib.grind.distance import Distance
-from shakelib.grind.station import StationList
+from shakelib.grind.distance import Distance, get_distance
 from shakelib.grind.multigmpe import MultiGMPE
 from shakelib.grind.virtualipe import VirtualIPE
-from shakelib.grind.distance import get_distance_measures
 
-from shakelib.grind.container import InputContainer
+from shakelib.grind.container import InputContainer, OutputContainer
 from shakemap.utils.config import get_config_paths
 
 #%%
+#
+# helper function for things (ipe, gmice, ccf) that don't have a 
+# fromConfig() constructor yet. Instantiates an instance of a 
+# class from config entry, 'name', that has a corresponding 
+# 'name'_module dictionary of class name, module path
+#
+def get_object_from_config(obj, cfg):
+    cls_abbr = cfg['grind'][obj]
+    mods = obj + '_modules'
+    (cname, mpath) = cfg[mods][cls_abbr]
+    return getattr(import_module(mpath), cname)()
 
+#
+# Set the attributes of the site context
+#        
+def set_sx_params(sx, lons, lats, vs30):      
+    sx.lons            = lons
+    sx.lats            = lats
+    sx.vs30            = vs30
+    sx.z1pt0_cy14_cal  = Sites._z1pt0_from_vs30_cy14_cal(sx.vs30)
+    sx.z1pt0_ask14_cal = Sites._z1pt0_from_vs30_ask14_cal(sx.vs30)
+    sx.z2pt5_cb14_cal  = Sites._z2pt5_from_vs30_cb14_cal(sx.vs30) / 1000.0
+    sx.z1pt0_cy08      = Sites._z1pt0_from_vs30_cy08(sx.vs30)
+    sx.z2pt5_cb07      = Sites._z2pt5_from_z1pt0_cb07(sx.z1pt0_cy08)
+    sx.vs30measured    = np.zeros_like(lons)
+    sx.backarc         = np.zeros_like(lons)
+    return sx
+
+#
+# Helper function to call get_mean_and_stddevs for the 
+# appropriate object given the IMT
+#
+def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
+    if 'MMI' in oqimt:
+        pe = ipe
+    else:
+        pe = gmpe
+    return pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
+
+#: Earth radius in km.
+EARTH_RADIUS = 6371.0
+#
+# Quick and dirty distance calculator; uses numexpr for speed
+#
+def geodetic_distance(lons1, lats1, lons2, lats2, diameter=2*EARTH_RADIUS):
+    d = ne.evaluate("EARTH_RADIUS * sqrt(((lons1 - lons2) * cos(0.5 * " \
+                    "(lats1 + lats2)))**2.0 + (lats1 - lats2)**2.0)")
+    return d
+
+#%%
+#args = type('Dummy', (object,), {'eventid' : 'northridge',
+#                                 'verbose' : True})
+#if True:
 def grind(args):
+    verbose = args.verbose
     #
     # Find the shake_data file
     #
@@ -44,101 +94,605 @@ def grind(args):
     if not os.path.isfile(datafile):
         print('%s is not a valid shake data file.' % datafile)
         sys.exit(1)
-    #
-    # Make the input container
-    #
+    #------------------------------------------------------------------
+    # Make the input container and extract the config
+    #------------------------------------------------------------------
     ic = InputContainer.loadFromHDF(datafile)
-    #
-    # Extract the config from the input container
-    #
     config = ic.getConfig()
 #    pprint.pprint(config)
-    #
-    # Probably should do some map extent stuff here.
-    #
-    smdx = config['grind']['prediction_location']['xres']
-    smdy = config['grind']['prediction_location']['yres']
-
-    if config['grind']['prediction_location']['file']:
-        #
-        # Open the file and get the output points
-        #
-        pass
-    else:
-        extent = config['grind']['prediction_location']['extent']
-        W = extent[0]
-        S = extent[1]
-        E = extent[2]
-        N = extent[3]
-    #
-    # What about vs30?
-    #
-
-    #
+    #------------------------------------------------------------------
     # Instantiate the gmpe, gmice, ipe, and ccf
-    #
+    #------------------------------------------------------------------
     gmpe = MultiGMPE.from_config(config)
 
-    gmice = getattr(
-            import_module(
-                config['gmice_modules'][config['grind']['gmice']][1]),
-            config['gmice_modules'][config['grind']['gmice']][0]
-        )()
+    gmice = get_object_from_config('gmice', config)
 
     if config['ipe_modules'][config['grind']['ipe']][0] == 'VirtualIPE':
         ipe = VirtualIPE.fromFuncs(gmpe, gmice)
     else:
-        ipe = getattr(
-                import_module(
-                    config['ipe_modules'][config['grind']['ipe']][1]),
-                config['ipe_modules'][config['grind']['ipe']][0]
-            )()
+        ipe = get_object_from_config('ipe', config)
 
-    ccf = getattr(
-            import_module(
-                config['ccf_modules'][config['grind']['ccf']][1]),
-            config['ccf_modules'][config['grind']['ccf']][0]
-        )()
-    #
+    ccf = get_object_from_config('ccf', config)
+    #------------------------------------------------------------------
     # Bias parameters
-    #
-    bias_max_range    = config['grind']['bias']['max_range']
-    bias_max_mag      = config['grind']['bias']['max_mag']
-    bias_max_dsigma   = config['grind']['bias']['max_delta_sigma']
-    #
+    #------------------------------------------------------------------
+    do_bias         = config['grind']['bias']['do_bias']
+    bias_max_range  = config['grind']['bias']['max_range']
+    bias_max_mag    = config['grind']['bias']['max_mag']
+    bias_max_dsigma = config['grind']['bias']['max_delta_sigma']
+    #------------------------------------------------------------------
     # Outlier parameters
-    #
+    #------------------------------------------------------------------
     outlier_deviation_level = config['grind']['outlier']['max_deviation']
     outlier_max_mag = config['grind']['outlier']['max_mag']
-    #
+    #------------------------------------------------------------------
     # These are the IMTs we want to make
-    #
+    #------------------------------------------------------------------
     imt_out_set_str = config['grind']['imt_list']
     imt_out_set = [imt.from_string(x) for x in imt_out_set_str]
-    #
+    #------------------------------------------------------------------
+    # Get the rupture object and rupture context
+    #------------------------------------------------------------------
+    rupture_obj = ic.getRupture()
+    rx = rupture_obj.getRuptureContext([gmpe])
+    if rx.rake == None:
+        rx.rake = 0
+    #------------------------------------------------------------------
+    # Get the Vs30 file name
+    #------------------------------------------------------------------
+    vs30default = config['grind']['vs30default']
+    vs30_file = config['grind']['vs30file']
+    if not vs30_file:
+        vs30_file = None 
+    #------------------------------------------------------------------
+    # The output locations: either a grid or a list of points
+    #------------------------------------------------------------------
+    if config['grind']['prediction_location']['file']:
+        #
+        # FILE: Open the file and get the output points
+        #
+        lons, lats, idents = np.genfromtxt(
+                        config['grind']['prediction_location']['file'],
+                        autostrip=True, unpack=True)
+        depths = np.zeros_like(lats)
+        smnx = np.size(lons)
+        smny = 1
+        dist_obj_out = Distance(gmpe, lons, lats, depths, rupture_obj)
+        #
+        # Get the Vs30 from a file (could add other params here)
+        # In the future we may want to support selecting
+        # the Vs30 values from a grid
+        #
+        vs30_rock = np.full_like(lons, vs30default)
+        if vs30_file:
+            ids, vs = np.genfromtxt(vs30_file, autostrip=True, unpack=True)
+            vs30_hash = dict(zip(ids, vs))
+            vs30 = np.ndarray([vs30_hash[x] for x in idents])
+        else:
+            vs30 = vs30_rock
+        sx_out_soil = oqbase.SitesContext()
+        sx_out_rock = oqbase.SitesContext()
+        
+        sx_out_soil = set_sx_params(sx_out_soil, lons, lats, vs30)
+        sx_out_rock = set_sx_params(sx_out_rock, lons, lats, vs30_rock)
+    else:
+        #
+        # GRID: Figure out the grid parameters and get output points
+        #
+        smdx = config['grind']['prediction_location']['xres']
+        smdy = config['grind']['prediction_location']['yres']
+
+        W, S, E, N = config['grind']['prediction_location']['extent']
+        
+        sites_obj_out = Sites.fromBounds(W, E, S, N, smdx, smdy, 
+                                         defaultVs30=vs30default, 
+                                         vs30File=vs30_file)
+        smnx, smny = sites_obj_out.getNxNy()
+        
+        sx_out_soil = sites_obj_out.getSitesContext()
+        sx_out_rock = sites_obj_out.getSitesContext(rock_vs30=vs30default)
+        lons, lats = np.meshgrid(sx_out_rock.lons, sx_out_rock.lats)
+        lons = np.flipud(lons)
+        lats = np.flipud(lats)
+        lons = lons.flatten()
+        lats = lats.flatten()
+        depths = np.zeros_like(lats)
+
+        dist_obj_out = Distance.fromSites(gmpe, sites_obj_out, rupture_obj)
+    
+    dx_out = dist_obj_out.getDistanceContext()
+        
+    lons_out_rad = np.radians(lons)
+    lats_out_rad = np.radians(lats)
+    #------------------------------------------------------------------
     # Station data
-    #
+    #------------------------------------------------------------------
     stations = ic.getStationList()
+    stddev_types = [oqconst.StdDev.TOTAL, oqconst.StdDev.INTER_EVENT, 
+                    oqconst.StdDev.INTRA_EVENT]
     #
     # df1 holds the instrumented data (PGA, PGV, SA)
     # df2 holds the non-instrumented data (MMI)
     #
-    df1 = {}
-    df2 = {}
+    df_dict = {'df1': None, 'df2': None}
+    imt_in_str_dict = {'df1': None, 'df2': None}
+    imt_in_dict = {'df1': None, 'df2': None}
+    imt_in_str_set = set()
+    sx_dict = {'df1': None, 'df2': None}
+    dx_dict = {'df1': None, 'df2': None}
     if stations is not None:
-        df1 = stations.getStationDataframe(1)
-        df2 = stations.getStationDataframe(0)
+        df_dict['df1'] = stations.getStationDataframe(1)
+        df_dict['df2'] = stations.getStationDataframe(0)
+        #
+        # Get the sites and distance contexts for each dataframe then
+        # compute the predictions for the IMTs in that dataframe.
+        #
+        for ndf, df in df_dict.items():
+            if not df:
+                continue
+            #
+            # Get lists of the input IMTs
+            #
+            imt_in_str_dict[ndf] = set(
+                    [x for x in df.keys() if x in ('PGA', 'PGV', 'MMI') or 
+                     x.startswith('SA(')])
+            imt_in_dict[ndf] = set(
+                    [imt.from_string(x) for x in imt_in_str_dict[ndf]])
+            imt_in_str_set |= imt_in_str_dict[ndf]
+            #
+            # Get the sites and distance contexts
+            #
+            df['depth'] = np.zeros_like(df['lon'])
+            lldict = {'lons': df['lon'], 'lats': df['lat']}
+            sx_dict[ndf] = sites_obj_out.getSitesContext(lldict)
+            dist_obj = Distance(gmpe, df['lon'], df['lat'], df['depth'], 
+                                rupture_obj)
+            dx_dict[ndf] = dist_obj.getDistanceContext()
+            #
+            # Do the predictions and other bookkeeping for each IMT
+            #
+            for imtstr in imt_in_str_dict[ndf]:
+                pmean, psd = gmas(ipe, gmpe, sx_dict[ndf], rx, dx_dict[ndf], 
+                                  imt.from_string(imtstr), stddev_types)
+                df[imtstr + '_pred'] = pmean
+                df[imtstr + '_pred_sd_total'] = psd[0]
+                df[imtstr + '_pred_sd_inter'] = psd[1]
+                df[imtstr + '_pred_sd_intra'] = psd[2]
+                #
+                # Compute the total residual
+                #
+                df[imtstr + '_residual'] = df[imtstr] - df[imtstr + '_pred']
+                #
+                # Do the outlier flagging if we don't have a fault and
+                # the event magnitude is over the limit
+                #
+                if not isinstance(rupture_obj, PointRupture) or \
+                   rx.mag <= outlier_max_mag:
+                    #
+                    # turn off nan warnings for this statement
+                    #
+                    np.seterr(invalid='ignore')
+                    flagged = np.abs(df[imtstr + '_residual']) > \
+                              outlier_deviation_level * \
+                              df[imtstr + '_pred_sd_total']
+                    np.seterr(invalid='warn')
+                    if verbose:
+                        print('IMT: %s, flagged: %d' % 
+                              (imtstr, np.sum(flagged)))
+                    df[imtstr + '_outliers'] = flagged
+                    df[imtstr][flagged] = np.nan
+                    df[imtstr + '_residual'][flagged] = np.nan
+                #
+                # Make the uncertainty arrays for any IMTs that don't
+                # have them.
+                #
+                if (imtstr + '_sd') not in df:
+                    if imtstr == 'MMI':
+                        sdval = 0.3
+                    else:
+                        sdval = 0.0
+                    df[imtstr + '_sd'] = np.full_like(df['lon'], sdval)
+            #
+            # Get the lons/lats in radians while we're at it
+            #
+            df['lon_rad'] = np.radians(df['lon'])
+            df['lat_rad'] = np.radians(df['lat'])
+            #
+            # It will be handy later on to have the rupture distance
+            # in the dataframes
+            #
+            dd = get_distance(['rrup'], df['lat'], df['lon'], 
+                                      df['depth'], rupture_obj)
+            df['rrup'] = dd['rrup']
+    df1 = df_dict['df1']
+    df2 = df_dict['df2']
+#%%
+    #------------------------------------------------------------------
+    # Do the bias for each of the input IMTs
+    # It is possible that the observations at different stations will
+    # have different weights, so we need to fix that up before the 
+    # final version.
+    #------------------------------------------------------------------
+#    bias = {}
+#    sigma_2_eta = {}
+#    if not isinstance(rupture_obj, PointRupture) or rx.mag <= bias_max_mag:
+#        for imtstr in imt_in_str_set:
+#            if imtstr in df1:
+#                df = df1
+#                ndf = 'df1'
+#            else:
+#                df = df2
+#                ndf = 'df2'
+#            #
+#            # Find the valid indices for this IMT
+#            #
+#            vidx = ~np.isnan(df[imtstr]) & (df['rrup'] <= bias_max_range)
+#            if not np.any(vidx):
+#                bias[imtstr] = 0.0
+#                sigma_2_eta[imtstr] = 0.0
+#                continue
+#            #
+#            # Get the total residual for the IMT
+#            #
+#            resid = df[imtstr + '_residual'][vidx]
+#            resid = resid.reshape((-1, 1))
+#    #        print('mean %s residual %f' % (imtstr, np.mean(resid)))
+#            ONE = np.ones_like(resid)
+#            tau = np.mean(df[imtstr + '_pred_sd_inter'][vidx])
+#            sta_lons_rad = (df['lon_rad'][vidx]).reshape(-1, 1)
+#            sta_lats_rad = (df['lat_rad'][vidx]).reshape(-1, 1)
+#            dist22 = geodetic_distance(sta_lons_rad, sta_lats_rad,
+#                                       sta_lons_rad.transpose(), 
+#                                       sta_lats_rad.transpose())                                  
+#            if imtstr == 'PGA':
+#                period = 0.01
+#            elif imtstr == 'PGV' or imtstr == 'MMI':
+#                period = 1.0
+#            else:
+#                period = imt.from_string(imtstr).period
+#            t1 = t2 = np.full_like(dist22, period)
+#            corr22 = ccf.getCorrelation(t1, t2, dist22)
+#            sta_sigma = (df[imtstr + '_pred_sd_intra'][vidx]).reshape(-1, 1)
+#            sigma22 = corr22 * (sta_sigma * sta_sigma.transpose())
+#            sigma22_inv = np.linalg.pinv(sigma22)
+#            sigma_2_eta[imtstr] = 1.0 / (1 / tau**2 + \
+#                                   ONE.transpose().dot(sigma22_inv.dot(ONE)))
+#            bias[imtstr] = ONE.transpose().dot(sigma22_inv.dot(resid)) * \
+#                        sigma_2_eta[imtstr]
+#            if bias[imtstr] > bias_max_dsigma:
+#                bias[imtstr] = 0.0
+#                sigma_2_eta[imtstr] = 0.0
+#            if verbose:
+#                print('%s: bias %f variance %f' % (imtstr, bias[imtstr], 
+#                                                   sigma_2_eta[imtstr]))
+#    else:
+#        for imtstr in imt_in_str_set:
+#            bias[imtstr] = 0.0
+#            sigma_2_eta[imtstr] = 0.0
 
-    imt_in_set1 = set([x for x in df1.keys() if x in ('PGA', 'PGV', 'MMI')
-            or 'SA(' in x])
-    imt_in_set2 = set([x for x in df2.keys() if x in ('PGA', 'PGV', 'MMI')
-            or 'SA(' in x])
-    imt_in_set = imt_in_set1 | imt_in_set2
+#%%
+    #------------------------------------------------------------------
+    # Compute all the IMTs possible from MMI
+    # This logic needs to be revisited. We should probably make what
+    # we have to to do the CMS to make the needed output IMTs, but
+    # for now, we're just going to use what we have and the ccf.
+    #------------------------------------------------------------------
+    if df2:
+        for gmice_imt in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
+            if imt.SA == gmice_imt:
+                iterlist = gmice.DEFINED_FOR_SA_PERIODS                    
+            else:
+                iterlist = [None]
+            for period in iterlist:
+                oqimt = gmice_imt(period)
+                imtstr = str(oqimt)
+                df2[imtstr], _ = gmice.getGMfromMI(df2['MMI'], oqimt, 
+                                                   dists=df2['rrup'], 
+                                                   mag=rx.mag)
+                np.seterr(invalid='ignore')
+                df2[imtstr][df2['MMI'] < 4.0] = np.nan
+                np.seterr(invalid='warn')
+                df2[imtstr + '_sd'] = np.full_like(df2['MMI'],
+                       gmice.getMI2GMsd()[oqimt])
+                imt_in_str_dict['df2'].add(imtstr)
+                #
+                # Get the predictions and stddevs, too
+                #
+#
+# Should we bias the predictions?
+#
+                pmean, psd = gmas(ipe, gmpe, sx_dict['df2'], rx, 
+                                  dx_dict['df2'], oqimt, stddev_types)
+                df2[imtstr + '_pred'] = pmean
+                df2[imtstr + '_pred_sd_total'] = psd[0]
+                df2[imtstr + '_pred_sd_inter'] = psd[1]
+                df2[imtstr + '_pred_sd_intra'] = psd[2]
+                df2[imtstr + '_residual'] = df2[str(oqimt)] - pmean
+                
     #
-    # End grind()
+    # Now make derived MMI from the best available PGM; This is ugly and it
+    # would be nice to have a more deterministic way of doing it
     #
+    if df1:
+        imtstr = None
+        if 'PGV' in df1 \
+                and imt.PGV in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
+            imtstr = 'PGV'
+        elif 'PGA' in df1 \
+                and imt.PGA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
+            imtstr = 'PGA'
+        elif 'SA(1.0)' in df1 \
+                and imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES \
+                and 1.0 in gmice.DEFINED_FOR_SA_PERIODS:
+            imtstr = 'SA(1.0)'
+        elif 'SA(0.3)' in df1 \
+                and imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES \
+                and 0.3 in gmice.DEFINED_FOR_SA_PERIODS:
+            imtstr = 'SA(0.3)'
+        elif 'SA(3.0)' in df1 \
+                and imt.SA in gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES \
+                and 3.0 in gmice.DEFINED_FOR_SA_PERIODS:
+            imtstr = 'SA(3.0)'
+        
+        if imtstr is not None:
+            oqimt = imt.from_string(imtstr)
+            df1['MMI'], _ = gmice.getMIfromGM(df1[imtstr], oqimt,
+                                              dists=df1['rrup'], mag=rx.mag)
+            df1['MMI_sd'] = np.full_like(df1[imtstr], 
+                                         gmice.getGM2MIsd()[oqimt])
+            imt_in_str_dict['df1'].add('MMI')
+            #
+            # Get the prediction and stddevs
+            #
+            pmean, psd = gmas(ipe, gmpe, sx_dict['df1'], rx, dx_dict['df1'], 
+                              imt.from_string('MMI'), stddev_types)
+            df1['MMI' + '_pred'] = pmean
+            df1['MMI' + '_pred_sd_total'] = psd[0]
+            df1['MMI' + '_pred_sd_inter'] = psd[1]
+            df1['MMI' + '_pred_sd_intra'] = psd[2]
+            df1['MMI' + '_residual'] = df1['MMI'] - pmean
+                
+#%%
+    #------------------------------------------------------------------
+    # Do the MVN
+    #------------------------------------------------------------------
+    bias = {}
+    sigma_2_eta = {}
+    outgrid = {}
+    outsd = {}
     
+#    for imtstr in ('PGV',):
+    for imtstr in imt_out_set_str:
+        #
+        # Get the (pesudo-) period of the output IMT
+        #
+        time1 = time.time()
+        oqimt = imt.from_string(imtstr)
+        if imtstr == 'PGA':
+            outperiod = 0.01
+        elif imtstr in ('PGV', 'MMI'):
+            outperiod = 1.0
+        else:
+            outperiod = oqimt.period
+        #
+        # Get the predictions at the output points
+        #
+        pout_mean, pout_sd = gmas(ipe, gmpe, sx_out_soil, rx, dx_out, oqimt, 
+                                  stddev_types)
+        pout_sd = pout_sd[2]
+        pout_sd2 = np.power(pout_sd, 2.0)
 
+        ampgrid = np.zeros_like(pout_mean)
+        sdgrid = np.zeros_like(pout_mean)
+        
+        sta_lons_rad = np.array([])
+        sta_lats_rad = np.array([])
+        sta_resids = np.array([])
+        sta_sigs = np.array([])
+        sta_sigs_total = np.array([])
+        sta_period = np.array([])
+        for ndf, sdf in df_dict.items():
+            for imtin in imt_in_str_dict[ndf]:
+#                if imtin != imtstr:
+#                    continue
+                oqimtin = imt.from_string(imtin)
+                if imtin == 'PGA':
+                    inperiod = 0.01
+                elif imtin in ('PGV', 'MMI'):
+                    inperiod = 1.0
+                else:
+                    inperiod = oqimtin.period
+                vidx = ~np.isnan(sdf[imtin])
+                sta_lons_rad = np.append(sta_lons_rad, sdf['lon_rad'][vidx])
+                sta_lats_rad = np.append(sta_lats_rad, sdf['lat_rad'][vidx])
+                sta_resids = np.append(sta_resids, 
+                                       sdf[imtin + '_residual'][vidx])
+                psd = sdf[imtstr + '_pred_sd_intra'][vidx]
+                sta_sigs = np.append(sta_sigs, psd)
+                sta_sigs_total = np.append(sta_sigs_total, np.sqrt(
+                        psd**2 + sdf[imtstr + '_sd'][vidx]**2))
+                sta_period = np.append(sta_period, np.full_like(psd, inperiod))
+        if np.size(sta_lons_rad) == 0:
+            outgrid[imtstr] = pout_mean
+            outsd[imtstr] = pout_sd[0]
+            continue
+        sta_lons_rad = sta_lons_rad.reshape((-1, 1))
+        sta_lats_rad = sta_lats_rad.reshape((-1, 1))
+        sta_resids = sta_resids.reshape((-1, 1))
+        sta_sigs = sta_sigs.reshape((-1, 1))
+        sta_sigs_total = sta_sigs_total.reshape((-1, 1))
+        sta_period = sta_period.reshape((-1, 1))
+        corr_adj = (sta_sigs / sta_sigs_total)
+        corr_adj12 = corr_adj * np.ones((1, smnx))
+        corr_adj22 = corr_adj * corr_adj.T
+        np.fill_diagonal(corr_adj22, 1.0)
+        dist22 = geodetic_distance(sta_lons_rad, sta_lats_rad,
+                                   sta_lons_rad.T, sta_lats_rad.T)
+        d22_rows, d22_cols = np.shape(dist22) # should be square
+        t1_22 = np.tile(sta_period, (1, d22_cols))
+        t2_22 = np.tile(sta_period.T, (d22_rows, 1))
+        corr22 = ccf.getCorrelation(t1_22, t2_22, dist22) * corr_adj22
+        sigma22 = corr22 * (sta_sigs * sta_sigs.T)
+        sigma22inv = np.linalg.pinv(sigma22)
+        #
+        # Compute the bias and apply it to the predictions and the
+        # residuals
+        #
+        if do_bias and (not isinstance(rupture_obj, PointRupture) 
+                        or rx.mag <= bias_max_mag):        
+            ONE = np.ones_like(sta_resids)
+            tau = np.mean(pout_sd[1])
+            sigma_2_eta[imtstr] = 1.0 / (1 / tau**2 + \
+                                   ONE.T.dot(sigma22inv.dot(ONE)))
+            bias[imtstr] = ONE.T.dot(sigma22inv.dot(sta_resids)) * \
+                        sigma_2_eta[imtstr]
+            if bias[imtstr] > bias_max_dsigma:
+                bias[imtstr] = 0.0
+                sigma_2_eta[imtstr] = 0.0
+            if verbose:
+                print('%s: bias %f stddev %f' % (imtstr, bias[imtstr], 
+                                                 np.sqrt(sigma_2_eta[imtstr])))
+        else:
+            bias[imtstr] = 0.0
+            sigma_2_eta[imtstr] = 0.0
+#
+# Should probably check to see if there is a bias and if not, select the
+# total uncertainty rather than the intra even uncertainty...
+#
+        #
+        # Bias the predictions
+        #
+        pout_mean += bias[imtstr]
+        #
+        # Remake the residual array now that we (may) have a bias
+        #
+        if bias[imtstr] != 0:
+            sta_resids = np.array([])        
+            for ndf, sdf in df_dict.items():
+                for imtin in imt_in_str_dict[ndf]:
+#                    if imtin != imtstr:
+#                        continue
+                    vidx = ~np.isnan(sdf[imtin])
+                    sta_resids = np.append(
+                            sta_resids, 
+                            sdf[imtin + '_residual'][vidx] - bias[imtstr])
+        sta_resids = sta_resids.reshape((-1, 1))
+        #
+        # Now do the MVN itself...
+        #
+        prep_time = time.time() - time1            
+        dtime = 0
+        mtime = 0
+        ddtime = 0
+        ctime = stime = atime = 0
+        #
+        # These two lines are out of the loop for performance reasons,
+        # but they should be moved back inside, and corr_adj12 should
+        # be replaced with dist12, if the size/shape of the output
+        # can change (e.g., if we divide up a list of points into
+        # smaller chunks and the final chunk is not the same size as 
+        # the others.
+        #
+        t2_12 = np.full_like(corr_adj12, outperiod)
+        d12_rows, d12_cols = np.shape(corr_adj12)
+        for iy in range(smny):
+            ss = iy * smnx
+            se = (iy + 1) * smnx
+            time4 = time.time()
+            dist12 = geodetic_distance(lons_out_rad[ss:se].reshape(1, -1), 
+                                       lats_out_rad[ss:se].reshape(1, -1),
+                                       sta_lons_rad, sta_lats_rad)
+            t1_12 = np.tile(sta_period, (1, d12_cols))
+            ddtime += time.time() - time4
+            time4 = time.time()
+            corr12 = ccf.getCorrelation(t1_12, t2_12, dist12)
+            ctime += time.time() - time4
+            time4 = time.time()
+            psd = pout_sd[iy, :].reshape((1, -1))
+            sigma12 =  ne.evaluate(
+                    "corr12 * corr_adj12 * (sta_sigs * psd)"
+                    ).T
+            stime += time.time() - time4    
+            time4 = time.time()
+            rcmatrix = sigma12.dot(sigma22inv)
+            dtime += time.time() - time4    
+            time4 = time.time()
+            ampgrid[iy, :] = pout_mean[iy, :] + ((corr_adj12.T * 
+                   rcmatrix).dot(sta_resids)).reshape((-1,))
+            atime += time.time() - time4
+            time4 = time.time()
+    #        sdgrid[ss:se] = pout_sd2[ss:se] - np.diag(rcmatrix.dot(sigma12))
+            sdgrid[iy, :] = pout_sd2[iy, :] - \
+                    np.sum(rcmatrix * sigma12, axis=1)
+            mtime += time.time() - time4
+                
+        outgrid[imtstr] = ampgrid
+        sdgrid[sdgrid < 0] = 0
+        outsd[imtstr] = np.sqrt(sdgrid)
+        if verbose:
+            print('prep time for %s=%f' % (imtstr, prep_time))
+            print('time for %s distance=%f' % (imtstr, ddtime))
+            print('time for %s correlation=%f' % (imtstr, ctime))
+            print('time for %s sigma=%f' % (imtstr, stime))
+            print('time for %s rcmatrix=%f' % (imtstr, dtime))
+            print('time for %s amp calc=%f' % (imtstr, atime))
+            print('time for %s sd calc=%f' % (imtstr, mtime))
+            print('total time for %s=%f' % (imtstr, time.time() - time1))
+
+#%%
+    #------------------------------------------------------------------
+    # Output the data and metadata
+    #------------------------------------------------------------------
+    oc = OutputContainer.createEmpty(os.path.join(datadir, 'shake_result.hdf'))
+    #
+    # Might as well stick the whole config in the result
+    #
+    oc.addMetadata(config, name='config')
+    #
+    # Clean up the metadata, and add new stuff
+    #
+    metadata = copy.deepcopy(config)
+    del metadata['ccf_modules']
+    del metadata['gmice_modules']
+    del metadata['gmpe_modules']
+    del metadata['gmpe_sets']
+    del metadata['ipe_modules']
+    del metadata['grind']['vs30file']
+    metadata['grind']['ccf'] = config['ccf_modules'][config['grind']['ccf']][0]
+    metadata['grind']['ipe'] = config['ipe_modules'][config['grind']['ipe']][0]
+    metadata['grind']['gmice'] = \
+            config['gmice_modules'][config['grind']['gmice']][0]
+    metadata['bias'] = {}
+    for key, value in bias.items():
+        metadata['bias'][key] = value
+    metadata['max_amp'] = {}
+    for key, value in outgrid.items():
+        metadata['max_amp'][key] = np.max(outgrid[key])
+        #
+        # How do we get max value on land?
+        #
+    #
+    # Need:
+    #   event info
+    #   rupture info (how?)
+    #   number of stations, dyfi
+    #   ShakeMap grade (how?)
+    #   ShakeMap version, map version, date of production
+    #   station data
+    #
+    oc.addMetadata(metadata)
+    
+    for key, value in outgrid.items():
+        oc.addData(value, key)
+        oc.addData(outsd[key], key + '_sd')
+    
+    oc.close()
+    print('done')
+    #------------------------------------------------------------------
+    # End grind()
+    #------------------------------------------------------------------
+    
+#%%
 if __name__ == '__main__':
     description = '''Process a shakemap...
 The only argument is a ShakeMap event ID, which should correspond to a 
@@ -148,6 +702,9 @@ directory in the ShakeMap data directory of the current profile.
     parser.add_argument('eventid', 
                     help='Path to ShakeMap data directory containing '
                          'input and config files.')
+    parser.add_argument('-v','--verbose', action='store_true',
+                        help='Print informational messages.')
     pargs = parser.parse_args()
     grind(pargs)
+
 
