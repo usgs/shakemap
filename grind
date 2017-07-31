@@ -33,11 +33,11 @@ from shakemap.utils.config import get_config_paths
 # class from config entry, 'name', that has a corresponding 
 # 'name'_module dictionary of class name, module path
 #
-def get_object_from_config(obj, cfg):
+def get_object_from_config(obj, cfg, *args):
     cls_abbr = cfg['grind'][obj]
     mods = obj + '_modules'
     (cname, mpath) = cfg[mods][cls_abbr]
-    return getattr(import_module(mpath), cname)()
+    return getattr(import_module(mpath), cname)(*args)
 
 #
 # Set the attributes of the site context
@@ -76,11 +76,77 @@ def geodetic_distance(lons1, lats1, lons2, lats2, diameter=2*EARTH_RADIUS):
                     "(lats1 + lats2)))**2.0 + (lats1 - lats2)**2.0)")
     return d
 
+def get_imts(imtstr, imtset):
+
+    if imtstr in imtset:
+        return (imtstr, )
+
+    salist = [x for x in imtset if x.startswith('SA(')]
+    periodlist = [float(x.replace('SA(', '').replace(')', '')) for x in salist]
+    periodlist = sorted(periodlist)
+    periodlist_str = [str(x) for x in periodlist]
+    
+    #
+    # If we're here, then we know that IMT isn't in the inputs. Try
+    # some alternatives.
+    #
+    if imtstr == 'PGA':
+        #
+        # Use the highest frequency in the inputs, otherwise use PGV
+        #
+        if len(salist):
+            return ('SA(' + periodlist_str[0] + ')', )
+        elif 'PGV' in imtset:
+            return ('PGV', )
+        else:
+            return ()
+    elif imtstr == 'PGV':
+        #
+        # Use 1.0 sec SA (or its bracket) if it's there, otherwise
+        # use PGA
+        #
+        sa_tuple = get_sa_bracket(1.0, periodlist, periodlist_str)
+        if sa_tuple != ():
+            return sa_tuple
+        if 'PGA' in imtset:
+            return ('PGA', )
+        else:
+            return ()            
+    elif imtstr == 'MMI':
+        #
+        # Use PGV if it's there, otherwise use 1.0 sec SA (or its
+        # bracket)
+        #
+        if 'PGV' in imtset:
+            return ('PGV', )
+        return get_sa_bracket(1.0, periodlist, periodlist_str)
+    elif imtstr.startswith('SA('):
+        myper = float(imtstr.replace('SA(', '').replace(')', ''))
+        return get_sa_bracket(myper, periodlist, periodlist_str)
+    else:
+        raise ValueError('Unknown IMT %s in get_imt_bracket' % imtstr)
+        
+def get_sa_bracket(myper, plist, plist_str):
+        
+    if not len(plist):
+        return ()
+    try:
+        return ('SA(' + plist_str[plist.index(myper)] + ')', )
+    except ValueError:
+        pass
+    for i, v in enumerate(plist):
+        if v > myper:
+            break
+    if i == 0 or v < myper:
+        return ('SA(' + plist_str[i] + ')', )
+    else:
+        return ('SA(' + plist_str[i-1] + ')', 'SA(' + plist_str[i] + ')')
+
 #%%
-#args = type('Dummy', (object,), {'eventid' : 'northridge',
-#                                 'verbose' : True})
-#if True:
-def grind(args):
+args = type('Dummy', (object,), {'eventid' : 'northridge',
+                                 'verbose' : True})
+if True:
+#def grind(args):
     verbose = args.verbose
     #
     # Find the shake_data file
@@ -112,7 +178,7 @@ def grind(args):
     else:
         ipe = get_object_from_config('ipe', config)
 
-    ccf = get_object_from_config('ccf', config)
+#    ccf = get_object_from_config('ccf', config)
     #------------------------------------------------------------------
     # Bias parameters
     #------------------------------------------------------------------
@@ -128,7 +194,8 @@ def grind(args):
     #------------------------------------------------------------------
     # These are the IMTs we want to make
     #------------------------------------------------------------------
-    imt_out_set_str = config['grind']['imt_list']
+    imt_out_set_str = set(config['grind']['imt_list'])
+    imt_out_set_str.add('SA(2.0)')
     imt_out_set = [imt.from_string(x) for x in imt_out_set_str]
     #------------------------------------------------------------------
     # Get the rupture object and rupture context
@@ -306,69 +373,6 @@ def grind(args):
             df['rrup'] = dd['rrup']
     df1 = df_dict['df1']
     df2 = df_dict['df2']
-#%%
-    #------------------------------------------------------------------
-    # Do the bias for each of the input IMTs
-    # It is possible that the observations at different stations will
-    # have different weights, so we need to fix that up before the 
-    # final version.
-    #------------------------------------------------------------------
-#    bias = {}
-#    sigma_2_eta = {}
-#    if not isinstance(rupture_obj, PointRupture) or rx.mag <= bias_max_mag:
-#        for imtstr in imt_in_str_set:
-#            if imtstr in df1:
-#                df = df1
-#                ndf = 'df1'
-#            else:
-#                df = df2
-#                ndf = 'df2'
-#            #
-#            # Find the valid indices for this IMT
-#            #
-#            vidx = ~np.isnan(df[imtstr]) & (df['rrup'] <= bias_max_range)
-#            if not np.any(vidx):
-#                bias[imtstr] = 0.0
-#                sigma_2_eta[imtstr] = 0.0
-#                continue
-#            #
-#            # Get the total residual for the IMT
-#            #
-#            resid = df[imtstr + '_residual'][vidx]
-#            resid = resid.reshape((-1, 1))
-#    #        print('mean %s residual %f' % (imtstr, np.mean(resid)))
-#            ONE = np.ones_like(resid)
-#            tau = np.mean(df[imtstr + '_pred_sd_inter'][vidx])
-#            sta_lons_rad = (df['lon_rad'][vidx]).reshape(-1, 1)
-#            sta_lats_rad = (df['lat_rad'][vidx]).reshape(-1, 1)
-#            dist22 = geodetic_distance(sta_lons_rad, sta_lats_rad,
-#                                       sta_lons_rad.transpose(), 
-#                                       sta_lats_rad.transpose())                                  
-#            if imtstr == 'PGA':
-#                period = 0.01
-#            elif imtstr == 'PGV' or imtstr == 'MMI':
-#                period = 1.0
-#            else:
-#                period = imt.from_string(imtstr).period
-#            t1 = t2 = np.full_like(dist22, period)
-#            corr22 = ccf.getCorrelation(t1, t2, dist22)
-#            sta_sigma = (df[imtstr + '_pred_sd_intra'][vidx]).reshape(-1, 1)
-#            sigma22 = corr22 * (sta_sigma * sta_sigma.transpose())
-#            sigma22_inv = np.linalg.pinv(sigma22)
-#            sigma_2_eta[imtstr] = 1.0 / (1 / tau**2 + \
-#                                   ONE.transpose().dot(sigma22_inv.dot(ONE)))
-#            bias[imtstr] = ONE.transpose().dot(sigma22_inv.dot(resid)) * \
-#                        sigma_2_eta[imtstr]
-#            if bias[imtstr] > bias_max_dsigma:
-#                bias[imtstr] = 0.0
-#                sigma_2_eta[imtstr] = 0.0
-#            if verbose:
-#                print('%s: bias %f variance %f' % (imtstr, bias[imtstr], 
-#                                                   sigma_2_eta[imtstr]))
-#    else:
-#        for imtstr in imt_in_str_set:
-#            bias[imtstr] = 0.0
-#            sigma_2_eta[imtstr] = 0.0
 
 #%%
     #------------------------------------------------------------------
@@ -451,29 +455,64 @@ def grind(args):
             df1['MMI' + '_pred_sd_inter'] = psd[1]
             df1['MMI' + '_pred_sd_intra'] = psd[2]
             df1['MMI' + '_residual'] = df1['MMI'] - pmean
-                
+
+
+    imt_per = set()
+    for ndf, sdf in df_dict.items():
+        for imtstr in imt_in_str_dict[ndf]:
+            if imtstr == 'PGA':
+                imt_per.add(0.01)
+            elif imtstr == 'PGV' or imtstr == 'MMI':
+                imt_per.add(1.0)
+            else:
+                imt_per.add(imt.from_string(imtstr).period)
+    for imtstr in imt_out_set_str:
+        if imtstr == 'PGA':
+            imt_per.add(0.01)
+        elif imtstr == 'PGV' or imtstr == 'MMI':
+            imt_per.add(1.0)
+        else:
+            imt_per.add(imt.from_string(imtstr).period)
+        
+    ccf = get_object_from_config('ccf', config, imt_per)
+
+    imt_per_ix = {}
+    for ix, per in enumerate(sorted(imt_per)):
+        imt_per_ix[str(per)] = ix          
 #%%
     #------------------------------------------------------------------
     # Do the MVN
     #------------------------------------------------------------------
+    #
+    # First do the bias for all of the input and output IMTs. Hold on
+    # to some of the products that will be used for the interpolation.
+    #
     bias = {}
     sigma_2_eta = {}
     outgrid = {}
     outsd = {}
     
-#    for imtstr in ('PGV',):
-    for imtstr in imt_out_set_str:
+    sta_lons_rad = {}
+    sta_lats_rad = {}
+    sta_resids = {}
+    sta_period_ix = {}
+    sta_sigs = {}
+    corr_adj = {}
+    sigma22inv = {}
+    combined_imt_str = imt_in_str_dict['df1'] | imt_in_str_dict['df2'] \
+                                              | imt_out_set_str
+    for imtstr in combined_imt_str:
         #
         # Get the (pesudo-) period of the output IMT
         #
         time1 = time.time()
         oqimt = imt.from_string(imtstr)
         if imtstr == 'PGA':
-            outperiod = 0.01
+            outperiod_ix = imt_per_ix['0.01']
         elif imtstr in ('PGV', 'MMI'):
-            outperiod = 1.0
+            outperiod_ix = imt_per_ix['1.0']
         else:
-            outperiod = oqimt.period
+            outperiod_ix = imt_per_ix[str(oqimt.period)]
         #
         # Get the predictions at the output points
         #
@@ -485,80 +524,114 @@ def grind(args):
         ampgrid = np.zeros_like(pout_mean)
         sdgrid = np.zeros_like(pout_mean)
         
-        sta_lons_rad = np.array([])
-        sta_lats_rad = np.array([])
-        sta_resids = np.array([])
-        sta_sigs = np.array([])
+        sta_lons_rad[imtstr] = np.array([])
+        sta_lats_rad[imtstr] = np.array([])
+        sta_resids[imtstr] = np.array([])
+        sta_sigs[imtstr] = np.array([])
         sta_sigs_total = np.array([])
-        sta_period = np.array([])
+        sta_period_ix[imtstr] = np.array([], dtype=np.int64)
         for ndf, sdf in df_dict.items():
-            for imtin in imt_in_str_dict[ndf]:
-#                if imtin != imtstr:
-#                    continue
+            for imtin in get_imts(imtstr, imt_in_str_dict[ndf]):
+                print('doing imt %s, input %s' % (imtstr, imtin))
                 oqimtin = imt.from_string(imtin)
                 if imtin == 'PGA':
-                    inperiod = 0.01
+                    inperiod_ix = imt_per_ix['0.01']
                 elif imtin in ('PGV', 'MMI'):
-                    inperiod = 1.0
+                    inperiod_ix = imt_per_ix['1.0']
                 else:
-                    inperiod = oqimtin.period
+                    inperiod_ix = imt_per_ix[str(oqimtin.period)]
                 vidx = ~np.isnan(sdf[imtin])
-                sta_lons_rad = np.append(sta_lons_rad, sdf['lon_rad'][vidx])
-                sta_lats_rad = np.append(sta_lats_rad, sdf['lat_rad'][vidx])
-                sta_resids = np.append(sta_resids, 
+                sta_lons_rad[imtstr] = np.append(sta_lons_rad[imtstr], 
+                                                 sdf['lon_rad'][vidx])
+                sta_lats_rad[imtstr] = np.append(sta_lats_rad[imtstr], 
+                                                 sdf['lat_rad'][vidx])
+                sta_resids[imtstr] = np.append(sta_resids[imtstr], 
                                        sdf[imtin + '_residual'][vidx])
-                psd = sdf[imtstr + '_pred_sd_intra'][vidx]
-                sta_sigs = np.append(sta_sigs, psd)
+                psd = sdf[imtin + '_pred_sd_intra'][vidx]
+                sta_sigs[imtstr] = np.append(sta_sigs[imtstr], psd)
                 sta_sigs_total = np.append(sta_sigs_total, np.sqrt(
-                        psd**2 + sdf[imtstr + '_sd'][vidx]**2))
-                sta_period = np.append(sta_period, np.full_like(psd, inperiod))
+                        psd**2 + sdf[imtin + '_sd'][vidx]**2))
+                sta_period_ix[imtstr] = np.append(sta_period_ix[imtstr], 
+                                          np.full(psd.shape, inperiod_ix, 
+                                                  dtype=np.int64))
         if np.size(sta_lons_rad) == 0:
             outgrid[imtstr] = pout_mean
             outsd[imtstr] = pout_sd[0]
             continue
-        sta_lons_rad = sta_lons_rad.reshape((-1, 1))
-        sta_lats_rad = sta_lats_rad.reshape((-1, 1))
-        sta_resids = sta_resids.reshape((-1, 1))
-        sta_sigs = sta_sigs.reshape((-1, 1))
+        sta_lons_rad[imtstr] = sta_lons_rad[imtstr].reshape((-1, 1))
+        sta_lats_rad[imtstr] = sta_lats_rad[imtstr].reshape((-1, 1))
+        sta_resids[imtstr] = sta_resids[imtstr].reshape((-1, 1))
+        sta_sigs[imtstr] = sta_sigs[imtstr].reshape((-1, 1))
         sta_sigs_total = sta_sigs_total.reshape((-1, 1))
-        sta_period = sta_period.reshape((-1, 1))
-        corr_adj = (sta_sigs / sta_sigs_total)
-        corr_adj12 = corr_adj * np.ones((1, smnx))
-        corr_adj22 = corr_adj * corr_adj.T
+        sta_period_ix[imtstr] = sta_period_ix[imtstr].reshape((-1, 1))
+        corr_adj[imtstr] = (sta_sigs[imtstr] / sta_sigs_total)
+        corr_adj22 = corr_adj[imtstr] * corr_adj[imtstr].T
         np.fill_diagonal(corr_adj22, 1.0)
-        dist22 = geodetic_distance(sta_lons_rad, sta_lats_rad,
-                                   sta_lons_rad.T, sta_lats_rad.T)
+        dist22 = geodetic_distance(sta_lons_rad[imtstr], 
+                                   sta_lats_rad[imtstr],
+                                   sta_lons_rad[imtstr].T, 
+                                   sta_lats_rad[imtstr].T)
         d22_rows, d22_cols = np.shape(dist22) # should be square
-        t1_22 = np.tile(sta_period, (1, d22_cols))
-        t2_22 = np.tile(sta_period.T, (d22_rows, 1))
+        t1_22 = np.tile(sta_period_ix[imtstr], (1, d22_cols))
+        t2_22 = np.tile(sta_period_ix[imtstr].T, (d22_rows, 1))
         corr22 = ccf.getCorrelation(t1_22, t2_22, dist22) * corr_adj22
-        sigma22 = corr22 * (sta_sigs * sta_sigs.T)
-        sigma22inv = np.linalg.pinv(sigma22)
+        sigma22 = corr22 * (sta_sigs[imtstr] * sta_sigs[imtstr].T)
+        sigma22inv[imtstr] = np.linalg.pinv(sigma22)
         #
         # Compute the bias and apply it to the predictions and the
         # residuals
         #
         if do_bias and (not isinstance(rupture_obj, PointRupture) 
                         or rx.mag <= bias_max_mag):        
-            ONE = np.ones_like(sta_resids)
+            ONE = np.ones_like(sta_resids[imtstr])
             tau = np.mean(pout_sd[1])
             sigma_2_eta[imtstr] = 1.0 / (1 / tau**2 + \
-                                   ONE.T.dot(sigma22inv.dot(ONE)))
-            bias[imtstr] = ONE.T.dot(sigma22inv.dot(sta_resids)) * \
-                        sigma_2_eta[imtstr]
+                                   ONE.T.dot(sigma22inv[imtstr].dot(ONE)))
+            bias[imtstr] = \
+                    ONE.T.dot(sigma22inv[imtstr].dot(sta_resids[imtstr])) * \
+                    sigma_2_eta[imtstr]
             if bias[imtstr] > bias_max_dsigma:
                 bias[imtstr] = 0.0
                 sigma_2_eta[imtstr] = 0.0
-            if verbose:
-                print('%s: bias %f stddev %f' % (imtstr, bias[imtstr], 
-                                                 np.sqrt(sigma_2_eta[imtstr])))
         else:
             bias[imtstr] = 0.0
             sigma_2_eta[imtstr] = 0.0
+        bias_time = time.time() - time1
+        if verbose:
+            print('%s: bias %f stddev %f (time=%f sec)' % 
+                  (imtstr, bias[imtstr], np.sqrt(sigma_2_eta[imtstr]), 
+                   bias_time))
+
+
+
+
+
+#    imt_out_set_str = set(['PGV'])
+
+    for imtstr in imt_out_set_str:
+        time1 = time.time()
+        #
+        # Get the (pesudo-) period of the output IMT
+        #
+        oqimt = imt.from_string(imtstr)
+        if imtstr == 'PGA':
+            outperiod_ix = imt_per_ix['0.01']
+        elif imtstr in ('PGV', 'MMI'):
+            outperiod_ix = imt_per_ix['1.0']
+        else:
+            outperiod_ix = imt_per_ix[str(oqimt.period)]
+        #
+        # Get the predictions at the output points
+        #
 #
 # Should probably check to see if there is a bias and if not, select the
 # total uncertainty rather than the intra even uncertainty...
 #
+        pout_mean, pout_sd = gmas(ipe, gmpe, sx_out_soil, rx, dx_out, oqimt, 
+                                  stddev_types)
+        pout_sd = pout_sd[2]
+        pout_sd2 = np.power(pout_sd, 2.0)
+
         #
         # Bias the predictions
         #
@@ -567,58 +640,52 @@ def grind(args):
         # Remake the residual array now that we (may) have a bias
         #
         if bias[imtstr] != 0:
-            sta_resids = np.array([])        
+            sta_resids[imtstr] = np.array([])        
             for ndf, sdf in df_dict.items():
-                for imtin in imt_in_str_dict[ndf]:
-#                    if imtin != imtstr:
-#                        continue
+                for imtin in get_imts(imtstr, imt_in_str_dict[ndf]):
                     vidx = ~np.isnan(sdf[imtin])
-                    sta_resids = np.append(
-                            sta_resids, 
+                    sta_resids[imtstr] = np.append(
+                            sta_resids[imtstr], 
                             sdf[imtin + '_residual'][vidx] - bias[imtstr])
-        sta_resids = sta_resids.reshape((-1, 1))
+        sta_resids[imtstr] = sta_resids[imtstr].reshape((-1, 1))
         #
         # Now do the MVN itself...
         #
-        prep_time = time.time() - time1            
         dtime = 0
         mtime = 0
         ddtime = 0
         ctime = stime = atime = 0
-        #
-        # These two lines are out of the loop for performance reasons,
-        # but they should be moved back inside, and corr_adj12 should
-        # be replaced with dist12, if the size/shape of the output
-        # can change (e.g., if we divide up a list of points into
-        # smaller chunks and the final chunk is not the same size as 
-        # the others.
-        #
-        t2_12 = np.full_like(corr_adj12, outperiod)
-        d12_rows, d12_cols = np.shape(corr_adj12)
+
+        ampgrid = np.zeros_like(pout_mean)
+        sdgrid = np.zeros_like(pout_mean)
+        corr_adj12 = corr_adj[imtstr] * np.ones((1, smnx))
         for iy in range(smny):
             ss = iy * smnx
             se = (iy + 1) * smnx
             time4 = time.time()
             dist12 = geodetic_distance(lons_out_rad[ss:se].reshape(1, -1), 
                                        lats_out_rad[ss:se].reshape(1, -1),
-                                       sta_lons_rad, sta_lats_rad)
-            t1_12 = np.tile(sta_period, (1, d12_cols))
+                                       sta_lons_rad[imtstr], sta_lats_rad[imtstr])
+            t2_12 = np.full(dist12.shape, outperiod_ix, dtype=np.int)
+            d12_rows, d12_cols = np.shape(dist12)
+            t1_12 = np.tile(sta_period_ix[imtstr], (1, d12_cols))
             ddtime += time.time() - time4
             time4 = time.time()
             corr12 = ccf.getCorrelation(t1_12, t2_12, dist12)
             ctime += time.time() - time4
             time4 = time.time()
             psd = pout_sd[iy, :].reshape((1, -1))
+            ss = sta_sigs[imtstr]
             sigma12 =  ne.evaluate(
-                    "corr12 * corr_adj12 * (sta_sigs * psd)"
+                    "corr12 * corr_adj12 * (ss * psd)"
                     ).T
             stime += time.time() - time4    
             time4 = time.time()
-            rcmatrix = sigma12.dot(sigma22inv)
+            rcmatrix = sigma12.dot(sigma22inv[imtstr])
             dtime += time.time() - time4    
             time4 = time.time()
             ampgrid[iy, :] = pout_mean[iy, :] + ((corr_adj12.T * 
-                   rcmatrix).dot(sta_resids)).reshape((-1,))
+                   rcmatrix).dot(sta_resids[imtstr])).reshape((-1,))
             atime += time.time() - time4
             time4 = time.time()
     #        sdgrid[ss:se] = pout_sd2[ss:se] - np.diag(rcmatrix.dot(sigma12))
@@ -630,7 +697,6 @@ def grind(args):
         sdgrid[sdgrid < 0] = 0
         outsd[imtstr] = np.sqrt(sdgrid)
         if verbose:
-            print('prep time for %s=%f' % (imtstr, prep_time))
             print('time for %s distance=%f' % (imtstr, ddtime))
             print('time for %s correlation=%f' % (imtstr, ctime))
             print('time for %s sigma=%f' % (imtstr, stime))
