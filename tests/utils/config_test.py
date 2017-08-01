@@ -12,7 +12,7 @@ shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 
 from validate import ValidateError
 
-import shakemap.utils.config as config
+import shakelib.utils.config as config
 
 def test_config():
 

@@ -9,7 +9,7 @@ import shutil
 import pprint
 
 #shakemap imports
-from shakemap.utils.config import get_data_path
+from shakelib.utils.config import get_data_path
 
 current_markers = {True:'**Current Profile**',False:''}
 
