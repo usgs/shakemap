@@ -5,7 +5,7 @@ import os.path
 import time as time
 import argparse
 from importlib import import_module
-import copy
+from time import gmtime, strftime
 
 # Not really needed, but handy for looking at the config
 import pprint
@@ -33,11 +33,11 @@ from shakemap.utils.config import get_config_paths
 # class from config entry, 'name', that has a corresponding 
 # 'name'_module dictionary of class name, module path
 #
-def get_object_from_config(obj, cfg):
+def get_object_from_config(obj, cfg, *args):
     cls_abbr = cfg['grind'][obj]
     mods = obj + '_modules'
     (cname, mpath) = cfg[mods][cls_abbr]
-    return getattr(import_module(mpath), cname)()
+    return getattr(import_module(mpath), cname)(*args)
 
 #
 # Set the attributes of the site context
@@ -76,11 +76,104 @@ def geodetic_distance(lons1, lats1, lons2, lats2, diameter=2*EARTH_RADIUS):
                     "(lats1 + lats2)))**2.0 + (lats1 - lats2)**2.0)")
     return d
 
+def get_period_index_from_imt_str(imtstr, imt_per_ix):
+        if imtstr == 'PGA':
+            return imt_per_ix['0.01']
+        elif imtstr in ('PGV', 'MMI'):
+            return imt_per_ix['1.0']
+        else:
+            return imt_per_ix[imtstr.replace('SA(', '').replace(')', '')]
+
+def get_period_array(*args):
+    imt_per = set()
+    for imt_list in args:
+        for imtstr in imt_list:
+            if imtstr == 'PGA':
+                imt_per.add(0.01)
+            elif imtstr == 'PGV' or imtstr == 'MMI':
+                imt_per.add(1.0)
+            else:
+                imt_per.add(float(imtstr.replace('SA(', '').replace(')', '')))
+    return np.array(sorted(imt_per))
+
+def get_imts(imtstr, imtset):
+
+    if imtstr in imtset:
+        return (imtstr, )
+
+    salist = [x for x in imtset if x.startswith('SA(')]
+    periodlist = [float(x.replace('SA(', '').replace(')', '')) for x in salist]
+    periodlist = sorted(periodlist)
+    periodlist_str = [str(x) for x in periodlist]
+    
+    #
+    # If we're here, then we know that IMT isn't in the inputs. Try
+    # some alternatives.
+    #
+    if imtstr == 'PGA':
+        #
+        # Use the highest frequency in the inputs, otherwise use PGV
+        #
+        if len(salist):
+            return ('SA(' + periodlist_str[0] + ')', )
+        elif 'PGV' in imtset:
+            return ('PGV', )
+        else:
+            return ()
+    elif imtstr == 'PGV':
+        #
+        # Use 1.0 sec SA (or its bracket) if it's there, otherwise
+        # use PGA
+        #
+        sa_tuple = get_sa_bracket(1.0, periodlist, periodlist_str)
+        if sa_tuple != ():
+            return sa_tuple
+        if 'PGA' in imtset:
+            return ('PGA', )
+        else:
+            return ()            
+    elif imtstr == 'MMI':
+        #
+        # Use PGV if it's there, otherwise use 1.0 sec SA (or its
+        # bracket)
+        #
+        if 'PGV' in imtset:
+            return ('PGV', )
+        return get_sa_bracket(1.0, periodlist, periodlist_str)
+    elif imtstr.startswith('SA('):
+        myper = float(imtstr.replace('SA(', '').replace(')', ''))
+        return get_sa_bracket(myper, periodlist, periodlist_str)
+    else:
+        raise ValueError('Unknown IMT %s in get_imt_bracket' % imtstr)
+        
+def get_sa_bracket(myper, plist, plist_str):
+        
+    if not len(plist):
+        return ()
+    try:
+        return ('SA(' + plist_str[plist.index(myper)] + ')', )
+    except ValueError:
+        pass
+    for i, v in enumerate(plist):
+        if v > myper:
+            break
+    if i == 0 or v < myper:
+        return ('SA(' + plist_str[i] + ')', )
+    else:
+        return ('SA(' + plist_str[i-1] + ')', 'SA(' + plist_str[i] + ')')
+
+def get_sta_imts(imtstr, sdf, ix, imtset):
+    myimts = set()
+    for this_imt in imtset:
+        if not np.isnan(sdf[this_imt][ix]) and \
+           not sdf[this_imt + '_outliers'][ix]:
+            myimts.add(this_imt)
+    return get_imts(imtstr, myimts)
 #%%
-#args = type('Dummy', (object,), {'eventid' : 'northridge',
-#                                 'verbose' : True})
-#if True:
-def grind(args):
+args = type('Dummy', (object,), {'eventid' : 'northridge',
+                                 'verbose' : True})
+if True:
+#def grind(args):
     verbose = args.verbose
     #
     # Find the shake_data file
@@ -111,8 +204,6 @@ def grind(args):
         ipe = VirtualIPE.fromFuncs(gmpe, gmice)
     else:
         ipe = get_object_from_config('ipe', config)
-
-    ccf = get_object_from_config('ccf', config)
     #------------------------------------------------------------------
     # Bias parameters
     #------------------------------------------------------------------
@@ -128,7 +219,8 @@ def grind(args):
     #------------------------------------------------------------------
     # These are the IMTs we want to make
     #------------------------------------------------------------------
-    imt_out_set_str = config['grind']['imt_list']
+    imt_out_set_str = set(config['grind']['imt_list'])
+    imt_out_set_str.add('SA(2.0)')
     imt_out_set = [imt.from_string(x) for x in imt_out_set_str]
     #------------------------------------------------------------------
     # Get the rupture object and rupture context
@@ -280,8 +372,9 @@ def grind(args):
                         print('IMT: %s, flagged: %d' % 
                               (imtstr, np.sum(flagged)))
                     df[imtstr + '_outliers'] = flagged
-                    df[imtstr][flagged] = np.nan
-                    df[imtstr + '_residual'][flagged] = np.nan
+                else:
+                    df[imtstr + '_outliers'] = np.full(df[imtstr].shape, True, 
+                                                       dtype=np.bool)
                 #
                 # Make the uncertainty arrays for any IMTs that don't
                 # have them.
@@ -306,69 +399,6 @@ def grind(args):
             df['rrup'] = dd['rrup']
     df1 = df_dict['df1']
     df2 = df_dict['df2']
-#%%
-    #------------------------------------------------------------------
-    # Do the bias for each of the input IMTs
-    # It is possible that the observations at different stations will
-    # have different weights, so we need to fix that up before the 
-    # final version.
-    #------------------------------------------------------------------
-#    bias = {}
-#    sigma_2_eta = {}
-#    if not isinstance(rupture_obj, PointRupture) or rx.mag <= bias_max_mag:
-#        for imtstr in imt_in_str_set:
-#            if imtstr in df1:
-#                df = df1
-#                ndf = 'df1'
-#            else:
-#                df = df2
-#                ndf = 'df2'
-#            #
-#            # Find the valid indices for this IMT
-#            #
-#            vidx = ~np.isnan(df[imtstr]) & (df['rrup'] <= bias_max_range)
-#            if not np.any(vidx):
-#                bias[imtstr] = 0.0
-#                sigma_2_eta[imtstr] = 0.0
-#                continue
-#            #
-#            # Get the total residual for the IMT
-#            #
-#            resid = df[imtstr + '_residual'][vidx]
-#            resid = resid.reshape((-1, 1))
-#    #        print('mean %s residual %f' % (imtstr, np.mean(resid)))
-#            ONE = np.ones_like(resid)
-#            tau = np.mean(df[imtstr + '_pred_sd_inter'][vidx])
-#            sta_lons_rad = (df['lon_rad'][vidx]).reshape(-1, 1)
-#            sta_lats_rad = (df['lat_rad'][vidx]).reshape(-1, 1)
-#            dist22 = geodetic_distance(sta_lons_rad, sta_lats_rad,
-#                                       sta_lons_rad.transpose(), 
-#                                       sta_lats_rad.transpose())                                  
-#            if imtstr == 'PGA':
-#                period = 0.01
-#            elif imtstr == 'PGV' or imtstr == 'MMI':
-#                period = 1.0
-#            else:
-#                period = imt.from_string(imtstr).period
-#            t1 = t2 = np.full_like(dist22, period)
-#            corr22 = ccf.getCorrelation(t1, t2, dist22)
-#            sta_sigma = (df[imtstr + '_pred_sd_intra'][vidx]).reshape(-1, 1)
-#            sigma22 = corr22 * (sta_sigma * sta_sigma.transpose())
-#            sigma22_inv = np.linalg.pinv(sigma22)
-#            sigma_2_eta[imtstr] = 1.0 / (1 / tau**2 + \
-#                                   ONE.transpose().dot(sigma22_inv.dot(ONE)))
-#            bias[imtstr] = ONE.transpose().dot(sigma22_inv.dot(resid)) * \
-#                        sigma_2_eta[imtstr]
-#            if bias[imtstr] > bias_max_dsigma:
-#                bias[imtstr] = 0.0
-#                sigma_2_eta[imtstr] = 0.0
-#            if verbose:
-#                print('%s: bias %f variance %f' % (imtstr, bias[imtstr], 
-#                                                   sigma_2_eta[imtstr]))
-#    else:
-#        for imtstr in imt_in_str_set:
-#            bias[imtstr] = 0.0
-#            sigma_2_eta[imtstr] = 0.0
 
 #%%
     #------------------------------------------------------------------
@@ -398,9 +428,6 @@ def grind(args):
                 #
                 # Get the predictions and stddevs, too
                 #
-#
-# Should we bias the predictions?
-#
                 pmean, psd = gmas(ipe, gmpe, sx_dict['df2'], rx, 
                                   dx_dict['df2'], oqimt, stddev_types)
                 df2[imtstr + '_pred'] = pmean
@@ -408,6 +435,8 @@ def grind(args):
                 df2[imtstr + '_pred_sd_inter'] = psd[1]
                 df2[imtstr + '_pred_sd_intra'] = psd[2]
                 df2[imtstr + '_residual'] = df2[str(oqimt)] - pmean
+                df2[imtstr + '_outliers'] = np.full(pmean.shape, False, 
+                                                    dtype=np.bool)
                 
     #
     # Now make derived MMI from the best available PGM; This is ugly and it
@@ -451,174 +480,232 @@ def grind(args):
             df1['MMI' + '_pred_sd_inter'] = psd[1]
             df1['MMI' + '_pred_sd_intra'] = psd[2]
             df1['MMI' + '_residual'] = df1['MMI'] - pmean
-                
+            df1['MMI' + '_outliers'] = np.full(pmean.shape, False, 
+                                               dtype=np.bool)
+
+    imt_per = get_period_array(imt_in_str_dict['df1'], 
+                               imt_in_str_dict['df2'],
+                               imt_out_set_str)
+    ccf = get_object_from_config('ccf', config, imt_per)
+
+    imt_per_ix = {str(per) : ix for ix, per in enumerate(imt_per)}
 #%%
     #------------------------------------------------------------------
     # Do the MVN
     #------------------------------------------------------------------
+    #
+    # First do the bias for all of the input and output IMTs. Hold on
+    # to some of the products that will be used for the interpolation.
+    #
     bias = {}
     sigma_2_eta = {}
     outgrid = {}
     outsd = {}
     
-#    for imtstr in ('PGV',):
-    for imtstr in imt_out_set_str:
-        #
-        # Get the (pesudo-) period of the output IMT
-        #
-        time1 = time.time()
-        oqimt = imt.from_string(imtstr)
-        if imtstr == 'PGA':
-            outperiod = 0.01
-        elif imtstr in ('PGV', 'MMI'):
-            outperiod = 1.0
+    sta_lons_rad = {}
+    sta_lats_rad = {}
+    sta_resids = {}
+    sta_period_ix = {}
+    sta_sigs = {}
+    sta_sigs_total = {}
+    sta_sigs_inter = {}
+    corr_adj = {}
+    sigma22inv = {}
+    
+    #
+    # Python scoping is weird. But ths works. Seemingly.
+    # The only reason to have this function is to avoid repeating
+    # all this code, and the reason to make it nested is to avoid
+    # having to pass eleven arguments.
+    #
+    def build_list(imtstr, imtin, sdf, vidx):
+        inperiod_ix = get_period_index_from_imt_str(imtin, imt_per_ix)
+        sta_lons_rad[imtstr] = np.append(sta_lons_rad[imtstr], 
+                                         sdf['lon_rad'][vidx])
+        sta_lats_rad[imtstr] = np.append(sta_lats_rad[imtstr], 
+                                         sdf['lat_rad'][vidx])
+        sta_resids[imtstr] = np.append(sta_resids[imtstr], 
+                               sdf[imtin + '_residual'][vidx])
+        psd = sdf[imtin + '_pred_sd_intra'][vidx]
+        sta_sigs[imtstr] = np.append(sta_sigs[imtstr], psd)
+        sta_sigs_inter[imtstr] = np.append(sta_sigs_inter[imtstr], 
+                      sdf[imtin + '_pred_sd_inter'][vidx])
+        sta_sigs_total[imtstr] = np.append(sta_sigs_total[imtstr], 
+                      np.sqrt(psd**2 + sdf[imtin + '_sd'][vidx]**2))
+        if isinstance(vidx, int):
+            per_val = inperiod_ix
         else:
-            outperiod = oqimt.period
-        #
-        # Get the predictions at the output points
-        #
-        pout_mean, pout_sd = gmas(ipe, gmpe, sx_out_soil, rx, dx_out, oqimt, 
-                                  stddev_types)
-        pout_sd = pout_sd[2]
-        pout_sd2 = np.power(pout_sd, 2.0)
+            per_val = np.full(psd.shape, inperiod_ix, dtype=np.int64)
+        sta_period_ix[imtstr] = np.append(sta_period_ix[imtstr], per_val)
+        return
 
-        ampgrid = np.zeros_like(pout_mean)
-        sdgrid = np.zeros_like(pout_mean)
-        
-        sta_lons_rad = np.array([])
-        sta_lats_rad = np.array([])
-        sta_resids = np.array([])
-        sta_sigs = np.array([])
-        sta_sigs_total = np.array([])
-        sta_period = np.array([])
+    combined_imt_str = imt_in_str_dict['df1'] | imt_in_str_dict['df2'] \
+                                              | imt_out_set_str
+    for imtstr in combined_imt_str:
+        time1 = time.time()
+        #
+        # Get the index of the (pesudo-) period of the output IMT
+        #
+        outperiod_ix = get_period_index_from_imt_str(imtstr, imt_per_ix)
+        #
+        # Fill the station arrays
+        #        
+        sta_lons_rad[imtstr] = np.array([])
+        sta_lats_rad[imtstr] = np.array([])
+        sta_resids[imtstr] = np.array([])
+        sta_sigs[imtstr] = np.array([])
+        sta_sigs_total[imtstr] = np.array([])
+        sta_sigs_inter[imtstr] = np.array([])
+        sta_period_ix[imtstr] = np.array([], dtype=np.int64)
         for ndf, sdf in df_dict.items():
-            for imtin in imt_in_str_dict[ndf]:
-#                if imtin != imtstr:
-#                    continue
-                oqimtin = imt.from_string(imtin)
-                if imtin == 'PGA':
-                    inperiod = 0.01
-                elif imtin in ('PGV', 'MMI'):
-                    inperiod = 1.0
-                else:
-                    inperiod = oqimtin.period
-                vidx = ~np.isnan(sdf[imtin])
-                sta_lons_rad = np.append(sta_lons_rad, sdf['lon_rad'][vidx])
-                sta_lats_rad = np.append(sta_lats_rad, sdf['lat_rad'][vidx])
-                sta_resids = np.append(sta_resids, 
-                                       sdf[imtin + '_residual'][vidx])
-                psd = sdf[imtstr + '_pred_sd_intra'][vidx]
-                sta_sigs = np.append(sta_sigs, psd)
-                sta_sigs_total = np.append(sta_sigs_total, np.sqrt(
-                        psd**2 + sdf[imtstr + '_sd'][vidx]**2))
-                sta_period = np.append(sta_period, np.full_like(psd, inperiod))
-        if np.size(sta_lons_rad) == 0:
-            outgrid[imtstr] = pout_mean
-            outsd[imtstr] = pout_sd[0]
+            if ndf == 'df1':
+                for i in range(np.size(sdf['lon'])):
+                    for imtin in get_sta_imts(imtstr, sdf, i, 
+                                              imt_in_str_dict[ndf]):
+                        build_list(imtstr, imtin, sdf, i)
+            else:                       
+                for imtin in get_imts(imtstr, imt_in_str_dict['df2']):
+                    vidx = ~(np.isnan(sdf[imtin]) | sdf[imtin + '_outliers'])
+                    build_list(imtstr, imtin, sdf, vidx)       
+        if np.size(sta_lons_rad[imtstr]) == 0:
+            bias[imtstr] = 0.0
+            sigma_2_eta[imtstr] = 0.0
             continue
-        sta_lons_rad = sta_lons_rad.reshape((-1, 1))
-        sta_lats_rad = sta_lats_rad.reshape((-1, 1))
-        sta_resids = sta_resids.reshape((-1, 1))
-        sta_sigs = sta_sigs.reshape((-1, 1))
-        sta_sigs_total = sta_sigs_total.reshape((-1, 1))
-        sta_period = sta_period.reshape((-1, 1))
-        corr_adj = (sta_sigs / sta_sigs_total)
-        corr_adj12 = corr_adj * np.ones((1, smnx))
-        corr_adj22 = corr_adj * corr_adj.T
+        sta_lons_rad[imtstr] = sta_lons_rad[imtstr].reshape((-1, 1))
+        sta_lats_rad[imtstr] = sta_lats_rad[imtstr].reshape((-1, 1))
+        sta_resids[imtstr] = sta_resids[imtstr].reshape((-1, 1))
+        sta_sigs[imtstr] = sta_sigs[imtstr].reshape((-1, 1))
+        sta_sigs_total[imtstr] = sta_sigs_total[imtstr].reshape((-1, 1))
+        sta_period_ix[imtstr] = sta_period_ix[imtstr].reshape((-1, 1))
+        corr_adj[imtstr] = (sta_sigs[imtstr] / sta_sigs_total[imtstr])
+        corr_adj22 = corr_adj[imtstr] * corr_adj[imtstr].T
         np.fill_diagonal(corr_adj22, 1.0)
-        dist22 = geodetic_distance(sta_lons_rad, sta_lats_rad,
-                                   sta_lons_rad.T, sta_lats_rad.T)
+        dist22 = geodetic_distance(sta_lons_rad[imtstr], 
+                                   sta_lats_rad[imtstr],
+                                   sta_lons_rad[imtstr].T, 
+                                   sta_lats_rad[imtstr].T)
         d22_rows, d22_cols = np.shape(dist22) # should be square
-        t1_22 = np.tile(sta_period, (1, d22_cols))
-        t2_22 = np.tile(sta_period.T, (d22_rows, 1))
+        t1_22 = np.tile(sta_period_ix[imtstr], (1, d22_cols))
+        t2_22 = np.tile(sta_period_ix[imtstr].T, (d22_rows, 1))
         corr22 = ccf.getCorrelation(t1_22, t2_22, dist22) * corr_adj22
-        sigma22 = corr22 * (sta_sigs * sta_sigs.T)
-        sigma22inv = np.linalg.pinv(sigma22)
+        sigma22 = corr22 * (sta_sigs[imtstr] * sta_sigs[imtstr].T)
+        sigma22inv[imtstr] = np.linalg.pinv(sigma22)
         #
         # Compute the bias and apply it to the predictions and the
         # residuals
         #
         if do_bias and (not isinstance(rupture_obj, PointRupture) 
                         or rx.mag <= bias_max_mag):        
-            ONE = np.ones_like(sta_resids)
-            tau = np.mean(pout_sd[1])
+            ONE = np.ones_like(sta_resids[imtstr])
+            tau = np.mean(sta_sigs_inter[imtstr])
             sigma_2_eta[imtstr] = 1.0 / (1 / tau**2 + \
-                                   ONE.T.dot(sigma22inv.dot(ONE)))
-            bias[imtstr] = ONE.T.dot(sigma22inv.dot(sta_resids)) * \
-                        sigma_2_eta[imtstr]
+                                   ONE.T.dot(sigma22inv[imtstr].dot(ONE)))
+            bias[imtstr] = \
+                    ONE.T.dot(sigma22inv[imtstr].dot(sta_resids[imtstr])) * \
+                    sigma_2_eta[imtstr]
             if bias[imtstr] > bias_max_dsigma:
                 bias[imtstr] = 0.0
                 sigma_2_eta[imtstr] = 0.0
-            if verbose:
-                print('%s: bias %f stddev %f' % (imtstr, bias[imtstr], 
-                                                 np.sqrt(sigma_2_eta[imtstr])))
         else:
             bias[imtstr] = 0.0
             sigma_2_eta[imtstr] = 0.0
+        bias_time = time.time() - time1
+        if verbose:
+            print('%s: bias %f stddev %f; %d stations (time=%f sec)' % 
+                  (imtstr, bias[imtstr], np.sqrt(sigma_2_eta[imtstr]), 
+                   np.size(sta_lons_rad[imtstr]), bias_time))
+    #
+    # End bias
+    #
+    #
+    # Now do the MVN with the intra-event residuals
+    #
+    for imtstr in imt_out_set_str:
+        time1 = time.time()
+        #
+        # Get the index of the (pesudo-) period of the output IMT
+        #
+        outperiod_ix = get_period_index_from_imt_str(imtstr, imt_per_ix)
+        #
+        # Get the predictions at the output points
+        #
 #
 # Should probably check to see if there is a bias and if not, select the
 # total uncertainty rather than the intra even uncertainty...
 #
+        oqimt = imt.from_string(imtstr)
+        pout_mean, pout_sd = gmas(ipe, gmpe, sx_out_soil, rx, dx_out, oqimt, 
+                                  stddev_types)
+        pout_sd = pout_sd[2]
+        pout_sd2 = np.power(pout_sd, 2.0)
+
         #
         # Bias the predictions
         #
         pout_mean += bias[imtstr]
         #
+        # If there are no data, just use the unbiased prediction
+        #
+        if np.size(sta_lons_rad[imtstr]) == 0:
+            outgrid[imtstr] = pout_mean
+            outsd[imtstr] = pout_sd[0]
+            continue
+        #
         # Remake the residual array now that we (may) have a bias
         #
-        if bias[imtstr] != 0:
-            sta_resids = np.array([])        
-            for ndf, sdf in df_dict.items():
-                for imtin in imt_in_str_dict[ndf]:
-#                    if imtin != imtstr:
-#                        continue
-                    vidx = ~np.isnan(sdf[imtin])
-                    sta_resids = np.append(
-                            sta_resids, 
-                            sdf[imtin + '_residual'][vidx] - bias[imtstr])
-        sta_resids = sta_resids.reshape((-1, 1))
+        if bias[imtstr] != 0:            
+            sta_resids[imtstr] = np.array([])        
+            sdf = df_dict['df1']
+            for i in range(np.size(sdf['lon'])):
+                for imtin in get_sta_imts(imtstr, sdf, i, imt_in_str_dict['df1']):
+                    sta_resids[imtstr] = np.append(
+                            sta_resids[imtstr], 
+                            sdf[imtin + '_residual'][i] - bias[imtin])        
+            sdf = df_dict['df2']        
+            for imtin in get_imts(imtstr, imt_in_str_dict['df2']):
+                vidx = ~(np.isnan(sdf[imtin]) | sdf[imtin + '_outliers'])
+                sta_resids[imtstr] = np.append(
+                        sta_resids[imtstr], 
+                        sdf[imtin + '_residual'][vidx] - bias[imtin])
+        sta_resids[imtstr] = sta_resids[imtstr].reshape((-1, 1))
         #
         # Now do the MVN itself...
         #
-        prep_time = time.time() - time1            
         dtime = 0
         mtime = 0
         ddtime = 0
         ctime = stime = atime = 0
-        #
-        # These two lines are out of the loop for performance reasons,
-        # but they should be moved back inside, and corr_adj12 should
-        # be replaced with dist12, if the size/shape of the output
-        # can change (e.g., if we divide up a list of points into
-        # smaller chunks and the final chunk is not the same size as 
-        # the others.
-        #
-        t2_12 = np.full_like(corr_adj12, outperiod)
-        d12_rows, d12_cols = np.shape(corr_adj12)
+
+        ampgrid = np.zeros_like(pout_mean)
+        sdgrid = np.zeros_like(pout_mean)
+        corr_adj12 = corr_adj[imtstr] * np.ones((1, smnx))
         for iy in range(smny):
             ss = iy * smnx
             se = (iy + 1) * smnx
             time4 = time.time()
             dist12 = geodetic_distance(lons_out_rad[ss:se].reshape(1, -1), 
                                        lats_out_rad[ss:se].reshape(1, -1),
-                                       sta_lons_rad, sta_lats_rad)
-            t1_12 = np.tile(sta_period, (1, d12_cols))
+                                       sta_lons_rad[imtstr], sta_lats_rad[imtstr])
+            t2_12 = np.full(dist12.shape, outperiod_ix, dtype=np.int)
+            d12_rows, d12_cols = np.shape(dist12)
+            t1_12 = np.tile(sta_period_ix[imtstr], (1, d12_cols))
             ddtime += time.time() - time4
             time4 = time.time()
             corr12 = ccf.getCorrelation(t1_12, t2_12, dist12)
             ctime += time.time() - time4
             time4 = time.time()
             psd = pout_sd[iy, :].reshape((1, -1))
+            ss = sta_sigs[imtstr]
             sigma12 =  ne.evaluate(
-                    "corr12 * corr_adj12 * (sta_sigs * psd)"
+                    "corr12 * corr_adj12 * (ss * psd)"
                     ).T
             stime += time.time() - time4    
             time4 = time.time()
-            rcmatrix = sigma12.dot(sigma22inv)
+            rcmatrix = sigma12.dot(sigma22inv[imtstr])
             dtime += time.time() - time4    
             time4 = time.time()
             ampgrid[iy, :] = pout_mean[iy, :] + ((corr_adj12.T * 
-                   rcmatrix).dot(sta_resids)).reshape((-1,))
+                   rcmatrix).dot(sta_resids[imtstr])).reshape((-1,))
             atime += time.time() - time4
             time4 = time.time()
     #        sdgrid[ss:se] = pout_sd2[ss:se] - np.diag(rcmatrix.dot(sigma12))
@@ -630,13 +717,12 @@ def grind(args):
         sdgrid[sdgrid < 0] = 0
         outsd[imtstr] = np.sqrt(sdgrid)
         if verbose:
-            print('prep time for %s=%f' % (imtstr, prep_time))
-            print('time for %s distance=%f' % (imtstr, ddtime))
-            print('time for %s correlation=%f' % (imtstr, ctime))
-            print('time for %s sigma=%f' % (imtstr, stime))
-            print('time for %s rcmatrix=%f' % (imtstr, dtime))
-            print('time for %s amp calc=%f' % (imtstr, atime))
-            print('time for %s sd calc=%f' % (imtstr, mtime))
+            print('\ttime for %s distance=%f' % (imtstr, ddtime))
+            print('\ttime for %s correlation=%f' % (imtstr, ctime))
+            print('\ttime for %s sigma=%f' % (imtstr, stime))
+            print('\ttime for %s rcmatrix=%f' % (imtstr, dtime))
+            print('\ttime for %s amp calc=%f' % (imtstr, atime))
+            print('\ttime for %s sd calc=%f' % (imtstr, mtime))
             print('total time for %s=%f' % (imtstr, time.time() - time1))
 
 #%%
@@ -648,39 +734,140 @@ def grind(args):
     # Might as well stick the whole config in the result
     #
     oc.addMetadata(config, name='config')
+    
+    metadata = {}
+    metadata['input'] = {}
+    metadata['input']['event_information'] = {}
+    metadata['input']['event_information']['depth'] = rx.hypo_depth
+    metadata['input']['event_information']['event_id'] = args.eventid
+    metadata['input']['event_information']['fault_ref'] = rupture_obj._reference
+    metadata['input']['event_information']['faultfiles'] = ''                                       ################
+    metadata['input']['event_information']['feregion'] = config['zone_info']['fename']
+    metadata['input']['event_information']['intensity_observations'] = np.size(df2['lon'])
+    metadata['input']['event_information']['latitude'] = rx.hypo_lat
+    metadata['input']['event_information']['longitude'] = rx.hypo_lon
+    metadata['input']['event_information']['location'] = rupture_obj._origin.locstring
+    metadata['input']['event_information']['magnitude'] = rx.mag
+    metadata['input']['event_information']['mech_src'] = config['zone_info']['moment_tensor_source']
+    metadata['input']['event_information']['origin_time'] = rupture_obj._origin.time.strftime('%Y-%m-%d %H:%M:%S')
+    metadata['input']['event_information']['seismic_stations'] = np.size(df1['lon'])
+    metadata['input']['event_information']['src_mech'] = rupture_obj._origin.mech
+    metadata['input']['event_information']['tectonic_regime'] = config['zone_info']['domain']
+    metadata['input']['event_information']['event_description'] = rupture_obj._origin.locstring     ################
+    metadata['input']['event_information']['event_type'] = rupture_obj._origin.mech                 ################
+    metadata['output'] = {}
+    metadata['output']['ground_motions'] = {}
+    metadata['output']['ground_motions']['intensity'] = {}
+    metadata['output']['ground_motions']['intensity']['units'] = 'MMI'
+    metadata['output']['ground_motions']['intensity']['bias'] = bias['MMI']
+    metadata['output']['ground_motions']['intensity']['max_grid'] = np.max(outgrid['MMI'])
+    metadata['output']['ground_motions']['intensity']['max'] = np.max(outgrid['MMI'])         ################
+    metadata['output']['ground_motions']['pga'] = {}
+    metadata['output']['ground_motions']['pga']['units'] = 'g'
+    metadata['output']['ground_motions']['pga']['bias'] = bias['PGA']
+    metadata['output']['ground_motions']['pga']['max_grid'] = np.max(outgrid['PGA'])
+    metadata['output']['ground_motions']['pga']['max'] = np.max(outgrid['PGA'])         ################
+    metadata['output']['ground_motions']['pgv'] = {}
+    metadata['output']['ground_motions']['pgv']['units'] = 'cms'
+    metadata['output']['ground_motions']['pgv']['bias'] = bias['PGV']
+    metadata['output']['ground_motions']['pgv']['max_grid'] = np.max(outgrid['PGV'])
+    metadata['output']['ground_motions']['pgv']['max'] = np.max(outgrid['PGV'])         ################
     #
-    # Clean up the metadata, and add new stuff
+    # Meet with HazDev to revise these old-style SA tags
     #
-    metadata = copy.deepcopy(config)
-    del metadata['ccf_modules']
-    del metadata['gmice_modules']
-    del metadata['gmpe_modules']
-    del metadata['gmpe_sets']
-    del metadata['ipe_modules']
-    del metadata['grind']['vs30file']
-    metadata['grind']['ccf'] = config['ccf_modules'][config['grind']['ccf']][0]
-    metadata['grind']['ipe'] = config['ipe_modules'][config['grind']['ipe']][0]
-    metadata['grind']['gmice'] = \
-            config['gmice_modules'][config['grind']['gmice']][0]
-    metadata['bias'] = {}
-    for key, value in bias.items():
-        metadata['bias'][key] = value
-    metadata['max_amp'] = {}
-    for key, value in outgrid.items():
-        metadata['max_amp'][key] = np.max(outgrid[key])
+    for imtstr in imt_out_set_str:
+        if not imtstr.startswith('SA('):
+            continue
+        imtper = imtstr.replace('SA(', '').replace('.', '').replace(')', '')
+        newimt = 'psa' + imtper
+        metadata['output']['ground_motions'][newimt] = {}
+        metadata['output']['ground_motions'][newimt]['units'] = 'g'
+        metadata['output']['ground_motions'][newimt]['bias'] = bias[imtstr]
+        metadata['output']['ground_motions'][newimt]['max_grid'] = np.max(outgrid[imtstr])
         #
         # How do we get max value on land?
+        # Basemap.is_land()?
         #
+        metadata['output']['ground_motions'][newimt]['max'] = np.max(outgrid[imtstr])         ################
+    metadata['output']['map_information'] = {}
+    metadata['output']['map_information']['grid_points'] = {}
+    metadata['output']['map_information']['grid_points']['longitude'] = smnx
+    metadata['output']['map_information']['grid_points']['latitude'] = smny
+    metadata['output']['map_information']['grid_points']['units'] = ''
+    metadata['output']['map_information']['grid_spacing'] = {}
+    metadata['output']['map_information']['grid_spacing']['longitude'] = smdx
+    metadata['output']['map_information']['grid_spacing']['latitude'] = smdy
+    metadata['output']['map_information']['grid_spacing']['units'] = 'degrees'
+    metadata['output']['map_information']['grid_span'] = {}
+    metadata['output']['map_information']['grid_span']['longitude'] = E - W
+    metadata['output']['map_information']['grid_span']['latitude'] = N - S
+    metadata['output']['map_information']['grid_span']['units'] = 'degrees'
+    metadata['output']['map_information']['min'] = {}
+    metadata['output']['map_information']['min']['longitude'] = W
+    metadata['output']['map_information']['min']['latitude'] = S
+    metadata['output']['map_information']['min']['units'] = 'degrees'
+    metadata['output']['map_information']['max'] = {}
+    metadata['output']['map_information']['max']['longitude'] = E
+    metadata['output']['map_information']['max']['latitude'] = N
+    metadata['output']['map_information']['max']['units'] = 'degrees'
+    metadata['output']['uncertainty'] = {}
+    metadata['output']['uncertainty']['grade'] = ''                                     ############# Need map grade
+    metadata['output']['uncertainty']['mean_uncertainty'] = {}
+    metadata['output']['uncertainty']['total_flagged_mi'] = np.sum(df2['MMI_outliers'] | np.isnan(df2['MMI']))
+    all_flagged = np.full(df1['lon'].shape, False, dtype=np.bool)
+    for imtstr in imt_in_str_dict['df1']:
+        if 'MMI' in imtstr:
+            continue
+        all_flagged |= df1[imtstr + '_outliers'] | np.isnan(df1[imtstr])
+    metadata['output']['uncertainty']['total_flagged_pgm'] = np.sum(all_flagged)
+    metadata['processing'] = {}
+    metadata['processing']['ground_motion_modules'] = {}
+    metadata['processing']['ground_motion_modules']['gmpe'] = {}
+    metadata['processing']['ground_motion_modules']['gmpe']['module'] = config['grind']['gmpe']
+    metadata['processing']['ground_motion_modules']['gmpe']['reference'] = ''
+    metadata['processing']['ground_motion_modules']['ipe'] = {}
+    metadata['processing']['ground_motion_modules']['ipe']['module'] = config['ipe_modules'][config['grind']['ipe']][0]
+    metadata['processing']['ground_motion_modules']['ipe']['reference'] = ''
+    metadata['processing']['ground_motion_modules']['mi2pgm'] = {}             #############3 change these two to just 'gmice'
+    metadata['processing']['ground_motion_modules']['mi2pgm']['module'] = config['gmice_modules'][config['grind']['gmice']][0]
+    metadata['processing']['ground_motion_modules']['mi2pgm']['reference'] = ''
+    metadata['processing']['ground_motion_modules']['pgm2mi'] = {}
+    metadata['processing']['ground_motion_modules']['pgm2mi']['module'] = config['gmice_modules'][config['grind']['gmice']][0]
+    metadata['processing']['ground_motion_modules']['pgm2mi']['reference'] = ''
+    metadata['processing']['ground_motion_modules']['ccf'] = {}                 ############# Add this with HazDev
+    metadata['processing']['ground_motion_modules']['ccf']['module'] = config['ccf_modules'][config['grind']['ccf']][0]
+    metadata['processing']['ground_motion_modules']['ccf']['reference'] = ''
+    metadata['processing']['ground_motion_modules']['basin_correction'] = {} 
+    metadata['processing']['ground_motion_modules']['basin_correction']['module'] = 'None'
+    metadata['processing']['ground_motion_modules']['basin_correction']['reference'] = ''
+    metadata['processing']['ground_motion_modules']['directivity'] = {} 
+    metadata['processing']['ground_motion_modules']['directivity']['module'] = 'None'
+    metadata['processing']['ground_motion_modules']['directivity']['reference'] = ''
+    metadata['processing']['miscellaneous'] = {}
+    metadata['processing']['miscellaneous']['bias_max_dsigma'] = bias_max_dsigma
+    metadata['processing']['miscellaneous']['bias_max_mag'] = bias_max_mag
+    metadata['processing']['miscellaneous']['bias_max_range'] = bias_max_range
+    metadata['processing']['miscellaneous']['median_dist'] = 'True'
+    metadata['processing']['miscellaneous']['outlier_deviation_level'] = outlier_deviation_level
+    metadata['processing']['miscellaneous']['outlier_max_mag'] = outlier_max_mag
+    metadata['processing']['shakemap_versions'] = {}
+    metadata['processing']['shakemap_versions']['shakemap_revision'] = '4.0a'       ##################
+    metadata['processing']['shakemap_versions']['process_time'] = strftime("%Y-%m-%d %H:%M:%S", gmtime())
+    metadata['processing']['shakemap_versions']['map_version'] = 1                  ##################
+    metadata['processing']['shakemap_versions']['map_status'] = 'released'          ##################
+    metadata['processing']['site_response'] = {}
+    metadata['processing']['site_response']['vs30default'] = vs30default
+    metadata['processing']['site_response']['site_correction'] = 'GMPE native'
+    
+    oc.addMetadata(metadata)
+    
     #
     # Need:
-    #   event info
     #   rupture info (how?)
-    #   number of stations, dyfi
     #   ShakeMap grade (how?)
-    #   ShakeMap version, map version, date of production
-    #   station data
+    #   ShakeMap version, map version
+    #   station data stored (how? station.json string?)
     #
-    oc.addMetadata(metadata)
     
     for key, value in outgrid.items():
         oc.addData(value, key)
