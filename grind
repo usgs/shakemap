@@ -24,7 +24,7 @@ from shakelib.grind.multigmpe import MultiGMPE
 from shakelib.grind.virtualipe import VirtualIPE
 
 from shakelib.grind.container import InputContainer, OutputContainer
-from shakemap.utils.config import get_config_paths
+from shakelib.utils.config import get_config_paths
 
 #%%
 #

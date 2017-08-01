@@ -12,7 +12,7 @@ from configobj import ConfigObj, flatten_errors
 from validate import Validator
 
 from shakelib.grind.container import InputContainer
-from shakemap.utils.config import get_config_paths, get_custom_validator,\
+from shakelib.utils.config import get_config_paths, get_custom_validator,\
         config_error
 
 def main(args):
