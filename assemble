@@ -5,11 +5,9 @@ import sys
 import os.path
 import argparse
 import glob
-import pprint
 
 #third party imports
 from configobj import ConfigObj, flatten_errors
-from validate import Validator
 
 from shakelib.grind.container import InputContainer
 from shakelib.utils.config import get_config_paths, get_custom_validator,\
@@ -117,31 +115,32 @@ def main(args):
 
 def check_config(config):
     if config['grind']['gmpe'] not in config['gmpe_sets']:
-        print('Configuration error: gmpe %s not in gmpe_sets' % 
+        print('Configuration error: gmpe %s not in gmpe_sets' %
                 (config['grind']['gmpe']))
         sys.exit(1)
     if config['grind']['gmice'] not in config['gmice_modules']:
-        print('Configuration error: gmice %s not in gmice_modules' % 
+        print('Configuration error: gmice %s not in gmice_modules' %
                 (config['grind']['gmice']))
         sys.exit(1)
     if config['grind']['ipe'] not in config['ipe_modules']:
-        print('Configuration error: ipe %s not in ipe_modules' % 
+        print('Configuration error: ipe %s not in ipe_modules' %
                 (config['grind']['ipe']))
         sys.exit(1)
     if config['grind']['ccf'] not in config['ccf_modules']:
-        print('Configuration error: ccf %s not in ccf_modules' % 
+        print('Configuration error: ccf %s not in ccf_modules' %
                 (config['grind']['ccf']))
         sys.exit(1)
 
 
 if __name__ == '__main__':
-    description = '''Assemble ShakeMap input data into an HDF package.
-The only argument is a ShakeMap event ID, which should correspond to a 
-directory in the ShakeMap data directory. The output will be an HDF5 data 
-file called shake_data.hdf in that same event data directory.
-'''
+    description = '''
+    Assemble ShakeMap input data into an HDF package. The only argument is a
+    ShakeMap event ID, which should correspond to a directory in the ShakeMap
+    data directory. The output will be an HDF5 data  file called shake_data.hdf
+    in that same event data directory.
+    '''
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('eventid', 
+    parser.add_argument('eventid',
                     help='Path to ShakeMap data directory containing '
                          'event.xml, grind_zc.conf')
     pargs = parser.parse_args()
