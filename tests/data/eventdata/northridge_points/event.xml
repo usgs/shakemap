@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
+<!DOCTYPE earthquake [
+<!ELEMENT  earthquake EMPTY>
+<!ATTLIST earthquake
+  id 		ID	#REQUIRED
+  lat		CDATA	#REQUIRED
+  lon		CDATA	#REQUIRED
+  mag		CDATA	#REQUIRED
+  year          CDATA   #REQUIRED
+  month         CDATA   #REQUIRED
+  day           CDATA   #REQUIRED
+  hour          CDATA   #REQUIRED
+  minute        CDATA   #REQUIRED
+  second        CDATA   #REQUIRED
+  timezone      CDATA   #REQUIRED
+  depth		CDATA	#REQUIRED
+  locstring	CDATA	#REQUIRED
+  pga		CDATA   #REQUIRED
+  pgv		CDATA   #REQUIRED
+  sp03		CDATA   #REQUIRED
+  sp10		CDATA   #REQUIRED
+  sp30		CDATA   #REQUIRED
+  created	CDATA	#REQUIRED
+>
+]>
+<earthquake id="Northridge" lat="34.213" lon="-118.5357" mag="6.7" year="1994" month="01" day="17" hour="12" minute="30" second="55" timezone="GMT" depth="18" locstring="Northridge" description="Northridge Mean" type="RS" created="1056046245" network="ci" />
+
