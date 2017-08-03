@@ -87,12 +87,29 @@ def main(args):
     #
     vs30file = global_grind['grind']['vs30file']
     if vs30file:
+        vs30file = vs30file.replace('<INSTALL_DIR>', install_path)
         vs30file = vs30file.replace('<DATA_DIR>', data_path)
         vs30file = vs30file.replace('<EVENT_ID>', args.eventid)
         if not os.path.isfile(vs30file):
             print("file '%s' is not a valid file" % vs30file)
             sys.exit(1)
         global_grind['grind']['vs30file'] = vs30file
+
+    #
+    # If there is a prediction_location->file file, then we need
+    # to expand any macros
+    #
+    if 'file' in global_grind['grind']['prediction_location']:
+        loc_file = global_grind['grind']['prediction_location']['file']
+        if loc_file:
+            loc_file = loc_file.replace('<INSTALL_DIR>', install_path)
+            loc_file = loc_file.replace('<DATA_DIR>', data_path)
+            loc_file = loc_file.replace('<EVENT_ID>', args.eventid)
+            if not os.path.isfile(loc_file):
+                print("file '%s' is not a valid file" % loc_file)
+                sys.exit(1)
+            global_grind['grind']['prediction_location']['file'] = loc_file
+
 #    pprint.pprint(global_grind)
 
     config = global_grind.dict()
@@ -129,6 +146,10 @@ def check_config(config):
     if config['grind']['ccf'] not in config['ccf_modules']:
         print('Configuration error: ccf %s not in ccf_modules' %
                 (config['grind']['ccf']))
+        sys.exit(1)
+    if config['grind']['component'] not in config['component_modules']:
+        print('Configuration error: component %s not in component_modules' %
+                (config['grind']['component']))
         sys.exit(1)
 
 

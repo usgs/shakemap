@@ -26,6 +26,8 @@ from shakelib.grind.virtualipe import VirtualIPE
 from shakelib.grind.container import InputContainer, OutputContainer
 from shakelib.utils.config import get_config_paths
 
+from shakemap._version import get_versions
+
 #%%
 #
 # helper function for things (ipe, gmice, ccf) that don't have a
@@ -51,8 +53,8 @@ def set_sx_params(sx, lons, lats, vs30):
     sx.z2pt5_cb14_cal  = Sites._z2pt5_from_vs30_cb14_cal(sx.vs30) / 1000.0
     sx.z1pt0_cy08      = Sites._z1pt0_from_vs30_cy08(sx.vs30)
     sx.z2pt5_cb07      = Sites._z2pt5_from_z1pt0_cb07(sx.z1pt0_cy08)
-    sx.vs30measured    = np.zeros_like(lons)
-    sx.backarc         = np.zeros_like(lons)
+    sx.vs30measured    = np.zeros(lons.shape, dtype=bool)
+    sx.backarc         = np.zeros(lons.shape, dtype=bool)
     return sx
 
 #
@@ -170,7 +172,7 @@ def get_sta_imts(imtstr, sdf, ix, imtset):
             myimts.add(this_imt)
     return get_imts(imtstr, myimts)
 #%%
-args = type('Dummy', (object,), {'eventid' : 'northridge',
+args = type('Dummy', (object,), {'eventid' : 'northridge_points',
                                  'verbose' : True})
 if True:
 #def grind(args):
@@ -239,34 +241,39 @@ if True:
     #------------------------------------------------------------------
     # The output locations: either a grid or a list of points
     #------------------------------------------------------------------
+    smdx = config['grind']['prediction_location']['xres']
+    smdy = config['grind']['prediction_location']['yres']
     if config['grind']['prediction_location']['file']:
         #
         # FILE: Open the file and get the output points
         #
-        lons, lats, idents = np.genfromtxt(
+        in_sites = np.genfromtxt(
                         config['grind']['prediction_location']['file'],
-                        autostrip=True, unpack=True)
+                        autostrip=True, unpack=True,
+                        dtype=[np.float, np.float, np.float, '<U80'])
+        lons, lats, vs30, idents = zip(*in_sites)
+        lons = np.array(lons).reshape(1, -1)
+        lats = np.array(lats).reshape(1, -1)
+        vs30 = np.array(vs30).reshape(1, -1)
         depths = np.zeros_like(lats)
+        W = np.min(lons)
+        E = np.max(lons)
+        S = np.min(lats)
+        N = np.max(lats)
         smnx = np.size(lons)
         smny = 1
         dist_obj_out = Distance(gmpe, lons, lats, depths, rupture_obj)
-        #
-        # Get the Vs30 from a file (could add other params here)
-        # In the future we may want to support selecting
-        # the Vs30 values from a grid
-        #
-        vs30_rock = np.full_like(lons, vs30default)
-        if vs30_file:
-            ids, vs = np.genfromtxt(vs30_file, autostrip=True, unpack=True)
-            vs30_hash = dict(zip(ids, vs))
-            vs30 = np.ndarray([vs30_hash[x] for x in idents])
-        else:
-            vs30 = vs30_rock
+        
+        sites_obj_out = Sites.fromBounds(W, E, S, N, smdx, smdy,
+                                         defaultVs30=vs30default,
+                                         vs30File=vs30_file)        
+
         sx_out_soil = oqbase.SitesContext()
-        sx_out_rock = oqbase.SitesContext()
+#        sx_out_rock = oqbase.SitesContext()
 
         sx_out_soil = set_sx_params(sx_out_soil, lons, lats, vs30)
-        sx_out_rock = set_sx_params(sx_out_rock, lons, lats, vs30_rock)
+#        vs30_rock = np.full_like(lons, vs30default)
+#        sx_out_rock = set_sx_params(sx_out_rock, lons, lats, vs30_rock)
     else:
         #
         # GRID: Figure out the grid parameters and get output points
@@ -282,8 +289,8 @@ if True:
         smnx, smny = sites_obj_out.getNxNy()
 
         sx_out_soil = sites_obj_out.getSitesContext()
-        sx_out_rock = sites_obj_out.getSitesContext(rock_vs30=vs30default)
-        lons, lats = np.meshgrid(sx_out_rock.lons, sx_out_rock.lats)
+#        sx_out_rock = sites_obj_out.getSitesContext(rock_vs30=vs30default)
+        lons, lats = np.meshgrid(sx_out_soil.lons, sx_out_soil.lats)
         lons = np.flipud(lons)
         lats = np.flipud(lats)
         lons = lons.flatten()
@@ -741,7 +748,7 @@ if True:
     metadata['input']['event_information']['depth'] = rx.hypo_depth
     metadata['input']['event_information']['event_id'] = args.eventid
     metadata['input']['event_information']['fault_ref'] = rupture_obj._reference
-    metadata['input']['event_information']['faultfiles'] = ''                                       ################
+    metadata['input']['event_information']['faultfiles'] = ''                                       #### Do we need this?
     metadata['input']['event_information']['feregion'] = config['zone_info']['fename']
     metadata['input']['event_information']['intensity_observations'] = np.size(df2['lon'])
     metadata['input']['event_information']['latitude'] = rx.hypo_lat
@@ -753,25 +760,25 @@ if True:
     metadata['input']['event_information']['seismic_stations'] = np.size(df1['lon'])
     metadata['input']['event_information']['src_mech'] = rupture_obj._origin.mech
     metadata['input']['event_information']['tectonic_regime'] = config['zone_info']['domain']
-    metadata['input']['event_information']['event_description'] = rupture_obj._origin.locstring     ################
-    metadata['input']['event_information']['event_type'] = rupture_obj._origin.mech                 ################
+    metadata['input']['event_information']['event_description'] = rupture_obj._origin.locstring     ##### This AND locaction?
+    metadata['input']['event_information']['event_type'] = rupture_obj._origin.mech                 ##### This AND src_mech?
     metadata['output'] = {}
     metadata['output']['ground_motions'] = {}
     metadata['output']['ground_motions']['intensity'] = {}
     metadata['output']['ground_motions']['intensity']['units'] = 'MMI'
     metadata['output']['ground_motions']['intensity']['bias'] = bias['MMI']
     metadata['output']['ground_motions']['intensity']['max_grid'] = np.max(outgrid['MMI'])
-    metadata['output']['ground_motions']['intensity']['max'] = np.max(outgrid['MMI'])         ################
+    metadata['output']['ground_motions']['intensity']['max'] = np.max(outgrid['MMI'])         ##### Landmask?
     metadata['output']['ground_motions']['pga'] = {}
-    metadata['output']['ground_motions']['pga']['units'] = 'g'
+    metadata['output']['ground_motions']['pga']['units'] = 'ln(g)'
     metadata['output']['ground_motions']['pga']['bias'] = bias['PGA']
     metadata['output']['ground_motions']['pga']['max_grid'] = np.max(outgrid['PGA'])
-    metadata['output']['ground_motions']['pga']['max'] = np.max(outgrid['PGA'])         ################
+    metadata['output']['ground_motions']['pga']['max'] = np.max(outgrid['PGA'])         ##### Landmask?
     metadata['output']['ground_motions']['pgv'] = {}
     metadata['output']['ground_motions']['pgv']['units'] = 'cms'
     metadata['output']['ground_motions']['pgv']['bias'] = bias['PGV']
     metadata['output']['ground_motions']['pgv']['max_grid'] = np.max(outgrid['PGV'])
-    metadata['output']['ground_motions']['pgv']['max'] = np.max(outgrid['PGV'])         ################
+    metadata['output']['ground_motions']['pgv']['max'] = np.max(outgrid['PGV'])         ##### Landmask?
     #
     # Meet with HazDev to revise these old-style SA tags
     #
@@ -781,14 +788,14 @@ if True:
         imtper = imtstr.replace('SA(', '').replace('.', '').replace(')', '')
         newimt = 'psa' + imtper
         metadata['output']['ground_motions'][newimt] = {}
-        metadata['output']['ground_motions'][newimt]['units'] = 'g'
+        metadata['output']['ground_motions'][newimt]['units'] = 'ln(g)'
         metadata['output']['ground_motions'][newimt]['bias'] = bias[imtstr]
         metadata['output']['ground_motions'][newimt]['max_grid'] = np.max(outgrid[imtstr])
         #
         # How do we get max value on land?
         # Basemap.is_land()?
         #
-        metadata['output']['ground_motions'][newimt]['max'] = np.max(outgrid[imtstr])         ################
+        metadata['output']['ground_motions'][newimt]['max'] = np.max(outgrid[imtstr])         ##### Landmask?
     metadata['output']['map_information'] = {}
     metadata['output']['map_information']['grid_points'] = {}
     metadata['output']['map_information']['grid_points']['longitude'] = smnx
@@ -812,7 +819,7 @@ if True:
     metadata['output']['map_information']['max']['units'] = 'degrees'
     metadata['output']['uncertainty'] = {}
     metadata['output']['uncertainty']['grade'] = ''                                     ############# Need map grade
-    metadata['output']['uncertainty']['mean_uncertainty'] = {}
+    metadata['output']['uncertainty']['mean_uncertainty_ratio'] = np.nan                ############# Need map grade
     metadata['output']['uncertainty']['total_flagged_mi'] = np.sum(df2['MMI_outliers'] | np.isnan(df2['MMI']))
     all_flagged = np.full(df1['lon'].shape, False, dtype=np.bool)
     for imtstr in imt_in_str_dict['df1']:
@@ -828,13 +835,10 @@ if True:
     metadata['processing']['ground_motion_modules']['ipe'] = {}
     metadata['processing']['ground_motion_modules']['ipe']['module'] = config['ipe_modules'][config['grind']['ipe']][0]
     metadata['processing']['ground_motion_modules']['ipe']['reference'] = ''
-    metadata['processing']['ground_motion_modules']['mi2pgm'] = {}             #############3 change these two to just 'gmice'
-    metadata['processing']['ground_motion_modules']['mi2pgm']['module'] = config['gmice_modules'][config['grind']['gmice']][0]
-    metadata['processing']['ground_motion_modules']['mi2pgm']['reference'] = ''
-    metadata['processing']['ground_motion_modules']['pgm2mi'] = {}
-    metadata['processing']['ground_motion_modules']['pgm2mi']['module'] = config['gmice_modules'][config['grind']['gmice']][0]
-    metadata['processing']['ground_motion_modules']['pgm2mi']['reference'] = ''
-    metadata['processing']['ground_motion_modules']['ccf'] = {}                 ############# Add this with HazDev
+    metadata['processing']['ground_motion_modules']['gmice'] = {}
+    metadata['processing']['ground_motion_modules']['gmice']['module'] = config['gmice_modules'][config['grind']['gmice']][0]
+    metadata['processing']['ground_motion_modules']['gmice']['reference'] = ''
+    metadata['processing']['ground_motion_modules']['ccf'] = {}
     metadata['processing']['ground_motion_modules']['ccf']['module'] = config['ccf_modules'][config['grind']['ccf']][0]
     metadata['processing']['ground_motion_modules']['ccf']['reference'] = ''
     metadata['processing']['ground_motion_modules']['basin_correction'] = {}
@@ -851,7 +855,8 @@ if True:
     metadata['processing']['miscellaneous']['outlier_deviation_level'] = outlier_deviation_level
     metadata['processing']['miscellaneous']['outlier_max_mag'] = outlier_max_mag
     metadata['processing']['shakemap_versions'] = {}
-    metadata['processing']['shakemap_versions']['shakemap_revision'] = '4.0a'       ##################
+    metadata['processing']['shakemap_versions']['shakemap_revision'] = get_versions()['version']
+    metadata['processing']['shakemap_versions']['shakemap_revision_id'] = get_versions()['full-revisionid']
     metadata['processing']['shakemap_versions']['process_time'] = strftime("%Y-%m-%d %H:%M:%S", gmtime())
     metadata['processing']['shakemap_versions']['map_version'] = 1                  ##################
     metadata['processing']['shakemap_versions']['map_status'] = 'released'          ##################
