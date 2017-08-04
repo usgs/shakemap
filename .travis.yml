@@ -1,9 +1,5 @@
 language: python
 sudo: false
-#cache:
-#  directories:
-#  - /home/travis/miniconda/envs/
-#  - /home/travis/virtualenv/python3.5.2/lib/python3.5/site-packages
 python:
     - "3.5"
 
@@ -18,6 +14,9 @@ install:
     - conda config --set always_yes yes --set changeps1 no
     - conda update -q conda
     - conda info -a
+    - conda config --prepend channels conda-forge
+    - conda config --append channels digitalglobe # for rasterio v 1.0a9
+    - conda config --append channels ioos # for rasterio v 1.0a2
     - bash setup_env.sh
     - source activate shake
     #---------------------
