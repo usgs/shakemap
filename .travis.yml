@@ -18,7 +18,7 @@ install:
     - conda config --append channels digitalglobe # for rasterio v 1.0a9
     - conda config --append channels ioos # for rasterio v 1.0a2
     - bash setup_env.sh
-    - source activate shake
+    - source activate shakemap
     #---------------------
     # Install shakemap
     #---------------------
