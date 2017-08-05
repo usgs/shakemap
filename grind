@@ -4,14 +4,19 @@ import sys
 import os.path
 import time as time
 import argparse
+import copy
 from importlib import import_module
 from time import gmtime, strftime
+import json
+import warnings
 
 # Not really needed, but handy for looking at the config
-import pprint
+#import pprint
 
 import numpy as np
+import numpy.ma as ma
 import numexpr as ne
+from mpl_toolkits.basemap import maskoceans
 
 from openquake.hazardlib import imt
 import openquake.hazardlib.const as oqconst
@@ -171,8 +176,29 @@ def get_sta_imts(imtstr, sdf, ix, imtset):
            not sdf[this_imt + '_outliers'][ix]:
             myimts.add(this_imt)
     return get_imts(imtstr, myimts)
+
+def get_map_grade(do_grid, outsd, psd, moutgrid):
+    mean_rat = '-'
+    mygrade = '-'    
+    if not do_grid or 'PGA' not in outsd:
+        return mean_rat, mygrade, []
+    sd_rat = outsd['PGA'] / psd['PGA']
+    mmimasked = ma.masked_less(moutgrid['MMI'], 6.0)
+    mpgasd_rat = ma.masked_array(sd_rat, mask=mmimasked.mask)
+    if not np.all(mpgasd_rat.mask):
+        gvals = [0.96, 0.98, 1.05, 1.25]
+        grades = ['A', 'B', 'C', 'D', 'F']
+        mean_rat = mpgasd_rat.mean()
+        for ix, val in enumerate(gvals):
+            if mean_rat <= val:
+                mygrade = grades[ix]
+                break
+        if mygrade == '-':
+            mygrade = 'F'
+    return mean_rat, mygrade, sd_rat
+
 #%%
-args = type('Dummy', (object,), {'eventid' : 'northridge_points',
+args = type('Dummy', (object,), {'eventid' : 'northridge',
                                  'verbose' : True})
 if True:
 #def grind(args):
@@ -243,10 +269,12 @@ if True:
     #------------------------------------------------------------------
     smdx = config['grind']['prediction_location']['xres']
     smdy = config['grind']['prediction_location']['yres']
-    if config['grind']['prediction_location']['file']:
+    if config['grind']['prediction_location']['file'] and \
+       config['grind']['prediction_location']['file'] != 'None':
         #
         # FILE: Open the file and get the output points
         #
+        do_grid = False
         in_sites = np.genfromtxt(
                         config['grind']['prediction_location']['file'],
                         autostrip=True, unpack=True,
@@ -278,6 +306,7 @@ if True:
         #
         # GRID: Figure out the grid parameters and get output points
         #
+        do_grid = True
         smdx = config['grind']['prediction_location']['xres']
         smdy = config['grind']['prediction_location']['yres']
 
@@ -351,12 +380,13 @@ if True:
             # Do the predictions and other bookkeeping for each IMT
             #
             for imtstr in imt_in_str_dict[ndf]:
-                pmean, psd = gmas(ipe, gmpe, sx_dict[ndf], rx, dx_dict[ndf],
-                                  imt.from_string(imtstr), stddev_types)
+                pmean, pstddev = gmas(ipe, gmpe, sx_dict[ndf], rx, 
+                                      dx_dict[ndf], imt.from_string(imtstr), 
+                                      stddev_types)
                 df[imtstr + '_pred'] = pmean
-                df[imtstr + '_pred_sd_total'] = psd[0]
-                df[imtstr + '_pred_sd_inter'] = psd[1]
-                df[imtstr + '_pred_sd_intra'] = psd[2]
+                df[imtstr + '_pred_sd_total'] = pstddev[0]
+                df[imtstr + '_pred_sd_inter'] = pstddev[1]
+                df[imtstr + '_pred_sd_intra'] = pstddev[2]
                 #
                 # Compute the total residual
                 #
@@ -435,12 +465,12 @@ if True:
                 #
                 # Get the predictions and stddevs, too
                 #
-                pmean, psd = gmas(ipe, gmpe, sx_dict['df2'], rx,
-                                  dx_dict['df2'], oqimt, stddev_types)
+                pmean, pstddev = gmas(ipe, gmpe, sx_dict['df2'], rx,
+                                      dx_dict['df2'], oqimt, stddev_types)
                 df2[imtstr + '_pred'] = pmean
-                df2[imtstr + '_pred_sd_total'] = psd[0]
-                df2[imtstr + '_pred_sd_inter'] = psd[1]
-                df2[imtstr + '_pred_sd_intra'] = psd[2]
+                df2[imtstr + '_pred_sd_total'] = pstddev[0]
+                df2[imtstr + '_pred_sd_inter'] = pstddev[1]
+                df2[imtstr + '_pred_sd_intra'] = pstddev[2]
                 df2[imtstr + '_residual'] = df2[str(oqimt)] - pmean
                 df2[imtstr + '_outliers'] = np.full(pmean.shape, False,
                                                     dtype=np.bool)
@@ -480,12 +510,12 @@ if True:
             #
             # Get the prediction and stddevs
             #
-            pmean, psd = gmas(ipe, gmpe, sx_dict['df1'], rx, dx_dict['df1'],
-                              imt.from_string('MMI'), stddev_types)
+            pmean, pstddev = gmas(ipe, gmpe, sx_dict['df1'], rx, dx_dict['df1'],
+                                  imt.from_string('MMI'), stddev_types)
             df1['MMI' + '_pred'] = pmean
-            df1['MMI' + '_pred_sd_total'] = psd[0]
-            df1['MMI' + '_pred_sd_inter'] = psd[1]
-            df1['MMI' + '_pred_sd_intra'] = psd[2]
+            df1['MMI' + '_pred_sd_total'] = pstddev[0]
+            df1['MMI' + '_pred_sd_inter'] = pstddev[1]
+            df1['MMI' + '_pred_sd_intra'] = pstddev[2]
             df1['MMI' + '_residual'] = df1['MMI'] - pmean
             df1['MMI' + '_outliers'] = np.full(pmean.shape, False,
                                                dtype=np.bool)
@@ -508,6 +538,7 @@ if True:
     sigma_2_eta = {}
     outgrid = {}
     outsd = {}
+    psd = {}
 
     sta_lons_rad = {}
     sta_lats_rad = {}
@@ -533,16 +564,16 @@ if True:
                                          sdf['lat_rad'][vidx])
         sta_resids[imtstr] = np.append(sta_resids[imtstr],
                                sdf[imtin + '_residual'][vidx])
-        psd = sdf[imtin + '_pred_sd_intra'][vidx]
-        sta_sigs[imtstr] = np.append(sta_sigs[imtstr], psd)
+        sdarr = sdf[imtin + '_pred_sd_intra'][vidx]
+        sta_sigs[imtstr] = np.append(sta_sigs[imtstr], sdarr)
         sta_sigs_inter[imtstr] = np.append(sta_sigs_inter[imtstr],
                       sdf[imtin + '_pred_sd_inter'][vidx])
         sta_sigs_total[imtstr] = np.append(sta_sigs_total[imtstr],
-                      np.sqrt(psd**2 + sdf[imtin + '_sd'][vidx]**2))
+                      np.sqrt(sdarr**2 + sdf[imtin + '_sd'][vidx]**2))
         if isinstance(vidx, int):
             per_val = inperiod_ix
         else:
-            per_val = np.full(psd.shape, inperiod_ix, dtype=np.int64)
+            per_val = np.full(sdarr.shape, inperiod_ix, dtype=np.int64)
         sta_period_ix[imtstr] = np.append(sta_period_ix[imtstr], per_val)
         return
 
@@ -636,15 +667,14 @@ if True:
         #
         # Get the predictions at the output points
         #
-#
-# Should probably check to see if there is a bias and if not, select the
-# total uncertainty rather than the intra even uncertainty...
-#
         oqimt = imt.from_string(imtstr)
         pout_mean, pout_sd = gmas(ipe, gmpe, sx_out_soil, rx, dx_out, oqimt,
                                   stddev_types)
-        pout_sd = pout_sd[2]
-        pout_sd2 = np.power(pout_sd, 2.0)
+        if bias[imtstr]:
+            psd[imtstr] = pout_sd[2]
+        else:
+            psd[imtstr] = pout_sd[0]
+        pout_sd2 = np.power(psd[imtstr], 2.0)
 
         #
         # Bias the predictions
@@ -701,10 +731,10 @@ if True:
             corr12 = ccf.getCorrelation(t1_12, t2_12, dist12)
             ctime += time.time() - time4
             time4 = time.time()
-            psd = pout_sd[iy, :].reshape((1, -1))
+            sdarr = psd[imtstr][iy, :].reshape((1, -1))
             ss = sta_sigs[imtstr]
             sigma12 =  ne.evaluate(
-                    "corr12 * corr_adj12 * (ss * psd)"
+                    "corr12 * corr_adj12 * (ss * sdarr)"
                     ).T
             stime += time.time() - time4
             time4 = time.time()
@@ -742,43 +772,81 @@ if True:
     #
     oc.addMetadata(config, name='config')
 
-    metadata = {}
-    metadata['input'] = {}
-    metadata['input']['event_information'] = {}
-    metadata['input']['event_information']['depth'] = rx.hypo_depth
-    metadata['input']['event_information']['event_id'] = args.eventid
-    metadata['input']['event_information']['fault_ref'] = rupture_obj._reference
-    metadata['input']['event_information']['faultfiles'] = ''                                       #### Do we need this?
-    metadata['input']['event_information']['feregion'] = config['zone_info']['fename']
-    metadata['input']['event_information']['intensity_observations'] = np.size(df2['lon'])
-    metadata['input']['event_information']['latitude'] = rx.hypo_lat
-    metadata['input']['event_information']['longitude'] = rx.hypo_lon
-    metadata['input']['event_information']['location'] = rupture_obj._origin.locstring
-    metadata['input']['event_information']['magnitude'] = rx.mag
-    metadata['input']['event_information']['mech_src'] = config['zone_info']['moment_tensor_source']
-    metadata['input']['event_information']['origin_time'] = rupture_obj._origin.time.strftime('%Y-%m-%d %H:%M:%S')
-    metadata['input']['event_information']['seismic_stations'] = np.size(df1['lon'])
-    metadata['input']['event_information']['src_mech'] = rupture_obj._origin.mech
-    metadata['input']['event_information']['tectonic_regime'] = config['zone_info']['domain']
-    metadata['input']['event_information']['event_description'] = rupture_obj._origin.locstring     ##### This AND locaction?
-    metadata['input']['event_information']['event_type'] = rupture_obj._origin.mech                 ##### This AND src_mech?
-    metadata['output'] = {}
-    metadata['output']['ground_motions'] = {}
-    metadata['output']['ground_motions']['intensity'] = {}
-    metadata['output']['ground_motions']['intensity']['units'] = 'MMI'
-    metadata['output']['ground_motions']['intensity']['bias'] = bias['MMI']
-    metadata['output']['ground_motions']['intensity']['max_grid'] = np.max(outgrid['MMI'])
-    metadata['output']['ground_motions']['intensity']['max'] = np.max(outgrid['MMI'])         ##### Landmask?
-    metadata['output']['ground_motions']['pga'] = {}
-    metadata['output']['ground_motions']['pga']['units'] = 'ln(g)'
-    metadata['output']['ground_motions']['pga']['bias'] = bias['PGA']
-    metadata['output']['ground_motions']['pga']['max_grid'] = np.max(outgrid['PGA'])
-    metadata['output']['ground_motions']['pga']['max'] = np.max(outgrid['PGA'])         ##### Landmask?
-    metadata['output']['ground_motions']['pgv'] = {}
-    metadata['output']['ground_motions']['pgv']['units'] = 'cms'
-    metadata['output']['ground_motions']['pgv']['bias'] = bias['PGV']
-    metadata['output']['ground_motions']['pgv']['max_grid'] = np.max(outgrid['PGV'])
-    metadata['output']['ground_motions']['pgv']['max'] = np.max(outgrid['PGV'])         ##### Landmask?
+    #
+    # We're going to need masked arrays of the output grids later, so
+    # make them now
+    #
+    moutgrid = {}
+    refimt = list(imt_out_set_str)[0]
+    #
+    # Don't know what to do about this warning; hopefully someone
+    # will fix maskoceans()
+    #
+    with warnings.catch_warnings():
+        warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
+        moutgrid[refimt] = maskoceans(lons.reshape((smny, smnx)), 
+                                      lats.reshape((smny, smnx)),
+                                      outgrid[refimt], inlands=False, grid=1.25)
+    for imtout in imt_out_set_str:
+        if imtout == refimt:
+            continue
+        moutgrid[imtout] = ma.masked_array(outgrid[imtout], 
+                mask=copy.copy(moutgrid[refimt].mask))
+    #
+    # Get the map grade
+    #
+    mean_rat, mygrade, sd_rat = get_map_grade(do_grid, outsd, psd, moutgrid)
+    #
+    # This is the metadata for creating info.json
+    #
+    ip = 'input'
+    ei = 'event_information'
+    op = 'output'
+    gm = 'ground_motions'
+    mi = 'map_information'
+    un = 'uncertainty'
+    pp = 'processing'
+    gmm = 'ground_motion_modules'
+    ms = 'miscellaneous'
+    sv = 'shakemap_versions'
+    sr = 'site_response'
+    info = {}
+    info[ip] = {}
+    info[ip][ei] = {}
+    info[ip][ei]['depth'] = str(rx.hypo_depth)
+    info[ip][ei]['event_id'] = args.eventid
+    info[ip][ei]['fault_ref'] = rupture_obj._reference
+    info[ip][ei]['faultfiles'] = ''                                    #### Do we need this?
+    info[ip][ei]['feregion'] = config['zone_info']['fename']
+    info[ip][ei]['intensity_observations'] = str(np.size(df2['lon']))
+    info[ip][ei]['latitude'] = str(rx.hypo_lat)
+    info[ip][ei]['longitude'] = str(rx.hypo_lon)
+    info[ip][ei]['location'] = rupture_obj._origin.locstring
+    info[ip][ei]['magnitude'] = str(rx.mag)
+    info[ip][ei]['mech_src'] = config['zone_info']['moment_tensor_source']
+    info[ip][ei]['origin_time'] = rupture_obj._origin.time.strftime('%Y-%m-%d %H:%M:%S')
+    info[ip][ei]['seismic_stations'] = str(np.size(df1['lon']))
+    info[ip][ei]['src_mech'] = rupture_obj._origin.mech
+    info[ip][ei]['tectonic_regime'] = config['zone_info']['domain']
+    info[ip][ei]['event_description'] = rupture_obj._origin.locstring  ##### This AND locaction?
+    info[ip][ei]['event_type'] = rupture_obj._origin.mech              ##### This AND src_mech?
+    info[op] = {}
+    info[op][gm] = {}
+    info[op][gm]['intensity'] = {}
+    info[op][gm]['intensity']['units'] = 'MMI'
+    info[op][gm]['intensity']['bias'] = str(bias['MMI'])
+    info[op][gm]['intensity']['max_grid'] = str(np.max(outgrid['MMI']))
+    info[op][gm]['intensity']['max'] = str(np.max(moutgrid['MMI']))
+    info[op][gm]['pga'] = {}
+    info[op][gm]['pga']['units'] = 'ln(g)'
+    info[op][gm]['pga']['bias'] = str(bias['PGA'])
+    info[op][gm]['pga']['max_grid'] = str(np.max(outgrid['PGA']))
+    info[op][gm]['pga']['max'] = str(np.max(moutgrid['PGA']))
+    info[op][gm]['pgv'] = {}
+    info[op][gm]['pgv']['units'] = 'cms'
+    info[op][gm]['pgv']['bias'] = str(bias['PGV'])
+    info[op][gm]['pgv']['max_grid'] = str(np.max(outgrid['PGV']))
+    info[op][gm]['pgv']['max'] = str(np.max(moutgrid['PGV']))
     #
     # Meet with HazDev to revise these old-style SA tags
     #
@@ -787,93 +855,157 @@ if True:
             continue
         imtper = imtstr.replace('SA(', '').replace('.', '').replace(')', '')
         newimt = 'psa' + imtper
-        metadata['output']['ground_motions'][newimt] = {}
-        metadata['output']['ground_motions'][newimt]['units'] = 'ln(g)'
-        metadata['output']['ground_motions'][newimt]['bias'] = bias[imtstr]
-        metadata['output']['ground_motions'][newimt]['max_grid'] = np.max(outgrid[imtstr])
-        #
-        # How do we get max value on land?
-        # Basemap.is_land()?
-        #
-        metadata['output']['ground_motions'][newimt]['max'] = np.max(outgrid[imtstr])         ##### Landmask?
-    metadata['output']['map_information'] = {}
-    metadata['output']['map_information']['grid_points'] = {}
-    metadata['output']['map_information']['grid_points']['longitude'] = smnx
-    metadata['output']['map_information']['grid_points']['latitude'] = smny
-    metadata['output']['map_information']['grid_points']['units'] = ''
-    metadata['output']['map_information']['grid_spacing'] = {}
-    metadata['output']['map_information']['grid_spacing']['longitude'] = smdx
-    metadata['output']['map_information']['grid_spacing']['latitude'] = smdy
-    metadata['output']['map_information']['grid_spacing']['units'] = 'degrees'
-    metadata['output']['map_information']['grid_span'] = {}
-    metadata['output']['map_information']['grid_span']['longitude'] = E - W
-    metadata['output']['map_information']['grid_span']['latitude'] = N - S
-    metadata['output']['map_information']['grid_span']['units'] = 'degrees'
-    metadata['output']['map_information']['min'] = {}
-    metadata['output']['map_information']['min']['longitude'] = W
-    metadata['output']['map_information']['min']['latitude'] = S
-    metadata['output']['map_information']['min']['units'] = 'degrees'
-    metadata['output']['map_information']['max'] = {}
-    metadata['output']['map_information']['max']['longitude'] = E
-    metadata['output']['map_information']['max']['latitude'] = N
-    metadata['output']['map_information']['max']['units'] = 'degrees'
-    metadata['output']['uncertainty'] = {}
-    metadata['output']['uncertainty']['grade'] = ''                                     ############# Need map grade
-    metadata['output']['uncertainty']['mean_uncertainty_ratio'] = np.nan                ############# Need map grade
-    metadata['output']['uncertainty']['total_flagged_mi'] = np.sum(df2['MMI_outliers'] | np.isnan(df2['MMI']))
+        info[op][gm][newimt] = {}
+        info[op][gm][newimt]['units'] = 'ln(g)'
+        info[op][gm][newimt]['bias'] = str(bias[imtstr])
+        info[op][gm][newimt]['max_grid'] = str(np.max(outgrid[imtstr]))
+        info[op][gm][newimt]['max'] = str(np.max(moutgrid[imtstr]))
+    info[op][mi] = {}
+    info[op][mi]['grid_points'] = {}
+    info[op][mi]['grid_points']['longitude'] = str(smnx)
+    info[op][mi]['grid_points']['latitude'] = str(smny)
+    info[op][mi]['grid_points']['units'] = ''
+    info[op][mi]['grid_spacing'] = {}
+    info[op][mi]['grid_spacing']['longitude'] = str(smdx)
+    info[op][mi]['grid_spacing']['latitude'] = str(smdy)
+    info[op][mi]['grid_spacing']['units'] = 'degrees'
+    info[op][mi]['grid_span'] = {}
+    info[op][mi]['grid_span']['longitude'] = str(E - W)
+    info[op][mi]['grid_span']['latitude'] = str(N - S)
+    info[op][mi]['grid_span']['units'] = 'degrees'
+    info[op][mi]['min'] = {}
+    info[op][mi]['min']['longitude'] = str(W)
+    info[op][mi]['min']['latitude'] = str(S)
+    info[op][mi]['min']['units'] = 'degrees'
+    info[op][mi]['max'] = {}
+    info[op][mi]['max']['longitude'] = str(E)
+    info[op][mi]['max']['latitude'] = str(N)
+    info[op][mi]['max']['units'] = 'degrees'
+    info[op][un] = {}
+    info[op][un]['grade'] = mygrade
+    info[op][un]['mean_uncertainty_ratio'] = mean_rat
+    info[op][un]['total_flagged_mi'] = str(np.sum(df2['MMI_outliers'] | np.isnan(df2['MMI'])))
     all_flagged = np.full(df1['lon'].shape, False, dtype=np.bool)
     for imtstr in imt_in_str_dict['df1']:
         if 'MMI' in imtstr:
             continue
         all_flagged |= df1[imtstr + '_outliers'] | np.isnan(df1[imtstr])
-    metadata['output']['uncertainty']['total_flagged_pgm'] = np.sum(all_flagged)
-    metadata['processing'] = {}
-    metadata['processing']['ground_motion_modules'] = {}
-    metadata['processing']['ground_motion_modules']['gmpe'] = {}
-    metadata['processing']['ground_motion_modules']['gmpe']['module'] = config['grind']['gmpe']
-    metadata['processing']['ground_motion_modules']['gmpe']['reference'] = ''
-    metadata['processing']['ground_motion_modules']['ipe'] = {}
-    metadata['processing']['ground_motion_modules']['ipe']['module'] = config['ipe_modules'][config['grind']['ipe']][0]
-    metadata['processing']['ground_motion_modules']['ipe']['reference'] = ''
-    metadata['processing']['ground_motion_modules']['gmice'] = {}
-    metadata['processing']['ground_motion_modules']['gmice']['module'] = config['gmice_modules'][config['grind']['gmice']][0]
-    metadata['processing']['ground_motion_modules']['gmice']['reference'] = ''
-    metadata['processing']['ground_motion_modules']['ccf'] = {}
-    metadata['processing']['ground_motion_modules']['ccf']['module'] = config['ccf_modules'][config['grind']['ccf']][0]
-    metadata['processing']['ground_motion_modules']['ccf']['reference'] = ''
-    metadata['processing']['ground_motion_modules']['basin_correction'] = {}
-    metadata['processing']['ground_motion_modules']['basin_correction']['module'] = 'None'
-    metadata['processing']['ground_motion_modules']['basin_correction']['reference'] = ''
-    metadata['processing']['ground_motion_modules']['directivity'] = {}
-    metadata['processing']['ground_motion_modules']['directivity']['module'] = 'None'
-    metadata['processing']['ground_motion_modules']['directivity']['reference'] = ''
-    metadata['processing']['miscellaneous'] = {}
-    metadata['processing']['miscellaneous']['bias_max_dsigma'] = bias_max_dsigma
-    metadata['processing']['miscellaneous']['bias_max_mag'] = bias_max_mag
-    metadata['processing']['miscellaneous']['bias_max_range'] = bias_max_range
-    metadata['processing']['miscellaneous']['median_dist'] = 'True'
-    metadata['processing']['miscellaneous']['outlier_deviation_level'] = outlier_deviation_level
-    metadata['processing']['miscellaneous']['outlier_max_mag'] = outlier_max_mag
-    metadata['processing']['shakemap_versions'] = {}
-    metadata['processing']['shakemap_versions']['shakemap_revision'] = get_versions()['version']
-    metadata['processing']['shakemap_versions']['shakemap_revision_id'] = get_versions()['full-revisionid']
-    metadata['processing']['shakemap_versions']['process_time'] = strftime("%Y-%m-%d %H:%M:%S", gmtime())
-    metadata['processing']['shakemap_versions']['map_version'] = 1                  ##################
-    metadata['processing']['shakemap_versions']['map_status'] = 'released'          ##################
-    metadata['processing']['site_response'] = {}
-    metadata['processing']['site_response']['vs30default'] = vs30default
-    metadata['processing']['site_response']['site_correction'] = 'GMPE native'
+    info[op][un]['total_flagged_pgm'] = str(np.sum(all_flagged))
+    info[pp] = {}
+    info[pp][gmm] = {}
+    info[pp][gmm]['gmpe'] = {}
+    info[pp][gmm]['gmpe']['module'] = str(config['grind']['gmpe'])
+    info[pp][gmm]['gmpe']['reference'] = ''
+    info[pp][gmm]['ipe'] = {}
+    info[pp][gmm]['ipe']['module'] = str(config['ipe_modules'][config['grind']['ipe']][0])
+    info[pp][gmm]['ipe']['reference'] = ''
+    info[pp][gmm]['gmice'] = {}
+    info[pp][gmm]['gmice']['module'] = str(config['gmice_modules'][config['grind']['gmice']][0])
+    info[pp][gmm]['gmice']['reference'] = ''
+    info[pp][gmm]['ccf'] = {}
+    info[pp][gmm]['ccf']['module'] = str(config['ccf_modules'][config['grind']['ccf']][0])
+    info[pp][gmm]['ccf']['reference'] = ''
+    info[pp][gmm]['basin_correction'] = {}
+    info[pp][gmm]['basin_correction']['module'] = 'None'
+    info[pp][gmm]['basin_correction']['reference'] = ''
+    info[pp][gmm]['directivity'] = {}
+    info[pp][gmm]['directivity']['module'] = 'None'
+    info[pp][gmm]['directivity']['reference'] = ''
+    info[pp][ms] = {}
+    info[pp][ms]['bias_max_dsigma'] = str(bias_max_dsigma)
+    info[pp][ms]['bias_max_mag'] = str(bias_max_mag)
+    info[pp][ms]['bias_max_range'] = str(bias_max_range)
+    info[pp][ms]['median_dist'] = 'True'
+    info[pp][ms]['outlier_deviation_level'] = str(outlier_deviation_level)
+    info[pp][ms]['outlier_max_mag'] = str(outlier_max_mag)
+    info[pp][sv] = {}
+    info[pp][sv]['shakemap_revision'] = get_versions()['version']
+    info[pp][sv]['shakemap_revision_id'] = get_versions()['full-revisionid']
+    info[pp][sv]['process_time'] = strftime("%Y-%m-%d %H:%M:%S%Z", gmtime())
+    info[pp][sv]['map_version'] = str(1)                  ##################
+    info[pp][sv]['map_status'] = 'released'          ##################
+    info[pp][sr] = {}
+    info[pp][sr]['vs30default'] = str(vs30default)
+    info[pp][sr]['site_correction'] = 'GMPE native'
 
-    oc.addMetadata(metadata)
+    oc.addData(json.dumps(info), 'info.json')
 
+    #
+    # Add the rupture JSON as a text string 
+    #
+    oc.addData(json.dumps(rupture_obj._geojson), 'rupture.json')
+    
+    #
+    # Add the station data
+    #
+    sjdict = stations.getGeoJson()
+    sta_ix = {}
+    for ndf, sdf in df_dict.items():
+        sta_ix[ndf] = dict(zip(sdf['id'], range(len(sdf['id']))))
+    for station in sjdict['features']:
+        if station['id'] in sta_ix['df1']:
+            sdf = df1
+            six = sta_ix['df1'][station['id']]
+        elif station['id'] in sta_ix['df2']:
+            sdf = df2
+            six = sta_ix['df2'][station['id']]
+        else:
+            raise ValueError('Unknown station %s in stationlist' % 
+                             (station['id']))
+        if 'MMI' in sdf and not sdf['MMI_outliers'][six]: 
+            station['properties']['intensity'] = '%.1f' % sdf['MMI'][six]
+        else:
+            station['properties']['intensity'] = 'null'
+
+        if 'PGA' in sdf and not sdf['PGA_outliers'][six]: 
+            station['properties']['pga'] = '%.4f' % \
+                                           (np.exp(sdf['PGA'][six]) * 100)
+        else:
+            station['properties']['pga'] = 'null'
+        if 'PGV' in sdf and not sdf['PGV_outliers'][six]: 
+            station['properties']['pgv'] = '%.4f' % (np.exp(sdf['PGV'][six]))
+        else:
+            station['properties']['pgv'] = 'null'
+        station['properties']['distance'] = '%.2f' % sdf['rrup'][six]
+        for channel in station['properties']['channels']:
+            for amp in channel['amplitudes']:
+                Name = amp['name'].upper()
+                if sdf[Name + '_outliers'][six]:
+                    if amp['flag'] == '0':
+                        amp['flag'] = 'T'
+                    else:
+                        amp['flag'] += 'T'
+                if not amp['flag']:
+                    amp['flag'] = '0'
+    
+    oc.addData(json.dumps(sjdict), 'stationlist.json')            
+        
     #
     # Need:
-    #   rupture info (how?)
-    #   ShakeMap grade (how?)
-    #   ShakeMap version, map version
-    #   station data stored (how? station.json string?)
+    #   map version, map status
     #
-
+    metadata = {}
+    if do_grid:
+        metadata['type'] = 'grid'
+        metadata['bounds'] = {}
+        metadata['bounds']['W'] = W
+        metadata['bounds']['E'] = E
+        metadata['bounds']['S'] = S
+        metadata['bounds']['N'] = N
+        metadata['nx'] = smnx
+        metadata['ny'] = smny
+        metadata['dx'] = smdx
+        metadata['dy'] = smdy
+        oc.addData(sx_out_soil.vs30, 'vs30')
+        if 'PGA' in outsd:
+            oc.addData(sd_rat, 'URATPGA')
+    else:
+        metadata['type'] = 'points'
+        oc.addData(lons.flatten(), 'lons')
+        oc.addData(lats.flatten(), 'lats')
+        oc.addData(vs30.flatten(), 'vs30')
+        oc.addData([x.encode('ascii') for x in idents], 'facility_ids')
+        
     for key, value in outgrid.items():
         oc.addData(value, key)
         oc.addData(outsd[key], key + '_sd')
