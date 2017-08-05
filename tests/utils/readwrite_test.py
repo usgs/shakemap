@@ -9,7 +9,7 @@ from shakemap.utils.readwrite import read_nshmp_grid_xml
 
 homedir = os.path.dirname(os.path.abspath(__file__))
 shakedir = os.path.abspath(os.path.join(homedir, '../..'))
-datdir = os.path.join(shakedir, 'tests', 'data')
+datdir = os.path.join(homedir, 'readwrite_data')
 
 def test_read_nshmp_fault_xml():
     file = os.path.join(datdir, 'sub0_ch_mid.xml')
