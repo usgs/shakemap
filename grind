@@ -94,6 +94,8 @@ def get_period_index_from_imt_str(imtstr, imt_per_ix):
 def get_period_array(*args):
     imt_per = set()
     for imt_list in args:
+        if imt_list is None:
+            continue
         for imtstr in imt_list:
             if imtstr == 'PGA':
                 imt_per.add(0.01)
@@ -198,7 +200,7 @@ def get_map_grade(do_grid, outsd, psd, moutgrid):
     return mean_rat, mygrade, sd_rat
 
 #%%
-args = type('Dummy', (object,), {'eventid' : 'northridge',
+args = type('Dummy', (object,), {'eventid' : 'nc72282711_nodata_nofault',
                                  'verbose' : True})
 if True:
 #def grind(args):
@@ -357,6 +359,8 @@ if True:
         #
         for ndf, df in df_dict.items():
             if not df:
+                imt_in_str_dict[ndf] = set()
+                imt_in_dict[ndf] = set()
                 continue
             #
             # Get lists of the input IMTs
@@ -596,6 +600,8 @@ if True:
         sta_sigs_inter[imtstr] = np.array([])
         sta_period_ix[imtstr] = np.array([], dtype=np.int64)
         for ndf, sdf in df_dict.items():
+            if not sdf:
+                continue
             if ndf == 'df1':
                 for i in range(np.size(sdf['lon'])):
                     for imtin in get_sta_imts(imtstr, sdf, i,
@@ -693,17 +699,20 @@ if True:
         if bias[imtstr] != 0:
             sta_resids[imtstr] = np.array([])
             sdf = df_dict['df1']
-            for i in range(np.size(sdf['lon'])):
-                for imtin in get_sta_imts(imtstr, sdf, i, imt_in_str_dict['df1']):
+            if sdf:
+                for i in range(np.size(sdf['lon'])):
+                    for imtin in get_sta_imts(imtstr, sdf, i, 
+                                              imt_in_str_dict['df1']):
+                        sta_resids[imtstr] = np.append(
+                                sta_resids[imtstr],
+                                sdf[imtin + '_residual'][i] - bias[imtin])
+            sdf = df_dict['df2']
+            if sdf:
+                for imtin in get_imts(imtstr, imt_in_str_dict['df2']):
+                    vidx = ~(np.isnan(sdf[imtin]) | sdf[imtin + '_outliers'])
                     sta_resids[imtstr] = np.append(
                             sta_resids[imtstr],
-                            sdf[imtin + '_residual'][i] - bias[imtin])
-            sdf = df_dict['df2']
-            for imtin in get_imts(imtstr, imt_in_str_dict['df2']):
-                vidx = ~(np.isnan(sdf[imtin]) | sdf[imtin + '_outliers'])
-                sta_resids[imtstr] = np.append(
-                        sta_resids[imtstr],
-                        sdf[imtin + '_residual'][vidx] - bias[imtin])
+                            sdf[imtin + '_residual'][vidx] - bias[imtin])
         sta_resids[imtstr] = sta_resids[imtstr].reshape((-1, 1))
         #
         # Now do the MVN itself...
@@ -799,6 +808,10 @@ if True:
     #
     # This is the metadata for creating info.json
     #
+#
+# Need:
+#   map version, map status
+#
     ip = 'input'
     ei = 'event_information'
     op = 'output'
@@ -816,16 +829,16 @@ if True:
     info[ip][ei]['depth'] = str(rx.hypo_depth)
     info[ip][ei]['event_id'] = args.eventid
     info[ip][ei]['fault_ref'] = rupture_obj._reference
-    info[ip][ei]['faultfiles'] = ''                                    #### Do we need this?
+#    info[ip][ei]['faultfiles'] = ''                                    #### Do we need this? I don't think so.
     info[ip][ei]['feregion'] = config['zone_info']['fename']
-    info[ip][ei]['intensity_observations'] = str(np.size(df2['lon']))
+    info[ip][ei]['intensity_observations'] = str(np.size(df2['lon'])) if df2 else '0'
     info[ip][ei]['latitude'] = str(rx.hypo_lat)
     info[ip][ei]['longitude'] = str(rx.hypo_lon)
     info[ip][ei]['location'] = rupture_obj._origin.locstring
     info[ip][ei]['magnitude'] = str(rx.mag)
     info[ip][ei]['mech_src'] = config['zone_info']['moment_tensor_source']
     info[ip][ei]['origin_time'] = rupture_obj._origin.time.strftime('%Y-%m-%d %H:%M:%S')
-    info[ip][ei]['seismic_stations'] = str(np.size(df1['lon']))
+    info[ip][ei]['seismic_stations'] = str(np.size(df1['lon'])) if df1 else '0'
     info[ip][ei]['src_mech'] = rupture_obj._origin.mech
     info[ip][ei]['tectonic_regime'] = config['zone_info']['domain']
     info[ip][ei]['event_description'] = rupture_obj._origin.locstring  ##### This AND locaction?
@@ -884,13 +897,16 @@ if True:
     info[op][un] = {}
     info[op][un]['grade'] = mygrade
     info[op][un]['mean_uncertainty_ratio'] = mean_rat
-    info[op][un]['total_flagged_mi'] = str(np.sum(df2['MMI_outliers'] | np.isnan(df2['MMI'])))
-    all_flagged = np.full(df1['lon'].shape, False, dtype=np.bool)
-    for imtstr in imt_in_str_dict['df1']:
-        if 'MMI' in imtstr:
-            continue
-        all_flagged |= df1[imtstr + '_outliers'] | np.isnan(df1[imtstr])
-    info[op][un]['total_flagged_pgm'] = str(np.sum(all_flagged))
+    info[op][un]['total_flagged_mi'] = str(np.sum(df2['MMI_outliers'] | np.isnan(df2['MMI']))) if df2 else '0'
+    if df1:
+        all_flagged = np.full(df1['lon'].shape, False, dtype=np.bool)
+        for imtstr in imt_in_str_dict['df1']:
+            if 'MMI' in imtstr:
+                continue
+            all_flagged |= df1[imtstr + '_outliers'] | np.isnan(df1[imtstr])
+        info[op][un]['total_flagged_pgm'] = str(np.sum(all_flagged))
+    else:
+        info[op][un]['total_flagged_pgm'] = '0'
     info[pp] = {}
     info[pp][gmm] = {}
     info[pp][gmm]['gmpe'] = {}
@@ -922,8 +938,8 @@ if True:
     info[pp][sv]['shakemap_revision'] = get_versions()['version']
     info[pp][sv]['shakemap_revision_id'] = get_versions()['full-revisionid']
     info[pp][sv]['process_time'] = strftime("%Y-%m-%d %H:%M:%S%Z", gmtime())
-    info[pp][sv]['map_version'] = str(1)                  ##################
-    info[pp][sv]['map_status'] = 'released'          ##################
+    info[pp][sv]['map_version'] = str(1)                                            ##################
+    info[pp][sv]['map_status'] = 'released'                                         ##################
     info[pp][sr] = {}
     info[pp][sr]['vs30default'] = str(vs30default)
     info[pp][sr]['site_correction'] = 'GMPE native'
@@ -936,11 +952,15 @@ if True:
     oc.addData(json.dumps(rupture_obj._geojson), 'rupture.json')
     
     #
-    # Add the station data
+    # Add the station data. The stationlist object has the original
+    # data and produces a GeoJSON object (a dictionary, really), but
+    # we need to add peak values and flagging that has been done here.
     #
     sjdict = stations.getGeoJson()
     sta_ix = {}
     for ndf, sdf in df_dict.items():
+        if not sdf:
+            continue
         sta_ix[ndf] = dict(zip(sdf['id'], range(len(sdf['id']))))
     for station in sjdict['features']:
         if station['id'] in sta_ix['df1']:
@@ -980,35 +1000,30 @@ if True:
     
     oc.addData(json.dumps(sjdict), 'stationlist.json')            
         
-    #
-    # Need:
-    #   map version, map status
-    #
     metadata = {}
     if do_grid:
         metadata['type'] = 'grid'
-        metadata['bounds'] = {}
-        metadata['bounds']['W'] = W
-        metadata['bounds']['E'] = E
-        metadata['bounds']['S'] = S
-        metadata['bounds']['N'] = N
+        metadata['W'] = W
+        metadata['E'] = E
+        metadata['S'] = S
+        metadata['N'] = N
         metadata['nx'] = smnx
         metadata['ny'] = smny
         metadata['dx'] = smdx
         metadata['dy'] = smdy
-        oc.addData(sx_out_soil.vs30, 'vs30')
+        oc.addData(sx_out_soil.vs30, 'vs30', metadata=metadata)
         if 'PGA' in outsd:
-            oc.addData(sd_rat, 'URATPGA')
+            oc.addData(sd_rat, 'URATPGA', metadata=metadata)
     else:
         metadata['type'] = 'points'
-        oc.addData(lons.flatten(), 'lons')
-        oc.addData(lats.flatten(), 'lats')
-        oc.addData(vs30.flatten(), 'vs30')
-        oc.addData([x.encode('ascii') for x in idents], 'facility_ids')
+        metadata['lons'] = lons.flatten()
+        metadata['lats'] = lats.flatten()
+        metadata['facility_ids'] = [x.encode('ascii') for x in idents]
+        oc.addData(vs30.flatten(), 'vs30', metadata=metadata)
         
     for key, value in outgrid.items():
-        oc.addData(value, key)
-        oc.addData(outsd[key], key + '_sd')
+        oc.addData(value, key, metadata=metadata)
+        oc.addData(outsd[key], key + '_sd', metadata=metadata)
 
     oc.close()
     print('done')
