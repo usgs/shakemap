@@ -1,0 +1,9 @@
+# Jack Boatwright's interpolation of Doug Dreger's finit fault
+# For SM 3.5 and later, each line must consist of lines containing
+# latitude, longitude, depth points to form one or more closed polygons
+# Disconnected polygons should be separated by lines containing only ">".
+38.220 -122.313 2
+38.310 -122.333 2
+38.310 -122.333 11
+38.220 -122.313 11
+38.220 -122.313 2
