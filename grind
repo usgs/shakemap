@@ -27,6 +27,7 @@ from shakelib.grind.sites import Sites
 from shakelib.grind.distance import Distance, get_distance
 from shakelib.grind.multigmpe import MultiGMPE
 from shakelib.grind.virtualipe import VirtualIPE
+from shakelib.utils.utils import get_extent
 
 from shakelib.grind.container import InputContainer, OutputContainer
 from shakelib.utils.config import get_config_paths
@@ -200,10 +201,10 @@ def get_map_grade(do_grid, outsd, psd, moutgrid):
     return mean_rat, mygrade, sd_rat
 
 #%%
-args = type('Dummy', (object,), {'eventid' : 'nc72282711_nodata_nofault',
-                                 'verbose' : True})
-if True:
-#def grind(args):
+#args = type('Dummy', (object,), {'eventid' : 'wenchuan',
+#                                 'verbose' : True})
+#if True:
+def grind(args):
     verbose = args.verbose
     #
     # Find the shake_data file
@@ -250,8 +251,6 @@ if True:
     # These are the IMTs we want to make
     #------------------------------------------------------------------
     imt_out_set_str = set(config['grind']['imt_list'])
-    imt_out_set_str.add('SA(2.0)')
-    imt_out_set = [imt.from_string(x) for x in imt_out_set_str]
     #------------------------------------------------------------------
     # Get the rupture object and rupture context
     #------------------------------------------------------------------
@@ -312,7 +311,10 @@ if True:
         smdx = config['grind']['prediction_location']['xres']
         smdy = config['grind']['prediction_location']['yres']
 
-        W, S, E, N = config['grind']['prediction_location']['extent']
+        if config['grind']['prediction_location']['extent']:
+           W, S, E, N = config['grind']['prediction_location']['extent']
+        else:
+           W, E, S, N = get_extent(rupture_obj)
 
         sites_obj_out = Sites.fromBounds(W, E, S, N, smdx, smdy,
                                          defaultVs30=vs30default,
@@ -457,10 +459,11 @@ if True:
             for period in iterlist:
                 oqimt = gmice_imt(period)
                 imtstr = str(oqimt)
+                
+                np.seterr(invalid='ignore')
                 df2[imtstr], _ = gmice.getGMfromMI(df2['MMI'], oqimt,
                                                    dists=df2['rrup'],
                                                    mag=rx.mag)
-                np.seterr(invalid='ignore')
                 df2[imtstr][df2['MMI'] < 4.0] = np.nan
                 np.seterr(invalid='warn')
                 df2[imtstr + '_sd'] = np.full_like(df2['MMI'],
@@ -506,8 +509,10 @@ if True:
 
         if imtstr is not None:
             oqimt = imt.from_string(imtstr)
+            np.seterr(invalid='ignore')
             df1['MMI'], _ = gmice.getMIfromGM(df1[imtstr], oqimt,
                                               dists=df1['rrup'], mag=rx.mag)
+            np.seterr(invalid='warn')
             df1['MMI_sd'] = np.full_like(df1[imtstr],
                                          gmice.getGM2MIsd()[oqimt])
             imt_in_str_dict['df1'].add('MMI')
@@ -731,7 +736,8 @@ if True:
             time4 = time.time()
             dist12 = geodetic_distance(lons_out_rad[ss:se].reshape(1, -1),
                                        lats_out_rad[ss:se].reshape(1, -1),
-                                       sta_lons_rad[imtstr], sta_lats_rad[imtstr])
+                                       sta_lons_rad[imtstr], 
+                                       sta_lats_rad[imtstr])
             t2_12 = np.full(dist12.shape, outperiod_ix, dtype=np.int)
             d12_rows, d12_cols = np.shape(dist12)
             t1_12 = np.tile(sta_period_ix[imtstr], (1, d12_cols))
@@ -742,9 +748,7 @@ if True:
             time4 = time.time()
             sdarr = psd[imtstr][iy, :].reshape((1, -1))
             ss = sta_sigs[imtstr]
-            sigma12 =  ne.evaluate(
-                    "corr12 * corr_adj12 * (ss * sdarr)"
-                    ).T
+            sigma12 =  ne.evaluate("corr12 * corr_adj12 * (ss * sdarr)").T
             stime += time.time() - time4
             time4 = time.time()
             rcmatrix = sigma12.dot(sigma22inv[imtstr])
@@ -783,7 +787,8 @@ if True:
 
     #
     # We're going to need masked arrays of the output grids later, so
-    # make them now
+    # make them now. We only need to make the mask once, then we can
+    # apply it to all of the other grids.
     #
     moutgrid = {}
     refimt = list(imt_out_set_str)[0]
@@ -828,7 +833,7 @@ if True:
     info[ip][ei] = {}
     info[ip][ei]['depth'] = str(rx.hypo_depth)
     info[ip][ei]['event_id'] = args.eventid
-    info[ip][ei]['fault_ref'] = rupture_obj._reference
+    info[ip][ei]['fault_ref'] = rupture_obj.getReference()
 #    info[ip][ei]['faultfiles'] = ''                                    #### Do we need this? I don't think so.
     info[ip][ei]['feregion'] = config['zone_info']['fename']
     info[ip][ei]['intensity_observations'] = str(np.size(df2['lon'])) if df2 else '0'
@@ -845,34 +850,18 @@ if True:
     info[ip][ei]['event_type'] = rupture_obj._origin.mech              ##### This AND src_mech?
     info[op] = {}
     info[op][gm] = {}
-    info[op][gm]['intensity'] = {}
-    info[op][gm]['intensity']['units'] = 'MMI'
-    info[op][gm]['intensity']['bias'] = str(bias['MMI'])
-    info[op][gm]['intensity']['max_grid'] = str(np.max(outgrid['MMI']))
-    info[op][gm]['intensity']['max'] = str(np.max(moutgrid['MMI']))
-    info[op][gm]['pga'] = {}
-    info[op][gm]['pga']['units'] = 'ln(g)'
-    info[op][gm]['pga']['bias'] = str(bias['PGA'])
-    info[op][gm]['pga']['max_grid'] = str(np.max(outgrid['PGA']))
-    info[op][gm]['pga']['max'] = str(np.max(moutgrid['PGA']))
-    info[op][gm]['pgv'] = {}
-    info[op][gm]['pgv']['units'] = 'cms'
-    info[op][gm]['pgv']['bias'] = str(bias['PGV'])
-    info[op][gm]['pgv']['max_grid'] = str(np.max(outgrid['PGV']))
-    info[op][gm]['pgv']['max'] = str(np.max(moutgrid['PGV']))
-    #
-    # Meet with HazDev to revise these old-style SA tags
-    #
-    for imtstr in imt_out_set_str:
-        if not imtstr.startswith('SA('):
-            continue
-        imtper = imtstr.replace('SA(', '').replace('.', '').replace(')', '')
-        newimt = 'psa' + imtper
-        info[op][gm][newimt] = {}
-        info[op][gm][newimt]['units'] = 'ln(g)'
-        info[op][gm][newimt]['bias'] = str(bias[imtstr])
-        info[op][gm][newimt]['max_grid'] = str(np.max(outgrid[imtstr]))
-        info[op][gm][newimt]['max'] = str(np.max(moutgrid[imtstr]))
+    for myimt in imt_out_set_str:
+        info[op][gm][myimt] = {}
+        if myimt == 'MMI':
+            units = 'intensity'
+        elif myimt == 'PGV':
+            units = 'cms'
+        else:
+            units = 'ln(g)'
+        info[op][gm][myimt]['units'] = units
+        info[op][gm][myimt]['bias'] = str(bias[myimt]) if myimt in bias else '-'
+        info[op][gm][myimt]['max_grid'] = str(np.max(outgrid[myimt]))
+        info[op][gm][myimt]['max'] = str(np.max(moutgrid[myimt]))
     info[op][mi] = {}
     info[op][mi]['grid_points'] = {}
     info[op][mi]['grid_points']['longitude'] = str(smnx)
