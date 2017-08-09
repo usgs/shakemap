@@ -818,7 +818,7 @@ other calls that GIS developers can make through the `REST API
 **Accessing ShakeMap GIS Files:** While this GIS service only provides access to
 significant earthquakes that have occurred within the last thirty days, users can
 download GIS files for `significant events
-<https://tmservices1.esri.com/arcgis/rest/services/LiveFeeds/USGS_Seismic_Data/MapServer>`_
+<http://usgs.maps.arcgis.com/home/webmap/viewer.html?webmap=5555eabe9d65418d8e0b5677b3fe59b5>`_
 on our website after the thirty-day period.  The significant earthquake archive has
 a list of large events with links to each event’s webpage.  From the event
 page, users can click on the ShakeMap tab and navigate to the “Downloads”
