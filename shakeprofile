@@ -9,7 +9,7 @@ import shutil
 import pprint
 
 #shakemap imports
-from shakelib.utils.config import get_data_path
+from shakemap.utils.config import get_data_path
 
 current_markers = {True:'**Current Profile**',False:''}
 
@@ -25,13 +25,13 @@ class ShakeProfile(object):
         tpl = (self.name,self.current_marker,self.install_path,self.data_path)
         return fmt % tpl
 
-def make_dir(pathstr,default):
+def make_dir(pathstr, default):
     max_tries = 3
     ntries = 1
     make_ok = False
     ppath = ''
     while not make_ok:
-        ppath = input('Please enter the %s: [%s] ' % (default,pathstr))
+        ppath = input('Please enter the %s: [%s] ' % (pathstr, default))
         if not len(ppath.strip()):
             ppath = default
         try:
@@ -74,11 +74,11 @@ def create(configfile, profile, progname):
     print('   configuration, (cfg), logging (log), and support data (lib).')
     print(' - A *data* path, under which will be created directories for each')
     print('   event processed.\n')
-    install_path,install_ok = make_dir('install path',default_install)
+    install_path, install_ok = make_dir('install path', default_install)
     if not install_ok:
         print('Please try to find a path that can be created on this system and then try again.  Exiting.')
         sys.exit(1)
-    data_path,data_ok = make_dir('data path',default_data)
+    data_path,data_ok = make_dir('data path', default_data)
     if not data_ok:
         print('Please try to find a path that can be created on this system and then try again.  Exiting.')
         shutil.rmtree(install_path)
@@ -93,8 +93,8 @@ def create(configfile, profile, progname):
     shutil.copy(grind_file,config_path)
 
     #put northridge in the data directory
-    event_path = os.path.join(data_path,'us19940117123055')
-    os.mkdir(event_path)
+    event_path = os.path.join(data_path, 'us19940117123055', 'current')
+    os.makedirs(event_path)
 
     #copy files over
     data_event_file = os.path.join(event_path,'event.xml')

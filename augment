@@ -1,0 +1,167 @@
+#!/usr/bin/env python
+
+# stdlib imports
+import sys
+import os.path
+import argparse
+import glob
+import datetime
+
+# third party imports
+from configobj import ConfigObj
+
+from shakelib.grind.container import InputContainer
+from shakemap.utils.config import get_config_paths, get_custom_validator,\
+        config_error, check_config, get_configspec
+
+# %%
+#args = type('Dummy', (object,), {'eventid': 'wenchuan',
+#                                 'verbose': True})
+#if True:
+def main(args):
+    verbose = args.verbose
+
+    install_path, data_path = get_config_paths()
+    datadir = os.path.join(data_path, args.eventid, 'current')
+    if not os.path.isdir(datadir):
+        print('%s is not a valid directory.' % datadir)
+        sys.exit(1)
+
+    hdf_file = os.path.join(datadir, 'shake_data.hdf')
+    if not os.path.isfile(hdf_file):
+        print('%s does not exist. Use assemble.' % hdf_file)
+        sys.exit(1)
+    shake_data = InputContainer.loadFromHDF(hdf_file)
+
+    eventxml = os.path.join(datadir, 'event.xml')
+    if os.path.isfile(eventxml):
+        if verbose: print('Updating event.xml file...')
+        shake_data.updateEvent(eventxml)
+
+    #
+    # Get the config from the HDF file and merge in the local configs
+    #
+    spec_file = get_configspec()
+    validator = get_custom_validator()
+    shake_config = shake_data.getConfig()
+    shake_config = ConfigObj(shake_config, configspec=spec_file)
+
+    modules_file = os.path.join(install_path, 'config', 'modules.conf')
+    if os.path.isfile(modules_file):
+        if verbose: print('Found a modules file.')
+        modules = ConfigObj(modules_file, configspec=spec_file)
+        shake_config.merge(modules)
+    gmpe_file = os.path.join(install_path, 'config', 'gmpe_sets.conf')
+    if os.path.isfile(gmpe_file):
+        if verbose: print('Found a gmpe file.')
+        gmpe_sets = ConfigObj(gmpe_file, configspec=spec_file)
+        shake_config.merge(gmpe_sets)
+    grind_file = os.path.join(install_path, 'config', 'grind.conf')
+    if os.path.isfile(grind_file):
+        if verbose: print('Found a global grind file.')
+        global_grind = ConfigObj(grind_file, configspec=spec_file)
+        shake_config.merge(global_grind)
+    #
+    # this is the event specific grind.conf (may not be present)
+    # prefer grind.conf to grind_zc.conf
+    #
+    event_grind_file = os.path.join(datadir, 'grind.conf')
+    event_grind_zc_file = os.path.join(datadir, 'grind_zc.conf')
+    if os.path.isfile(event_grind_file):
+        if verbose: print('Found an event specific grind file.')
+        event_grind = ConfigObj(event_grind_file, configspec=spec_file)
+        shake_config.merge(event_grind)
+    elif os.path.isfile(event_grind_zc_file):
+        if verbose: print('Found an event specific grind_zc file.')
+        event_grind = ConfigObj(event_grind_zc_file, configspec=spec_file)
+        shake_config.merge(event_grind)
+    #
+    # Validate the resulting config
+    #
+    results = shake_config.validate(validator)
+    if not results:
+        config_error(shake_config, results)
+    check_config(shake_config)
+    #
+    # The vs30 file may have macros in it
+    #
+    vs30file = shake_config['grind']['vs30file']
+    if vs30file:
+        vs30file = vs30file.replace('<INSTALL_DIR>', install_path)
+        vs30file = vs30file.replace('<DATA_DIR>', data_path)
+        vs30file = vs30file.replace('<EVENT_ID>', args.eventid)
+        if not os.path.isfile(vs30file):
+            print("vs30 file '%s' is not a valid file" % vs30file)
+            sys.exit(1)
+        shake_config['grind']['vs30file'] = vs30file
+    #
+    # If there is a prediction_location->file file, then we need
+    # to expand any macros
+    #
+    if 'file' in shake_config['grind']['prediction_location']:
+        loc_file = shake_config['grind']['prediction_location']['file']
+        if loc_file and loc_file != 'None':      # Note that 'None' is a string here
+            loc_file = loc_file.replace('<INSTALL_DIR>', install_path)
+            loc_file = loc_file.replace('<DATA_DIR>', data_path)
+            loc_file = loc_file.replace('<EVENT_ID>', args.eventid)
+            if not os.path.isfile(loc_file):
+                print("prediction file '%s' is not a valid file" % loc_file)
+                sys.exit(1)
+            shake_config['grind']['prediction_location']['file'] = loc_file
+    #
+    # Put the updated config back into shake_data.hdf`
+    #
+    config = shake_config.dict()
+    shake_data.updateConfig(config)
+    #
+    # Look for additional data files and update the stationlist if found
+    #
+    datafiles = glob.glob(os.path.join(datadir, '*_dat.xml'))
+    if os.path.isfile(os.path.join(datadir, 'stationlist.xml')):
+        datafiles.append(os.path.join(datadir, 'stationlist.xml'))
+    if datafiles:
+        if verbose: print('Found additional data files...')
+        shake_data.addData(datafiles)
+    #
+    # Look for a rupture file and replace the existing one if found
+    #
+    rupturefiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
+    if len(rupturefiles):
+        if verbose: print('Found new rupture file...')
+        shake_data.updateRupture(rupturefiles[0])
+    #
+    # Sort out the version history. We're working with an existing
+    # HDF file, so: if we are the originator, just update the timestamp,
+    # otherwise add a new line.
+    #
+    timestamp = datetime.datetime.utcnow().strftime('%FT%TZ')
+    originator = config['grind']['source_network']
+
+    history = shake_data.getHistory()
+    if history['history'][-1][1] == originator:
+        history['history'][-1][0] = timestamp
+    else:
+        version = int(history['history'][-1][2]) + 1
+        new_line = [timestamp, originator, version]
+        history['history'].append(new_line)
+    shake_data.updateHistory(history)
+
+# %%
+    shake_data.close()
+
+# %%
+if __name__ == '__main__':
+    description = '''
+    Assemble ShakeMap input data into an HDF package. The only argument is a
+    ShakeMap event ID, which should correspond to a directory in the ShakeMap
+    data directory. The output will be an HDF5 data  file called shake_data.hdf
+    in that same event data directory.
+    '''
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('eventid',
+                        help='Path to ShakeMap data directory containing '
+                        'event.xml, grind_zc.conf')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Print informational messages.')
+    pargs = parser.parse_args()
+    main(pargs)
