@@ -1,5 +1,4 @@
 import os.path
-import io
 import sys
 
 # third party libraries
@@ -80,7 +79,7 @@ def check_config(config):
 def annotatedfloat_type(value):
     try:
         out = float(value)
-    except:
+    except ValueError:
         try:
             if value.endswith('c'):
                 out = float(value.replace('c', '')) / 3600.0
@@ -146,7 +145,7 @@ def gmpe_list(value, min):
         raise ValidateError()
     for gmpe in value:
         if not isinstance(gmpe, str):
-            print("'%s' is not a list of strings" % (value, min))
+            print("'%s' is not a list of strings" % (value))
             raise ValidateError()
 
     return value
