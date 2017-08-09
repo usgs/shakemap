@@ -152,10 +152,12 @@ def main(args):
 # %%
 if __name__ == '__main__':
     description = '''
-    Assemble ShakeMap input data into an HDF package. The only argument is a
-    ShakeMap event ID, which should correspond to a directory in the ShakeMap
-    data directory. The output will be an HDF5 data  file called shake_data.hdf
-    in that same event data directory.
+    Augment a ShakeMap input data file with local configs, data, rupture,
+    etc.  The only argument is a ShakeMap event ID, which should correspond 
+    to a directory in the ShakeMap data directory. The output will be an 
+    HDF5 data file called shake_data.hdf in that same event data directory.
+    The version history will only be incremented if the originator differs
+    from the originator in the previous line of the history.
     '''
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('eventid',

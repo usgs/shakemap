@@ -585,8 +585,14 @@ def grind(args):
         sta_period_ix[imtstr] = np.append(sta_period_ix[imtstr], per_val)
         return
 
-    combined_imt_str = imt_in_str_dict['df1'] | imt_in_str_dict['df2'] \
-                                              | imt_out_set_str
+    #
+    # Compute a bias for all of the IMTs in the inputs and outputs
+    #
+    combined_imt_str = imt_out_set_str
+    if imt_in_str_dict['df1']: 
+        combined_imt_str |= imt_in_str_dict['df1']
+    if imt_in_str_dict['df2']:
+        combined_imt_str |= imt_in_str_dict['df2']
     for imtstr in combined_imt_str:
         time1 = time.time()
         #
@@ -949,47 +955,51 @@ def grind(args):
     # data and produces a GeoJSON object (a dictionary, really), but
     # we need to add peak values and flagging that has been done here.
     #
-    sjdict = stations.getGeoJson()
-    sta_ix = {}
-    for ndf, sdf in df_dict.items():
-        if not sdf:
-            continue
-        sta_ix[ndf] = dict(zip(sdf['id'], range(len(sdf['id']))))
-    for station in sjdict['features']:
-        if station['id'] in sta_ix['df1']:
-            sdf = df1
-            six = sta_ix['df1'][station['id']]
-        elif station['id'] in sta_ix['df2']:
-            sdf = df2
-            six = sta_ix['df2'][station['id']]
-        else:
-            raise ValueError('Unknown station %s in stationlist' %
-                             (station['id']))
-        if 'MMI' in sdf and not sdf['MMI_outliers'][six]:
-            station['properties']['intensity'] = '%.1f' % sdf['MMI'][six]
-        else:
-            station['properties']['intensity'] = 'null'
+    if stations:
+        sjdict = stations.getGeoJson()
+        sta_ix = {}
+        for ndf, sdf in df_dict.items():
+            if not sdf:
+                sta_ix[ndf] = {}
+            else:
+                sta_ix[ndf] = dict(zip(sdf['id'], range(len(sdf['id']))))
+        for station in sjdict['features']:
+            if station['id'] in sta_ix['df1']:
+                sdf = df1
+                six = sta_ix['df1'][station['id']]
+            elif station['id'] in sta_ix['df2']:
+                sdf = df2
+                six = sta_ix['df2'][station['id']]
+            else:
+                raise ValueError('Unknown station %s in stationlist' %
+                                (station['id']))
+            if 'MMI' in sdf and not sdf['MMI_outliers'][six]:
+                station['properties']['intensity'] = '%.1f' % sdf['MMI'][six]
+            else:
+                station['properties']['intensity'] = 'null'
 
-        if 'PGA' in sdf and not sdf['PGA_outliers'][six]:
-            station['properties']['pga'] = '%.4f' % \
-                                           (np.exp(sdf['PGA'][six]) * 100)
-        else:
-            station['properties']['pga'] = 'null'
-        if 'PGV' in sdf and not sdf['PGV_outliers'][six]:
-            station['properties']['pgv'] = '%.4f' % (np.exp(sdf['PGV'][six]))
-        else:
-            station['properties']['pgv'] = 'null'
-        station['properties']['distance'] = '%.2f' % sdf['rrup'][six]
-        for channel in station['properties']['channels']:
-            for amp in channel['amplitudes']:
-                Name = amp['name'].upper()
-                if sdf[Name + '_outliers'][six]:
-                    if amp['flag'] == '0':
-                        amp['flag'] = 'T'
-                    else:
-                        amp['flag'] += 'T'
-                if not amp['flag']:
-                    amp['flag'] = '0'
+            if 'PGA' in sdf and not sdf['PGA_outliers'][six]:
+                station['properties']['pga'] = '%.4f' % \
+                                            (np.exp(sdf['PGA'][six]) * 100)
+            else:
+                station['properties']['pga'] = 'null'
+            if 'PGV' in sdf and not sdf['PGV_outliers'][six]:
+                station['properties']['pgv'] = '%.4f' % (np.exp(sdf['PGV'][six]))
+            else:
+                station['properties']['pgv'] = 'null'
+            station['properties']['distance'] = '%.2f' % sdf['rrup'][six]
+            for channel in station['properties']['channels']:
+                for amp in channel['amplitudes']:
+                    Name = amp['name'].upper()
+                    if sdf[Name + '_outliers'][six]:
+                        if amp['flag'] == '0':
+                            amp['flag'] = 'T'
+                        else:
+                            amp['flag'] += 'T'
+                    if not amp['flag']:
+                        amp['flag'] = '0'
+    else:
+        sjdict = {}
 
     oc.addData(json.dumps(sjdict), 'stationlist.json')
 
@@ -1019,7 +1029,7 @@ def grind(args):
         oc.addData(outsd[key], key + '_sd', metadata=metadata)
 
     oc.close()
-    print('done')
+    if verbose: print('done')
     #------------------------------------------------------------------
     # End grind()
     #------------------------------------------------------------------
