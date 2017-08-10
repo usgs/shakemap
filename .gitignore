@@ -10,3 +10,4 @@ shakemap.egg-info/
 **/shake_data.hdf
 **/shake_result.hdf
 **/.gmtcommands4
+htmlcov
