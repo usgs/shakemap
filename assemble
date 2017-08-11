@@ -83,7 +83,7 @@ def main(args):
         global_grind['zone_info']['equations'] = {}
 
     results = global_grind.validate(validator)
-    if not results:
+    if not results or isinstance(results, dict):
         config_error(global_grind, results)
 
     check_config(global_grind)

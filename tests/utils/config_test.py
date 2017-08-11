@@ -4,6 +4,8 @@ import os.path
 import tempfile
 import textwrap
 import sys
+import pytest
+import copy
 
 from configobj import ConfigObj
 
@@ -17,225 +19,190 @@ import shakemap.utils.config as config
 def test_config():
 
     #
-    # Should test get_data_path() and get_config_path() here
-    # but I don't know how that stuff will work on Travis,
-    # and we haven't run shakeprofile on Travis... Probably
-    # ought to look into how to do that, and maybe add arguments
-    # to the functions to use a specific path when '~' isn't 
-    # meaningful.
-    #
-
-    #
     # Some stuff we just call and see if it bombs out
     #
-    junk = config.get_custom_validator()
+    mydatapath = config.get_data_path()
+    myinstall, mydata = config.get_config_paths()
+
+    myspec = config.get_configspec()
+    myvalid = config.get_custom_validator()
+
+    c1 = ConfigObj(os.path.join(mydatapath, "grind.conf"),
+                   configspec=myspec)
+    c2 = ConfigObj(os.path.join(mydatapath, "modules.conf"),
+                   configspec=myspec)
+    c3 = ConfigObj(os.path.join(mydatapath, "gmpe_sets.conf"),
+                   configspec=myspec)
+    c4 = ConfigObj(os.path.join(mydatapath, "northridge_grind.conf"),
+                   configspec=myspec)
+    c1.merge(c2)
+    c1.merge(c3)
+    c1.merge(c4)
+
+    results = c1.validate(myvalid, preserve_errors=True)
+    assert isinstance(results, bool) and results
+
+    config.check_config(c1)
+    #
+    # Break the config
+    #
+    ctest = copy.deepcopy(c1)
+    ctest['grind']['component'] = 'NotAComponent'
+    with pytest.raises(ValidateError):
+        config.check_config(ctest)
+    ctest = copy.deepcopy(c1)
+    ctest['grind']['ccf'] = 'NotACCF'
+    with pytest.raises(ValidateError):
+        config.check_config(ctest)
+    ctest = copy.deepcopy(c1)
+    ctest['grind']['ipe'] = 'NotAnIPE'
+    with pytest.raises(ValidateError):
+        config.check_config(ctest)
+    ctest = copy.deepcopy(c1)
+    ctest['grind']['gmice'] = 'NotAGMICE'
+    with pytest.raises(ValidateError):
+        config.check_config(ctest)
+    ctest = copy.deepcopy(c1)
+    ctest['grind']['gmpe'] = 'NotAGMPE'
+    with pytest.raises(ValidateError):
+        config.check_config(ctest)
+
+    ctest = copy.deepcopy(c1)
+    ctest['grind']['gmpe'] = 47
+    results = ctest.validate(myvalid, preserve_errors=True)
+    assert isinstance(results, dict)
+    with pytest.raises(RuntimeError):
+        config.config_error(ctest, results)
+
+    ctest = copy.deepcopy(c1)
+    del ctest['grind']
+    results = ctest.validate(myvalid, preserve_errors=True)
+    assert isinstance(results, dict)
+    with pytest.raises(RuntimeError):
+        config.config_error(ctest, results)
 
     #
     # annotatedfloat_type()
     #
-    try:
-        res = config.annotatedfloat_type('4.0')
-        assert isinstance(res, float)
-        assert res == 4.0
-    except ValidateError:
-        assert False
-    try:
-        res = config.annotatedfloat_type('4.0d')
-        assert isinstance(res, float)
-        assert res == 4.0
-    except ValidateError:
-        assert False
-    try:
-        res = config.annotatedfloat_type('4.0m')
-        assert isinstance(res, float)
-        assert res == 4.0 / 60.0
-    except ValidateError:
-        assert False
-    try:
-        res = config.annotatedfloat_type('4.0c')
-        assert isinstance(res, float)
-        assert res == 4.0 / 3600.0
-    except ValidateError:
-        assert False
-    try:
+    res = config.annotatedfloat_type('4.0')
+    assert isinstance(res, float)
+    assert res == 4.0
+    res = config.annotatedfloat_type('4.0d')
+    assert isinstance(res, float)
+    assert res == 4.0
+    res = config.annotatedfloat_type('4.0m')
+    assert isinstance(res, float)
+    assert res == 4.0 / 60.0
+    res = config.annotatedfloat_type('4.0c')
+    assert isinstance(res, float)
+    assert res == 4.0 / 3600.0
+    with pytest.raises(ValidateError):
         res = config.annotatedfloat_type('4.0caweoifaw')
-        assert False
-    except ValidateError:
-        assert True
-    try:
+    with pytest.raises(ValidateError):
         res = config.annotatedfloat_type('')
-        assert False
-    except ValidateError:
-        assert True
     #
     # weight_list()
     #
-    try:
-        res = config.weight_list(['0.2', '0.3', '0.5'], min=0)
-        assert isinstance(res, list)
-        assert res == [0.2, 0.3, 0.5]
-    except ValidateError:
-        assert False
-    try:
-        res = config.weight_list('None', min=0)
-        assert isinstance(res, list)
-        assert res == []
-    except ValidateError:
-        assert False
-    try:
-        res = config.weight_list('[]', min=0)
-        assert isinstance(res, list)
-        assert res == []
-    except ValidateError:
-        assert False
-    try:
+    res = config.weight_list(['0.2', '0.3', '0.5'], min=0)
+    assert isinstance(res, list)
+    assert res == [0.2, 0.3, 0.5]
+    res = config.weight_list('None', min=0)
+    assert isinstance(res, list)
+    assert res == []
+    res = config.weight_list('[]', min=0)
+    assert isinstance(res, list)
+    assert res == []
+    res = config.weight_list(['0.2', '0.3', '0.5'], min=3)
+    assert isinstance(res, list)
+    assert res == [0.2, 0.3, 0.5]
+    with pytest.raises(ValidateError):
+        res = config.weight_list([], min=1)
+    with pytest.raises(ValidateError):
         res = config.weight_list('[]', min=1)
-        assert False
-    except ValidateError:
-        assert True
-    try:
+    with pytest.raises(ValidateError):
         res = config.weight_list('[None]', min=1)
-        assert False
-    except ValidateError:
-        assert True
-    try:
+    with pytest.raises(ValidateError):
+        res = config.weight_list('None', min=1)
+    with pytest.raises(ValidateError):
         res = config.weight_list(['0.2', '0.3', '0.5'], min=4)
-        assert False
-    except ValidateError:
-        assert True
-    try:
-        res = config.weight_list(['0.2', '0.3', '0.5'], min=3)
-        assert isinstance(res, list)
-        assert res == [0.2, 0.3, 0.5]
-    except ValidateError:
-        assert False
-    try:
+    with pytest.raises(ValidateError):
         res = config.weight_list(['-0.2', '0.3', '0.5'], min=3)
-        assert False
-    except ValidateError:
-        assert True
-    try:
+    with pytest.raises(ValidateError):
         res = config.weight_list(['0.1', '0.3', '0.5'], min=3)
-        assert False
-    except ValidateError:
-        assert True
     #
     # gmpe_list()
     #
-    try:
-        res = config.gmpe_list('[]', min=0)
-        assert isinstance(res, list)
-        assert res == []
-    except ValidateError:
-        assert False
-    try:
+    res = config.gmpe_list('[]', min=0)
+    assert isinstance(res, list)
+    assert res == []
+    with pytest.raises(ValidateError):
         res = config.gmpe_list('[]', min=1)
-        assert False
-    except ValidateError:
-        assert True
-    try:
-        res = config.gmpe_list('thing1', min=0)
-        assert isinstance(res, list)
-        assert res == ['thing1']
-    except ValidateError:
-        assert False
-    try:
-        res = config.gmpe_list(['thing1'], min=0)
-        assert isinstance(res, list)
-        assert res == ['thing1']
-    except ValidateError:
-        assert False
-    try:
-        res = config.gmpe_list(['thing1', 'thing2'], min=0)
-        assert isinstance(res, list)
-        assert res == ['thing1', 'thing2']
-    except ValidateError:
-        assert False
-    try:
+    res = config.gmpe_list('thing1', min=0)
+    assert isinstance(res, list)
+    assert res == ['thing1']
+    res = config.gmpe_list(['thing1'], min=0)
+    assert isinstance(res, list)
+    assert res == ['thing1']
+    res = config.gmpe_list(['thing1', 'thing2'], min=0)
+    assert isinstance(res, list)
+    assert res == ['thing1', 'thing2']
+    with pytest.raises(ValidateError):
         res = config.gmpe_list(['thing1', 'thing2'], min=3)
-        assert False
-    except ValidateError:
-        assert True
-    try:
+    with pytest.raises(ValidateError):
         res = config.gmpe_list(7, min=0)
-        assert False
-    except ValidateError:
-        assert True
+    with pytest.raises(ValidateError):
+        res = config.gmpe_list([7], min=0)
     #
     # extent_list()
     #
-    try:
-        res = config.extent_list('[]')
-        assert isinstance(res, list)
-        assert res == []
-    except ValidateError:
-        assert False
-    try:
+    res = config.extent_list('[]')
+    assert isinstance(res, list)
+    assert res == []
+    res = config.extent_list([])
+    assert isinstance(res, list)
+    assert res == []
+    with pytest.raises(ValidateError):
         res = config.extent_list(7)
-        assert False
-    except ValidateError:
-        assert True
-    try:
+    with pytest.raises(ValidateError):
         res = config.extent_list(['-20.0', '-10.0', '20.0'])
-        assert False
-    except ValidateError:
-        assert True
-    try:
+    with pytest.raises(ValidateError):
         res = config.extent_list(['-20.0', '-10.0', '20.0', 'thing'])
-        assert False
-    except ValidateError:
-        assert True
-    try:
+    with pytest.raises(ValidateError):
         res = config.extent_list(['-20.0', '-10.0', '20.0', '1000.0'])
-        assert False
-    except ValidateError:
-        assert True
-    try:
-        res = config.extent_list(['-20.0', '-10.0', '20.0', '10.0'])
-        assert isinstance(res, list)
-        assert res == [-20.0, -10.0, 20.0, 10.0]
-    except ValidateError:
-        assert False
+    res = config.extent_list(['-20.0', '-10.0', '20.0', '10.0'])
+    assert isinstance(res, list)
+    assert res == [-20.0, -10.0, 20.0, 10.0]
     #
     # file_type()
     #
-    try:
-        res = config.file_type('None')
-        assert isinstance(res, str)
-        assert not res
-    except ValidateError:
-        assert False
-    try:
+    res = config.file_type('None')
+    assert isinstance(res, str)
+    assert not res
+    with pytest.raises(ValidateError):
         res = config.file_type('/home/xxxyyyzzz/awefawe')
-        assert False
-    except ValidateError:
-        assert True
-    try:
-        res = config.file_type(os.path.abspath(__file__))
-        assert isinstance(res, str)
-        assert res == os.path.abspath(__file__)
-    except ValidateError:
-        assert False
+    res = config.file_type(os.path.abspath(__file__))
+    assert isinstance(res, str)
+    assert res == os.path.abspath(__file__)
     #
     # directory_type()
     #
-    try:
-        res = config.directory_type('None')
-        assert isinstance(res, str)
-        assert not res
-    except ValidateError:
-        assert False
-    try:
+    res = config.directory_type('None')
+    assert isinstance(res, str)
+    assert not res
+    with pytest.raises(ValidateError):
         res = config.directory_type('/home/xxxyyyzzz/awefawe')
-        assert False
-    except ValidateError:
-        assert True
-    try:
-        res = config.directory_type(os.path.dirname(os.path.abspath(__file__)))
-        assert isinstance(res, str)
-        assert res == os.path.dirname(os.path.abspath(__file__))
-    except ValidateError:
-        assert False
+    res = config.directory_type(os.path.dirname(os.path.abspath(__file__)))
+    assert isinstance(res, str)
+    assert res == os.path.dirname(os.path.abspath(__file__))
+    #
+    # status_string()
+    #
+    res = config.status_string('', min=1)
+    assert res == 'automatic'
+    res = config.status_string('automatic', min=1)
+    assert res == 'automatic'
+    with pytest.raises(ValidateError):
+        res = config.status_string('thing', min=1)
 
 if __name__ == '__main__':
     test_config()

@@ -209,3 +209,9 @@ def test_read_nshmp_rlme_xml():
          2.04776120e-05,   2.04776120e-05,   2.04776120e-05,
          2.04776120e-05])
     np.testing.assert_allclose(rate, ratetarget)
+
+if __name__ == '__main__':
+
+    test_read_nshmp_rlme_xml()
+    test_read_nshmp_grid_xml()
+    test_read_nshmp_fault_xml()
