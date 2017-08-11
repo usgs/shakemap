@@ -10,6 +10,7 @@ import pprint
 
 #shakemap imports
 from shakemap.utils.config import get_data_path
+from shakemap.utils.utils import query_yes_no
 
 current_markers = {True:'**Current Profile**',False:''}
 
@@ -25,17 +26,20 @@ class ShakeProfile(object):
         tpl = (self.name,self.current_marker,self.install_path,self.data_path)
         return fmt % tpl
 
-def make_dir(pathstr, default):
+def make_dir(pathstr, default, accept):
     max_tries = 3
     ntries = 1
     make_ok = False
     ppath = ''
     while not make_ok:
-        ppath = input('Please enter the %s: [%s] ' % (pathstr, default))
+        if not accept:
+            ppath = input('Please enter the %s: [%s] ' % (pathstr, default))
+        else:
+            ppath = default
         if not len(ppath.strip()):
             ppath = default
         try:
-            os.makedirs(ppath,exist_ok=True)
+            os.makedirs(ppath, exist_ok=True)
             make_ok = True
         except OSError as error:
             msg = 'Cannot make install_folder %s.  Please try again (%i of % tries).'
@@ -43,9 +47,9 @@ def make_dir(pathstr, default):
             ntries += 1
         if ntries >= max_tries:
             break
-    return (ppath,make_ok)
+    return (ppath, make_ok)
     
-def create(configfile, profile, progname):
+def create(configfile, profile, progname, accept):
     data_path = get_data_path()
     module_file = os.path.join(data_path,'modules.conf')
     sets_file = os.path.join(data_path,'gmpe_sets.conf')
@@ -74,11 +78,11 @@ def create(configfile, profile, progname):
     print('   configuration, (cfg), logging (log), and support data (lib).')
     print(' - A *data* path, under which will be created directories for each')
     print('   event processed.\n')
-    install_path, install_ok = make_dir('install path', default_install)
+    install_path, install_ok = make_dir('install path', default_install, accept)
     if not install_ok:
         print('Please try to find a path that can be created on this system and then try again.  Exiting.')
         sys.exit(1)
-    data_path,data_ok = make_dir('data path', default_data)
+    data_path,data_ok = make_dir('data path', default_data, accept)
     if not data_ok:
         print('Please try to find a path that can be created on this system and then try again.  Exiting.')
         shutil.rmtree(install_path)
@@ -122,7 +126,7 @@ def main(pparser,args):
         sys.exit(1)
         
     if args.create:
-        create(configfile,args.create,pparser.prog)
+        create(configfile, args.create, pparser.prog, args.accept)
         sys.exit(0)
         
     if args.list:
@@ -162,8 +166,13 @@ def main(pparser,args):
 
         install_path = config['profiles'][profile]['install_path']
         data_path = config['profiles'][profile]['data_path']
-        shutil.rmtree(install_path,ignore_errors=True)
-        shutil.rmtree(install_path,ignore_errors=True)
+        question = \
+            'Are you sure you want to delete everything in:\n%s\n--and--\n%s?\n'\
+            % (install_path, data_path)
+        if not query_yes_no(question, default='yes'):
+            sys.exit(0)
+        shutil.rmtree(install_path, ignore_errors=True)
+        shutil.rmtree(data_path, ignore_errors=True)
                 
         del config['profiles'][profile]
 
@@ -194,8 +203,9 @@ def main(pparser,args):
         
 if __name__ == '__main__':
     desc = '''Manage ShakeMap profiles.
-These ShakeMap profiles allow one user to have multiple ShakeMap profiles (installations)
-on the same machine.  These profiles can all be configured differently, if desired.
+These ShakeMap profiles allow one user to have multiple ShakeMap profiles
+(installations) on the same machine.  These profiles can all be configured 
+differently, if desired.
 '''
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument('-s','--switch', metavar='PROFILE',
@@ -206,6 +216,8 @@ on the same machine.  These profiles can all be configured differently, if desir
                         help='Create new profile PROFILE and switch to it.')
     parser.add_argument('-d','--delete', metavar='PROFILE',
                         help='Delete existing profile PROFILE.')
+    parser.add_argument('-a','--accept', action='store_true',
+                        help='Accept the defaults when creating a profile.')
     pargs = parser.parse_args()
     main(parser,pargs)
     
