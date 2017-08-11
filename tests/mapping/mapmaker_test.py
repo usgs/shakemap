@@ -20,8 +20,8 @@ from mapio.shake import ShakeGrid
 
 # local imports
 from shakelib.grind.station import StationList
-from shakelib.grind.rupture import QuadRupture
-from shakelib.grind.origin import Origin
+from shakelib.grind.rupture.quad_rupture import QuadRupture
+from shakelib.grind.rupture.origin import Origin
 
 
 def _test_intensity():

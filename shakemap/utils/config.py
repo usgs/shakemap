@@ -49,8 +49,8 @@ def config_error(config, results):
             print('The following section was missing:%s ' % 
                     ', '.join(section_list))
             errs += 1
-        if errs:
-            raise RuntimeError('There %s %d %s in configuration.' %
+    if errs:
+        raise RuntimeError('There %s %d %s in configuration.' %
                     ('was' if errs == 1 else 'were', errs, 
                      'error' if errs == 1 else 'errors'))
 
@@ -58,23 +58,23 @@ def check_config(config):
     if config['grind']['gmpe'] not in config['gmpe_sets']:
         print('Configuration error: gmpe %s not in gmpe_sets' %
               (config['grind']['gmpe']))
-        sys.exit(1)
+        raise ValidateError()
     if config['grind']['gmice'] not in config['gmice_modules']:
         print('Configuration error: gmice %s not in gmice_modules' %
               (config['grind']['gmice']))
-        sys.exit(1)
+        raise ValidateError()
     if config['grind']['ipe'] not in config['ipe_modules']:
         print('Configuration error: ipe %s not in ipe_modules' %
               (config['grind']['ipe']))
-        sys.exit(1)
+        raise ValidateError()
     if config['grind']['ccf'] not in config['ccf_modules']:
         print('Configuration error: ccf %s not in ccf_modules' %
               (config['grind']['ccf']))
-        sys.exit(1)
+        raise ValidateError()
     if config['grind']['component'] not in config['component_modules']:
         print('Configuration error: component %s not in component_modules' %
               (config['grind']['component']))
-        sys.exit(1)
+        raise ValidateError()
 
 def annotatedfloat_type(value):
     try:

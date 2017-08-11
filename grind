@@ -22,7 +22,7 @@ from openquake.hazardlib import imt
 import openquake.hazardlib.const as oqconst
 import openquake.hazardlib.gsim.base as oqbase
 
-from shakelib.grind.rupture import PointRupture
+from shakelib.grind.rupture.point_rupture import PointRupture
 from shakelib.grind.sites import Sites
 from shakelib.grind.distance import Distance, get_distance
 from shakelib.grind.multigmpe import MultiGMPE
@@ -589,7 +589,7 @@ def grind(args):
     # Compute a bias for all of the IMTs in the inputs and outputs
     #
     combined_imt_str = imt_out_set_str
-    if imt_in_str_dict['df1']: 
+    if imt_in_str_dict['df1']:
         combined_imt_str |= imt_in_str_dict['df1']
     if imt_in_str_dict['df2']:
         combined_imt_str |= imt_in_str_dict['df2']

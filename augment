@@ -79,7 +79,7 @@ def main(args):
     # Validate the resulting config
     #
     results = shake_config.validate(validator)
-    if not results:
+    if not results or isinstance(results, dict):
         config_error(shake_config, results)
     check_config(shake_config)
     #
