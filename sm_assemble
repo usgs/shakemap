@@ -46,14 +46,14 @@ def main(args):
             os.path.join(install_path, 'config', 'gmpe_sets.conf'),
             configspec=spec_file)
     global_config = ConfigObj(
-            os.path.join(install_path, 'config', 'interp.conf'),
+            os.path.join(install_path, 'config', 'model.conf'),
             configspec=spec_file)
     #
-    # this is the event specific interp.conf (may not be present)
-    # prefer interp.conf to interp_zc.conf
+    # this is the event specific model.conf (may not be present)
+    # prefer model.conf to model_zc.conf
     #
-    event_config_file = os.path.join(datadir, 'interp.conf')
-    event_config_zc_file = os.path.join(datadir, 'interp_zc.conf')
+    event_config_file = os.path.join(datadir, 'model.conf')
+    event_config_zc_file = os.path.join(datadir, 'model_zc.conf')
     if os.path.isfile(event_config_file):
         event_config = ConfigObj(event_config_file, configspec=spec_file)
     elif os.path.isfile(event_config_zc_file):
@@ -194,7 +194,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('eventid',
                         help='Path to ShakeMap data directory containing '
-                        'event.xml, interp_zc.conf')
+                        'event.xml, model_zc.conf')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Print informational messages.')
     pargs = parser.parse_args()

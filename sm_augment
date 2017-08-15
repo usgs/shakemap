@@ -56,25 +56,25 @@ def main(args):
         if verbose: print('Found a gmpe file.')
         gmpe_sets = ConfigObj(gmpe_file, configspec=spec_file)
         shake_config.merge(gmpe_sets)
-    interp_file = os.path.join(install_path, 'config', 'interp.conf')
-    if os.path.isfile(interp_file):
-        if verbose: print('Found a global interp file.')
-        global_interp = ConfigObj(interp_file, configspec=spec_file)
-        shake_config.merge(global_interp)
+    config_file = os.path.join(install_path, 'config', 'model.conf')
+    if os.path.isfile(config_file):
+        if verbose: print('Found a global config file.')
+        global_config = ConfigObj(config_file, configspec=spec_file)
+        shake_config.merge(global_config)
     #
-    # this is the event specific interp.conf (may not be present)
-    # prefer interp.conf to interp_zc.conf
+    # this is the event specific model.conf (may not be present)
+    # prefer model.conf to model_zc.conf
     #
-    event_interp_file = os.path.join(datadir, 'interp.conf')
-    event_interp_zc_file = os.path.join(datadir, 'interp_zc.conf')
-    if os.path.isfile(event_interp_file):
-        if verbose: print('Found an event specific interp file.')
-        event_interp = ConfigObj(event_interp_file, configspec=spec_file)
-        shake_config.merge(event_interp)
-    elif os.path.isfile(event_interp_zc_file):
-        if verbose: print('Found an event specific interp_zc file.')
-        event_interp = ConfigObj(event_interp_zc_file, configspec=spec_file)
-        shake_config.merge(event_interp)
+    event_config_file = os.path.join(datadir, 'model.conf')
+    event_config_zc_file = os.path.join(datadir, 'model_zc.conf')
+    if os.path.isfile(event_config_file):
+        if verbose: print('Found an event specific model.conf file.')
+        event_config = ConfigObj(event_config_file, configspec=spec_file)
+        shake_config.merge(event_config)
+    elif os.path.isfile(event_config_zc_file):
+        if verbose: print('Found an event specific model_zc file.')
+        event_config = ConfigObj(event_config_zc_file, configspec=spec_file)
+        shake_config.merge(event_config)
     #
     # Validate the resulting config
     #
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('eventid',
                         help='Path to ShakeMap data directory containing '
-                        'event.xml, interp_zc.conf')
+                        'event.xml, model_zc.conf')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Print informational messages.')
     pargs = parser.parse_args()

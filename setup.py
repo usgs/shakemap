@@ -17,5 +17,5 @@ setup(name='shakemap',
       package_data={'shakemap': [os.path.join('tests', 'data', '*'),
                                  os.path.join('utils', 'configspec.ini'),
                                  ]},
-      scripts=['mkfault'],
+      scripts=['sm_assemble', 'sm_augment', 'sm_model', 'sm_profile'],
       )

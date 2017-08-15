@@ -27,13 +27,13 @@ def test_config():
     myspec = config.get_configspec()
     myvalid = config.get_custom_validator()
 
-    c1 = ConfigObj(os.path.join(mydatapath, "interp.conf"),
+    c1 = ConfigObj(os.path.join(mydatapath, "model.conf"),
                    configspec=myspec)
     c2 = ConfigObj(os.path.join(mydatapath, "modules.conf"),
                    configspec=myspec)
     c3 = ConfigObj(os.path.join(mydatapath, "gmpe_sets.conf"),
                    configspec=myspec)
-    c4 = ConfigObj(os.path.join(mydatapath, "northridge_interp.conf"),
+    c4 = ConfigObj(os.path.join(mydatapath, "northridge_model.conf"),
                    configspec=myspec)
     c1.merge(c2)
     c1.merge(c3)
