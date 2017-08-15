@@ -61,11 +61,11 @@ def create(configfile, profile, progname, accept):
     data_path = get_data_path()
     module_file = os.path.join(data_path,'modules.conf')
     sets_file = os.path.join(data_path,'gmpe_sets.conf')
-    grind_file = os.path.join(data_path,'grind.conf')
+    interp_file = os.path.join(data_path,'interp.conf')
     data_file = os.path.join(data_path,'northridge_dat.xml')
     event_file = os.path.join(data_path,'northridge_event.xml')
     rupture_file = os.path.join(data_path,'northridge_fault.txt')
-    event_grind_file = os.path.join(data_path,'northridge_grind.conf')
+    event_interp_file = os.path.join(data_path,'northridge_interp.conf')
     vs30_file = os.path.join(data_path,'northridge_vs30.grd')
     if not os.path.isfile(configfile):
         config = ConfigObj(indent_type='  ')
@@ -105,12 +105,12 @@ def create(configfile, profile, progname, accept):
         sys.exit(1)
 
     # put the default config files in the install path
-    config_path = os.path.join(install_path,'config')
+    config_path = os.path.join(install_path, 'config')
     os.mkdir(config_path)
 
-    shutil.copy(module_file,config_path)
-    shutil.copy(sets_file,config_path)
-    shutil.copy(grind_file,config_path)
+    shutil.copy(module_file, config_path)
+    shutil.copy(sets_file, config_path)
+    shutil.copy(interp_file, config_path)
 
     if profile == 'default' or profile == 'test':
         # put northridge in the data directory
@@ -119,12 +119,12 @@ def create(configfile, profile, progname, accept):
 
         # copy files over
         data_event_file = os.path.join(event_path, 'event.xml')
-        data_grind_file = os.path.join(event_path, 'grind_zc.conf')
+        data_interp_file = os.path.join(event_path, 'interp_zc.conf')
         vs30_event_file = os.path.join(event_path, 'vs30.grd')
         shutil.copy(data_file, event_path)
         shutil.copyfile(event_file, data_event_file)
         shutil.copy(rupture_file, event_path)
-        shutil.copyfile(event_grind_file, data_grind_file)
+        shutil.copyfile(event_interp_file, data_interp_file)
         shutil.copyfile(vs30_file, vs30_event_file)
         
     if 'profiles' not in config:
