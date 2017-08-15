@@ -56,25 +56,25 @@ def main(args):
         if verbose: print('Found a gmpe file.')
         gmpe_sets = ConfigObj(gmpe_file, configspec=spec_file)
         shake_config.merge(gmpe_sets)
-    grind_file = os.path.join(install_path, 'config', 'grind.conf')
-    if os.path.isfile(grind_file):
-        if verbose: print('Found a global grind file.')
-        global_grind = ConfigObj(grind_file, configspec=spec_file)
-        shake_config.merge(global_grind)
+    config_file = os.path.join(install_path, 'config', 'model.conf')
+    if os.path.isfile(config_file):
+        if verbose: print('Found a global config file.')
+        global_config = ConfigObj(config_file, configspec=spec_file)
+        shake_config.merge(global_config)
     #
-    # this is the event specific grind.conf (may not be present)
-    # prefer grind.conf to grind_zc.conf
+    # this is the event specific model.conf (may not be present)
+    # prefer model.conf to model_zc.conf
     #
-    event_grind_file = os.path.join(datadir, 'grind.conf')
-    event_grind_zc_file = os.path.join(datadir, 'grind_zc.conf')
-    if os.path.isfile(event_grind_file):
-        if verbose: print('Found an event specific grind file.')
-        event_grind = ConfigObj(event_grind_file, configspec=spec_file)
-        shake_config.merge(event_grind)
-    elif os.path.isfile(event_grind_zc_file):
-        if verbose: print('Found an event specific grind_zc file.')
-        event_grind = ConfigObj(event_grind_zc_file, configspec=spec_file)
-        shake_config.merge(event_grind)
+    event_config_file = os.path.join(datadir, 'model.conf')
+    event_config_zc_file = os.path.join(datadir, 'model_zc.conf')
+    if os.path.isfile(event_config_file):
+        if verbose: print('Found an event specific model.conf file.')
+        event_config = ConfigObj(event_config_file, configspec=spec_file)
+        shake_config.merge(event_config)
+    elif os.path.isfile(event_config_zc_file):
+        if verbose: print('Found an event specific model_zc file.')
+        event_config = ConfigObj(event_config_zc_file, configspec=spec_file)
+        shake_config.merge(event_config)
     #
     # Validate the resulting config
     #
@@ -85,7 +85,7 @@ def main(args):
     #
     # The vs30 file may have macros in it
     #
-    vs30file = shake_config['grind']['vs30file']
+    vs30file = shake_config['data']['vs30file']
     if vs30file:
         vs30file = vs30file.replace('<INSTALL_DIR>', install_path)
         vs30file = vs30file.replace('<DATA_DIR>', data_path)
@@ -93,13 +93,13 @@ def main(args):
         if not os.path.isfile(vs30file):
             print("vs30 file '%s' is not a valid file" % vs30file)
             sys.exit(1)
-        shake_config['grind']['vs30file'] = vs30file
+        shake_config['data']['vs30file'] = vs30file
     #
     # If there is a prediction_location->file file, then we need
     # to expand any macros
     #
-    if 'file' in shake_config['grind']['prediction_location']:
-        loc_file = shake_config['grind']['prediction_location']['file']
+    if 'file' in shake_config['interp']['prediction_location']:
+        loc_file = shake_config['interp']['prediction_location']['file']
         if loc_file and loc_file != 'None':      # Note that 'None' is a string here
             loc_file = loc_file.replace('<INSTALL_DIR>', install_path)
             loc_file = loc_file.replace('<DATA_DIR>', data_path)
@@ -107,7 +107,7 @@ def main(args):
             if not os.path.isfile(loc_file):
                 print("prediction file '%s' is not a valid file" % loc_file)
                 sys.exit(1)
-            shake_config['grind']['prediction_location']['file'] = loc_file
+            shake_config['interp']['prediction_location']['file'] = loc_file
     #
     # Put the updated config back into shake_data.hdf`
     #
@@ -135,7 +135,7 @@ def main(args):
     # otherwise add a new line.
     #
     timestamp = datetime.datetime.utcnow().strftime('%FT%TZ')
-    originator = config['grind']['source_network']
+    originator = config['system']['source_network']
 
     history = shake_data.getHistory()
     if history['history'][-1][1] == originator:
@@ -162,7 +162,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('eventid',
                         help='Path to ShakeMap data directory containing '
-                        'event.xml, grind_zc.conf')
+                        'event.xml, model_zc.conf')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Print informational messages.')
     pargs = parser.parse_args()

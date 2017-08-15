@@ -55,25 +55,25 @@ def config_error(config, results):
                      'error' if errs == 1 else 'errors'))
 
 def check_config(config):
-    if config['grind']['gmpe'] not in config['gmpe_sets']:
+    if config['modeling']['gmpe'] not in config['gmpe_sets']:
         print('Configuration error: gmpe %s not in gmpe_sets' %
-              (config['grind']['gmpe']))
+              (config['modeling']['gmpe']))
         raise ValidateError()
-    if config['grind']['gmice'] not in config['gmice_modules']:
+    if config['modeling']['gmice'] not in config['gmice_modules']:
         print('Configuration error: gmice %s not in gmice_modules' %
-              (config['grind']['gmice']))
+              (config['modeling']['gmice']))
         raise ValidateError()
-    if config['grind']['ipe'] not in config['ipe_modules']:
+    if config['modeling']['ipe'] not in config['ipe_modules']:
         print('Configuration error: ipe %s not in ipe_modules' %
-              (config['grind']['ipe']))
+              (config['modeling']['ipe']))
         raise ValidateError()
-    if config['grind']['ccf'] not in config['ccf_modules']:
+    if config['modeling']['ccf'] not in config['ccf_modules']:
         print('Configuration error: ccf %s not in ccf_modules' %
-              (config['grind']['ccf']))
+              (config['modeling']['ccf']))
         raise ValidateError()
-    if config['grind']['component'] not in config['component_modules']:
+    if config['interp']['component'] not in config['component_modules']:
         print('Configuration error: component %s not in component_modules' %
-              (config['grind']['component']))
+              (config['interp']['component']))
         raise ValidateError()
 
 def annotatedfloat_type(value):

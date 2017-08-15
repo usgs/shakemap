@@ -27,13 +27,13 @@ def test_config():
     myspec = config.get_configspec()
     myvalid = config.get_custom_validator()
 
-    c1 = ConfigObj(os.path.join(mydatapath, "grind.conf"),
+    c1 = ConfigObj(os.path.join(mydatapath, "model.conf"),
                    configspec=myspec)
     c2 = ConfigObj(os.path.join(mydatapath, "modules.conf"),
                    configspec=myspec)
     c3 = ConfigObj(os.path.join(mydatapath, "gmpe_sets.conf"),
                    configspec=myspec)
-    c4 = ConfigObj(os.path.join(mydatapath, "northridge_grind.conf"),
+    c4 = ConfigObj(os.path.join(mydatapath, "northridge_model.conf"),
                    configspec=myspec)
     c1.merge(c2)
     c1.merge(c3)
@@ -47,35 +47,35 @@ def test_config():
     # Break the config
     #
     ctest = copy.deepcopy(c1)
-    ctest['grind']['component'] = 'NotAComponent'
+    ctest['interp']['component'] = 'NotAComponent'
     with pytest.raises(ValidateError):
         config.check_config(ctest)
     ctest = copy.deepcopy(c1)
-    ctest['grind']['ccf'] = 'NotACCF'
+    ctest['modeling']['ccf'] = 'NotACCF'
     with pytest.raises(ValidateError):
         config.check_config(ctest)
     ctest = copy.deepcopy(c1)
-    ctest['grind']['ipe'] = 'NotAnIPE'
+    ctest['modeling']['ipe'] = 'NotAnIPE'
     with pytest.raises(ValidateError):
         config.check_config(ctest)
     ctest = copy.deepcopy(c1)
-    ctest['grind']['gmice'] = 'NotAGMICE'
+    ctest['modeling']['gmice'] = 'NotAGMICE'
     with pytest.raises(ValidateError):
         config.check_config(ctest)
     ctest = copy.deepcopy(c1)
-    ctest['grind']['gmpe'] = 'NotAGMPE'
+    ctest['modeling']['gmpe'] = 'NotAGMPE'
     with pytest.raises(ValidateError):
         config.check_config(ctest)
 
     ctest = copy.deepcopy(c1)
-    ctest['grind']['gmpe'] = 47
+    ctest['modeling']['gmpe'] = 47
     results = ctest.validate(myvalid, preserve_errors=True)
     assert isinstance(results, dict)
     with pytest.raises(RuntimeError):
         config.config_error(ctest, results)
 
     ctest = copy.deepcopy(c1)
-    del ctest['grind']
+    del ctest['interp']
     results = ctest.validate(myvalid, preserve_errors=True)
     assert isinstance(results, dict)
     with pytest.raises(RuntimeError):

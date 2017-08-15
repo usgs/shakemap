@@ -45,53 +45,53 @@ def main(args):
     gmpe_sets = ConfigObj(
             os.path.join(install_path, 'config', 'gmpe_sets.conf'),
             configspec=spec_file)
-    global_grind = ConfigObj(
-            os.path.join(install_path, 'config', 'grind.conf'),
+    global_config = ConfigObj(
+            os.path.join(install_path, 'config', 'model.conf'),
             configspec=spec_file)
     #
-    # this is the event specific grind.conf (may not be present)
-    # prefer grind.conf to grind_zc.conf
+    # this is the event specific model.conf (may not be present)
+    # prefer model.conf to model_zc.conf
     #
-    event_grind_file = os.path.join(datadir, 'grind.conf')
-    event_grind_zc_file = os.path.join(datadir, 'grind_zc.conf')
-    if os.path.isfile(event_grind_file):
-        event_grind = ConfigObj(event_grind_file, configspec=spec_file)
-    elif os.path.isfile(event_grind_zc_file):
-        event_grind = ConfigObj(event_grind_zc_file, configspec=spec_file)
+    event_config_file = os.path.join(datadir, 'model.conf')
+    event_config_zc_file = os.path.join(datadir, 'model_zc.conf')
+    if os.path.isfile(event_config_file):
+        event_config = ConfigObj(event_config_file, configspec=spec_file)
+    elif os.path.isfile(event_config_zc_file):
+        event_config = ConfigObj(event_config_zc_file, configspec=spec_file)
     else:
-        event_grind = ConfigObj()
+        event_config = ConfigObj()
 
     #
-    # start merging event_grind
+    # start merging event_config
     #
-    global_grind.merge(event_grind)
-    global_grind.merge(modules)
-    global_grind.merge(gmpe_sets)
+    global_config.merge(event_config)
+    global_config.merge(modules)
+    global_config.merge(gmpe_sets)
 
     #
     # Add dummy zone_info section and its subsections
     #
-    if 'zone_info' not in global_grind:
-        global_grind['zone_info'] = {}
-        global_grind['zone_info']['slab'] = {}
-        global_grind['zone_info']['plunge_values'] = {}
-        global_grind['zone_info']['plunge_values']['taxis'] = {}
-        global_grind['zone_info']['plunge_values']['paxis'] = {}
-        global_grind['zone_info']['plunge_values']['naxis'] = {}
-        global_grind['zone_info']['plunge_values']['nodalplane1'] = {}
-        global_grind['zone_info']['plunge_values']['nodalplane2'] = {}
-        global_grind['zone_info']['equations'] = {}
+    if 'zone_info' not in global_config:
+        global_config['zone_info'] = {}
+        global_config['zone_info']['slab'] = {}
+        global_config['zone_info']['plunge_values'] = {}
+        global_config['zone_info']['plunge_values']['taxis'] = {}
+        global_config['zone_info']['plunge_values']['paxis'] = {}
+        global_config['zone_info']['plunge_values']['naxis'] = {}
+        global_config['zone_info']['plunge_values']['nodalplane1'] = {}
+        global_config['zone_info']['plunge_values']['nodalplane2'] = {}
+        global_config['zone_info']['equations'] = {}
 
-    results = global_grind.validate(validator)
+    results = global_config.validate(validator)
     if not results or isinstance(results, dict):
-        config_error(global_grind, results)
+        config_error(global_config, results)
 
-    check_config(global_grind)
+    check_config(global_config)
 
     #
     # The vs30 file may have macros in it
     #
-    vs30file = global_grind['grind']['vs30file']
+    vs30file = global_config['data']['vs30file']
     if vs30file:
         vs30file = vs30file.replace('<INSTALL_DIR>', install_path)
         vs30file = vs30file.replace('<DATA_DIR>', data_path)
@@ -99,14 +99,14 @@ def main(args):
         if not os.path.isfile(vs30file):
             print("vs30 file '%s' is not a valid file" % vs30file)
             sys.exit(1)
-        global_grind['grind']['vs30file'] = vs30file
+        global_config['data']['vs30file'] = vs30file
 
     #
     # If there is a prediction_location->file file, then we need
     # to expand any macros
     #
-    if 'file' in global_grind['grind']['prediction_location']:
-        loc_file = global_grind['grind']['prediction_location']['file']
+    if 'file' in global_config['interp']['prediction_location']:
+        loc_file = global_config['interp']['prediction_location']['file']
         if loc_file and loc_file != 'None':      # Note that 'None' is a string here
             loc_file = loc_file.replace('<INSTALL_DIR>', install_path)
             loc_file = loc_file.replace('<DATA_DIR>', data_path)
@@ -114,9 +114,9 @@ def main(args):
             if not os.path.isfile(loc_file):
                 print("prediction file '%s' is not a valid file" % loc_file)
                 sys.exit(1)
-            global_grind['grind']['prediction_location']['file'] = loc_file
+            global_config['interp']['prediction_location']['file'] = loc_file
 
-    config = global_grind.dict()
+    config = global_config.dict()
 
     if verbose: print('Looking for data files...')
     datafiles = glob.glob(os.path.join(datadir, '*_dat.xml'))
@@ -134,7 +134,7 @@ def main(args):
     # extract the existing history. Then add a new line for this run.
     #
     timestamp = datetime.datetime.utcnow().strftime('%FT%TZ')
-    originator = config['grind']['source_network']
+    originator = config['system']['source_network']
     backup_dirs = sorted(
             glob.glob(os.path.join(datadir, '..', '.backup*')),
             reverse=True)
@@ -194,7 +194,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('eventid',
                         help='Path to ShakeMap data directory containing '
-                        'event.xml, grind_zc.conf')
+                        'event.xml, model_zc.conf')
     parser.add_argument('-v', '--verbose', action='store_true',
                         help='Print informational messages.')
     pargs = parser.parse_args()

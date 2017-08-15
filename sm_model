@@ -42,7 +42,7 @@ from shakemap._version import get_versions
 # 'name'_module dictionary of class name, module path
 #
 def get_object_from_config(obj, cfg, *args):
-    cls_abbr = cfg['grind'][obj]
+    cls_abbr = cfg['modeling'][obj]
     mods = obj + '_modules'
     (cname, mpath) = cfg[mods][cls_abbr]
     return getattr(import_module(mpath), cname)(*args)
@@ -204,7 +204,7 @@ def get_map_grade(do_grid, outsd, psd, moutgrid):
 #args = type('Dummy', (object,), {'eventid' : 'wenchuan',
 #                                 'verbose' : True})
 #if True:
-def grind(args):
+def interp(args):
     verbose = args.verbose
     #
     # Find the shake_data file
@@ -230,26 +230,26 @@ def grind(args):
 
     gmice = get_object_from_config('gmice', config)
 
-    if config['ipe_modules'][config['grind']['ipe']][0] == 'VirtualIPE':
+    if config['ipe_modules'][config['modeling']['ipe']][0] == 'VirtualIPE':
         ipe = VirtualIPE.fromFuncs(gmpe, gmice)
     else:
         ipe = get_object_from_config('ipe', config)
     #------------------------------------------------------------------
     # Bias parameters
     #------------------------------------------------------------------
-    do_bias         = config['grind']['bias']['do_bias']
-    bias_max_range  = config['grind']['bias']['max_range']
-    bias_max_mag    = config['grind']['bias']['max_mag']
-    bias_max_dsigma = config['grind']['bias']['max_delta_sigma']
+    do_bias         = config['modeling']['bias']['do_bias']
+    bias_max_range  = config['modeling']['bias']['max_range']
+    bias_max_mag    = config['modeling']['bias']['max_mag']
+    bias_max_dsigma = config['modeling']['bias']['max_delta_sigma']
     #------------------------------------------------------------------
     # Outlier parameters
     #------------------------------------------------------------------
-    outlier_deviation_level = config['grind']['outlier']['max_deviation']
-    outlier_max_mag = config['grind']['outlier']['max_mag']
+    outlier_deviation_level = config['data']['outlier']['max_deviation']
+    outlier_max_mag = config['data']['outlier']['max_mag']
     #------------------------------------------------------------------
     # These are the IMTs we want to make
     #------------------------------------------------------------------
-    imt_out_set_str = set(config['grind']['imt_list'])
+    imt_out_set_str = set(config['interp']['imt_list'])
     #------------------------------------------------------------------
     # Get the rupture object and rupture context
     #------------------------------------------------------------------
@@ -260,23 +260,23 @@ def grind(args):
     #------------------------------------------------------------------
     # Get the Vs30 file name
     #------------------------------------------------------------------
-    vs30default = config['grind']['vs30default']
-    vs30_file = config['grind']['vs30file']
+    vs30default = config['data']['vs30default']
+    vs30_file = config['data']['vs30file']
     if not vs30_file:
         vs30_file = None
     #------------------------------------------------------------------
     # The output locations: either a grid or a list of points
     #------------------------------------------------------------------
-    smdx = config['grind']['prediction_location']['xres']
-    smdy = config['grind']['prediction_location']['yres']
-    if config['grind']['prediction_location']['file'] and \
-       config['grind']['prediction_location']['file'] != 'None':
+    smdx = config['interp']['prediction_location']['xres']
+    smdy = config['interp']['prediction_location']['yres']
+    if config['interp']['prediction_location']['file'] and \
+       config['interp']['prediction_location']['file'] != 'None':
         #
         # FILE: Open the file and get the output points
         #
         do_grid = False
         in_sites = np.genfromtxt(
-                        config['grind']['prediction_location']['file'],
+                        config['interp']['prediction_location']['file'],
                         autostrip=True, unpack=True,
                         dtype=[np.float, np.float, np.float, '<U80'])
         lons, lats, vs30, idents = zip(*in_sites)
@@ -307,11 +307,11 @@ def grind(args):
         # GRID: Figure out the grid parameters and get output points
         #
         do_grid = True
-        smdx = config['grind']['prediction_location']['xres']
-        smdy = config['grind']['prediction_location']['yres']
+        smdx = config['interp']['prediction_location']['xres']
+        smdy = config['interp']['prediction_location']['yres']
 
-        if config['grind']['prediction_location']['extent']:
-           W, S, E, N = config['grind']['prediction_location']['extent']
+        if config['interp']['prediction_location']['extent']:
+           W, S, E, N = config['interp']['prediction_location']['extent']
         else:
            W, E, S, N = get_extent(rupture_obj)
 
@@ -908,16 +908,16 @@ def grind(args):
     info[pp] = {}
     info[pp][gmm] = {}
     info[pp][gmm]['gmpe'] = {}
-    info[pp][gmm]['gmpe']['module'] = str(config['grind']['gmpe'])
+    info[pp][gmm]['gmpe']['module'] = str(config['modeling']['gmpe'])
     info[pp][gmm]['gmpe']['reference'] = ''
     info[pp][gmm]['ipe'] = {}
-    info[pp][gmm]['ipe']['module'] = str(config['ipe_modules'][config['grind']['ipe']][0])
+    info[pp][gmm]['ipe']['module'] = str(config['ipe_modules'][config['modeling']['ipe']][0])
     info[pp][gmm]['ipe']['reference'] = ''
     info[pp][gmm]['gmice'] = {}
-    info[pp][gmm]['gmice']['module'] = str(config['gmice_modules'][config['grind']['gmice']][0])
+    info[pp][gmm]['gmice']['module'] = str(config['gmice_modules'][config['modeling']['gmice']][0])
     info[pp][gmm]['gmice']['reference'] = ''
     info[pp][gmm]['ccf'] = {}
-    info[pp][gmm]['ccf']['module'] = str(config['ccf_modules'][config['grind']['ccf']][0])
+    info[pp][gmm]['ccf']['module'] = str(config['ccf_modules'][config['modeling']['ccf']][0])
     info[pp][gmm]['ccf']['reference'] = ''
     info[pp][gmm]['basin_correction'] = {}
     info[pp][gmm]['basin_correction']['module'] = 'None'
@@ -938,7 +938,7 @@ def grind(args):
     info[pp][sv]['process_time'] = strftime("%Y-%m-%d %H:%M:%S%Z", gmtime())
     info[pp][sv]['map_version'] = ic.getHistory()['history'][-1][2]
     info[pp][sv]['map_data_history'] = ic.getHistory()['history']
-    info[pp][sv]['map_status'] = config['grind']['map_status']
+    info[pp][sv]['map_status'] = config['system']['map_status']
     info[pp][sr] = {}
     info[pp][sr]['vs30default'] = str(vs30default)
     info[pp][sr]['site_correction'] = 'GMPE native'
@@ -1031,7 +1031,7 @@ def grind(args):
     oc.close()
     if verbose: print('done')
     #------------------------------------------------------------------
-    # End grind()
+    # End interp()
     #------------------------------------------------------------------
 
 #%%
@@ -1047,6 +1047,6 @@ directory in the ShakeMap data directory of the current profile.
     parser.add_argument('-v','--verbose', action='store_true',
                         help='Print informational messages.')
     pargs = parser.parse_args()
-    grind(pargs)
+    interp(pargs)
 
 
