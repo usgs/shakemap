@@ -10,7 +10,7 @@ import datetime
 # third party imports
 from configobj import ConfigObj
 
-from shakelib.grind.container import InputContainer
+from shakelib.utils.container import InputContainer
 from shakemap.utils.config import get_config_paths, get_custom_validator,\
         config_error, check_config, get_configspec
 

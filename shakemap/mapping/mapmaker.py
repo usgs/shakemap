@@ -28,7 +28,7 @@ import pyproj
 
 # local imports
 from shakelib.utils.exception import ShakeLibException
-from shakelib.grind.gmice.wgrw12 import WGRW12
+from shakelib.gmice.wgrw12 import WGRW12
 
 
 CITY_COLS = 2

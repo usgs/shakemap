@@ -19,9 +19,9 @@ from mapio.basemapcity import BasemapCities
 from mapio.shake import ShakeGrid
 
 # local imports
-from shakelib.grind.station import StationList
-from shakelib.grind.rupture.quad_rupture import QuadRupture
-from shakelib.grind.rupture.origin import Origin
+from shakelib.station import StationList
+from shakelib.rupture.quad_rupture import QuadRupture
+from shakelib.rupture.origin import Origin
 
 
 def _test_intensity():
