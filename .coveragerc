@@ -1,2 +1,3 @@
 [run]
-omit = tests/*,*/_version.py,*/__init__.py,*/extern/*
+omit = tests/*, */_version.py, */__init__.py, */extern/*, versioneer.py, setup.py, makedocs.py
+#include = sm_assemble, sm_augment, sm_model, sm_profile, shakemap/*

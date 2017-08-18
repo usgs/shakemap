@@ -3,6 +3,8 @@
 # stdlib imports
 import os.path
 import sys
+import tempfile
+import shutil
 
 # third party
 
@@ -20,14 +22,14 @@ from mapio.shake import ShakeGrid
 
 # local imports
 from shakelib.station import StationList
-from shakelib.rupture.quad_rupture import QuadRupture
+from shakelib.rupture.factory import get_rupture
 from shakelib.rupture.origin import Origin
 
 
-def _test_intensity():
+def test_intensity(tmpdir):
 
     datadir = os.path.abspath(os.path.join(
-        homedir, '..', 'data', 'eventdata', 'northridge'))
+        homedir, 'mapmaker_data', 'northridge'))
     shakefile = os.path.join(datadir, 'northridge_grid.xml')
     topofile = os.path.join(datadir, 'northridge_topo.grd')
     rupturefile = os.path.join(datadir, 'northridge_fault.txt')
@@ -37,7 +39,8 @@ def _test_intensity():
     statefile = os.path.join(datadir, 'northridge_states.json')
     lakefile = os.path.join(datadir, 'northridge_lakes.json')
     oceanfile = os.path.join(datadir, 'northridge_ocean.json')
-    stationfile = os.path.join(datadir, 'northridge_stations.db')
+    stationfile = os.path.join(datadir, 'hist_dat.xml')
+    dyfifile = os.path.join(datadir, 'dyfi_dat.xml')
     roadfile = os.path.join(datadir, 'northridge_roads.json')
     tancptfile = os.path.join(shakedir, 'shakemap', 'mapping', 'tan.cpt')
     shakecptfile = os.path.join(
@@ -54,20 +57,21 @@ def _test_intensity():
     shakecolormap = ColorPalette.fromPreset('mmi')
     cities = BasemapCities.loadFromCSV(cityfile)
     shakemap = ShakeGrid.load(shakefile, adjust='res')
-    stations = StationList(stationfile)
-    rupture = QuadRupture.readRuptureFile(rupturefile)
+    stations = StationList.loadFromXML([stationfile, dyfifile])
     edict = shakemap.getEventDict()
     eventdict = {'lat': edict['lat'],
                  'lon': edict['lon'],
                  'depth': edict['depth'],
                  'mag': edict['magnitude'],
+                 'id': 'northridge',
                  'time': edict['event_timestamp']}
     origin = Origin(eventdict)
+    rupture = get_rupture(origin, rupturefile)
     maker = MapMaker(shakemap, topofile, stations,
                      rupture, layerdict, origin, cities)
 
     # draw intensity map
-    outfolder = os.path.expanduser('~')
+    outfolder = str(tmpdir)
     maker.setIntensityLayer('mmi')
     maker.setIntensityGMTColorMap(shakecolormap)
     intensity_map = maker.drawIntensityMap(outfolder)
@@ -102,4 +106,5 @@ def _test_intensity():
     print('PSA3.0 contour map saved as: %s' % contour_psa30_map)
 
 if __name__ == '__main__':
-    _test_intensity()
+    tmpdir = tempfile.TemporaryDirectory()
+    test_intensity(tmpdir.name)

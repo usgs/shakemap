@@ -20,7 +20,7 @@ from shapely.geometry import GeometryCollection
 from shapely.geometry import Polygon as sPolygon
 from shapely.geometry import shape as sShape
 from shapely.geometry import mapping
-#from mpl_toolkits.basemap import Basemap
+from mpl_toolkits.basemap import Basemap
 import numpy as np
 from descartes import PolygonPatch
 from scipy.ndimage import gaussian_filter
@@ -332,42 +332,48 @@ class MapMaker(object):
 
     def _drawStations(self, m, fill=False, imt='pga'):
         # get the locations and values of the MMI observations
-        mmidf = self.stations.getMMIStations()
+        mmidf = self.stations.getStationDataframe(0)
         # get the locations and values of the instrumented observations
-        instdf = self.stations.getInstrumentedStations()
-        dimt = imt + '_mmi'
+        instdf = self.stations.getStationDataframe(1)
+        if imt in ('mmi', 'pga', 'pgv'):
+            dimt = imt.upper()
+        else:
+            perstr = imt.replace('psa', '')
+            dimt = 'SA(' + perstr[0] + '.' + perstr[1] + ')'
         if not fill:
             # plot MMI as small circles
-            mmilat = mmidf['lat'].as_matrix()
-            mmilon = mmidf['lon'].as_matrix()
+            mmilat = mmidf['lat']
+            mmilon = mmidf['lon']
             m.plot(mmilon, mmilat, 'ko', latlon=True, fillstyle='none',
                    markersize=4, zorder=STATIONS_ZORDER)
 
             # plot MMI as slightly larger triangles
-            instlat = instdf['lat'].as_matrix()
-            instlon = instdf['lon'].as_matrix()
+            instlat = instdf['lat']
+            instlon = instdf['lon']
             m.plot(instlon, instlat, 'k^', latlon=True, fillstyle='none',
                    markersize=6, zorder=STATIONS_ZORDER)
         else:
-            for idx, row in mmidf.iterrows():
-                mlat = row['lat']
-                mlon = row['lon']
-                mmi = row['mmi']
+            for idx, value in enumerate(mmidf['lat']):
+                mlat = mmidf['lat'][idx]
+                mlon = mmidf['lon'][idx]
+                mmi = mmidf['MMI'][idx]
                 mcolor = self.intensity_colormap.getDataColor(mmi)
                 m.plot(mlon, mlat, 'o', latlon=True,
-                       markerfacecolor=mcolor, markeredgecolor='k', markersize=4, zorder=STATIONS_ZORDER)
+                       markerfacecolor=mcolor, markeredgecolor='k', 
+                       markersize=4, zorder=STATIONS_ZORDER)
 
-            for idx, row in instdf.iterrows():
-                mlat = row['lat']
-                mlon = row['lon']
-                dmmi = row[dimt]
+            for idx, value in enumerate(instdf['lat']):
+                mlat = instdf['lat'][idx]
+                mlon = instdf['lon'][idx]
+                dmmi = instdf[dimt][idx]
                 mcolor = self.intensity_colormap.getDataColor(dmmi)
                 m.plot(mlon, mlat, '^', latlon=True,
-                       markerfacecolor=mcolor, markeredgecolor='k', markersize=6, zorder=STATIONS_ZORDER)
+                       markerfacecolor=mcolor, markeredgecolor='k', 
+                       markersize=6, zorder=STATIONS_ZORDER)
 
     def _drawFault(self, m):
-        lats = self.fault.getLats()
-        lons = self.fault.getLons()
+        lats = self.fault.lats
+        lons = self.fault.lons
         x, y = m(lons, lats)
         m.plot(x, y, 'k', lw=2, zorder=FAULT_ZORDER)
 
@@ -378,7 +384,7 @@ class MapMaker(object):
         t0 = time.time()
         # resample shakemap to topogrid
         # get the geodict for the topo file
-        topodict = GMTGrid.getFileGeoDict(self.topofile)
+        topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
         # get the geodict for the ShakeMap
         smdict = self.shakemap.getGeoDict()
         # get a geodict that is aligned with topo, but inside shakemap
@@ -533,7 +539,7 @@ class MapMaker(object):
         t0 = time.time()
         # resample shakemap to topogrid
         # get the geodict for the topo file
-        topodict = GMTGrid.getFileGeoDict(self.topofile)
+        topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
         # get the geodict for the ShakeMap
         smdict = self.shakemap.getGeoDict()
         # get a geodict that is aligned with topo, but inside shakemap
