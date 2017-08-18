@@ -304,7 +304,8 @@ def test_model():
 
     products_dir = os.path.join(datapath, 'northridge_points', 'current', 
                             'products')
-    shutil.rmtree(products_dir)
+    if os.path.isdir(products_dir):
+        shutil.rmtree(products_dir)
     program = os.path.join(shakedir, 'sm_model')
     cp = subprocess.run([program, 'northridge_points', '-v'], shell=False)
     assert not cp.returncode
