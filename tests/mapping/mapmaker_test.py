@@ -26,7 +26,7 @@ from shakelib.rupture.factory import get_rupture
 from shakelib.rupture.origin import Origin
 
 
-def test_intensity(tmpdir):
+def ____test_intensity(tmpdir):
 
     datadir = os.path.abspath(os.path.join(
         homedir, 'mapmaker_data', 'northridge'))
@@ -107,4 +107,4 @@ def test_intensity(tmpdir):
 
 if __name__ == '__main__':
     tmpdir = tempfile.TemporaryDirectory()
-    test_intensity(tmpdir.name)
+    ____test_intensity(tmpdir.name)
