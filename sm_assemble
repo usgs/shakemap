@@ -83,7 +83,7 @@ def main(args):
         global_config['zone_info']['equations'] = {}
 
     results = global_config.validate(validator)
-    if not results or isinstance(results, dict):
+    if not isinstance(results, bool) or not results:
         config_error(global_config, results)
 
     check_config(global_config)
@@ -100,7 +100,6 @@ def main(args):
             print("vs30 file '%s' is not a valid file" % vs30file)
             sys.exit(1)
         global_config['data']['vs30file'] = vs30file
-
     #
     # If there is a prediction_location->file file, then we need
     # to expand any macros
@@ -128,7 +127,6 @@ def main(args):
     rupturefile = None
     if len(rupturefiles):
         rupturefile = rupturefiles[0]
-
     #
     # Sort out the version history. Get the most recent backup file and
     # extract the existing history. Then add a new line for this run.

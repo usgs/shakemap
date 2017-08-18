@@ -31,7 +31,7 @@ def check_config(config):
     if 'profiles' not in config:
         print('There are currently no profiles. Use "shakeprofile '
               '-c <profile>" to create one.')
-        sys.exit(0)
+        sys.exit(1)
 
 def make_dir(pathstr, default, accept):
     max_tries = 3
@@ -49,37 +49,18 @@ def make_dir(pathstr, default, accept):
             os.makedirs(ppath, exist_ok=True)
             make_ok = True
         except OSError as error:
-            msg = ('Cannot make install_folder %s.  Please try again (%i '
-                   'of % tries).')
-            print(msg % (ppath,ntries,max_tries))
+            msg = ('Cannot make install_folder %s.  Please try again (%d '
+                   'of %d tries).')
+            print(msg % (ppath, ntries, max_tries))
             ntries += 1
-        if ntries >= max_tries:
+        if ntries > max_tries:
             break
     return (ppath, make_ok)
     
-def create(configfile, profile, progname, accept):
-    data_path = get_data_path()
-    module_file = os.path.join(data_path,'modules.conf')
-    sets_file = os.path.join(data_path,'gmpe_sets.conf')
-    config_file = os.path.join(data_path,'model.conf')
-    data_file = os.path.join(data_path,'northridge_dat.xml')
-    event_file = os.path.join(data_path,'northridge_event.xml')
-    rupture_file = os.path.join(data_path,'northridge_fault.txt')
-    event_config_file = os.path.join(data_path,'northridge_model.conf')
-    vs30_file = os.path.join(data_path,'northridge_vs30.grd')
-    if not os.path.isfile(configfile):
-        config = ConfigObj(indent_type='  ')
-        config['profiles'] = {}
-    else:
-        config = ConfigObj(configfile)
+def create(config, profile, accept):
+    shakeconfig_data_path = get_data_path()
 
-    if 'profiles' in config and profile in config['profiles']:
-        msg = ('Profile %s already in %s.  Run %s -l to see available '
-               'profiles.')
-        print(msg % (profile,configfile,progname))
-        sys.exit(1)
-
-    profile_path = os.path.join(os.path.expanduser('~'),'ShakeMap',profile)
+    profile_path = os.path.join(os.path.expanduser('~'), 'ShakeMap', profile)
     default_install = os.path.join(profile_path,'install')
     default_data = os.path.join(profile_path,'data')
     print('You will be prompted to supply two directories for this '
@@ -97,7 +78,7 @@ def create(configfile, profile, progname, accept):
         print('Please try to find a path that can be created on this '
               'system and then try again.  Exiting.')
         sys.exit(1)
-    data_path,data_ok = make_dir('data path', default_data, accept)
+    new_data_path, data_ok = make_dir('data path', default_data, accept)
     if not data_ok:
         print('Please try to find a path that can be created on this '
               'system and then try again.  Exiting.')
@@ -106,32 +87,45 @@ def create(configfile, profile, progname, accept):
 
     # put the default config files in the install path
     config_path = os.path.join(install_path, 'config')
-    os.mkdir(config_path)
+    if not os.path.isdir(config_path):
+        os.mkdir(config_path)
 
-    shutil.copy(module_file, config_path)
-    shutil.copy(sets_file, config_path)
-    shutil.copy(config_file, config_path)
+    module_file = os.path.join(shakeconfig_data_path, 'modules.conf')
+    sets_file = os.path.join(shakeconfig_data_path, 'gmpe_sets.conf')
+    config_file = os.path.join(shakeconfig_data_path, 'model.conf')
+    if not os.path.isfile(os.path.join(config_path, 'modules.conf')):
+        shutil.copy(module_file, config_path)
+    if not os.path.isfile(os.path.join(config_path, 'gmpe_sets.conf')):
+        shutil.copy(sets_file, config_path)
+    if not os.path.isfile(os.path.join(config_path, 'model.conf')):
+        shutil.copy(config_file, config_path)
 
     if profile == 'default' or profile == 'test':
         # put northridge in the data directory
-        event_path = os.path.join(data_path, 'us19940117123055', 'current')
-        os.makedirs(event_path)
+        event_path = os.path.join(new_data_path, 'us19940117123055', 'current')
+        if not os.path.isdir(event_path):
+            os.makedirs(event_path)
 
-        # copy files over
-        data_event_file = os.path.join(event_path, 'event.xml')
-        data_config_file = os.path.join(event_path, 'model_zc.conf')
-        vs30_event_file = os.path.join(event_path, 'vs30.grd')
-        shutil.copy(data_file, event_path)
-        shutil.copyfile(event_file, data_event_file)
-        shutil.copy(rupture_file, event_path)
-        shutil.copyfile(event_config_file, data_config_file)
-        shutil.copyfile(vs30_file, vs30_event_file)
+            # copy files over
+            data_file = os.path.join(shakeconfig_data_path,'northridge_dat.xml')
+            event_file = os.path.join(shakeconfig_data_path,'northridge_event.xml')
+            rupture_file = os.path.join(shakeconfig_data_path,'northridge_fault.txt')
+            event_config_file = os.path.join(shakeconfig_data_path,'northridge_model.conf')
+            vs30_file = os.path.join(shakeconfig_data_path,'northridge_vs30.grd')
+            data_event_file = os.path.join(event_path, 'event.xml')
+            data_config_file = os.path.join(event_path, 'model_zc.conf')
+            vs30_event_file = os.path.join(event_path, 'vs30.grd')
+            shutil.copy(data_file, event_path)
+            shutil.copyfile(event_file, data_event_file)
+            shutil.copy(rupture_file, event_path)
+            shutil.copyfile(event_config_file, data_config_file)
+            shutil.copyfile(vs30_file, vs30_event_file)
         
     if 'profiles' not in config:
         config['profiles'] = {}
     config['profiles'][profile] = {'install_path': install_path, 
-                                   'data_path': data_path}
-    config.filename = configfile
+                                   'data_path': new_data_path}
+#    config.filename = configfile
     config['profile'] = profile
     config.write()
     sprofile = ShakeProfile(profile,config['profiles'][profile])
@@ -144,18 +138,22 @@ def main(pparser,args):
     configfile = os.path.join(configdir, 'profiles.conf')
     if not os.path.isfile(configfile):
         pathlib.Path(configfile).touch(exist_ok=True)
-    if not args.create and not os.path.isfile(configfile):
-        print('You must run %s -c to create a config file with at least '
-              'one profile in it.' % pparser.prog)
-        sys.exit(1)
         
+    config = ConfigObj(configfile)
+
     if args.create:
-        create(configfile, args.create, pparser.prog, args.accept)
+        profile = args.create
+        if 'profiles' in config and profile in config['profiles']:
+            msg = ('Profile %s already in %s.  Run %s -l to see available '
+                   'profiles.')
+            print(msg % (profile, configfile, pparser.prog))
+            sys.exit(1)
+        create(config, profile, args.accept)
         sys.exit(0)
         
+    check_config(config)
+
     if args.list:
-        config = ConfigObj(configfile)
-        check_config(config)
         profiles = config['profiles']
         current = config['profile']
         for profname,profdict in profiles.items():
@@ -168,13 +166,11 @@ def main(pparser,args):
         
     if args.switch:
         newprofile = args.switch
-        config = ConfigObj(configfile)
-        check_config(config)
         oldprofile = config['profile']
         if newprofile not in config['profiles']:
-            msg = ('Profile %s not in %s.  Run %(prog)s -l to see '
+            msg = ('Profile %s not in %s.  Run %s -l to see '
                    'available profiles.')
-            print(msg % (profile,configfile))
+            print(msg % (newprofile, configfile, pparser.prog))
             sys.exit(1)
         config['profile'] = newprofile
         config.filename = configfile
@@ -186,21 +182,20 @@ def main(pparser,args):
 
     if args.delete:
         profile = args.delete
-        config = ConfigObj(configfile)
-        check_config(config)
         if profile not in config['profiles']:
             msg = 'Profile %s not in %s.  Run %s -l to available profiles.'
-            print(msg % (profile,configfile,pparser.prog))
+            print(msg % (profile, configfile, pparser.prog))
             sys.exit(1)
 
         install_path = config['profiles'][profile]['install_path']
         data_path = config['profiles'][profile]['data_path']
         question = ('Are you sure you want to delete everything in:\n'
                     '%s\n--and--\n%s?\n' % (install_path, data_path))
-        if not query_yes_no(question, default='yes'):
+        if not args.accept and not query_yes_no(question, default='yes'):
             sys.exit(0)
-        shutil.rmtree(install_path, ignore_errors=True)
-        shutil.rmtree(data_path, ignore_errors=True)
+        if not args.preserve:
+            shutil.rmtree(install_path, ignore_errors=True)
+            shutil.rmtree(data_path, ignore_errors=True)
                 
         del config['profiles'][profile]
 
@@ -227,8 +222,6 @@ def main(pparser,args):
         print('The -a argument must be used in conjunction with -c.')
         sys.exit(1)
 
-    config = ConfigObj(configfile)
-    check_config(config)
     profile = config['profile']
     profiles = config['profiles']
     if profile not in profiles:
@@ -258,7 +251,10 @@ differently, if desired.
     parser.add_argument('-d','--delete', metavar='PROFILE',
                         help='Delete existing profile PROFILE.')
     parser.add_argument('-a','--accept', action='store_true',
-                        help='Accept the defaults when creating a profile.')
+                        help='Accept the defaults when creating or '\
+                             'deleting a profile.')
+    parser.add_argument('-p','--preserve', action='store_true',
+                        help='Preserve data when deleting a profile')
     pargs = parser.parse_args()
     main(parser,pargs)
     

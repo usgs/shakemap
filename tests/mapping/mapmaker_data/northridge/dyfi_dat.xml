@@ -1,0 +1,3338 @@
+<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
+<!DOCTYPE stationlist [
+<!ELEMENT stationlist (station+)>
+<!ATTLIST stationlist
+  created	CDATA	#REQUIRED
+>
+
+<!ELEMENT station (comp+)>
+<!ATTLIST station
+  code		CDATA 			#REQUIRED
+  name		CDATA 			#REQUIRED
+  insttype	CDATA 			#REQUIRED
+  lat		CDATA 			#REQUIRED
+  lon		CDATA 			#REQUIRED
+  source	(SCSN|CGS|NSMP) 	'SCSN'
+  netid		CDATA			#REQUIRED
+  commtype	(DIG|ANA) 		'DIG'
+  dist          CDATA                   '10.0'
+  loc		CDATA			''
+>
+
+<!ELEMENT comp (acc,vel,psa*)>
+<!ATTLIST comp
+  name          CDATA  #REQUIRED
+  originalname  CDATA  #IMPLIED
+>
+
+<!ELEMENT acc EMPTY>
+<!ELEMENT vel EMPTY>
+<!ELEMENT psa03 EMPTY>
+<!ELEMENT psa10 EMPTY>
+<!ELEMENT psa30 EMPTY>
+<!ATTLIST acc
+  value  CDATA         #REQUIRED
+  flag   CDATA        ''
+>
+<!ATTLIST vel
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa03
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa10
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa30
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+]>
+<stationlist created="1224096519">
+<station code="91042" name="ZIP Code 91042 (Intensity VII, 38 responses)" insttype="USGS (Did You Feel It?)" lat="34.282604" lon="-118.237943" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.4">
+<comp name="Intensity Questionnaire">
+<acc value="30.4608" />
+<vel value="28.5319" />
+</comp>
+</station>
+<station code="92584" name="ZIP Code 92584 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.657910" lon="-117.178161" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.6">
+<comp name="Intensity Questionnaire">
+<acc value="2.7893" />
+<vel value="2.2921" />
+</comp>
+</station>
+<station code="90302" name="ZIP Code 90302 (Intensity VII, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.974611" lon="-118.35517" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="92122" name="ZIP Code 92122 (Intensity IV, 23 responses)" insttype="USGS (Did You Feel It?)" lat="32.856662" lon="-117.210068" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.1">
+<comp name="Intensity Questionnaire">
+<acc value="3.8203" />
+<vel value="3.1939" />
+</comp>
+</station>
+<station code="91350" name="ZIP Code 91350 (Intensity VIII, 72 responses)" insttype="USGS (Did You Feel It?)" lat="34.424976" lon="-118.515374" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.8">
+<comp name="Intensity Questionnaire">
+<acc value="39.1769" />
+<vel value="37.2053" />
+</comp>
+</station>
+<station code="92057" name="ZIP Code 92057 (Intensity IV, 6 responses)" insttype="USGS (Did You Feel It?)" lat="33.252223" lon="-117.290161" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.4">
+<comp name="Intensity Questionnaire">
+<acc value="4.6139" />
+<vel value="3.8974" />
+</comp>
+</station>
+<station code="92019" name="ZIP Code 92019 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="32.780333" lon="-116.879818" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.5">
+<comp name="Intensity Questionnaire">
+<acc value="2.6192" />
+<vel value="2.1449" />
+</comp>
+</station>
+<station code="92101" name="ZIP Code 92101 (Intensity IV, 10 responses)" insttype="USGS (Did You Feel It?)" lat="32.723295" lon="-117.16933" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.2">
+<comp name="Intensity Questionnaire">
+<acc value="4.0684" />
+<vel value="3.4130" />
+</comp>
+</station>
+<station code="90008" name="ZIP Code 90008 (Intensity VIII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.009030" lon="-118.348145" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.6">
+<comp name="Intensity Questionnaire">
+<acc value="34.5450" />
+<vel value="32.5813" />
+</comp>
+</station>
+<station code="92103" name="ZIP Code 92103 (Intensity V, 16 responses)" insttype="USGS (Did You Feel It?)" lat="32.747328" lon="-117.166835" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="92243" name="ZIP Code 92243 (Intensity III, 4 responses)" insttype="USGS (Did You Feel It?)" lat="32.774777" lon="-115.598948" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.0">
+<comp name="Intensity Questionnaire">
+<acc value="1.9123" />
+<vel value="1.5393" />
+</comp>
+</station>
+<station code="93013" name="ZIP Code 93013 (Intensity VI, 11 responses)" insttype="USGS (Did You Feel It?)" lat="34.414751" lon="-119.515492" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="91910" name="ZIP Code 91910 (Intensity IV, 14 responses)" insttype="USGS (Did You Feel It?)" lat="32.637922" lon="-117.055419" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.3">
+<comp name="Intensity Questionnaire">
+<acc value="4.3326" />
+<vel value="3.6472" />
+</comp>
+</station>
+<station code="90066" name="ZIP Code 90066 (Intensity VII, 76 responses)" insttype="USGS (Did You Feel It?)" lat="33.999244" lon="-118.429728" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.3">
+<comp name="Intensity Questionnaire">
+<acc value="28.6035" />
+<vel value="26.7001" />
+</comp>
+</station>
+<station code="91302" name="ZIP Code 91302 (Intensity VIII, 35 responses)" insttype="USGS (Did You Feel It?)" lat="34.123996" lon="-118.672365" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.8">
+<comp name="Intensity Questionnaire">
+<acc value="39.1769" />
+<vel value="37.2053" />
+</comp>
+</station>
+<station code="91606" name="ZIP Code 91606 (Intensity VIII, 42 responses)" insttype="USGS (Did You Feel It?)" lat="34.186831" lon="-118.389004" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.7">
+<comp name="Intensity Questionnaire">
+<acc value="36.7882" />
+<vel value="34.8166" />
+</comp>
+</station>
+<station code="91360" name="ZIP Code 91360 (Intensity VII, 83 responses)" insttype="USGS (Did You Feel It?)" lat="34.214054" lon="-118.880805" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="90272" name="ZIP Code 90272 (Intensity VII, 30 responses)" insttype="USGS (Did You Feel It?)" lat="34.079765" lon="-118.544388" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="91205" name="ZIP Code 91205 (Intensity VII, 17 responses)" insttype="USGS (Did You Feel It?)" lat="34.136614" lon="-118.243507" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="90650" name="ZIP Code 90650 (Intensity VI, 20 responses)" insttype="USGS (Did You Feel It?)" lat="33.906961" lon="-118.082812" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="92807" name="ZIP Code 92807 (Intensity VI, 20 responses)" insttype="USGS (Did You Feel It?)" lat="33.849130" lon="-117.788484" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="90260" name="ZIP Code 90260 (Intensity VI, 9 responses)" insttype="USGS (Did You Feel It?)" lat="33.889224" lon="-118.35291" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="91107" name="ZIP Code 91107 (Intensity VI, 86 responses)" insttype="USGS (Did You Feel It?)" lat="34.158928" lon="-118.087257" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="92648" name="ZIP Code 92648 (Intensity VI, 26 responses)" insttype="USGS (Did You Feel It?)" lat="33.682443" lon="-118.012724" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="92649" name="ZIP Code 92649 (Intensity VI, 22 responses)" insttype="USGS (Did You Feel It?)" lat="33.721145" lon="-118.044453" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="92504" name="ZIP Code 92504 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.906878" lon="-117.398719" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="90732" name="ZIP Code 90732 (Intensity VII, 17 responses)" insttype="USGS (Did You Feel It?)" lat="33.733678" lon="-118.313017" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.5">
+<comp name="Intensity Questionnaire">
+<acc value="17.2918" />
+<vel value="15.7024" />
+</comp>
+</station>
+<station code="92673" name="ZIP Code 92673 (Intensity VI, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.465010" lon="-117.612945" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="93003" name="ZIP Code 93003 (Intensity VI, 61 responses)" insttype="USGS (Did You Feel It?)" lat="34.278967" lon="-119.218586" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="91202" name="ZIP Code 91202 (Intensity VII, 24 responses)" insttype="USGS (Did You Feel It?)" lat="34.168289" lon="-118.267874" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="92868" name="ZIP Code 92868 (Intensity VI, 9 responses)" insttype="USGS (Did You Feel It?)" lat="33.787770" lon="-117.876462" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="95064" name="ZIP Code 95064 (Intensity IV, 3 responses)" insttype="USGS (Did You Feel It?)" lat="37.000057" lon="-122.062214" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.0">
+<comp name="Intensity Questionnaire">
+<acc value="3.5874" />
+<vel value="2.9889" />
+</comp>
+</station>
+<station code="90038" name="ZIP Code 90038 (Intensity VIII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.088973" lon="-118.32666" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.9">
+<comp name="Intensity Questionnaire">
+<acc value="41.7208" />
+<vel value="39.7579" />
+</comp>
+</station>
+<station code="89120" name="ZIP Code 89120 (Intensity IV, 3 responses)" insttype="USGS (Did You Feel It?)" lat="36.081493" lon="-115.095768" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.9">
+<comp name="Intensity Questionnaire">
+<acc value="3.3687" />
+<vel value="2.7970" />
+</comp>
+</station>
+<station code="90806" name="ZIP Code 90806 (Intensity VII, 6 responses)" insttype="USGS (Did You Feel It?)" lat="33.804549" lon="-118.193697" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.1">
+<comp name="Intensity Questionnaire">
+<acc value="25.2217" />
+<vel value="23.3817" />
+</comp>
+</station>
+<station code="90621" name="ZIP Code 90621 (Intensity VI, 12 responses)" insttype="USGS (Did You Feel It?)" lat="33.874951" lon="-117.99325" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="92262" name="ZIP Code 92262 (Intensity V, 10 responses)" insttype="USGS (Did You Feel It?)" lat="33.862530" lon="-116.568348" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="91801" name="ZIP Code 91801 (Intensity VII, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.090557" lon="-118.128163" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.9">
+<comp name="Intensity Questionnaire">
+<acc value="22.2397" />
+<vel value="20.4757" />
+</comp>
+</station>
+<station code="92220" name="ZIP Code 92220 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.941408" lon="-116.85235" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.2">
+<comp name="Intensity Questionnaire">
+<acc value="4.0684" />
+<vel value="3.4130" />
+</comp>
+</station>
+<station code="93405" name="ZIP Code 93405 (Intensity V, 5 responses)" insttype="USGS (Did You Feel It?)" lat="35.278444" lon="-120.781032" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="93108" name="ZIP Code 93108 (Intensity V, 10 responses)" insttype="USGS (Did You Feel It?)" lat="34.453860" lon="-119.544237" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="93304" name="ZIP Code 93304 (Intensity IV, 16 responses)" insttype="USGS (Did You Feel It?)" lat="35.339342" lon="-119.023666" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.4">
+<comp name="Intensity Questionnaire">
+<acc value="4.6139" />
+<vel value="3.8974" />
+</comp>
+</station>
+<station code="92567" name="ZIP Code 92567 (Intensity VI, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.810151" lon="-117.100581" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="91006" name="ZIP Code 91006 (Intensity VI, 21 responses)" insttype="USGS (Did You Feel It?)" lat="34.135879" lon="-118.02738" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="91792" name="ZIP Code 91792 (Intensity VI, 3 responses)" insttype="USGS (Did You Feel It?)" lat="34.025495" lon="-117.900062" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="92405" name="ZIP Code 92405 (Intensity VI, 6 responses)" insttype="USGS (Did You Feel It?)" lat="34.146147" lon="-117.304" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="90740" name="ZIP Code 90740 (Intensity VI, 15 responses)" insttype="USGS (Did You Feel It?)" lat="33.754539" lon="-118.07127" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="90045" name="ZIP Code 90045 (Intensity VII, 48 responses)" insttype="USGS (Did You Feel It?)" lat="33.953047" lon="-118.401481" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="93243" name="ZIP Code 93243 (Intensity V, 6 responses)" insttype="USGS (Did You Feel It?)" lat="34.706614" lon="-118.885192" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="92307" name="ZIP Code 92307 (Intensity V, 9 responses)" insttype="USGS (Did You Feel It?)" lat="34.592432" lon="-117.131185" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="91345" name="ZIP Code 91345 (Intensity IX, 19 responses)" insttype="USGS (Did You Feel It?)" lat="34.266453" lon="-118.460354" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.6">
+<comp name="Intensity Questionnaire">
+<acc value="64.8052" />
+<vel value="63.2634" />
+</comp>
+</station>
+<station code="93063" name="ZIP Code 93063 (Intensity IX, 143 responses)" insttype="USGS (Did You Feel It?)" lat="34.288237" lon="-118.688935" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.6">
+<comp name="Intensity Questionnaire">
+<acc value="64.8052" />
+<vel value="63.2634" />
+</comp>
+</station>
+<station code="91745" name="ZIP Code 91745 (Intensity VI, 25 responses)" insttype="USGS (Did You Feel It?)" lat="34.000621" lon="-117.975849" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="92604" name="ZIP Code 92604 (Intensity V, 17 responses)" insttype="USGS (Did You Feel It?)" lat="33.688102" lon="-117.788567" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="90814" name="ZIP Code 90814 (Intensity VI, 20 responses)" insttype="USGS (Did You Feel It?)" lat="33.771699" lon="-118.144049" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="92861" name="ZIP Code 92861 (Intensity VI, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.817341" lon="-117.810148" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="92130" name="ZIP Code 92130 (Intensity V, 6 responses)" insttype="USGS (Did You Feel It?)" lat="32.953944" lon="-117.201406" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="92571" name="ZIP Code 92571 (Intensity VI, 5 responses)" insttype="USGS (Did You Feel It?)" lat="33.834610" lon="-117.18995" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="91340" name="ZIP Code 91340 (Intensity VIII, 6 responses)" insttype="USGS (Did You Feel It?)" lat="34.287043" lon="-118.434841" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.3">
+<comp name="Intensity Questionnaire">
+<acc value="53.6590" />
+<vel value="51.8439" />
+</comp>
+</station>
+<station code="90031" name="ZIP Code 90031 (Intensity VII, 9 responses)" insttype="USGS (Did You Feel It?)" lat="34.079627" lon="-118.211363" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="93534" name="ZIP Code 93534 (Intensity VI, 32 responses)" insttype="USGS (Did You Feel It?)" lat="34.720258" lon="-118.148503" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="91301" name="ZIP Code 91301 (Intensity VII, 53 responses)" insttype="USGS (Did You Feel It?)" lat="34.136492" lon="-118.756362" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.4">
+<comp name="Intensity Questionnaire">
+<acc value="30.4608" />
+<vel value="28.5319" />
+</comp>
+</station>
+<station code="91762" name="ZIP Code 91762 (Intensity VI, 9 responses)" insttype="USGS (Did You Feel It?)" lat="34.056865" lon="-117.667627" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="93268" name="ZIP Code 93268 (Intensity V, 4 responses)" insttype="USGS (Did You Feel It?)" lat="35.169943" lon="-119.424332" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.7">
+<comp name="Intensity Questionnaire">
+<acc value="5.5723" />
+<vel value="4.7559" />
+</comp>
+</station>
+<station code="92123" name="ZIP Code 92123 (Intensity V, 8 responses)" insttype="USGS (Did You Feel It?)" lat="32.805908" lon="-117.135159" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="91776" name="ZIP Code 91776 (Intensity VII, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.089723" lon="-118.095535" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="93012" name="ZIP Code 93012 (Intensity VII, 48 responses)" insttype="USGS (Did You Feel It?)" lat="34.205749" lon="-118.992762" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.9">
+<comp name="Intensity Questionnaire">
+<acc value="22.2397" />
+<vel value="20.4757" />
+</comp>
+</station>
+<station code="93110" name="ZIP Code 93110 (Intensity VI, 15 responses)" insttype="USGS (Did You Feel It?)" lat="34.435052" lon="-119.768968" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="93444" name="ZIP Code 93444 (Intensity V, 4 responses)" insttype="USGS (Did You Feel It?)" lat="35.027647" lon="-120.49714" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.8">
+<comp name="Intensity Questionnaire">
+<acc value="5.9341" />
+<vel value="5.0822" />
+</comp>
+</station>
+<station code="92240" name="ZIP Code 92240 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.962758" lon="-116.529621" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.6">
+<comp name="Intensity Questionnaire">
+<acc value="2.7893" />
+<vel value="2.2921" />
+</comp>
+</station>
+<station code="89109" name="ZIP Code 89109 (Intensity IV, 12 responses)" insttype="USGS (Did You Feel It?)" lat="36.125968" lon="-115.153324" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.9">
+<comp name="Intensity Questionnaire">
+<acc value="3.3687" />
+<vel value="2.7970" />
+</comp>
+</station>
+<station code="91780" name="ZIP Code 91780 (Intensity VI, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.101689" lon="-118.055676" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="90670" name="ZIP Code 90670 (Intensity VII, 5 responses)" insttype="USGS (Did You Feel It?)" lat="33.932182" lon="-118.062376" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.7">
+<comp name="Intensity Questionnaire">
+<acc value="19.6103" />
+<vel value="17.9309" />
+</comp>
+</station>
+<station code="90011" name="ZIP Code 90011 (Intensity VIII, 6 responses)" insttype="USGS (Did You Feel It?)" lat="34.007530" lon="-118.258744" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.7">
+<comp name="Intensity Questionnaire">
+<acc value="36.7882" />
+<vel value="34.8166" />
+</comp>
+</station>
+<station code="92555" name="ZIP Code 92555 (Intensity V, 5 responses)" insttype="USGS (Did You Feel It?)" lat="33.905446" lon="-117.125722" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="91505" name="ZIP Code 91505 (Intensity VIII, 54 responses)" insttype="USGS (Did You Feel It?)" lat="34.177031" lon="-118.347892" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.9">
+<comp name="Intensity Questionnaire">
+<acc value="41.7208" />
+<vel value="39.7579" />
+</comp>
+</station>
+<station code="92782" name="ZIP Code 92782 (Intensity VI, 6 responses)" insttype="USGS (Did You Feel It?)" lat="33.726158" lon="-117.800197" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="92397" name="ZIP Code 92397 (Intensity VI, 9 responses)" insttype="USGS (Did You Feel It?)" lat="34.348403" lon="-117.587544" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="91361" name="ZIP Code 91361 (Intensity VII, 26 responses)" insttype="USGS (Did You Feel It?)" lat="34.146009" lon="-118.878224" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.1">
+<comp name="Intensity Questionnaire">
+<acc value="25.2217" />
+<vel value="23.3817" />
+</comp>
+</station>
+<station code="90028" name="ZIP Code 90028 (Intensity VIII, 25 responses)" insttype="USGS (Did You Feel It?)" lat="34.099780" lon="-118.32672" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.0">
+<comp name="Intensity Questionnaire">
+<acc value="44.4299" />
+<vel value="42.4856" />
+</comp>
+</station>
+<station code="91709" name="ZIP Code 91709 (Intensity VI, 23 responses)" insttype="USGS (Did You Feel It?)" lat="33.950662" lon="-117.725696" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="91011" name="ZIP Code 91011 (Intensity VII, 22 responses)" insttype="USGS (Did You Feel It?)" lat="34.224757" lon="-118.111466" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.5">
+<comp name="Intensity Questionnaire">
+<acc value="17.2918" />
+<vel value="15.7024" />
+</comp>
+</station>
+<station code="92530" name="ZIP Code 92530 (Intensity VI, 12 responses)" insttype="USGS (Did You Feel It?)" lat="33.607297" lon="-117.395824" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="91932" name="ZIP Code 91932 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="32.579303" lon="-117.117645" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="90277" name="ZIP Code 90277 (Intensity VII, 44 responses)" insttype="USGS (Did You Feel It?)" lat="33.830443" lon="-118.384023" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.5">
+<comp name="Intensity Questionnaire">
+<acc value="17.2918" />
+<vel value="15.7024" />
+</comp>
+</station>
+<station code="91204" name="ZIP Code 91204 (Intensity VII, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.136193" lon="-118.260561" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="93427" name="ZIP Code 93427 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="34.673124" lon="-120.223911" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="92806" name="ZIP Code 92806 (Intensity VI, 17 responses)" insttype="USGS (Did You Feel It?)" lat="33.838237" lon="-117.870124" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="90249" name="ZIP Code 90249 (Intensity VI, 11 responses)" insttype="USGS (Did You Feel It?)" lat="33.901471" lon="-118.317202" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="93535" name="ZIP Code 93535 (Intensity VI, 35 responses)" insttype="USGS (Did You Feel It?)" lat="34.733696" lon="-117.893867" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="92701" name="ZIP Code 92701 (Intensity VI, 7 responses)" insttype="USGS (Did You Feel It?)" lat="33.748360" lon="-117.858722" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="92835" name="ZIP Code 92835 (Intensity VI, 19 responses)" insttype="USGS (Did You Feel It?)" lat="33.902090" lon="-117.9153" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="91770" name="ZIP Code 91770 (Intensity VII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.064389" lon="-118.083728" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.5">
+<comp name="Intensity Questionnaire">
+<acc value="17.2918" />
+<vel value="15.7024" />
+</comp>
+</station>
+<station code="92869" name="ZIP Code 92869 (Intensity V, 16 responses)" insttype="USGS (Did You Feel It?)" lat="33.798953" lon="-117.785872" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="91764" name="ZIP Code 91764 (Intensity VI, 17 responses)" insttype="USGS (Did You Feel It?)" lat="34.075190" lon="-117.60261" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="92592" name="ZIP Code 92592 (Intensity V, 11 responses)" insttype="USGS (Did You Feel It?)" lat="33.507151" lon="-117.013029" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="90064" name="ZIP Code 90064 (Intensity VIII, 54 responses)" insttype="USGS (Did You Feel It?)" lat="34.037215" lon="-118.424229" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.1">
+<comp name="Intensity Questionnaire">
+<acc value="47.3149" />
+<vel value="45.4005" />
+</comp>
+</station>
+<station code="90201" name="ZIP Code 90201 (Intensity VII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="33.970682" lon="-118.170628" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="90631" name="ZIP Code 90631 (Intensity VI, 28 responses)" insttype="USGS (Did You Feel It?)" lat="33.941921" lon="-117.951357" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="93550" name="ZIP Code 93550 (Intensity VI, 44 responses)" insttype="USGS (Did You Feel It?)" lat="34.500567" lon="-118.07035" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="90017" name="ZIP Code 90017 (Intensity VII, 3 responses)" insttype="USGS (Did You Feel It?)" lat="34.053076" lon="-118.264674" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.3">
+<comp name="Intensity Questionnaire">
+<acc value="28.6035" />
+<vel value="26.7001" />
+</comp>
+</station>
+<station code="93516" name="ZIP Code 93516 (Intensity VI, 6 responses)" insttype="USGS (Did You Feel It?)" lat="35.012251" lon="-117.666047" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="93510" name="ZIP Code 93510 (Intensity VI, 11 responses)" insttype="USGS (Did You Feel It?)" lat="34.472744" lon="-118.213473" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="92647" name="ZIP Code 92647 (Intensity VI, 30 responses)" insttype="USGS (Did You Feel It?)" lat="33.723632" lon="-118.00665" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="92007" name="ZIP Code 92007 (Intensity IV, 5 responses)" insttype="USGS (Did You Feel It?)" lat="33.019058" lon="-117.269376" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.9">
+<comp name="Intensity Questionnaire">
+<acc value="3.3687" />
+<vel value="2.7970" />
+</comp>
+</station>
+<station code="91761" name="ZIP Code 91761 (Intensity VII, 11 responses)" insttype="USGS (Did You Feel It?)" lat="34.035310" lon="-117.592106" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="91411" name="ZIP Code 91411 (Intensity VIII, 28 responses)" insttype="USGS (Did You Feel It?)" lat="34.177786" lon="-118.459084" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.1">
+<comp name="Intensity Questionnaire">
+<acc value="47.3149" />
+<vel value="45.4005" />
+</comp>
+</station>
+<station code="92139" name="ZIP Code 92139 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="32.679910" lon="-117.048908" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="91744" name="ZIP Code 91744 (Intensity VII, 15 responses)" insttype="USGS (Did You Feel It?)" lat="34.029050" lon="-117.937321" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.7">
+<comp name="Intensity Questionnaire">
+<acc value="19.6103" />
+<vel value="17.9309" />
+</comp>
+</station>
+<station code="91724" name="ZIP Code 91724 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="34.081108" lon="-117.855028" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="92313" name="ZIP Code 92313 (Intensity V, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.030993" lon="-117.312807" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="92373" name="ZIP Code 92373 (Intensity VI, 23 responses)" insttype="USGS (Did You Feel It?)" lat="34.001314" lon="-117.152026" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92354" name="ZIP Code 92354 (Intensity VI, 7 responses)" insttype="USGS (Did You Feel It?)" lat="34.049863" lon="-117.251875" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92026" name="ZIP Code 92026 (Intensity V, 9 responses)" insttype="USGS (Did You Feel It?)" lat="33.214235" lon="-117.113667" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.7">
+<comp name="Intensity Questionnaire">
+<acc value="5.5723" />
+<vel value="4.7559" />
+</comp>
+</station>
+<station code="91711" name="ZIP Code 91711 (Intensity V, 55 responses)" insttype="USGS (Did You Feel It?)" lat="34.126706" lon="-117.715551" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="90638" name="ZIP Code 90638 (Intensity VI, 13 responses)" insttype="USGS (Did You Feel It?)" lat="33.902426" lon="-118.00907" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="90815" name="ZIP Code 90815 (Intensity VI, 30 responses)" insttype="USGS (Did You Feel It?)" lat="33.796238" lon="-118.11596" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="93307" name="ZIP Code 93307 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="35.234389" lon="-118.915489" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.8">
+<comp name="Intensity Questionnaire">
+<acc value="3.1633" />
+<vel value="2.6174" />
+</comp>
+</station>
+<station code="92570" name="ZIP Code 92570 (Intensity V, 12 responses)" insttype="USGS (Did You Feel It?)" lat="33.784507" lon="-117.320838" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="92335" name="ZIP Code 92335 (Intensity VI, 19 responses)" insttype="USGS (Did You Feel It?)" lat="34.086953" lon="-117.466355" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="93561" name="ZIP Code 93561 (Intensity V, 11 responses)" insttype="USGS (Did You Feel It?)" lat="35.154190" lon="-118.503555" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="90046" name="ZIP Code 90046 (Intensity VII, 72 responses)" insttype="USGS (Did You Feel It?)" lat="34.107228" lon="-118.364759" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.4">
+<comp name="Intensity Questionnaire">
+<acc value="30.4608" />
+<vel value="28.5319" />
+</comp>
+</station>
+<station code="93285" name="ZIP Code 93285 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="35.634301" lon="-118.590254" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.7">
+<comp name="Intensity Questionnaire">
+<acc value="2.9704" />
+<vel value="2.4493" />
+</comp>
+</station>
+<station code="91352" name="ZIP Code 91352 (Intensity VII, 25 responses)" insttype="USGS (Did You Feel It?)" lat="34.230222" lon="-118.354287" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="92345" name="ZIP Code 92345 (Intensity VI, 20 responses)" insttype="USGS (Did You Feel It?)" lat="34.387365" lon="-117.339958" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="93532" name="ZIP Code 93532 (Intensity V, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.685663" lon="-118.565974" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="90402" name="ZIP Code 90402 (Intensity VIII, 28 responses)" insttype="USGS (Did You Feel It?)" lat="34.035043" lon="-118.503426" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.2">
+<comp name="Intensity Questionnaire">
+<acc value="50.3872" />
+<vel value="48.5153" />
+</comp>
+</station>
+<station code="93065" name="ZIP Code 93065 (Intensity VIII, 168 responses)" insttype="USGS (Did You Feel It?)" lat="34.283639" lon="-118.76925" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.1">
+<comp name="Intensity Questionnaire">
+<acc value="47.3149" />
+<vel value="45.4005" />
+</comp>
+</station>
+<station code="92582" name="ZIP Code 92582 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.809313" lon="-117.012751" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.8">
+<comp name="Intensity Questionnaire">
+<acc value="5.9341" />
+<vel value="5.0822" />
+</comp>
+</station>
+<station code="91722" name="ZIP Code 91722 (Intensity VI, 12 responses)" insttype="USGS (Did You Feel It?)" lat="34.097248" lon="-117.905797" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="92832" name="ZIP Code 92832 (Intensity VI, 12 responses)" insttype="USGS (Did You Feel It?)" lat="33.868438" lon="-117.929187" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="92118" name="ZIP Code 92118 (Intensity V, 9 responses)" insttype="USGS (Did You Feel It?)" lat="32.672123" lon="-117.167858" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.5">
+<comp name="Intensity Questionnaire">
+<acc value="4.9135" />
+<vel value="4.1648" />
+</comp>
+</station>
+<station code="92708" name="ZIP Code 92708 (Intensity VI, 21 responses)" insttype="USGS (Did You Feel It?)" lat="33.710355" lon="-117.951465" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="91763" name="ZIP Code 91763 (Intensity VI, 9 responses)" insttype="USGS (Did You Feel It?)" lat="34.072196" lon="-117.698388" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="92128" name="ZIP Code 92128 (Intensity V, 15 responses)" insttype="USGS (Did You Feel It?)" lat="32.996549" lon="-117.072804" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.5">
+<comp name="Intensity Questionnaire">
+<acc value="4.9135" />
+<vel value="4.1648" />
+</comp>
+</station>
+<station code="90731" name="ZIP Code 90731 (Intensity VI, 25 responses)" insttype="USGS (Did You Feel It?)" lat="33.739424" lon="-118.291034" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="90063" name="ZIP Code 90063 (Intensity VII, 9 responses)" insttype="USGS (Did You Feel It?)" lat="34.044185" lon="-118.185374" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="91010" name="ZIP Code 91010 (Intensity VI, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.147075" lon="-117.958598" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="90032" name="ZIP Code 90032 (Intensity VI, 7 responses)" insttype="USGS (Did You Feel It?)" lat="34.080938" lon="-118.178028" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="90039" name="ZIP Code 90039 (Intensity VII, 18 responses)" insttype="USGS (Did You Feel It?)" lat="34.112386" lon="-118.261242" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="92627" name="ZIP Code 92627 (Intensity VI, 26 responses)" insttype="USGS (Did You Feel It?)" lat="33.648212" lon="-117.920362" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="92301" name="ZIP Code 92301 (Intensity VI, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.668420" lon="-117.529532" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92841" name="ZIP Code 92841 (Intensity VI, 7 responses)" insttype="USGS (Did You Feel It?)" lat="33.787139" lon="-117.981622" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="91739" name="ZIP Code 91739 (Intensity VI, 7 responses)" insttype="USGS (Did You Feel It?)" lat="34.135290" lon="-117.525567" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="90069" name="ZIP Code 90069 (Intensity VIII, 30 responses)" insttype="USGS (Did You Feel It?)" lat="34.094291" lon="-118.381502" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.5">
+<comp name="Intensity Questionnaire">
+<acc value="32.4387" />
+<vel value="30.4895" />
+</comp>
+</station>
+<station code="90002" name="ZIP Code 90002 (Intensity VII, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.949088" lon="-118.247031" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="91344" name="ZIP Code 91344 (Intensity IX, 128 responses)" insttype="USGS (Did You Feel It?)" lat="34.291474" lon="-118.506079" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.7">
+<comp name="Intensity Questionnaire">
+<acc value="69.0132" />
+<vel value="67.6038" />
+</comp>
+</station>
+<station code="90720" name="ZIP Code 90720 (Intensity VI, 20 responses)" insttype="USGS (Did You Feel It?)" lat="33.795589" lon="-118.063774" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="91406" name="ZIP Code 91406 (Intensity VIII, 74 responses)" insttype="USGS (Did You Feel It?)" lat="34.198799" lon="-118.489647" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.2">
+<comp name="Intensity Questionnaire">
+<acc value="50.3872" />
+<vel value="48.5153" />
+</comp>
+</station>
+<station code="92801" name="ZIP Code 92801 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.844887" lon="-117.951769" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="92106" name="ZIP Code 92106 (Intensity V, 6 responses)" insttype="USGS (Did You Feel It?)" lat="32.714255" lon="-117.245332" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.8">
+<comp name="Intensity Questionnaire">
+<acc value="5.9341" />
+<vel value="5.0822" />
+</comp>
+</station>
+<station code="90640" name="ZIP Code 90640 (Intensity VII, 15 responses)" insttype="USGS (Did You Feel It?)" lat="34.014671" lon="-118.110889" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="91605" name="ZIP Code 91605 (Intensity VIII, 29 responses)" insttype="USGS (Did You Feel It?)" lat="34.206714" lon="-118.401101" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.6">
+<comp name="Intensity Questionnaire">
+<acc value="34.5450" />
+<vel value="32.5813" />
+</comp>
+</station>
+<station code="90805" name="ZIP Code 90805 (Intensity VII, 21 responses)" insttype="USGS (Did You Feel It?)" lat="33.864819" lon="-118.18079" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.5">
+<comp name="Intensity Questionnaire">
+<acc value="17.2918" />
+<vel value="15.7024" />
+</comp>
+</station>
+<station code="90018" name="ZIP Code 90018 (Intensity VII, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.028047" lon="-118.317713" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.3">
+<comp name="Intensity Questionnaire">
+<acc value="28.6035" />
+<vel value="26.7001" />
+</comp>
+</station>
+<station code="92054" name="ZIP Code 92054 (Intensity V, 10 responses)" insttype="USGS (Did You Feel It?)" lat="33.236271" lon="-117.351052" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="91741" name="ZIP Code 91741 (Intensity V, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.154309" lon="-117.840902" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="93308" name="ZIP Code 93308 (Intensity V, 16 responses)" insttype="USGS (Did You Feel It?)" lat="35.553859" lon="-118.915447" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.8">
+<comp name="Intensity Questionnaire">
+<acc value="5.9341" />
+<vel value="5.0822" />
+</comp>
+</station>
+<station code="92114" name="ZIP Code 92114 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="32.707772" lon="-117.055084" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.7">
+<comp name="Intensity Questionnaire">
+<acc value="5.5723" />
+<vel value="4.7559" />
+</comp>
+</station>
+<station code="91207" name="ZIP Code 91207 (Intensity VII, 7 responses)" insttype="USGS (Did You Feel It?)" lat="34.184651" lon="-118.258774" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.9">
+<comp name="Intensity Questionnaire">
+<acc value="22.2397" />
+<vel value="20.4757" />
+</comp>
+</station>
+<station code="93313" name="ZIP Code 93313 (Intensity V, 12 responses)" insttype="USGS (Did You Feel It?)" lat="35.153226" lon="-119.04808" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="90292" name="ZIP Code 90292 (Intensity VII, 18 responses)" insttype="USGS (Did You Feel It?)" lat="33.978881" lon="-118.458479" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.5">
+<comp name="Intensity Questionnaire">
+<acc value="17.2918" />
+<vel value="15.7024" />
+</comp>
+</station>
+<station code="90713" name="ZIP Code 90713 (Intensity VII, 16 responses)" insttype="USGS (Did You Feel It?)" lat="33.847910" lon="-118.112563" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.5">
+<comp name="Intensity Questionnaire">
+<acc value="17.2918" />
+<vel value="15.7024" />
+</comp>
+</station>
+<station code="90262" name="ZIP Code 90262 (Intensity VI, 6 responses)" insttype="USGS (Did You Feel It?)" lat="33.923627" lon="-118.20095" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="92109" name="ZIP Code 92109 (Intensity V, 22 responses)" insttype="USGS (Did You Feel It?)" lat="32.793585" lon="-117.2352" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.5">
+<comp name="Intensity Questionnaire">
+<acc value="4.9135" />
+<vel value="4.1648" />
+</comp>
+</station>
+<station code="93245" name="ZIP Code 93245 (Intensity IV, 6 responses)" insttype="USGS (Did You Feel It?)" lat="36.288376" lon="-119.846707" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.2">
+<comp name="Intensity Questionnaire">
+<acc value="4.0684" />
+<vel value="3.4130" />
+</comp>
+</station>
+<station code="92882" name="ZIP Code 92882 (Intensity V, 7 responses)" insttype="USGS (Did You Feel It?)" lat="33.841937" lon="-117.603934" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="92505" name="ZIP Code 92505 (Intensity VI, 13 responses)" insttype="USGS (Did You Feel It?)" lat="33.934145" lon="-117.495001" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="92805" name="ZIP Code 92805 (Intensity VI, 17 responses)" insttype="USGS (Did You Feel It?)" lat="33.829806" lon="-117.905601" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="91405" name="ZIP Code 91405 (Intensity VIII, 37 responses)" insttype="USGS (Did You Feel It?)" lat="34.201128" lon="-118.44792" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.0">
+<comp name="Intensity Questionnaire">
+<acc value="44.4299" />
+<vel value="42.4856" />
+</comp>
+</station>
+<station code="92672" name="ZIP Code 92672 (Intensity V, 32 responses)" insttype="USGS (Did You Feel It?)" lat="33.396679" lon="-117.553821" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="90254" name="ZIP Code 90254 (Intensity VII, 27 responses)" insttype="USGS (Did You Feel It?)" lat="33.865218" lon="-118.396562" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="92624" name="ZIP Code 92624 (Intensity VI, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.459074" lon="-117.665994" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="90077" name="ZIP Code 90077 (Intensity VIII, 12 responses)" insttype="USGS (Did You Feel It?)" lat="34.105075" lon="-118.455499" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.9">
+<comp name="Intensity Questionnaire">
+<acc value="41.7208" />
+<vel value="39.7579" />
+</comp>
+</station>
+<station code="90263" name="ZIP Code 90263 (Intensity VI, 3 responses)" insttype="USGS (Did You Feel It?)" lat="34.039236" lon="-118.708143" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="92223" name="ZIP Code 92223 (Intensity VI, 11 responses)" insttype="USGS (Did You Feel It?)" lat="33.914958" lon="-116.98951" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="91911" name="ZIP Code 91911 (Intensity V, 9 responses)" insttype="USGS (Did You Feel It?)" lat="32.607239" lon="-117.050352" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.6">
+<comp name="Intensity Questionnaire">
+<acc value="5.2326" />
+<vel value="4.4506" />
+</comp>
+</station>
+<station code="93015" name="ZIP Code 93015 (Intensity VIII, 27 responses)" insttype="USGS (Did You Feel It?)" lat="34.416154" lon="-118.846918" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.1">
+<comp name="Intensity Questionnaire">
+<acc value="47.3149" />
+<vel value="45.4005" />
+</comp>
+</station>
+<station code="90840" name="ZIP Code 90840 (Intensity I, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.783956" lon="-118.114775" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="1.0">
+<comp name="Intensity Questionnaire">
+<acc value="0.0" />
+<vel value="0.0" />
+</comp>
+</station>
+<station code="91106" name="ZIP Code 91106 (Intensity VI, 53 responses)" insttype="USGS (Did You Feel It?)" lat="34.139049" lon="-118.127608" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="91790" name="ZIP Code 91790 (Intensity VI, 15 responses)" insttype="USGS (Did You Feel It?)" lat="34.067365" lon="-117.937621" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="92675" name="ZIP Code 92675 (Intensity V, 16 responses)" insttype="USGS (Did You Feel It?)" lat="33.564959" lon="-117.545555" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="92407" name="ZIP Code 92407 (Intensity VI, 40 responses)" insttype="USGS (Did You Feel It?)" lat="34.257035" lon="-117.406756" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="91108" name="ZIP Code 91108 (Intensity VII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.122350" lon="-118.113689" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="93402" name="ZIP Code 93402 (Intensity IV, 9 responses)" insttype="USGS (Did You Feel It?)" lat="35.286743" lon="-120.82763" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.8">
+<comp name="Intensity Questionnaire">
+<acc value="3.1633" />
+<vel value="2.6174" />
+</comp>
+</station>
+<station code="93420" name="ZIP Code 93420 (Intensity IV, 10 responses)" insttype="USGS (Did You Feel It?)" lat="35.140993" lon="-120.415438" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.1">
+<comp name="Intensity Questionnaire">
+<acc value="3.8203" />
+<vel value="3.1939" />
+</comp>
+</station>
+<station code="90007" name="ZIP Code 90007 (Intensity VII, 41 responses)" insttype="USGS (Did You Feel It?)" lat="34.027664" lon="-118.285095" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.9">
+<comp name="Intensity Questionnaire">
+<acc value="22.2397" />
+<vel value="20.4757" />
+</comp>
+</station>
+<station code="92804" name="ZIP Code 92804 (Intensity VI, 34 responses)" insttype="USGS (Did You Feel It?)" lat="33.819353" lon="-117.974302" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="93109" name="ZIP Code 93109 (Intensity V, 15 responses)" insttype="USGS (Did You Feel It?)" lat="34.406365" lon="-119.727914" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="91942" name="ZIP Code 91942 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="32.783270" lon="-117.016776" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.6">
+<comp name="Intensity Questionnaire">
+<acc value="2.7893" />
+<vel value="2.2921" />
+</comp>
+</station>
+<station code="93277" name="ZIP Code 93277 (Intensity III, 6 responses)" insttype="USGS (Did You Feel It?)" lat="36.299698" lon="-119.381572" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.3">
+<comp name="Intensity Questionnaire">
+<acc value="2.3095" />
+<vel value="1.8783" />
+</comp>
+</station>
+<station code="92065" name="ZIP Code 92065 (Intensity V, 10 responses)" insttype="USGS (Did You Feel It?)" lat="33.041460" lon="-116.852967" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.6">
+<comp name="Intensity Questionnaire">
+<acc value="5.2326" />
+<vel value="4.4506" />
+</comp>
+</station>
+<station code="90501" name="ZIP Code 90501 (Intensity V, 15 responses)" insttype="USGS (Did You Feel It?)" lat="33.833567" lon="-118.314275" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="91351" name="ZIP Code 91351 (Intensity VIII, 90 responses)" insttype="USGS (Did You Feel It?)" lat="34.432131" lon="-118.465553" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.2">
+<comp name="Intensity Questionnaire">
+<acc value="50.3872" />
+<vel value="48.5153" />
+</comp>
+</station>
+<station code="92651" name="ZIP Code 92651 (Intensity V, 12 responses)" insttype="USGS (Did You Feel It?)" lat="33.558824" lon="-117.772332" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.7">
+<comp name="Intensity Questionnaire">
+<acc value="5.5723" />
+<vel value="4.7559" />
+</comp>
+</station>
+<station code="90033" name="ZIP Code 90033 (Intensity VIII, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.050211" lon="-118.210849" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.5">
+<comp name="Intensity Questionnaire">
+<acc value="32.4387" />
+<vel value="30.4895" />
+</comp>
+</station>
+<station code="92653" name="ZIP Code 92653 (Intensity VI, 19 responses)" insttype="USGS (Did You Feel It?)" lat="33.592762" lon="-117.699131" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="91020" name="ZIP Code 91020 (Intensity VII, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.211382" lon="-118.230656" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.1">
+<comp name="Intensity Questionnaire">
+<acc value="25.2217" />
+<vel value="23.3817" />
+</comp>
+</station>
+<station code="92780" name="ZIP Code 92780 (Intensity VI, 26 responses)" insttype="USGS (Did You Feel It?)" lat="33.735806" lon="-117.819222" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="90804" name="ZIP Code 90804 (Intensity VII, 16 responses)" insttype="USGS (Did You Feel It?)" lat="33.782773" lon="-118.14974" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="93066" name="ZIP Code 93066 (Intensity VII, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.296769" lon="-119.035143" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.9">
+<comp name="Intensity Questionnaire">
+<acc value="22.2397" />
+<vel value="20.4757" />
+</comp>
+</station>
+<station code="90703" name="ZIP Code 90703 (Intensity VI, 16 responses)" insttype="USGS (Did You Feel It?)" lat="33.868041" lon="-118.068641" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="91737" name="ZIP Code 91737 (Intensity VI, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.151680" lon="-117.582682" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="92372" name="ZIP Code 92372 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="34.441320" lon="-117.631721" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="90405" name="ZIP Code 90405 (Intensity VIII, 61 responses)" insttype="USGS (Did You Feel It?)" lat="34.011432" lon="-118.468893" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.8">
+<comp name="Intensity Questionnaire">
+<acc value="39.1769" />
+<vel value="37.2053" />
+</comp>
+</station>
+<station code="92646" name="ZIP Code 92646 (Intensity VI, 34 responses)" insttype="USGS (Did You Feel It?)" lat="33.665031" lon="-117.968182" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="92056" name="ZIP Code 92056 (Intensity IV, 11 responses)" insttype="USGS (Did You Feel It?)" lat="33.201597" lon="-117.289336" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.4">
+<comp name="Intensity Questionnaire">
+<acc value="4.6139" />
+<vel value="3.8974" />
+</comp>
+</station>
+<station code="92591" name="ZIP Code 92591 (Intensity VI, 8 responses)" insttype="USGS (Did You Feel It?)" lat="33.533155" lon="-117.109531" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="92614" name="ZIP Code 92614 (Intensity V, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.681800" lon="-117.832666" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="92833" name="ZIP Code 92833 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.880037" lon="-117.96109" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="92129" name="ZIP Code 92129 (Intensity V, 22 responses)" insttype="USGS (Did You Feel It?)" lat="32.968601" lon="-117.127647" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.8">
+<comp name="Intensity Questionnaire">
+<acc value="5.9341" />
+<vel value="5.0822" />
+</comp>
+</station>
+<station code="92545" name="ZIP Code 92545 (Intensity V, 5 responses)" insttype="USGS (Did You Feel It?)" lat="33.732042" lon="-117.042168" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.7">
+<comp name="Intensity Questionnaire">
+<acc value="5.5723" />
+<vel value="4.7559" />
+</comp>
+</station>
+<station code="91330" name="ZIP Code 91330 (Intensity VIII, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.241760" lon="-118.526979" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.3">
+<comp name="Intensity Questionnaire">
+<acc value="53.6590" />
+<vel value="51.8439" />
+</comp>
+</station>
+<station code="92553" name="ZIP Code 92553 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.922823" lon="-117.245213" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92707" name="ZIP Code 92707 (Intensity VII, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.707496" lon="-117.871013" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.9">
+<comp name="Intensity Questionnaire">
+<acc value="22.2397" />
+<vel value="20.4757" />
+</comp>
+</station>
+<station code="92055" name="ZIP Code 92055 (Intensity VI, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.366281" lon="-117.403598" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="92865" name="ZIP Code 92865 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.829138" lon="-117.84864" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="90057" name="ZIP Code 90057 (Intensity VII, 5 responses)" insttype="USGS (Did You Feel It?)" lat="34.062205" lon="-118.277435" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.1">
+<comp name="Intensity Questionnaire">
+<acc value="25.2217" />
+<vel value="23.3817" />
+</comp>
+</station>
+<station code="90620" name="ZIP Code 90620 (Intensity VI, 23 responses)" insttype="USGS (Did You Feel It?)" lat="33.846335" lon="-118.01149" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="92663" name="ZIP Code 92663 (Intensity VI, 9 responses)" insttype="USGS (Did You Feel It?)" lat="33.623016" lon="-117.930014" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="92119" name="ZIP Code 92119 (Intensity V, 12 responses)" insttype="USGS (Did You Feel It?)" lat="32.806697" lon="-117.030248" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="93555" name="ZIP Code 93555 (Intensity VI, 33 responses)" insttype="USGS (Did You Feel It?)" lat="35.691982" lon="-117.449307" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="91941" name="ZIP Code 91941 (Intensity IV, 9 responses)" insttype="USGS (Did You Feel It?)" lat="32.761215" lon="-117.001757" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.9">
+<comp name="Intensity Questionnaire">
+<acc value="3.3687" />
+<vel value="2.7970" />
+</comp>
+</station>
+<station code="91381" name="ZIP Code 91381 (Intensity IX, 11 responses)" insttype="USGS (Did You Feel It?)" lat="34.364725" lon="-118.614548" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.6">
+<comp name="Intensity Questionnaire">
+<acc value="64.8052" />
+<vel value="63.2634" />
+</comp>
+</station>
+<station code="93001" name="ZIP Code 93001 (Intensity VI, 28 responses)" insttype="USGS (Did You Feel It?)" lat="34.348026" lon="-119.326437" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="90210" name="ZIP Code 90210 (Intensity VIII, 24 responses)" insttype="USGS (Did You Feel It?)" lat="34.101990" lon="-118.414694" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.5">
+<comp name="Intensity Questionnaire">
+<acc value="32.4387" />
+<vel value="30.4895" />
+</comp>
+</station>
+<station code="90293" name="ZIP Code 90293 (Intensity VII, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.951437" lon="-118.443832" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="93230" name="ZIP Code 93230 (Intensity IV, 7 responses)" insttype="USGS (Did You Feel It?)" lat="36.292092" lon="-119.621108" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.4">
+<comp name="Intensity Questionnaire">
+<acc value="4.6139" />
+<vel value="3.8974" />
+</comp>
+</station>
+<station code="91740" name="ZIP Code 91740 (Intensity VI, 19 responses)" insttype="USGS (Did You Feel It?)" lat="34.118523" lon="-117.853792" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="92346" name="ZIP Code 92346 (Intensity VI, 16 responses)" insttype="USGS (Did You Feel It?)" lat="34.118725" lon="-117.177856" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="92107" name="ZIP Code 92107 (Intensity IV, 8 responses)" insttype="USGS (Did You Feel It?)" lat="32.741647" lon="-117.243417" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.9">
+<comp name="Intensity Questionnaire">
+<acc value="3.3687" />
+<vel value="2.7970" />
+</comp>
+</station>
+<station code="93309" name="ZIP Code 93309 (Intensity V, 19 responses)" insttype="USGS (Did You Feel It?)" lat="35.343350" lon="-119.064562" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="91766" name="ZIP Code 91766 (Intensity VI, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.041641" lon="-117.757054" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="92021" name="ZIP Code 92021 (Intensity V, 8 responses)" insttype="USGS (Did You Feel It?)" lat="32.839323" lon="-116.869138" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.8">
+<comp name="Intensity Questionnaire">
+<acc value="5.9341" />
+<vel value="5.0822" />
+</comp>
+</station>
+<station code="92870" name="ZIP Code 92870 (Intensity VI, 31 responses)" insttype="USGS (Did You Feel It?)" lat="33.880917" lon="-117.855315" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="92590" name="ZIP Code 92590 (Intensity III, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.478889" lon="-117.218722" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="2.9">
+<comp name="Intensity Questionnaire">
+<acc value="1.7957" />
+<vel value="1.4405" />
+</comp>
+</station>
+<station code="91608" name="ZIP Code 91608 (Intensity VIII, 3 responses)" insttype="USGS (Did You Feel It?)" lat="34.138592" lon="-118.352885" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.1">
+<comp name="Intensity Questionnaire">
+<acc value="47.3149" />
+<vel value="45.4005" />
+</comp>
+</station>
+<station code="92131" name="ZIP Code 92131 (Intensity IV, 10 responses)" insttype="USGS (Did You Feel It?)" lat="32.915374" lon="-117.088313" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.3">
+<comp name="Intensity Questionnaire">
+<acc value="4.3326" />
+<vel value="3.6472" />
+</comp>
+</station>
+<station code="93501" name="ZIP Code 93501 (Intensity V, 4 responses)" insttype="USGS (Did You Feel It?)" lat="35.053860" lon="-118.140363" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="91950" name="ZIP Code 91950 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="32.668323" lon="-117.091646" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.5">
+<comp name="Intensity Questionnaire">
+<acc value="4.9135" />
+<vel value="4.1648" />
+</comp>
+</station>
+<station code="93301" name="ZIP Code 93301 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="35.384332" lon="-119.020739" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.5">
+<comp name="Intensity Questionnaire">
+<acc value="2.6192" />
+<vel value="2.1449" />
+</comp>
+</station>
+<station code="91506" name="ZIP Code 91506 (Intensity VII, 31 responses)" insttype="USGS (Did You Feel It?)" lat="34.171294" lon="-118.323986" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="91343" name="ZIP Code 91343 (Intensity IX, 54 responses)" insttype="USGS (Did You Feel It?)" lat="34.238424" lon="-118.480736" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.5">
+<comp name="Intensity Questionnaire">
+<acc value="60.8537" />
+<vel value="59.2017" />
+</comp>
+</station>
+<station code="90089" name="ZIP Code 90089 (Intensity VII, 3 responses)" insttype="USGS (Did You Feel It?)" lat="34.021861" lon="-118.288345" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="92883" name="ZIP Code 92883 (Intensity V, 5 responses)" insttype="USGS (Did You Feel It?)" lat="33.764149" lon="-117.49241" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="91423" name="ZIP Code 91423 (Intensity VIII, 63 responses)" insttype="USGS (Did You Feel It?)" lat="34.147936" lon="-118.432176" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.4">
+<comp name="Intensity Questionnaire">
+<acc value="57.1432" />
+<vel value="55.4008" />
+</comp>
+</station>
+<station code="91311" name="ZIP Code 91311 (Intensity IX, 111 responses)" insttype="USGS (Did You Feel It?)" lat="34.285589" lon="-118.604478" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.5">
+<comp name="Intensity Questionnaire">
+<acc value="60.8537" />
+<vel value="59.2017" />
+</comp>
+</station>
+<station code="91354" name="ZIP Code 91354 (Intensity VIII, 18 responses)" insttype="USGS (Did You Feel It?)" lat="34.451601" lon="-118.552669" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.5">
+<comp name="Intensity Questionnaire">
+<acc value="32.4387" />
+<vel value="30.4895" />
+</comp>
+</station>
+<station code="92311" name="ZIP Code 92311 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="34.839973" lon="-117.042913" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="90027" name="ZIP Code 90027 (Intensity VII, 49 responses)" insttype="USGS (Did You Feel It?)" lat="34.125067" lon="-118.29062" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.4">
+<comp name="Intensity Questionnaire">
+<acc value="30.4608" />
+<vel value="28.5319" />
+</comp>
+</station>
+<station code="90744" name="ZIP Code 90744 (Intensity VI, 10 responses)" insttype="USGS (Did You Feel It?)" lat="33.782378" lon="-118.261199" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="91206" name="ZIP Code 91206 (Intensity VII, 37 responses)" insttype="USGS (Did You Feel It?)" lat="34.160580" lon="-118.21384" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="91324" name="ZIP Code 91324 (Intensity IX, 63 responses)" insttype="USGS (Did You Feel It?)" lat="34.238445" lon="-118.550199" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.7">
+<comp name="Intensity Questionnaire">
+<acc value="69.0132" />
+<vel value="67.6038" />
+</comp>
+</station>
+<station code="91016" name="ZIP Code 91016 (Intensity VII, 27 responses)" insttype="USGS (Did You Feel It?)" lat="34.166474" lon="-117.982911" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="92879" name="ZIP Code 92879 (Intensity V, 16 responses)" insttype="USGS (Did You Feel It?)" lat="33.880191" lon="-117.538004" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="91105" name="ZIP Code 91105 (Intensity VI, 25 responses)" insttype="USGS (Did You Feel It?)" lat="34.139218" lon="-118.167541" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="92024" name="ZIP Code 92024 (Intensity IV, 18 responses)" insttype="USGS (Did You Feel It?)" lat="33.058901" lon="-117.253348" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.2">
+<comp name="Intensity Questionnaire">
+<acc value="4.0684" />
+<vel value="3.4130" />
+</comp>
+</station>
+<station code="92503" name="ZIP Code 92503 (Intensity VI, 19 responses)" insttype="USGS (Did You Feel It?)" lat="33.889827" lon="-117.446839" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="90401" name="ZIP Code 90401 (Intensity VIII, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.014959" lon="-118.493045" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.4">
+<comp name="Intensity Questionnaire">
+<acc value="57.1432" />
+<vel value="55.4008" />
+</comp>
+</station>
+<station code="94080" name="ZIP Code 94080 (Intensity I, 3 responses)" insttype="USGS (Did You Feel It?)" lat="37.654887" lon="-122.422476" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="1.0">
+<comp name="Intensity Questionnaire">
+<acc value="0.0" />
+<vel value="0.0" />
+</comp>
+</station>
+<station code="90240" name="ZIP Code 90240 (Intensity VI, 9 responses)" insttype="USGS (Did You Feel It?)" lat="33.956770" lon="-118.118108" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="90803" name="ZIP Code 90803 (Intensity VI, 30 responses)" insttype="USGS (Did You Feel It?)" lat="33.761789" lon="-118.123328" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="91733" name="ZIP Code 91733 (Intensity V, 9 responses)" insttype="USGS (Did You Feel It?)" lat="34.045498" lon="-118.052974" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="91791" name="ZIP Code 91791 (Intensity V, 14 responses)" insttype="USGS (Did You Feel It?)" lat="34.060731" lon="-117.893719" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="89101" name="ZIP Code 89101 (Intensity IV, 5 responses)" insttype="USGS (Did You Feel It?)" lat="36.172618" lon="-115.122026" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.3">
+<comp name="Intensity Questionnaire">
+<acc value="4.3326" />
+<vel value="3.6472" />
+</comp>
+</station>
+<station code="91306" name="ZIP Code 91306 (Intensity IX, 78 responses)" insttype="USGS (Did You Feel It?)" lat="34.210114" lon="-118.575909" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.5">
+<comp name="Intensity Questionnaire">
+<acc value="60.8537" />
+<vel value="59.2017" />
+</comp>
+</station>
+<station code="91355" name="ZIP Code 91355 (Intensity VIII, 81 responses)" insttype="USGS (Did You Feel It?)" lat="34.416698" lon="-118.596965" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.4">
+<comp name="Intensity Questionnaire">
+<acc value="57.1432" />
+<vel value="55.4008" />
+</comp>
+</station>
+<station code="92173" name="ZIP Code 92173 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="32.554738" lon="-117.050442" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.6">
+<comp name="Intensity Questionnaire">
+<acc value="5.2326" />
+<vel value="4.4506" />
+</comp>
+</station>
+<station code="91103" name="ZIP Code 91103 (Intensity VI, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.166772" lon="-118.164764" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="92677" name="ZIP Code 92677 (Intensity VI, 28 responses)" insttype="USGS (Did You Feel It?)" lat="33.526724" lon="-117.704128" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="93023" name="ZIP Code 93023 (Intensity VI, 22 responses)" insttype="USGS (Did You Feel It?)" lat="34.517915" lon="-119.270746" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="93105" name="ZIP Code 93105 (Intensity VI, 31 responses)" insttype="USGS (Did You Feel It?)" lat="34.572430" lon="-119.773157" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="90048" name="ZIP Code 90048 (Intensity VIII, 25 responses)" insttype="USGS (Did You Feel It?)" lat="34.073090" lon="-118.372808" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.5">
+<comp name="Intensity Questionnaire">
+<acc value="32.4387" />
+<vel value="30.4895" />
+</comp>
+</station>
+<station code="93449" name="ZIP Code 93449 (Intensity II, 3 responses)" insttype="USGS (Did You Feel It?)" lat="35.159789" lon="-120.656996" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="2.0">
+<comp name="Intensity Questionnaire">
+<acc value="1.0194" />
+<vel value="0.7927" />
+</comp>
+</station>
+<station code="92108" name="ZIP Code 92108 (Intensity V, 6 responses)" insttype="USGS (Did You Feel It?)" lat="32.772689" lon="-117.144715" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.5">
+<comp name="Intensity Questionnaire">
+<acc value="4.9135" />
+<vel value="4.1648" />
+</comp>
+</station>
+<station code="93111" name="ZIP Code 93111 (Intensity V, 11 responses)" insttype="USGS (Did You Feel It?)" lat="34.448093" lon="-119.80343" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="92356" name="ZIP Code 92356 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.527056" lon="-116.87923" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.6">
+<comp name="Intensity Questionnaire">
+<acc value="2.7893" />
+<vel value="2.2921" />
+</comp>
+</station>
+<station code="90630" name="ZIP Code 90630 (Intensity VI, 31 responses)" insttype="USGS (Did You Feel It?)" lat="33.818097" lon="-118.038102" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="92027" name="ZIP Code 92027 (Intensity IV, 6 responses)" insttype="USGS (Did You Feel It?)" lat="33.136218" lon="-116.98631" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.4">
+<comp name="Intensity Questionnaire">
+<acc value="4.6139" />
+<vel value="3.8974" />
+</comp>
+</station>
+<station code="91501" name="ZIP Code 91501 (Intensity VII, 35 responses)" insttype="USGS (Did You Feel It?)" lat="34.202898" lon="-118.298527" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.4">
+<comp name="Intensity Questionnaire">
+<acc value="30.4608" />
+<vel value="28.5319" />
+</comp>
+</station>
+<station code="93041" name="ZIP Code 93041 (Intensity VII, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.162806" lon="-119.201722" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.7">
+<comp name="Intensity Questionnaire">
+<acc value="19.6103" />
+<vel value="17.9309" />
+</comp>
+</station>
+<station code="90605" name="ZIP Code 90605 (Intensity VII, 9 responses)" insttype="USGS (Did You Feel It?)" lat="33.949342" lon="-118.038874" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="93257" name="ZIP Code 93257 (Intensity II, 3 responses)" insttype="USGS (Did You Feel It?)" lat="36.003840" lon="-118.875968" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="2.0">
+<comp name="Intensity Questionnaire">
+<acc value="1.0194" />
+<vel value="0.7927" />
+</comp>
+</station>
+<station code="90005" name="ZIP Code 90005 (Intensity VIII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.059046" lon="-118.308838" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.5">
+<comp name="Intensity Questionnaire">
+<acc value="32.4387" />
+<vel value="30.4895" />
+</comp>
+</station>
+<station code="93060" name="ZIP Code 93060 (Intensity VI, 22 responses)" insttype="USGS (Did You Feel It?)" lat="34.379505" lon="-119.105615" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="93551" name="ZIP Code 93551 (Intensity VI, 22 responses)" insttype="USGS (Did You Feel It?)" lat="34.592079" lon="-118.234743" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="91754" name="ZIP Code 91754 (Intensity VII, 7 responses)" insttype="USGS (Did You Feel It?)" lat="34.051871" lon="-118.145941" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.1">
+<comp name="Intensity Questionnaire">
+<acc value="25.2217" />
+<vel value="23.3817" />
+</comp>
+</station>
+<station code="91377" name="ZIP Code 91377 (Intensity VII, 23 responses)" insttype="USGS (Did You Feel It?)" lat="34.185879" lon="-118.765271" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.4">
+<comp name="Intensity Questionnaire">
+<acc value="30.4608" />
+<vel value="28.5319" />
+</comp>
+</station>
+<station code="92126" name="ZIP Code 92126 (Intensity V, 14 responses)" insttype="USGS (Did You Feel It?)" lat="32.912464" lon="-117.142964" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.5">
+<comp name="Intensity Questionnaire">
+<acc value="4.9135" />
+<vel value="4.1648" />
+</comp>
+</station>
+<station code="92083" name="ZIP Code 92083 (Intensity V, 8 responses)" insttype="USGS (Did You Feel It?)" lat="33.198031" lon="-117.248147" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="91765" name="ZIP Code 91765 (Intensity VI, 28 responses)" insttype="USGS (Did You Feel It?)" lat="33.987393" lon="-117.815241" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="90712" name="ZIP Code 90712 (Intensity VII, 23 responses)" insttype="USGS (Did You Feel It?)" lat="33.849260" lon="-118.146835" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.5">
+<comp name="Intensity Questionnaire">
+<acc value="17.2918" />
+<vel value="15.7024" />
+</comp>
+</station>
+<station code="90602" name="ZIP Code 90602 (Intensity VII, 10 responses)" insttype="USGS (Did You Feel It?)" lat="33.969919" lon="-118.030844" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.5">
+<comp name="Intensity Questionnaire">
+<acc value="17.2918" />
+<vel value="15.7024" />
+</comp>
+</station>
+<station code="90232" name="ZIP Code 90232 (Intensity VIII, 24 responses)" insttype="USGS (Did You Feel It?)" lat="34.017908" lon="-118.391994" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.7">
+<comp name="Intensity Questionnaire">
+<acc value="36.7882" />
+<vel value="34.8166" />
+</comp>
+</station>
+<station code="90290" name="ZIP Code 90290 (Intensity VII, 20 responses)" insttype="USGS (Did You Feel It?)" lat="34.101868" lon="-118.611577" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="90029" name="ZIP Code 90029 (Intensity VIII, 12 responses)" insttype="USGS (Did You Feel It?)" lat="34.089761" lon="-118.29457" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.7">
+<comp name="Intensity Questionnaire">
+<acc value="36.7882" />
+<vel value="34.8166" />
+</comp>
+</station>
+<station code="92840" name="ZIP Code 92840 (Intensity VI, 12 responses)" insttype="USGS (Did You Feel It?)" lat="33.785910" lon="-117.931831" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92630" name="ZIP Code 92630 (Intensity VI, 33 responses)" insttype="USGS (Did You Feel It?)" lat="33.645955" lon="-117.685663" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="90604" name="ZIP Code 90604 (Intensity VI, 18 responses)" insttype="USGS (Did You Feel It?)" lat="33.930207" lon="-118.012867" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="92377" name="ZIP Code 92377 (Intensity VI, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.154830" lon="-117.40535" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="90715" name="ZIP Code 90715 (Intensity VII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="33.840518" lon="-118.078845" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="91024" name="ZIP Code 91024 (Intensity VI, 10 responses)" insttype="USGS (Did You Feel It?)" lat="34.169065" lon="-118.049922" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="92629" name="ZIP Code 92629 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.477248" lon="-117.704989" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="91789" name="ZIP Code 91789 (Intensity VI, 16 responses)" insttype="USGS (Did You Feel It?)" lat="34.020820" lon="-117.854089" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92014" name="ZIP Code 92014 (Intensity IV, 11 responses)" insttype="USGS (Did You Feel It?)" lat="32.981867" lon="-117.222775" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.8">
+<comp name="Intensity Questionnaire">
+<acc value="3.1633" />
+<vel value="2.6174" />
+</comp>
+</station>
+<station code="90211" name="ZIP Code 90211 (Intensity VIII, 11 responses)" insttype="USGS (Did You Feel It?)" lat="34.064869" lon="-118.383167" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.1">
+<comp name="Intensity Questionnaire">
+<acc value="47.3149" />
+<vel value="45.4005" />
+</comp>
+</station>
+<station code="93274" name="ZIP Code 93274 (Intensity IV, 3 responses)" insttype="USGS (Did You Feel It?)" lat="36.177212" lon="-119.368106" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.9">
+<comp name="Intensity Questionnaire">
+<acc value="3.3687" />
+<vel value="2.7970" />
+</comp>
+</station>
+<station code="90745" name="ZIP Code 90745 (Intensity VII, 6 responses)" insttype="USGS (Did You Feel It?)" lat="33.822551" lon="-118.262092" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="92688" name="ZIP Code 92688 (Intensity V, 15 responses)" insttype="USGS (Did You Feel It?)" lat="33.629648" lon="-117.611038" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="91342" name="ZIP Code 91342 (Intensity VIII, 113 responses)" insttype="USGS (Did You Feel It?)" lat="34.358607" lon="-118.276278" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.3">
+<comp name="Intensity Questionnaire">
+<acc value="53.6590" />
+<vel value="51.8439" />
+</comp>
+</station>
+<station code="93010" name="ZIP Code 93010 (Intensity VI, 43 responses)" insttype="USGS (Did You Feel It?)" lat="34.227513" lon="-119.06963" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="90280" name="ZIP Code 90280 (Intensity VII, 12 responses)" insttype="USGS (Did You Feel It?)" lat="33.944392" lon="-118.192019" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="90270" name="ZIP Code 90270 (Intensity VIII, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.988649" lon="-118.188013" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.1">
+<comp name="Intensity Questionnaire">
+<acc value="47.3149" />
+<vel value="45.4005" />
+</comp>
+</station>
+<station code="92543" name="ZIP Code 92543 (Intensity VI, 7 responses)" insttype="USGS (Did You Feel It?)" lat="33.702218" lon="-116.97818" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="92880" name="ZIP Code 92880 (Intensity VI, 7 responses)" insttype="USGS (Did You Feel It?)" lat="33.920730" lon="-117.611599" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="90041" name="ZIP Code 90041 (Intensity VII, 16 responses)" insttype="USGS (Did You Feel It?)" lat="34.137121" lon="-118.207258" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.9">
+<comp name="Intensity Questionnaire">
+<acc value="22.2397" />
+<vel value="20.4757" />
+</comp>
+</station>
+<station code="90701" name="ZIP Code 90701 (Intensity VI, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.867381" lon="-118.080838" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92104" name="ZIP Code 92104 (Intensity IV, 5 responses)" insttype="USGS (Did You Feel It?)" lat="32.742756" lon="-117.126714" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.2">
+<comp name="Intensity Questionnaire">
+<acc value="4.0684" />
+<vel value="3.4130" />
+</comp>
+</station>
+<station code="91607" name="ZIP Code 91607 (Intensity VIII, 47 responses)" insttype="USGS (Did You Feel It?)" lat="34.166447" lon="-118.399895" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.9">
+<comp name="Intensity Questionnaire">
+<acc value="41.7208" />
+<vel value="39.7579" />
+</comp>
+</station>
+<station code="91784" name="ZIP Code 91784 (Intensity V, 5 responses)" insttype="USGS (Did You Feel It?)" lat="34.141040" lon="-117.659189" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.9">
+<comp name="Intensity Questionnaire">
+<acc value="6.3195" />
+<vel value="5.4309" />
+</comp>
+</station>
+<station code="90660" name="ZIP Code 90660 (Intensity VI, 9 responses)" insttype="USGS (Did You Feel It?)" lat="33.988539" lon="-118.090747" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="92201" name="ZIP Code 92201 (Intensity V, 6 responses)" insttype="USGS (Did You Feel It?)" lat="33.707506" lon="-116.233902" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="91214" name="ZIP Code 91214 (Intensity VII, 46 responses)" insttype="USGS (Did You Feel It?)" lat="34.235632" lon="-118.245388" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.9">
+<comp name="Intensity Questionnaire">
+<acc value="22.2397" />
+<vel value="20.4757" />
+</comp>
+</station>
+<station code="92866" name="ZIP Code 92866 (Intensity IV, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.784648" lon="-117.84456" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.4">
+<comp name="Intensity Questionnaire">
+<acc value="4.6139" />
+<vel value="3.8974" />
+</comp>
+</station>
+<station code="93306" name="ZIP Code 93306 (Intensity IV, 14 responses)" insttype="USGS (Did You Feel It?)" lat="35.411917" lon="-118.875585" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.4">
+<comp name="Intensity Questionnaire">
+<acc value="4.6139" />
+<vel value="3.8974" />
+</comp>
+</station>
+<station code="92154" name="ZIP Code 92154 (Intensity III, 3 responses)" insttype="USGS (Did You Feel It?)" lat="32.567635" lon="-117.000184" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.3">
+<comp name="Intensity Questionnaire">
+<acc value="2.3095" />
+<vel value="1.8783" />
+</comp>
+</station>
+<station code="91001" name="ZIP Code 91001 (Intensity VI, 26 responses)" insttype="USGS (Did You Feel It?)" lat="34.195194" lon="-118.138155" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="90034" name="ZIP Code 90034 (Intensity VIII, 69 responses)" insttype="USGS (Did You Feel It?)" lat="34.030729" lon="-118.39945" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.5">
+<comp name="Intensity Questionnaire">
+<acc value="32.4387" />
+<vel value="30.4895" />
+</comp>
+</station>
+<station code="90404" name="ZIP Code 90404 (Intensity VIII, 20 responses)" insttype="USGS (Did You Feel It?)" lat="34.026743" lon="-118.4737" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.2">
+<comp name="Intensity Questionnaire">
+<acc value="50.3872" />
+<vel value="48.5153" />
+</comp>
+</station>
+<station code="92120" name="ZIP Code 92120 (Intensity IV, 7 responses)" insttype="USGS (Did You Feel It?)" lat="32.794475" lon="-117.072564" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.3">
+<comp name="Intensity Questionnaire">
+<acc value="4.3326" />
+<vel value="3.6472" />
+</comp>
+</station>
+<station code="92557" name="ZIP Code 92557 (Intensity V, 16 responses)" insttype="USGS (Did You Feel It?)" lat="33.971896" lon="-117.258872" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="91390" name="ZIP Code 91390 (Intensity VIII, 6 responses)" insttype="USGS (Did You Feel It?)" lat="34.523448" lon="-118.400744" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.7">
+<comp name="Intensity Questionnaire">
+<acc value="36.7882" />
+<vel value="34.8166" />
+</comp>
+</station>
+<station code="91768" name="ZIP Code 91768 (Intensity VI, 10 responses)" insttype="USGS (Did You Feel It?)" lat="34.063195" lon="-117.789104" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="91750" name="ZIP Code 91750 (Intensity VI, 17 responses)" insttype="USGS (Did You Feel It?)" lat="34.128459" lon="-117.762634" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="91356" name="ZIP Code 91356 (Intensity VIII, 55 responses)" insttype="USGS (Did You Feel It?)" lat="34.153859" lon="-118.546738" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.4">
+<comp name="Intensity Questionnaire">
+<acc value="57.1432" />
+<vel value="55.4008" />
+</comp>
+</station>
+<station code="91387" name="ZIP Code 91387 (Intensity VIII, 19 responses)" insttype="USGS (Did You Feel It?)" lat="34.423357" lon="-118.410121" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.6">
+<comp name="Intensity Questionnaire">
+<acc value="34.5450" />
+<vel value="32.5813" />
+</comp>
+</station>
+<station code="91325" name="ZIP Code 91325 (Intensity IX, 82 responses)" insttype="USGS (Did You Feel It?)" lat="34.236865" lon="-118.518189" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.8">
+<comp name="Intensity Questionnaire">
+<acc value="73.4944" />
+<vel value="72.2420" />
+</comp>
+</station>
+<station code="90808" name="ZIP Code 90808 (Intensity VI, 27 responses)" insttype="USGS (Did You Feel It?)" lat="33.823137" lon="-118.119339" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="90746" name="ZIP Code 90746 (Intensity VI, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.860269" lon="-118.270716" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="92374" name="ZIP Code 92374 (Intensity V, 20 responses)" insttype="USGS (Did You Feel It?)" lat="34.068562" lon="-117.171983" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="90680" name="ZIP Code 90680 (Intensity VII, 7 responses)" insttype="USGS (Did You Feel It?)" lat="33.801131" lon="-117.994898" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="91364" name="ZIP Code 91364 (Intensity VIII, 35 responses)" insttype="USGS (Did You Feel It?)" lat="34.155419" lon="-118.594993" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.4">
+<comp name="Intensity Questionnaire">
+<acc value="57.1432" />
+<vel value="55.4008" />
+</comp>
+</station>
+<station code="90503" name="ZIP Code 90503 (Intensity VI, 31 responses)" insttype="USGS (Did You Feel It?)" lat="33.841995" lon="-118.351641" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="92595" name="ZIP Code 92595 (Intensity V, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.618947" lon="-117.261004" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="91773" name="ZIP Code 91773 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="34.106679" lon="-117.808302" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="91502" name="ZIP Code 91502 (Intensity VIII, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.176816" lon="-118.30922" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.5">
+<comp name="Intensity Questionnaire">
+<acc value="32.4387" />
+<vel value="30.4895" />
+</comp>
+</station>
+<station code="92655" name="ZIP Code 92655 (Intensity VII, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.745113" lon="-117.984572" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="92705" name="ZIP Code 92705 (Intensity VI, 12 responses)" insttype="USGS (Did You Feel It?)" lat="33.756682" lon="-117.813987" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="92037" name="ZIP Code 92037 (Intensity IV, 24 responses)" insttype="USGS (Did You Feel It?)" lat="32.855012" lon="-117.249785" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.5">
+<comp name="Intensity Questionnaire">
+<acc value="2.6192" />
+<vel value="2.1449" />
+</comp>
+</station>
+<station code="90250" name="ZIP Code 90250 (Intensity VI, 37 responses)" insttype="USGS (Did You Feel It?)" lat="33.914766" lon="-118.34864" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="93436" name="ZIP Code 93436 (Intensity V, 15 responses)" insttype="USGS (Did You Feel It?)" lat="34.605545" lon="-120.381121" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="93710" name="ZIP Code 93710 (Intensity III, 3 responses)" insttype="USGS (Did You Feel It?)" lat="36.823227" lon="-119.760453" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.0">
+<comp name="Intensity Questionnaire">
+<acc value="1.9123" />
+<vel value="1.5393" />
+</comp>
+</station>
+<station code="92501" name="ZIP Code 92501 (Intensity VI, 11 responses)" insttype="USGS (Did You Feel It?)" lat="33.995375" lon="-117.372849" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="91436" name="ZIP Code 91436 (Intensity VIII, 16 responses)" insttype="USGS (Did You Feel It?)" lat="34.149997" lon="-118.494312" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.8">
+<comp name="Intensity Questionnaire">
+<acc value="39.1769" />
+<vel value="37.2053" />
+</comp>
+</station>
+<station code="90016" name="ZIP Code 90016 (Intensity VIII, 5 responses)" insttype="USGS (Did You Feel It?)" lat="34.028428" lon="-118.354174" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.3">
+<comp name="Intensity Questionnaire">
+<acc value="53.6590" />
+<vel value="51.8439" />
+</comp>
+</station>
+<station code="90504" name="ZIP Code 90504 (Intensity VII, 25 responses)" insttype="USGS (Did You Feel It?)" lat="33.869549" lon="-118.329919" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="92270" name="ZIP Code 92270 (Intensity V, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.767174" lon="-116.422786" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="90301" name="ZIP Code 90301 (Intensity VII, 9 responses)" insttype="USGS (Did You Feel It?)" lat="33.956414" lon="-118.358639" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="90403" name="ZIP Code 90403 (Intensity VIII, 65 responses)" insttype="USGS (Did You Feel It?)" lat="34.030658" lon="-118.490538" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.3">
+<comp name="Intensity Questionnaire">
+<acc value="53.6590" />
+<vel value="51.8439" />
+</comp>
+</station>
+<station code="90710" name="ZIP Code 90710 (Intensity V, 8 responses)" insttype="USGS (Did You Feel It?)" lat="33.798169" lon="-118.29926" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="90245" name="ZIP Code 90245 (Intensity VI, 33 responses)" insttype="USGS (Did You Feel It?)" lat="33.916898" lon="-118.402151" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="91201" name="ZIP Code 91201 (Intensity VII, 22 responses)" insttype="USGS (Did You Feel It?)" lat="34.170317" lon="-118.289077" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="92084" name="ZIP Code 92084 (Intensity VI, 10 responses)" insttype="USGS (Did You Feel It?)" lat="33.222107" lon="-117.205148" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="92260" name="ZIP Code 92260 (Intensity V, 12 responses)" insttype="USGS (Did You Feel It?)" lat="33.689089" lon="-116.397067" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="92064" name="ZIP Code 92064 (Intensity IV, 18 responses)" insttype="USGS (Did You Feel It?)" lat="32.978990" lon="-117.019007" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.0">
+<comp name="Intensity Questionnaire">
+<acc value="3.5874" />
+<vel value="2.9889" />
+</comp>
+</station>
+<station code="91706" name="ZIP Code 91706 (Intensity VI, 6 responses)" insttype="USGS (Did You Feel It?)" lat="34.098453" lon="-117.96778" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="90049" name="ZIP Code 90049 (Intensity VII, 61 responses)" insttype="USGS (Did You Feel It?)" lat="34.086867" lon="-118.488121" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="92324" name="ZIP Code 92324 (Intensity VI, 11 responses)" insttype="USGS (Did You Feel It?)" lat="34.031428" lon="-117.285557" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="92620" name="ZIP Code 92620 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.708800" lon="-117.756955" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="92234" name="ZIP Code 92234 (Intensity V, 7 responses)" insttype="USGS (Did You Feel It?)" lat="33.815696" lon="-116.46649" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.7">
+<comp name="Intensity Questionnaire">
+<acc value="5.5723" />
+<vel value="4.7559" />
+</comp>
+</station>
+<station code="92127" name="ZIP Code 92127 (Intensity V, 5 responses)" insttype="USGS (Did You Feel It?)" lat="33.029614" lon="-117.127571" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="92831" name="ZIP Code 92831 (Intensity VI, 27 responses)" insttype="USGS (Did You Feel It?)" lat="33.879159" lon="-117.896305" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="90706" name="ZIP Code 90706 (Intensity VII, 17 responses)" insttype="USGS (Did You Feel It?)" lat="33.888039" lon="-118.12711" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.7">
+<comp name="Intensity Questionnaire">
+<acc value="19.6103" />
+<vel value="17.9309" />
+</comp>
+</station>
+<station code="93524" name="ZIP Code 93524 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="34.908636" lon="-117.65072" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.9">
+<comp name="Intensity Questionnaire">
+<acc value="6.3195" />
+<vel value="5.4309" />
+</comp>
+</station>
+<station code="91307" name="ZIP Code 91307 (Intensity VIII, 60 responses)" insttype="USGS (Did You Feel It?)" lat="34.205169" lon="-118.678518" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.9">
+<comp name="Intensity Questionnaire">
+<acc value="41.7208" />
+<vel value="39.7579" />
+</comp>
+</station>
+<station code="90802" name="ZIP Code 90802 (Intensity VI, 22 responses)" insttype="USGS (Did You Feel It?)" lat="33.759699" lon="-118.204734" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="92886" name="ZIP Code 92886 (Intensity VI, 26 responses)" insttype="USGS (Did You Feel It?)" lat="33.896693" lon="-117.794736" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="91748" name="ZIP Code 91748 (Intensity VII, 7 responses)" insttype="USGS (Did You Feel It?)" lat="33.976396" lon="-117.898651" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="92867" name="ZIP Code 92867 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.814671" lon="-117.827346" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92004" name="ZIP Code 92004 (Intensity V, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.207414" lon="-116.282307" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.8">
+<comp name="Intensity Questionnaire">
+<acc value="5.9341" />
+<vel value="5.0822" />
+</comp>
+</station>
+<station code="92316" name="ZIP Code 92316 (Intensity V, 7 responses)" insttype="USGS (Did You Feel It?)" lat="34.059217" lon="-117.393361" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="93033" name="ZIP Code 93033 (Intensity VI, 21 responses)" insttype="USGS (Did You Feel It?)" lat="34.153226" lon="-119.123034" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="91104" name="ZIP Code 91104 (Intensity VI, 29 responses)" insttype="USGS (Did You Feel It?)" lat="34.168036" lon="-118.123458" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="91504" name="ZIP Code 91504 (Intensity VII, 23 responses)" insttype="USGS (Did You Feel It?)" lat="34.202788" lon="-118.328915" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.3">
+<comp name="Intensity Questionnaire">
+<acc value="28.6035" />
+<vel value="26.7001" />
+</comp>
+</station>
+<station code="93401" name="ZIP Code 93401 (Intensity II, 4 responses)" insttype="USGS (Did You Feel It?)" lat="35.235228" lon="-120.620322" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="2.0">
+<comp name="Intensity Questionnaire">
+<acc value="1.0194" />
+<vel value="0.7927" />
+</comp>
+</station>
+<station code="92843" name="ZIP Code 92843 (Intensity VII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="33.763945" lon="-117.931198" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="90606" name="ZIP Code 90606 (Intensity VII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="33.977236" lon="-118.065953" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.7">
+<comp name="Intensity Questionnaire">
+<acc value="19.6103" />
+<vel value="17.9309" />
+</comp>
+</station>
+<station code="91803" name="ZIP Code 91803 (Intensity VII, 14 responses)" insttype="USGS (Did You Feel It?)" lat="34.074678" lon="-118.146235" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="91767" name="ZIP Code 91767 (Intensity VI, 20 responses)" insttype="USGS (Did You Feel It?)" lat="34.081420" lon="-117.738464" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="91602" name="ZIP Code 91602 (Intensity VIII, 35 responses)" insttype="USGS (Did You Feel It?)" lat="34.150713" lon="-118.365958" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.2">
+<comp name="Intensity Questionnaire">
+<acc value="50.3872" />
+<vel value="48.5153" />
+</comp>
+</station>
+<station code="90035" name="ZIP Code 90035 (Intensity VIII, 39 responses)" insttype="USGS (Did You Feel It?)" lat="34.051843" lon="-118.383634" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.9">
+<comp name="Intensity Questionnaire">
+<acc value="41.7208" />
+<vel value="39.7579" />
+</comp>
+</station>
+<station code="90505" name="ZIP Code 90505 (Intensity VI, 29 responses)" insttype="USGS (Did You Feel It?)" lat="33.808655" lon="-118.348289" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="90212" name="ZIP Code 90212 (Intensity VII, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.062066" lon="-118.401525" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.4">
+<comp name="Intensity Questionnaire">
+<acc value="30.4608" />
+<vel value="28.5319" />
+</comp>
+</station>
+<station code="92071" name="ZIP Code 92071 (Intensity V, 20 responses)" insttype="USGS (Did You Feel It?)" lat="32.869678" lon="-117.010376" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.7">
+<comp name="Intensity Questionnaire">
+<acc value="5.5723" />
+<vel value="4.7559" />
+</comp>
+</station>
+<station code="92069" name="ZIP Code 92069 (Intensity V, 9 responses)" insttype="USGS (Did You Feel It?)" lat="33.175404" lon="-117.157542" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.6">
+<comp name="Intensity Questionnaire">
+<acc value="5.2326" />
+<vel value="4.4506" />
+</comp>
+</station>
+<station code="92508" name="ZIP Code 92508 (Intensity V, 11 responses)" insttype="USGS (Did You Feel It?)" lat="33.892242" lon="-117.325115" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="90024" name="ZIP Code 90024 (Intensity VIII, 59 responses)" insttype="USGS (Did You Feel It?)" lat="34.065345" lon="-118.435042" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.5">
+<comp name="Intensity Questionnaire">
+<acc value="32.4387" />
+<vel value="30.4895" />
+</comp>
+</station>
+<station code="90603" name="ZIP Code 90603 (Intensity VI, 11 responses)" insttype="USGS (Did You Feel It?)" lat="33.945683" lon="-117.991797" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="92105" name="ZIP Code 92105 (Intensity V, 6 responses)" insttype="USGS (Did You Feel It?)" lat="32.737602" lon="-117.092511" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.7">
+<comp name="Intensity Questionnaire">
+<acc value="5.5723" />
+<vel value="4.7559" />
+</comp>
+</station>
+<station code="92277" name="ZIP Code 92277 (Intensity IV, 5 responses)" insttype="USGS (Did You Feel It?)" lat="34.198818" lon="-115.760736" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.0">
+<comp name="Intensity Questionnaire">
+<acc value="3.5874" />
+<vel value="2.9889" />
+</comp>
+</station>
+<station code="91331" name="ZIP Code 91331 (Intensity VIII, 48 responses)" insttype="USGS (Did You Feel It?)" lat="34.255818" lon="-118.420396" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.9">
+<comp name="Intensity Questionnaire">
+<acc value="41.7208" />
+<vel value="39.7579" />
+</comp>
+</station>
+<station code="91316" name="ZIP Code 91316 (Intensity VIII, 50 responses)" insttype="USGS (Did You Feel It?)" lat="34.165184" lon="-118.516011" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.2">
+<comp name="Intensity Questionnaire">
+<acc value="50.3872" />
+<vel value="48.5153" />
+</comp>
+</station>
+<station code="93422" name="ZIP Code 93422 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="35.461761" lon="-120.681195" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.5">
+<comp name="Intensity Questionnaire">
+<acc value="2.6192" />
+<vel value="2.1449" />
+</comp>
+</station>
+<station code="90723" name="ZIP Code 90723 (Intensity VII, 5 responses)" insttype="USGS (Did You Feel It?)" lat="33.897481" lon="-118.164669" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="93433" name="ZIP Code 93433 (Intensity IV, 10 responses)" insttype="USGS (Did You Feel It?)" lat="35.121268" lon="-120.619766" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.0">
+<comp name="Intensity Questionnaire">
+<acc value="3.5874" />
+<vel value="2.9889" />
+</comp>
+</station>
+<station code="93465" name="ZIP Code 93465 (Intensity III, 4 responses)" insttype="USGS (Did You Feel It?)" lat="35.533818" lon="-120.713191" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.3">
+<comp name="Intensity Questionnaire">
+<acc value="2.3095" />
+<vel value="1.8783" />
+</comp>
+</station>
+<station code="90067" name="ZIP Code 90067 (Intensity VIII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.057673" lon="-118.414122" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.7">
+<comp name="Intensity Questionnaire">
+<acc value="36.7882" />
+<vel value="34.8166" />
+</comp>
+</station>
+<station code="91710" name="ZIP Code 91710 (Intensity VI, 26 responses)" insttype="USGS (Did You Feel It?)" lat="33.990473" lon="-117.662208" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="91335" name="ZIP Code 91335 (Intensity IX, 123 responses)" insttype="USGS (Did You Feel It?)" lat="34.201322" lon="-118.540688" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.5">
+<comp name="Intensity Questionnaire">
+<acc value="60.8537" />
+<vel value="59.2017" />
+</comp>
+</station>
+<station code="92612" name="ZIP Code 92612 (Intensity V, 19 responses)" insttype="USGS (Did You Feel It?)" lat="33.660358" lon="-117.826087" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="90042" name="ZIP Code 90042 (Intensity VII, 29 responses)" insttype="USGS (Did You Feel It?)" lat="34.115175" lon="-118.191869" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="92706" name="ZIP Code 92706 (Intensity VI, 10 responses)" insttype="USGS (Did You Feel It?)" lat="33.766000" lon="-117.881232" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="92683" name="ZIP Code 92683 (Intensity VI, 28 responses)" insttype="USGS (Did You Feel It?)" lat="33.752510" lon="-117.993967" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="90717" name="ZIP Code 90717 (Intensity VI, 13 responses)" insttype="USGS (Did You Feel It?)" lat="33.793603" lon="-118.317297" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="92008" name="ZIP Code 92008 (Intensity V, 8 responses)" insttype="USGS (Did You Feel It?)" lat="33.150967" lon="-117.303718" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="92692" name="ZIP Code 92692 (Intensity VI, 21 responses)" insttype="USGS (Did You Feel It?)" lat="33.609761" lon="-117.643175" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="90807" name="ZIP Code 90807 (Intensity VI, 12 responses)" insttype="USGS (Did You Feel It?)" lat="33.830750" lon="-118.182171" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="92704" name="ZIP Code 92704 (Intensity VI, 15 responses)" insttype="USGS (Did You Feel It?)" lat="33.720790" lon="-117.90839" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="90266" name="ZIP Code 90266 (Intensity VI, 46 responses)" insttype="USGS (Did You Feel It?)" lat="33.889388" lon="-118.397317" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="92887" name="ZIP Code 92887 (Intensity IV, 7 responses)" insttype="USGS (Did You Feel It?)" lat="33.883897" lon="-117.731766" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.2">
+<comp name="Intensity Questionnaire">
+<acc value="4.0684" />
+<vel value="3.4130" />
+</comp>
+</station>
+<station code="91731" name="ZIP Code 91731 (Intensity VII, 5 responses)" insttype="USGS (Did You Feel It?)" lat="34.078932" lon="-118.041467" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.1">
+<comp name="Intensity Questionnaire">
+<acc value="25.2217" />
+<vel value="23.3817" />
+</comp>
+</station>
+<station code="91752" name="ZIP Code 91752 (Intensity VI, 5 responses)" insttype="USGS (Did You Feel It?)" lat="33.995864" lon="-117.534085" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="89029" name="ZIP Code 89029 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="35.171108" lon="-114.720955" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.3">
+<comp name="Intensity Questionnaire">
+<acc value="4.3326" />
+<vel value="3.6472" />
+</comp>
+</station>
+<station code="92124" name="ZIP Code 92124 (Intensity V, 15 responses)" insttype="USGS (Did You Feel It?)" lat="32.823644" lon="-117.0945" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.9">
+<comp name="Intensity Questionnaire">
+<acc value="6.3195" />
+<vel value="5.4309" />
+</comp>
+</station>
+<station code="91326" name="ZIP Code 91326 (Intensity VIII, 70 responses)" insttype="USGS (Did You Feel It?)" lat="34.280396" lon="-118.556143" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.4">
+<comp name="Intensity Questionnaire">
+<acc value="57.1432" />
+<vel value="55.4008" />
+</comp>
+</station>
+<station code="91040" name="ZIP Code 91040 (Intensity VII, 31 responses)" insttype="USGS (Did You Feel It?)" lat="34.274983" lon="-118.318435" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="90036" name="ZIP Code 90036 (Intensity VII, 34 responses)" insttype="USGS (Did You Feel It?)" lat="34.070365" lon="-118.350106" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.4">
+<comp name="Intensity Questionnaire">
+<acc value="30.4608" />
+<vel value="28.5319" />
+</comp>
+</station>
+<station code="92241" name="ZIP Code 92241 (Intensity III, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.865777" lon="-116.333713" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.2">
+<comp name="Intensity Questionnaire">
+<acc value="2.1687" />
+<vel value="1.7577" />
+</comp>
+</station>
+<station code="91901" name="ZIP Code 91901 (Intensity IV, 3 responses)" insttype="USGS (Did You Feel It?)" lat="32.806638" lon="-116.715169" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.6">
+<comp name="Intensity Questionnaire">
+<acc value="2.7893" />
+<vel value="2.2921" />
+</comp>
+</station>
+<station code="91208" name="ZIP Code 91208 (Intensity VI, 20 responses)" insttype="USGS (Did You Feel It?)" lat="34.196137" lon="-118.240428" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="90242" name="ZIP Code 90242 (Intensity VII, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.922292" lon="-118.141451" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.7">
+<comp name="Intensity Questionnaire">
+<acc value="19.6103" />
+<vel value="17.9309" />
+</comp>
+</station>
+<station code="92562" name="ZIP Code 92562 (Intensity VI, 16 responses)" insttype="USGS (Did You Feel It?)" lat="33.548651" lon="-117.267846" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="93536" name="ZIP Code 93536 (Intensity VI, 29 responses)" insttype="USGS (Did You Feel It?)" lat="34.755309" lon="-118.413645" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="90025" name="ZIP Code 90025 (Intensity VIII, 80 responses)" insttype="USGS (Did You Feel It?)" lat="34.045021" lon="-118.446604" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.8">
+<comp name="Intensity Questionnaire">
+<acc value="39.1769" />
+<vel value="37.2053" />
+</comp>
+</station>
+<station code="91730" name="ZIP Code 91730 (Intensity VI, 28 responses)" insttype="USGS (Did You Feel It?)" lat="34.099655" lon="-117.579535" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92392" name="ZIP Code 92392 (Intensity VI, 15 responses)" insttype="USGS (Did You Feel It?)" lat="34.479743" lon="-117.407171" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="93312" name="ZIP Code 93312 (Intensity IV, 15 responses)" insttype="USGS (Did You Feel It?)" lat="35.391339" lon="-119.119256" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.3">
+<comp name="Intensity Questionnaire">
+<acc value="4.3326" />
+<vel value="3.6472" />
+</comp>
+</station>
+<station code="92656" name="ZIP Code 92656 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.574809" lon="-117.731013" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92110" name="ZIP Code 92110 (Intensity IV, 5 responses)" insttype="USGS (Did You Feel It?)" lat="32.765182" lon="-117.201453" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.2">
+<comp name="Intensity Questionnaire">
+<acc value="4.0684" />
+<vel value="3.4130" />
+</comp>
+</station>
+<station code="90006" name="ZIP Code 90006 (Intensity VII, 11 responses)" insttype="USGS (Did You Feel It?)" lat="34.048027" lon="-118.294093" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.7">
+<comp name="Intensity Questionnaire">
+<acc value="19.6103" />
+<vel value="17.9309" />
+</comp>
+</station>
+<station code="90291" name="ZIP Code 90291 (Intensity VII, 61 responses)" insttype="USGS (Did You Feel It?)" lat="33.993971" lon="-118.463738" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="90043" name="ZIP Code 90043 (Intensity VII, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.988723" lon="-118.335096" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.9">
+<comp name="Intensity Questionnaire">
+<acc value="22.2397" />
+<vel value="20.4757" />
+</comp>
+</station>
+<station code="92549" name="ZIP Code 92549 (Intensity V, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.783553" lon="-116.777276" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="93103" name="ZIP Code 93103 (Intensity V, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.435298" lon="-119.684259" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="93514" name="ZIP Code 93514 (Intensity II, 3 responses)" insttype="USGS (Did You Feel It?)" lat="37.476252" lon="-118.401005" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="2.0">
+<comp name="Intensity Questionnaire">
+<acc value="1.0194" />
+<vel value="0.7927" />
+</comp>
+</station>
+<station code="93117" name="ZIP Code 93117 (Intensity VI, 53 responses)" insttype="USGS (Did You Feel It?)" lat="34.493160" lon="-120.046164" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="91786" name="ZIP Code 91786 (Intensity VI, 28 responses)" insttype="USGS (Did You Feel It?)" lat="34.105227" lon="-117.662097" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="91321" name="ZIP Code 91321 (Intensity IX, 50 responses)" insttype="USGS (Did You Feel It?)" lat="34.357908" lon="-118.473741" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.5">
+<comp name="Intensity Questionnaire">
+<acc value="60.8537" />
+<vel value="59.2017" />
+</comp>
+</station>
+<station code="90274" name="ZIP Code 90274 (Intensity VI, 28 responses)" insttype="USGS (Did You Feel It?)" lat="33.777078" lon="-118.376431" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="91723" name="ZIP Code 91723 (Intensity VI, 6 responses)" insttype="USGS (Did You Feel It?)" lat="34.084941" lon="-117.886607" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="90278" name="ZIP Code 90278 (Intensity VI, 48 responses)" insttype="USGS (Did You Feel It?)" lat="33.873367" lon="-118.370278" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="91030" name="ZIP Code 91030 (Intensity VII, 39 responses)" insttype="USGS (Did You Feel It?)" lat="34.110426" lon="-118.157186" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="90068" name="ZIP Code 90068 (Intensity VII, 38 responses)" insttype="USGS (Did You Feel It?)" lat="34.128047" lon="-118.328747" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.1">
+<comp name="Intensity Questionnaire">
+<acc value="25.2217" />
+<vel value="23.3817" />
+</comp>
+</station>
+<station code="91304" name="ZIP Code 91304 (Intensity VIII, 79 responses)" insttype="USGS (Did You Feel It?)" lat="34.224175" lon="-118.633063" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.2">
+<comp name="Intensity Questionnaire">
+<acc value="50.3872" />
+<vel value="48.5153" />
+</comp>
+</station>
+<station code="91401" name="ZIP Code 91401 (Intensity VIII, 25 responses)" insttype="USGS (Did You Feel It?)" lat="34.178075" lon="-118.431511" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.2">
+<comp name="Intensity Questionnaire">
+<acc value="50.3872" />
+<vel value="48.5153" />
+</comp>
+</station>
+<station code="90275" name="ZIP Code 90275 (Intensity VI, 34 responses)" insttype="USGS (Did You Feel It?)" lat="33.755284" lon="-118.363079" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="90247" name="ZIP Code 90247 (Intensity VI, 10 responses)" insttype="USGS (Did You Feel It?)" lat="33.891254" lon="-118.297582" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="93036" name="ZIP Code 93036 (Intensity V, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.237641" lon="-119.173686" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="90013" name="ZIP Code 90013 (Intensity VIII, 5 responses)" insttype="USGS (Did You Feel It?)" lat="34.044386" lon="-118.241693" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.5">
+<comp name="Intensity Questionnaire">
+<acc value="32.4387" />
+<vel value="30.4895" />
+</comp>
+</station>
+<station code="90056" name="ZIP Code 90056 (Intensity VI, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.993088" lon="-118.373736" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.2">
+<comp name="Intensity Questionnaire">
+<acc value="14.3177" />
+<vel value="12.8680" />
+</comp>
+</station>
+<station code="92679" name="ZIP Code 92679 (Intensity V, 8 responses)" insttype="USGS (Did You Feel It?)" lat="33.652530" lon="-117.56266" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="92845" name="ZIP Code 92845 (Intensity V, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.783155" lon="-118.026649" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.0">
+<comp name="Intensity Questionnaire">
+<acc value="6.7298" />
+<vel value="5.8035" />
+</comp>
+</station>
+<station code="91601" name="ZIP Code 91601 (Intensity VIII, 37 responses)" insttype="USGS (Did You Feel It?)" lat="34.168208" lon="-118.37206" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.0">
+<comp name="Intensity Questionnaire">
+<acc value="44.4299" />
+<vel value="42.4856" />
+</comp>
+</station>
+<station code="90020" name="ZIP Code 90020 (Intensity VII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.066328" lon="-118.310348" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="93455" name="ZIP Code 93455 (Intensity IV, 13 responses)" insttype="USGS (Did You Feel It?)" lat="34.822994" lon="-120.389693" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.1">
+<comp name="Intensity Questionnaire">
+<acc value="3.8203" />
+<vel value="3.1939" />
+</comp>
+</station>
+<station code="92029" name="ZIP Code 92029 (Intensity V, 6 responses)" insttype="USGS (Did You Feel It?)" lat="33.081316" lon="-117.132034" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.7">
+<comp name="Intensity Questionnaire">
+<acc value="5.5723" />
+<vel value="4.7559" />
+</comp>
+</station>
+<station code="92025" name="ZIP Code 92025 (Intensity IV, 12 responses)" insttype="USGS (Did You Feel It?)" lat="33.085082" lon="-117.027154" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.1">
+<comp name="Intensity Questionnaire">
+<acc value="3.8203" />
+<vel value="3.1939" />
+</comp>
+</station>
+<station code="90220" name="ZIP Code 90220 (Intensity VII, 9 responses)" insttype="USGS (Did You Feel It?)" lat="33.879389" lon="-118.237112" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="92626" name="ZIP Code 92626 (Intensity VI, 43 responses)" insttype="USGS (Did You Feel It?)" lat="33.679142" lon="-117.90858" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="92111" name="ZIP Code 92111 (Intensity IV, 8 responses)" insttype="USGS (Did You Feel It?)" lat="32.806534" lon="-117.16893" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.5">
+<comp name="Intensity Questionnaire">
+<acc value="2.6192" />
+<vel value="2.1449" />
+</comp>
+</station>
+<station code="93543" name="ZIP Code 93543 (Intensity VII, 6 responses)" insttype="USGS (Did You Feel It?)" lat="34.507550" lon="-117.937286" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.1">
+<comp name="Intensity Questionnaire">
+<acc value="25.2217" />
+<vel value="23.3817" />
+</comp>
+</station>
+<station code="92703" name="ZIP Code 92703 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.748589" lon="-117.90559" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="93035" name="ZIP Code 93035 (Intensity VII, 33 responses)" insttype="USGS (Did You Feel It?)" lat="34.183948" lon="-119.223912" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.5">
+<comp name="Intensity Questionnaire">
+<acc value="17.2918" />
+<vel value="15.7024" />
+</comp>
+</station>
+<station code="92376" name="ZIP Code 92376 (Intensity VI, 15 responses)" insttype="USGS (Did You Feel It?)" lat="34.110518" lon="-117.380169" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="92028" name="ZIP Code 92028 (Intensity V, 8 responses)" insttype="USGS (Did You Feel It?)" lat="33.404809" lon="-117.251612" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="93101" name="ZIP Code 93101 (Intensity V, 37 responses)" insttype="USGS (Did You Feel It?)" lat="34.419032" lon="-119.706992" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.2">
+<comp name="Intensity Questionnaire">
+<acc value="7.6322" />
+<vel value="6.6271" />
+</comp>
+</station>
+<station code="90265" name="ZIP Code 90265 (Intensity VII, 26 responses)" insttype="USGS (Did You Feel It?)" lat="34.065566" lon="-118.816405" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="93560" name="ZIP Code 93560 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.918982" lon="-118.497" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.3">
+<comp name="Intensity Questionnaire">
+<acc value="4.3326" />
+<vel value="3.6472" />
+</comp>
+</station>
+<station code="92821" name="ZIP Code 92821 (Intensity VII, 15 responses)" insttype="USGS (Did You Feel It?)" lat="33.927573" lon="-117.884677" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.5">
+<comp name="Intensity Questionnaire">
+<acc value="17.2918" />
+<vel value="15.7024" />
+</comp>
+</station>
+<station code="90255" name="ZIP Code 90255 (Intensity VI, 5 responses)" insttype="USGS (Did You Feel It?)" lat="33.976977" lon="-118.217283" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="92102" name="ZIP Code 92102 (Intensity III, 4 responses)" insttype="USGS (Did You Feel It?)" lat="32.717149" lon="-117.118665" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.4">
+<comp name="Intensity Questionnaire">
+<acc value="2.4595" />
+<vel value="2.0072" />
+</comp>
+</station>
+<station code="91604" name="ZIP Code 91604 (Intensity VIII, 62 responses)" insttype="USGS (Did You Feel It?)" lat="34.139515" lon="-118.393138" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.2">
+<comp name="Intensity Questionnaire">
+<acc value="50.3872" />
+<vel value="48.5153" />
+</comp>
+</station>
+<station code="91732" name="ZIP Code 91732 (Intensity VII, 5 responses)" insttype="USGS (Did You Feel It?)" lat="34.072307" lon="-118.014766" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="90022" name="ZIP Code 90022 (Intensity VII, 6 responses)" insttype="USGS (Did You Feel It?)" lat="34.024690" lon="-118.155695" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="93004" name="ZIP Code 93004 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="34.281944" lon="-119.163872" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="92009" name="ZIP Code 92009 (Intensity IV, 11 responses)" insttype="USGS (Did You Feel It?)" lat="33.100383" lon="-117.263992" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.9">
+<comp name="Intensity Questionnaire">
+<acc value="3.3687" />
+<vel value="2.7970" />
+</comp>
+</station>
+<station code="91701" name="ZIP Code 91701 (Intensity VI, 18 responses)" insttype="USGS (Did You Feel It?)" lat="34.138010" lon="-117.600917" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="91203" name="ZIP Code 91203 (Intensity VII, 7 responses)" insttype="USGS (Did You Feel It?)" lat="34.152750" lon="-118.263976" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.3">
+<comp name="Intensity Questionnaire">
+<acc value="28.6035" />
+<vel value="26.7001" />
+</comp>
+</station>
+<station code="90026" name="ZIP Code 90026 (Intensity VIII, 29 responses)" insttype="USGS (Did You Feel It?)" lat="34.078767" lon="-118.26378" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.5">
+<comp name="Intensity Questionnaire">
+<acc value="32.4387" />
+<vel value="30.4895" />
+</comp>
+</station>
+<station code="90065" name="ZIP Code 90065 (Intensity VIII, 20 responses)" insttype="USGS (Did You Feel It?)" lat="34.109339" lon="-118.227965" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.6">
+<comp name="Intensity Questionnaire">
+<acc value="34.5450" />
+<vel value="32.5813" />
+</comp>
+</station>
+<station code="92660" name="ZIP Code 92660 (Intensity V, 23 responses)" insttype="USGS (Did You Feel It?)" lat="33.632708" lon="-117.875785" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="92337" name="ZIP Code 92337 (Intensity VI, 6 responses)" insttype="USGS (Did You Feel It?)" lat="34.049178" lon="-117.471378" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="92067" name="ZIP Code 92067 (Intensity VI, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.024009" lon="-117.204344" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92399" name="ZIP Code 92399 (Intensity V, 14 responses)" insttype="USGS (Did You Feel It?)" lat="34.038462" lon="-117.007727" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="92507" name="ZIP Code 92507 (Intensity V, 25 responses)" insttype="USGS (Did You Feel It?)" lat="33.974383" lon="-117.333243" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="93022" name="ZIP Code 93022 (Intensity VI, 5 responses)" insttype="USGS (Did You Feel It?)" lat="34.403839" lon="-119.298298" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="91367" name="ZIP Code 91367 (Intensity VIII, 79 responses)" insttype="USGS (Did You Feel It?)" lat="34.176384" lon="-118.616036" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.4">
+<comp name="Intensity Questionnaire">
+<acc value="57.1432" />
+<vel value="55.4008" />
+</comp>
+</station>
+<station code="90601" name="ZIP Code 90601 (Intensity VII, 16 responses)" insttype="USGS (Did You Feel It?)" lat="34.001867" lon="-118.029714" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="92691" name="ZIP Code 92691 (Intensity VI, 31 responses)" insttype="USGS (Did You Feel It?)" lat="33.610502" lon="-117.666159" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.6">
+<comp name="Intensity Questionnaire">
+<acc value="9.8161" />
+<vel value="8.6417" />
+</comp>
+</station>
+<station code="91007" name="ZIP Code 91007 (Intensity VI, 20 responses)" insttype="USGS (Did You Feel It?)" lat="34.128795" lon="-118.047901" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="90095" name="ZIP Code 90095 (Intensity VIII, 5 responses)" insttype="USGS (Did You Feel It?)" lat="34.070339" lon="-118.442646" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.2">
+<comp name="Intensity Questionnaire">
+<acc value="50.3872" />
+<vel value="48.5153" />
+</comp>
+</station>
+<station code="91403" name="ZIP Code 91403 (Intensity VIII, 51 responses)" insttype="USGS (Did You Feel It?)" lat="34.146684" lon="-118.462999" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.3">
+<comp name="Intensity Questionnaire">
+<acc value="53.6590" />
+<vel value="51.8439" />
+</comp>
+</station>
+<station code="91362" name="ZIP Code 91362 (Intensity VII, 67 responses)" insttype="USGS (Did You Feel It?)" lat="34.192426" lon="-118.819463" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.3">
+<comp name="Intensity Questionnaire">
+<acc value="28.6035" />
+<vel value="26.7001" />
+</comp>
+</station>
+<station code="90019" name="ZIP Code 90019 (Intensity VIII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.048660" lon="-118.33862" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.8">
+<comp name="Intensity Questionnaire">
+<acc value="39.1769" />
+<vel value="37.2053" />
+</comp>
+</station>
+<station code="91917" name="ZIP Code 91917 (Intensity II, 4 responses)" insttype="USGS (Did You Feel It?)" lat="32.606910" lon="-116.794451" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="2.0">
+<comp name="Intensity Questionnaire">
+<acc value="1.0194" />
+<vel value="0.7927" />
+</comp>
+</station>
+<station code="93311" name="ZIP Code 93311 (Intensity V, 15 responses)" insttype="USGS (Did You Feel It?)" lat="35.189208" lon="-119.18138" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.3">
+<comp name="Intensity Questionnaire">
+<acc value="8.1278" />
+<vel value="7.0818" />
+</comp>
+</station>
+<station code="91101" name="ZIP Code 91101 (Intensity VII, 24 responses)" insttype="USGS (Did You Feel It?)" lat="34.146579" lon="-118.138881" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="93505" name="ZIP Code 93505 (Intensity V, 11 responses)" insttype="USGS (Did You Feel It?)" lat="35.182127" lon="-117.824743" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="93030" name="ZIP Code 93030 (Intensity VI, 32 responses)" insttype="USGS (Did You Feel It?)" lat="34.207348" lon="-119.179937" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.4">
+<comp name="Intensity Questionnaire">
+<acc value="16.2374" />
+<vel value="14.6942" />
+</comp>
+</station>
+<station code="92404" name="ZIP Code 92404 (Intensity VI, 11 responses)" insttype="USGS (Did You Feel It?)" lat="34.177310" lon="-117.274311" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="90704" name="ZIP Code 90704 (Intensity V, 8 responses)" insttype="USGS (Did You Feel It?)" lat="33.382280" lon="-118.433642" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="93552" name="ZIP Code 93552 (Intensity VI, 11 responses)" insttype="USGS (Did You Feel It?)" lat="34.578844" lon="-118.021687" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="92587" name="ZIP Code 92587 (Intensity V, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.695666" lon="-117.250643" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="92371" name="ZIP Code 92371 (Intensity VII, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.455939" lon="-117.540987" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="93523" name="ZIP Code 93523 (Intensity VI, 7 responses)" insttype="USGS (Did You Feel It?)" lat="34.994794" lon="-117.93632" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="93463" name="ZIP Code 93463 (Intensity VI, 4 responses)" insttype="USGS (Did You Feel It?)" lat="34.591241" lon="-120.122765" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92506" name="ZIP Code 92506 (Intensity V, 52 responses)" insttype="USGS (Did You Feel It?)" lat="33.934607" lon="-117.361869" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.8">
+<comp name="Intensity Questionnaire">
+<acc value="5.9341" />
+<vel value="5.0822" />
+</comp>
+</station>
+<station code="92625" name="ZIP Code 92625 (Intensity VI, 6 responses)" insttype="USGS (Did You Feel It?)" lat="33.601597" lon="-117.865651" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.5">
+<comp name="Intensity Questionnaire">
+<acc value="9.2175" />
+<vel value="8.0869" />
+</comp>
+</station>
+<station code="93305" name="ZIP Code 93305 (Intensity IV, 4 responses)" insttype="USGS (Did You Feel It?)" lat="35.389083" lon="-118.985337" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="3.9">
+<comp name="Intensity Questionnaire">
+<acc value="3.3687" />
+<vel value="2.7970" />
+</comp>
+</station>
+<station code="90004" name="ZIP Code 90004 (Intensity VII, 21 responses)" insttype="USGS (Did You Feel It?)" lat="34.076244" lon="-118.311381" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.2">
+<comp name="Intensity Questionnaire">
+<acc value="26.8594" />
+<vel value="24.9859" />
+</comp>
+</station>
+<station code="90230" name="ZIP Code 90230 (Intensity VII, 44 responses)" insttype="USGS (Did You Feel It?)" lat="33.994939" lon="-118.399327" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="91702" name="ZIP Code 91702 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="34.133603" lon="-117.908864" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.9">
+<comp name="Intensity Questionnaire">
+<acc value="11.8551" />
+<vel value="10.5452" />
+</comp>
+</station>
+<station code="95008" name="ZIP Code 95008 (Intensity II, 3 responses)" insttype="USGS (Did You Feel It?)" lat="37.279862" lon="-121.954781" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="2.0">
+<comp name="Intensity Questionnaire">
+<acc value="1.0194" />
+<vel value="0.7927" />
+</comp>
+</station>
+<station code="90241" name="ZIP Code 90241 (Intensity VII, 11 responses)" insttype="USGS (Did You Feel It?)" lat="33.940844" lon="-118.128555" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.6">
+<comp name="Intensity Questionnaire">
+<acc value="18.4146" />
+<vel value="16.7797" />
+</comp>
+</station>
+<station code="92082" name="ZIP Code 92082 (Intensity IV, 3 responses)" insttype="USGS (Did You Feel It?)" lat="33.253434" lon="-116.994043" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.2">
+<comp name="Intensity Questionnaire">
+<acc value="4.0684" />
+<vel value="3.4130" />
+</comp>
+</station>
+<station code="91320" name="ZIP Code 91320 (Intensity VII, 66 responses)" insttype="USGS (Did You Feel It?)" lat="34.141629" lon="-118.978871" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.8">
+<comp name="Intensity Questionnaire">
+<acc value="20.8836" />
+<vel value="19.1611" />
+</comp>
+</station>
+<station code="92336" name="ZIP Code 92336 (Intensity VI, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.135212" lon="-117.462129" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="92808" name="ZIP Code 92808 (Intensity V, 9 responses)" insttype="USGS (Did You Feel It?)" lat="33.853993" lon="-117.736476" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.4">
+<comp name="Intensity Questionnaire">
+<acc value="8.6555" />
+<vel value="7.5677" />
+</comp>
+</station>
+<station code="91303" name="ZIP Code 91303 (Intensity VIII, 20 responses)" insttype="USGS (Did You Feel It?)" lat="34.197897" lon="-118.601827" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.2">
+<comp name="Intensity Questionnaire">
+<acc value="50.3872" />
+<vel value="48.5153" />
+</comp>
+</station>
+<station code="92860" name="ZIP Code 92860 (Intensity VI, 10 responses)" insttype="USGS (Did You Feel It?)" lat="33.924654" lon="-117.552693" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="90012" name="ZIP Code 90012 (Intensity VII, 8 responses)" insttype="USGS (Did You Feel It?)" lat="34.065865" lon="-118.238532" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.4">
+<comp name="Intensity Questionnaire">
+<acc value="30.4608" />
+<vel value="28.5319" />
+</comp>
+</station>
+<station code="92802" name="ZIP Code 92802 (Intensity VI, 14 responses)" insttype="USGS (Did You Feel It?)" lat="33.808077" lon="-117.923465" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.7">
+<comp name="Intensity Questionnaire">
+<acc value="10.4535" />
+<vel value="9.2346" />
+</comp>
+</station>
+<station code="92020" name="ZIP Code 92020 (Intensity V, 11 responses)" insttype="USGS (Did You Feel It?)" lat="32.796498" lon="-116.970495" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.1">
+<comp name="Intensity Questionnaire">
+<acc value="7.1668" />
+<vel value="6.2016" />
+</comp>
+</station>
+<station code="90044" name="ZIP Code 90044 (Intensity VI, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.953022" lon="-118.291498" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.3">
+<comp name="Intensity Questionnaire">
+<acc value="15.2474" />
+<vel value="13.7508" />
+</comp>
+</station>
+<station code="92509" name="ZIP Code 92509 (Intensity VI, 28 responses)" insttype="USGS (Did You Feel It?)" lat="34.003384" lon="-117.445589" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.1">
+<comp name="Intensity Questionnaire">
+<acc value="13.4447" />
+<vel value="12.0418" />
+</comp>
+</station>
+<station code="92116" name="ZIP Code 92116 (Intensity V, 9 responses)" insttype="USGS (Did You Feel It?)" lat="32.764944" lon="-117.123242" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.9">
+<comp name="Intensity Questionnaire">
+<acc value="6.3195" />
+<vel value="5.4309" />
+</comp>
+</station>
+<station code="93021" name="ZIP Code 93021 (Intensity VII, 55 responses)" insttype="USGS (Did You Feel It?)" lat="34.309140" lon="-118.863966" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.0">
+<comp name="Intensity Questionnaire">
+<acc value="23.6838" />
+<vel value="21.8805" />
+</comp>
+</station>
+<station code="91402" name="ZIP Code 91402 (Intensity VIII, 30 responses)" insttype="USGS (Did You Feel It?)" lat="34.224224" lon="-118.444649" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="8.0">
+<comp name="Intensity Questionnaire">
+<acc value="44.4299" />
+<vel value="42.4856" />
+</comp>
+</station>
+<station code="91384" name="ZIP Code 91384 (Intensity VIII, 29 responses)" insttype="USGS (Did You Feel It?)" lat="34.554925" lon="-118.644497" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.7">
+<comp name="Intensity Questionnaire">
+<acc value="36.7882" />
+<vel value="34.8166" />
+</comp>
+</station>
+<station code="93454" name="ZIP Code 93454 (Intensity IV, 7 responses)" insttype="USGS (Did You Feel It?)" lat="34.930793" lon="-120.235296" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.3">
+<comp name="Intensity Questionnaire">
+<acc value="4.3326" />
+<vel value="3.6472" />
+</comp>
+</station>
+<station code="92610" name="ZIP Code 92610 (Intensity VI, 4 responses)" insttype="USGS (Did You Feel It?)" lat="33.706295" lon="-117.665611" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="92117" name="ZIP Code 92117 (Intensity V, 23 responses)" insttype="USGS (Did You Feel It?)" lat="32.824845" lon="-117.199973" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="4.5">
+<comp name="Intensity Questionnaire">
+<acc value="4.9135" />
+<vel value="4.1648" />
+</comp>
+</station>
+<station code="92844" name="ZIP Code 92844 (Intensity VI, 6 responses)" insttype="USGS (Did You Feel It?)" lat="33.765526" lon="-117.969586" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="5.8">
+<comp name="Intensity Questionnaire">
+<acc value="11.1322" />
+<vel value="9.8682" />
+</comp>
+</station>
+<station code="90037" name="ZIP Code 90037 (Intensity VII, 3 responses)" insttype="USGS (Did You Feel It?)" lat="34.002744" lon="-118.287491" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="7.1">
+<comp name="Intensity Questionnaire">
+<acc value="25.2217" />
+<vel value="23.3817" />
+</comp>
+</station>
+<station code="90623" name="ZIP Code 90623 (Intensity VI, 7 responses)" insttype="USGS (Did You Feel It?)" lat="33.850473" lon="-118.040977" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.0">
+<comp name="Intensity Questionnaire">
+<acc value="12.6249" />
+<vel value="11.2687" />
+</comp>
+</station>
+<station code="90502" name="ZIP Code 90502 (Intensity VII, 5 responses)" insttype="USGS (Did You Feel It?)" lat="33.835159" lon="-118.293015" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.9">
+<comp name="Intensity Questionnaire">
+<acc value="22.2397" />
+<vel value="20.4757" />
+</comp>
+</station>
+<station code="91775" name="ZIP Code 91775 (Intensity VII, 16 responses)" insttype="USGS (Did You Feel It?)" lat="34.114599" lon="-118.089177" source="USGS (Did You Feel It?)" netid="CIIM" commtype="USGS (Did You Feel It?)" intensity="6.7">
+<comp name="Intensity Questionnaire">
+<acc value="19.6103" />
+<vel value="17.9309" />
+</comp>
+</station>
+
+</stationlist>
