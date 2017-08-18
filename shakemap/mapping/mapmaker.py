@@ -460,7 +460,7 @@ class MapMaker(object):
                 (gd.xmin, gd.xmax, gd.ymin, gd.ymax))
             self.cities = self.cities.limitByGrid(nx=self.city_cols, ny=self.city_rows,
                                                   cities_per_grid=self.cities_per_grid)
-            self.cities = self.cities.limitByMapCollision(m, fontname='Times New Roman')
+            self.cities = self.cities.limitByMapCollision(m)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
         # draw title and supertitle
@@ -636,7 +636,7 @@ class MapMaker(object):
                 (gd.xmin, gd.xmax, gd.ymin, gd.ymax))
             self.cities = self.cities.limitByGrid(nx=self.city_cols, ny=self.city_rows,
                                                   cities_per_grid=self.cities_per_grid)
-            self.cities = self.cities.limitByMapCollision(m, fontname='Times New Roman')
+            self.cities = self.cities.limitByMapCollision(m)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
         # draw title and supertitle
