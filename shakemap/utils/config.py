@@ -1,5 +1,5 @@
 import os.path
-import sys
+import pkg_resources
 
 # third party libraries
 import numpy as np
@@ -7,9 +7,7 @@ from configobj import ConfigObj, flatten_errors
 from validate import Validator, ValidateError
 
 def get_data_path():
-    homedir = os.path.dirname(os.path.abspath(__file__)) #where is this script?
-    datadir = os.path.join(homedir, '..', 'data')
-    return datadir
+    return pkg_resources.resource_filename('shakemap', 'data')
 
 def get_configspec():
     return os.path.join(get_data_path(), 'configspec.conf')
