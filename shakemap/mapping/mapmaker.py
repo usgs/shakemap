@@ -20,7 +20,7 @@ from shapely.geometry import GeometryCollection
 from shapely.geometry import Polygon as sPolygon
 from shapely.geometry import shape as sShape
 from shapely.geometry import mapping
-#from mpl_toolkits.basemap import Basemap
+from mpl_toolkits.basemap import Basemap
 import numpy as np
 from descartes import PolygonPatch
 from scipy.ndimage import gaussian_filter
@@ -460,7 +460,12 @@ class MapMaker(object):
                 (gd.xmin, gd.xmax, gd.ymin, gd.ymax))
             self.cities = self.cities.limitByGrid(nx=self.city_cols, ny=self.city_rows,
                                                   cities_per_grid=self.cities_per_grid)
-            self.cities = self.cities.limitByMapCollision(m)
+            print("Available fonts: ", self.cities._fontlist)
+            if 'Times New Roman' in self.cities._fontlist:
+                font = 'Times New Roman'
+            else:
+                font = 'DejaVu Sans'
+            self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
         # draw title and supertitle
@@ -636,7 +641,11 @@ class MapMaker(object):
                 (gd.xmin, gd.xmax, gd.ymin, gd.ymax))
             self.cities = self.cities.limitByGrid(nx=self.city_cols, ny=self.city_rows,
                                                   cities_per_grid=self.cities_per_grid)
-            self.cities = self.cities.limitByMapCollision(m)
+            if 'Times New Roman' in self.cities._fontlist:
+                font = 'Times New Roman'
+            else:
+                font = 'DejaVu Sans'
+            self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
         # draw title and supertitle
