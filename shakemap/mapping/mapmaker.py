@@ -461,7 +461,11 @@ class MapMaker(object):
             self.cities = self.cities.limitByGrid(nx=self.city_cols, ny=self.city_rows,
                                                   cities_per_grid=self.cities_per_grid)
             print("Available fonts: ", self.cities._fontlist)
-            self.cities = self.cities.limitByMapCollision(m, fontname='Times New Roman')
+            if 'Times New Roman' in self.cities._fontlist:
+                font = 'Times New Roman'
+            else
+                font = 'DejaVu Sans'
+            self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
         # draw title and supertitle
@@ -637,7 +641,11 @@ class MapMaker(object):
                 (gd.xmin, gd.xmax, gd.ymin, gd.ymax))
             self.cities = self.cities.limitByGrid(nx=self.city_cols, ny=self.city_rows,
                                                   cities_per_grid=self.cities_per_grid)
-            self.cities = self.cities.limitByMapCollision(m, fontname='Times New Roman')
+            if 'Times New Roman' in self.cities._fontlist:
+                font = 'Times New Roman'
+            else
+                font = 'DejaVu Sans'
+            self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
         # draw title and supertitle
