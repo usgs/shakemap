@@ -460,6 +460,7 @@ class MapMaker(object):
                 (gd.xmin, gd.xmax, gd.ymin, gd.ymax))
             self.cities = self.cities.limitByGrid(nx=self.city_cols, ny=self.city_rows,
                                                   cities_per_grid=self.cities_per_grid)
+            print("Available fonts: ", self.cities._fontlist)
             self.cities = self.cities.limitByMapCollision(m)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
