@@ -463,7 +463,7 @@ class MapMaker(object):
             print("Available fonts: ", self.cities._fontlist)
             if 'Times New Roman' in self.cities._fontlist:
                 font = 'Times New Roman'
-            else
+            else:
                 font = 'DejaVu Sans'
             self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
@@ -643,7 +643,7 @@ class MapMaker(object):
                                                   cities_per_grid=self.cities_per_grid)
             if 'Times New Roman' in self.cities._fontlist:
                 font = 'Times New Roman'
-            else
+            else:
                 font = 'DejaVu Sans'
             self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
