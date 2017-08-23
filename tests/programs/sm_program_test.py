@@ -371,7 +371,7 @@ def test_model():
 ########################################################################
 # Test sm_contour
 ########################################################################
-def test_model():
+def test_contour():
     installpath, datapath = get_config_paths()
     #
     # Run in verbose mode to hit that code
