@@ -5,8 +5,9 @@ python:
 
 before_install:
     - sudo apt-get -qq update
-    - sudo apt-get install -y msttcorefonts
-    - sudo apt-get install -y ttf-ubuntu-font-family ttf-aenigma fonts-tuffy
+    - sudo apt-get --reinstall install -y msttcorefonts
+    - sudo apt-get --reinstall install -y ttf-mscorefonts-installer
+      #    - sudo apt-get install -y ttf-ubuntu-font-family ttf-aenigma fonts-tuffy
 
 install:
     #------------------
