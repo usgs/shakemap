@@ -781,17 +781,17 @@ def interp(args):
             print('total time for %s=%f' % (imtstr, time.time() - time1))
 
 #%%
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # Output the data and metadata
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     product_path = os.path.join(datadir, 'products')
     if not os.path.isdir(product_path):
         os.mkdir(product_path)
     oc = OutputContainer.createEmpty(os.path.join(product_path,
                                                   'shake_result.hdf'))
-    #
+    # ------------------------------------------------------------------
     # Might as well stick the whole config in the result
-    #
+    # ------------------------------------------------------------------
     oc.addMetadata(config, name='config')
 
     #
@@ -819,13 +819,9 @@ def interp(args):
     # Get the map grade
     #
     mean_rat, mygrade, sd_rat = get_map_grade(do_grid, outsd, psd, moutgrid)
-    #
+    # ------------------------------------------------------------------
     # This is the metadata for creating info.json
-    #
-#
-# Need:
-#   map version, map status
-#
+    # ------------------------------------------------------------------
     ip = 'input'
     ei = 'event_information'
     op = 'output'
@@ -945,16 +941,16 @@ def interp(args):
 
     oc.addData(json.dumps(info), 'info.json')
 
-    #
+    # ------------------------------------------------------------------
     # Add the rupture JSON as a text string
-    #
+    # ------------------------------------------------------------------
     oc.addData(json.dumps(rupture_obj._geojson), 'rupture.json')
 
-    #
+    # ------------------------------------------------------------------
     # Add the station data. The stationlist object has the original
     # data and produces a GeoJSON object (a dictionary, really), but
     # we need to add peak values and flagging that has been done here.
-    #
+    # ------------------------------------------------------------------
     if stations:
         sjdict = stations.getGeoJson()
         sta_ix = {}
@@ -987,6 +983,27 @@ def interp(args):
                 station['properties']['pgv'] = '%.4f' % (np.exp(sdf['PGV'][six]))
             else:
                 station['properties']['pgv'] = 'null'
+            #
+            # Add the predictions so we can plot residuals
+            #
+            station['properties']['predictions'] = {}
+            for key in sdf.keys():
+                if not key.endswith('_pred'):
+                    continue
+                myamp = sdf[key][six]
+                if key.startswith('PGV'):
+                    value = np.exp(myamp)
+                    units = 'cm/s'
+                elif key.startswith('MMI'):
+                    value = myamp
+                    units = 'intensity'
+                else:
+                    value = np.exp(myamp) * 100
+                    units = '%g'
+                station['properties']['predictions'][key.lower()] = {
+                        'value' : value,
+                        'units' : units
+                }
             station['properties']['distance'] = '%.2f' % sdf['rrup'][six]
             for channel in station['properties']['channels']:
                 for amp in channel['amplitudes']:
@@ -1003,6 +1020,10 @@ def interp(args):
 
     oc.addData(json.dumps(sjdict), 'stationlist.json')
 
+    # ------------------------------------------------------------------
+    # Add the output grids or points to the output; include some
+    # metadata.
+    # ------------------------------------------------------------------
     metadata = {}
     if do_grid:
         metadata['type'] = 'grid'
