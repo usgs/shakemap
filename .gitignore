@@ -11,3 +11,4 @@ shakemap.egg-info/
 **/shake_result.hdf
 **/.gmtcommands4
 htmlcov
+tests/data/eventdata/*/current/products

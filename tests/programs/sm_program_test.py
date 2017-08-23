@@ -310,7 +310,7 @@ def test_model():
     cp = subprocess.run([program, 'northridge_points', '-v'], shell=False)
     assert not cp.returncode
     #
-    # This is a small grid with station data only
+    # This is a small grid with station data only (should succeed)
     #
     program = os.path.join(shakedir, 'sm_assemble')
     cp = subprocess.run([program, 'nc72282711'], shell=False)
@@ -366,6 +366,36 @@ def test_model():
     program = os.path.join(shakedir, 'sm_model')
     cp = subprocess.run([program, 'not_an_event'], shell=False)
     assert cp.returncode
+    
+
+########################################################################
+# Test sm_contour
+########################################################################
+def test_contour():
+    installpath, datapath = get_config_paths()
+    #
+    # Run in verbose mode to hit that code
+    #
+    program = os.path.join(shakedir, 'sm_contour')
+    cp = subprocess.run([program, 'nc72282711', '-v'], shell=False)
+    assert not cp.returncode
+    #
+    # Run a nonexistent event to hit the error-handling code
+    #
+    program = os.path.join(shakedir, 'sm_contour')
+    cp = subprocess.run([program, 'not_an_event'], shell=False)
+    assert cp.returncode
+    #
+    # Remove the products directory to hit that code
+    #
+    hdf_file = os.path.join(datapath, 'nc72282711', 'current', 
+                            'products', 'shake_result.hdf')
+    os.rename(hdf_file, hdf_file + '_safe')
+
+    program = os.path.join(shakedir, 'sm_contour')
+    cp = subprocess.run([program, 'nc72282711'], shell=False)
+    assert cp.returncode
+    os.rename(hdf_file + '_safe', hdf_file)
 
 
 ########################################################################
@@ -378,9 +408,13 @@ def test_restore():
     if os.path.isdir(smrc + '_safe'):
         os.rename(smrc + '_safe', smrc)
     
+########################################################################
+# main program
+########################################################################
 if __name__ == '__main__':
     test_profile()
     test_assemble()
     test_augment()
     test_model()
+    test_contour()
     test_restore()
