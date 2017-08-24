@@ -7,13 +7,38 @@ from configobj import ConfigObj, flatten_errors
 from validate import Validator, ValidateError
 
 def get_data_path():
+    """
+    Return the path to the shakemap package data directory holding
+    configspec.conf, the template config files, and the example config
+    files.
+
+    Returns:
+        (str): The full path to the data directory.
+
+    """
     return pkg_resources.resource_filename('shakemap', 'data')
 
 def get_configspec():
+    """
+    Returns the full path to the ShakeMap configspec.conf file.
+
+    Returns:
+        (str): The path to the configspec.
+
+    """
     return os.path.join(get_data_path(), 'configspec.conf')
 
 
 def get_config_paths():
+    """
+    Returns two paths based on the currently selected profile in the 
+    user's ~/.shakemap/profile.conf: 1) the path to the ShakeMap
+    installation directory; 2) the path to the data directory.
+
+    Returns:
+        (str, str): The paths to the ShakeMap install directory
+        and the data directory.
+    """
     config_file = os.path.join(os.path.expanduser('~'), '.shakemap', 
                                'profiles.conf')
     config = ConfigObj(config_file)
@@ -24,6 +49,14 @@ def get_config_paths():
     return (install,data)
 
 def get_custom_validator():
+    """
+    Returns a validator suitable for validating the ShakeMap config
+    files.
+
+    Returns:
+        (:class:`Validator`): A Validator object.
+
+    """
     fdict = {
         'file_type': file_type,
         'directory_type': directory_type,
@@ -37,6 +70,21 @@ def get_custom_validator():
     return validator
 
 def config_error(config, results):
+    """
+    Parse the results of a ConfigObj validation and print the errors.
+    Throws a RuntimeError exception  upon completion if any errors or 
+    missing sections are encountered.
+
+    Args:
+        config (ConfigObj): The ConfigObj instance representing the 
+            parsed config.
+        results (dict): The dictionary returned by the validation of
+        the 'config' arguments.
+
+    Returns:
+        (Nothing): Nothing
+
+    """
     errs = 0
     for (section_list, key, _) in flatten_errors(config, results):
         if key is not None:
@@ -53,6 +101,18 @@ def config_error(config, results):
                      'error' if errs == 1 else 'errors'))
 
 def check_config(config):
+    """
+    Checks that the gmpe, gmice, ipe, ccf, and component parameters
+    in config are defined in their respective sections. Raises a 
+    ValidateError exception if an error is encountered.
+
+    Args:
+        config (ConfigObj): A ConfigObj instance.
+
+    Returns:
+        (Nothing): Nothing.
+
+    """
     if config['modeling']['gmpe'] not in config['gmpe_sets']:
         print('Configuration error: gmpe %s not in gmpe_sets' %
               (config['modeling']['gmpe']))
@@ -75,6 +135,21 @@ def check_config(config):
         raise ValidateError()
 
 def annotatedfloat_type(value):
+    """
+    Checks to see if value is a float, or a float with a 'c', 'm', or 'd'
+    appended. Then converts the value to decimal degrees where an unadorned
+    float or a float plus 'd' is interpreted as decimal degrees, 'm' is
+    interpreted as arc-minutes, and 'c' is interpreted as arc-seconds.
+    Raises a ValidateError exception on failure.
+
+    Args:
+        value (str): A string representing a float or a float appended 
+        with 'd', 'm', or 'c' (for degrees, minutes, seconds).
+
+    Returns:
+        (float): The input value converted to decimal degrees.
+
+    """
     try:
         out = float(value)
     except ValueError:
@@ -92,6 +167,18 @@ def annotatedfloat_type(value):
     return out
 
 def weight_list(value, min):
+    """
+    Checks to see if value is a list of floats at least min elements long,
+    and whose values add up to 1.0.  Raises a ValidateError exception on 
+    failure.
+
+    Args:
+        value (str): A string representing a list of floats.
+
+    Returns:
+        (list): The input string converted to a list of floats.
+
+    """
 
     if isinstance(value, str) and value == 'None':
         if int(min) == 0:
@@ -133,6 +220,18 @@ def weight_list(value, min):
     return out
 
 def gmpe_list(value, min):
+    """
+    Checks to see if value is a list of strings at least min elements long.
+    The entries are not checked for their validity as GMPEs. Raises a 
+    ValidateError exception on failure.
+
+    Args:
+        value (str): A string representing a list of GMPEs.
+
+    Returns:
+        (list): The input string converted to a list of GMPEs.
+
+    """
 
     if value == 'None' or value == '[]':
         value = []
@@ -149,6 +248,20 @@ def gmpe_list(value, min):
     return value
 
 def extent_list(value):
+    """
+    Checks to see if value is an empty list or a list of four floats,
+    whose values are valid coordinates in (longitude, longitude,
+    latitude, latitude) order. Returns a list upon success; raises a
+    ValidateError exception on failure.
+
+    Args:
+        value (str): A string representing a list of geographic 
+            coordinates.
+
+    Returns:
+        (list): The input string converted to a list of floats.
+
+    """
 
     if isinstance(value, str) and (value == 'None' or value == '[]'):
         return []
@@ -176,6 +289,17 @@ def extent_list(value):
     return out
 
 def file_type(value):
+    """
+    Checks to see if value is a valid file or an empty string.
+    Raises a ValidateError exception on failure.
+
+    Args:
+        value (str): A string representing the path to a file.
+
+    Returns:
+        (string): The input string.
+
+    """
     if not value or value == 'None':
         return ''
     if not os.path.isfile(value):
@@ -184,6 +308,17 @@ def file_type(value):
     return value
 
 def directory_type(value):
+    """
+    Checks to see if value is a valid directory or an empty string.
+    Raises a ValidateError exception on failure.
+
+    Args:
+        value (str): A string representing the path to a directory.
+
+    Returns:
+        (string): The input string.
+
+    """
     if not value or value == 'None':
         return ''
     if not os.path.isdir(value):
@@ -191,6 +326,19 @@ def directory_type(value):
     return value
 
 def status_string(value, min):
+    """
+    Checks to see if value is one of the ShakeMap status string of
+    'automatic', 'released', or 'reviewed.  Raises a ValidateError 
+    exception on failure.
+
+    Args:
+        value (str): A status string.
+
+    Returns:
+        (string): The input string. 'automatic' is returned if
+        value is empty.
+
+    """
     if not value:
         return 'automatic'
     if value not in ('automatic', 'released', 'reviewed'):

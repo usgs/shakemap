@@ -1,0 +1,15 @@
+shakemap.utils.extern.scp
+=================================
+
+Submodules
+
+.. toctree::
+
+   shakemap.utils.extern.scp.scp
+
+Module contents
+
+.. automodule:: shakemap.utils.extern.scp
+    :members:
+    :undoc-members:
+    :show-inheritance:

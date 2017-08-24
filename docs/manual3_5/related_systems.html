@@ -1,0 +1,492 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>3.5. Related Systems &mdash; ShakeMap Documentation  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
+        <link rel="up" title="3. User’s Guide" href="users_guide.html"/>
+        <link rel="next" title="3.6. Disclaimers" href="disclaimers.html"/>
+        <link rel="prev" title="3.4. Applications of ShakeMap" href="shakemap_applications.html"/> 
+
+  
+  <script src="../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> ShakeMap Documentation
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tg_software.html">2.1. ShakeMap Software Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_philosophy.html">2.2. Philosophy of Estimating and Interpolating Ground Motions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_parameters.html">2.3. Recorded Ground-motion Parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tg_parameters.html#data-acquisition">2.3.1. Data Acquisition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_parameters.html#derived-parametric-ground-motion-values">2.3.2. Derived Parametric Ground-motion Values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_parameters.html#macroseismic-intensity">2.3.3. Macroseismic Intensity</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tg_predictions.html">2.4. Ground Motion and Intensity Predictions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_processing.html">2.5. ShakeMap Processing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#data-preparation">2.5.1. Data preparation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#event-bias">2.5.2. Event Bias</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#interpolation">2.5.3. Interpolation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#amplify-ground-motions">2.5.4. Amplify Ground Motions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#differences-in-handling-mmi">2.5.5. Differences in Handling MMI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#fault-considerations">2.5.6. Fault Considerations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#additional-considerations">2.5.7. Additional Considerations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tg_intensity.html">2.6. Representing Macroseismic Intensity on Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tg_intensity.html#color-palette-for-the-shakemap-instrumental-intensity-scale">2.6.1. Color Palette for the ShakeMap Instrumental Intensity Scale</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_intensity.html#shakemap-instrumental-intensity-scale-text-descriptions">2.6.2. ShakeMap Instrumental Intensity Scale Text Descriptions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_intensity.html#shakemap-intensity-scale-and-peak-ground-motions">2.6.3. ShakeMap Intensity Scale and Peak Ground Motions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_intensity.html#color-coding-stations-by-intensity">2.6.4. Color Coding Stations by Intensity</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tg_choice_of_parameters.html">2.7. Discussion of Chosen Map Parameters (Intensity Measures)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tg_choice_of_parameters.html#use-of-peak-values-rather-than-mean">2.7.1. Use of Peak Values Rather than Mean</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="background.html">3.1. Background</a></li>
+<li class="toctree-l3"><a class="reference internal" href="products.html">3.2. Products and Formats</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="products.html#input-files">3.2.1. Input Files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="products.html#output-files-and-products">3.2.2. Output Files and Products</a></li>
+<li class="toctree-l4"><a class="reference internal" href="products.html#real-time-product-distribution-automatic-access-and-feeds">3.2.3. Real-Time Product Distribution, Automatic Access, and Feeds</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap_archives.html">3.3. ShakeMap Archives</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="shakemap_archives.html#real-time-shakemaps">3.3.1. Real-time ShakeMaps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap_archives.html#shakemap-atlas">3.3.2. ShakeMap Atlas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap_archives.html#shakemap-scenarios">3.3.3. ShakeMap Scenarios</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap_applications.html">3.4. Applications of ShakeMap</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="shakemap_applications.html#emergency-management-and-response">3.4.1. Emergency Management and Response</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap_applications.html#loss-estimation">3.4.2. Loss Estimation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap_applications.html#financial-sector-decision-making">3.4.3. Financial Sector Decision-Making</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap_applications.html#public-information-and-education">3.4.4. Public Information and Education</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap_applications.html#emergency-preparedness">3.4.5. Emergency Preparedness</a></li>
+<li class="toctree-l4"><a class="reference internal" href="shakemap_applications.html#earthquake-engineering-and-seismological-research">3.4.6. Earthquake Engineering and Seismological Research</a></li>
+</ul>
+</li>
+<li class="toctree-l3 current"><a class="current reference internal" href="">3.5. Related Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#sec-shakecast">3.5.1. ShakeCast</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#pager">3.5.2. PAGER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#public-and-private-sector-tools">3.5.3. Public and Private Sector Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="disclaimers.html">3.6. Disclaimers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="disclaimers.html#general-disclaimer">3.6.1. General Disclaimer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="disclaimers.html#shakemap-update-policy">3.6.2. ShakeMap Update Policy</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html">4. Software &amp; Implementation Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="software_guide.html#implementation-considerations">4.1. Implementation Considerations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="software_guide.html#seismic-network">4.1.1. Seismic Network</a></li>
+<li class="toctree-l4"><a class="reference internal" href="software_guide.html#seismic-stations-and-parametric-data">4.1.2. Seismic Stations and Parametric Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="software_guide.html#triggering-shakemap">4.1.3. Triggering ShakeMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="software_guide.html#system-configuration">4.1.4. System Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="software_guide.html#operations">4.1.5. Operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="software_guide.html#scenarios">4.1.6. Scenarios</a></li>
+<li class="toctree-l4"><a class="reference internal" href="software_guide.html#backup">4.1.7. Backup</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="software_guide.html#shakemap-implementation-checklist">4.2. ShakeMap Implementation Checklist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="software_guide.html#software-availability-software-guide">4.3. Software Availability &amp; Software Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="regionals.html">5. Regional Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="future_directions.html">6. Future Directions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="future_directions.html#research-development">6.1. Research &amp; Development</a></li>
+<li class="toctree-l3"><a class="reference internal" href="future_directions.html#software-shakemap-4-0-python">6.2. Software: ShakeMap 4.0 (Python)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="acknowledgments.html">7. Acknowledgments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="references.html">8. References &amp; Bibliography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.mapping.html">shakemap.mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.mapping.mapmaker.html">shakemap.mapping.mapmaker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.mapping.sm_colordict.html">shakemap.mapping.sm_colordict</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.utils.html">shakemap.utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.config.html">shakemap.utils.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.readwrite.html">shakemap.utils.readwrite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.utils.html">shakemap.utils.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">ShakeMap Documentation</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">ShakeMap 3.5 Manual</a> &raquo;</li>
+      
+          <li><a href="users_guide.html">3. User&#8217;s Guide</a> &raquo;</li>
+      
+    <li>3.5. Related Systems</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/manual3_5/related_systems.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="related-systems">
+<span id="sec-related-systems"></span><h1>3.5. Related Systems<a class="headerlink" href="#related-systems" title="Permalink to this headline">¶</a></h1>
+<p>Here is a brief listing of USGS Earthquake Hazards Program rapid earthquake information products:</p>
+<ul class="simple">
+<li><a class="reference external" href="https://sslearthquake.usgs.gov/ens">Earthquake Notification System</a> sends automated, customizable notifications of earthquakes through email, pager, or cell phone.</li>
+<li><a class="reference external" href="http://earthquake.usgs.gov/earthquakes/map/">Realtime Earthquake Map</a>: Automatic maps and event information
+displayed online within minutes after earthquakes worldwidema</li>
+<li><a class="reference external" href="http://earthquake.usgs.gov/earthquakes/shakemap/">ShakeMap</a> automatically generates maps displaying
+instrumentally measured shaking intensities.</li>
+<li><a class="reference external" href="http://earthquake.usgs.gov/earthquakes/dyfi/">Did You Feel It?</a>: Map of earthquake effects derived from citizen
+input via online Web forms</li>
+<li><a class="reference internal" href="#pager">PAGER</a> (Prompt Assessment of Global Earthquakes for Response) rapidly
+compares the population exposed to various shaking intensities to estimate likely fatalities and economic losses</li>
+<li><a class="reference external" href="http://www.cisn.org/software/cisndisplay.html">CISN Display</a>: Stand-alone application that graphically alerts
+users, in near real time, of earthquakes and related hazards information.</li>
+<li><a class="reference external" href="http://earthquake.usgs.gov/research/software/shakecast/">ShakeCast</a>: An application for automated delivery of
+ShakeMaps and potential damage or inspection priority for specific user-selected facilities.</li>
+<li><a class="reference external" href="http://www.shakealert.org/faq/">ShakeAlert</a>: Prototype Earthquake Early Warning (EEW) System.</li>
+</ul>
+<p>While ShakeMap has met with success as a standalone product for communicating
+earthquake effects to the public and the emergency response and recovery
+community, it is increasingly being incorporated into value-added products that
+help in the assessment of earthquake impacts for response management and
+government officials.</p>
+<div class="figure align-center" id="id2">
+<span id="figure-related-systems"></span><a class="reference internal image-reference" href="../_images/SMap_SCast_DYFI_PAGER.png"><img alt="Related Systems" src="../_images/SMap_SCast_DYFI_PAGER.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 1: Interplay between ShakeMap, DYFI, ShakeCast, and PAGER.</span></p>
+</div>
+<p>As discussed in detail the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>, ShakeMap is augmented by
+DYFI input for constraining intensities, and from those, estimates of peak
+ground motions (in some cases, and for some regions), as shown
+in <a class="pageref" href="#figure-related-systems">Figure  1</a>.  DYFI and ShakeMap in conjunction then represent
+the shaking hazard
+input for two other primary systems that estimated losses: ShakeCast and PAGER.
+ShakeCast is intended for specific users to prioritize response for specific
+user-centric portfolios of facilities; PAGER is for more general societal-impact
+assessments, providing estimated loss of life and economic impacts for the
+region affected.</p>
+<div class="section" id="sec-shakecast">
+<span id="id1"></span><h2>3.5.1. ShakeCast<a class="headerlink" href="#sec-shakecast" title="Permalink to this headline">¶</a></h2>
+<p><a class="reference external" href="http://earthquake.usgs.gov/research/software/shakecast/">ShakeCast</a> is a freely available
+post-earthquake situational awareness application that automatically retrieves
+earthquake shaking data from ShakeMap, compares intensity measures against
+users’ facilities, and generates potential damage assessment notifications,
+facility damage maps, and other web-based products for emergency managers and
+responders.</p>
+<div class="sidebar">
+<p class="first sidebar-title">USE CASE #2</p>
+<p>The <a class="reference external" href="http://www.earthquakeauthority.com/">California Department of Transportation</a> (Caltrans) employs ShakeMap
+for post-earthquake overpass and bridge assessments for significant
+California earthquakes:</p>
+<p class="last"><em>The Caltrans ShakeCast system performed
+reliably and as expected during the Napa earthquake. The system delivered key
+information on the potential impacts to the state bridge inventory
+within 11 minutes of the event.  Of a total of 2720 state bridges
+within the ShakeMap region, 87 state bridges were identified by
+ShakeCast as having undergone significant ground shaking and were
+assigned an inspection priority state. Of the 87 state bridges
+identified, 9 were later confirmed to have sustained minor damage.
+These 9 state bridges were ranked in the top 40% of the ShakeCast
+list.</em>
+&#8211;(<a class="reference internal" href="references.html#turner2014"><span>Turner, 2014</span></a>)</p>
+</div>
+<p>ShakeCast, short for ShakeMap Broadcast, is a fully automated system for
+delivering specific ShakeMap products to critical users and for triggering
+established post-earthquake response protocols. ShakeMap was developed
+and is used primarily for emergency response, loss estimation, and public
+information; for an informed response to a serious earthquake, critical users
+must go beyond just looking at ShakeMap, and understand the likely extent and
+severity of impact on the facilities for which they are responsible. To this
+end, the USGS has developed ShakeCast.</p>
+<div class="figure align-center" id="id3">
+<a class="reference external image-reference" href="CaltransNapa"><img alt="Caltrans" src="../_images/Caltrans_Napa_Report.png" style="width: 350px;" /></a>
+<p class="caption"><span class="caption-text">Figure 2: Caltrans ShakeCast report for the 2011 M6.0 Napa, CA earthquake.</span></p>
+</div>
+<p>ShakeCast allows utilities, transportation agencies, businesses, and other
+large organizations to control and optimize the earthquake information they
+receive. With ShakeCast, they can automatically determine the shaking value at
+their facilities, set thresholds for notification of damage states for each
+facility, and then automatically notify (by pager, cell phone, or email)
+specified operators and inspectors within their organizations who are
+responsible for those particular facilities so they can set priorities for
+response.</p>
+<div class="sidebar">
+<p class="first sidebar-title">USE CASE #3</p>
+<p class="last"><em>&#8220;Thought you might like to see the [Division of Safety of Dams]
+ShakeCast message for the recent Napa [Aug, 2014] Earthquake.  We have since
+divided the 1250 dams into three fragility classes (called levels of
+concern). The message provides explicit instructions on what action
+to take for each dam and transmits owner contact information. The
+message was received in my inbox 16 minutes after the earthquake,
+which was about 10 minutes after the ShakeMap version 1 was
+released. The technology has become very well accepted by the field
+inspectors. Thanks for such a great product.&#8221;</em>
+&#8211;W. A. Fraser, C.E.G.,
+Chief, Geology Branch, CA Division of Safety of Dams, Sacramento, CA.</p>
+</div>
+</div>
+<div class="section" id="pager">
+<h2>3.5.2. PAGER<a class="headerlink" href="#pager" title="Permalink to this headline">¶</a></h2>
+<p>Another important USGS product that uses ShakeMap output as its primary data
+source is <a class="reference internal" href="#pager">PAGER</a> (Prompt Assessment of Global Earthquakes for Response), an
+automated system that produces content concerning the impact of significant
+earthquakes around the world, informing emergency responders, government and aid
+agencies, and the media of the potential scope of the disaster. PAGER rapidly
+assesses earthquake impacts by comparing the population exposed to each level of
+shaking intensity with models of economic and fatality losses based on past
+earthquakes in each country or region of the world. Earthquake alerts&#8212;which
+were formerly sent based only on event magnitude and location, or population
+exposure to shaking&#8212;will now be generated based also on the estimated range of
+fatalities and economic losses.</p>
+<p>PAGER alerts are based on the “Earthquake Impact Scale” developed by <a class="reference internal" href="references.html#wald2011b"><span>Wald et al. (2011)</span></a>.</p>
+<div class="figure align-right" id="id4">
+<a class="reference external image-reference" href="NepalOnePAGERAlertExample"><img alt="Nepal onePAGER" src="../_images/Nepal_M7_8_onepager_V5.png" style="width: 350px;" /></a>
+<p class="caption"><span class="caption-text">Figure 3: Nepal OnePAGER Alert Example</span></p>
+</div>
+</div>
+<div class="section" id="public-and-private-sector-tools">
+<h2>3.5.3. Public and Private Sector Tools<a class="headerlink" href="#public-and-private-sector-tools" title="Permalink to this headline">¶</a></h2>
+<p>Alternatives, modifications, and enhancements to the ShakeMap methodology are
+used widely around the world. Likewise, downstream derivative products and systems for loss estimation are
+widely employed, both in the public and private sector. What follows is
+a brief (and incomplete) description of some of these systems. Many
+proprietary hazard and loss modeling systems exist in the private
+sector, and typically they are openly described or referenced.</p>
+<p>On the shaking hazard front, domestically, some public/private sector
+utilities run in-house shaking aggregation and estimation systems,
+including the East Bay Metropolitan Utility District (EBMUD&#8217;s Marconi
+system) and Pacific Gas and Electric (PG&amp;E).</p>
+<p>Impressive systems also exist in Japan, Taiwan, New Zealand, Turkey,
+among other countries.</p>
+<ul class="simple">
+<li>JMA</li>
+<li>GNS</li>
+<li>INGV</li>
+</ul>
+<p>On the rapid loss estimation front, several systems are in place in the U.S.</p>
+<p>Internationally, <a class="reference internal" href="references.html#erdik2011"><span>Erdik et al. (2011)</span></a>
+and <a class="reference internal" href="references.html#erdik2014"><span>Erdik et al. (2014)</span></a> provide examples of
+operative rapid earthquake loss estimation systems.</p>
+<ul class="simple">
+<li>Taiwan Earthquake Rapid Reporting System,</li>
+<li>Realtime Earthquake Assessment Disaster System in Yokohama</li>
+<li>Real Time Earthquake Disaster Mitigation System of the Tokyo Gas
+Co.</li>
+<li>IGDAS Earthquake Protection System</li>
+<li>Istanbul Earthquake Rapid Response System</li>
+<li>ELER</li>
+<li>SELENA</li>
+<li>OpenQuake (OQ, GEM Foundation)</li>
+<li>GDACS</li>
+<li>QuakeLoss (WAPMERR)</li>
+<li>PAGER (USGS)</li>
+</ul>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Links and pointers to non-USGS sites are provided for information only and do not constitute endorsement by the USGS (see <a class="reference external" href="http://www.usgs.gov/laws/info_policies.html">USGS policy and disclaimers</a>).</p>
+</div>
+<p>Lastly, many systems are available and in operation in the U.S. for
+aggregating hazard and impact information for emergency response and
+awareness. Many are multihazard oriented, and only those with focus on
+earthquake information are mentioned here. Some examples include:</p>
+<ul class="simple">
+<li>InLet (ImageCat,Inc.)</li>
+<li>HAZUS-MH,</li>
+<li>ArcGIS online</li>
+</ul>
+<p>As summarized by <a class="reference internal" href="references.html#gomberg2013"><span>Gomberg and Jokobitz (2013)</span></a>:
+“others have built in-house systems to organize, share and display observations
+using commercial applications like Microsoft’s Streets and Trips and SharePoint,
+Google’s GoogleEarth, or ESRI’s ArcGIS. WebEOC, a real-time Web-enabled crisis
+information management system developed commercially by Esri, is meant to be an
+official link among public sector emergency managers in Washington State (see
+<a class="reference external" href="http://www.esi911.com/esi">http://www.esi911.com/esi</a>). While used by many agencies, it always was just one
+of multiple communication tools. A commonly expressed desire was for a
+centralized hub for all types of disaster information (like the
+Department of Homeland Security’s <a class="reference external" href="https://www.dropbox.com/home/Correlation/figures/SanDiego?preview=economic+losses0.png">Virtual USA</a>).&#8221;</p>
+<p>Further information on private sector tools can
+be found in the Department of Homeland Security
+(DHS) summary for the <a class="reference external" href="http://www.cusec.org/capstone14/documents/2014.03.06_PSW/2014.03.06_CAPSTONE_Private_Sector_GIS.pdf">Capstone 2014</a>
+National Level (scenario) Exercise.</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="disclaimers.html" class="btn btn-neutral float-right" title="3.6. Disclaimers" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="shakemap_applications.html" class="btn btn-neutral" title="3.4. Applications of ShakeMap" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+shakemap.utils.readwrite
+===============================
+
+.. automodule:: shakemap.utils.readwrite
+    :members:
+    :undoc-members:
+    :show-inheritance:

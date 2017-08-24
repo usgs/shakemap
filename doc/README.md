@@ -1,2 +1,0 @@
-# shake-doc
-ShakeMap documentation.
