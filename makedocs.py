@@ -5,7 +5,6 @@ import os.path
 import shutil
 import sys
 import re
-import tempfile
 import pathlib
 from distutils.dir_util import copy_tree
 
