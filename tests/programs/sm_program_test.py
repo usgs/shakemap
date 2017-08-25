@@ -22,7 +22,7 @@ def test_profile():
     #
     # Do some stuff that won't work until we create a profile
     #
-    program = os.path.join(shakedir, 'sm_profile')
+    program = os.path.join(shakedir, 'bin', 'sm_profile')
     cp = subprocess.run([program], shell=False)
     assert cp.returncode
     cp = subprocess.run([program, '-a'], shell=False)
@@ -148,7 +148,7 @@ def test_profile():
 ########################################################################
 def test_assemble():
     installpath, datapath = get_config_paths()
-    program = os.path.join(shakedir, 'sm_assemble')
+    program = os.path.join(shakedir, 'bin', 'sm_assemble')
 
     # Process a non-existent event (should fail)
     cp = subprocess.run([program, 'not_an_event'], shell=False)
@@ -220,8 +220,8 @@ def test_assemble():
 ########################################################################
 def test_augment():
     installpath, datapath = get_config_paths()
-    assemble_program = os.path.join(shakedir, 'sm_assemble')
-    program = os.path.join(shakedir, 'sm_augment')
+    assemble_program = os.path.join(shakedir, 'bin', 'sm_assemble')
+    program = os.path.join(shakedir, 'bin', 'sm_augment')
 
     # Process a non-existent event (should fail)
     cp = subprocess.run([program, 'not_an_event'], shell=False)
@@ -298,56 +298,48 @@ def test_model():
     # Run in verbose mode to hit that code
     # Remove the products directory to hit that code
     #
-    program = os.path.join(shakedir, 'sm_assemble')
-    cp = subprocess.run([program, 'northridge_points'], shell=False)
+    assemble_program = os.path.join(shakedir, 'bin', 'sm_assemble')
+    cp = subprocess.run([assemble_program, 'northridge_points'], shell=False)
     assert not cp.returncode
 
     products_dir = os.path.join(datapath, 'northridge_points', 'current', 
                             'products')
     if os.path.isdir(products_dir):
         shutil.rmtree(products_dir)
-    program = os.path.join(shakedir, 'sm_model')
+    program = os.path.join(shakedir, 'bin', 'sm_model')
     cp = subprocess.run([program, 'northridge_points', '-v'], shell=False)
     assert not cp.returncode
     #
     # This is a small grid with station data only (should succeed)
     #
-    program = os.path.join(shakedir, 'sm_assemble')
-    cp = subprocess.run([program, 'nc72282711'], shell=False)
+    cp = subprocess.run([assemble_program, 'nc72282711'], shell=False)
     assert not cp.returncode
 
-    program = os.path.join(shakedir, 'sm_model')
     cp = subprocess.run([program, 'nc72282711', '-v'], shell=False)
     assert not cp.returncode
     #
     # This is a small grid with DYFI data only
     #
-    program = os.path.join(shakedir, 'sm_assemble')
-    cp = subprocess.run([program, 'nc72282711_dyfi'], shell=False)
+    cp = subprocess.run([assemble_program, 'nc72282711_dyfi'], shell=False)
     assert not cp.returncode
 
-    program = os.path.join(shakedir, 'sm_model')
     cp = subprocess.run([program, 'nc72282711_dyfi', '-v'], shell=False)
     assert not cp.returncode
     #
     # Run with no data and no fault, and use the default extent.
     #
-    program = os.path.join(shakedir, 'sm_assemble')
-    cp = subprocess.run([program, 'nc72282711_nodata_nofault'], shell=False)
+    cp = subprocess.run([assemble_program, 'nc72282711_nodata_nofault'], shell=False)
     assert not cp.returncode
 
-    program = os.path.join(shakedir, 'sm_model')
     cp = subprocess.run([program, 'nc72282711_nodata_nofault'], shell=False)
     assert not cp.returncode
     #
     # Set the bias and outlier magnitude limits low to test additional
     # code branches
     #
-    program = os.path.join(shakedir, 'sm_assemble')
-    cp = subprocess.run([program, 'nc72282711_nofault'], shell=False)
+    cp = subprocess.run([assemble_program, 'nc72282711_nofault'], shell=False)
     assert not cp.returncode
 
-    program = os.path.join(shakedir, 'sm_model')
     cp = subprocess.run([program, 'nc72282711_nofault', '-v'], shell=False)
     assert not cp.returncode
     #
@@ -356,14 +348,12 @@ def test_model():
     hdf_file = os.path.join(datapath, 'nc72282711_dyfi', 'current', 
                             'shake_data.hdf')
     os.rename(hdf_file, hdf_file + '_safe')
-    program = os.path.join(shakedir, 'sm_model')
     cp = subprocess.run([program, 'nc72282711_dyfi'], shell=False)
     assert cp.returncode
     os.rename(hdf_file + '_safe', hdf_file)
     #
     # This event doesn't exist (should fail)
     #
-    program = os.path.join(shakedir, 'sm_model')
     cp = subprocess.run([program, 'not_an_event'], shell=False)
     assert cp.returncode
     
@@ -376,13 +366,12 @@ def test_contour():
     #
     # Run in verbose mode to hit that code
     #
-    program = os.path.join(shakedir, 'sm_contour')
+    program = os.path.join(shakedir, 'bin', 'sm_contour')
     cp = subprocess.run([program, 'nc72282711', '-v'], shell=False)
     assert not cp.returncode
     #
     # Run a nonexistent event to hit the error-handling code
     #
-    program = os.path.join(shakedir, 'sm_contour')
     cp = subprocess.run([program, 'not_an_event'], shell=False)
     assert cp.returncode
     #
@@ -392,7 +381,6 @@ def test_contour():
                             'products', 'shake_result.hdf')
     os.rename(hdf_file, hdf_file + '_safe')
 
-    program = os.path.join(shakedir, 'sm_contour')
     cp = subprocess.run([program, 'nc72282711'], shell=False)
     assert cp.returncode
     os.rename(hdf_file + '_safe', hdf_file)
