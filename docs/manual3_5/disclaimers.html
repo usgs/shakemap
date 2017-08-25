@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
         <link rel="up" title="3. User’s Guide" href="users_guide.html"/>
         <link rel="next" title="4. Software &amp; Implementation Guide" href="software_guide.html"/>
@@ -114,7 +117,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="users_guide.html">3. User’s Guide</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="products.html#input-files">3.2.1. Input Files</a></li>
@@ -143,7 +146,7 @@
 <li class="toctree-l4"><a class="reference internal" href="related_systems.html#public-and-private-sector-tools">3.5.3. Public and Private Sector Tools</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="current reference internal" href="">3.6. Disclaimers</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">3.6. Disclaimers</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#general-disclaimer">3.6.1. General Disclaimer</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#shakemap-update-policy">3.6.2. ShakeMap Update Policy</a></li>
 </ul>
@@ -174,6 +177,33 @@
 <li class="toctree-l2"><a class="reference internal" href="acknowledgments.html">7. Acknowledgments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="references.html">8. References &amp; Bibliography</a></li>
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
@@ -212,7 +242,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -222,13 +252,13 @@
       
           <li><a href="index.html">ShakeMap 3.5 Manual</a> &raquo;</li>
       
-          <li><a href="users_guide.html">3. User&#8217;s Guide</a> &raquo;</li>
+          <li><a href="users_guide.html">3. User’s Guide</a> &raquo;</li>
       
     <li>3.6. Disclaimers</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/manual3_5/disclaimers.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/manual3_5/disclaimers.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -300,7 +330,7 @@ strong-motion station coverage there.</li>
 <p class="last">ShakeMaps are preliminary in nature and will be updated as data arrives from a variety of distributed sources. Our practice is to improve the maps as soon as possible, but there are factors beyond our control that can result in delayed updates.</p>
 </div>
 <ul class="simple">
-<li>For regions around the world, where there are insufficient near&#8211;real-time
+<li>For regions around the world, where there are insufficient near–real-time
 strong-motion seismic stations to generate an adequate strong-ground-motion
 data-controlled ShakeMap, we can still provide a very useful estimate of the
 shaking distribution using the ShakeMap software. Site amplification is
@@ -308,7 +338,7 @@ approximated from a relationship developed between topographic gradient and
 shear-wave velocity. Additional constraints for these predictive maps come
 primarily from  additional earthquake source information, particularly fault
 rupture dimensions, observed macroseismic intensities (including via the USGS
-&#8220;Did You Feel It?&#8221; system), and observed strong ground motions, when and where
+“Did You Feel It?” system), and observed strong ground motions, when and where
 available.</li>
 <li>There is no formal “final” version of any ShakeMap. Version Control is up to
 users. ShakeMap version numbers and timestamps are provided on the maps,

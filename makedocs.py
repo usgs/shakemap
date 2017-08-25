@@ -2,11 +2,10 @@
 
 import argparse
 import os.path
-import shutil
 import sys
-import re
 import pathlib
-from distutils.dir_util import copy_tree
+import glob
+import re
 
 from impactutils.io.cmd import get_command_output
 
@@ -61,7 +60,6 @@ def main(args):
     clean_cmd = "sed -e '/-.*-/d' -i '' `find %s/*.rst -type f "\
                 "-maxdepth 0 -print`" % API_DIR
     res, stdout, stderr = get_command_output(clean_cmd)
-
 
     #-------------------------------------------------------------
     # Go to the api directory and build the html

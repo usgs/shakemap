@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
         <link rel="up" title="3. User’s Guide" href="users_guide.html"/>
         <link rel="next" title="3.2. Products and Formats" href="products.html"/>
@@ -114,8 +117,8 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="">3.1. Background</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="users_guide.html">3. User’s Guide</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="products.html#input-files">3.2.1. Input Files</a></li>
 <li class="toctree-l4"><a class="reference internal" href="products.html#output-files-and-products">3.2.2. Output Files and Products</a></li>
@@ -176,6 +179,33 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.mapping.html">shakemap.mapping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.mapping.mapmaker.html">shakemap.mapping.mapmaker</a></li>
@@ -212,7 +242,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -222,13 +252,13 @@
       
           <li><a href="index.html">ShakeMap 3.5 Manual</a> &raquo;</li>
       
-          <li><a href="users_guide.html">3. User&#8217;s Guide</a> &raquo;</li>
+          <li><a href="users_guide.html">3. User’s Guide</a> &raquo;</li>
       
     <li>3.1. Background</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/manual3_5/background.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/manual3_5/background.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -252,7 +282,7 @@ earthquakes that were either distant from
 the epicentral region or out of the immediate media limelight were not fully
 appreciated until long after the initial reports of damage. The full extent of
 damage from the 1995 M6.9 Kobe, Japan, earthquake was not recognized by
-the central government in Tokyo until many hours later (e.g., <a class="reference internal" href="references.html#yamakawa1998"><span>Yamakawa, 1998</span></a>),
+the central government in Tokyo until many hours later (e.g., <a class="reference internal" href="references.html#yamakawa1998"><span class="std std-ref">Yamakawa, 1998</span></a>),
 seriously delaying rescue and recovery efforts.</p>
 <p>In contrast, a ShakeMap is a representation of actual
 ground shaking produced by an earthquake. The
@@ -264,7 +294,7 @@ although an earthquake has one magnitude and one epicenter, it produces a range
 of ground shaking levels at sites throughout the region, depending on distance
 from the earthquake fault that ruptured, the rock and soil conditions at sites,
 and variations in the propagation of seismic waves from the earthquake due to
-complexities in the structure of the Earth&#8217;s crust.</p>
+complexities in the structure of the Earth’s crust.</p>
 <p>Part of the strategy for generating rapid-response ground motion maps was to
 determine the best format for reliable presentation of the maps given the
 diverse audience, which includes scientists, businesses, emergency response
@@ -286,17 +316,17 @@ the recorded and estimated ground motions to the expected felt and damage
 distributions. Intensities are estimated from ground shaking
 using equations based on analyses
 of intensities reported near recorded seismic stations for past
-earthquakes, e.g., <a class="reference internal" href="references.html#wald1999b"><span>Wald et al. (1999b)</span></a> or
-<a class="reference internal" href="references.html#worden2012"><span>Worden et al. (2012)</span></a>. The
+earthquakes, e.g., <a class="reference internal" href="references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> or
+<a class="reference internal" href="references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>. The
 legend on the ShakeMap indicates which relationship was used to estimate
 intensities from ground motions and vice versa (see the ShakeMap
-<a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a> for more details).</p>
+<a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a> for more details).</p>
 <p>Station locations are the best indicator of where the map is most accurate: near
 seismic stations, the shaking is well constrained by data; far from such
 stations, the shaking is estimated using standard seismological inferences and
 geospatial interpolation. Details about the interpolation; uncertainty maps; and
 codes for the seismic station components, network contributors, and potential
-outlier or clipped flag codes are provided in the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>. Peak
+outlier or clipped flag codes are provided in the <a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a>. Peak
 horizontal acceleration and spectral acceleration values are in units of
 percent-g (or %g, where g = acceleration due to the force of gravity = 981cm/s/s). The
 peak values of the vertical components are not used in the construction of the

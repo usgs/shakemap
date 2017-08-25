@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -112,7 +115,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/users_guide.html">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/users_guide.html">3. User’s Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../manual3_5/background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../manual3_5/products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../manual3_5/products.html#input-files">3.2.1. Input Files</a></li>
@@ -172,6 +175,33 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/acknowledgments.html">7. Acknowledgments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/references.html">8. References &amp; Bibliography</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/glossary.html">9. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
@@ -237,9 +267,9 @@
 <span class="kn">import</span> <span class="nn">pkg_resources</span>
 
 <span class="c1"># third party libraries</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">configobj</span> <span class="kn">import</span> <span class="n">ConfigObj</span><span class="p">,</span> <span class="n">flatten_errors</span>
-<span class="kn">from</span> <span class="nn">validate</span> <span class="kn">import</span> <span class="n">Validator</span><span class="p">,</span> <span class="n">ValidateError</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span><span class="p">,</span> <span class="n">flatten_errors</span>
+<span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="n">Validator</span><span class="p">,</span> <span class="n">ValidateError</span>
 
 <div class="viewcode-block" id="get_data_path"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_data_path">[docs]</a><span class="k">def</span> <span class="nf">get_data_path</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -322,12 +352,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">errs</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">section_list</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">flatten_errors</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;The &quot;</span><span class="si">%s</span><span class="s1">&quot; key in the section &quot;</span><span class="si">%s</span><span class="s1">&quot; failed validation&#39;</span> <span class="o">%</span> 
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The &quot;</span><span class="si">%s</span><span class="s1">&quot; key in the section &quot;</span><span class="si">%s</span><span class="s1">&quot; failed validation&#39;</span> <span class="o">%</span> 
                     <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">section_list</span><span class="p">)))</span>
             <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;The following section was missing:</span><span class="si">%s</span><span class="s1"> &#39;</span> <span class="o">%</span> 
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The following section was missing:</span><span class="si">%s</span><span class="s1"> &#39;</span> <span class="o">%</span> 
                     <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">section_list</span><span class="p">))</span>
             <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="n">errs</span><span class="p">:</span>
@@ -349,23 +379,23 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;gmpe_sets&#39;</span><span class="p">]:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: gmpe </span><span class="si">%s</span><span class="s1"> not in gmpe_sets&#39;</span> <span class="o">%</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: gmpe </span><span class="si">%s</span><span class="s1"> not in gmpe_sets&#39;</span> <span class="o">%</span>
               <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmice&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;gmice_modules&#39;</span><span class="p">]:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: gmice </span><span class="si">%s</span><span class="s1"> not in gmice_modules&#39;</span> <span class="o">%</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: gmice </span><span class="si">%s</span><span class="s1"> not in gmice_modules&#39;</span> <span class="o">%</span>
               <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmice&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ipe&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;ipe_modules&#39;</span><span class="p">]:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: ipe </span><span class="si">%s</span><span class="s1"> not in ipe_modules&#39;</span> <span class="o">%</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: ipe </span><span class="si">%s</span><span class="s1"> not in ipe_modules&#39;</span> <span class="o">%</span>
               <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ipe&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ccf&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;ccf_modules&#39;</span><span class="p">]:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: ccf </span><span class="si">%s</span><span class="s1"> not in ccf_modules&#39;</span> <span class="o">%</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: ccf </span><span class="si">%s</span><span class="s1"> not in ccf_modules&#39;</span> <span class="o">%</span>
               <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ccf&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;component_modules&#39;</span><span class="p">]:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: component </span><span class="si">%s</span><span class="s1"> not in component_modules&#39;</span> <span class="o">%</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: component </span><span class="si">%s</span><span class="s1"> not in component_modules&#39;</span> <span class="o">%</span>
               <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span></div>
 
@@ -419,7 +449,7 @@
         <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">return</span> <span class="p">[]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;list must contain at least </span><span class="si">%d</span><span class="s2"> entr</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;list must contain at least </span><span class="si">%d</span><span class="s2"> entr</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
                   <span class="p">(</span><span class="nb">min</span><span class="p">,</span> <span class="s2">&quot;ies&quot;</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;y&quot;</span><span class="p">))</span>
             <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
@@ -430,26 +460,26 @@
             <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="s2">&quot;list must contain at least </span><span class="si">%d</span><span class="s2"> entr</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;list must contain at least </span><span class="si">%d</span><span class="s2"> entr</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
                       <span class="p">(</span><span class="nb">min</span><span class="p">,</span> <span class="s2">&quot;ies&quot;</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;y&quot;</span><span class="p">))</span>
                 <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;list must contain at least </span><span class="si">%d</span><span class="s2"> entr</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;list must contain at least </span><span class="si">%d</span><span class="s2"> entr</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
               <span class="p">(</span><span class="nb">min</span><span class="p">,</span> <span class="s2">&quot;ies&quot;</span> <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;y&quot;</span><span class="p">))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
     <span class="k">except</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a list of floats&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a list of floats&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="n">np_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np_out</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;all list values must be &gt;= 0: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;all list values must be &gt;= 0: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np_out</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;weights must sum to 1.0: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;weights must sum to 1.0: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">out</span></div>
@@ -473,11 +503,11 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">int</span><span class="p">(</span><span class="nb">min</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list of at least </span><span class="si">%s</span><span class="s2"> gmpes&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list of at least </span><span class="si">%s</span><span class="s2"> gmpes&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">gmpe</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list of strings&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list of strings&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
             <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">value</span></div>
@@ -503,21 +533,21 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
         <span class="k">return</span> <span class="p">[]</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list of 4 coordinates&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list of 4 coordinates&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;extent list must contain 4 entries&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;extent list must contain 4 entries&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
     <span class="k">except</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a list of 4 floats&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a list of 4 floats&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">360.0</span> <span class="ow">or</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">360.0</span> <span class="ow">or</span> \
        <span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">360.0</span> <span class="ow">or</span> <span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">360.0</span> <span class="ow">or</span> \
        <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">90.0</span> <span class="ow">or</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">90.0</span> <span class="ow">or</span> \
        <span class="n">out</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">90.0</span> <span class="ow">or</span> <span class="n">out</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">90.0</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Invalid extent: &quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid extent: &quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> 
               <span class="s2">&quot; : -360 &lt;= longitude &lt;= 360, -90 &lt;= latitude &lt;= 90&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
 
@@ -538,7 +568,7 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;&#39;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-        <span class="k">print</span><span class="p">(</span><span class="s2">&quot;file &#39;</span><span class="si">%s</span><span class="s2">&#39; is not a valid file&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;file &#39;</span><span class="si">%s</span><span class="s2">&#39; is not a valid file&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">value</span></div>
 

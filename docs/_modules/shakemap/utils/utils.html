@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -112,7 +115,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/users_guide.html">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/users_guide.html">3. User’s Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../manual3_5/background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../manual3_5/products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../manual3_5/products.html#input-files">3.2.1. Input Files</a></li>
@@ -172,6 +175,33 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/acknowledgments.html">7. Acknowledgments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/references.html">8. References &amp; Bibliography</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/glossary.html">9. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
@@ -252,9 +282,9 @@
 <span class="sd">        (bool): The &quot;answer&quot; return value is True for &quot;yes&quot; or False for &quot;no&quot;.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">valid</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;yes&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> <span class="s2">&quot;ye&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
-             <span class="s2">&quot;no&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">}</span>
-    <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+    <span class="n">valid</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;yes&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;ye&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+             <span class="s2">&quot;no&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;n&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot; [y/n] &quot;</span>
     <span class="k">elif</span> <span class="n">default</span> <span class="o">==</span> <span class="s2">&quot;yes&quot;</span><span class="p">:</span>
         <span class="n">prompt</span> <span class="o">=</span> <span class="s2">&quot; [Y/n] &quot;</span>
@@ -263,10 +293,10 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;invalid default answer: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">default</span><span class="p">)</span>
 
-    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">question</span> <span class="o">+</span> <span class="n">prompt</span><span class="p">)</span>
         <span class="n">choice</span> <span class="o">=</span> <span class="nb">input</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span> <span class="ow">and</span> <span class="n">choice</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">default</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">choice</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">valid</span><span class="p">[</span><span class="n">default</span><span class="p">]</span>
         <span class="k">elif</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">valid</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">valid</span><span class="p">[</span><span class="n">choice</span><span class="p">]</span>

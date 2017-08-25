@@ -1,7 +1,0 @@
-shakemap
-========
-
-.. toctree::
-   :maxdepth: 4
-
-   shakemap

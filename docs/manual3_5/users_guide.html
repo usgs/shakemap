@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
         <link rel="up" title="ShakeMap 3.5 Manual" href="index.html"/>
         <link rel="next" title="3.1. Background" href="background.html"/>
@@ -114,7 +117,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">3. User’s Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="products.html#input-files">3.2.1. Input Files</a></li>
@@ -176,6 +179,33 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.mapping.html">shakemap.mapping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.mapping.mapmaker.html">shakemap.mapping.mapmaker</a></li>
@@ -212,7 +242,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -222,11 +252,11 @@
       
           <li><a href="index.html">ShakeMap 3.5 Manual</a> &raquo;</li>
       
-    <li>3. User&#8217;s Guide</li>
+    <li>3. User’s Guide</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/manual3_5/users_guide.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/manual3_5/users_guide.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -237,7 +267,7 @@
            <div itemprop="articleBody">
             
   <div class="section" id="user-s-guide">
-<span id="users-guide"></span><h1>3. User&#8217;s Guide<a class="headerlink" href="#user-s-guide" title="Permalink to this headline">¶</a></h1>
+<span id="users-guide"></span><h1>3. User’s Guide<a class="headerlink" href="#user-s-guide" title="Permalink to this headline">¶</a></h1>
 <p>ShakeMap originated primarily as an internet-based system to provide
 real-time displays of earthquake shaking.
 Although the online color-coded intensity maps are the most visible result of
@@ -250,10 +280,10 @@ files, regression plots, contours, metadata, and uncertainty
 estimates. The ShakeMap webpages also serve a variety of formats, including
 PDF, KML, XML, GeoJSON, HAZUS-MH, GIS files, ESRI Raster, and a host of other
 formats and products for varied user needs and applications.</p>
-<p>In this User&#8217;s Guide, after some background, we present the range of ShakeMap
+<p>In this User’s Guide, after some background, we present the range of ShakeMap
 products and describe the available formats. The different automated mechanisms
-to receive and utilize ShakeMap&#8212;including GIS Web Services, GeoJSON feeds,
-and ShakeCast&#8212;are described and links are provided. Many users also
+to receive and utilize ShakeMap—including GIS Web Services, GeoJSON feeds,
+and ShakeCast—are described and links are provided. Many users also
 take advantage of real-time ShakeMaps, as well as older events and earthquake
 planning scenarios, so we describe the three primary ShakeMap repositories:
 real-time ShakeMaps, historic ShakeMap Atlas events, and collections of
@@ -263,7 +293,7 @@ quickly assessing the overall domain of shaking, ShakeMap is used across many
 sectors: planning and response, loss estimation, financial services, education
 and outreach, and engineering and seismological research. We provide examples of
 each. The section that follows expands on how ShakeMap integrates with the related
-systems of DYFI, ShakeCast, and PAGER. Lastly, and importantly, are <a class="reference internal" href="disclaimers.html#sec-disclaimers"><span>Disclaimers</span></a>
+systems of DYFI, ShakeCast, and PAGER. Lastly, and importantly, are <a class="reference internal" href="disclaimers.html#sec-disclaimers"><span class="std std-ref">Disclaimers</span></a>
 that users should be aware of and refer to when employing ShakeMap as
 part of their post-earthquake decision making.</p>
 <div class="toctree-wrapper compound">

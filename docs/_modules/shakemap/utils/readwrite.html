@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -112,7 +115,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/users_guide.html">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/users_guide.html">3. User’s Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../manual3_5/background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../manual3_5/products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../manual3_5/products.html#input-files">3.2.1. Input Files</a></li>
@@ -172,6 +175,33 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/acknowledgments.html">7. Acknowledgments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/references.html">8. References &amp; Bibliography</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/glossary.html">9. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
@@ -235,11 +265,11 @@
   <h1>Source code for shakemap.utils.readwrite</h1><div class="highlight"><pre>
 <span></span><span class="ch">#!/usr/bin/env python</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
 
 
-<div class="viewcode-block" id="read_nshmp_fault_xml"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.readwrite.html#shakemap.utils.readwrite.read_nshmp_fault_xml">[docs]</a><span class="k">def</span> <span class="nf">read_nshmp_fault_xml</span><span class="p">(</span><span class="nb">file</span><span class="p">):</span>
+<div class="viewcode-block" id="read_nshmp_fault_xml"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.readwrite.html#shakemap.utils.readwrite.read_nshmp_fault_xml">[docs]</a><span class="k">def</span> <span class="nf">read_nshmp_fault_xml</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Method for reading the XML format used by the NSHMP for faults. </span>
 <span class="sd">    `[example] &lt;https://github.com/usgs/nshmp-model-cous-2014/blob/master/Western%20US/Fault/Geologic%20Model%20Full%20Rupture.xml&gt;`__</span>
@@ -257,7 +287,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
     <span class="n">sources</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;Source&#39;</span><span class="p">)</span>
     <span class="n">srclist</span> <span class="o">=</span> <span class="p">[]</span>
@@ -311,7 +341,7 @@
 
     <span class="k">return</span> <span class="n">srclist</span></div>
 
-<div class="viewcode-block" id="read_nshmp_grid_xml"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.readwrite.html#shakemap.utils.readwrite.read_nshmp_grid_xml">[docs]</a><span class="k">def</span> <span class="nf">read_nshmp_grid_xml</span><span class="p">(</span><span class="nb">file</span><span class="p">):</span>
+<div class="viewcode-block" id="read_nshmp_grid_xml"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.readwrite.html#shakemap.utils.readwrite.read_nshmp_grid_xml">[docs]</a><span class="k">def</span> <span class="nf">read_nshmp_grid_xml</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Method for reading the XML format used by the NSHMP for gridded seismicity.  </span>
 <span class="sd">    `[example] &lt;https://github.com/usgs/nshmp-model-cous-2014/blob/master/Central%20%26%20Eastern%20US/Grid/rlme/Charlevoix%20Seismic%20Zone.xml&gt;`__</span>
@@ -331,7 +361,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">tree</span><span class="o">.</span><span class="n">getroot</span><span class="p">()</span>
     <span class="n">settings</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;Settings&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">nodes</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="s1">&#39;Nodes&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">getchildren</span><span class="p">()</span>

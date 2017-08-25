@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
         <link rel="up" title="2. Technical Guide" href="technical_guide.html"/>
         <link rel="next" title="2.5. ShakeMap Processing" href="tg_processing.html"/>
@@ -90,7 +93,7 @@
 <li class="toctree-l4"><a class="reference internal" href="tg_parameters.html#macroseismic-intensity">2.3.3. Macroseismic Intensity</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="current reference internal" href="">2.4. Ground Motion and Intensity Predictions</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">2.4. Ground Motion and Intensity Predictions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tg_processing.html">2.5. ShakeMap Processing</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="tg_processing.html#data-preparation">2.5.1. Data preparation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tg_processing.html#event-bias">2.5.2. Event Bias</a></li>
@@ -114,7 +117,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User’s Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="products.html#input-files">3.2.1. Input Files</a></li>
@@ -176,6 +179,33 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.mapping.html">shakemap.mapping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.mapping.mapmaker.html">shakemap.mapping.mapmaker</a></li>
@@ -212,7 +242,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -228,7 +258,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/manual3_5/tg_predictions.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/manual3_5/tg_predictions.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -245,14 +275,14 @@ motions must be estimated using the available earthquake source parameters and G
 or Intensity Prediction Equations (IPEs). GMPEs are available for a wide range of magnitudes, source mechanisms,
 and tectonic settings. IPEs are still comparatively uncommon, with only a handful of
 published relations, focused on active tectonic and stable shield (cratonic) environments
-(e.g., <a class="reference internal" href="references.html#atkinson-wald2007"><span>Atkinson and Wald, 2007</span></a>; <a class="reference internal" href="references.html#allen2012"><span>Allen et al., 2012</span></a>). To supplement the available IPEs, we
-have developed a &#8220;virtual IPE&#8221; which is a combination of the operator&#8217;s selected GMPE
+(e.g., <a class="reference internal" href="references.html#atkinson-wald2007"><span class="std std-ref">Atkinson and Wald, 2007</span></a>; <a class="reference internal" href="references.html#allen2012"><span class="std std-ref">Allen et al., 2012</span></a>). To supplement the available IPEs, we
+have developed a “virtual IPE” which is a combination of the operator’s selected GMPE
 and Ground Motion/Intensity Conversion Equation (GMICE), which work together to
 present the same interface and behaviors as a direct IPE, while being available for a
 wider range of regional and tectonic environments.</p>
 <p>We describe the way ShakeMap employs ground-motion and intensity predictions in
-<a class="reference internal" href="tg_processing.html#sec-shakemap-processing"><span>ShakeMap Processing</span></a>. An up-to-date list of the GMPEs and IPEs available for ShakeMap can be
-found in the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span>Software Guide</span></a>.</p>
+<a class="reference internal" href="tg_processing.html#sec-shakemap-processing"><span class="std std-ref">ShakeMap Processing</span></a>. An up-to-date list of the GMPEs and IPEs available for ShakeMap can be
+found in the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a>.</p>
 </div>
 
 
