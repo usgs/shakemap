@@ -1,0 +1,7 @@
+shakemap.utils.extern.scp.scp
+====================================
+
+.. automodule:: shakemap.utils.extern.scp.scp
+    :members:
+    :undoc-members:
+    :show-inheritance:

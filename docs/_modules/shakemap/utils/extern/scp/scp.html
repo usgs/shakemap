@@ -1,0 +1,775 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>shakemap.utils.extern.scp.scp &mdash; ShakeMap Documentation  documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="ShakeMap Documentation  documentation" href="../../../../../index.html"/>
+        <link rel="up" title="Module code" href="../../../../index.html"/> 
+
+  
+  <script src="../../../../../_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home"> ShakeMap Documentation
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../manual3_5/index.html">ShakeMap 3.5 Manual</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manual3_5/introduction.html">1. Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manual3_5/technical_guide.html">2. Technical Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/tg_software.html">2.1. ShakeMap Software Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/tg_philosophy.html">2.2. Philosophy of Estimating and Interpolating Ground Motions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/tg_parameters.html">2.3. Recorded Ground-motion Parameters</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_parameters.html#data-acquisition">2.3.1. Data Acquisition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_parameters.html#derived-parametric-ground-motion-values">2.3.2. Derived Parametric Ground-motion Values</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_parameters.html#macroseismic-intensity">2.3.3. Macroseismic Intensity</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/tg_predictions.html">2.4. Ground Motion and Intensity Predictions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/tg_processing.html">2.5. ShakeMap Processing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_processing.html#data-preparation">2.5.1. Data preparation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_processing.html#event-bias">2.5.2. Event Bias</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_processing.html#interpolation">2.5.3. Interpolation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_processing.html#amplify-ground-motions">2.5.4. Amplify Ground Motions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_processing.html#differences-in-handling-mmi">2.5.5. Differences in Handling MMI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_processing.html#fault-considerations">2.5.6. Fault Considerations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_processing.html#additional-considerations">2.5.7. Additional Considerations</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/tg_intensity.html">2.6. Representing Macroseismic Intensity on Maps</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_intensity.html#color-palette-for-the-shakemap-instrumental-intensity-scale">2.6.1. Color Palette for the ShakeMap Instrumental Intensity Scale</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_intensity.html#shakemap-instrumental-intensity-scale-text-descriptions">2.6.2. ShakeMap Instrumental Intensity Scale Text Descriptions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_intensity.html#shakemap-intensity-scale-and-peak-ground-motions">2.6.3. ShakeMap Intensity Scale and Peak Ground Motions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_intensity.html#color-coding-stations-by-intensity">2.6.4. Color Coding Stations by Intensity</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/tg_choice_of_parameters.html">2.7. Discussion of Chosen Map Parameters (Intensity Measures)</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/tg_choice_of_parameters.html#use-of-peak-values-rather-than-mean">2.7.1. Use of Peak Values Rather than Mean</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manual3_5/users_guide.html">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/background.html">3.1. Background</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/products.html">3.2. Products and Formats</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/products.html#input-files">3.2.1. Input Files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/products.html#output-files-and-products">3.2.2. Output Files and Products</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/products.html#real-time-product-distribution-automatic-access-and-feeds">3.2.3. Real-Time Product Distribution, Automatic Access, and Feeds</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/shakemap_archives.html">3.3. ShakeMap Archives</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/shakemap_archives.html#real-time-shakemaps">3.3.1. Real-time ShakeMaps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/shakemap_archives.html#shakemap-atlas">3.3.2. ShakeMap Atlas</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/shakemap_archives.html#shakemap-scenarios">3.3.3. ShakeMap Scenarios</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/shakemap_applications.html">3.4. Applications of ShakeMap</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/shakemap_applications.html#emergency-management-and-response">3.4.1. Emergency Management and Response</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/shakemap_applications.html#loss-estimation">3.4.2. Loss Estimation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/shakemap_applications.html#financial-sector-decision-making">3.4.3. Financial Sector Decision-Making</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/shakemap_applications.html#public-information-and-education">3.4.4. Public Information and Education</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/shakemap_applications.html#emergency-preparedness">3.4.5. Emergency Preparedness</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/shakemap_applications.html#earthquake-engineering-and-seismological-research">3.4.6. Earthquake Engineering and Seismological Research</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/related_systems.html">3.5. Related Systems</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/related_systems.html#sec-shakecast">3.5.1. ShakeCast</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/related_systems.html#pager">3.5.2. PAGER</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/related_systems.html#public-and-private-sector-tools">3.5.3. Public and Private Sector Tools</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/disclaimers.html">3.6. Disclaimers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/disclaimers.html#general-disclaimer">3.6.1. General Disclaimer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/disclaimers.html#shakemap-update-policy">3.6.2. ShakeMap Update Policy</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manual3_5/software_guide.html">4. Software &amp; Implementation Guide</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/software_guide.html#implementation-considerations">4.1. Implementation Considerations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/software_guide.html#seismic-network">4.1.1. Seismic Network</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/software_guide.html#seismic-stations-and-parametric-data">4.1.2. Seismic Stations and Parametric Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/software_guide.html#triggering-shakemap">4.1.3. Triggering ShakeMap</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/software_guide.html#system-configuration">4.1.4. System Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/software_guide.html#operations">4.1.5. Operations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/software_guide.html#scenarios">4.1.6. Scenarios</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../manual3_5/software_guide.html#backup">4.1.7. Backup</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/software_guide.html#shakemap-implementation-checklist">4.2. ShakeMap Implementation Checklist</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/software_guide.html#software-availability-software-guide">4.3. Software Availability &amp; Software Guide</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manual3_5/regionals.html">5. Regional Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manual3_5/future_directions.html">6. Future Directions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/future_directions.html#research-development">6.1. Research &amp; Development</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../manual3_5/future_directions.html#software-shakemap-4-0-python">6.2. Software: ShakeMap 4.0 (Python)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manual3_5/acknowledgments.html">7. Acknowledgments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manual3_5/references.html">8. References &amp; Bibliography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../manual3_5/glossary.html">9. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../apidoc/shakemap.html">ShakeMap 4.0 API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../apidoc/shakemap.mapping.html">shakemap.mapping</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../apidoc/shakemap.mapping.mapmaker.html">shakemap.mapping.mapmaker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../apidoc/shakemap.mapping.sm_colordict.html">shakemap.mapping.sm_colordict</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../../apidoc/shakemap.utils.html">shakemap.utils</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../apidoc/shakemap.utils.extern.html">shakemap.utils.extern</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../../apidoc/shakemap.utils.extern.scp.html">shakemap.utils.extern.scp</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../apidoc/shakemap.utils.config.html">shakemap.utils.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../apidoc/shakemap.utils.readwrite.html">shakemap.utils.readwrite</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../../../apidoc/shakemap.utils.utils.html">shakemap.utils.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../../../../index.html">ShakeMap Documentation</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../../../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+      
+    <li>shakemap.utils.extern.scp.scp</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for shakemap.utils.extern.scp.scp</h1><div class="highlight"><pre>
+<span></span><span class="c1"># scp.py</span>
+<span class="c1"># Copyright (C) 2008 James Bardin &lt;j.bardin@gmail.com&gt;</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utilities for sending files over ssh using the scp1 protocol.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="n">__version__</span> <span class="o">=</span> <span class="s1">&#39;0.10.2&#39;</span>
+
+<span class="kn">import</span> <span class="nn">locale</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">socket</span> <span class="kn">import</span> <span class="n">timeout</span> <span class="k">as</span> <span class="n">SocketTimeout</span>
+
+
+<span class="c1"># this is quote from the shlex module, added in py3.3</span>
+<span class="n">_find_unsafe</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">br</span><span class="s1">&#39;[^\w@%+=:,./~-]&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">search</span>
+
+
+<span class="k">def</span> <span class="nf">_sh_quote</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a shell-escaped version of the string `s`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">s</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">b</span><span class="s2">&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">_find_unsafe</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">s</span>
+
+    <span class="c1"># use single quotes, and put single quotes into double quotes</span>
+    <span class="c1"># the string $&#39;b is then quoted as &#39;$&#39;&quot;&#39;&quot;&#39;b&#39;</span>
+    <span class="k">return</span> <span class="n">b</span><span class="s2">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">b</span><span class="s2">&quot;&#39;&quot;</span><span class="p">,</span> <span class="n">b</span><span class="s2">&quot;&#39;</span><span class="se">\&quot;</span><span class="s2">&#39;</span><span class="se">\&quot;</span><span class="s2">&#39;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="s2">&quot;&#39;&quot;</span>
+
+
+<span class="c1"># Unicode conversion functions; assume UTF-8</span>
+
+<div class="viewcode-block" id="asbytes"><a class="viewcode-back" href="../../../../../apidoc/shakemap.utils.extern.scp.scp.html#shakemap.utils.extern.scp.scp.asbytes">[docs]</a><span class="k">def</span> <span class="nf">asbytes</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Turns unicode into bytes, if needed.</span>
+
+<span class="sd">    Assumes UTF-8.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="asunicode"><a class="viewcode-back" href="../../../../../apidoc/shakemap.utils.extern.scp.scp.html#shakemap.utils.extern.scp.scp.asunicode">[docs]</a><span class="k">def</span> <span class="nf">asunicode</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Turns bytes into unicode, if needed.</span>
+
+<span class="sd">    Uses UTF-8.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="s1">&#39;replace&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+
+<span class="c1"># os.path.sep is unicode on Python 3, no matter the platform</span>
+<span class="n">bytes_sep</span> <span class="o">=</span> <span class="n">asbytes</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+
+
+<span class="c1"># Unicode conversion function for Windows</span>
+<span class="c1"># Used to convert local paths if the local machine is Windows</span>
+
+<div class="viewcode-block" id="asunicode_win"><a class="viewcode-back" href="../../../../../apidoc/shakemap.utils.extern.scp.scp.html#shakemap.utils.extern.scp.scp.asunicode_win">[docs]</a><span class="k">def</span> <span class="nf">asunicode_win</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Turns bytes into unicode, if needed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="n">locale</span><span class="o">.</span><span class="n">getpreferredencoding</span><span class="p">())</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">s</span></div>
+
+
+<div class="viewcode-block" id="SCPClient"><a class="viewcode-back" href="../../../../../apidoc/shakemap.utils.extern.scp.scp.html#shakemap.utils.extern.scp.scp.SCPClient">[docs]</a><span class="k">class</span> <span class="nc">SCPClient</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    An scp1 implementation, compatible with openssh scp.</span>
+<span class="sd">    Raises SCPException for all transport related errors. Local filesystem</span>
+<span class="sd">    and OS errors pass through.</span>
+
+<span class="sd">    Main public methods are .put and .get</span>
+<span class="sd">    The get method is controlled by the remote scp instance, and behaves</span>
+<span class="sd">    accordingly. This means that symlinks are resolved, and the transfer is</span>
+<span class="sd">    halted after too many levels of symlinks are detected.</span>
+<span class="sd">    The put method uses os.walk for recursion, and sends files accordingly.</span>
+<span class="sd">    Since scp doesn&#39;t support symlinks, we send file symlinks as the file</span>
+<span class="sd">    (matching scp behaviour), but we make no attempt at symlinked directories.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">transport</span><span class="p">,</span> <span class="n">buff_size</span><span class="o">=</span><span class="mi">16384</span><span class="p">,</span> <span class="n">socket_timeout</span><span class="o">=</span><span class="mf">5.0</span><span class="p">,</span>
+                 <span class="n">progress</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">sanitize</span><span class="o">=</span><span class="n">_sh_quote</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an scp1 client.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            transport (L{Transport}): an existing paramiko L{Transport}</span>
+<span class="sd">            buff_size (int): size of the scp send buffer.</span>
+<span class="sd">            socket_timeout (float): channel socket timeout in seconds</span>
+<span class="sd">            progress: callback - called with (filename, size, sent) during</span>
+<span class="sd">                transfers</span>
+<span class="sd">            sanitize: function - called with filename, should return</span>
+<span class="sd">                safe or escaped string.  Uses _sh_quote by default.</span>
+<span class="sd">            progress: function(string, int, int)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">transport</span> <span class="o">=</span> <span class="n">transport</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">buff_size</span> <span class="o">=</span> <span class="n">buff_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">socket_timeout</span> <span class="o">=</span> <span class="n">socket_timeout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preserve_times</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span> <span class="o">=</span> <span class="n">progress</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rename</span> <span class="o">=</span> <span class="bp">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_utime</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sanitize</span> <span class="o">=</span> <span class="n">sanitize</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dirtimes</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">traceback</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SCPClient.put"><a class="viewcode-back" href="../../../../../apidoc/shakemap.utils.extern.scp.scp.html#shakemap.utils.extern.scp.scp.SCPClient.put">[docs]</a>    <span class="k">def</span> <span class="nf">put</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">,</span> <span class="n">remote_path</span><span class="o">=</span><span class="n">b</span><span class="s1">&#39;.&#39;</span><span class="p">,</span>
+            <span class="n">recursive</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">preserve_times</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transfer files to remote host.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            files: A single path, or a list of paths to be transfered.</span>
+<span class="sd">                recursive must be True to transfer directories.</span>
+<span class="sd">            remote_path: path in which to receive the files on the remote</span>
+<span class="sd">                host. defaults to &#39;.&#39;</span>
+<span class="sd">            recursive: boolean transfer files and directories recursively</span>
+<span class="sd">                preserve_times: boolean preserve mtime and atime of transfered files</span>
+<span class="sd">                and directories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">preserve_times</span> <span class="o">=</span> <span class="n">preserve_times</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pushed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_timeout</span><span class="p">)</span>
+        <span class="n">scp_command</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="s1">&#39;scp -t &#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39;scp -r -t &#39;</span><span class="p">)[</span><span class="n">recursive</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">exec_command</span><span class="p">(</span><span class="n">scp_command</span> <span class="o">+</span>
+                                  <span class="bp">self</span><span class="o">.</span><span class="n">sanitize</span><span class="p">(</span><span class="n">asbytes</span><span class="p">(</span><span class="n">remote_path</span><span class="p">)))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recv_confirm</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">files</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_recursive</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_files</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="SCPClient.get"><a class="viewcode-back" href="../../../../../apidoc/shakemap.utils.extern.scp.scp.html#shakemap.utils.extern.scp.scp.SCPClient.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">local_path</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="n">recursive</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">preserve_times</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Transfer files from remote host to localhost.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            remote_path: path to retreive from remote host. since this is</span>
+<span class="sd">                evaluated by scp on the remote host, shell wildcards and</span>
+<span class="sd">                environment variables may be used.</span>
+<span class="sd">            local_path: path in which to receive files locally</span>
+<span class="sd">            recursive: boolean transfer files and directories recursively</span>
+<span class="sd">            preserve_times: boolean preserve mtime and atime of transfered files</span>
+<span class="sd">                and directories.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">remote_path</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
+            <span class="n">remote_path</span> <span class="o">=</span> <span class="p">[</span><span class="n">remote_path</span><span class="p">]</span>
+        <span class="n">remote_path</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">sanitize</span><span class="p">(</span><span class="n">asbytes</span><span class="p">(</span><span class="n">r</span><span class="p">))</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">remote_path</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span> <span class="o">=</span> <span class="n">local_path</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rename</span> <span class="o">=</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">remote_path</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span>
+                        <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">local_path</span><span class="p">)))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">remote_path</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="s2">&quot;Local path &#39;</span><span class="si">%s</span><span class="s2">&#39; does not exist&quot;</span> <span class="o">%</span>
+                                   <span class="n">asunicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span><span class="p">))</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="s2">&quot;Local path &#39;</span><span class="si">%s</span><span class="s2">&#39; is not a directory&quot;</span> <span class="o">%</span>
+                                   <span class="n">asunicode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span><span class="p">))</span>
+        <span class="n">rcsv</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39; -r&#39;</span><span class="p">)[</span><span class="n">recursive</span><span class="p">]</span>
+        <span class="n">prsv</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39; -p&#39;</span><span class="p">)[</span><span class="n">preserve_times</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_open</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pushed</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">settimeout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">socket_timeout</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">exec_command</span><span class="p">(</span><span class="n">b</span><span class="s2">&quot;scp&quot;</span> <span class="o">+</span>
+                                  <span class="n">rcsv</span> <span class="o">+</span>
+                                  <span class="n">prsv</span> <span class="o">+</span>
+                                  <span class="n">b</span><span class="s2">&quot; -f &quot;</span> <span class="o">+</span>
+                                  <span class="n">b</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">remote_path</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recv_all</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="nf">_open</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        open a scp channel</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transport</span><span class="o">.</span><span class="n">open_session</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span>
+
+<div class="viewcode-block" id="SCPClient.close"><a class="viewcode-back" href="../../../../../apidoc/shakemap.utils.extern.scp.scp.html#shakemap.utils.extern.scp.scp.SCPClient.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        close scp channel</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="bp">None</span></div>
+
+    <span class="k">def</span> <span class="nf">_read_stats</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        return just the file stats needed for scp</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">asunicode</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">stats</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">mode</span> <span class="o">=</span> <span class="nb">oct</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">st_mode</span><span class="p">)[</span><span class="o">-</span><span class="mi">4</span><span class="p">:]</span>
+        <span class="n">size</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">st_size</span>
+        <span class="n">atime</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">st_atime</span><span class="p">)</span>
+        <span class="n">mtime</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">stats</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">mtime</span><span class="p">,</span> <span class="n">atime</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_send_files</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="n">basename</span> <span class="o">=</span> <span class="n">asbytes</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+            <span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">mtime</span><span class="p">,</span> <span class="n">atime</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_stats</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preserve_times</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_time</span><span class="p">(</span><span class="n">mtime</span><span class="p">,</span> <span class="n">atime</span><span class="p">)</span>
+            <span class="n">file_hdl</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
+
+            <span class="c1"># The protocol can&#39;t handle \n in the filename.</span>
+            <span class="c1"># Quote them as the control sequence \^J for now,</span>
+            <span class="c1"># which is how openssh handles it.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">sendall</span><span class="p">((</span><span class="s2">&quot;C</span><span class="si">%s</span><span class="s2"> </span><span class="si">%d</span><span class="s2"> &quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">size</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span> <span class="o">+</span>
+                                 <span class="n">basename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">^J&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_recv_confirm</span><span class="p">()</span>
+            <span class="n">file_pos</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="c1"># avoid divide-by-zero</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">(</span><span class="n">basename</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">(</span><span class="n">basename</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">buff_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buff_size</span>
+            <span class="n">chan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span>
+            <span class="k">while</span> <span class="n">file_pos</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">:</span>
+                <span class="n">chan</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="n">file_hdl</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">buff_size</span><span class="p">))</span>
+                <span class="n">file_pos</span> <span class="o">=</span> <span class="n">file_hdl</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">(</span><span class="n">basename</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">file_pos</span><span class="p">)</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">file_hdl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_recv_confirm</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_chdir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">from_dir</span><span class="p">,</span> <span class="n">to_dir</span><span class="p">):</span>
+        <span class="c1"># Pop until we&#39;re one level up from our next push.</span>
+        <span class="c1"># Push *once* into to_dir.</span>
+        <span class="c1"># This is dependent on the depth-first traversal from os.walk</span>
+
+        <span class="c1"># add path.sep to each when checking the prefix, so we can use</span>
+        <span class="c1"># path.dirname after</span>
+        <span class="n">common</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">commonprefix</span><span class="p">([</span><span class="n">from_dir</span> <span class="o">+</span> <span class="n">bytes_sep</span><span class="p">,</span>
+                                       <span class="n">to_dir</span> <span class="o">+</span> <span class="n">bytes_sep</span><span class="p">])</span>
+        <span class="c1"># now take the dirname, since commonprefix is character based,</span>
+        <span class="c1"># and we either have a seperator, or a partial name</span>
+        <span class="n">common</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">common</span><span class="p">)</span>
+        <span class="n">cur_dir</span> <span class="o">=</span> <span class="n">from_dir</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="n">bytes_sep</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">cur_dir</span> <span class="o">!=</span> <span class="n">common</span><span class="p">:</span>
+            <span class="n">cur_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">cur_dir</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_popd</span><span class="p">()</span>
+        <span class="c1"># now we&#39;re in our common base directory, so on</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_send_pushd</span><span class="p">(</span><span class="n">to_dir</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_send_recursive</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">files</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">base</span><span class="p">):</span>
+                <span class="c1"># filename mixed into the bunch</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_files</span><span class="p">([</span><span class="n">base</span><span class="p">])</span>
+                <span class="k">continue</span>
+            <span class="n">last_dir</span> <span class="o">=</span> <span class="n">asbytes</span><span class="p">(</span><span class="n">base</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">root</span><span class="p">,</span> <span class="n">dirs</span><span class="p">,</span> <span class="n">fls</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">base</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_chdir</span><span class="p">(</span><span class="n">last_dir</span><span class="p">,</span> <span class="n">asbytes</span><span class="p">(</span><span class="n">root</span><span class="p">))</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_files</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">fls</span><span class="p">])</span>
+                <span class="n">last_dir</span> <span class="o">=</span> <span class="n">asbytes</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+            <span class="c1"># back out of the directory</span>
+            <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pushed</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_send_popd</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_send_pushd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">mode</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">mtime</span><span class="p">,</span> <span class="n">atime</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_stats</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">asbytes</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">directory</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preserve_times</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_send_time</span><span class="p">(</span><span class="n">mtime</span><span class="p">,</span> <span class="n">atime</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">sendall</span><span class="p">((</span><span class="s1">&#39;D</span><span class="si">%s</span><span class="s1"> 0 &#39;</span> <span class="o">%</span> <span class="n">mode</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span> <span class="o">+</span>
+                             <span class="n">basename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">^J&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recv_confirm</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pushed</span> <span class="o">+=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_send_popd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="s1">&#39;E</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recv_confirm</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pushed</span> <span class="o">-=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">_send_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mtime</span><span class="p">,</span> <span class="n">atime</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">sendall</span><span class="p">((</span><span class="s1">&#39;T</span><span class="si">%d</span><span class="s1"> 0 </span><span class="si">%d</span><span class="s1"> 0</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mtime</span><span class="p">,</span> <span class="n">atime</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recv_confirm</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_recv_confirm</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># read scp response</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="n">b</span><span class="s1">&#39;&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">SocketTimeout</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="s1">&#39;Timout waiting for scp response&#39;</span><span class="p">)</span>
+        <span class="c1"># slice off the first byte, so this compare will work in py2 and py3</span>
+        <span class="k">if</span> <span class="n">msg</span> <span class="ow">and</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">elif</span> <span class="n">msg</span> <span class="ow">and</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x01</span><span class="s1">&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="n">asunicode</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">recv_stderr_ready</span><span class="p">():</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">recv_stderr</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="n">asunicode</span><span class="p">(</span><span class="n">msg</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">msg</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="s1">&#39;No response from server&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="s1">&#39;Invalid response from server&#39;</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_recv_all</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># loop over scp commands, and receive as necessary</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="p">{</span><span class="n">b</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_file</span><span class="p">,</span>
+                   <span class="n">b</span><span class="s1">&#39;T&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_set_time</span><span class="p">,</span>
+                   <span class="n">b</span><span class="s1">&#39;D&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_pushd</span><span class="p">,</span>
+                   <span class="n">b</span><span class="s1">&#39;E&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_popd</span><span class="p">}</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="c1"># wait for command as long as we&#39;re open</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">sendall</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">1024</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">msg</span><span class="p">:</span>  <span class="c1"># chan closed while recving</span>
+                <span class="k">break</span>
+            <span class="k">assert</span> <span class="n">msg</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span> <span class="o">==</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">code</span> <span class="o">=</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">command</span><span class="p">[</span><span class="n">code</span><span class="p">](</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="n">asunicode</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="c1"># directory times can&#39;t be set until we&#39;re done writing files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_dirtimes</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_set_time</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">times</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+            <span class="n">mtime</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">atime</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">times</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="ow">or</span> <span class="n">mtime</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;</span><span class="se">\x01</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="s1">&#39;Bad time format&#39;</span><span class="p">)</span>
+        <span class="c1"># save for later</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_utime</span> <span class="o">=</span> <span class="p">(</span><span class="n">atime</span><span class="p">,</span> <span class="n">mtime</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_recv_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="n">chan</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">channel</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rename</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_rename</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">asunicode_win</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span><span class="p">),</span>
+                                    <span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">asbytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span><span class="p">),</span>
+                                    <span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\x01</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="s1">&#39;Bad file format&#39;</span><span class="p">)</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">file_hdl</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;</span><span class="se">\x01</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># avoid divide-by-zero</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="n">buff_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">buff_size</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">chan</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="n">pos</span> <span class="o">&lt;</span> <span class="n">size</span><span class="p">:</span>
+                <span class="c1"># we have to make sure we don&#39;t read the final byte</span>
+                <span class="k">if</span> <span class="n">size</span> <span class="o">-</span> <span class="n">pos</span> <span class="o">&lt;=</span> <span class="n">buff_size</span><span class="p">:</span>
+                    <span class="n">buff_size</span> <span class="o">=</span> <span class="n">size</span> <span class="o">-</span> <span class="n">pos</span>
+                <span class="n">file_hdl</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="n">buff_size</span><span class="p">))</span>
+                <span class="n">pos</span> <span class="o">=</span> <span class="n">file_hdl</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_progress</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span>
+
+            <span class="n">msg</span> <span class="o">=</span> <span class="n">chan</span><span class="o">.</span><span class="n">recv</span><span class="p">(</span><span class="mi">512</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">msg</span> <span class="ow">and</span> <span class="n">msg</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="n">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="n">asunicode</span><span class="p">(</span><span class="n">msg</span><span class="p">[</span><span class="mi">1</span><span class="p">:]))</span>
+        <span class="k">except</span> <span class="n">SocketTimeout</span><span class="p">:</span>
+            <span class="n">chan</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="s1">&#39;Error receiving, socket.timeout&#39;</span><span class="p">)</span>
+
+        <span class="n">file_hdl</span><span class="o">.</span><span class="n">truncate</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">utime</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_utime</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_utime</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+            <span class="c1"># should we notify the other end?</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">file_hdl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="c1"># &#39;\x00&#39; confirmation sent in _recv_all</span>
+
+    <span class="k">def</span> <span class="nf">_recv_pushd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">mode</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">8</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rename</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_rename</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;nt&#39;</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">asunicode_win</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span><span class="p">),</span>
+                                    <span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">asbytes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span><span class="p">),</span>
+                                    <span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">except</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;</span><span class="se">\x01</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="s1">&#39;Bad directory format&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">chmod</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">mode</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">SCPException</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: Not a directory&#39;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dirtimes</span><span class="p">[</span><span class="n">path</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_utime</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_utime</span> <span class="o">=</span> <span class="bp">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span> <span class="o">=</span> <span class="n">path</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">OSError</span><span class="p">,</span> <span class="n">SCPException</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">b</span><span class="s1">&#39;</span><span class="se">\x01</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">asbytes</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="k">raise</span>
+
+    <span class="k">def</span> <span class="nf">_recv_popd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">cmd</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_recv_dir</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_set_dirtimes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirtimes</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">utime</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dirtimes</span><span class="p">[</span><span class="n">d</span><span class="p">])</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_dirtimes</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+
+<div class="viewcode-block" id="SCPException"><a class="viewcode-back" href="../../../../../apidoc/shakemap.utils.extern.scp.scp.html#shakemap.utils.extern.scp.scp.SCPException">[docs]</a><span class="k">class</span> <span class="nc">SCPException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    SCP exception class</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../../../../',
+            VERSION:'',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../../../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../../../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../../../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
