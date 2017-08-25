@@ -28,7 +28,7 @@ install:
     # Install shakemap
     #---------------------
     - python setup.py install
-    - python sm_profile -c default -a
+    - python bin/sm_profile -c default -a
 before_script:
     # This is to take care of Invalid DISPLAY variable
     - "export DISPLAY=:99.0"

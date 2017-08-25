@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
         <link rel="up" title="ShakeMap 3.5 Manual" href="index.html"/>
         <link rel="next" title="5. Regional Operations" href="regionals.html"/>
@@ -114,7 +117,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User’s Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="products.html#input-files">3.2.1. Input Files</a></li>
@@ -150,7 +153,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">4. Software &amp; Implementation Guide</a><ul>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">4. Software &amp; Implementation Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#implementation-considerations">4.1. Implementation Considerations</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#seismic-network">4.1.1. Seismic Network</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#seismic-stations-and-parametric-data">4.1.2. Seismic Stations and Parametric Data</a></li>
@@ -174,6 +177,33 @@
 <li class="toctree-l2"><a class="reference internal" href="acknowledgments.html">7. Acknowledgments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="references.html">8. References &amp; Bibliography</a></li>
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
@@ -212,7 +242,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -226,7 +256,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/manual3_5/software_guide.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/manual3_5/software_guide.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -250,7 +280,7 @@ ShakeMap system. In this section, we will discuss a number of these issues.</p>
 of a seismic network capable of determining the location and magnitude of significant
 earthquakes within minutes of their occurrence. This network must also produce
 parametric data for ShakeMap within minutes of the earthquake. The parametric data
-should come from free-field strong motion sensors with real-time or near&#8211;real-time
+should come from free-field strong motion sensors with real-time or near–real-time
 telemetry, and minimally consist of the horizontal components of Peak Ground
 Acceleration (PGA) and Peak Ground Velocity (PGV), as well as (ideally) 5% damped pseudo-
 spectral acceleration (PSA) at 0.3, 1.0, and 3.0 sec periods.</p>
@@ -268,7 +298,7 @@ USGS to produce ShakeMaps. As the following sections will illustrate, running a
 ShakeMap system is a considerable operational undertaking, and in many instances it will
 strain the resources of local or regional networks. The USGS operates a fully-staffed,
 24/7 operations center for global earthquakes and produces ShakeMaps on a daily basis.
-If a regional network&#8217;s parametric data can be made available to the USGS, the USGS&#8217;s
+If a regional network’s parametric data can be made available to the USGS, the USGS’s
 global ShakeMap system will include that data in the processing, and finished ShakeMap
 products can be delivered via ShakeCast for local consumption. Please contact us if you
 are interested in this kind of arrangement.</p>
@@ -276,7 +306,7 @@ are interested in this kind of arrangement.</p>
 <div class="section" id="seismic-stations-and-parametric-data">
 <h3>4.1.2. Seismic Stations and Parametric Data<a class="headerlink" href="#seismic-stations-and-parametric-data" title="Permalink to this headline">¶</a></h3>
 <p>As mentioned above, seismic waveform or parametric data must be communicated to the
-processing center in real-time or near&#8212;real&#8211;time. The sensors must be &#8220;free field&#8221; (i.e., not
+processing center in real-time or near—real–time. The sensors must be “free field” (i.e., not
 located in, or adjacent to, large structures) and installed in accordance with modern standard
 practices. Strong-motion instruments are preferred for ShakeMap, as broadband
 instruments typically clip when ground motions reach the level of interest to ShakeMap.
@@ -285,7 +315,7 @@ range of a station and its overall usefulness, but the network operator is respo
 specifying the crossover from broadband to strong motion, and ShakeMap should be
 presented only with the amplitudes from the favored instrument. Off-scale, clipped,
 below-noise, or otherwise unreliable data must be flagged or omitted from the ShakeMap
-input files. Horizontal components are mandatory&#8212;ShakeMap does not use vertical
+input files. Horizontal components are mandatory—ShakeMap does not use vertical
 components.</p>
 <p>At a minimum, the network must produce PGA and PGV for the ShakeMap stations, but
 PSA (at 0.3, 1.0, and 3.0 sec) is also desirable. The algorithms
@@ -293,7 +323,7 @@ used to compute the parametric data should be verified against known standards.
 ShakeMap can be quite helpful in
 highlighting grossly mis-calibrated stations, but it is best to find these (and more subtle)
 errors before a large earthquake strikes.</p>
-<p>Intensity data from the USGS&#8217;s DYFI system (or an equivalent
+<p>Intensity data from the USGS’s DYFI system (or an equivalent
 regional internet intensity system) is acceptable as input to ShakeMap; however, care
 should be exercised with international DYFI data, as it is often aggregated by city and
 therefore may be too coarse-grained for large-scale maps.</p>
@@ -304,7 +334,7 @@ therefore may be too coarse-grained for large-scale maps.</p>
 Unless an operator is constantly standing by to run ShakeMap, the system must be
 automatic to be useful. The operator must select the boundaries of the region ShakeMap
 will cover and the minimum earthquake magnitude that will trigger a run. These choices
-will be influenced by the reliability of the network&#8217;s earthquake location and magnitude
+will be influenced by the reliability of the network’s earthquake location and magnitude
 data over the region in question. The operator must also consider that a large earthquake may
 occur outside their region of responsibility, but have effects inside their region.</p>
 <p>The ShakeMap software is distributed with a program for responding to event triggers
@@ -312,8 +342,8 @@ and queuing events to be processed, but it is only applicable to the AQMS networ
 software. While this software can serve as a guide, users of other systems (e.g., Antelope,
 Earthworm) will need to develop their own triggering systems.</p>
 <p>Once triggered, ShakeMap will expect to find event and parametric data files in the
-event&#8217;s input directory. Whether the amplitudes are retrieved from a database or stored in
-files, it is the operator&#8217;s responsibility to provide ShakeMap with properly formatted
+event’s input directory. Whether the amplitudes are retrieved from a database or stored in
+files, it is the operator’s responsibility to provide ShakeMap with properly formatted
 files. Again, example programs are distributed with ShakeMap, but operators should
 anticipate that some coding may be necessary.</p>
 </div>
@@ -324,10 +354,10 @@ consideration is needed to properly configure the system for a particular region
 ShakeMap presents the operator with a large number of configuration options, and these
 options will directly affect the accuracy and reliability of the products. The
 operator must select the proper GMPE or GMPEs for the region, and specify under which
-conditions they will be used. An appropriate Ground-Motion&#8211;Intensity Conversion
+conditions they will be used. An appropriate Ground-Motion–Intensity Conversion
 Equation (GMICE) must likewise be chosen. The operator may also elect to use an Intensity
 Prediction Equation (IPE) or to use the default virtual IPE. For best results, the operator
-will need to provide a Vs30 grid, and while the <a class="reference external" href="http://earthquake.usgs.gov/hazards/apps/vs30/">USGS&#8217;s Vs30 server</a> can supply such a
+will need to provide a Vs30 grid, and while the <a class="reference external" href="http://earthquake.usgs.gov/hazards/apps/vs30/">USGS’s Vs30 server</a> can supply such a
 grid based on topographic slope, a grid based on regional geology is preferable <a class="footnote-reference" href="#id2" id="id1">[1]</a>. The
 user must also decide whether to use GMPE-native or Borcherdt-style site correction
 factors. This is just a partial list of configuration choices. There are numerous other
@@ -338,7 +368,7 @@ wishing more sophisticated webpages or non-English support can anticipate a subs
 investment in bringing the system online. Some modifications of the ShakeMap software
 may be required for languages other than English, but such modifications may make it
 more difficult to update the software.</p>
-<p>For further information on ShakeMap configuration, see the <a class="reference internal" href="#sm35-software-guide"><span>Software Guide</span></a> and the
+<p>For further information on ShakeMap configuration, see the <a class="reference internal" href="#sm35-software-guide"><span class="std std-ref">Software Guide</span></a> and the
 ShakeMap configuration files themselves.</p>
 </div>
 <div class="section" id="operations">
@@ -422,7 +452,7 @@ backup for your ShakeMap system, please contact us.</p>
 <div class="section" id="shakemap-implementation-checklist">
 <h2>4.2. ShakeMap Implementation Checklist<a class="headerlink" href="#shakemap-implementation-checklist" title="Permalink to this headline">¶</a></h2>
 <p>The checklist below is based on the one we use when discussing ShakeMap operations with active or
-potential producers within the USGS&#8217;s Advanced National Seismic System (ANSS).
+potential producers within the USGS’s Advanced National Seismic System (ANSS).
 While some of the issues are ANSS-specific, there may be analogous considerations for
 other regional or national networks.</p>
 <ol class="arabic simple">
@@ -442,14 +472,14 @@ convention?  If not, can they be easily associated with the authoritative ID?</l
 </ol>
 </li>
 <li><strong>Station Coverage and Parametric Data</strong><ol class="upperalpha">
-<li>Real-time or near&#8211;real-time data flow.  What are the types and distribution of
-stations contributing to ShakeMap? Are all stations &#8220;ShakeMap-quality”?</li>
+<li>Real-time or near–real-time data flow.  What are the types and distribution of
+stations contributing to ShakeMap? Are all stations “ShakeMap-quality”?</li>
 <li>Parametric Data.  How are the parametric data computed? (Five parameters:
 PGA, PGV, and three periods of PSA.)</li>
 <li>Are parametric data imported from other sources (NSMP-triggered stations,
 state or commercial agencies, neighboring networks, etc.)? How are these
 integrated with the ShakeMap input?</li>
-<li>Are &#8220;Did You Feel It?&#8221; data used as input?</li>
+<li>Are “Did You Feel It?” data used as input?</li>
 <li>Co-location of different sensor types, priorities, and preventing redundant
 input data. How are co-located instruments resolved by the network to
 produce only a single (best) set of amplitudes for ShakeMap?</li>
@@ -462,7 +492,7 @@ determined?<ol class="loweralpha">
 under what conditions?</li>
 <li>IPEs. Which Intensity Prediction Equations are used, and under what
 circumstances?</li>
-<li>GMICEs. Which Ground-Motion&#8211;Intensity Conversion Equations are
+<li>GMICEs. Which Ground-Motion–Intensity Conversion Equations are
 used?</li>
 <li>Site Amplification.  How are site conditions established and what
 amplifications are used (GMPE-native, Borcherdt-style)?</li>
@@ -537,8 +567,8 @@ Hazard Maps, both with attenuation relations and in source parameterization.
 Coordination with the National Earthquake Information Center (NEIC) is essential.</li>
 <li>Is a copy of scenarios also available on the USGS web site?</li>
 <li>How and when will scenarios be reprocessed?</li>
-<li>Archive “final&#8221; ShakeMaps for significant events.  Many users want
-ShakeMaps for significant events &#8220;frozen in time&#8221;. Once a ShakeMap gets
+<li>Archive “final” ShakeMaps for significant events.  Many users want
+ShakeMaps for significant events “frozen in time”. Once a ShakeMap gets
 used as a reference for damage-loss modelers, insurance investigators, and
 researchers, there needs to be an archival version of these events. Once all the
 available ground-motion data have been collected and included in ShakeMap,

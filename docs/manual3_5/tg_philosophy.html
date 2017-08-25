@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
         <link rel="up" title="2. Technical Guide" href="technical_guide.html"/>
         <link rel="next" title="2.3. Recorded Ground-motion Parameters" href="tg_parameters.html"/>
@@ -83,7 +86,7 @@
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="tg_software.html">2.1. ShakeMap Software Overview</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="">2.2. Philosophy of Estimating and Interpolating Ground Motions</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">2.2. Philosophy of Estimating and Interpolating Ground Motions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tg_parameters.html">2.3. Recorded Ground-motion Parameters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="tg_parameters.html#data-acquisition">2.3.1. Data Acquisition</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tg_parameters.html#derived-parametric-ground-motion-values">2.3.2. Derived Parametric Ground-motion Values</a></li>
@@ -114,7 +117,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User’s Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="products.html#input-files">3.2.1. Input Files</a></li>
@@ -176,6 +179,33 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.mapping.html">shakemap.mapping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.mapping.mapmaker.html">shakemap.mapping.mapmaker</a></li>
@@ -212,7 +242,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -228,7 +258,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/manual3_5/tg_philosophy.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/manual3_5/tg_philosophy.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -242,7 +272,7 @@
 <span id="sec-philosophy"></span><h1>2.2. Philosophy of Estimating and Interpolating Ground Motions<a class="headerlink" href="#philosophy-of-estimating-and-interpolating-ground-motions" title="Permalink to this headline">¶</a></h1>
 <p>The overall strategy for the deployment of stations under the ANSS implementation plan
 relies on dense instrumentation concentrated in urban areas with high seismic hazards
-(<a class="reference internal" href="references.html#usgs1999"><span>USGS, 1999</span></a>) and fewer stations in outlying areas.  Based on this philosophy, and when
+(<a class="reference internal" href="references.html#usgs1999"><span class="std std-ref">USGS, 1999</span></a>) and fewer stations in outlying areas.  Based on this philosophy, and when
 fully deployed, maps generated in these urban regions are expected to be most accurate
 where the population at risk is the greatest, and therefore, where emergency response and
 recovery efforts will likely be most urgent and complex.</p>
@@ -272,9 +302,9 @@ can take many forms. There are some good reasons to employ geospatial kriging-wi
 However, the complexity of the trends (GMPE, as well as inter-event bias
 corrections per Intensity Measure or IM), the use of multiply-weighted strong-motion and macroseimic
 data, and the real-time nature of the processing require other considerations. Effectively,
-the approach ShakeMap currently employs for interpolation (<a class="reference internal" href="references.html#worden2010"><span>Worden et al., 2010</span></a>), which
+the approach ShakeMap currently employs for interpolation (<a class="reference internal" href="references.html#worden2010"><span class="std std-ref">Worden et al., 2010</span></a>), which
 employs a predetermined spatial correlation function, is broadly analogous to <a class="reference external" href="https://en.wikipedia.org/wiki/Kriging">kriging-with-a-trend</a>
-mathematically. We address this possibility further in <a class="reference internal" href="future_directions.html#future-directions"><span>Future Directions</span></a>.</p>
+mathematically. We address this possibility further in <a class="reference internal" href="future_directions.html#future-directions"><span class="std std-ref">Future Directions</span></a>.</p>
 <p>Estimating motions where there are few stations, and then interpolating the recordings and
 estimates to a fine grid for mapping and contouring, requires several steps. In the
 following sections, we describe the process from input to final interpolated grid. Where

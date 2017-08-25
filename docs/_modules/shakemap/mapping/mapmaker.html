@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../../../genindex.html"/>
+        <link rel="search" title="Search" href="../../../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../../../index.html"/>
         <link rel="up" title="Module code" href="../../index.html"/> 
 
@@ -112,7 +115,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/users_guide.html">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/users_guide.html">3. User’s Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../manual3_5/background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../manual3_5/products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../manual3_5/products.html#input-files">3.2.1. Input Files</a></li>
@@ -172,6 +175,33 @@
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/acknowledgments.html">7. Acknowledgments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/references.html">8. References &amp; Bibliography</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../manual3_5/glossary.html">9. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
@@ -238,32 +268,32 @@
 <span class="c1"># stdlib</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">time</span>
-<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
 <span class="c1"># third party</span>
 <span class="c1">#from mapio.basemapcity import BasemapCities</span>
-<span class="kn">from</span> <span class="nn">mapio.gmt</span> <span class="kn">import</span> <span class="n">GMTGrid</span>
+<span class="kn">from</span> <span class="nn">mapio.gmt</span> <span class="k">import</span> <span class="n">GMTGrid</span>
 <span class="kn">import</span> <span class="nn">fiona</span>
-<span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="kn">import</span> <span class="n">Polygon</span>
-<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="kn">import</span> <span class="n">LightSource</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">as</span> <span class="nn">plt</span>
-<span class="kn">from</span> <span class="nn">shapely.ops</span> <span class="kn">import</span> <span class="n">transform</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">MultiPolygon</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">MultiLineString</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">GeometryCollection</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">Polygon</span> <span class="k">as</span> <span class="n">sPolygon</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">shape</span> <span class="k">as</span> <span class="n">sShape</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="kn">import</span> <span class="n">mapping</span>
-<span class="kn">from</span> <span class="nn">mpl_toolkits.basemap</span> <span class="kn">import</span> <span class="n">Basemap</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">descartes</span> <span class="kn">import</span> <span class="n">PolygonPatch</span>
-<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">gaussian_filter</span>
+<span class="kn">from</span> <span class="nn">matplotlib.patches</span> <span class="k">import</span> <span class="n">Polygon</span>
+<span class="kn">from</span> <span class="nn">matplotlib.colors</span> <span class="k">import</span> <span class="n">LightSource</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">shapely.ops</span> <span class="k">import</span> <span class="n">transform</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">MultiPolygon</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">MultiLineString</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">GeometryCollection</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">Polygon</span> <span class="k">as</span> <span class="n">sPolygon</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">shape</span> <span class="k">as</span> <span class="n">sShape</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">mapping</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.basemap</span> <span class="k">import</span> <span class="n">Basemap</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">descartes</span> <span class="k">import</span> <span class="n">PolygonPatch</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="k">import</span> <span class="n">gaussian_filter</span>
 <span class="kn">import</span> <span class="nn">pyproj</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="kn">import</span> <span class="n">ShakeLibException</span>
-<span class="kn">from</span> <span class="nn">shakelib.gmice.wgrw12</span> <span class="kn">import</span> <span class="n">WGRW12</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="k">import</span> <span class="n">ShakeLibException</span>
+<span class="kn">from</span> <span class="nn">shakelib.gmice.wgrw12</span> <span class="k">import</span> <span class="n">WGRW12</span>
 
 
 <span class="n">CITY_COLS</span> <span class="o">=</span> <span class="mi">2</span>
@@ -312,12 +342,12 @@
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">polygon</span><span class="p">:</span>
             <span class="n">ppolygon</span> <span class="o">=</span> <span class="n">getProjectedPolygon</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
             <span class="n">patch</span> <span class="o">=</span> <span class="n">PolygonPatch</span><span class="p">(</span><span class="n">ppolygon</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">edgecolor</span><span class="p">,</span>
-                                 <span class="n">zorder</span><span class="o">=</span><span class="n">OCEAN_ZORDER</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                                 <span class="n">zorder</span><span class="o">=</span><span class="n">OCEAN_ZORDER</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">ppolygon</span> <span class="o">=</span> <span class="n">getProjectedPolygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
         <span class="n">patch</span> <span class="o">=</span> <span class="n">PolygonPatch</span><span class="p">(</span><span class="n">ppolygon</span><span class="p">,</span> <span class="n">facecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">edgecolor</span><span class="p">,</span>
-                             <span class="n">zorder</span><span class="o">=</span><span class="n">OCEAN_ZORDER</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                             <span class="n">zorder</span><span class="o">=</span><span class="n">OCEAN_ZORDER</span><span class="p">,</span> <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">patches</span></div>
@@ -325,7 +355,7 @@
 
 <div class="viewcode-block" id="MapMaker"><a class="viewcode-back" href="../../../apidoc/shakemap.mapping.mapmaker.html#shakemap.mapping.mapmaker.MapMaker">[docs]</a><span class="k">class</span> <span class="nc">MapMaker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shakemap</span><span class="p">,</span> <span class="n">topofile</span><span class="p">,</span> <span class="n">stations</span><span class="p">,</span> <span class="n">fault</span><span class="p">,</span> <span class="n">layerdict</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">cities</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shakemap</span><span class="p">,</span> <span class="n">topofile</span><span class="p">,</span> <span class="n">stations</span><span class="p">,</span> <span class="n">fault</span><span class="p">,</span> <span class="n">layerdict</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">cities</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">req_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;coast&#39;</span><span class="p">,</span> <span class="s1">&#39;ocean&#39;</span><span class="p">,</span> <span class="s1">&#39;lake&#39;</span><span class="p">,</span> <span class="s1">&#39;country&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="s1">&#39;roads&#39;</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">layerdict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">req_keys</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">req_keys</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ShakeMapException</span><span class="p">(</span>
@@ -337,10 +367,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="o">=</span> <span class="n">CITY_COLS</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span> <span class="o">=</span> <span class="n">CITY_ROWS</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="n">CITIES_PER_GRID</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">imt_layer</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">contour_layer</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">intensity_colormap</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">contour_colormap</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imt_layer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contour_layer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">intensity_colormap</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">contour_colormap</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stations</span> <span class="o">=</span> <span class="n">stations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fault</span> <span class="o">=</span> <span class="n">fault</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">source</span> <span class="o">=</span> <span class="n">source</span>
@@ -351,7 +381,7 @@
         <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_clipBounds</span><span class="p">()</span>
         <span class="n">t2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to clip vectors.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t2</span> <span class="o">-</span> <span class="n">t1</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to clip vectors.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t2</span> <span class="o">-</span> <span class="n">t1</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_clipBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># returns a list of GeoJSON-like mapping objects</span>
@@ -368,7 +398,7 @@
                 <span class="n">tshape</span> <span class="o">=</span> <span class="n">sShape</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">])</span>
                 <span class="n">intshape</span> <span class="o">=</span> <span class="n">tshape</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">bboxpoly</span><span class="p">)</span>
                 <span class="n">vshapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">intshape</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Filename is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Filename is </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
             <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">vectors</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">vshapes</span>
 
@@ -383,9 +413,9 @@
 
 <div class="viewcode-block" id="MapMaker.setCityList"><a class="viewcode-back" href="../../../apidoc/shakemap.mapping.mapmaker.html#shakemap.mapping.mapmaker.MapMaker.setCityList">[docs]</a>    <span class="k">def</span> <span class="nf">setCityList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="n">BaseMapCities</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>  <span class="c1"># may raise exception</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="o">=</span> <span class="bp">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="bp">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="kc">None</span></div>
 
 <div class="viewcode-block" id="MapMaker.setIntensityLayer"><a class="viewcode-back" href="../../../apidoc/shakemap.mapping.mapmaker.html#shakemap.mapping.mapmaker.MapMaker.setIntensityLayer">[docs]</a>    <span class="k">def</span> <span class="nf">setIntensityLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_layer</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">imt_layer</span> <span class="o">=</span> <span class="n">imt_layer</span></div>
@@ -408,7 +438,7 @@
         <span class="n">m</span> <span class="o">=</span> <span class="n">Basemap</span><span class="p">(</span><span class="n">llcrnrlon</span><span class="o">=</span><span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">llcrnrlat</span><span class="o">=</span><span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">urcrnrlon</span><span class="o">=</span><span class="n">gd</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">urcrnrlat</span><span class="o">=</span><span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">,</span>
                     <span class="n">rsphere</span><span class="o">=</span><span class="p">(</span><span class="mf">6378137.00</span><span class="p">,</span> <span class="mf">6356752.3142</span><span class="p">),</span>
                     <span class="n">resolution</span><span class="o">=</span><span class="n">BASEMAP_RESOLUTION</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s1">&#39;merc&#39;</span><span class="p">,</span>
-                    <span class="n">lat_0</span><span class="o">=</span><span class="n">clat</span><span class="p">,</span> <span class="n">lon_0</span><span class="o">=</span><span class="n">clon</span><span class="p">,</span> <span class="n">lat_ts</span><span class="o">=</span><span class="n">clat</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">suppress_ticks</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+                    <span class="n">lat_0</span><span class="o">=</span><span class="n">clat</span><span class="p">,</span> <span class="n">lon_0</span><span class="o">=</span><span class="n">clon</span><span class="p">,</span> <span class="n">lat_ts</span><span class="o">=</span><span class="n">clat</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">suppress_ticks</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">m</span>
 
     <span class="k">def</span> <span class="nf">_projectGrid</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">):</span>
@@ -420,8 +450,8 @@
         <span class="c1"># backwards so it plots right side up</span>
         <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
         <span class="n">llons1</span><span class="p">,</span> <span class="n">llats1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">)</span>
-        <span class="n">pdata</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">transform_scalar</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">gd</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">returnxy</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
-                                   <span class="n">checkbounds</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+        <span class="n">pdata</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">transform_scalar</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">[::</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">gd</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">returnxy</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                   <span class="n">checkbounds</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">masked</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pdata</span>
 
     <span class="k">def</span> <span class="nf">_getDraped</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">topodata</span><span class="p">):</span>
@@ -534,7 +564,7 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">yticks</span><span class="p">(</span><span class="n">yticks</span><span class="p">,</span> <span class="p">())</span>
         <span class="n">m</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">direction</span><span class="o">=</span><span class="s1">&#39;out&#39;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_drawTitle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isContour</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_drawTitle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isContour</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># Add a title</span>
         <span class="n">hlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
         <span class="n">hlat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
@@ -565,7 +595,7 @@
                   <span class="n">tpl</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;bottom&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">eid</span>
 
-    <span class="k">def</span> <span class="nf">_drawStations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">imt</span><span class="o">=</span><span class="s1">&#39;pga&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_drawStations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">imt</span><span class="o">=</span><span class="s1">&#39;pga&#39;</span><span class="p">):</span>
         <span class="c1"># get the locations and values of the MMI observations</span>
         <span class="n">mmidf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">stations</span><span class="o">.</span><span class="n">getStationDataframe</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="c1"># get the locations and values of the instrumented observations</span>
@@ -579,13 +609,13 @@
             <span class="c1"># plot MMI as small circles</span>
             <span class="n">mmilat</span> <span class="o">=</span> <span class="n">mmidf</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
             <span class="n">mmilon</span> <span class="o">=</span> <span class="n">mmidf</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
-            <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mmilon</span><span class="p">,</span> <span class="n">mmilat</span><span class="p">,</span> <span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mmilon</span><span class="p">,</span> <span class="n">mmilat</span><span class="p">,</span> <span class="s1">&#39;ko&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
                    <span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">STATIONS_ZORDER</span><span class="p">)</span>
 
             <span class="c1"># plot MMI as slightly larger triangles</span>
             <span class="n">instlat</span> <span class="o">=</span> <span class="n">instdf</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
             <span class="n">instlon</span> <span class="o">=</span> <span class="n">instdf</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
-            <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">instlon</span><span class="p">,</span> <span class="n">instlat</span><span class="p">,</span> <span class="s1">&#39;k^&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">instlon</span><span class="p">,</span> <span class="n">instlat</span><span class="p">,</span> <span class="s1">&#39;k^&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
                    <span class="n">markersize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">STATIONS_ZORDER</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mmidf</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]):</span>
@@ -593,7 +623,7 @@
                 <span class="n">mlon</span> <span class="o">=</span> <span class="n">mmidf</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
                 <span class="n">mmi</span> <span class="o">=</span> <span class="n">mmidf</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
                 <span class="n">mcolor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intensity_colormap</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">mmi</span><span class="p">)</span>
-                <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mlon</span><span class="p">,</span> <span class="n">mlat</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mlon</span><span class="p">,</span> <span class="n">mlat</span><span class="p">,</span> <span class="s1">&#39;o&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">markerfacecolor</span><span class="o">=</span><span class="n">mcolor</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> 
                        <span class="n">markersize</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">STATIONS_ZORDER</span><span class="p">)</span>
 
@@ -602,7 +632,7 @@
                 <span class="n">mlon</span> <span class="o">=</span> <span class="n">instdf</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
                 <span class="n">dmmi</span> <span class="o">=</span> <span class="n">instdf</span><span class="p">[</span><span class="n">dimt</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
                 <span class="n">mcolor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intensity_colormap</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">dmmi</span><span class="p">)</span>
-                <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mlon</span><span class="p">,</span> <span class="n">mlat</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mlon</span><span class="p">,</span> <span class="n">mlat</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                        <span class="n">markerfacecolor</span><span class="o">=</span><span class="n">mcolor</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> 
                        <span class="n">markersize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">STATIONS_ZORDER</span><span class="p">)</span>
 
@@ -613,7 +643,7 @@
         <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">FAULT_ZORDER</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MapMaker.drawIntensityMap"><a class="viewcode-back" href="../../../apidoc/shakemap.mapping.mapmaker.html#shakemap.mapping.mapmaker.MapMaker.drawIntensityMap">[docs]</a>    <span class="k">def</span> <span class="nf">drawIntensityMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outfolder</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">intensity_colormap</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">intensity_colormap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ShakeMapException</span><span class="p">(</span>
                 <span class="s1">&#39;MapMaker.setGMTColormap() has not been called.&#39;</span><span class="p">)</span>
         <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -634,7 +664,7 @@
 
         <span class="c1"># get topo layer and project it</span>
         <span class="n">topogrid</span> <span class="o">=</span> <span class="n">GMTGrid</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">topofile</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">sampledict</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">topofile</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">sampledict</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">topodata</span> <span class="o">=</span> <span class="n">topogrid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">ptopo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projectGrid</span><span class="p">(</span><span class="n">topodata</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
 
@@ -661,7 +691,7 @@
         <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawOceans</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
         <span class="n">t2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render oceans.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t2</span> <span class="o">-</span> <span class="n">t1</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render oceans.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t2</span> <span class="o">-</span> <span class="n">t1</span><span class="p">))</span>
 
         <span class="c1"># draw coastlines</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawCoastlines</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
@@ -684,18 +714,18 @@
         <span class="c1"># draw epicenter</span>
         <span class="n">hlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
         <span class="n">hlat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
-        <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hlon</span><span class="p">,</span> <span class="n">hlat</span><span class="p">,</span> <span class="s1">&#39;k*&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hlon</span><span class="p">,</span> <span class="n">hlat</span><span class="p">,</span> <span class="s1">&#39;k*&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
                <span class="n">markersize</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">EPICENTER_ZORDER</span><span class="p">)</span>
 
         <span class="c1"># draw cities</span>
         <span class="c1"># reduce the number of cities to those whose labels don&#39;t collide</span>
         <span class="c1"># set up cities</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">limitByBounds</span><span class="p">(</span>
                 <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">limitByGrid</span><span class="p">(</span><span class="n">nx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span><span class="p">,</span>
                                                   <span class="n">cities_per_grid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span><span class="p">)</span>
-            <span class="k">print</span><span class="p">(</span><span class="s2">&quot;Available fonts: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">_fontlist</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Available fonts: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">_fontlist</span><span class="p">)</span>
             <span class="k">if</span> <span class="s1">&#39;Times New Roman&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">_fontlist</span><span class="p">:</span>
                 <span class="n">font</span> <span class="o">=</span> <span class="s1">&#39;Times New Roman&#39;</span>
             <span class="k">else</span><span class="p">:</span>
@@ -714,7 +744,7 @@
         <span class="n">outfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;intensity_</span><span class="si">%s</span><span class="s1">.pdf&#39;</span> <span class="o">%</span> <span class="n">eventid</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
         <span class="n">tn</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">outfile</span></div>
 
     <span class="k">def</span> <span class="nf">_getShaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ptopo</span><span class="p">):</span>
@@ -772,8 +802,8 @@
         <span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">newdmin</span><span class="p">,</span> <span class="n">newdmax</span> <span class="o">+</span> <span class="n">dinc</span><span class="p">,</span> <span class="n">dinc</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">levels</span></div>
 
-<div class="viewcode-block" id="MapMaker.drawContourMap"><a class="viewcode-back" href="../../../apidoc/shakemap.mapping.mapmaker.html#shakemap.mapping.mapmaker.MapMaker.drawContourMap">[docs]</a>    <span class="k">def</span> <span class="nf">drawContourMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outfolder</span><span class="p">,</span> <span class="n">cmin</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">cmax</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">contour_colormap</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+<div class="viewcode-block" id="MapMaker.drawContourMap"><a class="viewcode-back" href="../../../apidoc/shakemap.mapping.mapmaker.html#shakemap.mapping.mapmaker.MapMaker.drawContourMap">[docs]</a>    <span class="k">def</span> <span class="nf">drawContourMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outfolder</span><span class="p">,</span> <span class="n">cmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">contour_colormap</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ShakeMapException</span><span class="p">(</span>
                 <span class="s1">&#39;MapMaker.setGMTColormap() has not been called.&#39;</span><span class="p">)</span>
         <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -794,7 +824,7 @@
 
         <span class="c1"># get topo layer and project it</span>
         <span class="n">topogrid</span> <span class="o">=</span> <span class="n">GMTGrid</span><span class="o">.</span><span class="n">load</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">topofile</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">sampledict</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">topofile</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">sampledict</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">topodata</span> <span class="o">=</span> <span class="n">topogrid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">ptopo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projectGrid</span><span class="p">(</span><span class="n">topodata</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
 
@@ -821,7 +851,7 @@
         <span class="n">dmax</span> <span class="o">=</span> <span class="n">pimt</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
         <span class="n">levels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getContourLevels</span><span class="p">(</span><span class="n">dmin</span><span class="p">,</span> <span class="n">dmax</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">contour_layer</span><span class="p">)</span>
         <span class="n">cs</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">pimt</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span>
-                       <span class="n">cmap</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">levels</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">CONTOUR_ZORDER</span><span class="p">)</span>
+                       <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">levels</span><span class="o">=</span><span class="n">levels</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">CONTOUR_ZORDER</span><span class="p">)</span>
         <span class="n">clabels</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">clabel</span><span class="p">(</span><span class="n">cs</span><span class="p">,</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span><span class="p">,</span>
                              <span class="n">fontsize</span><span class="o">=</span><span class="mf">8.0</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">CONTOUR_ZORDER</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">cl</span> <span class="ow">in</span> <span class="n">clabels</span><span class="p">:</span>
@@ -839,7 +869,7 @@
         <span class="n">t1</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawOceans</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
         <span class="n">t2</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render oceans.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t2</span> <span class="o">-</span> <span class="n">t1</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render oceans.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">t2</span> <span class="o">-</span> <span class="n">t1</span><span class="p">))</span>
 
         <span class="c1"># draw coastlines</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawCoastlines</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
@@ -848,7 +878,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawGraticules</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
 
         <span class="c1"># draw filled symbols for MMI and instrumented measures</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_drawStations</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">imt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">contour_layer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drawStations</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">imt</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">contour_layer</span><span class="p">)</span>
 
         <span class="c1"># draw map scale</span>
         <span class="n">scalex</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmin</span> <span class="o">+</span> <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">)</span> <span class="o">/</span> <span class="mf">5.0</span>
@@ -865,13 +895,13 @@
         <span class="c1"># draw epicenter</span>
         <span class="n">hlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
         <span class="n">hlat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
-        <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hlon</span><span class="p">,</span> <span class="n">hlat</span><span class="p">,</span> <span class="s1">&#39;k*&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+        <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hlon</span><span class="p">,</span> <span class="n">hlat</span><span class="p">,</span> <span class="s1">&#39;k*&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
                <span class="n">markersize</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">EPICENTER_ZORDER</span><span class="p">)</span>
 
         <span class="c1"># draw cities</span>
         <span class="c1"># reduce the number of cities to those whose labels don&#39;t collide</span>
         <span class="c1"># set up cities</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">limitByBounds</span><span class="p">(</span>
                 <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">limitByGrid</span><span class="p">(</span><span class="n">nx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span><span class="p">,</span>
@@ -884,7 +914,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">renderToMap</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">CITIES_ZORDER</span><span class="p">)</span>
 
         <span class="c1"># draw title and supertitle</span>
-        <span class="n">eventid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drawTitle</span><span class="p">(</span><span class="n">isContour</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="n">eventid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_drawTitle</span><span class="p">(</span><span class="n">isContour</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># draw whatever road data is available</span>
         <span class="c1"># self._drawRoads(m)</span>
@@ -895,7 +925,7 @@
                                <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contour_layer</span><span class="p">,</span> <span class="n">eventid</span><span class="p">))</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
         <span class="n">tn</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">outfile</span></div></div>
 </pre></div>
 

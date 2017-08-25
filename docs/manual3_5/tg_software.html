@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
         <link rel="up" title="2. Technical Guide" href="technical_guide.html"/>
         <link rel="next" title="2.2. Philosophy of Estimating and Interpolating Ground Motions" href="tg_philosophy.html"/>
@@ -82,7 +85,7 @@
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="">2.1. ShakeMap Software Overview</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">2.1. ShakeMap Software Overview</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tg_philosophy.html">2.2. Philosophy of Estimating and Interpolating Ground Motions</a></li>
 <li class="toctree-l3"><a class="reference internal" href="tg_parameters.html">2.3. Recorded Ground-motion Parameters</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="tg_parameters.html#data-acquisition">2.3.1. Data Acquisition</a></li>
@@ -114,7 +117,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User’s Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="products.html#input-files">3.2.1. Input Files</a></li>
@@ -176,6 +179,33 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.mapping.html">shakemap.mapping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.mapping.mapmaker.html">shakemap.mapping.mapmaker</a></li>
@@ -212,7 +242,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -228,7 +258,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/manual3_5/tg_software.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/manual3_5/tg_software.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -245,7 +275,7 @@ available scripting language that runs on all computer platforms.  The collectio
 modules allows the processing to flow in discrete steps that can be run collectively or
 individually.  Within the PERL scripts, other software packages are called, specifically
 packages that enable the graphics and much of the heavy grid-based computation.  For
-instance, maps are made using the Generic Mapping Tool (GMT; <a class="reference internal" href="references.html#gmt-ref"><span>Wessel and Smith,
+instance, maps are made using the Generic Mapping Tool (GMT; <a class="reference internal" href="references.html#gmt-ref"><span class="std std-ref">Wessel and Smith,
 1991)</span></a>, and the Postscript output from GMT is converted to JPEG format using
 <a class="reference external" href="http://www.imagemagick.org/script/index.php">ImageMagick</a> or
 <a class="reference external" href="http://www.graphicsmagick.org/">GraphicsMagick</a>.  In the design of ShakeMap,
@@ -256,19 +286,19 @@ note that much of the heavy computational load is handled by highly optimized pr
 (usually written in C) that are called from within the PERL programs. Even for networks
 with hundreds of stations over large regions, ShakeMap takes only a minute or so to run
 on a modern computer (and much of that time is spent in product generation, e.g.,
-converting PostScript images to JPEG&#8212;something that would be very difficult to
+converting PostScript images to JPEG—something that would be very difficult to
 optimize further).</p>
 <p>To enable customization for specific earthquakes or for different regions, each ShakeMap
 module has an accompanying collection of configuration files.  For example, in these
 files, one assigns the regional geographic boundaries and mapping characteristics to be
 used by GMT, which ground motion prediction equation (GMPE) to use, where and how
 to transfer the maps, email recipient lists, and so on.  Specific details about the software
-and configuration files are described in detail in the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span>Software Guide</span></a>.</p>
+and configuration files are described in detail in the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a>.</p>
 <p>With standardization in GIS and web application interfaces (API), several aspects of the
 ShakeMap system could be accomplished within GIS applications, but the open-source,
 freely available nature of GMT combined with PERL scripting tools allows for a flexible
 and readily available ShakeMap software package.  Nonetheless, we do generate a
-number of GIS product formats for that widespread user group as described in the <a class="reference internal" href="users_guide.html#users-guide"><span>User&#8217;s Guide</span></a>.</p>
+number of GIS product formats for that widespread user group as described in the <a class="reference internal" href="users_guide.html#users-guide"><span class="std std-ref">User’s Guide</span></a>.</p>
 </div>
 
 

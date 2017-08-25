@@ -16,6 +16,6 @@ setup(name='shakemap',
       package_data={'shakemap': [os.path.join('tests', 'data', '*'),
                                  os.path.join('data', '*'),
                                  ]},
-      scripts=['sm_assemble', 'sm_augment', 'sm_contour', 'sm_model', 
-               'sm_profile'],
+      scripts=['bin/sm_assemble', 'bin/sm_augment', 'bin/sm_contour',
+               'bin/sm_model', 'bin/sm_profile'],
       )

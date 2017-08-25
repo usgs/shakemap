@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
         <link rel="up" title="3. User’s Guide" href="users_guide.html"/>
         <link rel="next" title="3.3. ShakeMap Archives" href="shakemap_archives.html"/>
@@ -114,9 +117,9 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="users_guide.html">3. User’s Guide</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="background.html">3.1. Background</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="">3.2. Products and Formats</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#input-files">3.2.1. Input Files</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#output-files-and-products">3.2.2. Output Files and Products</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#real-time-product-distribution-automatic-access-and-feeds">3.2.3. Real-Time Product Distribution, Automatic Access, and Feeds</a></li>
@@ -176,6 +179,33 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.mapping.html">shakemap.mapping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.mapping.mapmaker.html">shakemap.mapping.mapmaker</a></li>
@@ -212,7 +242,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -222,13 +252,13 @@
       
           <li><a href="index.html">ShakeMap 3.5 Manual</a> &raquo;</li>
       
-          <li><a href="users_guide.html">3. User&#8217;s Guide</a> &raquo;</li>
+          <li><a href="users_guide.html">3. User’s Guide</a> &raquo;</li>
       
     <li>3.2. Products and Formats</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/manual3_5/products.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/manual3_5/products.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -262,14 +292,14 @@ all of the original processing center’s input files in a ShakeMap-readable
 format. The file may contain seismic station data, intensity data, or a
 combination of both. The file also contains an event tag with the earthquake
 source specifications.
-See the ShakeMap <a class="reference internal" href="software_guide.html#software-guide"><span>Software &amp; Implementation Guide</span></a> for a complete specification of
+See the ShakeMap <a class="reference internal" href="software_guide.html#software-guide"><span class="std std-ref">Software &amp; Implementation Guide</span></a> for a complete specification of
 the ShakeMap-input XML formats.</p>
 <p>For reasons of backward compatibility, we also provide <em>stationlist.txt</em>. As with
 <em>grid.xyz</em>, the use of this file is deprecated and it may disappear in a future
 release.</p>
 <p><strong>Fault Files</strong>. Fault files are named <em>&lt;something&gt;_fault.txt</em> and are listed in
 <em>info.xml</em>. Zero or more fault files may be present in the ShakeMap input
-directory. See the ShakeMap <a class="reference internal" href="software_guide.html#software-guide"><span>Software &amp; Implementation Guide</span></a> for a complete specification
+directory. See the ShakeMap <a class="reference internal" href="software_guide.html#software-guide"><span class="std std-ref">Software &amp; Implementation Guide</span></a> for a complete specification
 of the fault file format. For the purposes of reproducing the ShakeMap for an
 earthquake, it is sufficient to copy the specified file(s) into the event’s
 input directory.</p>
@@ -357,10 +387,10 @@ understanding or replicating any particular ShakeMap.</p>
 <h3>3.2.2.2. Static Maps and Plots (Images)<a class="headerlink" href="#static-maps-and-plots-images" title="Permalink to this headline">¶</a></h3>
 <p>ShakeMap generates a number of static ground-motion maps and plots for various
 parameters (intensity measures, or IMs). Most of these maps are available in
-JPEG format, as well as zipped PostScript files that&#8212;as vector-based
-images&#8212;are suitable for PDF conversion or editing. These maps are typically
+JPEG format, as well as zipped PostScript files that—as vector-based
+images—are suitable for PDF conversion or editing. These maps are typically
 generated automatically, limiting the format, extent, and features that can be
-depicted. Nonetheless, these static maps are ShakeMap’s &#8220;signature products&#8221; and
+depicted. Nonetheless, these static maps are ShakeMap’s “signature products” and
 serve as maps of record and for other purposes, as described below. Static maps
 can be accessed and selected using tabs along the top of the USGS earthquake event
 page, as shown in the example in <a class="pageref" href="#napa-event-page">Figure  1</a>.</p>
@@ -371,35 +401,35 @@ earthquake. The static instrumental intensity map is shown. Tabs above the map a
 comparison of different intensity measures (IMs), as well as the uncertainty map
 and station list.</span></p>
 </div>
-<p><strong>Intensity Maps</strong>. Intensity images&#8212;typically of Modified Mercalli Intensity
-(MMI), but potentially other intensity measures&#8212;are the most familiar ShakeMap
+<p><strong>Intensity Maps</strong>. Intensity images—typically of Modified Mercalli Intensity
+(MMI), but potentially other intensity measures—are the most familiar ShakeMap
 products. The main intensity map consists of a colored overlay of intensity with
 the epicenter (and the causative fault, if supplied) prominently marked,
 (usually) overlain upon the region’s topography, with other cultural and
 geologic features (cities, roads, and active faults) plotted, depending on the
 configuration of the ShakeMap system. A detailed scale of intensity is also
-provided as described in detail in the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>.</p>
+provided as described in detail in the <a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last"><strong>ShakeMap Symbology</strong>. It is a recent ShakeMap convention to depict seismic stations as <strong>triangles</strong> and intensity observations as <strong>circles</strong> (for cities) or <strong>squares</strong> (for geocoded boxes). On intensity maps, symbols are unfilled so that the underlying intensity values are visible. On peak ground motion maps, observations are (optionally) color coded to their amplitude according to the legend shown below each map. The epicenter is indicated with a <strong>star</strong>, and for larger earthquakes, the surface projection of the causative fault is shown with <strong>black lines</strong>.</p>
 </div>
-<p>Strong motion and intensity data symbols default to &#8220;see-through” (unfilled) mode for the
+<p>Strong motion and intensity data symbols default to “see-through” (unfilled) mode for the
 intensity map shown in <a class="pageref" href="#napa-shakemap-cover">Figure  2</a> and are color-filled
 for peak ground motion maps (<a class="pageref" href="#napa-pga">Figure  3</a>). ShakeMap operators may
 chose to modify these defaults using alternative mapping configurations.</p>
 <div class="figure align-center" id="id4">
 <span id="napa-shakemap-cover"></span><a class="reference internal image-reference" href="../_images/Napa_ShakeMap_cover.png"><img alt="../_images/Napa_ShakeMap_cover.png" src="../_images/Napa_ShakeMap_cover.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 2: Intensity ShakeMap from the 2014 M6.0 American Canyon (Napa Valley), CA earthquake. Strong-motion data
-(triangles) and intensity data (circles) default to &#8220;see-through” mode for the intensity map. The
+(triangles) and intensity data (circles) default to “see-through” mode for the intensity map. The
 north-south black line indicates the fault location, and the epicenter is a red star. The intensity
-color-coding either as observed (for macroseismic data) or as converted is derived from the conversion equations of <a class="reference internal" href="references.html#wald1999b"><span>Wald et al. (1999b)</span></a> as shown in the legend. Note: Map Version Number reflects separate offline processing for this Manual.</span></p>
+color-coding either as observed (for macroseismic data) or as converted is derived from the conversion equations of <a class="reference internal" href="references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> as shown in the legend. Note: Map Version Number reflects separate offline processing for this Manual.</span></p>
 </div>
 <div class="figure align-center" id="id5">
 <span id="napa-pga"></span><a class="reference internal image-reference" href="../_images/Figure_1_2.png"><img alt="../_images/Figure_1_2.png" src="../_images/Figure_1_2.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 3: Peak acceleration ShakeMap from the 2014 M6.0 American Canyon (Napa Valley), CA
 earthquake. Strong-motion data (triangles) and intensity data (circles) are color-coded according to their intensity
 value, either as observed (for macroseismic data) or as converted by
-<a class="reference internal" href="references.html#wald1999b"><span>Wald et al. (1999b)</span></a> as shown in the
+<a class="reference internal" href="references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> as shown in the
 legend. The north-south black line indicates the fault location, which nucleated near the epicenter (red star). Note:
 Map Version Number reflects separate offline processing for this Manual.</span></p>
 </div>
@@ -407,11 +437,11 @@ Map Version Number reflects separate offline processing for this Manual.</span><
 Intensity, and optionally, three separate maps for PSA
 (at 0.3, 1.0, and 3.0 sec). The PGM maps are distinct from the
 intensity maps: shaking values on the former are colored image overlays; the latter are
-PGM contours. On PGM maps, stations&#8217; fill colors
+PGM contours. On PGM maps, stations’ fill colors
 indicate the ground motion of the station converted to intensity or, optionally,
 the identity of the seismic network data source. When the color indicates peak
 ground motion, the values are converted to the intensity color scheme via the
-selected ground-motion&#8211;intensity conversion equation (GMICE), and the
+selected ground-motion–intensity conversion equation (GMICE), and the
 corresponding color scale bar is provided at the bottom of the map (see example
 in <a class="pageref" href="#napa-pga">Figure  3</a>).</p>
 </div>
@@ -437,7 +467,7 @@ stations (<a class="pageref" href="#napa-dyfi">Figure  7</a>).</p>
 <p class="caption"><span class="caption-text">Figure 4: Interactive ShakeMap for the 2014 M6.0 American Canyon, CA
 earthquake. Contours indicate intensities; strong motion data (triangles) and intensity data (circles) are
 color-coded according to their intensity value, either as observed (for macroseismic data) or as converted
-by <a class="reference internal" href="references.html#worden2012"><span>Worden et al. (2012)</span></a>.</span></p>
+by <a class="reference internal" href="references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>.</span></p>
 </div>
 <div class="figure align-center" id="id7">
 <span id="napa-mobile"></span><a class="reference internal image-reference" href="../_images/Napa_mobile_shakemap.png"><img alt="../_images/Napa_mobile_shakemap.png" src="../_images/Napa_mobile_shakemap.png" style="width: 256.0px; height: 454.40000000000003px;" /></a>
@@ -455,18 +485,18 @@ earthquake showing station information pop-up.</span></p>
 <p class="caption"><span class="caption-text">Figure 7: Interactive ShakeMap for the 2014 M6.0 American Canyon, CA
 earthquake. On the interactive map, reported (DYFI) intensities are geocoded and represented with
 <strong>squares</strong> depicting the 1km grid area they occupy. Reported Intensities are color-coded according to their intensity
-value, either as observed or as converted by <a class="reference internal" href="references.html#wald1999b"><span>Wald et al. (1999b)</span></a>.</span></p>
+value, either as observed or as converted by <a class="reference internal" href="references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a>.</span></p>
 </div>
 <p>The interactive maps may be accessed by clicking on the static ShakeMaps on the
 USGS event pages (e.g., <a class="reference external" href="http://earthquake.usgs.gov/earthquakes/eventpage/us10003zgz#impact_shakemap">http://earthquake.usgs.gov/earthquakes/eventpage/us10003zgz#impact_shakemap</a>).</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">Currently, interactive maps only portray contours of intensity. Other contours can be downloaded for users&#8217; programs, or overlain with the GIS or KML formats provided with each ShakeMap.</p>
+<p class="last">Currently, interactive maps only portray contours of intensity. Other contours can be downloaded for users’ programs, or overlain with the GIS or KML formats provided with each ShakeMap.</p>
 </div>
-<p><strong>Uncertainty Maps</strong>. As discussed in detail in the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>,
+<p><strong>Uncertainty Maps</strong>. As discussed in detail in the <a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a>,
 gridded uncertainty is available for all ground motion parameters. The ratio of
 the ShakeMap PGA uncertainty to the GMPE’s uncertainty is also available (see
-the section on <a class="reference internal" href="tg_processing.html#sec-interpolation"><span>Interpolation</span></a>).</p>
+the section on <a class="reference internal" href="tg_processing.html#sec-interpolation"><span class="std std-ref">Interpolation</span></a>).</p>
 <p>We utilize the uncertainty ratio to produce a graded map of uncertainty. Where
 the ratio is 1.0 (meaning the ShakeMap is purely predictive), the map is colored
 white. Where the ratio is greater than 1.0 (meaning that the ShakeMap
@@ -488,8 +518,8 @@ earthquake. Color-coded legend shows uncertainty ratio, where “1.0”
 indicates 1.0 times the GMPE’s sigma. The average uncertainty is
 computed by averaging uncertainty at grid points that lie
 within the MMI-VI contour (bold contour line). For more details, see
-<a class="reference internal" href="references.html#wald2008"><span>Wald et al. (2008)</span></a>,
-<a class="reference internal" href="references.html#worden2010"><span>Worden et al. (2010)</span></a>, and the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>.</span></p>
+<a class="reference internal" href="references.html#wald2008"><span class="std std-ref">Wald et al. (2008)</span></a>,
+<a class="reference internal" href="references.html#worden2010"><span class="std std-ref">Worden et al. (2010)</span></a>, and the <a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a>.</span></p>
 </div>
 <p><strong>Regression (GMPE and Distance Attenuation) Plots.</strong></p>
 <p>ShakeMap can also (optionally) produce graphs of the observational data plotted with the biased
@@ -511,7 +541,7 @@ DYFI observations are blue circles) plotted with the unbiased (red line) and bia
 </div>
 <div class="section" id="interpolated-ground-motion-grids">
 <span id="sec-interpolated-grid-file"></span><h3>3.2.2.4. Interpolated Ground Motion Grids<a class="headerlink" href="#interpolated-ground-motion-grids" title="Permalink to this headline">¶</a></h3>
-<p>As described in the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>, the fundamental output product of the
+<p>As described in the <a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a>, the fundamental output product of the
 ShakeMap processing system is a finely-sampled grid (nominally 1km
 spacing) of latitude and longitude
 pairs with associated amplitude values of shaking parameters at each point.
@@ -523,17 +553,17 @@ maps, for further interpolation to infer shaking at selected locations, and for
 generating GIS-formatted files for further analyses.</p>
 <p><strong>XML Grid</strong>. The ShakeMap XML grid file is the basis for nearly all ShakeMap
 products, as well as for computerized post-processing in systems such as
-ShakeCast and PAGER [see <a class="reference internal" href="related_systems.html#sec-related-systems"><span>Related Systems</span></a>]. The XML grid is available
+ShakeCast and PAGER [see <a class="reference internal" href="related_systems.html#sec-related-systems"><span class="std std-ref">Related Systems</span></a>]. The XML grid is available
 as both plain text (<em>grid.xml</em>) and compressed as a zip file
 (<em>grid.xml.zip</em>). As XML, the grid is meant to be self-describing; however, we describe the format
 here for the sake of completeness.</p>
 <p>After the XML header, the first line is the <em>shakemap_grid</em> tag:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>&lt;shakemap_grid xsi:schemaLocation=&quot;http://earthquake.usgs.gov
- http://earthquake.usgs.gov/eqcenter/shakemap/xml/schemas/shakemap.xsd&quot;
- event_id=&quot;19940117123055&quot; shakemap_id=&quot;19940117123055&quot; shakemap_version=&quot;2&quot;
- code_version=&quot;3.5.1446&quot; process_timestamp=&quot;2015-10-30T20:38:19Z&quot;
- shakemap_originator=&quot;us&quot; map_status=&quot;RELEASED&quot; shakemap_event_type=&quot;ACTUAL&quot;&gt;
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">shakemap_grid</span> <span class="n">xsi</span><span class="p">:</span><span class="n">schemaLocation</span><span class="o">=</span><span class="s2">&quot;http://earthquake.usgs.gov</span>
+ <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">earthquake</span><span class="o">.</span><span class="n">usgs</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">eqcenter</span><span class="o">/</span><span class="n">shakemap</span><span class="o">/</span><span class="n">xml</span><span class="o">/</span><span class="n">schemas</span><span class="o">/</span><span class="n">shakemap</span><span class="o">.</span><span class="n">xsd</span><span class="s2">&quot;</span>
+ <span class="n">event_id</span><span class="o">=</span><span class="s2">&quot;19940117123055&quot;</span> <span class="n">shakemap_id</span><span class="o">=</span><span class="s2">&quot;19940117123055&quot;</span> <span class="n">shakemap_version</span><span class="o">=</span><span class="s2">&quot;2&quot;</span>
+ <span class="n">code_version</span><span class="o">=</span><span class="s2">&quot;3.5.1446&quot;</span> <span class="n">process_timestamp</span><span class="o">=</span><span class="s2">&quot;2015-10-30T20:38:19Z&quot;</span>
+ <span class="n">shakemap_originator</span><span class="o">=</span><span class="s2">&quot;us&quot;</span> <span class="n">map_status</span><span class="o">=</span><span class="s2">&quot;RELEASED&quot;</span> <span class="n">shakemap_event_type</span><span class="o">=</span><span class="s2">&quot;ACTUAL&quot;</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -554,9 +584,9 @@ and transferred.</li>
 </ul>
 <p>The next tag describes the earthquake source:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>&lt;event event_id=&quot;Northridge&quot; magnitude=&quot;6.7&quot; depth=&quot;18&quot; lat=&quot;34.213000&quot;
- lon=&quot;-118.535700&quot; event_timestamp=&quot;1994-01-17T12:30:55GMT&quot; event_network=&quot;ci&quot;
- event_description=&quot;Northridge&quot; /&gt;
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">event</span> <span class="n">event_id</span><span class="o">=</span><span class="s2">&quot;Northridge&quot;</span> <span class="n">magnitude</span><span class="o">=</span><span class="s2">&quot;6.7&quot;</span> <span class="n">depth</span><span class="o">=</span><span class="s2">&quot;18&quot;</span> <span class="n">lat</span><span class="o">=</span><span class="s2">&quot;34.213000&quot;</span>
+ <span class="n">lon</span><span class="o">=</span><span class="s2">&quot;-118.535700&quot;</span> <span class="n">event_timestamp</span><span class="o">=</span><span class="s2">&quot;1994-01-17T12:30:55GMT&quot;</span> <span class="n">event_network</span><span class="o">=</span><span class="s2">&quot;ci&quot;</span>
+ <span class="n">event_description</span><span class="o">=</span><span class="s2">&quot;Northridge&quot;</span> <span class="o">/&gt;</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -572,9 +602,9 @@ and transferred.</li>
 </ul>
 <p>Following the event tag is the grid_specification tag:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>&lt;grid_specification lon_min=&quot;-119.785700&quot; lat_min=&quot;33.379666&quot; lon_max=&quot;-117.285700&quot;
- lat_max=&quot;35.046334&quot; nominal_lon_spacing=&quot;0.008333&quot; nominal_lat_spacing=&quot;0.008333&quot;
- nlon=&quot;301&quot; nlat=&quot;201&quot; /&gt;
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">grid_specification</span> <span class="n">lon_min</span><span class="o">=</span><span class="s2">&quot;-119.785700&quot;</span> <span class="n">lat_min</span><span class="o">=</span><span class="s2">&quot;33.379666&quot;</span> <span class="n">lon_max</span><span class="o">=</span><span class="s2">&quot;-117.285700&quot;</span>
+ <span class="n">lat_max</span><span class="o">=</span><span class="s2">&quot;35.046334&quot;</span> <span class="n">nominal_lon_spacing</span><span class="o">=</span><span class="s2">&quot;0.008333&quot;</span> <span class="n">nominal_lat_spacing</span><span class="o">=</span><span class="s2">&quot;0.008333&quot;</span>
+ <span class="n">nlon</span><span class="o">=</span><span class="s2">&quot;301&quot;</span> <span class="n">nlat</span><span class="o">=</span><span class="s2">&quot;201&quot;</span> <span class="o">/&gt;</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -591,12 +621,12 @@ contain nlon times nlat rows.</li>
 </ul>
 <p>Following the <em>grid_specification</em> tag will be a set of event-specific uncertainty tags:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>&lt;event_specific_uncertainty name=&quot;pga&quot; value=&quot;0.466260&quot; numsta=&quot;598&quot; /&gt;
-&lt;event_specific_uncertainty name=&quot;pgv&quot; value=&quot;0.464209&quot; numsta=&quot;595&quot; /&gt;
-&lt;event_specific_uncertainty name=&quot;mi&quot; value=&quot;0.624327&quot; numsta=&quot;598&quot; /&gt;
-&lt;event_specific_uncertainty name=&quot;psa03&quot; value=&quot;0.436803&quot; numsta=&quot;594&quot; /&gt;
-&lt;event_specific_uncertainty name=&quot;psa10&quot; value=&quot;0.534212&quot; numsta=&quot;595&quot; /&gt;
-&lt;event_specific_uncertainty name=&quot;psa30&quot; value=&quot;0.577897&quot; numsta=&quot;594&quot; /&gt;
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">event_specific_uncertainty</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pga&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;0.466260&quot;</span> <span class="n">numsta</span><span class="o">=</span><span class="s2">&quot;598&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">event_specific_uncertainty</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;pgv&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;0.464209&quot;</span> <span class="n">numsta</span><span class="o">=</span><span class="s2">&quot;595&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">event_specific_uncertainty</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;mi&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;0.624327&quot;</span> <span class="n">numsta</span><span class="o">=</span><span class="s2">&quot;598&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">event_specific_uncertainty</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psa03&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;0.436803&quot;</span> <span class="n">numsta</span><span class="o">=</span><span class="s2">&quot;594&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">event_specific_uncertainty</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psa10&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;0.534212&quot;</span> <span class="n">numsta</span><span class="o">=</span><span class="s2">&quot;595&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">event_specific_uncertainty</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;psa30&quot;</span> <span class="n">value</span><span class="o">=</span><span class="s2">&quot;0.577897&quot;</span> <span class="n">numsta</span><span class="o">=</span><span class="s2">&quot;594&quot;</span> <span class="o">/&gt;</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -608,17 +638,17 @@ falls below the minimum required to compute the bias, the uncertainty value will
 set to -1.</p>
 <p>These lines are followed by a number of grid_field tags:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>&lt;grid_field index=&quot;1&quot; name=&quot;LON&quot; units=&quot;dd&quot; /&gt;
-&lt;grid_field index=&quot;2&quot; name=&quot;LAT&quot; units=&quot;dd&quot; /&gt;
-&lt;grid_field index=&quot;3&quot; name=&quot;PGA&quot; units=&quot;pctg&quot; /&gt;
-&lt;grid_field index=&quot;4&quot; name=&quot;PGV&quot; units=&quot;cms&quot; /&gt;
-&lt;grid_field index=&quot;5&quot; name=&quot;MMI&quot; units=&quot;intensity&quot; /&gt;
-&lt;grid_field index=&quot;6&quot; name=&quot;PSA03&quot; units=&quot;pctg&quot; /&gt;
-&lt;grid_field index=&quot;7&quot; name=&quot;PSA10&quot; units=&quot;pctg&quot; /&gt;
-&lt;grid_field index=&quot;8&quot; name=&quot;PSA30&quot; units=&quot;pctg&quot; /&gt;
-&lt;grid_field index=&quot;9&quot; name=&quot;STDPGA&quot; units=&quot;ln(pctg)&quot; /&gt;
-&lt;grid_field index=&quot;10&quot; name=&quot;URAT&quot; units=&quot;&quot; /&gt;
-&lt;grid_field index=&quot;11&quot; name=&quot;SVEL&quot; units=&quot;ms&quot; /&gt;
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">grid_field</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;1&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;LON&quot;</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;dd&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">grid_field</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;2&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;LAT&quot;</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;dd&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">grid_field</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;3&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;PGA&quot;</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;pctg&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">grid_field</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;4&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;PGV&quot;</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;cms&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">grid_field</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;5&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;MMI&quot;</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;intensity&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">grid_field</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;6&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;PSA03&quot;</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;pctg&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">grid_field</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;7&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;PSA10&quot;</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;pctg&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">grid_field</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;8&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;PSA30&quot;</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;pctg&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">grid_field</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;9&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;STDPGA&quot;</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;ln(pctg)&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">grid_field</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;10&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;URAT&quot;</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;&quot;</span> <span class="o">/&gt;</span>
+<span class="o">&lt;</span><span class="n">grid_field</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;11&quot;</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;SVEL&quot;</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;ms&quot;</span> <span class="o">/&gt;</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -653,7 +683,7 @@ have the pseudo-spectral acceleration values; scenarios will not have STDPGA or
 URAT; and maps that have not been site corrected will not have SVEL.</p>
 <p>The <em>grid_field</em> tags are followed by the <em>grid_data</em> tag, the gridded data, and the closing tags:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>&lt;grid_data&gt;
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>&lt;grid_data&gt;
 -119.7857 35.0463 4.3 4.21 5.26 5.76 5.76 1.09 0.5 1 800
 -119.7774 35.0463 4.34 4.23 5.27 5.8 5.78 1.1 0.5 1 800
 -119.7690 35.0463 4.37 4.25 5.27 5.84 5.81 1.1 0.5 1 800
@@ -671,7 +701,7 @@ minimum/latitude maximum to longitude maximum/latitude minimum). The GMT program
 <p><strong>Rock Grid XML</strong>. The file <em>rock_grid.xml.zip</em> is a zipped XML file containing
 the interpolated grid without site amplifications applied. The rock grid has the
 same structure as <em>grid.xml</em>, but Vs30 values and PGA uncertainty values are not
-supplied. <a class="reference internal" href="tg_processing.html#amplify-ground-motions"><span>Amplify Ground Motions</span></a> in the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>.</p>
+supplied. <a class="reference internal" href="tg_processing.html#amplify-ground-motions"><span class="std std-ref">Amplify Ground Motions</span></a> in the <a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a>.</p>
 <p><strong>Uncertainty Grid XML</strong>. The file <em>uncertainty.xml.zip</em> is a zipped XML file
 containing the standard errors for each of the ground-motion parameters at each
 point in the output grid. It has the same structure as <em>grid.xml</em>, with the
@@ -697,10 +727,10 @@ ground motion data or Vs30 values are available in
 </div>
 <div class="section" id="station-lists">
 <h3>3.2.2.5. Station Lists<a class="headerlink" href="#station-lists" title="Permalink to this headline">¶</a></h3>
-<p>As discussed in the section <a class="reference internal" href="#sec-input-files"><span>Input Files</span></a>, ShakeMap produces station lists of input data
+<p>As discussed in the section <a class="reference internal" href="#sec-input-files"><span class="std std-ref">Input Files</span></a>, ShakeMap produces station lists of input data
 in XML and text format. We also produce a version in GeoJSON format, which is available for
 download, and is used by the website to plot the stations on the interactive maps. The station
-data is available for viewing online by selecting the “Station List” tab on an event&#8217;s ShakeMap
+data is available for viewing online by selecting the “Station List” tab on an event’s ShakeMap
 page. See <a class="pageref" href="#napa-station-table">Figure  11</a> for an example.</p>
 <div class="figure align-left" id="id13">
 <span id="napa-station-table"></span><a class="reference internal image-reference" href="../_images/Napa_station_table.png"><img alt="../_images/Napa_station_table.png" src="../_images/Napa_station_table.png" style="width: 650px;" /></a>
@@ -813,7 +843,7 @@ Baush, FEMA, Region VIII, oral commun., 2015).</p>
 reported, and used empirical relationships to estimate ground motions over the
 affected area.  These simplified ground-motion estimates would drive the computation of
 losses to structures and infrastructure, estimates of casualties and displaced
-households (for more details, see <a class="reference internal" href="references.html#nibs1997"><span>NIBS, 1997</span></a>).  With the
+households (for more details, see <a class="reference internal" href="references.html#nibs1997"><span class="std std-ref">NIBS, 1997</span></a>).  With the
 improvements to seismic systems nationally, particularly in digital
 strong-motion data acquisition, and the advent of ShakeMap, HAZUS can now
 directly import a much more accurate description of ground shaking.  The
@@ -826,7 +856,7 @@ archive of files compressed in
 zip format (<em>hazus.zip</em>) to facilitate file transfer.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last">An important note on the values of the parameters in the HAZUS shape files is that they are empirically corrected from the standard ShakeMap <strong>peak ground motion values</strong> to approximate the <strong>geometric mean</strong> values used for HAZUS loss estimation.  HAZUS was calibrated to work with mean ground motion values (FEMA, 1997). Peak amplitudes are corrected by scaling values down by 15 percent (Campbell, 1997; Joyner, oral commun., 2000). While more recent work by <a class="reference internal" href="references.html#beyer2006"><span>Beyer and Bommer (2006)</span></a> suggests different conversion factors, for the HAZUS shape files we continue to use 15 percent to maintain consistency in HAZUS results. As of this writing, FEMA is considering switching to peak ground motions as presented by ShakeMap rather than employing the geometric mean component.</p>
+<p class="last">An important note on the values of the parameters in the HAZUS shape files is that they are empirically corrected from the standard ShakeMap <strong>peak ground motion values</strong> to approximate the <strong>geometric mean</strong> values used for HAZUS loss estimation.  HAZUS was calibrated to work with mean ground motion values (FEMA, 1997). Peak amplitudes are corrected by scaling values down by 15 percent (Campbell, 1997; Joyner, oral commun., 2000). While more recent work by <a class="reference internal" href="references.html#beyer2006"><span class="std std-ref">Beyer and Bommer (2006)</span></a> suggests different conversion factors, for the HAZUS shape files we continue to use 15 percent to maintain consistency in HAZUS results. As of this writing, FEMA is considering switching to peak ground motions as presented by ShakeMap rather than employing the geometric mean component.</p>
 </div>
 </div>
 <div class="section" id="esri-raster-files-fit-files">
@@ -845,9 +875,9 @@ M4.5 and larger.</p>
 <ol class="last arabic simple">
 <li>Open the ArcToolbox in ArcMap</li>
 <li>Select Multidimension Tools -&gt; Make NetCDF Raster Layer</li>
-<li>In the dialog that appears, select the input <em>.grd</em> file you downloaded and unzipped, and name the layer    appropriately (&#8220;vs30&#8221;, etc.)</li>
+<li>In the dialog that appears, select the input <em>.grd</em> file you downloaded and unzipped, and name the layer    appropriately (“vs30”, etc.)</li>
 <li>The new layer should appear in your list of layers.</li>
-<li>Note: This layer is ephemeral&#8212;if you want to keep the raster version of the data, you&#8217;ll have to save the layer to a file.</li>
+<li>Note: This layer is ephemeral—if you want to keep the raster version of the data, you’ll have to save the layer to a file.</li>
 </ol>
 </div>
 </div>
@@ -862,11 +892,11 @@ transparency of the intensity overlay is adjustable by the user, as is the
 appearance of seismic stations. The KMZ file embeds several
 other files that may be found in the event’s download directory:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>epicenter.kmz
-fault.kmz
-overlay.kmz (links to ii_overlay.png)
-stations.kmz
-contours.kmz
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">epicenter</span><span class="o">.</span><span class="n">kmz</span>
+<span class="n">fault</span><span class="o">.</span><span class="n">kmz</span>
+<span class="n">overlay</span><span class="o">.</span><span class="n">kmz</span> <span class="p">(</span><span class="n">links</span> <span class="n">to</span> <span class="n">ii_overlay</span><span class="o">.</span><span class="n">png</span><span class="p">)</span>
+<span class="n">stations</span><span class="o">.</span><span class="n">kmz</span>
+<span class="n">contours</span><span class="o">.</span><span class="n">kmz</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -885,7 +915,7 @@ the layers available in the ShakeMap KMZ file.</p>
 <p>As mentioned above in the ShakeMap Output GIS format section,
 contour files are available for general GIS, HAZUS, and KML formats. We also
 provide GeoJSON format contours, all under the ShakeMap event-specific
-&#8220;Downloads&#8221; tab.</p>
+“Downloads” tab.</p>
 </div>
 </div>
 </div>
@@ -937,7 +967,7 @@ and 2016-01-01 in the bounding box lat. 10 to 20, long. -95 to -85,
 in case an event outside Guatemala results in shaking inside
 Guatemala; and includes a ShakeMap product:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&amp;
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>http://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&amp;
 starttime=2015-01-01T00:00:00&amp;maxlatitude=20&amp;minlatitude=10&amp;maxlongitude=-85&amp;
 minlongitude=-95&amp;endtime=2016-01-01T00:00:00&amp;producttype=shakemap
 </pre></div>
@@ -948,13 +978,13 @@ each event.  The <em>detail</em> property is a URL for the GeoJSON detail
 feed that includes URLs for ShakeMap files. For example, for the
 <em>us100044xh</em> event, the GeoJSON detailed feed URL is:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>HTTP://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us100044xh&amp;format=geojson
+<div><div class="highlight-default"><div class="highlight"><pre><span></span>HTTP://earthquake.usgs.gov/fdsnws/event/1/query?eventid=us100044xh&amp;format=geojson
 </pre></div>
 </div>
 </div></blockquote>
 <p>The URLs for the ShakeMap files can be found inside the feed:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">FEED</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">shakemap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="s1">&#39;download/grid.xml.zip&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span>
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">FEED</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">shakemap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="s1">&#39;download/grid.xml.zip&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span>
 <span class="n">FEED</span><span class="o">.</span><span class="n">properties</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">shakemap</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="p">[</span><span class="s1">&#39;download/shape.zip&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span>
 </pre></div>
 </div>
@@ -962,10 +992,10 @@ feed that includes URLs for ShakeMap files. For example, for the
 <p>In this case, these are the specific URLs are for the <em>grid.xml</em> file
 and for the <em>shape.zip</em> files, respectively:</p>
 <blockquote>
-<div><div class="highlight-python"><div class="highlight"><pre><span></span>http://earthquake.usgs.gov/archive/product/shakemap/us100044xh/us/1450404175265/
-download/grid.xml.zip
-http://earthquake.usgs.gov/archive/product/shakemap/us100044xh/us/1450404175265/
- download/shape.zip
+<div><div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">earthquake</span><span class="o">.</span><span class="n">usgs</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">archive</span><span class="o">/</span><span class="n">product</span><span class="o">/</span><span class="n">shakemap</span><span class="o">/</span><span class="n">us100044xh</span><span class="o">/</span><span class="n">us</span><span class="o">/</span><span class="mi">1450404175265</span><span class="o">/</span>
+<span class="n">download</span><span class="o">/</span><span class="n">grid</span><span class="o">.</span><span class="n">xml</span><span class="o">.</span><span class="n">zip</span>
+<span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">earthquake</span><span class="o">.</span><span class="n">usgs</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">archive</span><span class="o">/</span><span class="n">product</span><span class="o">/</span><span class="n">shakemap</span><span class="o">/</span><span class="n">us100044xh</span><span class="o">/</span><span class="n">us</span><span class="o">/</span><span class="mi">1450404175265</span><span class="o">/</span>
+ <span class="n">download</span><span class="o">/</span><span class="n">shape</span><span class="o">.</span><span class="n">zip</span>
 </pre></div>
 </div>
 </div></blockquote>
@@ -983,7 +1013,7 @@ inspection priority) calculations for specific portfolios. More advanced
 features of ShakeCast include a complete suite of damage
 estimation and mapping tools, coupled with sophisticated tools to notify
 responsible parties within an organization on a per-facility basis. See
-<a class="reference internal" href="related_systems.html#sec-related-systems"><span>Related Systems</span></a> for more details. Complete background on ShakeCast
+<a class="reference internal" href="related_systems.html#sec-related-systems"><span class="std std-ref">Related Systems</span></a> for more details. Complete background on ShakeCast
 can be found on the ShakeCast <a class="reference external" href="http://earthquake.usgs.gov/research/software/shakecast/">homepage</a> and <a class="reference external" href="https://my.usgs.gov/confluence/display/ShakeCast/Home">Wiki</a> and the documentation provided therein.</p>
 </div>
 <div class="section" id="product-delivery-layer-pdl-client">
@@ -1013,7 +1043,7 @@ to several USGS post-earthquake products.</p>
 other calls that GIS developers can make through the <a class="reference external" href="http://resources.arcgis.com/en/help/rest/apiref/">REST API</a>.</p>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
-<p class="last"><strong>Earthquake Significance</strong>. The NEIC associates a <a class="reference external" href="https://github.com/usgs/earthquake-event-ws/blob/master/src/lib/sql/fdsnws/getEventSummary.sql#L157">*significance*</a> number with each earthquake event. Larger numbers indicate more significance. This value is determined by a number of factors, including magnitude, maximum MMI, felt reports, and estimated impact.  The significance number ranges from 0 to 1000.  The &#8220;30 day significant earthquake feed&#8221; that determines which events are included in the ShakeMap GIS feed uses events with a significance of 600 and greater.</p>
+<p class="last"><strong>Earthquake Significance</strong>. The NEIC associates a <a class="reference external" href="https://github.com/usgs/earthquake-event-ws/blob/master/src/lib/sql/fdsnws/getEventSummary.sql#L157">*significance*</a> number with each earthquake event. Larger numbers indicate more significance. This value is determined by a number of factors, including magnitude, maximum MMI, felt reports, and estimated impact.  The significance number ranges from 0 to 1000.  The “30 day significant earthquake feed” that determines which events are included in the ShakeMap GIS feed uses events with a significance of 600 and greater.</p>
 </div>
 <p><strong>Accessing ShakeMap GIS Files:</strong> While this GIS service only provides access to
 significant earthquakes that have occurred within the last thirty days, users can

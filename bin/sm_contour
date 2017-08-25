@@ -1,0 +1,144 @@
+#!/usr/bin/env python
+"""
+Read shake_result.hdf and produce a set of GeoJSON contours in the
+event's 'products' directory.
+"""
+
+import sys
+import os.path
+import argparse
+import json
+
+import geojson as gj
+from geojson import FeatureCollection, Feature, MultiLineString
+import numpy as np
+from skimage import measure
+from scipy.ndimage.filters import median_filter
+
+from shakelib.utils.container import OutputContainer
+from shakemap.utils.config import get_config_paths
+
+def get_parser():
+    description = '''
+    Make a set of contours from shake_result.hdf.
+    '''
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('eventid',
+                        help='The id of the event to process.')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Print informational messages.')
+    return parser
+
+#%%
+#args = type('Dummy', (object,), {'eventid' : 'wenchuan',
+#                                 'verbose' : True})
+#if True:
+def contour(args):
+    verbose = args.verbose
+    #
+    # Find the shake_data file
+    #
+    install_path, data_path = get_config_paths()
+    datadir = os.path.join(data_path, args.eventid, 'current', 'products')
+    if not os.path.isdir(datadir):
+        print('%s is not a valid directory.' % datadir)
+        sys.exit(1)
+    datafile = os.path.join(datadir, 'shake_result.hdf')
+    if not os.path.isfile(datafile):
+        print('%s is not a valid shake result file.' % datafile)
+        sys.exit(1)
+    #
+    # Open the OutputContainer and extract the data
+    #
+    oc = OutputContainer.loadFromHDF(datafile)
+    jsonstr = oc.getData('info.json')[0]
+    infojson = json.loads(jsonstr)
+    ggmd = {
+        'event_id': args.eventid,
+        'latitude': infojson['input']['event_information']['latitude'],
+        'longitude': infojson['input']['event_information']['longitude']
+    }
+#    grid_dict = {}
+    contour_dict = {}
+    for imtype in oc.getIMTlist():
+        grid, metadata = oc.getData(imtype)
+        #
+        # Filter the contours. Sigma should be a parameter.
+        #
+        if imtype == 'MMI':
+            sgrid = grid
+            fgrid = median_filter(sgrid, size=10)
+            gmin = int(np.min(fgrid)) + 1   # Because you dont contour
+                                            # below the smallest value
+            gmax = int(np.max(fgrid)) + 1   # Because range ends at stop - 1
+            gdd = 1
+            units = 'mmi'
+        elif imtype == 'PGV':
+            sgrid = np.exp(grid)
+            fgrid = median_filter(sgrid, size=10)
+            gmin = int(np.min(fgrid) / 10) * 10 + 10
+            gmax = int(np.max(fgrid) / 10) * 10 + 10
+            gdd = 10
+            units = 'cms'
+        else:
+            sgrid = np.exp(grid) * 100.0
+            fgrid = median_filter(sgrid, size=10)
+            gmin = int(np.min(fgrid) / 10) * 10 + 10
+            gmax = int(np.max(fgrid) / 10) * 10 + 10
+            gdd = 10
+            units = 'pctg'
+
+        if verbose:
+            print('%s: sgrid max=%f, fgrid max=%f' %
+                  (imtype, np.max(sgrid), np.max(fgrid)))
+        lonstart = metadata['W']
+        latstart = metadata['S']
+        lonspan = np.abs(metadata['E'] - lonstart)
+        latspan = np.abs(metadata['N'] - latstart)
+        nlon = metadata['nx']
+        nlat = metadata['ny']
+
+        contour_dict[imtype] = {}
+        feature_list = []
+        for cval in range(gmin, gmax, gdd):
+            contours = measure.find_contours(fgrid, cval)
+            #
+            # Convert coords to geographic coordinates; the coordinates
+            # are returned in row, column order (i.e., (y, x))
+            #
+            new_contours = []
+            plot_contours = []
+            for ic, coords in enumerate(contours):
+                if len(coords) <= 20:
+                    continue
+                contours[ic][:, 1] = coords[:, 1] * lonspan / nlon + lonstart
+                contours[ic][:, 0] = (nlat - coords[:, 0]) * latspan / nlat + latstart
+                plot_contours.append(contours[ic])
+                new_contours.append(contours[ic].tolist())
+
+            if len(new_contours):
+                mls = MultiLineString(new_contours)
+                props = {'value': cval, 'units': units}
+                feature = Feature(geometry=mls, properties=props)
+                feature_list.append(feature)
+#                contour_dict[imtype][cval] = plot_contours
+        bbox = [metadata['W'], metadata['S'], metadata['E'], metadata['N']]
+        fc = FeatureCollection(feature_list, bbox=bbox, metadata=ggmd)
+        file = 'cont_' + \
+               imtype.replace('.', 'p')\
+                     .replace('(', '')\
+                     .replace(')', '')\
+                     .lower() + \
+               '.json'
+        with open(os.path.join(datadir, file), 'w') as fd:
+            print(gj.dumps(fc), file=fd)
+#        grid_dict[imtype] = fgrid
+
+
+
+# %%
+if __name__ == '__main__':
+    parser = get_parser()
+    pargs = parser.parse_args()
+    contour(pargs)
+    sys.exit(0)

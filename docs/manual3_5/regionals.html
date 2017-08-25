@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
         <link rel="up" title="ShakeMap 3.5 Manual" href="index.html"/>
         <link rel="next" title="6. Future Directions" href="future_directions.html"/>
@@ -114,7 +117,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User’s Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="products.html#input-files">3.2.1. Input Files</a></li>
@@ -165,7 +168,7 @@
 <li class="toctree-l3"><a class="reference internal" href="software_guide.html#software-availability-software-guide">4.3. Software Availability &amp; Software Guide</a></li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="current reference internal" href="">5. Regional Operations</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">5. Regional Operations</a></li>
 <li class="toctree-l2"><a class="reference internal" href="future_directions.html">6. Future Directions</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="future_directions.html#research-development">6.1. Research &amp; Development</a></li>
 <li class="toctree-l3"><a class="reference internal" href="future_directions.html#software-shakemap-4-0-python">6.2. Software: ShakeMap 4.0 (Python)</a></li>
@@ -174,6 +177,33 @@
 <li class="toctree-l2"><a class="reference internal" href="acknowledgments.html">7. Acknowledgments</a></li>
 <li class="toctree-l2"><a class="reference internal" href="references.html">8. References &amp; Bibliography</a></li>
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
@@ -212,7 +242,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -226,7 +256,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/manual3_5/regionals.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/manual3_5/regionals.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -269,8 +299,8 @@ used for any ShakeMap can be found in the event-specific summary
 files (<em>info.xml</em>).</p>
 </div>
 <p>Details for about regional configurations for ShakeMap operators can
-be found in the <a class="reference internal" href="software_guide.html#software-guide"><span>Software &amp; Implementation Guide</span></a>. For contact information for
-ANSS regional operators see the <a class="reference internal" href="acknowledgments.html#acknowledgments"><span>Acknowledgments</span></a>.</p>
+be found in the <a class="reference internal" href="software_guide.html#software-guide"><span class="std std-ref">Software &amp; Implementation Guide</span></a>. For contact information for
+ANSS regional operators see the <a class="reference internal" href="acknowledgments.html#acknowledgments"><span class="std std-ref">Acknowledgments</span></a>.</p>
 <ul class="simple">
 <li><strong>Northern California</strong></li>
 <li><strong>Southern California</strong></li>
@@ -284,7 +314,7 @@ ANSS regional operators see the <a class="reference internal" href="acknowledgme
 <li><em>Coverage Area</em>. State of Hawaii (Bounds:)</li>
 <li><em>Operations</em>. ShakeMap operated at NEIC in conjunction with HVO RSN operators</li>
 <li><em>Triggering and Data Flow</em>.</li>
-<li><em>Site Condition Map</em>. Vs30 from topographic slope-based (<a class="reference internal" href="references.html#allen2009b"><span>Allen and Wald, 2009b)</span></a></li>
+<li><em>Site Condition Map</em>. Vs30 from topographic slope-based (<a class="reference internal" href="references.html#allen2009b"><span class="std std-ref">Allen and Wald, 2009b)</span></a></li>
 <li><em>Ground Motion Prediction and Conversion Equations (GMPE/IPE/GMICE)</em>.</li>
 <li><em>Other Local Characteristics</em>.</li>
 </ul>

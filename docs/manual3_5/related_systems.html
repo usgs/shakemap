@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
         <link rel="up" title="3. User’s Guide" href="users_guide.html"/>
         <link rel="next" title="3.6. Disclaimers" href="disclaimers.html"/>
@@ -114,7 +117,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l2 current"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="users_guide.html">3. User’s Guide</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="products.html#input-files">3.2.1. Input Files</a></li>
@@ -137,7 +140,7 @@
 <li class="toctree-l4"><a class="reference internal" href="shakemap_applications.html#earthquake-engineering-and-seismological-research">3.4.6. Earthquake Engineering and Seismological Research</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="current reference internal" href="">3.5. Related Systems</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">3.5. Related Systems</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#sec-shakecast">3.5.1. ShakeCast</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#pager">3.5.2. PAGER</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#public-and-private-sector-tools">3.5.3. Public and Private Sector Tools</a></li>
@@ -176,6 +179,33 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.mapping.html">shakemap.mapping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.mapping.mapmaker.html">shakemap.mapping.mapmaker</a></li>
@@ -212,7 +242,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -222,13 +252,13 @@
       
           <li><a href="index.html">ShakeMap 3.5 Manual</a> &raquo;</li>
       
-          <li><a href="users_guide.html">3. User&#8217;s Guide</a> &raquo;</li>
+          <li><a href="users_guide.html">3. User’s Guide</a> &raquo;</li>
       
     <li>3.5. Related Systems</li>
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/manual3_5/related_systems.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/manual3_5/related_systems.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -266,7 +296,7 @@ government officials.</p>
 <span id="figure-related-systems"></span><a class="reference internal image-reference" href="../_images/SMap_SCast_DYFI_PAGER.png"><img alt="Related Systems" src="../_images/SMap_SCast_DYFI_PAGER.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 1: Interplay between ShakeMap, DYFI, ShakeCast, and PAGER.</span></p>
 </div>
-<p>As discussed in detail the <a class="reference internal" href="technical_guide.html#technical-guide"><span>Technical Guide</span></a>, ShakeMap is augmented by
+<p>As discussed in detail the <a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a>, ShakeMap is augmented by
 DYFI input for constraining intensities, and from those, estimates of peak
 ground motions (in some cases, and for some regions), as shown
 in <a class="pageref" href="#figure-related-systems">Figure  1</a>.  DYFI and ShakeMap in conjunction then represent
@@ -299,7 +329,7 @@ assigned an inspection priority state. Of the 87 state bridges
 identified, 9 were later confirmed to have sustained minor damage.
 These 9 state bridges were ranked in the top 40% of the ShakeCast
 list.</em>
-&#8211;(<a class="reference internal" href="references.html#turner2014"><span>Turner, 2014</span></a>)</p>
+–(<a class="reference internal" href="references.html#turner2014"><span class="std std-ref">Turner, 2014</span></a>)</p>
 </div>
 <p>ShakeCast, short for ShakeMap Broadcast, is a fully automated system for
 delivering specific ShakeMap products to critical users and for triggering
@@ -323,7 +353,7 @@ responsible for those particular facilities so they can set priorities for
 response.</p>
 <div class="sidebar">
 <p class="first sidebar-title">USE CASE #3</p>
-<p class="last"><em>&#8220;Thought you might like to see the [Division of Safety of Dams]
+<p class="last"><em>“Thought you might like to see the [Division of Safety of Dams]
 ShakeCast message for the recent Napa [Aug, 2014] Earthquake.  We have since
 divided the 1250 dams into three fragility classes (called levels of
 concern). The message provides explicit instructions on what action
@@ -331,8 +361,8 @@ to take for each dam and transmits owner contact information. The
 message was received in my inbox 16 minutes after the earthquake,
 which was about 10 minutes after the ShakeMap version 1 was
 released. The technology has become very well accepted by the field
-inspectors. Thanks for such a great product.&#8221;</em>
-&#8211;W. A. Fraser, C.E.G.,
+inspectors. Thanks for such a great product.”</em>
+–W. A. Fraser, C.E.G.,
 Chief, Geology Branch, CA Division of Safety of Dams, Sacramento, CA.</p>
 </div>
 </div>
@@ -345,11 +375,11 @@ earthquakes around the world, informing emergency responders, government and aid
 agencies, and the media of the potential scope of the disaster. PAGER rapidly
 assesses earthquake impacts by comparing the population exposed to each level of
 shaking intensity with models of economic and fatality losses based on past
-earthquakes in each country or region of the world. Earthquake alerts&#8212;which
+earthquakes in each country or region of the world. Earthquake alerts—which
 were formerly sent based only on event magnitude and location, or population
-exposure to shaking&#8212;will now be generated based also on the estimated range of
+exposure to shaking—will now be generated based also on the estimated range of
 fatalities and economic losses.</p>
-<p>PAGER alerts are based on the “Earthquake Impact Scale” developed by <a class="reference internal" href="references.html#wald2011b"><span>Wald et al. (2011)</span></a>.</p>
+<p>PAGER alerts are based on the “Earthquake Impact Scale” developed by <a class="reference internal" href="references.html#wald2011b"><span class="std std-ref">Wald et al. (2011)</span></a>.</p>
 <div class="figure align-right" id="id4">
 <a class="reference external image-reference" href="NepalOnePAGERAlertExample"><img alt="Nepal onePAGER" src="../_images/Nepal_M7_8_onepager_V5.png" style="width: 350px;" /></a>
 <p class="caption"><span class="caption-text">Figure 3: Nepal OnePAGER Alert Example</span></p>
@@ -365,7 +395,7 @@ proprietary hazard and loss modeling systems exist in the private
 sector, and typically they are openly described or referenced.</p>
 <p>On the shaking hazard front, domestically, some public/private sector
 utilities run in-house shaking aggregation and estimation systems,
-including the East Bay Metropolitan Utility District (EBMUD&#8217;s Marconi
+including the East Bay Metropolitan Utility District (EBMUD’s Marconi
 system) and Pacific Gas and Electric (PG&amp;E).</p>
 <p>Impressive systems also exist in Japan, Taiwan, New Zealand, Turkey,
 among other countries.</p>
@@ -375,8 +405,8 @@ among other countries.</p>
 <li>INGV</li>
 </ul>
 <p>On the rapid loss estimation front, several systems are in place in the U.S.</p>
-<p>Internationally, <a class="reference internal" href="references.html#erdik2011"><span>Erdik et al. (2011)</span></a>
-and <a class="reference internal" href="references.html#erdik2014"><span>Erdik et al. (2014)</span></a> provide examples of
+<p>Internationally, <a class="reference internal" href="references.html#erdik2011"><span class="std std-ref">Erdik et al. (2011)</span></a>
+and <a class="reference internal" href="references.html#erdik2014"><span class="std std-ref">Erdik et al. (2014)</span></a> provide examples of
 operative rapid earthquake loss estimation systems.</p>
 <ul class="simple">
 <li>Taiwan Earthquake Rapid Reporting System,</li>
@@ -405,7 +435,7 @@ earthquake information are mentioned here. Some examples include:</p>
 <li>HAZUS-MH,</li>
 <li>ArcGIS online</li>
 </ul>
-<p>As summarized by <a class="reference internal" href="references.html#gomberg2013"><span>Gomberg and Jokobitz (2013)</span></a>:
+<p>As summarized by <a class="reference internal" href="references.html#gomberg2013"><span class="std std-ref">Gomberg and Jokobitz (2013)</span></a>:
 “others have built in-house systems to organize, share and display observations
 using commercial applications like Microsoft’s Streets and Trips and SharePoint,
 Google’s GoogleEarth, or ESRI’s ArcGIS. WebEOC, a real-time Web-enabled crisis
@@ -414,7 +444,7 @@ official link among public sector emergency managers in Washington State (see
 <a class="reference external" href="http://www.esi911.com/esi">http://www.esi911.com/esi</a>). While used by many agencies, it always was just one
 of multiple communication tools. A commonly expressed desire was for a
 centralized hub for all types of disaster information (like the
-Department of Homeland Security’s <a class="reference external" href="https://www.dropbox.com/home/Correlation/figures/SanDiego?preview=economic+losses0.png">Virtual USA</a>).&#8221;</p>
+Department of Homeland Security’s <a class="reference external" href="https://www.dropbox.com/home/Correlation/figures/SanDiego?preview=economic+losses0.png">Virtual USA</a>).”</p>
 <p>Further information on private sector tools can
 be found in the Department of Homeland Security
 (DHS) summary for the <a class="reference external" href="http://www.cusec.org/capstone14/documents/2014.03.06_PSW/2014.03.06_CAPSTONE_Private_Sector_GIS.pdf">Capstone 2014</a>

@@ -30,6 +30,9 @@
   
 
   
+        <link rel="index" title="Index"
+              href="../genindex.html"/>
+        <link rel="search" title="Search" href="../search.html"/>
     <link rel="top" title="ShakeMap Documentation  documentation" href="../index.html"/>
         <link rel="up" title="2. Technical Guide" href="technical_guide.html"/>
         <link rel="next" title="3. User’s Guide" href="users_guide.html"/>
@@ -108,13 +111,13 @@
 <li class="toctree-l4"><a class="reference internal" href="tg_intensity.html#color-coding-stations-by-intensity">2.6.4. Color Coding Stations by Intensity</a></li>
 </ul>
 </li>
-<li class="toctree-l3 current"><a class="current reference internal" href="">2.7. Discussion of Chosen Map Parameters (Intensity Measures)</a><ul>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">2.7. Discussion of Chosen Map Parameters (Intensity Measures)</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#use-of-peak-values-rather-than-mean">2.7.1. Use of Peak Values Rather than Mean</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User&#8217;s Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User’s Guide</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="background.html">3.1. Background</a></li>
 <li class="toctree-l3"><a class="reference internal" href="products.html">3.2. Products and Formats</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="products.html#input-files">3.2.1. Input Files</a></li>
@@ -176,6 +179,33 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_augment.html">sm_augment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_augment.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_contour.html">sm_contour</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_contour.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_model.html">sm_model</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_model.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/sm_profile.html">sm_profile</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../programs/sm_profile.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.mapping.html">shakemap.mapping</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.mapping.mapmaker.html">shakemap.mapping.mapmaker</a></li>
@@ -212,7 +242,7 @@
         <div class="rst-content">
           
 
-
+ 
 
 
 
@@ -228,7 +258,7 @@
       <li class="wy-breadcrumbs-aside">
         
           
-            <a href="../_sources/manual3_5/tg_choice_of_parameters.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/manual3_5/tg_choice_of_parameters.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -249,15 +279,15 @@ roughly two-thirds of the TriNet (now the Southern California portion of CISN) s
 motion data (the California Geological Survey, or CGS, data)
 are delivered as peak values for individual components of
 motion, that is, as parametric data rather than waveforms. This left two options: providing peak
-values or median of the peak values&#8212;determining vector sums of the two horizontal
+values or median of the peak values—determining vector sums of the two horizontal
 components was not an option, because the peak values on each component do not
 necessarily occur at the same time.  A useful strategy going forward may be to employ
 the 50th percentile of the response spectra over all non-redundant rotation angles
-(RotD50; <a class="reference internal" href="references.html#boore2010"><span>Boore, 2010</span></a>), which is becoming a standard
-for &#8220;next-generation&#8221;
-GMPEs (<a class="reference internal" href="references.html#abrahamson2014"><span>Abrahamson et al., 2014</span></a>), or on another
+(RotD50; <a class="reference internal" href="references.html#boore2010"><span class="std std-ref">Boore, 2010</span></a>), which is becoming a standard
+for “next-generation”
+GMPEs (<a class="reference internal" href="references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al., 2014</span></a>), or on another
 agreed-upon vector-component
-calculation. (See <a class="reference internal" href="future_directions.html#future-directions"><span>Future Directions</span></a>). However, such changes would
+calculation. (See <a class="reference internal" href="future_directions.html#future-directions"><span class="std std-ref">Future Directions</span></a>). However, such changes would
 require adoption of these
 calculations on the part of each contributing seismic network, and would thus require
 consensus (and substantial software upgrades) all around.</p>
@@ -270,7 +300,7 @@ such motions (particularly when determined in logarithmic space) can seriously u
 the largest motion that a building may have experienced, and these pulse-like motions are
 typically associated with the regions of greatest damage. Thus, we chose peak ground
 motions as the parameters to be mapped.</p>
-<p><a class="reference internal" href="references.html#beyer2006"><span>Beyer and Bommer (2006)</span></a> provide statistical relationships
+<p><a class="reference internal" href="references.html#beyer2006"><span class="std std-ref">Beyer and Bommer (2006)</span></a> provide statistical relationships
 to convert among median and
 peak parameters and between aleatory variability for different definitions of the
 horizontal component of motion. This is useful when approximating alternative
@@ -279,19 +309,19 @@ these statistics may or may not be representative.</p>
 <p>Initially, our use of PGA and PGV for estimating intensities was also simply practical.
 We were retrieving only peak values from a large subset of the network, so it was
 impractical to compute more specific ground-motion parameters, such as average-
-response spectral values, kinetic energy, cumulative absolute velocities (CAV, <a class="reference internal" href="references.html#epri1991"><span>EPRI,
-1991</span></a>), or the JMA intensity algorithm (<a class="reference internal" href="references.html#jma1996"><span>JMA, 1996</span></a>). However, because
+response spectral values, kinetic energy, cumulative absolute velocities (CAV, <a class="reference internal" href="references.html#epri1991"><span class="std std-ref">EPRI,
+1991</span></a>), or the JMA intensity algorithm (<a class="reference internal" href="references.html#jma1996"><span class="std std-ref">JMA, 1996</span></a>). However, because
 near-source strong ground motions are often dominated by short-duration, pulse-like
 ground motions (usually associated with source directivity), PGV appears to be a robust measure
 of intensity for strong shaking. In other words, the kinetic energy (proportional to
 velocity squared) available for damage is well characterized by PGV. In addition, the
 close correspondence of the JMA intensities and peak ground velocity
 indicates that our use of peak ground velocities for higher intensities was
-consistent with the algorithm used by JMA. Work by <a class="reference internal" href="references.html#wu2003"><span>Wu et al. (2003)</span></a> indicates a very
+consistent with the algorithm used by JMA. Work by <a class="reference internal" href="references.html#wu2003"><span class="std std-ref">Wu et al. (2003)</span></a> indicates a very
 good correspondence between PGV and damage for data collected on the island of Taiwan,
 which included high-quality loss data and densely sampled strong-motion observations
 for the 1999 Chi-Chi earthquake. More recent work on Ground-Motion/Intensity
-Conversion Equations (GMICEs) (e.g., <a class="reference internal" href="references.html#atkinson2007"><span>Atkinson and Kaka, 2007</span></a>; <a class="reference internal" href="references.html#worden2012"><span>Worden, et al., 2012</span></a>) has also
+Conversion Equations (GMICEs) (e.g., <a class="reference internal" href="references.html#atkinson2007"><span class="std std-ref">Atkinson and Kaka, 2007</span></a>; <a class="reference internal" href="references.html#worden2012"><span class="std std-ref">Worden, et al., 2012</span></a>) has also
 confirmed the strong relationship between PGV and intensity.</p>
 <p>Nonetheless, for large, distant earthquakes, peak motions may be less informative, and
 spectral content and perhaps duration become key parameters.  Although we may eventually
