@@ -3,13 +3,14 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-ShakeMap 3.5 Documentation
-==========================
+ShakeMap Documentation
+======================
 
 .. toctree::
    :maxdepth: 1
 
    manual3_5/index.rst
+   manual4_0/title_page.rst
    ShakeMap 4.0a Command Line Interface <programs/programs.rst>
    ShakeMap 4.0a API <apidoc/shakemap.rst>
 

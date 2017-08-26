@@ -28,6 +28,8 @@
   
 
   
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  
 
   
         <link rel="index" title="Index"
@@ -179,6 +181,19 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../manual4_0/index.html">Table of Contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/introduction.html">1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/technical_guide.html">2. Technical Guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../manual4_0/tg_architecture.html">2.1. Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/references.html">3. References &amp; Bibliography</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/glossary.html">4. Glossary</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
@@ -214,7 +229,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.utils.html">shakemap.utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.config.html">shakemap.utils.config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.readwrite.html">shakemap.utils.readwrite</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.utils.html">shakemap.utils.utils</a></li>
 </ul>
 </li>
@@ -301,7 +315,7 @@ Southern California, a component of the California Integrated Seismic Network (<
 For perspective, as of 2015, there were nearly 800 real-time stations jointly operated with
 a collaboration between the USGS and the California Institute of Technology (Caltech). In addition, the California Geological Survey (CGS)
 contributes nearly 350 strong-motion stations in near real-time, utilizing an automated
-telephone dial-up procedure (<a class="reference internal" href="references.html#shakal1998"><span class="std std-ref">Shakal et al, 1998</span></a>), and the USGS National Strong Motion
+telephone dial-up procedure (<a class="reference internal" href="../manual4_0/references.html#shakal1998"><span class="std std-ref">Shakal et al, 1998</span></a>), and the USGS National Strong Motion
 Instrumentation Program (NSMP) contributes dial-up station parameters as well, with
 nearly 50 stations in Southern California alone.  Lastly, the
 <a class="reference external" href="http://earthquake.usgs.gov/monitoring/netquakes/map">“NetQuakes”</a> program, a
@@ -321,9 +335,9 @@ are acquired.</p>
 <p>Parametric data from stations serving ShakeMap should include peak ground acceleration
 (PGA), peak ground velocity (PGV), and peak response spectral acceleration amplitudes
 (at 0.3, 1.0, and 3.0 sec).  Often, parametric values are derived continuously, using
-recursive time-domain filtering as described by <a class="reference internal" href="references.html#kanamori1999"><span class="std std-ref">Kanamori et al. (1999)</span></a>.  Otherwise
-parameters are derived from post-processing as described by <a class="reference internal" href="references.html#shakal1998"><span class="std std-ref">Shakal et al. (1998)</span></a> and
-<a class="reference internal" href="references.html#converse1992"><span class="std std-ref">Converse and Brady (1992)</span></a>.</p>
+recursive time-domain filtering as described by <a class="reference internal" href="../manual4_0/references.html#kanamori1999"><span class="std std-ref">Kanamori et al. (1999)</span></a>.  Otherwise
+parameters are derived from post-processing as described by <a class="reference internal" href="../manual4_0/references.html#shakal1998"><span class="std std-ref">Shakal et al. (1998)</span></a> and
+<a class="reference internal" href="../manual4_0/references.html#converse1992"><span class="std std-ref">Converse and Brady (1992)</span></a>.</p>
 <p>ShakeMap will run successfully with no (or limited) parametric data, for example if only
 PGA values are available at each station. Default logic is employed to provide reasonable
 behavior for estimating intensities from PGA alone, bias correction, and interpolation
@@ -336,8 +350,8 @@ are accustomed to analyses employing the geometric mean of the horizontal peak-g
 motions, but that parameter is not computed by ShakeMap. More description and justification
 for this strategy is given in the section <a class="reference internal" href="tg_choice_of_parameters.html#peak-values-vs-mean"><span class="std std-ref">Use of Peak Values Rather than Mean</span></a>. It should be noted,
 however, that conversions from peak to geometric mean [or orientation-independent
-parameterizations (<a class="reference internal" href="references.html#boore2010"><span class="std std-ref">Boore, 2010</span></a>)] are available
-(e.g., <a class="reference internal" href="references.html#beyer2006"><span class="std std-ref">Beyer and Bommer, 2006</span></a>).</p>
+parameterizations (<a class="reference internal" href="../manual4_0/references.html#boore2010"><span class="std std-ref">Boore, 2010</span></a>)] are available
+(e.g., <a class="reference internal" href="../manual4_0/references.html#beyer2006"><span class="std std-ref">Beyer and Bommer, 2006</span></a>).</p>
 </div>
 <div class="section" id="macroseismic-intensity">
 <h2>2.3.3. Macroseismic Intensity<a class="headerlink" href="#macroseismic-intensity" title="Permalink to this headline">¶</a></h2>
@@ -348,12 +362,12 @@ macroseismic data (see the <a class="reference internal" href="software_guide.ht
 <p>Intensity data can fill important gaps where ground-motion recordings are not available,
 and often provide the only control in sparsely instrumented areas. This is particularly true
 for historic earthquakes, for which macroseismic data provide important constraints on
-shaking intensities. As later discussed, the ShakeMap Atlas (<a class="reference internal" href="references.html#allen2008"><span class="std std-ref">Allen et al., 2008</span></a>, <a class="reference internal" href="references.html#allen2009a"><span class="std std-ref">2009a</span></a>;
-<a class="reference internal" href="references.html#garcia2012a"><span class="std std-ref">Garcia et al., 2012a</span></a>) is a collection of important historic earthquake shaking maps which
-are now widely used for scientific analyses and for loss model calibration (e.g., <a class="reference internal" href="references.html#wald2008"><span class="std std-ref">Wald et
-al., 2008</span></a>; <a class="reference internal" href="references.html#jaiswal2010"><span class="std std-ref">Jaiswal and Wald, 2010</span></a>; <a class="reference internal" href="references.html#pomonis2011"><span class="std std-ref">Pomonis and So, 2011)</span></a>.</p>
+shaking intensities. As later discussed, the ShakeMap Atlas (<a class="reference internal" href="../manual4_0/references.html#allen2008"><span class="std std-ref">Allen et al., 2008</span></a>, <a class="reference internal" href="../manual4_0/references.html#allen2009a"><span class="std std-ref">2009a</span></a>;
+<a class="reference internal" href="../manual4_0/references.html#garcia2012a"><span class="std std-ref">Garcia et al., 2012a</span></a>) is a collection of important historic earthquake shaking maps which
+are now widely used for scientific analyses and for loss model calibration (e.g., <a class="reference internal" href="../manual4_0/references.html#wald2008"><span class="std std-ref">Wald et
+al., 2008</span></a>; <a class="reference internal" href="../manual4_0/references.html#jaiswal2010"><span class="std std-ref">Jaiswal and Wald, 2010</span></a>; <a class="reference internal" href="../manual4_0/references.html#pomonis2011"><span class="std std-ref">Pomonis and So, 2011)</span></a>.</p>
 <p>The most common source for immediate post-earthquake intensity data is the USGS’s
-“Did You Feel It?” (DYFI) system (<a class="reference internal" href="references.html#wald2011c"><span class="std std-ref">Wald et al., 2011</span></a>), though similar systems are
+“Did You Feel It?” (DYFI) system (<a class="reference internal" href="../manual4_0/references.html#wald2011c"><span class="std std-ref">Wald et al., 2011</span></a>), though similar systems are
 available in several countries. However, traditionally assigned intensities may be used as
 well. DYFI data can be programmatically retrieved from the USGS’s database and
 formatted for ShakeMap input using the ShakeMap program <em>getdyfi</em>, making it
@@ -366,11 +380,11 @@ ground-motion observation. ShakeMap accounts for this higher uncertainty by down
 weighting converted observations in the interpolation process, as discussed in the
 <a class="reference internal" href="tg_processing.html#sec-interpolation"><span class="std std-ref">Interpolation</span></a> section.</p>
 <p>A variety of GMICEs are available with the ShakeMap software distribution, both for
-MMI—based on <a class="reference internal" href="references.html#wald1999b"><span class="std std-ref">Wald, et al. (1999b)</span></a>, <a class="reference internal" href="references.html#worden2012"><span class="std std-ref">Worden, et al. (2012)</span></a>,
-and <a class="reference internal" href="references.html#atkinson2007"><span class="std std-ref">Atkinson and Kaka (2007)</span></a>, among others—and for MCS—based on <a class="reference internal" href="references.html#faenza2010"><span class="std std-ref">Faenza and Michilini (2010)</span></a>. Operators are
+MMI—based on <a class="reference internal" href="../manual4_0/references.html#wald1999b"><span class="std std-ref">Wald, et al. (1999b)</span></a>, <a class="reference internal" href="../manual4_0/references.html#worden2012"><span class="std std-ref">Worden, et al. (2012)</span></a>,
+and <a class="reference internal" href="../manual4_0/references.html#atkinson2007"><span class="std std-ref">Atkinson and Kaka (2007)</span></a>, among others—and for MCS—based on <a class="reference internal" href="../manual4_0/references.html#faenza2010"><span class="std std-ref">Faenza and Michilini (2010)</span></a>. Operators are
 encouraged to explore the need to develop their own relationships based on data covering
 their own operational area as GMICEs have been shown to have regional dependencies
-(e.g., <a class="reference internal" href="references.html#caprio2015"><span class="std std-ref">Caprio et al., 2015</span></a>). A complete list of GMICEs currently employed by ShakeMap is
+(e.g., <a class="reference internal" href="../manual4_0/references.html#caprio2015"><span class="std std-ref">Caprio et al., 2015</span></a>). A complete list of GMICEs currently employed by ShakeMap is
 provided in the <a class="reference internal" href="software_guide.html#sm35-software-guide"><span class="std std-ref">Software Guide</span></a>.</p>
 <p>We have implemented a convention for maps and regression plots that seismic stations
 are represented with triangles and macroseismic data are depicted with circles (see <a class="pageref" href="#figure1-1">Figure  1</a>, for example). This convention is forward-looking: not all seismic networks were
@@ -380,7 +394,7 @@ currently following this convention at the time of this writing.</p>
 <p class="caption"><span class="caption-text">Figure 1: Intensity ShakeMap from the 2014 M6.0 American Canyon (Napa Valley),
 CA earthquake. Strong motion data (triangles) and intensity data (circles) are color-coded
 according to their intensity value, either as observed (for macroseismic data) or as converted
-by <a class="reference internal" href="references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> as shown in the legend. The north-south black line indicates the
+by <a class="reference internal" href="../manual4_0/references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> as shown in the legend. The north-south black line indicates the
 fault location, which nucleated near the epicenter (red star). Note: Map Version Number reflects
 separate offline processing for this Manual.</span></p>
 </div>
@@ -391,7 +405,7 @@ intensity map  on the newer, interactive maps on the USGS web site.</p>
 <p class="caption"><span class="caption-text">Figure 2: Intensity ShakeMap from the 2006 M6.7 Kahola Bay, HI earthquake.
 Contours indicate intensities; strong motion data (triangles) and intensity data (circles) are color-
 coded according to their intensity value, either as observed (for macroseismic data) or as
-converted by <a class="reference internal" href="references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>. Inset on lower map shows
+converted by <a class="reference internal" href="../manual4_0/references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>. Inset on lower map shows
 pop-up station information.</span></p>
 </div>
 </div>
@@ -418,8 +432,7 @@ pop-up station information.</span></p>
     <p>
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

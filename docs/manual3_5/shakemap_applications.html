@@ -28,6 +28,8 @@
   
 
   
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  
 
   
         <link rel="index" title="Index"
@@ -179,6 +181,19 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../manual4_0/index.html">Table of Contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/introduction.html">1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/technical_guide.html">2. Technical Guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../manual4_0/tg_architecture.html">2.1. Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/references.html">3. References &amp; Bibliography</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/glossary.html">4. Glossary</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
@@ -214,7 +229,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.utils.html">shakemap.utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.config.html">shakemap.utils.config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.readwrite.html">shakemap.utils.readwrite</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.utils.html">shakemap.utils.utils</a></li>
 </ul>
 </li>
@@ -299,7 +313,7 @@ through deterministic scenarios and with Probabilistic Seismic Hazard Maps
 <h2>3.4.1. Emergency Management and Response<a class="headerlink" href="#emergency-management-and-response" title="Permalink to this headline">¶</a></h2>
 <p>The value of seismic monitoring and ShakeMap was addressed by a report by the National Research Council’s
 (NRC) ad-hoc Committee on the Economic Benefits of Improved Seismic
-Monitoring (<a class="reference internal" href="references.html#nrc2006"><span class="std std-ref">National Research Council, 20006</span></a>). In Chapter 7, “Benefits for Emergency Response and Recovery”, the
+Monitoring (<a class="reference internal" href="../manual4_0/references.html#nrc2006"><span class="std std-ref">National Research Council, 20006</span></a>). In Chapter 7, “Benefits for Emergency Response and Recovery”, the
 committee refers to the Oct. 16, 1999 M7.1 Hector Mine, California earthquake (ShakeMap shown
 in <a class="pageref" href="#hector-mine-shakemap">Figure  2</a>).</p>
 <div class="figure align-right" id="id1">
@@ -382,7 +396,7 @@ tools.</p>
 <p>The <a class="reference external" href="http://www.fema.gov/">Federal Emergency Management Agency</a> (FEMA) employs ShakeMap for
 post-earthquake damage assessments.
 USGS generates customized, formatted ESRI shapefiles for direct input into
-FEMA’s Hazards U.S. (<a class="reference external" href="http://www.fema.gov/hazus">HAZUS-MH</a> ; <a class="reference internal" href="references.html#fema2006"><span class="std std-ref">FEMA
+FEMA’s Hazards U.S. (<a class="reference external" href="http://www.fema.gov/hazus">HAZUS-MH</a> ; <a class="reference internal" href="../manual4_0/references.html#fema2006"><span class="std std-ref">FEMA
 (2006)</span></a> loss estimation software. The customization includes specific contour intervals for
 all events, geometric-mean ground motions (as opposed to ShakeMap standard
 maximum component), and peak ground velocity in units of inches/sec rather than
@@ -446,7 +460,7 @@ adjudication, and situational awareness. Such financial analyses can be of
 significant benefit to stakeholders, facilitating risk-transfer operations,
 fostering sensible management of risk portfolios, and assisting disaster
 responders. Ultimately, these improvements translate to benefits for the public
-and those at risk (<a class="reference internal" href="references.html#franco2015"><span class="std std-ref">Franco, 2015</span></a>).</p>
+and those at risk (<a class="reference internal" href="../manual4_0/references.html#franco2015"><span class="std std-ref">Franco, 2015</span></a>).</p>
 <p>In general, there are three categories of post-earthquake financial services and
 decision making: 1) analysis of expected losses arising from an actual event
 against a portfolio of exposures; 2) the triggering of payments for parametric
@@ -491,7 +505,7 @@ and an update of the global Atlas of ShakeMaps has been completed (see
 and scrutiny: implementing directivity; computing and depicting spatial ground
 motion correlations; improving approaches for quantifying and conveying
 uncertainties; and creating more explicit ShakeMap policy and version-control
-documentation. <a class="reference internal" href="references.html#wald2016"><span class="std std-ref">Wald and Franco (2016)</span></a> describe how these
+documentation. <a class="reference internal" href="../manual4_0/references.html#wald2016"><span class="std std-ref">Wald and Franco (2016)</span></a> describe how these
 advances may in turn facilitate the appearance of new and more refined financial
 instruments and insurance products.</p>
 </div>
@@ -502,20 +516,20 @@ desire for information following a significant earthquake, makes this mapping
 tool a huge potential source of public information and education. In instances
 in which an earthquake receives significant news coverage, the ShakeMap site
 and “Did You Feel It?” (DYFI) receive an enormous influx of
-visitors (<a class="reference internal" href="references.html#wald2011c"><span class="std std-ref">Wald et al., 2011</span></a>). Such opportunities are
+visitors (<a class="reference internal" href="../manual4_0/references.html#wald2011c"><span class="std std-ref">Wald et al., 2011</span></a>). Such opportunities are
 amplified by widespread adoption of ShakeMap into media and educational
 materials by other institutions.</p>
 <p>ShakeMap’s intensity scale is key for introducing and impressing upon the public and
 the media the importance of macroseismic intensity, rather than the continuing
 sole dependence on magnitude as the scale of reference for earthquakes. Although
-Japanese Meterological Agency (JMA) Intensity (.e.g., <a class="reference internal" href="references.html#jma1996"><span class="std std-ref">JMA, 1996</span></a>) differs slightly from its U.S. counterpart, Modified Mercalli Intensity (MMI)—JMA’s is strictly
+Japanese Meterological Agency (JMA) Intensity (.e.g., <a class="reference internal" href="../manual4_0/references.html#jma1996"><span class="std std-ref">JMA, 1996</span></a>) differs slightly from its U.S. counterpart, Modified Mercalli Intensity (MMI)—JMA’s is strictly
 instrumentally-derived—it is widely used and understood in Japan (e.g.,
-<a class="reference internal" href="references.html#celsi2005"><span class="std std-ref">Celsi et al., 2005</span></a>). JMA has successfully made intensity the
+<a class="reference internal" href="../manual4_0/references.html#celsi2005"><span class="std std-ref">Celsi et al., 2005</span></a>). JMA has successfully made intensity the
 norm for communicating to the Japanese population about real-time and future
 earthquake hazards via television, smartphone, web content, annual earthquake
 drills, and the educational system. Because JMA intensity is widely understood,
 the public is be more attuned to earthquake risks than populations familiar only
-with magnitude descriptions of earthquakes (e.g., <a class="reference internal" href="references.html#celsi2005"><span class="std std-ref">Celsi et al., 2005</span></a>).</p>
+with magnitude descriptions of earthquakes (e.g., <a class="reference internal" href="../manual4_0/references.html#celsi2005"><span class="std std-ref">Celsi et al., 2005</span></a>).</p>
 <blockquote>
 <div><em>Earthquake education also occurs through the media. The anchoring effect we
 report may be lessened significantly if the press consistently used the Mercalli
@@ -531,7 +545,7 @@ relationship between magnitude and intensity. In Japan, the overall magnitude
 and the intensity are both instrument numbers, with the latter being
 location-specific.</em></div></blockquote>
 <p>The acclimatization of the public to intensity is inline with the findings of
-<a class="reference internal" href="references.html#gomberg2013"><span class="std std-ref">Gomberg and Jokobitz (2013)</span></a>:</p>
+<a class="reference internal" href="../manual4_0/references.html#gomberg2013"><span class="std std-ref">Gomberg and Jokobitz (2013)</span></a>:</p>
 <blockquote>
 <div><em>Simpler messaging and
 explanations are needed by some users,
@@ -557,14 +571,14 @@ A widely used graphic (<a class="pageref" href="#northridge-nisqually">Figure  4
 compares ShakeMap-generated intensities for the 1994 Northridge earthquake, a
 shallow crustal earthquake near Los Angeles, with the 2001 deep, intraslab
 Nisqually, WA earthquake. This figure was reprinted in numerous reports,
-textbooks, classes, reports, and briefings, including <a class="reference external" href="http://www.earthquakecountry.org/roots/shaking.html">Putting Down Roots</a> and the <a class="reference internal" href="references.html#nrc2006"><span class="std std-ref">National
+textbooks, classes, reports, and briefings, including <a class="reference external" href="http://www.earthquakecountry.org/roots/shaking.html">Putting Down Roots</a> and the <a class="reference internal" href="../manual4_0/references.html#nrc2006"><span class="std std-ref">National
 Research Council</span></a>.</p>
 <div class="figure align-left" id="id4">
 <span id="northridge-nisqually"></span><a class="reference internal image-reference" href="../_images/Northridge_Nisqually.png"><img alt="../_images/Northridge_Nisqually.png" src="../_images/Northridge_Nisqually.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 4: Widely adopted graphic of comparing ShakeMaps for the 2001 M6.8 Nisqually, WA and 1994 M6.7 Northridge, CA earthquakes, showing how distance from an earthquake affects the level of shaking experienced. Even though the magnitude of the Nisqually earthquake was slightly greater than that of the Northridge earthquake, the shaking was lower on average, primarily because the fault that ruptured during the Northridge earthquake was shallower (5-20km deep) than that of the Nisqually earthquake (about 45-50km deep).</span></p>
 </div>
 <p>The continued longterm education of the public to intensity continues through many TV channels and other means,
-for instance, in academic courses (e.g., <a class="reference external" href="http://web.ics.purdue.edu/~braile/edumod/eqhazard/eqhazard2.htm">Larry Braile’s undergraduate courses</a>), textbooks (e.g., <a class="reference internal" href="references.html#yeats2004"><span class="std std-ref">Yeats, 2004</span></a>
+for instance, in academic courses (e.g., <a class="reference external" href="http://web.ics.purdue.edu/~braile/edumod/eqhazard/eqhazard2.htm">Larry Braile’s undergraduate courses</a>), textbooks (e.g., <a class="reference internal" href="../manual4_0/references.html#yeats2004"><span class="std std-ref">Yeats, 2004</span></a>
 “Living with Earthquakes in the Pacific Northwest”),
 and even <a class="reference external" href="https://en.wikipedia.org/wiki/2001_Nisqually_earthquake">Wikipedia</a>.</p>
 </div>
@@ -576,7 +590,7 @@ planning scenarios. In many of these cases, ShakeMap is employed both for
 developing the framework for portraying each earthquake in its
 hazard context and for computing loss estimates to examine and
 communicate its potential societal impact. The initial success of the
-Great Southern California ShakeOut (<a class="reference internal" href="references.html#jones2011"><span class="std std-ref">Jones et al. (2011</span></a>) has been built by SCEC, USGS, and others into a
+Great Southern California ShakeOut (<a class="reference internal" href="../manual4_0/references.html#jones2011"><span class="std std-ref">Jones et al. (2011</span></a>) has been built by SCEC, USGS, and others into a
 worldwide <a class="reference external" href="http://www.shakeout.org/home.html">annual exercise</a>
 (on Oct 15th of each year) involving millions of participants.</p>
 <p>On a statewide basis, exercises take place in several of the more
@@ -602,7 +616,7 @@ same ShakeMap input in order for DOD to focus on defense support to civilian aut
 </div>
 <p>Internationally, USGS participates (through the National Oceanic and Atmospheric Association, NOAA) in an annual “Caribe
 Wave” earthquake and tsunami exercise for the Caribbean region
-(<a class="reference internal" href="references.html#ioc2012"><span class="std std-ref">IOC, 2012</span></a>; see <a class="pageref" href="#caribewave-nle">Figure  5</a>). The USGS ShakeMap and PAGER group also work directly with the U.S.
+(<a class="reference internal" href="../manual4_0/references.html#ioc2012"><span class="std std-ref">IOC, 2012</span></a>; see <a class="pageref" href="#caribewave-nle">Figure  5</a>). The USGS ShakeMap and PAGER group also work directly with the U.S.
 Agency for International Development (USAID) Office of Foreign
 Disaster Assistance (OFDA), the World Bank, and Geohazards International (GHI) (among many other agencies, countries, and NGOs) to
 develop global planning exercises and scenarios.</p>
@@ -630,30 +644,30 @@ sampling of the range of studies these products motivate and facilitate:</p>
 <p><strong>Example Engineering Research and Analyses:</strong></p>
 <ul class="simple">
 <li>Analyses of potential damage to column/beam welds in steel
-buildings following the 1994 Northridge earthquake. <a class="reference internal" href="references.html#atc2002"><span class="std std-ref">ATC 2002</span></a>.</li>
+buildings following the 1994 Northridge earthquake. <a class="reference internal" href="../manual4_0/references.html#atc2002"><span class="std std-ref">ATC 2002</span></a>.</li>
 <li>ATC-54: Guidelines for using strong-motion data and ShakeMaps in
-Post-Earthquake Response.  <a class="reference internal" href="references.html#atc2002"><span class="std std-ref">ATC 2002</span></a>.</li>
+Post-Earthquake Response.  <a class="reference internal" href="../manual4_0/references.html#atc2002"><span class="std std-ref">ATC 2002</span></a>.</li>
 <li>An Empirical Model for Global Earthquake Fatality
-Estimation. <a class="reference internal" href="references.html#jaiswal2010"><span class="std std-ref">Jaiswal and Wald (2010)</span></a>.</li>
+Estimation. <a class="reference internal" href="../manual4_0/references.html#jaiswal2010"><span class="std std-ref">Jaiswal and Wald (2010)</span></a>.</li>
 <li>Guidelines for the Collection of Consequence Data, Global Earthquake Consequences Database Global
-Component Project. <a class="reference internal" href="references.html#pomonis2011"><span class="std std-ref">Pomonis and So (2011)</span></a>.</li>
-<li>ShakeCast Case Study on Nevada Bridges. <a class="reference internal" href="references.html#biasi2016"><span class="std std-ref">Biasi et al (2016)</span></a>.</li>
+Component Project. <a class="reference internal" href="../manual4_0/references.html#pomonis2011"><span class="std std-ref">Pomonis and So (2011)</span></a>.</li>
+<li>ShakeCast Case Study on Nevada Bridges. <a class="reference internal" href="../manual4_0/references.html#biasi2016"><span class="std std-ref">Biasi et al (2016)</span></a>.</li>
 </ul>
 <p><strong>Example Seismological Research and Analyses:</strong></p>
 <ul class="simple">
-<li>Intensity attenuation for active crustal regions. <a class="reference internal" href="references.html#allen2012"><span class="std std-ref">Allen et al, 2012</span></a>.</li>
+<li>Intensity attenuation for active crustal regions. <a class="reference internal" href="../manual4_0/references.html#allen2012"><span class="std std-ref">Allen et al, 2012</span></a>.</li>
 <li>Ground Motion to Intensity Conversion Equations (GMICEs): A Global
-Relationship and Evaluation of Regional Dependency. <a class="reference internal" href="references.html#caprio2015"><span class="std std-ref">Caprio
+Relationship and Evaluation of Regional Dependency. <a class="reference internal" href="../manual4_0/references.html#caprio2015"><span class="std std-ref">Caprio
 et al. (2015)</span></a>.</li>
 <li>Fault extent estimation for near-real time ground shaking map
-computation purposes. <a class="reference internal" href="references.html#convertito2011"><span class="std std-ref">Convertito et al. (2011)</span></a>.</li>
+computation purposes. <a class="reference internal" href="../manual4_0/references.html#convertito2011"><span class="std std-ref">Convertito et al. (2011)</span></a>.</li>
 <li>Bayesian Estimations of Peak Ground Acceleration and 5% Damped
 Spectral Acceleration from Modified Mercalli Intensity Data*.
-<a class="reference internal" href="references.html#ebel2003"><span class="std std-ref">Ebel and Wald (2003)</span></a>.</li>
+<a class="reference internal" href="../manual4_0/references.html#ebel2003"><span class="std std-ref">Ebel and Wald (2003)</span></a>.</li>
 <li>Regression analysis of MCS intensity and ground motion parameters
-in Italy and its application in ShakeMap. <a class="reference internal" href="references.html#faenza2010"><span class="std std-ref">Faenza and Michilini (2010)</span></a></li>
+in Italy and its application in ShakeMap. <a class="reference internal" href="../manual4_0/references.html#faenza2010"><span class="std std-ref">Faenza and Michilini (2010)</span></a></li>
 <li>A Global Earthquake Discrimination Scheme to Optimize Ground-Motion
-Prediction Equation Selection. <a class="reference internal" href="references.html#garcia2012b"><span class="std std-ref">Garcia et al. (2012b)</span></a>.</li>
+Prediction Equation Selection. <a class="reference internal" href="../manual4_0/references.html#garcia2012b"><span class="std std-ref">Garcia et al. (2012b)</span></a>.</li>
 </ul>
 </div>
 </div>
@@ -679,8 +693,7 @@ Prediction Equation Selection. <a class="reference internal" href="references.ht
     <p>
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 
