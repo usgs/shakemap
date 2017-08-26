@@ -178,7 +178,7 @@ html_static_path = ['_static']
 #html_show_sourcelink = True
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
-#html_show_sphinx = True
+html_show_sphinx = False
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
 html_show_copyright = False
@@ -355,3 +355,7 @@ autodoc_member_order = 'bysource'
 
 napoleon_include_special_with_doc = False
 todo_include_todos = True
+
+def setup(app):
+    app.add_stylesheet('css/custom.css')  # may also be an URL
+

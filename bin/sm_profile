@@ -27,7 +27,7 @@ These ShakeMap profiles allow one user to have multiple ShakeMap profiles
 (installations) on the same machine.  These profiles can all be configured 
 differently, if desired.
 '''
-    parser = argparse.ArgumentParser(description=desc)
+    parser = argparse.ArgumentParser(description=desc, epilog='\n\n')
     parser.add_argument('-s', '--switch', metavar='PROFILE',
                         help='Switch from current profile to PROFILE.')
     parser.add_argument('-l', '--list', action='store_true',

@@ -28,6 +28,8 @@
   
 
   
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  
 
   
         <link rel="index" title="Index"
@@ -179,6 +181,19 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../manual4_0/index.html">Table of Contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/introduction.html">1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/technical_guide.html">2. Technical Guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../manual4_0/tg_architecture.html">2.1. Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/references.html">3. References &amp; Bibliography</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/glossary.html">4. Glossary</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
@@ -214,7 +229,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.utils.html">shakemap.utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.config.html">shakemap.utils.config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.readwrite.html">shakemap.utils.readwrite</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.utils.html">shakemap.utils.utils</a></li>
 </ul>
 </li>
@@ -272,7 +286,7 @@
 <span id="sec-philosophy"></span><h1>2.2. Philosophy of Estimating and Interpolating Ground Motions<a class="headerlink" href="#philosophy-of-estimating-and-interpolating-ground-motions" title="Permalink to this headline">¶</a></h1>
 <p>The overall strategy for the deployment of stations under the ANSS implementation plan
 relies on dense instrumentation concentrated in urban areas with high seismic hazards
-(<a class="reference internal" href="references.html#usgs1999"><span class="std std-ref">USGS, 1999</span></a>) and fewer stations in outlying areas.  Based on this philosophy, and when
+(<a class="reference internal" href="../manual4_0/references.html#usgs1999"><span class="std std-ref">USGS, 1999</span></a>) and fewer stations in outlying areas.  Based on this philosophy, and when
 fully deployed, maps generated in these urban regions are expected to be most accurate
 where the population at risk is the greatest, and therefore, where emergency response and
 recovery efforts will likely be most urgent and complex.</p>
@@ -302,7 +316,7 @@ can take many forms. There are some good reasons to employ geospatial kriging-wi
 However, the complexity of the trends (GMPE, as well as inter-event bias
 corrections per Intensity Measure or IM), the use of multiply-weighted strong-motion and macroseimic
 data, and the real-time nature of the processing require other considerations. Effectively,
-the approach ShakeMap currently employs for interpolation (<a class="reference internal" href="references.html#worden2010"><span class="std std-ref">Worden et al., 2010</span></a>), which
+the approach ShakeMap currently employs for interpolation (<a class="reference internal" href="../manual4_0/references.html#worden2010"><span class="std std-ref">Worden et al., 2010</span></a>), which
 employs a predetermined spatial correlation function, is broadly analogous to <a class="reference external" href="https://en.wikipedia.org/wiki/Kriging">kriging-with-a-trend</a>
 mathematically. We address this possibility further in <a class="reference internal" href="future_directions.html#future-directions"><span class="std std-ref">Future Directions</span></a>.</p>
 <p>Estimating motions where there are few stations, and then interpolating the recordings and
@@ -332,8 +346,7 @@ beneficial, we illustrate the effects of key steps with example ShakeMap figures
     <p>
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

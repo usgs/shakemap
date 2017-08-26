@@ -28,6 +28,8 @@
   
 
   
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+  
 
   
         <link rel="index" title="Index"
@@ -179,6 +181,19 @@
 <li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../manual4_0/index.html">Table of Contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/introduction.html">1. Introduction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/technical_guide.html">2. Technical Guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../manual4_0/tg_architecture.html">2.1. Architecture</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/references.html">3. References &amp; Bibliography</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../manual4_0/glossary.html">4. Glossary</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../programs/sm_assemble.html">sm_assemble</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../programs/sm_assemble.html#Positional Arguments">Positional Arguments</a></li>
@@ -214,7 +229,6 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.utils.html">shakemap.utils</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.config.html">shakemap.utils.config</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.readwrite.html">shakemap.utils.readwrite</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../apidoc/shakemap.utils.utils.html">shakemap.utils.utils</a></li>
 </ul>
 </li>
@@ -270,14 +284,14 @@
             
   <div class="section" id="representing-macroseismic-intensity-on-maps">
 <span id="sec-tg-intensity"></span><h1>2.6. Representing Macroseismic Intensity on Maps<a class="headerlink" href="#representing-macroseismic-intensity-on-maps" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference internal" href="references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> relates recorded ground motions to Modified Mercalli Intensities in
+<p><a class="reference internal" href="../manual4_0/references.html#wald1999b"><span class="std std-ref">Wald et al. (1999b)</span></a> relates recorded ground motions to Modified Mercalli Intensities in
 California. While not the first work of its type, Wald et al. had the advantage of using
 several earthquakes that were both very well surveyed for MMI, and also well
 instrumented for recorded ground motions. By relating the ground motions to MMI, Wald
 et al. made possible the rapid calculation of expected intensities from recorded ground
 motions. These “instrumental intensities” could be interpolated over an area and
 represented on a map.</p>
-<p>As part of the original implementation of ShakeMap, <a class="reference internal" href="references.html#wald1999a"><span class="std std-ref">Wald, et al. (1999a)</span></a> developed a
+<p>As part of the original implementation of ShakeMap, <a class="reference internal" href="../manual4_0/references.html#wald1999a"><span class="std std-ref">Wald, et al. (1999a)</span></a> developed a
 color scale to represent expected intensities over the mapped area. This scale gives users
 an intuitive, easy-to-understand depiction of the ground shaking for a given earthquake.
 By mapping intensity to color, we also make the hardest-hit areas stand out for
@@ -285,8 +299,8 @@ emergency responders and members of the media. Along with the color scale, we
 developed simplified two-word descriptions of the felt intensity as well as the likely
 damage. These abridged descriptions are not meant to replace
 more comprehensive descriptions provided in the MMI (e.g.,
-<a class="reference internal" href="references.html#dewey2000"><span class="std std-ref">Dewey et al., 2000</span></a>; <a class="reference internal" href="references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>),
-or EMS-98 (<a class="reference internal" href="references.html#grunthal1998"><span class="std std-ref">Grunthal et al., 1998</span></a>) scales; however, they offer convenient description for
+<a class="reference internal" href="../manual4_0/references.html#dewey2000"><span class="std std-ref">Dewey et al., 2000</span></a>; <a class="reference internal" href="../manual4_0/references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>),
+or EMS-98 (<a class="reference internal" href="../manual4_0/references.html#grunthal1998"><span class="std std-ref">Grunthal et al., 1998</span></a>) scales; however, they offer convenient description for
 our purposes.</p>
 <p>By relating recorded peak ground motions to Modified Mercalli Intensities, we can
 generate instrumental intensities within a few minutes of an earthquake. In the current
@@ -307,9 +321,9 @@ addition, we saturate intensity X+ with dark red; observed ground motions alone 
 sufficient to warrant any higher intensities, given that the available empirical relationships
 do not have any values of intensity greater than IX. In recent years, the USGS has limited
 observed MMIs to IX, reserving intensity X for possible future
-observations (see <a class="reference internal" href="references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>, for more details); the USGS no
+observations (see <a class="reference internal" href="../manual4_0/references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>, for more details); the USGS no
 longer assigns intensity XI and XII. We note that there were only
-only two intensity-IX assignments for the 1994 Northridge earthquake (<a class="reference internal" href="references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>),
+only two intensity-IX assignments for the 1994 Northridge earthquake (<a class="reference internal" href="../manual4_0/references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>),
 and only two or three proper intensity-IX assignments for the
 1989 Loma Prieta earthquake (J. Dewey, 2015, personal communication).</p>
 <table border="1" class="docutils">
@@ -449,7 +463,7 @@ to columns 6-8.</p>
 <span id="figure1-16"></span><a class="reference internal image-reference" href="../_images/Figure_1_16_bottom.png"><img alt="../_images/Figure_1_16_bottom.png" src="../_images/Figure_1_16_bottom.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 1: Top: ShakeMap Instrumental Intensity Scale Legend: Color palette, two-word
 text descriptors, and ranges of peak motions for Instrumental Intensities. Note that the peak
-motions are applicable to <a class="reference internal" href="references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>; other Ground Motion/Intensity
+motions are applicable to <a class="reference internal" href="../manual4_0/references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>; other Ground Motion/Intensity
 Conversion Equations use the same color scale, but their ranges of peak motions will differ. Bottom:
 Legend below PGV ShakeMap. The legend for below each ShakeMap is now map
 (parameter-) and GMICE-specific as labeled. Color-coding of stations corresponds to their
@@ -470,19 +484,19 @@ the instrumental intensities are not based on observations of the earthquake’s
 people or structures. The terms “perceived shaking” and “potential damage” in the
 ShakeMap legend are chosen for this reason; these intensities were not observed, but they
 are consistent on average with intensities at these ranges of ground motions recorded in a
-number of past earthquakes (see, for example, <a class="reference internal" href="references.html#wald1999b"><span class="std std-ref">Wald et al., 1999b</span></a>; <a class="reference internal" href="references.html#worden2012"><span class="std std-ref">Worden et al., 2012</span></a>).
+number of past earthquakes (see, for example, <a class="reference internal" href="../manual4_0/references.html#wald1999b"><span class="std std-ref">Wald et al., 1999b</span></a>; <a class="reference internal" href="../manual4_0/references.html#worden2012"><span class="std std-ref">Worden et al., 2012</span></a>).
 Two-word descriptions of both shaking and damage levels are provided to summarize the
 effects in an area; they were derived with careful consideration of the existing
 descriptions in the Modified Mercalli definitions (L. Dengler and J. Dewey, written
 communication, 1998, 2003).</p>
 <p>The ShakeMap qualitative descriptions of shaking are intended to be consistent with the way
 people perceive the shaking in earthquakes.  The descriptions for intensities up to VII are
-constrained by the work of <a class="reference internal" href="references.html#dengler1998"><span class="std std-ref">Dengler and Dewey (1998)</span></a>, in which they compared results of
+constrained by the work of <a class="reference internal" href="../manual4_0/references.html#dengler1998"><span class="std std-ref">Dengler and Dewey (1998)</span></a>, in which they compared results of
 telephone surveys with USGS MMI intensities for the 1994 Northridge earthquake. The
 ShakeMap descriptions up to intensity VII may be viewed as a rendering of Dengler and
 Dewey’s Figure 7a.</p>
 <p>The instrumental intensity map for the Northridge earthquake shares most of the notable
-features of the Modified Mercalli map prepared by the USGS (<a class="reference internal" href="references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>),
+features of the Modified Mercalli map prepared by the USGS (<a class="reference internal" href="../manual4_0/references.html#dewey1995"><span class="std std-ref">Dewey et al., 1995</span></a>),
 including the relatively high intensities near Santa Monica and southeast of the epicenter
 near Sherman Oaks.  However, in general, the area of intensity IX on the instrumentally
 derived intensity map is slightly larger than on the USGS Modified Mercalli intensity
@@ -494,7 +508,7 @@ intensities will show high levels of strong shaking independent of the exposure 
 populations and buildings, while observed intensities only represent intensities where there are
 structures to damage and people to experience the earthquake.</p>
 <p>The ShakeMap descriptions of felt shaking begin to lose meaning above intensity VII or VIII. In
-the <a class="reference internal" href="references.html#dengler1998"><span class="std std-ref">Dengler and Dewey (1998)</span></a> study, peoples’ perception of shaking began to saturate in
+the <a class="reference internal" href="../manual4_0/references.html#dengler1998"><span class="std std-ref">Dengler and Dewey (1998)</span></a> study, peoples’ perception of shaking began to saturate in
 the VII-VIII range, with more than half the people at VII-VIII and above
 reporting the shaking as “violent” (on a scale from “weak” to “violent”).  In the ShakeMap
 descriptions, we intensified the descriptions of shaking with increases of intensity above
@@ -503,8 +517,8 @@ know of no solid evidence that one could discriminate intensities higher than VI
 basis of different individuals’ descriptions of perceived shaking alone.</p>
 <p>ShakeMap is not unique in describing intensity VI as corresponding to strong shaking. In
 the 7-point Japanese macroseismic scale, for which intensity 4 is equivalent to MMI VI,
-intensity 4 is described as “strong.” In the European Macroseismic Scale (<a class="reference internal" href="references.html#grunthal1998"><span class="std std-ref">Grunthel et al.,
-1998</span></a>) (EMS-98), which is compatible with MMI (<a class="reference internal" href="references.html#musson2010"><span class="std std-ref">Musson et al., 2010</span></a>), the bullet description of intensity
+intensity 4 is described as “strong.” In the European Macroseismic Scale (<a class="reference internal" href="../manual4_0/references.html#grunthal1998"><span class="std std-ref">Grunthel et al.,
+1998</span></a>) (EMS-98), which is compatible with MMI (<a class="reference internal" href="../manual4_0/references.html#musson2010"><span class="std std-ref">Musson et al., 2010</span></a>), the bullet description of intensity
 V is  “strong.”  Higher EMS-98 intensities are given bullet descriptions in terms of the
 damage they produce, rather than the strength of perceived shaking.</p>
 </div>
@@ -539,7 +553,7 @@ calling the program <em>mapping</em> with the flag <em>-pgminten</em>.</p>
 <p class="caption"><span class="caption-text">Figure 2: ShakeMap for the 1994 M6.7 Northridge, CA earthquake with a finite fault (red
 rectangle), strong motion data (triangles) and intensity data (circles). Stations and macroseismic
 data are color coded according to their intensity value, either as observed (for macroseismic data)
-or as converted by <a class="reference internal" href="references.html#worden2011"><span class="std std-ref">Worden et al. (2011)</span></a> and indicated by the scales shown. Note:
+or as converted by <a class="reference internal" href="../manual4_0/references.html#worden2011"><span class="std std-ref">Worden et al. (2011)</span></a> and indicated by the scales shown. Note:
 Macroseismic data do not change colors from map to map, but seismic stations do, since the
 estimated intensity conversion depends on which parameter is used.</span></p>
 </div>
@@ -567,8 +581,7 @@ estimated intensity conversion depends on which parameter is used.</span></p>
     <p>
 
     </p>
-  </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+  </div> 
 
 </footer>
 

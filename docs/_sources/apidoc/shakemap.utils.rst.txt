@@ -6,7 +6,6 @@ Submodules
 .. toctree::
 
    shakemap.utils.config
-   shakemap.utils.readwrite
    shakemap.utils.utils
 
 Module contents
