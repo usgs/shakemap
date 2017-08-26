@@ -5,7 +5,7 @@ ShakeMap 4 Manual
 
 .. image::  _static/northridge_points.*
    :alt: ShakeMap Northridge
-   :scale: 180 %
+   :scale: 100 %
    :align: left
 
 **written by: C. Bruce Worden, Eric M. Thompson, Michael G. Hearne, 

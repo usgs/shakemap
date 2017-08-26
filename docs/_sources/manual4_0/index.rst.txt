@@ -9,13 +9,13 @@ Table of Contents
 =================
 
 .. figure::  _static/northridge_points.*
-   :scale: 60%
+   :scale: 50%
    :alt: ShakeMap Northridge
    :align: right
 
 .. toctree::
    :numbered:
-   :maxdepth: 2
+   :maxdepth: 1
 
    introduction.rst
    technical_guide.rst

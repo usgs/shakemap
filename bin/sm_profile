@@ -23,6 +23,7 @@ from shakemap.utils.utils import query_yes_no
 
 def get_parser():
     desc = ''' Manage ShakeMap profiles.
+
 These ShakeMap profiles allow one user to have multiple ShakeMap profiles
 (installations) on the same machine.  These profiles can all be configured 
 differently, if desired.
