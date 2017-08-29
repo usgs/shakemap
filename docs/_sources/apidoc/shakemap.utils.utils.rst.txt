@@ -1,4 +1,4 @@
-shakemap\.utils\.utils module
+shakemap\.utils\.utils
 =============================
 
 .. automodule:: shakemap.utils.utils

@@ -50,18 +50,18 @@ def main(args):
     #--------------------------------------------
     # try to clean up some of the excess labeling
     #--------------------------------------------
-#    clean_cmd = "sed -e 's/ module//g' -i '' `find %s/*.rst -type f "\
-#                "-maxdepth 0 -print`" % API_DIR
-#    res, stdout, stderr = get_command_output(clean_cmd)
-#    clean_cmd = "sed -e 's/ package//g' -i '' `find %s/*.rst -type f "\
-#                "-maxdepth 0 -print`" % API_DIR
-#    res, stdout, stderr = get_command_output(clean_cmd)
-#    clean_cmd = "sed -e '/Subpackages/d' -i '' `find %s/*.rst -type f "\
-#                "-maxdepth 0 -print`" % API_DIR
-#    res, stdout, stderr = get_command_output(clean_cmd)
-#    clean_cmd = "sed -e '/-.*-/d' -i '' `find %s/*.rst -type f "\
-#                "-maxdepth 0 -print`" % API_DIR
-#    res, stdout, stderr = get_command_output(clean_cmd)
+    clean_cmd = "sed -e 's/ module//g' -i '' `find %s/*.rst -type f "\
+                "-maxdepth 0 -print`" % API_DIR
+    res, stdout, stderr = get_command_output(clean_cmd)
+    clean_cmd = "sed -e 's/ package//g' -i '' `find %s/*.rst -type f "\
+                "-maxdepth 0 -print`" % API_DIR
+    res, stdout, stderr = get_command_output(clean_cmd)
+    clean_cmd = "sed -e '/Subpackages/d' -i '' `find %s/*.rst -type f "\
+                "-maxdepth 0 -print`" % API_DIR
+    res, stdout, stderr = get_command_output(clean_cmd)
+    clean_cmd = "sed -e '/-.*-/d' -i '' `find %s/*.rst -type f "\
+                "-maxdepth 0 -print`" % API_DIR
+    res, stdout, stderr = get_command_output(clean_cmd)
 
     #-------------------------------------------------------------
     # Go to the api directory and build the html

@@ -1,4 +1,4 @@
-shakemap\.mapping\.sm\_colordict module
+shakemap\.mapping\.sm\_colordict
 =======================================
 
 .. automodule:: shakemap.mapping.sm_colordict

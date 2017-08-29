@@ -1,8 +1,6 @@
-shakemap package
+shakemap
 ================
 
-Subpackages
------------
 
 .. toctree::
 
@@ -10,7 +8,6 @@ Subpackages
     shakemap.utils
 
 Module contents
----------------
 
 .. automodule:: shakemap
     :members:

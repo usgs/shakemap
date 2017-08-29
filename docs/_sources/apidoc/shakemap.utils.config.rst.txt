@@ -1,4 +1,4 @@
-shakemap\.utils\.config module
+shakemap\.utils\.config
 ==============================
 
 .. automodule:: shakemap.utils.config
