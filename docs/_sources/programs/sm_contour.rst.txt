@@ -1,3 +1,5 @@
+.. _sm-contour:
+
 sm_contour
 ==========
 

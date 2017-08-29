@@ -1,3 +1,5 @@
+.. _sm-model:
+
 sm_model
 ========
 

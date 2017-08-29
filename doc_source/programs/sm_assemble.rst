@@ -1,3 +1,5 @@
+.. _sm-assemble:
+
 sm_assemble
 ===========
 

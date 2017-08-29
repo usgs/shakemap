@@ -123,7 +123,7 @@ html_theme = 'alabaster'
 # documentation.
 #html_theme_options = {'collapse_navigation': False}
 html_theme_options = {
-        'logo': 'northridge_points_thumbnail_100.png',
+        'logo': 'northridge_thumbnail_light_16x9.png',
         'logo_name': True,
         'github_button': False,
         'github_banner': False,

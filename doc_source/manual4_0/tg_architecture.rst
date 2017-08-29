@@ -72,7 +72,7 @@ cached by the web system to improve performance.
 
 .. _shake-web:
 
-.. figure:: _static/consumer.*
+.. figure:: _static/web.*
    :width: 650px
    :align: left
 
@@ -85,4 +85,188 @@ a subset of ShakeMap products available through a messaging system and deliver
 them when requested, rather than producing them itself). Thus, the same set of 
 constituent modules are needed, whether the products are delivered directly by 
 the authoritative ShakeMap system or through a web service.
+
+Programs
+========
+
+The core components of ShakeMap are a set of command line programs. These 
+programs allow the operator to set up a ShakeMap environment, collect 
+data and configurations into inputs (i.e., *shake_data.hdf*), and
+generate ShakeMap grids and their associated products. 
+
+sm_profile
+----------
+
+The user will need to run **sm_assemble** at least once to create a 
+ShakeMap
+environment, referred to as a 'profile.' This environment consists of two 
+directories -- one for 
+event data, and another for configuration files and associated support
+products (Vs30 grid, geographic information, etc.) -- and a configuration
+file that points to them. The profile data resides in a file called
+*profiles.conf* in a subdirectory, *.shakemap*, of the user's home 
+directory. Other ShakeMap programs read the profile 
+information in this configuration file and use it to find event and 
+configuration information.
+
+The data directory ('<data_dir>') contains event subdirectories (named
+with their event IDs) and their associated subdirectories::
+
+    <data_dir>/
+        <event_id_1>/
+            current/
+                event.xml
+                *_dat.xml
+                *_fault.txt (or .json)
+                model.conf (or model_zc.conf)
+                products/
+                    shake_result.hdf
+                    ...
+            .backup0001/
+                event.xml
+                ...
+            .backup0002/
+                ...
+            ...
+        <event_id_2>/
+            ...
+        <event_id_3>/
+            ...
+        ...
+
+The 'install' directory ('<install_dir>') holds configuration files and 
+user supplied geographic or other system specific data::
+
+    <install_dir>/
+        config/
+            model.conf
+            modules.conf
+            gmpe_sets.conf
+            ...
+        site_data/
+            vs30.grid
+        <other_directory>/
+            (additional data files)
+        ...
+
+Macros within the configuration system allow the user to specify the 
+root data and install directories when setting configuration 
+parameters.
+
+The user may have more than one profile, and switch between them with
+**sm_profile**. This allows the user to have different configurations 
+and data repositories for different event sets (e.g., real time events,
+scenarios, and historic events). See the 
+:ref:`sm_profile man page <sm-profile>` for usage and a list of options.
+
+sm_assemble
+-----------
+
+**sm_assemble** collects event and configuration data and creates the 
+file *shake_data.hdf*. It first reads *event.xml* and stores it in a 
+data structure. **sm_assemble** then reads the configuration files
+
+| <install_dir>/modules.conf
+| <install_dir>/gmpe_sets.conf
+| <install_dir>/model.conf
+
+and assembles them into a single configuration. It then reads 
+
+| <data_dir>/<evnt_id>/current>/model.conf (or model_zc.conf).
+
+Any parameter set in the event-specific *model.conf* will override 
+parameters set in the other configuration files. Note: if both 
+*model.conf* and *model_zc.conf* exist in the event directory, 
+*model.conf* will be processed and *model_zc.conf* will be ignored.
+
+**sm_assemble** then reads any files with a *_dat.xml* extension 
+and assembles them into a station list. See ??? for a description 
+of the data file format. Similarly, **sm_assmeble** will read a
+file with the *_fault.txt* (or *_fault.json*) extension and
+process it as a specification of a finite rupture. See ??? for
+a description of the rupture file formats. Note: only one rupture
+file should be present in the event's input directory. If more
+than one file exists, only the first (lexicographically) will we
+processed.
+
+If no backups exist (i.e., event subdirectories named *.backup????*) 
+then the ShakeMap history from an existing *shake_data.hdf* is
+extracted and updated. If there is no current *shake_data.hdf*, the
+history for the event is initiated. If backups do exist, then the 
+history is extracted from the most current backup and appended 
+with the current timestamp, originator, and version.
+
+**sm_assemble** then consolidated all of this data and writes 
+*shake_data.hdf* in the event's *current* directory. If *shake_data.hdf*
+already exists in that location, it will be overwritten.
+
+See the :ref:`sm_assemble man page <sm-assemble>` for usage.
+
+.. _shake-assemble:
+
+.. figure:: _static/assemble.*
+   :width: 650px
+   :align: left
+
+   Data flow of the *sm_assemble* process.
+
+sm_augment
+----------
+
+**sm_augment** behaves very similar to **sm_assemble** except that it
+will first read *shake_data.hdf* from the event's *current* directory.
+If *exven.xml* exists in the event's *current* directory, its data will
+replace the data in the existing *shake_data.hdf*. 
+
+The configuration data in *shake_data.hdf* is used as a starting point,
+and any configuration data from the system configuration files or the 
+event's *model.conf* (or *model_zc.conf*) will then be added to it. Where
+there are conflicts, the system configuration parameters will override 
+those found in *shake_data.hdf*. The event-specific configuration 
+parameters from the local system retain the highest priority.
+
+Data files (i.e., files in the event's *current* directory that have 
+the *_dat.xml* extension) will be added to any data already found in
+*shake_data.hdf*. If a fault file is found in the local directory, it 
+will replace the existing fault data in *shake_data.hdf*.
+
+The history information will be updated to reflect the update time and
+originator (if applicable).
+
+See the :ref:`sm_augment man page <sm-augment>` for usage.
+
+sm_model
+--------
+
+**sm_model** reads the data in *shake_data.hdf* and produces an
+interpolated ShakeMap. Depending upon the settings found in *model.conf*,
+the interpolation product may be a grid or a set of points. See
+*model.conf* for additional options and documentation.
+
+A great deal of this manual is devoted to the way the interpolation is
+performed, and the effect of various configuration options. See the 
+relevant sections for more.
+
+**sm_model** writes a file, *shake_result.hdf*, in the *products*
+subdirectory of the event's *current* directory. Aside from interpolated
+grids (or lists of points) for each intensity measure type, and their
+associated uncertainties, **sm_model** also writes ShakeMap metadata
+('*info.json*'), station data ('*stationlist.json*'), the finite
+fault information ('*rupture.json*'), and the entire configuration
+object into *shake_result.hdf*. See ??? for more on the format and
+content of *shake_result.hdf*.
+
+See the :ref:`sm_model man page <sm-model>` for usage.
+
+sm_contour
+----------
+
+**sm_contour** reads an event's *shake_result.hdf* and produces iso-seismal
+contours for each of the intensity measure types found therein. The contours
+are written as GeoJSON to files called *<imt_type>_cont.json* in the event's 
+*current/products* subdirectory.
+
+See the :ref:`sm_contour man page <sm-contour>` for usage.
+
+
 
