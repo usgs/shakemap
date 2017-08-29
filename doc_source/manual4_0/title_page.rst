@@ -1,3 +1,4 @@
+.. _manual_4_title_page:
 
 ===================
 ShakeMap 4 Manual

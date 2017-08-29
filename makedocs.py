@@ -16,8 +16,8 @@ def main(args):
     #-------------------------------------------------------------
     REPO_DIR = os.path.dirname(os.path.abspath(__file__))
     PACKAGE_DIR = os.path.join(REPO_DIR, 'shakemap')
-    DOC_DIR = os.path.join(REPO_DIR, 'doc')
-    API_DIR = os.path.join(DOC_DIR, 'apidoc')
+    DOC_SRC_DIR = os.path.join(REPO_DIR, 'doc_source')
+    API_DIR = os.path.join(DOC_SRC_DIR, 'apidoc')
     DOCS_DIR = os.path.join(REPO_DIR, 'docs')
 
     #-------------------------------------------------------------
@@ -38,12 +38,14 @@ def main(args):
     sphinx_cmd = 'sphinx-apidoc -o %s -f -e -d 12 -H "%s" -A "%s"'\
                  ' -V %s -T %s' % (API_DIR, PACKAGE, AUTHORS, verstr,
                                 PACKAGE_DIR)
-
     res, stdout, stderr = get_command_output(sphinx_cmd)
 
     if not res:
         raise Exception('Could not build ShakeMap API documentation'
-                        ' - error "%s".' % stderr)
+                        ' - error "%s".' % stderr.decode())
+    if args.verbose:
+        print(stdout.decode('utf-8'))
+        print(stderr.decode('utf-8'))
 
     #--------------------------------------------
     # try to clean up some of the excess labeling
@@ -65,10 +67,11 @@ def main(args):
     # Go to the api directory and build the html
     #-------------------------------------------------------------
     sys.stderr.write('Building shakemap manual (HTML)...\n')
-    res, stdout, stderr = get_command_output('sphinx-build -a -E doc docs')
+    res, stdout, stderr = get_command_output('sphinx-build -a -E %s %s'
+                                             % (DOC_SRC_DIR, DOCS_DIR))
     if not res:
         raise Exception('Could not build HTML. - '
-                        'error "%s"' % stderr)
+                        'error "%s"' % stderr.decode())
     if args.verbose:
         print(stdout.decode('utf-8'))
         print(stderr.decode('utf-8'))
