@@ -1,7 +1,8 @@
-shakemap\.utils
+shakemap\.utils package
 =======================
 
 Submodules
+----------
 
 .. toctree::
 
@@ -9,6 +10,7 @@ Submodules
    shakemap.utils.utils
 
 Module contents
+---------------
 
 .. automodule:: shakemap.utils
     :members:

@@ -1,4 +1,4 @@
-shakemap\.mapping\.mapmaker
+shakemap\.mapping\.mapmaker module
 ==================================
 
 .. automodule:: shakemap.mapping.mapmaker

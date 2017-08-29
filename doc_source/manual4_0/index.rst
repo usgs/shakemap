@@ -15,7 +15,6 @@ Table of Contents
 
 .. toctree::
    :numbered:
-   :maxdepth: 1
 
    introduction.rst
    technical_guide.rst

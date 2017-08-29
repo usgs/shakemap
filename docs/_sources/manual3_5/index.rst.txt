@@ -16,7 +16,6 @@ ShakeMap 3.5 Manual
 
 .. toctree::
    :numbered:
-   :maxdepth: 2
 
    introduction.rst
    technical_guide.rst

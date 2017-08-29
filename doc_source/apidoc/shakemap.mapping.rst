@@ -1,7 +1,8 @@
-shakemap\.mapping
+shakemap\.mapping package
 =========================
 
 Submodules
+----------
 
 .. toctree::
 
@@ -9,6 +10,7 @@ Submodules
    shakemap.mapping.sm_colordict
 
 Module contents
+---------------
 
 .. automodule:: shakemap.mapping
     :members:
