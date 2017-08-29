@@ -1,3 +1,5 @@
+.. _sm-augment:
+
 sm_augment
 ==========
 

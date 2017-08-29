@@ -40,7 +40,7 @@
         <div class="sphinxsidebarwrapper">
 <p class="logo">
   <a href="../index.html">
-    <img class="logo" src="../_static/northridge_points_thumbnail_100.png" alt="Logo"/>
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
     
     <h1 class="logo logo-name">ShakeMap Documentation</h1>
     
@@ -63,6 +63,14 @@
 <li class="toctree-l3 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">2.1. Architecture</a><ul>
 <li class="toctree-l5"><a class="reference internal" href="#overview">2.1.1. Overview</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#programs">2.1.2. Programs</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#sm-profile">2.1.2.1. sm_profile</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#sm-assemble">2.1.2.2. sm_assemble</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#sm-augment">2.1.2.3. sm_augment</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#sm-model">2.1.2.4. sm_model</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#sm-contour">2.1.2.5. sm_contour</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -150,7 +158,7 @@ products are needed (e.g., from users viewing or requesting downloads) they
 are produced on the fly by the web service. Once generated, products may be
 cached by the web system to improve performance.</p>
 <div class="figure align-left" id="id3">
-<span id="shake-web"></span><a class="reference internal image-reference" href="../_images/consumer.png"><img alt="../_images/consumer.png" src="../_images/consumer.png" style="width: 650px;" /></a>
+<span id="shake-web"></span><a class="reference internal image-reference" href="../_images/web.png"><img alt="../_images/web.png" src="../_images/web.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 3: An example of a website using a web service to retrieve products. The web
 service produces products from <em>shake_result.hdf</em>.</span></p>
 </div>
@@ -160,6 +168,164 @@ a subset of ShakeMap products available through a messaging system and deliver
 them when requested, rather than producing them itself). Thus, the same set of
 constituent modules are needed, whether the products are delivered directly by
 the authoritative ShakeMap system or through a web service.</p>
+</div>
+<div class="section" id="programs">
+<h2>2.1.2. Programs<a class="headerlink" href="#programs" title="Permalink to this headline">¶</a></h2>
+<p>The core components of ShakeMap are a set of command line programs. These
+programs allow the operator to set up a ShakeMap environment, collect
+data and configurations into inputs (i.e., <em>shake_data.hdf</em>), and
+generate ShakeMap grids and their associated products.</p>
+<div class="section" id="sm-profile">
+<h3>2.1.2.1. sm_profile<a class="headerlink" href="#sm-profile" title="Permalink to this headline">¶</a></h3>
+<p>The user will need to run <strong>sm_assemble</strong> at least once to create a
+ShakeMap
+environment, referred to as a ‘profile.’ This environment consists of two
+directories – one for
+event data, and another for configuration files and associated support
+products (Vs30 grid, geographic information, etc.) – and a configuration
+file that points to them. The profile data resides in a file called
+<em>profiles.conf</em> in a subdirectory, <em>.shakemap</em>, of the user’s home
+directory. Other ShakeMap programs read the profile
+information in this configuration file and use it to find event and
+configuration information.</p>
+<p>The data directory (‘&lt;data_dir&gt;’) contains event subdirectories (named
+with their event IDs) and their associated subdirectories:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">data_dir</span><span class="o">&gt;/</span>
+    <span class="o">&lt;</span><span class="n">event_id_1</span><span class="o">&gt;/</span>
+        <span class="n">current</span><span class="o">/</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">xml</span>
+            <span class="o">*</span><span class="n">_dat</span><span class="o">.</span><span class="n">xml</span>
+            <span class="o">*</span><span class="n">_fault</span><span class="o">.</span><span class="n">txt</span> <span class="p">(</span><span class="ow">or</span> <span class="o">.</span><span class="n">json</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">conf</span> <span class="p">(</span><span class="ow">or</span> <span class="n">model_zc</span><span class="o">.</span><span class="n">conf</span><span class="p">)</span>
+            <span class="n">products</span><span class="o">/</span>
+                <span class="n">shake_result</span><span class="o">.</span><span class="n">hdf</span>
+                <span class="o">...</span>
+        <span class="o">.</span><span class="n">backup0001</span><span class="o">/</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">xml</span>
+            <span class="o">...</span>
+        <span class="o">.</span><span class="n">backup0002</span><span class="o">/</span>
+            <span class="o">...</span>
+        <span class="o">...</span>
+    <span class="o">&lt;</span><span class="n">event_id_2</span><span class="o">&gt;/</span>
+        <span class="o">...</span>
+    <span class="o">&lt;</span><span class="n">event_id_3</span><span class="o">&gt;/</span>
+        <span class="o">...</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>The ‘install’ directory (‘&lt;install_dir&gt;’) holds configuration files and
+user supplied geographic or other system specific data:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">install_dir</span><span class="o">&gt;/</span>
+    <span class="n">config</span><span class="o">/</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">conf</span>
+        <span class="n">modules</span><span class="o">.</span><span class="n">conf</span>
+        <span class="n">gmpe_sets</span><span class="o">.</span><span class="n">conf</span>
+        <span class="o">...</span>
+    <span class="n">site_data</span><span class="o">/</span>
+        <span class="n">vs30</span><span class="o">.</span><span class="n">grid</span>
+    <span class="o">&lt;</span><span class="n">other_directory</span><span class="o">&gt;/</span>
+        <span class="p">(</span><span class="n">additional</span> <span class="n">data</span> <span class="n">files</span><span class="p">)</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+<p>Macros within the configuration system allow the user to specify the
+root data and install directories when setting configuration
+parameters.</p>
+<p>The user may have more than one profile, and switch between them with
+<strong>sm_profile</strong>. This allows the user to have different configurations
+and data repositories for different event sets (e.g., real time events,
+scenarios, and historic events). See the
+<a class="reference internal" href="../programs/sm_profile.html#sm-profile"><span class="std std-ref">sm_profile man page</span></a> for usage and a list of options.</p>
+</div>
+<div class="section" id="sm-assemble">
+<h3>2.1.2.2. sm_assemble<a class="headerlink" href="#sm-assemble" title="Permalink to this headline">¶</a></h3>
+<p><strong>sm_assemble</strong> collects event and configuration data and creates the
+file <em>shake_data.hdf</em>. It first reads <em>event.xml</em> and stores it in a
+data structure. <strong>sm_assemble</strong> then reads the configuration files</p>
+<div class="line-block">
+<div class="line">&lt;install_dir&gt;/modules.conf</div>
+<div class="line">&lt;install_dir&gt;/gmpe_sets.conf</div>
+<div class="line">&lt;install_dir&gt;/model.conf</div>
+</div>
+<p>and assembles them into a single configuration. It then reads</p>
+<div class="line-block">
+<div class="line">&lt;data_dir&gt;/&lt;evnt_id&gt;/current&gt;/model.conf (or model_zc.conf).</div>
+</div>
+<p>Any parameter set in the event-specific <em>model.conf</em> will override
+parameters set in the other configuration files. Note: if both
+<em>model.conf</em> and <em>model_zc.conf</em> exist in the event directory,
+<em>model.conf</em> will be processed and <em>model_zc.conf</em> will be ignored.</p>
+<p><strong>sm_assemble</strong> then reads any files with a <em>_dat.xml</em> extension
+and assembles them into a station list. See ??? for a description
+of the data file format. Similarly, <strong>sm_assmeble</strong> will read a
+file with the <em>_fault.txt</em> (or <em>_fault.json</em>) extension and
+process it as a specification of a finite rupture. See ??? for
+a description of the rupture file formats. Note: only one rupture
+file should be present in the event’s input directory. If more
+than one file exists, only the first (lexicographically) will we
+processed.</p>
+<p>If no backups exist (i.e., event subdirectories named <em>.backup????</em>)
+then the ShakeMap history from an existing <em>shake_data.hdf</em> is
+extracted and updated. If there is no current <em>shake_data.hdf</em>, the
+history for the event is initiated. If backups do exist, then the
+history is extracted from the most current backup and appended
+with the current timestamp, originator, and version.</p>
+<p><strong>sm_assemble</strong> then consolidated all of this data and writes
+<em>shake_data.hdf</em> in the event’s <em>current</em> directory. If <em>shake_data.hdf</em>
+already exists in that location, it will be overwritten.</p>
+<p>See the <a class="reference internal" href="../programs/sm_assemble.html#sm-assemble"><span class="std std-ref">sm_assemble man page</span></a> for usage.</p>
+<div class="figure align-left" id="id4">
+<span id="shake-assemble"></span><a class="reference internal image-reference" href="../_images/assemble.png"><img alt="../_images/assemble.png" src="../_images/assemble.png" style="width: 650px;" /></a>
+<p class="caption"><span class="caption-text">Figure 4: Data flow of the <em>sm_assemble</em> process.</span></p>
+</div>
+</div>
+<div class="section" id="sm-augment">
+<h3>2.1.2.3. sm_augment<a class="headerlink" href="#sm-augment" title="Permalink to this headline">¶</a></h3>
+<p><strong>sm_augment</strong> behaves very similar to <strong>sm_assemble</strong> except that it
+will first read <em>shake_data.hdf</em> from the event’s <em>current</em> directory.
+If <em>exven.xml</em> exists in the event’s <em>current</em> directory, its data will
+replace the data in the existing <em>shake_data.hdf</em>.</p>
+<p>The configuration data in <em>shake_data.hdf</em> is used as a starting point,
+and any configuration data from the system configuration files or the
+event’s <em>model.conf</em> (or <em>model_zc.conf</em>) will then be added to it. Where
+there are conflicts, the system configuration parameters will override
+those found in <em>shake_data.hdf</em>. The event-specific configuration
+parameters from the local system retain the highest priority.</p>
+<p>Data files (i.e., files in the event’s <em>current</em> directory that have
+the <em>_dat.xml</em> extension) will be added to any data already found in
+<em>shake_data.hdf</em>. If a fault file is found in the local directory, it
+will replace the existing fault data in <em>shake_data.hdf</em>.</p>
+<p>The history information will be updated to reflect the update time and
+originator (if applicable).</p>
+<p>See the <a class="reference internal" href="../programs/sm_augment.html#sm-augment"><span class="std std-ref">sm_augment man page</span></a> for usage.</p>
+</div>
+<div class="section" id="sm-model">
+<h3>2.1.2.4. sm_model<a class="headerlink" href="#sm-model" title="Permalink to this headline">¶</a></h3>
+<p><strong>sm_model</strong> reads the data in <em>shake_data.hdf</em> and produces an
+interpolated ShakeMap. Depending upon the settings found in <em>model.conf</em>,
+the interpolation product may be a grid or a set of points. See
+<em>model.conf</em> for additional options and documentation.</p>
+<p>A great deal of this manual is devoted to the way the interpolation is
+performed, and the effect of various configuration options. See the
+relevant sections for more.</p>
+<p><strong>sm_model</strong> writes a file, <em>shake_result.hdf</em>, in the <em>products</em>
+subdirectory of the event’s <em>current</em> directory. Aside from interpolated
+grids (or lists of points) for each intensity measure type, and their
+associated uncertainties, <strong>sm_model</strong> also writes ShakeMap metadata
+(‘<em>info.json</em>’), station data (‘<em>stationlist.json</em>’), the finite
+fault information (‘<em>rupture.json</em>’), and the entire configuration
+object into <em>shake_result.hdf</em>. See ??? for more on the format and
+content of <em>shake_result.hdf</em>.</p>
+<p>See the <a class="reference internal" href="../programs/sm_model.html#sm-model"><span class="std std-ref">sm_model man page</span></a> for usage.</p>
+</div>
+<div class="section" id="sm-contour">
+<h3>2.1.2.5. sm_contour<a class="headerlink" href="#sm-contour" title="Permalink to this headline">¶</a></h3>
+<p><strong>sm_contour</strong> reads an event’s <em>shake_result.hdf</em> and produces iso-seismal
+contours for each of the intensity measure types found therein. The contours
+are written as GeoJSON to files called <em>&lt;imt_type&gt;_cont.json</em> in the event’s
+<em>current/products</em> subdirectory.</p>
+<p>See the <a class="reference internal" href="../programs/sm_contour.html#sm-contour"><span class="std std-ref">sm_contour man page</span></a> for usage.</p>
+</div>
 </div>
 </div>
 

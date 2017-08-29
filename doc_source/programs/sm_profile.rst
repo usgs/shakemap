@@ -1,3 +1,5 @@
+.. _sm-profile:
+
 sm_profile
 ==========
 

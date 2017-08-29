@@ -4,7 +4,7 @@
 ShakeMap 4 Manual
 ===================
 
-.. image::  _static/northridge_points.*
+.. image::  _static/northridge_logo_light.*
    :alt: ShakeMap Northridge
    :scale: 100 %
    :align: left
