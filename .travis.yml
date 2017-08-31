@@ -3,32 +3,11 @@ sudo: false
 python:
     - "3.5"
 
-before_install:
-    #    - sudo apt-get -qq update
-    #    - sudo apt-get --reinstall install -y msttcorefonts
-    #    - sudo apt-get --reinstall install -y ttf-mscorefonts-installer
-    #    - sudo apt-get install -y ttf-ubuntu-font-family ttf-aenigma fonts-tuffy
-
 install:
-    #------------------
-    # Base requirements
-    #------------------
-    - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-    - bash miniconda.sh -f -b -p $HOME/miniconda
+    # Install shakemap and requirements
+    - bash install.sh -t
     - export PATH="$HOME/miniconda/bin:$PATH"
-    - conda config --set always_yes yes --set changeps1 no
-    - conda update -q conda
-    - conda info -a
-    - conda config --prepend channels conda-forge
-    - conda config --append channels digitalglobe # for rasterio v 1.0a9
-    - conda config --append channels ioos # for rasterio v 1.0a2
-    - bash setup_env.sh
     - source activate shakemap
-    #---------------------
-    # Install shakemap
-    #---------------------
-    - python setup.py install
-    - python bin/sm_profile -c default -a
 before_script:
     # This is to take care of Invalid DISPLAY variable
     - "export DISPLAY=:99.0"
@@ -38,7 +17,6 @@ script:
     - export PYTHONPATH="."
     - py.test --cov=.
     - echo `sphinx-build --version`
-    #- flake8 shakemap
 after_success:
     - pip install codecov codacy-coverage
     - codecov
