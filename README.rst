@@ -44,7 +44,7 @@ required extensive modifications to the original source code. Additional uses of
 ShakeMap, such as for scenario earthquakes and the ShakeMap Atlas, have also
 required ongoing modification of the code. 
 
-Dependencies
+Installation and Dependencies
 ------------
 
 - Mac OSX or Linux operating systems
@@ -52,6 +52,8 @@ Dependencies
 - Python libraries: numpy, scipy, rasterio, fiona, xlrd, pandas, basemap,
   basemap-data-hires, shapely, h5py, gdal, descartes, openquake.engine, neicio,
   MapIO, matplotlib, jupyter, pytables, lxml
+- The `install.sh` script installs this package and all dependencies. It is
+  regularly tested on OSX and Ubuntu.
 
 OQ Hazard Library
 -----------------
