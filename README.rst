@@ -1,7 +1,10 @@
 shakemap
 ========
 Note, this repository consists of experimental code that is still under 
-development. 
+development for the next major update to Shakemap. The current version
+of ShakeMap can be found here
+
+- https://vault.gps.caltech.edu/repos/products/shakemap/tags/release-3.5/
 
 |Travis| |CodeCov|
 
