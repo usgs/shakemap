@@ -1,8 +1,3 @@
-shakemap
-========
-Note, this repository consists of experimental code that is still under 
-development. 
-
 |Travis| |CodeCov|
 
 .. |Travis| image:: https://travis-ci.org/usgs/shakemap.svg?branch=master
@@ -11,6 +6,16 @@ development.
 .. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/usgs/shakemap
     :alt: Code Coverage Status
+
+
+shakemap
+========
+Note, this repository consists of experimental code that is still under 
+development for the next major update to Shakemap. The current version
+of ShakeMap can be found here
+
+- https://vault.gps.caltech.edu/repos/products/shakemap/tags/release-3.5/
+
 
 Introduction
 ------------
