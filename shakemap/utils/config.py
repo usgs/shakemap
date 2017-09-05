@@ -344,3 +344,61 @@ def status_string(value, min):
     if value not in ('automatic', 'released', 'reviewed'):
         raise ValidateError(value)
     return value
+
+def cfg_float_list(value):
+    """
+    Converts (if possible) the input list (or string) to a list
+    of floats. Raises ValidateError if the input can't be 
+    converted to a list of floats.
+
+    Args:
+        value (str or list): A string or list of strings to be
+            converted to a list of floats.
+
+    Returns:
+        (list): The input converted to a list of floats.
+
+    Raises:
+        ValidateError
+    """
+    if not value or value == 'None':
+        print("'%s' is not a list of at least 1 float" % (value))
+        raise ValidateError()
+    if isinstance(value, str):
+        value = [value]
+    if not isinstance(value, list) or len(value) < 1:
+        print("'%s' is not a list of at least 1 float" % (value))
+        raise ValidateError()
+    fvalue = []
+    for val in value:
+        try:
+            fval = float(val)
+        except ValueError:
+            print("'%s' is not a list of floats" % (value))
+            raise ValidateError()
+        fvalue.append(fval)
+    return fvalue
+
+def cfg_float(value):
+    """
+    Converts (if possible) the input string to a float. Raises 
+    ValidateError if the input can't be converted to a float.
+
+    Args:
+        value (str): A string to be converted to a float.
+
+    Returns:
+        (float): The input converted to a float.
+
+    Raises:
+        ValidateError
+    """
+    if not isinstance(value, (str, float)) or not value or value == 'None':
+        print("'%s' is not a float" % (value))
+        raise ValidateError()
+    try:
+        fval = float(value)
+    except ValueError:
+        print("'%s' is not a float" % (value))
+        raise ValidateError()
+    return fval

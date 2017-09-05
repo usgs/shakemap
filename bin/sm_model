@@ -270,6 +270,8 @@ def interp(args):
     # Get the rupture object and rupture context
     #------------------------------------------------------------------
     rupture_obj = ic.getRupture()
+    if 'mechanism' in config['modeling']:
+        rupture_obj._origin.setMechanism(mech=config['modeling']['mechanism'])
     rx = rupture_obj.getRuptureContext([gmpe])
     if rx.rake == None:
         rx.rake = 0
@@ -855,18 +857,14 @@ def interp(args):
     info[ip][ei]['depth'] = str(rx.hypo_depth)
     info[ip][ei]['event_id'] = args.eventid
     info[ip][ei]['fault_ref'] = rupture_obj.getReference()
-#    info[ip][ei]['faultfiles'] = ''                             #### Do we need this? I don't think so.
-    info[ip][ei]['feregion'] = config['zone_info']['fename']
     info[ip][ei]['intensity_observations'] = str(np.size(df2['lon'])) if df2 else '0'
     info[ip][ei]['latitude'] = str(rx.hypo_lat)
     info[ip][ei]['longitude'] = str(rx.hypo_lon)
     info[ip][ei]['location'] = rupture_obj._origin.locstring
     info[ip][ei]['magnitude'] = str(rx.mag)
-    info[ip][ei]['mech_src'] = config['zone_info']['moment_tensor_source']
     info[ip][ei]['origin_time'] = rupture_obj._origin.time.strftime('%Y-%m-%d %H:%M:%S')
     info[ip][ei]['seismic_stations'] = str(np.size(df1['lon'])) if df1 else '0'
     info[ip][ei]['src_mech'] = rupture_obj._origin.mech
-    info[ip][ei]['tectonic_regime'] = config['zone_info']['domain']
     info[ip][ei]['event_description'] = rupture_obj._origin.locstring  ##### This AND locaction?
     info[ip][ei]['event_type'] = rupture_obj._origin.mech              ##### This AND src_mech?
     info[op] = {}

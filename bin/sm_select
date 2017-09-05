@@ -1,0 +1,302 @@
+#!/usr/bin/env python
+"""
+Parse STREC output and create/select a GMPE set for an event.
+"""
+
+# stdlib imports
+import sys
+import os.path
+import argparse
+import pprint
+from collections import OrderedDict
+
+# third party imports
+import numpy as np
+from configobj import ConfigObj
+
+import shakemap.utils.config as cfg
+from shakelib.rupture.origin import Origin
+
+def get_parser():
+    description = '''Parses the output of STREC in accordance with the 
+    configuration file, creates a new event set specific to the event,
+    and writes model_zc.conf in the event's 'current' directory.
+    '''
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('eventid',
+                        help='ID of the event to process')
+    parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Print informational messages.')
+    return parser
+
+def parse_config(mydict):
+
+    for key in mydict:
+        if isinstance(mydict[key], dict):
+            parse_config(mydict[key])
+            continue
+        if key == 'horizontal_buffer' or key == 'vertical_buffer':
+            mydict[key] = cfg.cfg_float(mydict[key])
+        elif key == 'gmpe':
+            mydict[key] = cfg.gmpe_list(mydict[key], 1)
+        elif key == 'min_depth' or key == 'max_depth':
+            mydict[key] = cfg.cfg_float_list(mydict[key])
+        else:
+            print('Invalid entry in config: "%s"' % (key))
+            sys.exit(1)
+    return
+
+def get_strec(lon, lat, depth):
+
+    strec_out = {
+        'focal_mech' : 'ALL',
+        'tectonic_regions' : {
+            'acr' : {
+                'distance' : 40.0,
+            },
+            'scr' : {
+                'distance' : 0.0,
+            },
+            'subduction' : {
+                'distance' : 1400.0,
+                'probabilities' : {
+                    'crustal' : 0,
+                    'interface' : 0,
+                    'intraslab' : 0,
+                }
+            },
+            'volcanic' : {
+                'distance' : 2300.0,
+            },
+        },
+        'layers' : {
+            'induced' : {'distance' : 10.0},
+            'oceanic' : {'distance' : 1000.0},
+            'california' : {'distance' : 700.0},
+            'chile' : {'distance' : 4500.0},
+            'taiwan' : {'distance' : 7000.0},
+            'italy' : {'distance' : 7000.0},
+        }
+    }
+
+    return strec_out
+
+def get_gmpes_by_region(strec, cfg, origin):
+
+    gmpe_list = np.array([])
+    gmpe_weights = np.array([])
+    total_weight = 0
+    for reg in strec:
+        if reg not in cfg:
+            print('error: unknown tectonic_region: "%s"' % (reg))
+            sys.exit(1)
+        reg_dist = strec[reg]['distance']
+        if reg == 'subduction':
+            reg_buff = 0
+        else:
+            reg_buff = cfg[reg]['horizontal_buffer']
+        if reg_dist > reg_buff:
+            continue
+        if reg == 'subduction':
+            gmpes, weights = get_gmpes_from_probs(origin.depth, strec[reg], cfg)
+        else:
+            gmpes, weights = get_gmpes_from_depth(origin.depth, cfg[reg])
+        gmpe_list = np.append(gmpe_list, gmpes)
+        reg_weight = 1.0 - reg_dist / reg_buff
+        gmpe_weights = np.append(gmpe_weights, weights * reg_weight)
+        total_weight += reg_weight
+
+    if np.size(gmpe_list) < 1:
+        print('error: no valid tectonic_region:')
+        pprint.pprint(strec)
+        sys.exit(1)
+
+    gmpe_weights /= total_weight
+
+    return gmpe_list, gmpe_weights
+
+def get_gmpes_from_probs(depth, sreg, cfg):
+
+    cr_prob = sreg['probabilities']['crustal']
+    if_prob = sreg['probabilities']['interface']
+    is_prob = sreg['probabilities']['intraslab']
+    gmpe_list = np.array([])
+    gmpe_weights = np.array([])
+    if cr_prob == 0 and if_prob == 0 and is_prob == 0:
+        return gmpe_list, gmpe_weights
+
+    if cr_prob > 0:
+        gmpe_list = np.append(gmpe_list, cfg['subduction']['crustal'])
+        gmpe_weights = np.append(gmpe_weights, cr_prob)
+    if if_prob > 0:
+        gmpe_list = np.append(gmpe_list, cfg['subduction']['interface'])
+        gmpe_weights = np.append(gmpe_weights, if_prob)
+    if is_prob > 0:
+        gmpe_list = np.append(gmpe_list, cfg['subduction']['intraslab'])
+        gmpe_weights = np.append(gmpe_weights, is_prob)
+
+    return gmpe_list, gmpe_weights
+    
+
+def get_gmpes_from_depth(depth, region):
+    gmpe_list = np.array([])
+    gmpe_weights = np.array([])
+    vbuf = region['vertical_buffer']
+    for ig, gmpe in enumerate(region['gmpe']):
+        if depth >= region['min_depth'][ig] and depth <= region['max_depth'][ig]:
+            gmpe_list = np.append(gmpe_list, gmpe)
+            gmpe_weights = np.append(gmpe_weights, 1.0)
+            continue
+        if depth > (region['min_depth'][ig] - vbuf) and depth < region['min_depth'][ig]:
+            gmpe_list = np.append(gmpe_list, gmpe)
+            wgt = 1.0 - (region['min_depth'][ig] - depth) / vbuf
+            gmpe_weights = np.append(gmpe_weights, wgt)
+            continue
+        if depth < (region['max_depth'][ig] + vbuf) and depth > region['max_depth'][ig]:
+            gmpe_list = np.append(gmpe_list, gmpe)
+            wgt = 1.0 - (depth - region['max_depth'][ig]) / vbuf
+            gmpe_weights = np.append(gmpe_weights, wgt)
+            continue
+
+    if np.size(gmpe_list) < 1:
+        print('error: no valid gmpe for depth %f' % (depth))
+        pprint.pprint(region)
+        sys.exit(1)
+
+    gmpe_weights /= np.sum(gmpe_weights)
+    return gmpe_list, gmpe_weights
+
+
+#
+# Main function
+#
+def main(args):
+    verbose = args.verbose
+
+    #
+    # Get the install and data paths and verify that the even directory
+    # exists
+    #
+    install_path, data_path = cfg.get_config_paths()
+    datadir = os.path.join(data_path, args.eventid, 'current')
+    if not os.path.isdir(datadir):
+        print('%s is not a valid directory.' % datadir)
+        sys.exit(1)
+    #
+    # Open event.xml and make an Origin object
+    #
+    eventxml = os.path.join(datadir, 'event.xml')
+    if verbose: print('Looking for event.xml file...')
+    if not os.path.isfile(eventxml):
+        print('%s does not exist.' % eventxml)
+        sys.exit(1)
+    origin = Origin.fromFile(eventxml)
+
+    #
+    # Get config file from install_path/config, parse and
+    # validate it
+    #
+    config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
+    parse_config(config)
+    #
+    # Get the strec results
+    #
+    strec_out = get_strec(origin.lon, origin.lat, origin.depth)
+    #
+    # Get the default weighting for this event
+    #
+    cfg_tr = config['tectonic_regions']
+    str_tr = strec_out['tectonic_regions']
+    gmpe_list, weight_list = get_gmpes_by_region(str_tr, cfg_tr, origin)
+
+    #
+    # Find the first layer the event is within (if any) or the
+    # closest layer
+    #
+    min_dist = 999999.9
+    lname = None
+    for layer in config['layers']:
+        ldist = strec_out['layers'][layer]['distance']
+        if ldist < min_dist:
+            min_dist = ldist
+            lname = layer
+            if min_dist == 0:
+                break
+    #
+    # If we are in or near a geographic layer, update the gmpe and weight
+    # lists
+    #
+    if lname is not None and \
+            (min_dist == 0 or 
+             min_dist <= config['layers'][lname]['horizontal_buffer']):
+
+        lcfg = config['layers'][lname]
+        #
+        # Overwrite the tectonic regions with the layer's custom region 
+        # settings
+        #
+        for thing in lcfg:
+            if thing == 'horizontal_buffer':
+                layer_buff = lcfg[thing]
+                continue
+            layer = thing
+            for element in lcfg[layer]:
+                cfg_tr[layer][element] = lcfg[layer][element]
+        #
+        # Now get the gmpes and weights for the custom layer
+        #
+        layer_gmpes, layer_weights = get_gmpes_by_region(str_tr, cfg_tr, 
+                                                         origin)
+        if layer_buff == 0:
+            #
+            # If we're here, min_dist must be 0, so the weight is 1
+            #
+            lwgt = 1.0
+        else:
+            lwgt = 1.0 - min_dist / layer_buff
+        #
+        # If we're inside the region's boundaries, we just use the custom
+        # gmpe and weights. If we are outside the region (but still inside
+        # the buffer), we blend the custom gmpe and weights with the 
+        # generic ones we computed earlier.
+        #
+        if min_dist == 0:
+            gmpe_list = layer_gmpes
+            weight_list = layer_weights
+        else:
+            gmpe_list = np.append(gmpe_list, layer_gmpes)
+            weight_list = np.append(weight_list * (1.0 - lwgt), 
+                                    layer_weights * lwgt)
+    #
+    # Write model_zc.conf
+    #
+    zc_file = os.path.join(datadir, 'model_zc.conf')
+    zc_conf = ConfigObj(indent_type='    ')
+    zc_conf.filename = zc_file
+    #
+    # Set the new event set
+    #
+    event_set = 'gmpe_' + str(args.eventid) + '_custom'
+    zc_conf['gmpe_sets'] = {}
+    zc_conf['gmpe_sets'][event_set] = {}
+    zc_conf['gmpe_sets'][event_set]['gmpes'] = list(gmpe_list)
+    zc_conf['gmpe_sets'][event_set]['weights'] = list(weight_list)
+    zc_conf['gmpe_sets'][event_set]['weights_larage_dist'] = 'None'
+    zc_conf['gmpe_sets'][event_set]['dist_cutoff'] = 'nan'
+    zc_conf['gmpe_sets'][event_set]['site_gmpes'] = 'None'
+    zc_conf['gmpe_sets'][event_set]['weights_site_gmpes'] = 'None'
+    #
+    # Set gmpe to use the new event set
+    #
+    zc_conf['modeling'] = {}
+    zc_conf['modeling']['gmpe'] = event_set
+    zc_conf['modeling']['mechanism'] = strec_out['focal_mech']
+
+    zc_conf.write()
+
+
+
+if __name__ == '__main__':
+    parser = get_parser()
+    pargs = parser.parse_args()
+    main(pargs)
