@@ -251,13 +251,18 @@ def interp(args):
     config = ic.getConfig()
     #------------------------------------------------------------------
     # Instantiate the gmpe, gmice, ipe, and ccf
+    # Here we make a placeholder gmpe so that we can make the 
+    # rupture and distance contexts; later we'll make the 
+    # IMT-specific gmpes
     #------------------------------------------------------------------
-    gmpe = MultiGMPE.from_config(config)
+    default_gmpe = MultiGMPE.from_config(config)
 
     gmice = get_object_from_config('gmice', config)
 
     if config['ipe_modules'][config['modeling']['ipe']][0] == 'VirtualIPE':
-        ipe = VirtualIPE.fromFuncs(gmpe, gmice)
+        pgv_imt = imt.from_string('PGV')
+        ipe_gmpe = MultiGMPE.from_config(config, filter_imt=pgv_imt)
+        ipe = VirtualIPE.fromFuncs(ipe_gmpe, gmice)
     else:
         ipe = get_object_from_config('ipe', config)
     #------------------------------------------------------------------
@@ -282,7 +287,7 @@ def interp(args):
     rupture_obj = ic.getRupture()
     if 'mechanism' in config['modeling']:
         rupture_obj._origin.setMechanism(mech=config['modeling']['mechanism'])
-    rx = rupture_obj.getRuptureContext([gmpe])
+    rx = rupture_obj.getRuptureContext([default_gmpe])
     if rx.rake == None:
         rx.rake = 0
     #------------------------------------------------------------------
@@ -318,7 +323,7 @@ def interp(args):
         N = np.max(lats)
         smnx = np.size(lons)
         smny = 1
-        dist_obj_out = Distance(gmpe, lons, lats, depths, rupture_obj)
+        dist_obj_out = Distance(default_gmpe, lons, lats, depths, rupture_obj)
 
         sites_obj_out = Sites.fromBounds(W, E, S, N, smdx, smdy,
                                          defaultVs30=vs30default,
@@ -357,7 +362,8 @@ def interp(args):
         lats = lats.flatten()
         depths = np.zeros_like(lats)
 
-        dist_obj_out = Distance.fromSites(gmpe, sites_obj_out, rupture_obj)
+        dist_obj_out = Distance.fromSites(default_gmpe, sites_obj_out, 
+                                          rupture_obj)
 
     dx_out = dist_obj_out.getDistanceContext()
 
@@ -367,7 +373,7 @@ def interp(args):
     # Station data
     #------------------------------------------------------------------
     stations = ic.getStationList()
-    gmpe_sd_types = gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+    gmpe_sd_types = default_gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
     if len(gmpe_sd_types) == 1:
         total_sd_only = True
         stddev_types = [oqconst.StdDev.TOTAL]
@@ -412,16 +418,18 @@ def interp(args):
             df['depth'] = np.zeros_like(df['lon'])
             lldict = {'lons': df['lon'], 'lats': df['lat']}
             sx_dict[ndf] = sites_obj_out.getSitesContext(lldict)
-            dist_obj = Distance(gmpe, df['lon'], df['lat'], df['depth'],
-                                rupture_obj)
+            dist_obj = Distance(default_gmpe, df['lon'], df['lat'], 
+                                df['depth'], rupture_obj)
             dx_dict[ndf] = dist_obj.getDistanceContext()
             #
             # Do the predictions and other bookkeeping for each IMT
             #
             for imtstr in imt_in_str_dict[ndf]:
+                oqimt = imt.from_string(imtstr)
+                if imtstr != 'MMI':
+                    gmpe = MultiGMPE.from_config(config, filter_imt=oqimt)
                 pmean, pstddev = gmas(ipe, gmpe, sx_dict[ndf], rx,
-                                      dx_dict[ndf], imt.from_string(imtstr),
-                                      stddev_types)
+                                      dx_dict[ndf], oqimt, stddev_types)
                 df[imtstr + '_pred'] = pmean
                 df[imtstr + '_pred_sd_total'] = pstddev[0]
                 if total_sd_only is True:
@@ -510,8 +518,9 @@ def interp(args):
                        gmice.getMI2GMsd()[oqimt])
                 imt_in_str_dict['df2'].add(imtstr)
                 #
-                # Get the predictions and stddevs, too
+                # Get the predictions and stddevs
                 #
+                gmpe = MultiGMPE.from_config(config, filter_imt=oqimt)
                 pmean, pstddev = gmas(ipe, gmpe, sx_dict['df2'], rx,
                                       dx_dict['df2'], oqimt, stddev_types)
                 df2[imtstr + '_pred'] = pmean
@@ -740,6 +749,8 @@ def interp(args):
         # Get the predictions at the output points
         #
         oqimt = imt.from_string(imtstr)
+        if imtstr != 'MMI':
+            gmpe = MultiGMPE.from_config(config, filter_imt=oqimt)
         pout_mean, pout_sd = gmas(ipe, gmpe, sx_out_soil, rx, dx_out, oqimt,
                                   stddev_types)
         if bias[imtstr]:
