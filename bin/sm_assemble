@@ -86,20 +86,6 @@ def main(args):
     global_config.merge(modules)
     global_config.merge(gmpe_sets)
 
-    #
-    # Add dummy zone_info section and its subsections
-    #
-    if 'zone_info' not in global_config:
-        global_config['zone_info'] = {}
-        global_config['zone_info']['slab'] = {}
-        global_config['zone_info']['plunge_values'] = {}
-        global_config['zone_info']['plunge_values']['taxis'] = {}
-        global_config['zone_info']['plunge_values']['paxis'] = {}
-        global_config['zone_info']['plunge_values']['naxis'] = {}
-        global_config['zone_info']['plunge_values']['nodalplane1'] = {}
-        global_config['zone_info']['plunge_values']['nodalplane2'] = {}
-        global_config['zone_info']['equations'] = {}
-
     results = global_config.validate(validator)
     if not isinstance(results, bool) or not results:
         config_error(global_config, results)

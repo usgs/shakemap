@@ -99,8 +99,6 @@ def main(args):
     #
     # Validate the resulting config
     #
-    if type(shake_config['zone_info']['feregion']) == np.int64:
-        shake_config['zone_info']['feregion'] = int(shake_config['zone_info']['feregion'])
     results = shake_config.validate(validator)
     if not results or isinstance(results, dict):
         config_error(shake_config, results)

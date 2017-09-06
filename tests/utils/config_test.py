@@ -203,6 +203,34 @@ def test_config():
     assert res == 'automatic'
     with pytest.raises(ValidateError):
         res = config.status_string('thing', min=1)
+    #
+    # cfg_float_list()
+    #
+    res = config.cfg_float_list(['2.0', '3.0', '4.0'])
+    assert res == [2.0, 3.0, 4.0]
+    res = config.cfg_float_list('2.0')
+    assert res == [2.0]
+    with pytest.raises(ValidateError):
+        res = config.cfg_float_list('')
+    with pytest.raises(ValidateError):
+        res = config.cfg_float_list({})
+    with pytest.raises(ValidateError):
+        res = config.cfg_float_list([])
+    with pytest.raises(ValidateError):
+        res = config.cfg_float_list('thing')
+    #
+    # cfg_float()
+    #
+    res = config.cfg_float('2.0')
+    assert res == 2.0
+    with pytest.raises(ValidateError):
+        res = config.cfg_float(['2.0'])
+    with pytest.raises(ValidateError):
+        res = config.cfg_float('')
+    with pytest.raises(ValidateError):
+        res = config.cfg_float('None')
+    with pytest.raises(ValidateError):
+        res = config.cfg_float('thing')
 
 if __name__ == '__main__':
     test_config()
