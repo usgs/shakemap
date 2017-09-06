@@ -90,6 +90,16 @@ def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
         pe = gmpe
     return pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
 
+#
+# This is a stand-in for tau when the gmpe set doesn't provide it
+# It is an educated guess based on the NGA-east work and BC Hydro
+# gmpe. It's not perfect, but probably isn't too far off. It is
+# only used when the GMPEs don't provide a breakdown of the
+# uncertainty terms.
+#
+def get_std_inter():
+    return 0.35
+
 #: Earth radius in km.
 EARTH_RADIUS = 6371.0
 #
@@ -357,8 +367,14 @@ def interp(args):
     # Station data
     #------------------------------------------------------------------
     stations = ic.getStationList()
-    stddev_types = [oqconst.StdDev.TOTAL, oqconst.StdDev.INTER_EVENT,
-                    oqconst.StdDev.INTRA_EVENT]
+    gmpe_sd_types = gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+    if len(gmpe_sd_types) == 1:
+        total_sd_only = True
+        stddev_types = [oqconst.StdDev.TOTAL]
+    else:
+        total_sd_only = False
+        stddev_types = [oqconst.StdDev.TOTAL, oqconst.StdDev.INTER_EVENT,
+                        oqconst.StdDev.INTRA_EVENT]
     #
     # df1 holds the instrumented data (PGA, PGV, SA)
     # df2 holds the non-instrumented data (MMI)
@@ -408,8 +424,15 @@ def interp(args):
                                       stddev_types)
                 df[imtstr + '_pred'] = pmean
                 df[imtstr + '_pred_sd_total'] = pstddev[0]
-                df[imtstr + '_pred_sd_inter'] = pstddev[1]
-                df[imtstr + '_pred_sd_intra'] = pstddev[2]
+                if total_sd_only is True:
+                    tau_guess = get_std_inter()
+                    df[imtstr + '_pred_sd_inter'] = np.full_like(
+                            df[imtstr + '_pred'], tau_guess)
+                    df[imtstr + '_pred_sd_intra'] = np.sqrt(pstddev[0]**2 -
+                                                            tau_guess**2)
+                else:
+                    df[imtstr + '_pred_sd_inter'] = pstddev[1]
+                    df[imtstr + '_pred_sd_intra'] = pstddev[2]
                 #
                 # Compute the total residual
                 #
@@ -493,8 +516,15 @@ def interp(args):
                                       dx_dict['df2'], oqimt, stddev_types)
                 df2[imtstr + '_pred'] = pmean
                 df2[imtstr + '_pred_sd_total'] = pstddev[0]
-                df2[imtstr + '_pred_sd_inter'] = pstddev[1]
-                df2[imtstr + '_pred_sd_intra'] = pstddev[2]
+                if total_sd_only is True:
+                    tau_guess = get_std_inter()
+                    df2[imtstr + '_pred_sd_inter'] = np.full_like(
+                            df2[imtstr + '_pred'], tau_guess)
+                    df2[imtstr + '_pred_sd_intra'] = np.sqrt(pstddev[0]**2 -
+                                                            tau_guess**2)
+                else:
+                    df2[imtstr + '_pred_sd_inter'] = pstddev[1]
+                    df2[imtstr + '_pred_sd_intra'] = pstddev[2]
                 df2[imtstr + '_residual'] = df2[str(oqimt)] - pmean
                 df2[imtstr + '_outliers'] = np.full(pmean.shape, False,
                                                     dtype=np.bool)
@@ -536,12 +566,20 @@ def interp(args):
             #
             # Get the prediction and stddevs
             #
-            pmean, pstddev = gmas(ipe, gmpe, sx_dict['df1'], rx, dx_dict['df1'],
-                                  imt.from_string('MMI'), stddev_types)
+            pmean, pstddev = gmas(ipe, gmpe, sx_dict['df1'], rx,
+                                  dx_dict['df1'], imt.from_string('MMI'),
+                                  stddev_types)
             df1['MMI' + '_pred'] = pmean
             df1['MMI' + '_pred_sd_total'] = pstddev[0]
-            df1['MMI' + '_pred_sd_inter'] = pstddev[1]
-            df1['MMI' + '_pred_sd_intra'] = pstddev[2]
+            if total_sd_only is True:
+                tau_guess = get_std_inter()
+                df1['MMI' + '_pred_sd_inter'] = np.full_like(
+                        df1['MMI' + '_pred'], tau_guess)
+                df1['MMI' + '_pred_sd_intra'] = np.sqrt(pstddev[0]**2 -
+                                                        tau_guess**2)
+            else:
+                df1['MMI' + '_pred_sd_inter'] = pstddev[1]
+                df1['MMI' + '_pred_sd_intra'] = pstddev[2]
             df1['MMI' + '_residual'] = df1['MMI'] - pmean
             df1['MMI' + '_outliers'] = np.full(pmean.shape, False,
                                                dtype=np.bool)
@@ -705,7 +743,10 @@ def interp(args):
         pout_mean, pout_sd = gmas(ipe, gmpe, sx_out_soil, rx, dx_out, oqimt,
                                   stddev_types)
         if bias[imtstr]:
-            psd[imtstr] = pout_sd[2]
+            if total_sd_only is True:
+                psd[imtstr] = np.sqrt(pout_sd[0]**2 - get_std_inter()**2)
+            else:
+                psd[imtstr] = pout_sd[2]
         else:
             psd[imtstr] = pout_sd[0]
         pout_sd2 = np.power(psd[imtstr], 2.0)

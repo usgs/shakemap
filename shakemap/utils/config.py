@@ -213,7 +213,7 @@ def weight_list(value, min):
     if np.any(np_out < 0):
         print("all list values must be >= 0: %s" % value)
         raise ValidateError()
-    if len(out) > 0 and np.sum(np_out) != 1:
+    if len(out) > 0 and np.abs(np.sum(np_out) - 1.0) > 0.01:
         print("weights must sum to 1.0: %s" % value)
         raise ValidateError()
 
