@@ -137,7 +137,7 @@ def test_profile():
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE,
                         shell=False)
-    ipath = os.path.join(shakedir, 'tests', 'data') + '\n'
+    ipath = os.path.join(shakedir, 'tests', 'data', 'install') + '\n'
     dpath = os.path.join(shakedir, 'tests', 'data', 'eventdata') + '\n'
     op.communicate((ipath + dpath).encode('ascii'))
     assert not op.returncode
@@ -297,11 +297,11 @@ def test_model():
     # This is Northridge for a set of output points (not a grid)
     # Run in verbose mode to hit that code
     # Remove the products directory to hit that code
+    # (should succeed)
     #
     assemble_program = os.path.join(shakedir, 'bin', 'sm_assemble')
     cp = subprocess.run([assemble_program, 'northridge_points'], shell=False)
     assert not cp.returncode
-
     products_dir = os.path.join(datapath, 'northridge_points', 'current', 
                             'products')
     if os.path.isdir(products_dir):
@@ -318,7 +318,7 @@ def test_model():
     cp = subprocess.run([program, 'nc72282711', '-v'], shell=False)
     assert not cp.returncode
     #
-    # This is a small grid with DYFI data only
+    # This is a small grid with DYFI data only (should succeed)
     #
     cp = subprocess.run([assemble_program, 'nc72282711_dyfi'], shell=False)
     assert not cp.returncode

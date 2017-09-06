@@ -426,6 +426,7 @@ def interp(args):
             #
             for imtstr in imt_in_str_dict[ndf]:
                 oqimt = imt.from_string(imtstr)
+                gmpe = None
                 if imtstr != 'MMI':
                     gmpe = MultiGMPE.from_config(config, filter_imt=oqimt)
                 pmean, pstddev = gmas(ipe, gmpe, sx_dict[ndf], rx,
@@ -575,6 +576,7 @@ def interp(args):
             #
             # Get the prediction and stddevs
             #
+            gmpe = None
             pmean, pstddev = gmas(ipe, gmpe, sx_dict['df1'], rx,
                                   dx_dict['df1'], imt.from_string('MMI'),
                                   stddev_types)
@@ -749,6 +751,7 @@ def interp(args):
         # Get the predictions at the output points
         #
         oqimt = imt.from_string(imtstr)
+        gmpe = None
         if imtstr != 'MMI':
             gmpe = MultiGMPE.from_config(config, filter_imt=oqimt)
         pout_mean, pout_sd = gmas(ipe, gmpe, sx_out_soil, rx, dx_out, oqimt,
