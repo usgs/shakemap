@@ -69,6 +69,7 @@
 <li class="toctree-l6"><a class="reference internal" href="#sm-augment">2.1.2.3. sm_augment</a></li>
 <li class="toctree-l6"><a class="reference internal" href="#sm-model">2.1.2.4. sm_model</a></li>
 <li class="toctree-l6"><a class="reference internal" href="#sm-contour">2.1.2.5. sm_contour</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#sm-select">2.1.2.6. sm_select</a></li>
 </ul>
 </li>
 </ul>
@@ -119,7 +120,7 @@ seismotectonic regime and related choices about GMPE selection), and
 produces a file, <em>shake_data.hdf</em>, containing all of these parameters. This
 file may be injected into a messaging system, but may also be used locally
 by subsequent processes.</p>
-<div class="figure align-left" id="id1">
+<div class="figure align-left" id="id2">
 <span id="architecture-overview"></span><a class="reference internal image-reference" href="../_images/sm4.png"><img alt="../_images/sm4.png" src="../_images/sm4.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 1: Overview of ShakeMap architecture.</span></p>
 </div>
@@ -138,7 +139,7 @@ from a messaging system, and run the program <strong>sm_augment</strong> to add 
 data and configuration choices to those contained in <em>shake_data.hdf</em>
 (see <a class="pageref" href="#shake-consumer">Figure  2</a>). They may then run <strong>sm_model</strong> to
 generate a <em>shake_result.hdf</em> specific to their needs.</p>
-<div class="figure align-left" id="id2">
+<div class="figure align-left" id="id3">
 <span id="shake-consumer"></span><a class="reference internal image-reference" href="../_images/consumer.png"><img alt="../_images/consumer.png" src="../_images/consumer.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 2: An example of a consumer of the <em>shake_data.hdf</em> product.</span></p>
 </div>
@@ -157,7 +158,7 @@ generates those products from <em>shake_result.hdf</em> (via <strong>sm_genex</s
 products are needed (e.g., from users viewing or requesting downloads) they
 are produced on the fly by the web service. Once generated, products may be
 cached by the web system to improve performance.</p>
-<div class="figure align-left" id="id3">
+<div class="figure align-left" id="id4">
 <span id="shake-web"></span><a class="reference internal image-reference" href="../_images/web.png"><img alt="../_images/web.png" src="../_images/web.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 3: An example of a website using a web service to retrieve products. The web
 service produces products from <em>shake_result.hdf</em>.</span></p>
@@ -274,7 +275,7 @@ with the current timestamp, originator, and version.</p>
 <em>shake_data.hdf</em> in the event’s <em>current</em> directory. If <em>shake_data.hdf</em>
 already exists in that location, it will be overwritten.</p>
 <p>See the <a class="reference internal" href="../programs/sm_assemble.html#sm-assemble"><span class="std std-ref">sm_assemble man page</span></a> for usage.</p>
-<div class="figure align-left" id="id4">
+<div class="figure align-left" id="id5">
 <span id="shake-assemble"></span><a class="reference internal image-reference" href="../_images/assemble.png"><img alt="../_images/assemble.png" src="../_images/assemble.png" style="width: 650px;" /></a>
 <p class="caption"><span class="caption-text">Figure 4: Data flow of the <em>sm_assemble</em> process.</span></p>
 </div>
@@ -325,6 +326,99 @@ contours for each of the intensity measure types found therein. The contours
 are written as GeoJSON to files called <em>&lt;imt_type&gt;_cont.json</em> in the event’s
 <em>current/products</em> subdirectory.</p>
 <p>See the <a class="reference internal" href="../programs/sm_contour.html#sm-contour"><span class="std std-ref">sm_contour man page</span></a> for usage.</p>
+</div>
+<div class="section" id="sm-select">
+<h3>2.1.2.6. sm_select<a class="headerlink" href="#sm-select" title="Permalink to this headline">¶</a></h3>
+<p><strong>sm_select</strong> reads an event’s <em>event.xml</em> file for origin information
+and then constructs a GMPE set for the event based on the event’s residence
+within,
+and proximity to, a set of predefined tectonic regions. The GMPE set, and the
+selection of that GMPE set for use in processing, are written to
+<em>model_zc.conf</em> in the event’s <em>current</em> directory.</p>
+<p>The behavior of <strong>sm_select</strong> is controlled by the <em>select.conf</em>
+configuration file. See the documentation in <em>select.conf</em> for more on
+customizing <strong>sm_select</strong>.</p>
+<p>The tectonic regions, and additional geographic layers, that the event
+may fall within are defined by the STREC configuration. See the STREC
+documentation for information on adding additional layers, then use
+<em>select.conf</em> to customize the GMPE sets that the new layers will use.</p>
+<p>The process by which sm_select builds a GMPE set is somewhat complicated.
+STREC reports the tectonic region the earthquake lies within, as well
+as the distance to the closest polygon of the other tectonic region
+types. For example, for an earthquake in California STREC would report
+that the event was zero distance from region ‘acr’
+(which is to say that it lies within the active crustal region), but
+STREC would also report distances to regions ‘scr’ (stable continental),
+‘volcanic’, and ‘subduction’. Each non-subduction region is also
+configured with a “horizontal buffer.” The buffer determines how far
+the region extends into neighboring regions. The buffer for subduction
+regions is always zero.<a class="footnote-reference" href="#fn1" id="id1">[1]</a> If the event happens within the buffer
+of a neighboring region, the distance and buffer are used to build a
+weighted combination of the GMPE sets representing the regions in
+question.</p>
+<p>For example, if an earthquake occurred within the ‘scr’ region, but
+was 40 km from the “acr” region, and the ‘acr’ region’s horizontal
+buffer was 100 km, then the ‘scr’ region would be given a weight
+of 1.0, and the ‘acr’ would be given (100 - 40) / 100 = 0.6. Normalizing
+by the total, the final weights would be 0.625 ‘scr’ and 0.375 ‘acr’.</p>
+<p>Each region’s GMPE set is in turn comprised of a weighted set of other
+GMPE sets, based on the earthquake’s depth. For each of the non-subduction
+regions,
+<em>sm_select</em> builds a weighted combination of the configured GMPE sets
+based on the event’s depth. If the earthquake falls within a subduction
+regions, STREC
+reports the probabilities that the earthquake is crustal, on the
+subduction interface, or within the subducting slab. <em>sm_select</em>
+combines the GMPE sets for each of these regimes, weighted by their
+probabilities, into a subduction GMPE set that is specific to the
+earthquake’s location.</p>
+<p><em>sm_select</em> also considers the earthquake’s presence within, or
+distance from,
+any number of user-defined geographic layers. If the earthquake is
+within a layer, that layer’s
+parameters (as configured in <em>select.conf</em>) replace the any or all
+of the parameters of the corresponding tectonic regions, and the
+calculation of a weighted GMPE set proceeds as before. For example,
+the layer section of <em>select.conf</em> might contain:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">layers</span><span class="p">]</span>
+    <span class="p">[[</span><span class="n">california</span><span class="p">]]</span>
+        <span class="n">horizontal_buffer</span> <span class="o">=</span> <span class="mi">50</span>
+        <span class="p">[[[</span><span class="n">scr</span><span class="p">]]</span>
+            <span class="n">horizontal_buffer</span> <span class="o">=</span> <span class="mi">25</span>
+        <span class="p">[[[</span><span class="n">acr</span><span class="p">]]]</span>
+            <span class="n">horizontal_buffer</span> <span class="o">=</span> <span class="mi">25</span>
+            <span class="n">gmpe</span> <span class="o">=</span> <span class="n">Special_California_GMPE</span>
+            <span class="n">min_depth</span> <span class="o">=</span> <span class="o">-</span><span class="n">Inf</span>
+            <span class="n">max_depth</span> <span class="o">=</span> <span class="n">Inf</span>
+</pre></div>
+</div>
+<p>If an earthquake falls within the ‘california’ layer, the tectonc regions
+‘scr’ and ‘acr’ would have their horizontal buffers reset to 25 km and,
+in addition, the ‘acr’ region would have its GMPE selection reset to the
+GMPE set ‘Special_California_GMPE’ for earthquakes of all depths.</p>
+<p>If the
+earthquake is not inside a custom geographic layer, but within the horizontal
+buffer distance of one, the
+GMPE sets for the modified and unmodified tectonic regions are each
+determined separately
+and a weighted combination of the two is computed (where the weights
+are based on the distance and the horizontal buffer, as described
+above).</p>
+<p>Unlike the tectonic regions, with the geographic layers only the nearest
+layer is considered. If an earthquake falls
+within more than one layer (possible if layers are nested), the first one
+encountered in the <em>select.conf</em> is used and any other(s) will be ignored.</p>
+<p>See the <a class="reference internal" href="../programs/sm_select.html#sm-select"><span class="std std-ref">sm_select man page</span></a> for usage.</p>
+<p class="rubric">Footnotes</p>
+<table class="docutils footnote" frame="void" id="fn1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>Subduction regions do not extend beyond their defined boundaries
+because STREC cannot provide the crustal, interface,
+and slab probabilities for events outside of the defined subduction
+zones.</td></tr>
+</tbody>
+</table>
 </div>
 </div>
 </div>

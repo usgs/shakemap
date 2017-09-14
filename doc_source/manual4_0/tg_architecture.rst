@@ -268,5 +268,103 @@ are written as GeoJSON to files called *<imt_type>_cont.json* in the event's
 
 See the :ref:`sm_contour man page <sm-contour>` for usage.
 
+sm_select
+----------
+
+**sm_select** reads an event's *event.xml* file for origin information
+and then constructs a GMPE set for the event based on the event's residence 
+within,
+and proximity to, a set of predefined tectonic regions. The GMPE set, and the
+selection of that GMPE set for use in processing, are written to 
+*model_zc.conf* in the event's *current* directory.
+
+The behavior of **sm_select** is controlled by the *select.conf*
+configuration file. See the documentation in *select.conf* for more on
+customizing **sm_select**.
+
+The tectonic regions, and additional geographic layers, that the event
+may fall within are defined by the STREC configuration. See the STREC
+documentation for information on adding additional layers, then use
+*select.conf* to customize the GMPE sets that the new layers will use.
+
+The process by which sm_select builds a GMPE set is somewhat complicated.
+STREC reports the tectonic region the earthquake lies within, as well
+as the distance to the closest polygon of the other tectonic region
+types. For example, for an earthquake in California STREC would report
+that the event was zero distance from region 'acr'
+(which is to say that it lies within the active crustal region), but
+STREC would also report distances to regions 'scr' (stable continental),
+'volcanic', and 'subduction'. Each non-subduction region is also 
+configured with a "horizontal buffer." The buffer determines how far
+the region extends into neighboring regions. The buffer for subduction
+regions is always zero.\ [#fn1]_ If the event happens within the buffer
+of a neighboring region, the distance and buffer are used to build a 
+weighted combination of the GMPE sets representing the regions in 
+question.
+
+For example, if an earthquake occurred within the 'scr' region, but
+was 40 km from the "acr" region, and the 'acr' region's horizontal
+buffer was 100 km, then the 'scr' region would be given a weight
+of 1.0, and the 'acr' would be given (100 - 40) / 100 = 0.6. Normalizing
+by the total, the final weights would be 0.625 'scr' and 0.375 'acr'.
+
+Each region's GMPE set is in turn comprised of a weighted set of other
+GMPE sets, based on the earthquake's depth. For each of the non-subduction
+regions,
+*sm_select* builds a weighted combination of the configured GMPE sets
+based on the event's depth. If the earthquake falls within a subduction 
+regions, STREC 
+reports the probabilities that the earthquake is crustal, on the 
+subduction interface, or within the subducting slab. *sm_select* 
+combines the GMPE sets for each of these regimes, weighted by their
+probabilities, into a subduction GMPE set that is specific to the 
+earthquake's location.
+
+*sm_select* also considers the earthquake's presence within, or 
+distance from, 
+any number of user-defined geographic layers. If the earthquake is 
+within a layer, that layer's 
+parameters (as configured in *select.conf*) replace the any or all
+of the parameters of the corresponding tectonic regions, and the
+calculation of a weighted GMPE set proceeds as before. For example,
+the layer section of *select.conf* might contain::
+
+    [layers]
+        [[california]]
+            horizontal_buffer = 50
+            [[[scr]]
+                horizontal_buffer = 25
+            [[[acr]]]
+                horizontal_buffer = 25
+                gmpe = Special_California_GMPE
+                min_depth = -Inf
+                max_depth = Inf
+
+If an earthquake falls within the 'california' layer, the tectonc regions 
+'scr' and 'acr' would have their horizontal buffers reset to 25 km and,
+in addition, the 'acr' region would have its GMPE selection reset to the 
+GMPE set 'Special_California_GMPE' for earthquakes of all depths.
+
+If the 
+earthquake is not inside a custom geographic layer, but within the horizontal
+buffer distance of one, the
+GMPE sets for the modified and unmodified tectonic regions are each
+determined separately
+and a weighted combination of the two is computed (where the weights 
+are based on the distance and the horizontal buffer, as described
+above).
+
+Unlike the tectonic regions, with the geographic layers only the nearest 
+layer is considered. If an earthquake falls
+within more than one layer (possible if layers are nested), the first one
+encountered in the *select.conf* is used and any other(s) will be ignored.
+
+See the :ref:`sm_select man page <sm-select>` for usage.
 
 
+.. rubric:: Footnotes
+
+.. [#fn1] Subduction regions do not extend beyond their defined boundaries
+   because STREC cannot provide the crustal, interface, 
+   and slab probabilities for events outside of the defined subduction 
+   zones.
