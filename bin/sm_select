@@ -15,12 +15,18 @@ import numpy as np
 from configobj import ConfigObj
 
 import shakemap.utils.config as cfg
+from shakemap.utils.layers import get_layer_distances, get_tectonic_regions
 from shakelib.rupture.origin import Origin
 
+# ##########################################################################
+# Set up the parser for command-line arguments.
+# ##########################################################################
 def get_parser():
-    description = '''Parses the output of STREC in accordance with the 
-    configuration file, creates a new event set specific to the event,
+    description = '''Parses the output of STREC in accordance with the \
+    configuration file, creates a new GMPE set specific to the event, \
     and writes model_zc.conf in the event's 'current' directory.
+
+    Configuration file: select.conf
     '''
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('eventid',
@@ -29,11 +35,18 @@ def get_parser():
                         help='Print informational messages.')
     return parser
 
-def parse_config(mydict):
+# ##########################################################################
+# We can't use normal ConfigObj validation because there are 
+# inconsistent sub-section structures (i.e., acr, scr, and volcanic
+# vs. subduction. There are also optional sections with variable
+# structure (i.e., the layers). So we do our validation and variable
+# conversion here.
+# ##########################################################################
+def validate_config(mydict, install_path):
 
     for key in mydict:
         if isinstance(mydict[key], dict):
-            parse_config(mydict[key])
+            validate_config(mydict[key], install_path)
             continue
         if key == 'horizontal_buffer' or key == 'vertical_buffer':
             mydict[key] = cfg.cfg_float(mydict[key])
@@ -41,56 +54,27 @@ def parse_config(mydict):
             mydict[key] = cfg.gmpe_list(mydict[key], 1)
         elif key == 'min_depth' or key == 'max_depth':
             mydict[key] = cfg.cfg_float_list(mydict[key])
+        elif key == 'layer_dir':
+            mydict[key] = mydict[key].replace('<INSTALL_DIR>', install_path)
         else:
             print('Invalid entry in config: "%s"' % (key))
             sys.exit(1)
     return
 
-def get_strec(lon, lat, depth):
-
-    strec_out = {
-        'focal_mech' : 'ALL',
-        'tectonic_regions' : {
-            'acr' : {
-                'distance' : 40.0,
-            },
-            'scr' : {
-                'distance' : 0.0,
-            },
-            'subduction' : {
-                'distance' : 1400.0,
-                'probabilities' : {
-                    'crustal' : 0,
-                    'interface' : 0,
-                    'intraslab' : 0,
-                }
-            },
-            'volcanic' : {
-                'distance' : 2300.0,
-            },
-        },
-        'layers' : {
-            'induced' : {'distance' : 10.0},
-            'oceanic' : {'distance' : 1000.0},
-            'california' : {'distance' : 700.0},
-            'chile' : {'distance' : 4500.0},
-            'taiwan' : {'distance' : 7000.0},
-            'italy' : {'distance' : 7000.0},
-        }
-    }
-
-    return strec_out
-
-def get_gmpes_by_region(strec, cfg, origin):
+# ##########################################################################
+# Produce a weighted list of GMPE sets based on the earthquake's presence
+# in and proximity to the various tectonic regions.
+# ##########################################################################
+def get_gmpes_by_region(strec_tr, cfg, origin):
 
     gmpe_list = np.array([])
     gmpe_weights = np.array([])
     total_weight = 0
-    for reg in strec:
+    for reg in strec_tr:
         if reg not in cfg:
             print('error: unknown tectonic_region: "%s"' % (reg))
             sys.exit(1)
-        reg_dist = strec[reg]['distance']
+        reg_dist = strec_tr[reg]['distance']
         if reg == 'subduction':
             reg_buff = 0
         else:
@@ -98,7 +82,9 @@ def get_gmpes_by_region(strec, cfg, origin):
         if reg_dist > reg_buff:
             continue
         if reg == 'subduction':
-            gmpes, weights = get_gmpes_from_probs(origin.depth, strec[reg], cfg)
+            gmpes, weights = get_gmpes_from_probs(origin.depth, 
+                                                  strec_tr[reg], 
+                                                  cfg)
         else:
             gmpes, weights = get_gmpes_from_depth(origin.depth, cfg[reg])
         gmpe_list = np.append(gmpe_list, gmpes)
@@ -108,13 +94,17 @@ def get_gmpes_by_region(strec, cfg, origin):
 
     if np.size(gmpe_list) < 1:
         print('error: no valid tectonic_region:')
-        pprint.pprint(strec)
+        pprint.pprint(strec_tr)
         sys.exit(1)
 
     gmpe_weights /= total_weight
 
     return gmpe_list, gmpe_weights
 
+# ##########################################################################
+# Produce a GMPE list and weights for subduction events based on the 
+# probabilities of subduction type.
+# ##########################################################################
 def get_gmpes_from_probs(depth, sreg, cfg):
 
     cr_prob = sreg['probabilities']['crustal']
@@ -136,8 +126,12 @@ def get_gmpes_from_probs(depth, sreg, cfg):
         gmpe_weights = np.append(gmpe_weights, is_prob)
 
     return gmpe_list, gmpe_weights
-    
 
+
+# ##########################################################################
+# Produce a GMPE list and weights for non-subduction events based on the 
+# depth of the earthquake.
+# ##########################################################################
 def get_gmpes_from_depth(depth, region):
     gmpe_list = np.array([])
     gmpe_weights = np.array([])
@@ -167,72 +161,90 @@ def get_gmpes_from_depth(depth, region):
     return gmpe_list, gmpe_weights
 
 
-#
+# ##########################################################################
 # Main function
-#
+# ##########################################################################
 def main(args):
     verbose = args.verbose
 
-    #
+    # ---------------------------------------------------------------------
     # Get the install and data paths and verify that the even directory
     # exists
-    #
+    # ---------------------------------------------------------------------
     install_path, data_path = cfg.get_config_paths()
     datadir = os.path.join(data_path, args.eventid, 'current')
     if not os.path.isdir(datadir):
         print('%s is not a valid directory.' % datadir)
         sys.exit(1)
-    #
+    # ---------------------------------------------------------------------
     # Open event.xml and make an Origin object
-    #
+    # ---------------------------------------------------------------------
     eventxml = os.path.join(datadir, 'event.xml')
     if verbose: print('Looking for event.xml file...')
     if not os.path.isfile(eventxml):
         print('%s does not exist.' % eventxml)
         sys.exit(1)
-    origin = Origin.fromFile(eventxml)
+    org = Origin.fromFile(eventxml)
 
-    #
+    # ---------------------------------------------------------------------
     # Get config file from install_path/config, parse and
     # validate it
-    #
+    # ---------------------------------------------------------------------
     config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
-    parse_config(config)
-    #
+    validate_config(config, install_path)
+    # ---------------------------------------------------------------------
     # Get the strec results
-    #
-    strec_out = get_strec(origin.lon, origin.lat, origin.depth)
-    #
+    # ---------------------------------------------------------------------
+    strec_out = get_tectonic_regions(org.lon, org.lat, org.depth, 
+                                     args.eventid)
+    # ---------------------------------------------------------------------
     # Get the default weighting for this event
-    #
+    # ---------------------------------------------------------------------
     cfg_tr = config['tectonic_regions']
     str_tr = strec_out['tectonic_regions']
-    gmpe_list, weight_list = get_gmpes_by_region(str_tr, cfg_tr, origin)
+    gmpe_list, weight_list = get_gmpes_by_region(str_tr, cfg_tr, org)
 
+    # ---------------------------------------------------------------------
+    # Now look at the geographic layers to see if we need to modify or
+    # replace the gmpe list
+    # ---------------------------------------------------------------------
     #
-    # Find the first layer the event is within (if any) or the
+    # Find the first configured layer the event is within (if any) or the
     # closest layer
     #
-    min_dist = 999999.9
-    lname = None
-    for layer in config['layers']:
-        ldist = strec_out['layers'][layer]['distance']
-        if ldist < min_dist:
-            min_dist = ldist
-            lname = layer
-            if min_dist == 0:
-                break
+    min_dist_to_layer = 999999.9
+    nearest_layer_name = None
+    if 'layers' in config and 'layer_dir' in config['layers']:
+        layer_dir = config['layers']['layer_dir']
+        if layer_dir and layer_dir != 'None':
+            geo_layers = get_layer_distances(org.lon, org.lat, layer_dir)
+        else:
+            geo_layers = {}
+        for layer in config['layers']:
+            if layer == 'layer_dir':
+                continue
+            if layer not in geo_layers:
+                print('Error: cannot find layer %s in %s' % 
+                      (layer, layer_dir))
+                continue
+            ldist = geo_layers[layer]
+            if ldist < min_dist_to_layer:
+                min_dist_to_layer = ldist
+                nearest_layer_name = layer
+                if min_dist_to_layer == 0:
+                    break
     #
     # If we are in or near a geographic layer, update the gmpe and weight
     # lists
     #
-    if lname is not None and \
-            (min_dist == 0 or 
-             min_dist <= config['layers'][lname]['horizontal_buffer']):
+    if nearest_layer_name is not None and \
+       (min_dist_to_layer == 0 or
+        min_dist_to_layer <= 
+        config['layers'][nearest_layer_name]['horizontal_buffer']):
 
-        lcfg = config['layers'][lname]
+        lcfg = config['layers'][nearest_layer_name]
         #
-        # Overwrite the tectonic regions with the layer's custom region 
+        # Overwrite the tectonic regions with the layer's custom region
         # settings
         #
         for thing in lcfg:
@@ -245,56 +257,57 @@ def main(args):
         #
         # Now get the gmpes and weights for the custom layer
         #
-        layer_gmpes, layer_weights = get_gmpes_by_region(str_tr, cfg_tr, 
-                                                         origin)
+        layer_gmpes, layer_weights = get_gmpes_by_region(str_tr, cfg_tr, org)
         if layer_buff == 0:
             #
-            # If we're here, min_dist must be 0, so the weight is 1
+            # If we're here, min_dist_to_layer must be 0, so the weight is 1
             #
             lwgt = 1.0
         else:
-            lwgt = 1.0 - min_dist / layer_buff
+            lwgt = 1.0 - min_dist_to_layer / layer_buff
         #
         # If we're inside the region's boundaries, we just use the custom
         # gmpe and weights. If we are outside the region (but still inside
-        # the buffer), we blend the custom gmpe and weights with the 
+        # the buffer), we blend the custom gmpe and weights with the
         # generic ones we computed earlier.
         #
-        if min_dist == 0:
+        if min_dist_to_layer == 0:
             gmpe_list = layer_gmpes
             weight_list = layer_weights
         else:
             gmpe_list = np.append(gmpe_list, layer_gmpes)
-            weight_list = np.append(weight_list * (1.0 - lwgt), 
+            weight_list = np.append(weight_list * (1.0 - lwgt),
                                     layer_weights * lwgt)
-    #
-    # Write model_zc.conf
-    #
+    # ---------------------------------------------------------------------
+    # Create ConfigObj object for output to model_zc.conf
+    # ---------------------------------------------------------------------
     zc_file = os.path.join(datadir, 'model_zc.conf')
     zc_conf = ConfigObj(indent_type='    ')
     zc_conf.filename = zc_file
     #
-    # Set the new event set
+    # Add the new gmpe set to the object
     #
-    event_set = 'gmpe_' + str(args.eventid) + '_custom'
-    zc_conf['gmpe_sets'] = {}
-    zc_conf['gmpe_sets'][event_set] = {}
-    zc_conf['gmpe_sets'][event_set]['gmpes'] = list(gmpe_list)
-    zc_conf['gmpe_sets'][event_set]['weights'] = list(weight_list)
-    zc_conf['gmpe_sets'][event_set]['weights_larage_dist'] = 'None'
-    zc_conf['gmpe_sets'][event_set]['dist_cutoff'] = 'nan'
-    zc_conf['gmpe_sets'][event_set]['site_gmpes'] = 'None'
-    zc_conf['gmpe_sets'][event_set]['weights_site_gmpes'] = 'None'
+    gmpe_set = 'gmpe_' + str(args.eventid) + '_custom'
+    zc_conf['gmpe_sets'] = OrderedDict([
+        (gmpe_set, OrderedDict([
+            ('gmpes', list(gmpe_list)),
+            ('weights', list(weight_list)),
+            ('weights_larage_dist', 'None'),
+            ('dist_cutoff', 'nan'),
+            ('site_gmpes', 'None'),
+            ('weights_site_gmpes', 'None')
+        ]))
+    ])
     #
-    # Set gmpe to use the new event set
+    # Set gmpe to use the new gmpe set
     #
-    zc_conf['modeling'] = {}
-    zc_conf['modeling']['gmpe'] = event_set
-    zc_conf['modeling']['mechanism'] = strec_out['focal_mech']
+    zc_conf['modeling'] = OrderedDict([
+        ('gmpe', gmpe_set),
+        ('mechanism', strec_out['focal_mech'])
+    ])
 
     zc_conf.write()
-
-
+    sys.exit(0)
 
 if __name__ == '__main__':
     parser = get_parser()

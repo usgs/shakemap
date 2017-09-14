@@ -126,6 +126,10 @@ def create(config, profile, accept):
     sets_file = os.path.join(shakeconfig_data_path, 'gmpe_sets.conf')
     config_file = os.path.join(shakeconfig_data_path, 'model.conf')
     select_file = os.path.join(shakeconfig_data_path, 'select.conf')
+
+    layer_dir = os.path.join(shakeconfig_data_path, 'layers')
+    install_layer_dir = os.path.join(install_path, 'layers')
+
     if not os.path.isfile(os.path.join(config_path, 'modules.conf')):
         shutil.copy(module_file, config_path)
     if not os.path.isfile(os.path.join(config_path, 'gmpe_sets.conf')):
@@ -134,6 +138,9 @@ def create(config, profile, accept):
         shutil.copy(config_file, config_path)
     if not os.path.isfile(os.path.join(config_path, 'select.conf')):
         shutil.copy(select_file, config_path)
+
+    if not os.path.isdir(install_layer_dir):
+        shutil.copytree(layer_dir, install_layer_dir)
 
     if profile == 'default' or profile == 'test':
         # put northridge in the data directory

@@ -293,7 +293,7 @@
     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">np_out</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;all list values must be &gt;= 0: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np_out</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np_out</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.01</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;weights must sum to 1.0: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
 
@@ -424,6 +424,64 @@
     <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;automatic&#39;</span><span class="p">,</span> <span class="s1">&#39;released&#39;</span><span class="p">,</span> <span class="s1">&#39;reviewed&#39;</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">value</span></div>
+
+<div class="viewcode-block" id="cfg_float_list"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.cfg_float_list">[docs]</a><span class="k">def</span> <span class="nf">cfg_float_list</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts (if possible) the input list (or string) to a list</span>
+<span class="sd">    of floats. Raises ValidateError if the input can&#39;t be </span>
+<span class="sd">    converted to a list of floats.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value (str or list): A string or list of strings to be</span>
+<span class="sd">            converted to a list of floats.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (list): The input converted to a list of floats.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValidateError</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list of at least 1 float&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="p">[</span><span class="n">value</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list of at least 1 float&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
+    <span class="n">fvalue</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">fval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list of floats&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
+        <span class="n">fvalue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fval</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fvalue</span></div>
+
+<div class="viewcode-block" id="cfg_float"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.cfg_float">[docs]</a><span class="k">def</span> <span class="nf">cfg_float</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Converts (if possible) the input string to a float. Raises </span>
+<span class="sd">    ValidateError if the input can&#39;t be converted to a float.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        value (str): A string to be converted to a float.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (float): The input converted to a float.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValidateError</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">))</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a float&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a float&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">fval</span></div>
 </pre></div>
 
           </div>
