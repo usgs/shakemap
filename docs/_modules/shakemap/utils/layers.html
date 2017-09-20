@@ -1,0 +1,244 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakemap.utils.layers &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakemap.utils.layers</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+
+<span class="kn">import</span> <span class="nn">pyproj</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">MultiPolygon</span>
+<span class="kn">from</span> <span class="nn">shapely.ops</span> <span class="k">import</span> <span class="n">transform</span>
+<span class="kn">import</span> <span class="nn">shapely.wkt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="k">import</span> <span class="n">min_distance_to_segment</span>
+
+<div class="viewcode-block" id="nearest_edge"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.nearest_edge">[docs]</a><span class="k">def</span> <span class="nf">nearest_edge</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">poly</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the distance from a point to the nearest edge of a </span>
+<span class="sd">    polygon. </span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        elon, elat (float): The longitude and latitude of the reference</span>
+<span class="sd">            point.</span>
+<span class="sd">        poly (Polygon): An instance of a shapely Polygon. </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (float): The distance (in km) from the reference point to the</span>
+<span class="sd">        nearest edge (or vertex) of the polygon.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">elon_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">elon</span><span class="p">])</span>
+    <span class="n">elat_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">elat</span><span class="p">])</span>
+    <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">xy</span>
+    <span class="n">nearest</span> <span class="o">=</span> <span class="mf">99999.</span>
+    <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="n">dd</span> <span class="o">=</span> <span class="n">min_distance_to_segment</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">ix</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ix</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> 
+                                     <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">ix</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ix</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> 
+                                     <span class="n">elon_arr</span><span class="p">,</span> <span class="n">elat_arr</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dd</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">nearest</span><span class="p">:</span>
+            <span class="n">nearest</span> <span class="o">=</span> <span class="n">dd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">nearest</span></div>
+
+<div class="viewcode-block" id="dist_to_layer"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.dist_to_layer">[docs]</a><span class="k">def</span> <span class="nf">dist_to_layer</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">geom</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the distance from a point to the polygon(s) in a layer; zero if</span>
+<span class="sd">    the point is inside the polygon. If the nearest edge of the polygon is </span>
+<span class="sd">    greater than 5000 km from the point, the point cannot be inside the </span>
+<span class="sd">    polygon and the distance reported will be the distance to the nearest </span>
+<span class="sd">    edge. So don&#39;t make polygons too big.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        elon, elat (float): The longitude and latitude of the reference</span>
+<span class="sd">            point.</span>
+<span class="sd">        geom (Polygon or MultiPolygon): An instance of a shapely Polygon</span>
+<span class="sd">            or MultiPolygon.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (float): The distance (in km) from the reference point to the</span>
+<span class="sd">        nearest polygon in the layer. The distance will be zero if the</span>
+<span class="sd">        point lies inside the polygon.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">):</span>
+        <span class="n">plist</span> <span class="o">=</span> <span class="p">[</span><span class="n">geom</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geom</span><span class="p">,</span> <span class="n">MultiPolygon</span><span class="p">):</span>
+        <span class="n">plist</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">geoms</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Invalid geometry type in layer: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">geom</span><span class="p">))</span>
+
+    <span class="n">project</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span>
+        <span class="n">pyproj</span><span class="o">.</span><span class="n">transform</span><span class="p">,</span>
+        <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;latlong&#39;</span><span class="p">),</span>
+        <span class="n">pyproj</span><span class="o">.</span><span class="n">Proj</span><span class="p">(</span><span class="n">proj</span><span class="o">=</span><span class="s1">&#39;aeqd  +lat_0=</span><span class="si">%f</span><span class="s1"> +lon_0=</span><span class="si">%f</span><span class="s1"> +R=6371&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">elat</span><span class="p">,</span> <span class="n">elon</span><span class="p">)))</span>
+    <span class="n">ep</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">min_dist</span> <span class="o">=</span> <span class="mf">99999.</span>
+    <span class="k">for</span> <span class="n">poly</span> <span class="ow">in</span> <span class="n">plist</span><span class="p">:</span>
+        <span class="n">nearest</span> <span class="o">=</span> <span class="n">nearest_edge</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">poly</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">nearest</span> <span class="o">&lt;</span> <span class="mi">5000</span><span class="p">:</span>
+            <span class="n">nearest</span> <span class="o">=</span> <span class="n">ep</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">transform</span><span class="p">(</span><span class="n">project</span><span class="p">,</span> <span class="n">poly</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">nearest</span> <span class="o">&lt;</span> <span class="n">min_dist</span><span class="p">:</span>
+            <span class="n">min_dist</span> <span class="o">=</span> <span class="n">nearest</span>
+        <span class="k">if</span> <span class="n">min_dist</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">return</span> <span class="n">min_dist</span></div>
+
+<div class="viewcode-block" id="get_layer_distances"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.get_layer_distances">[docs]</a><span class="k">def</span> <span class="nf">get_layer_distances</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">layer_dir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the distances from a point to the nearest polygon in each </span>
+<span class="sd">    layer file found in &#39;layer_dir&#39;. The distance will be zero if</span>
+<span class="sd">    the point is inside a polygon. If the nearest edge of a polygon is </span>
+<span class="sd">    greater than 5000 km from the point, the point cannot be inside the </span>
+<span class="sd">    polygon and the distance reported will be the distance to the </span>
+<span class="sd">    nearest edge. So don&#39;t make polygons too big.</span>
+
+<span class="sd">    The layer files should be written in Well-Known Text (with .wkt</span>
+<span class="sd">    extensions), and should contain either a single POLYGON or </span>
+<span class="sd">    MULTIPOLYGON object. The layer name will be the file&#39;s basename.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        elon, elat (float): The longitude and latitude of the reference</span>
+<span class="sd">            point.</span>
+<span class="sd">        layer_dir (str): The path to the directory containg the layer</span>
+<span class="sd">            files.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (dict): A dictionary where the keys are the layer names, and the</span>
+<span class="sd">        values are the distance (in km) from the reference point to the</span>
+<span class="sd">        nearest polygon in the layer. The distance will be zero if the</span>
+<span class="sd">        point lies inside the polygon.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">layer_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">layer_dir</span><span class="p">,</span> <span class="s1">&#39;*.wkt&#39;</span><span class="p">))</span>
+    <span class="n">dist_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">layer_files</span><span class="p">:</span>
+        <span class="n">layer_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
+            <span class="n">data</span><span class="o">=</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">geom</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">wkt</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">dist_dict</span><span class="p">[</span><span class="n">layer_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist_to_layer</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dist_dict</span></div>
+
+<span class="c1">#</span>
+<span class="c1"># This is a dummy function. It needs to be replaced with the actual</span>
+<span class="c1"># function that gives the distance from the earthquake to the tectonic </span>
+<span class="c1"># regions # and, if the region is subduction, gives the probabilities </span>
+<span class="c1"># for the event types.</span>
+<span class="c1">#</span>
+<div class="viewcode-block" id="get_tectonic_regions"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.get_tectonic_regions">[docs]</a><span class="k">def</span> <span class="nf">get_tectonic_regions</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">edepth</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
+    <span class="n">strec_out</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;focal_mech&#39;</span> <span class="p">:</span> <span class="s1">&#39;ALL&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;tectonic_regions&#39;</span> <span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;acr&#39;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;distance&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;scr&#39;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;distance&#39;</span> <span class="p">:</span> <span class="mf">1500.0</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;subduction&#39;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;distance&#39;</span> <span class="p">:</span> <span class="mf">1400.0</span><span class="p">,</span>
+                <span class="s1">&#39;probabilities&#39;</span> <span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;crustal&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s1">&#39;interface&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s1">&#39;intraslab&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;volcanic&#39;</span> <span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;distance&#39;</span> <span class="p">:</span> <span class="mf">2300.0</span><span class="p">,</span>
+            <span class="p">},</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">strec_out</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -6,6 +6,7 @@ Submodules
 .. toctree::
 
    shakemap.utils.config
+   shakemap.utils.layers
    shakemap.utils.utils
 
 Module contents
