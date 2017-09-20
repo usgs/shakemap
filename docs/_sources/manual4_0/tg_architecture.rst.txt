@@ -1,7 +1,7 @@
 .. _sec-architecute-4:
 
 ****************************
-Architecture
+Software Architecture
 ****************************
 
 Overview

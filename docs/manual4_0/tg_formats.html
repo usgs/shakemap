@@ -1,0 +1,319 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2.2. Data Formats &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="3. References &amp; Bibliography" href="references.html" />
+    <link rel="prev" title="2.1. Software Architecture" href="tg_architecture.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="title_page.html">ShakeMap 4 Manual</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Table of Contents</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html">2.1. Software Architecture</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">2.2. Data Formats</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#about-the-hdf5-file-format">2.2.1. About the HDF5 File Format</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shake-data-hdf">2.2.2. shake_data.hdf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shake-result-hdf">2.2.3. shake_result.hdf</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>
+<li class="toctree-l3"><a class="reference internal" href="glossary.html">4. Glossary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="data-formats">
+<span id="sec-formats-4"></span><h1>2.2. Data Formats<a class="headerlink" href="#data-formats" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="about-the-hdf5-file-format">
+<h2>2.2.1. About the HDF5 File Format<a class="headerlink" href="#about-the-hdf5-file-format" title="Permalink to this headline">¶</a></h2>
+<p>HDF5 files are an efficient and flexible way to store large sets of
+structured data.  HDF stands for Hierachical Data Format and is an
+open-source project . The data
+model consists of two types of objects: groups and datasets. Groups
+may contain datasets or other groups (along with associated metadata).
+Datasets may contain multidimensional arrays of data (along with
+accompanying metadata). Groups may be thought of as directories or
+folders, and datasets as files. The metadata associated with each object
+allows HDF5 files to be self describing. Data is stored in binary,
+making the files smaller and more efficient to read and write than
+text-based formats (such as XML). For almost all uses
+a user will access the file through an API (bindings are available
+for many languages), making the details of file structure and layout
+not relevant.</p>
+<p>For more information on HDF5 see the
+<a class="reference external" href="https://support.hdfgroup.org/HDF5/">HDF5 support page</a>.
+The Python interface, h5py, is documented on the
+<a class="reference external" href="http://www.h5py.org/">h5py web site</a>.</p>
+<p>For ShakeMap, the two main data files (<em>shake_data.hdf</em> and
+<em>shake_result.hdf</em>) are accessed through the methods of the
+shakelib classes <strong>InputContainer</strong> and <strong>OutputContainer</strong>.
+For documentation see the <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">shakelib container module</a>.</p>
+</div>
+<div class="section" id="shake-data-hdf">
+<h2>2.2.2. shake_data.hdf<a class="headerlink" href="#shake-data-hdf" title="Permalink to this headline">¶</a></h2>
+<p><strong>shake_data.hdf</strong> is the input to <em>sm_model</em>. It is built by bringing
+together the various ShakeMap configuration files (found in both the
+current profile’s <code class="docutils literal"><span class="pre">install/config</span></code> path, and in the event’s <code class="docutils literal"><span class="pre">current</span></code>
+directory. It also aggregates information from the event’s rupture file
+(if one exists), <code class="docutils literal"><span class="pre">event.xml</span></code>, and the data files – all found in the
+event’s <code class="docutils literal"><span class="pre">current</span></code> directory. <strong>shake_data.hdf</strong> is usually created
+with <em>sm_assemble</em> (and possibly modified by <em>sm_augment</em>).</p>
+<p>It is generally not necessary for operators to access this file other
+than through the interfaces of <em>sm_assemble</em> and <em>sm_augment</em>. For
+developers, the file
+is accessed through the shakelib <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">InputContainer interface</a>.</p>
+</div>
+<div class="section" id="shake-result-hdf">
+<h2>2.2.3. shake_result.hdf<a class="headerlink" href="#shake-result-hdf" title="Permalink to this headline">¶</a></h2>
+<p>The primary output product of <strong>sm_model</strong> is the HDF5 file
+<em>shake_result.hdf</em>. There are some differences depending on whether
+<strong>sm_model</strong> produces output grids or lists of points. <em>shake_result.hdf</em>
+is essentially “flat” (i.e., all
+of the data objects are contained within the root group). The file
+contains:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="27%" />
+<col width="11%" />
+<col width="42%" />
+<col width="20%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Type</th>
+<th class="head">Contents</th>
+<th class="head">Attributess</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>config</td>
+<td>group</td>
+<td>ShakeMap configuration</td>
+<td>None</td>
+</tr>
+<tr class="row-odd"><td>info.json <a class="footnote-reference" href="#id9" id="id1">[1]</a></td>
+<td>dataset</td>
+<td>ShakeMap metadata in JSON format</td>
+<td>None</td>
+</tr>
+<tr class="row-even"><td>rupture.json <a class="footnote-reference" href="#id9" id="id2">[1]</a></td>
+<td>dataset</td>
+<td>GeoJSON representation of the
+finite fault</td>
+<td>None</td>
+</tr>
+<tr class="row-odd"><td>stationlist.json <a class="footnote-reference" href="#id9" id="id3">[1]</a></td>
+<td>dataset</td>
+<td>GeoJSON stationlist</td>
+<td>None</td>
+</tr>
+<tr class="row-even"><td>vs30</td>
+<td>dataset</td>
+<td>Vs30 values at output grid/points</td>
+<td>grid attrs <a class="footnote-reference" href="#id10" id="id4">[2]</a></td>
+</tr>
+<tr class="row-odd"><td>URATPGA <a class="footnote-reference" href="#id11" id="id5">[3]</a></td>
+<td>dataset</td>
+<td>Ratio of PGA stddev to GMPE stddev</td>
+<td>grid attrs <a class="footnote-reference" href="#id10" id="id6">[2]</a></td>
+</tr>
+<tr class="row-even"><td>IMT (multiple)</td>
+<td>dataset</td>
+<td>Interpolated data for IMT</td>
+<td>grid attrs <a class="footnote-reference" href="#id10" id="id7">[2]</a></td>
+</tr>
+<tr class="row-odd"><td>IMT_sd (multiple)</td>
+<td>dataset</td>
+<td>Stddev of interpolated IMT</td>
+<td>grid attrs <a class="footnote-reference" href="#id10" id="id8">[2]</a></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td><em>(<a class="fn-backref" href="#id1">1</a>, <a class="fn-backref" href="#id2">2</a>, <a class="fn-backref" href="#id3">3</a>)</em> JSON datasets are stored as continuous strings.</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id10" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[2]</td><td><em>(<a class="fn-backref" href="#id4">1</a>, <a class="fn-backref" href="#id6">2</a>, <a class="fn-backref" href="#id7">3</a>, <a class="fn-backref" href="#id8">4</a>)</em> <p>The atributes for grids are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Attr name</th>
+<th class="head">Contents</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>type</td>
+<td>“grid”</td>
+</tr>
+<tr class="row-odd"><td>W</td>
+<td>The western boundary of the grid (degrees longitude)</td>
+</tr>
+<tr class="row-even"><td>E</td>
+<td>The eastern boundary of the grid (degrees longitude)</td>
+</tr>
+<tr class="row-odd"><td>S</td>
+<td>The southern boundary of the grid (degrees latitude)</td>
+</tr>
+<tr class="row-even"><td>N</td>
+<td>The northern boundary of the grid (degrees latitude)</td>
+</tr>
+<tr class="row-odd"><td>nx</td>
+<td>The number of grid points in the x dimension</td>
+</tr>
+<tr class="row-even"><td>ny</td>
+<td>The number of grid points in the y dimension</td>
+</tr>
+<tr class="row-odd"><td>dx</td>
+<td>The grid interval in the x dimension</td>
+</tr>
+<tr class="row-even"><td>dy</td>
+<td>The grid interval in the y dimension</td>
+</tr>
+</tbody>
+</table>
+<p>For lists of points the attributes are:</p>
+<table border="1" class="last docutils">
+<colgroup>
+<col width="21%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Attr name</th>
+<th class="head">Contents</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>type</td>
+<td>“points”</td>
+</tr>
+<tr class="row-odd"><td>lons</td>
+<td>An array of longitudes corresponding to the points</td>
+</tr>
+<tr class="row-even"><td>lats</td>
+<td>An array of latitudes corresponding to the points</td>
+</tr>
+<tr class="row-odd"><td>facility_ids</td>
+<td>array of identifiers for the points</td>
+</tr>
+</tbody>
+</table>
+</td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id11" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id5">[3]</a></td><td>URATPGA is only provided for grids.</td></tr>
+</tbody>
+</table>
+<hr class="docutils" />
+<p>There will typically be multiple <em>IMT</em> (Intensity Measure Type) and
+<em>IMT_sd</em> (standard deviation of the corresponding IMT) datasets. For instance
+<em>PGA</em>, <em>PGA_sd</em>, <em>PGV</em>, <em>PGV_sd</em>, <em>MMI</em>, <em>MMI_sd</em>, and various <em>SA(#num)</em> and
+<em>SA(#num)_sd</em> [where #num is the period as a floating point number; e.g.,
+<em>SA(1.0)</em>].</p>
+<p>Developers will likely want to access <strong>shake_result.hdf</strong> through
+the <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">shakelib OutputContainer class</a>.
+Also see, for example, <em>sm_contour</em> for some basic access patterns.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
