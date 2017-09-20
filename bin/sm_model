@@ -15,9 +15,6 @@ import json
 import warnings
 import re
 
-# Not really needed, but handy for looking at the config
-#import pprint
-
 import numpy as np
 import numpy.ma as ma
 import numexpr as ne
@@ -98,8 +95,8 @@ directory in the ShakeMap data directory of the current profile.
 '''
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('eventid',
-                    help='The ID of the event to process')
-    parser.add_argument('-v','--verbose', action='store_true',
+                        help='The ID of the event to process')
+    parser.add_argument('-v', '--verbose', action='store_true',
                         help='Print informational messages.')
     return parser
 
@@ -119,6 +116,7 @@ def get_object_from_config(obj, cfg, *args):
 #
 # Set the attributes of the site context
 #
+# TODO: Fix the sites class to do this stuff
 def set_sx_params(sx, lons, lats, vs30):
     sx.lons            = lons
     sx.lats            = lats
@@ -143,6 +141,7 @@ def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
         pe = gmpe
     return pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
 
+
 #
 # This is a stand-in for tau when the gmpe set doesn't provide it
 # It is an educated guess based on the NGA-east work and BC Hydro
@@ -152,6 +151,7 @@ def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
 #
 def get_std_inter():
     return 0.35
+
 
 #: Earth radius in km.
 EARTH_RADIUS = 6371.0
@@ -171,6 +171,7 @@ def get_period_index_from_imt_str(imtstr, imt_per_ix):
         else:
             return imt_per_ix[imtstr.replace('SA(', '').replace(')', '')]
 
+# TODO Need to doc all of these functions
 def get_period_array(*args):
     imt_per = set()
     for imt_list in args:
@@ -304,8 +305,8 @@ def interp(args):
     config = ic.getConfig()
     #------------------------------------------------------------------
     # Instantiate the gmpe, gmice, ipe, and ccf
-    # Here we make a placeholder gmpe so that we can make the 
-    # rupture and distance contexts; later we'll make the 
+    # Here we make a placeholder gmpe so that we can make the
+    # rupture and distance contexts; later we'll make the
     # IMT-specific gmpes
     #------------------------------------------------------------------
     default_gmpe = MultiGMPE.from_config(config)
@@ -355,6 +356,7 @@ def interp(args):
     #------------------------------------------------------------------
     smdx = config['interp']['prediction_location']['xres']
     smdy = config['interp']['prediction_location']['yres']
+    # TODO: functionize these blocks?
     if config['interp']['prediction_location']['file'] and \
        config['interp']['prediction_location']['file'] != 'None':
         #
@@ -397,9 +399,9 @@ def interp(args):
         smdy = config['interp']['prediction_location']['yres']
 
         if config['interp']['prediction_location']['extent']:
-           W, S, E, N = config['interp']['prediction_location']['extent']
+            W, S, E, N = config['interp']['prediction_location']['extent']
         else:
-           W, E, S, N = get_extent(rupture_obj)
+            W, E, S, N = get_extent(rupture_obj)
 
         sites_obj_out = Sites.fromBounds(W, E, S, N, smdx, smdy,
                                          defaultVs30=vs30default,
@@ -415,16 +417,16 @@ def interp(args):
         lats = lats.flatten()
         depths = np.zeros_like(lats)
 
-        dist_obj_out = Distance.fromSites(default_gmpe, sites_obj_out, 
+        dist_obj_out = Distance.fromSites(default_gmpe, sites_obj_out,
                                           rupture_obj)
 
     dx_out = dist_obj_out.getDistanceContext()
 
     lons_out_rad = np.radians(lons)
     lats_out_rad = np.radians(lats)
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     # Station data
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     stations = ic.getStationList()
     gmpe_sd_types = default_gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
     if len(gmpe_sd_types) == 1:
@@ -445,6 +447,7 @@ def interp(args):
     sx_dict = {'df1': None, 'df2': None}
     dx_dict = {'df1': None, 'df2': None}
     if stations is not None:
+        # TODO: make the argument instrumented=bool
         df_dict['df1'] = stations.getStationDataframe(1)
         df_dict['df2'] = stations.getStationDataframe(0)
         #
@@ -471,7 +474,7 @@ def interp(args):
             df['depth'] = np.zeros_like(df['lon'])
             lldict = {'lons': df['lon'], 'lats': df['lat']}
             sx_dict[ndf] = sites_obj_out.getSitesContext(lldict)
-            dist_obj = Distance(default_gmpe, df['lon'], df['lat'], 
+            dist_obj = Distance(default_gmpe, df['lon'], df['lat'],
                                 df['depth'], rupture_obj)
             dx_dict[ndf] = dist_obj.getDistanceContext()
             #
@@ -518,6 +521,7 @@ def interp(args):
                               (imtstr, np.sum(flagged)))
                     df[imtstr + '_outliers'] = flagged
                 else:
+                    # TODO: should this be False??
                     df[imtstr + '_outliers'] = np.full(df[imtstr].shape, True,
                                                        dtype=np.bool)
                 #
@@ -526,6 +530,7 @@ def interp(args):
                 #
                 if (imtstr + '_sd') not in df:
                     if imtstr == 'MMI':
+                        # TODO: Make this a constant somewhere
                         sdval = 0.3
                     else:
                         sdval = 0.0
@@ -566,6 +571,8 @@ def interp(args):
                 df2[imtstr], _ = gmice.getGMfromMI(df2['MMI'], oqimt,
                                                    dists=df2['rrup'],
                                                    mag=rx.mag)
+                # TODO: make this a constant somehwere
+                # or build it into the gmice
                 df2[imtstr][df2['MMI'] < 4.0] = np.nan
                 np.seterr(invalid='warn')
                 df2[imtstr + '_sd'] = np.full_like(df2['MMI'],
@@ -932,10 +939,12 @@ def interp(args):
     # will fix maskoceans()
     #
     with warnings.catch_warnings():
-        warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning)
-        moutgrid[refimt] = maskoceans(lons.reshape((smny, smnx)),
-                                      lats.reshape((smny, smnx)),
-                                      outgrid[refimt], inlands=False, grid=1.25)
+        warnings.filterwarnings("ignore",
+                                category=np.VisibleDeprecationWarning)
+        moutgrid[refimt] = \
+            maskoceans(lons.reshape((smny, smnx)),
+                       lats.reshape((smny, smnx)),
+                       outgrid[refimt], inlands=False, grid=1.25)
     for imtout in imt_out_set_str:
         if imtout == refimt:
             continue
@@ -965,16 +974,18 @@ def interp(args):
     info[ip][ei]['depth'] = str(rx.hypo_depth)
     info[ip][ei]['event_id'] = args.eventid
     info[ip][ei]['fault_ref'] = rupture_obj.getReference()
-    info[ip][ei]['intensity_observations'] = str(np.size(df2['lon'])) if df2 else '0'
+    info[ip][ei]['intensity_observations'] = \
+        str(np.size(df2['lon'])) if df2 else '0'
     info[ip][ei]['latitude'] = str(rx.hypo_lat)
     info[ip][ei]['longitude'] = str(rx.hypo_lon)
     info[ip][ei]['location'] = rupture_obj._origin.locstring
     info[ip][ei]['magnitude'] = str(rx.mag)
-    info[ip][ei]['origin_time'] = rupture_obj._origin.time.strftime('%Y-%m-%d %H:%M:%S')
+    info[ip][ei]['origin_time'] = \
+        rupture_obj._origin.time.strftime('%Y-%m-%d %H:%M:%S')
     info[ip][ei]['seismic_stations'] = str(np.size(df1['lon'])) if df1 else '0'
     info[ip][ei]['src_mech'] = rupture_obj._origin.mech
-    info[ip][ei]['event_description'] = rupture_obj._origin.locstring  ##### This AND locaction?
-    info[ip][ei]['event_type'] = rupture_obj._origin.mech              ##### This AND src_mech?
+    info[ip][ei]['event_description'] = rupture_obj._origin.locstring  ### This AND locaction?
+    info[ip][ei]['event_type'] = rupture_obj._origin.mech              ### This AND src_mech?
     info[op] = {}
     info[op][gm] = {}
     for myimt in imt_out_set_str:
@@ -986,7 +997,8 @@ def interp(args):
         else:
             units = 'ln(g)'
         info[op][gm][myimt]['units'] = units
-        info[op][gm][myimt]['bias'] = str(bias[myimt]) if myimt in bias else '-'
+        info[op][gm][myimt]['bias'] = \
+            str(bias[myimt]) if myimt in bias else '-'
         info[op][gm][myimt]['max_grid'] = str(np.max(outgrid[myimt]))
         info[op][gm][myimt]['max'] = str(np.max(moutgrid[myimt]))
     info[op][mi] = {}
@@ -1013,7 +1025,8 @@ def interp(args):
     info[op][un] = {}
     info[op][un]['grade'] = mygrade
     info[op][un]['mean_uncertainty_ratio'] = mean_rat
-    info[op][un]['total_flagged_mi'] = str(np.sum(df2['MMI_outliers'] | np.isnan(df2['MMI']))) if df2 else '0'
+    info[op][un]['total_flagged_mi'] = \
+        str(np.sum(df2['MMI_outliers'] | np.isnan(df2['MMI']))) if df2 else '0'
     if df1:
         all_flagged = np.full(df1['lon'].shape, False, dtype=np.bool)
         for imtstr in imt_in_str_dict['df1']:
@@ -1029,13 +1042,16 @@ def interp(args):
     info[pp][gmm]['gmpe']['module'] = str(config['modeling']['gmpe'])
     info[pp][gmm]['gmpe']['reference'] = ''
     info[pp][gmm]['ipe'] = {}
-    info[pp][gmm]['ipe']['module'] = str(config['ipe_modules'][config['modeling']['ipe']][0])
+    info[pp][gmm]['ipe']['module'] = \
+        str(config['ipe_modules'][config['modeling']['ipe']][0])
     info[pp][gmm]['ipe']['reference'] = ''
     info[pp][gmm]['gmice'] = {}
-    info[pp][gmm]['gmice']['module'] = str(config['gmice_modules'][config['modeling']['gmice']][0])
+    info[pp][gmm]['gmice']['module'] = \
+        str(config['gmice_modules'][config['modeling']['gmice']][0])
     info[pp][gmm]['gmice']['reference'] = ''
     info[pp][gmm]['ccf'] = {}
-    info[pp][gmm]['ccf']['module'] = str(config['ccf_modules'][config['modeling']['ccf']][0])
+    info[pp][gmm]['ccf']['module'] = \
+        str(config['ccf_modules'][config['modeling']['ccf']][0])
     info[pp][gmm]['ccf']['reference'] = ''
     info[pp][gmm]['basin_correction'] = {}
     info[pp][gmm]['basin_correction']['module'] = 'None'
@@ -1192,12 +1208,14 @@ def interp(args):
 
     
     oc.close()
-    if verbose: print('done')
-    #------------------------------------------------------------------
+    if verbose:
+        print('done')
+    # ------------------------------------------------------------------
     # End interp()
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
 
-#%%
+
+# %%
 if __name__ == '__main__':
     parser = get_parser()
     pargs = parser.parse_args()
