@@ -63,9 +63,13 @@ def main(args):
     gmpe_sets = ConfigObj(
             os.path.join(install_path, 'config', 'gmpe_sets.conf'),
             configspec=spec_file)
+    products = ConfigObj(
+            os.path.join(install_path, 'config', 'products.conf'),
+            configspec=spec_file)
     global_config = ConfigObj(
             os.path.join(install_path, 'config', 'model.conf'),
             configspec=spec_file)
+    
     #
     # this is the event specific model.conf (may not be present)
     # prefer model.conf to model_zc.conf
@@ -85,6 +89,7 @@ def main(args):
     global_config.merge(event_config)
     global_config.merge(modules)
     global_config.merge(gmpe_sets)
+    global_config.merge(products)
 
     results = global_config.validate(validator)
     if not isinstance(results, bool) or not results:
@@ -147,7 +152,7 @@ def main(args):
         #
         bu_file = os.path.join(backup_dirs[0], 'shake_data.hdf')
         bu_ic = InputContainer.loadFromHDF(bu_file)
-        history = bu_ic.getHistory()
+        history = bu_ic.getEventHistory()
         bu_ic.close()
         version = int(
                 backup_dirs[0].replace(
@@ -162,8 +167,8 @@ def main(args):
         # source network (but leave the version alone).
         #
         bu_file = os.path.join(datadir, 'shake_data.hdf')
-        bu_ic = InputContainer.loadFromHDF(bu_file)
-        history = bu_ic.getHistory()
+        bu_ic = InputContainer.load(bu_file)
+        history = bu_ic.getVersionHistory()
         bu_ic.close()
         new_line = [timestamp, originator, history['history'][-1][2]]
         history['history'][-1] = new_line
@@ -179,8 +184,8 @@ def main(args):
 
     if verbose: print('Creating input container...')
     shake_data = InputContainer.loadFromInput(hdf_file, config, eventxml,
-                                              rupturefile, datafiles=datafiles,
-                                              version_history=history)
+                                     rupturefile, datafiles=datafiles,
+                                     version_history=history)
     print('Created HDF5 input container in %s' % shake_data.getFileName())
 # %%
     shake_data.close()

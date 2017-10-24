@@ -13,6 +13,7 @@ from importlib import import_module
 from time import gmtime, strftime
 import json
 import warnings
+import re
 
 # Not really needed, but handy for looking at the config
 #import pprint
@@ -32,11 +33,63 @@ from shakelib.distance import Distance, get_distance
 from shakelib.multigmpe import MultiGMPE
 from shakelib.virtualipe import VirtualIPE
 from shakelib.utils.utils import get_extent
-from shakelib.utils.container import InputContainer, OutputContainer
+from shakelib.utils.container import InputContainer
+
+from mapio.gridcontainer import GridHDFContainer
+from mapio.geodict import GeoDict
+from mapio.grid2d import Grid2D
 
 from shakemap.utils.config import get_config_paths
 
 from shakemap._version import get_versions
+
+#we need a way to get units information about intensity measure types
+#and translate between openquake naming convention and ShakeMap grid naming
+#convention.
+def get_layer_info(layer):
+    layer_out = layer
+    layer_units = ''
+    layer_digits = 4 #number of significant digits
+    if layer.endswith('_sd') and layer.startswith('SA'):
+        tlayer = layer.replace('_sd','')
+        match = re.match(r'^SA\(([^)]+?)\)$', tlayer)
+        try:
+            period = float(match.group(1))
+        except:
+            x = 1
+        layer_out = ('PSA%0.1f_sd' % period).replace('.','p')
+        layer_units = 'sd'
+    elif layer.startswith('SA'):
+        match = re.match(r'^SA\(([^)]+?)\)$', layer)
+        period = float(match.group(1))
+        layer_out = ('PSA%0.1f' % period).replace('.','p')
+        layer_units = '%g'
+    elif layer.startswith('PGA'):
+        if layer.endswith('_sd'):
+            layer_units = 'sd'
+        else:
+            layer_units = '%g'
+    elif layer.startswith('PGV'):
+        if layer.endswith('_sd'):
+            layer_units = 'sd'
+        else:
+            layer_units = 'cm/s'
+    elif layer.startswith('MMI'):
+        if layer.endswith('_sd'):
+            layer_units = 'sd'
+        else:
+            layer_units = 'intensity'
+        layer_digits = 2
+    elif layer.startswith('vs30'):
+        if layer.endswith('_sd'):
+            layer_units = 'sd'
+        else:
+            layer_units = 'm/s'
+    else:
+        pass
+
+    return (layer_out,layer_units,layer_digits)
+    
 
 def get_parser():
     description = '''Process a shakemap...
@@ -247,7 +300,7 @@ def interp(args):
     #------------------------------------------------------------------
     # Make the input container and extract the config
     #------------------------------------------------------------------
-    ic = InputContainer.loadFromHDF(datafile)
+    ic = InputContainer.load(datafile)
     config = ic.getConfig()
     #------------------------------------------------------------------
     # Instantiate the gmpe, gmice, ipe, and ccf
@@ -663,7 +716,7 @@ def interp(args):
     for imtstr in combined_imt_str:
         time1 = time.time()
         #
-        # Get the index of the (pesudo-) period of the output IMT
+        # Get the index of the (pseudo-) period of the output IMT
         #
         outperiod_ix = get_period_index_from_imt_str(imtstr, imt_per_ix)
         #
@@ -860,12 +913,12 @@ def interp(args):
     product_path = os.path.join(datadir, 'products')
     if not os.path.isdir(product_path):
         os.mkdir(product_path)
-    oc = OutputContainer.createEmpty(os.path.join(product_path,
+    oc = GridHDFContainer.create(os.path.join(product_path,
                                                   'shake_result.hdf'))
     # ------------------------------------------------------------------
     # Might as well stick the whole config in the result
     # ------------------------------------------------------------------
-    oc.addMetadata(config, name='config')
+    oc.setDictionary('config',config)
 
     #
     # We're going to need masked arrays of the output grids later, so
@@ -1001,19 +1054,19 @@ def interp(args):
     info[pp][sv]['shakemap_revision'] = get_versions()['version']
     info[pp][sv]['shakemap_revision_id'] = get_versions()['full-revisionid']
     info[pp][sv]['process_time'] = strftime("%Y-%m-%d %H:%M:%S%Z", gmtime())
-    info[pp][sv]['map_version'] = ic.getHistory()['history'][-1][2]
-    info[pp][sv]['map_data_history'] = ic.getHistory()['history']
+    info[pp][sv]['map_version'] = ic.getVersionHistory()['history'][-1][2]
+    info[pp][sv]['map_data_history'] = ic.getVersionHistory()['history']
     info[pp][sv]['map_status'] = config['system']['map_status']
     info[pp][sr] = {}
     info[pp][sr]['vs30default'] = str(vs30default)
     info[pp][sr]['site_correction'] = 'GMPE native'
 
-    oc.addData(json.dumps(info), 'info.json')
+    oc.setString('info.json',json.dumps(info))
 
     # ------------------------------------------------------------------
     # Add the rupture JSON as a text string
     # ------------------------------------------------------------------
-    oc.addData(json.dumps(rupture_obj._geojson), 'rupture.json')
+    oc.setString('rupture.json',json.dumps(rupture_obj._geojson))
 
     # ------------------------------------------------------------------
     # Add the station data. The stationlist object has the original
@@ -1087,7 +1140,7 @@ def interp(args):
     else:
         sjdict = {}
 
-    oc.addData(json.dumps(sjdict), 'stationlist.json')
+    oc.setString('stationlist.json',json.dumps(sjdict))
 
     # ------------------------------------------------------------------
     # Add the output grids or points to the output; include some
@@ -1095,28 +1148,42 @@ def interp(args):
     # ------------------------------------------------------------------
     metadata = {}
     if do_grid:
-        metadata['type'] = 'grid'
-        metadata['W'] = W
-        metadata['E'] = E
-        metadata['S'] = S
-        metadata['N'] = N
+        metadata['xmin'] = W
+        metadata['xmax'] = E
+        metadata['ymin'] = S
+        metadata['ymax'] = N
         metadata['nx'] = smnx
         metadata['ny'] = smny
         metadata['dx'] = smdx
         metadata['dy'] = smdy
-        oc.addData(sx_out_soil.vs30, 'vs30', metadata=metadata)
-        if 'PGA' in outsd:
-            oc.addData(sd_rat, 'URATPGA', metadata=metadata)
+        gdict = GeoDict(metadata)
+        layername,units,digits = get_layer_info('vs30')
+        vs30 = Grid2D(sx_out_soil.vs30,gdict)
+        vs30_metadata = {}
+        vs30_metadata['units'] = units
+        vs30_metadata['digits'] = digits
+        oc.setGrid('vs30', vs30, metadata=vs30_metadata)
     else:
         metadata['type'] = 'points'
         metadata['lons'] = lons.flatten()
         metadata['lats'] = lats.flatten()
         metadata['facility_ids'] = [x.encode('ascii') for x in idents]
-        oc.addData(vs30.flatten(), 'vs30', metadata=metadata)
+        oc.setArray('vs30',vs30.flatten(), metadata=metadata)
 
     for key, value in outgrid.items():
-        oc.addData(value, key, metadata=metadata)
-        oc.addData(outsd[key], key + '_sd', metadata=metadata)
+        #set the data grid
+        grid = Grid2D(value,gdict)
+        layername,units,digits = get_layer_info(key)
+        meta_metadata = {'units' : units,
+                         'digits' : digits}
+        oc.setGrid(layername, grid, metadata=meta_metadata)
+
+        #set the uncertainty grid
+        layername,units,digits = get_layer_info(key+'_sd')
+        unc_metadata = {'units' : units,
+                        'digits' : digits}
+        unc_grid = Grid2D(value,gdict.copy())
+        oc.setGrid(layername, unc_grid, metadata=unc_metadata)
 
     oc.close()
     if verbose: print('done')
