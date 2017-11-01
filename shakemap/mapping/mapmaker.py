@@ -90,12 +90,12 @@ def getProjectedPatches(polygon, m, edgecolor=WATERCOLOR):
 
 class MapMaker(object):
 
-    def __init__(self, shakemap, topofile, stations, fault, layerdict, source, cities=None):
+    def __init__(self, container, topofile, stations, fault, layerdict, source, cities=None):
         req_keys = set(['coast', 'ocean', 'lake', 'country', 'state', 'roads'])
         if len(set(layerdict.keys()).intersection(req_keys)) != len(req_keys):
             raise ShakeMapException(
                 'layerdict input must have all keys from %s' % str(req_keys))
-        self.shakemap = shakemap
+        self.container = container
         self.topofile = topofile
         self.layerdict = layerdict
         self.cities = cities
@@ -120,7 +120,7 @@ class MapMaker(object):
 
     def _clipBounds(self):
         # returns a list of GeoJSON-like mapping objects
-        xmin, xmax, ymin, ymax = self.shakemap.getBounds()
+        xmin, xmax, ymin, ymax = self.container.getBounds()
         bbox = (xmin, ymin, xmax, ymax)
         bboxpoly = sPolygon([(xmin, ymax), (xmax, ymax),
                              (xmax, ymin), (xmin, ymin), (xmin, ymax)])
@@ -301,9 +301,9 @@ class MapMaker(object):
 
     def _drawTitle(self, isContour=False):
         # Add a title
-        hlon = self.shakemap.getEventDict()['lon']
-        hlat = self.shakemap.getEventDict()['lat']
-        edict = self.shakemap.getEventDict()
+        hlon = self.container.getEventDict()['lon']
+        hlat = self.container.getEventDict()['lat']
+        edict = self.container.getEventDict()
         eloc = edict['event_description']
         timestr = edict['event_timestamp'].strftime('%b %d, %Y %H:%M:%S')
         mag = edict['magnitude']
@@ -386,13 +386,13 @@ class MapMaker(object):
         # get the geodict for the topo file
         topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
         # get the geodict for the ShakeMap
-        smdict = self.shakemap.getGeoDict()
+        smdict = self.container.getGeoDict()
         # get a geodict that is aligned with topo, but inside shakemap
         sampledict = topodict.getBoundsWithin(smdict)
 
-        self.shakemap = self.shakemap.interpolateToGrid(sampledict)
+        self.container = self.container.interpolateToGrid(sampledict)
 
-        gd = self.shakemap.getGeoDict()
+        gd = self.container.getGeoDict()
 
         # establish the basemap object
         m = self._setMap(gd)
@@ -404,7 +404,7 @@ class MapMaker(object):
         ptopo = self._projectGrid(topodata, m, gd)
 
         # get intensity layer and project it
-        imtdata = self.shakemap.getLayer(self.imt_layer).getData().copy()
+        imtdata = self.container.getLayer(self.imt_layer).getData().copy()
         pimt = self._projectGrid(imtdata, m, gd)
 
         # get the draped intensity data
@@ -447,8 +447,8 @@ class MapMaker(object):
         self._drawFault(m)  # get the fault loaded
 
         # draw epicenter
-        hlon = self.shakemap.getEventDict()['lon']
-        hlat = self.shakemap.getEventDict()['lat']
+        hlon = self.container.getEventDict()['lon']
+        hlat = self.container.getEventDict()['lat']
         m.plot(hlon, hlat, 'k*', latlon=True, fillstyle='none',
                markersize=22, mew=1.2, zorder=EPICENTER_ZORDER)
 
@@ -546,13 +546,13 @@ class MapMaker(object):
         # get the geodict for the topo file
         topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
         # get the geodict for the ShakeMap
-        smdict = self.shakemap.getGeoDict()
+        smdict = self.container.getGeoDict()
         # get a geodict that is aligned with topo, but inside shakemap
         sampledict = topodict.getBoundsWithin(smdict)
 
-        self.shakemap = self.shakemap.interpolateToGrid(sampledict)
+        self.container = self.container.interpolateToGrid(sampledict)
 
-        gd = self.shakemap.getGeoDict()
+        gd = self.container.getGeoDict()
 
         # establish the basemap object
         m = self._setMap(gd)
@@ -564,7 +564,7 @@ class MapMaker(object):
         ptopo = self._projectGrid(topodata, m, gd)
 
         # get contour layer and project it1
-        imtdata = self.shakemap.getLayer(self.contour_layer).getData().copy()
+        imtdata = self.container.getLayer(self.contour_layer).getData().copy()
         pimt = self._projectGrid(imtdata, m, gd)
 
         # get the draped intensity data
@@ -628,8 +628,8 @@ class MapMaker(object):
         self._drawFault(m)  # get the fault loaded
 
         # draw epicenter
-        hlon = self.shakemap.getEventDict()['lon']
-        hlat = self.shakemap.getEventDict()['lat']
+        hlon = self.container.getEventDict()['lon']
+        hlat = self.container.getEventDict()['lat']
         m.plot(hlon, hlat, 'k*', latlon=True, fillstyle='none',
                markersize=22, mew=1.2, zorder=EPICENTER_ZORDER)
 

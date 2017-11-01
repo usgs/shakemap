@@ -33,7 +33,7 @@ from shakelib.distance import Distance, get_distance
 from shakelib.multigmpe import MultiGMPE
 from shakelib.virtualipe import VirtualIPE
 from shakelib.utils.utils import get_extent
-from shakelib.utils.container import InputContainer
+from shakelib.utils.containers import InputContainer,OutputContainer
 
 from mapio.gridcontainer import GridHDFContainer
 from mapio.geodict import GeoDict
@@ -63,17 +63,17 @@ def get_layer_info(layer):
         match = re.match(r'^SA\(([^)]+?)\)$', layer)
         period = float(match.group(1))
         layer_out = ('PSA%0.1f' % period).replace('.','p')
-        layer_units = '%g'
+        layer_units = 'ln(g)'
     elif layer.startswith('PGA'):
         if layer.endswith('_sd'):
             layer_units = 'sd'
         else:
-            layer_units = '%g'
+            layer_units = 'ln(g)'
     elif layer.startswith('PGV'):
         if layer.endswith('_sd'):
             layer_units = 'sd'
         else:
-            layer_units = 'cm/s'
+            layer_units = 'ln(cm/s)'
     elif layer.startswith('MMI'):
         if layer.endswith('_sd'):
             layer_units = 'sd'
@@ -913,8 +913,8 @@ def interp(args):
     product_path = os.path.join(datadir, 'products')
     if not os.path.isdir(product_path):
         os.mkdir(product_path)
-    oc = GridHDFContainer.create(os.path.join(product_path,
-                                                  'shake_result.hdf'))
+    oc = OutputContainer.create(os.path.join(product_path,
+                                             'shake_result.hdf'))
     # ------------------------------------------------------------------
     # Might as well stick the whole config in the result
     # ------------------------------------------------------------------
@@ -1163,6 +1163,26 @@ def interp(args):
         vs30_metadata['units'] = units
         vs30_metadata['digits'] = digits
         oc.setGrid('vs30', vs30, metadata=vs30_metadata)
+
+        for key, value in outgrid.items():
+            component = config['interp']['component']
+            #set the data grid
+            mean_grid = Grid2D(value,gdict)
+            mean_layername,units,digits = get_layer_info(key)
+            mean_metadata = {'units' : units,
+                             'digits' : digits}
+            
+            #set the uncertainty grid
+            std_layername,units,digits = get_layer_info(key+'_sd')
+            std_metadata = {'units' : units,
+                            'digits' : digits}
+            std_grid = Grid2D(outsd[key],gdict.copy())
+            oc.setIMT(mean_layername,
+                      mean_grid,mean_metadata,
+                      std_grid,std_metadata,
+                      component)
+                          
+        
     else:
         metadata['type'] = 'points'
         metadata['lons'] = lons.flatten()
@@ -1170,21 +1190,7 @@ def interp(args):
         metadata['facility_ids'] = [x.encode('ascii') for x in idents]
         oc.setArray('vs30',vs30.flatten(), metadata=metadata)
 
-    for key, value in outgrid.items():
-        #set the data grid
-        grid = Grid2D(value,gdict)
-        layername,units,digits = get_layer_info(key)
-        meta_metadata = {'units' : units,
-                         'digits' : digits}
-        oc.setGrid(layername, grid, metadata=meta_metadata)
-
-        #set the uncertainty grid
-        layername,units,digits = get_layer_info(key+'_sd')
-        unc_metadata = {'units' : units,
-                        'digits' : digits}
-        unc_grid = Grid2D(value,gdict.copy())
-        oc.setGrid(layername, unc_grid, metadata=unc_metadata)
-
+    
     oc.close()
     if verbose: print('done')
     #------------------------------------------------------------------

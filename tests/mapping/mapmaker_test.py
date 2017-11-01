@@ -63,7 +63,7 @@ def test_intensity(tmpdir):
                  'lon': edict['lon'],
                  'depth': edict['depth'],
                  'mag': edict['magnitude'],
-                 'id': 'northridge',
+                 'eventsourcecode': 'northridge',
                  'time': edict['event_timestamp']}
     origin = Origin(eventdict)
     rupture = get_rupture(origin, rupturefile)

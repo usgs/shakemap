@@ -4,18 +4,23 @@
 import json
 from datetime import datetime
 
+#third party imports
 from mapio.shake import ShakeGrid
+import numpy as np
+
+#local imports
 import shakemap
 
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
 
-def make_xml_grid(container,xml_type='grid'):
+def make_xml_grid(container,component,xml_type='grid'):
     """
     Create an XML file containing either the ground motion arrays from sm_model,
     or the uncertainty values for those same ground motions.
     
     Args:
         container (GridHDFContainer): The container created by sm_model.
+        component (str): An IMT component ('Larger' or 'rotd50', for example.)
         xml_type (str): A string, either 'grid' or 'uncertainty'.
     Returns:
         (ShakeGrid): A ShakeGrid data structure containing ground motion or uncertain
@@ -23,25 +28,39 @@ def make_xml_grid(container,xml_type='grid'):
     """
 
     #get all of the grid layers and the geodict
-    gridnames = container.getGridNames()
+    gridnames = container.getIMTs(component)
     layers = {}
     field_keys = {}
     for gridname in gridnames:
-        if xml_type == 'grid' and gridname.endswith('_sd'):
-            continue
-        if xml_type == 'uncertainty' and not gridname.endswith('_sd'):
-            continue
-        grid,metadata = container.getGrid(gridname)
-        layers[gridname] = grid.getData()
+        imtdict = container.getIMT(gridname,component)
+        if xml_type == 'grid':
+            grid = imtdict['mean']
+            metadata = imtdict['mean_metadata']
+        elif xml_type == 'uncertainty':
+            grid = imtdict['mean']
+            metadata = imtdict['mean_metadata']
+            
         units = metadata['units']
         digits = metadata['digits']
+        grid_data = grid.getData()
+        #convert from HDF units to legacy grid.xml units
+        if units == 'ln(cm/s)':
+            grid_data = np.exp(grid_data)
+            units = 'cm/s'
+        elif units == 'ln(g)':
+            grid_data = np.exp(grid_data)*100
+            units = '%g'
+        else:
+            pass
+        layers[gridname] = grid_data
+        
         field_keys[gridname] = (units,digits)
     geodict = grid.getGeoDict()
 
-    config = container.getMetadata('config')
+    config = container.getDictionary('config')
 
     #event dictionary
-    info_data,info_metadata = container.getData('info.json')
+    info_data = container.getString('info.json')
     info = json.loads(info_data)
     event_info = info['input']['event_information']
     event_dict = {}

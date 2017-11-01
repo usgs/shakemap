@@ -15,7 +15,7 @@ import numpy as np
 from skimage import measure
 from scipy.ndimage.filters import median_filter
 
-from shakelib.utils.container import OutputContainer
+from shakelib.utils.containers import OutputContainer
 from shakemap.utils.config import get_config_paths
 
 def get_parser():
@@ -50,8 +50,10 @@ def contour(args):
     #
     # Open the OutputContainer and extract the data
     #
-    oc = OutputContainer.loadFromHDF(datafile)
-    jsonstr = oc.getData('info.json')[0]
+    oc = OutputContainer.load(datafile)
+    config = oc.getDictionary('config')
+    component = config['interp']['component']
+    jsonstr = oc.getString('info.json')
     infojson = json.loads(jsonstr)
     ggmd = {
         'event_id': args.eventid,
@@ -60,8 +62,11 @@ def contour(args):
     }
 #    grid_dict = {}
     contour_dict = {}
-    for imtype in oc.getIMTlist():
-        grid, metadata = oc.getData(imtype)
+    for imtype in oc.getIMTs(component):
+        imtdict = oc.getIMT(imtype,component)
+        gridobj = imtdict['mean']
+        grid = gridobj.getData()
+        metadata = gridobj.getGeoDict().asDict()
         #
         # Filter the contours. Sigma should be a parameter.
         #
@@ -91,10 +96,10 @@ def contour(args):
         if verbose:
             print('%s: sgrid max=%f, fgrid max=%f' %
                   (imtype, np.max(sgrid), np.max(fgrid)))
-        lonstart = metadata['W']
-        latstart = metadata['S']
-        lonspan = np.abs(metadata['E'] - lonstart)
-        latspan = np.abs(metadata['N'] - latstart)
+        lonstart = metadata['xmin']
+        latstart = metadata['ymin']
+        lonspan = np.abs(metadata['xmax'] - lonstart)
+        latspan = np.abs(metadata['ymax'] - latstart)
         nlon = metadata['nx']
         nlat = metadata['ny']
 
@@ -122,7 +127,7 @@ def contour(args):
                 feature = Feature(geometry=mls, properties=props)
                 feature_list.append(feature)
 #                contour_dict[imtype][cval] = plot_contours
-        bbox = [metadata['W'], metadata['S'], metadata['E'], metadata['N']]
+        bbox = [metadata['xmin'], metadata['ymin'], metadata['xmax'], metadata['ymax']]
         fc = FeatureCollection(feature_list, bbox=bbox, metadata=ggmd)
         file = 'cont_' + \
                imtype.replace('.', 'p')\
