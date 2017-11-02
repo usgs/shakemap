@@ -35,11 +35,15 @@ def test_config():
                    configspec=myspec)
     c4 = ConfigObj(os.path.join(mydatapath, "northridge_model.conf"),
                    configspec=myspec)
+    c5 = ConfigObj(os.path.join(mydatapath, "products.conf"),
+                   configspec=myspec)
     c1.merge(c2)
     c1.merge(c3)
     c1.merge(c4)
+    c1.merge(c5)
 
     results = c1.validate(myvalid, preserve_errors=True)
+
     assert isinstance(results, bool) and results
 
     config.check_config(c1)

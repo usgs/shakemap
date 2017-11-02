@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+#stdlib imports
+import sys
+import os.path
+import time as time
+import argparse
+import copy
+from importlib import import_module
+from time import gmtime, strftime
+import json
+import warnings
+
+#local imports
+from shakemap.utils.config import get_config_paths
+from shakemap.products.genprod import make_xml_grid
+from shakemap.mapping.mapmaker import MapMaker
+
+#third party imports
+from shakelib.utils.containers import OutputContainer
+
+def get_parser():
+    description = '''Generate any configured ShakeMap output products...
+The only argument is a ShakeMap event ID, which should correspond to a
+directory in the ShakeMap data directory of the current profile.
+'''
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('eventid',
+                    help='The ID of the event to process')
+    parser.add_argument('-v','--verbose', action='store_true',
+                        help='Print informational messages.')
+    return parser
+
+def main(args):
+    verbose = args.verbose
+    #
+    # Find the shake_data file
+    #
+    install_path, data_path = get_config_paths()
+    prod_dir = os.path.join(data_path, args.eventid, 'current','products')
+    if not os.path.isdir(prod_dir):
+        print('%s is not a valid directory.' % prod_dir)
+        sys.exit(1)
+    datafile = os.path.join(prod_dir, 'shake_result.hdf')
+    if not os.path.isfile(datafile):
+        print('%s is not a valid shake data file.' % datafile)
+        sys.exit(1)
+
+    container = OutputContainer.load(datafile)
+    config = container.getDictionary('config')
+
+    output = config['products']['output']
+    component = config['interp']['component']
+    if 'grid.xml' in output:
+        shake_grid = make_xml_grid(container,component,xml_type='grid')
+        shakefile = os.path.join(prod_dir,'grid.xml')
+        shake_grid.save(shakefile)
+        if verbose:
+            sys.stderr.write('Model results saved to %s.' % shakefile)
+
+if __name__ == '__main__':
+    parser = get_parser()
+    pargs = parser.parse_args()
+    main(pargs)

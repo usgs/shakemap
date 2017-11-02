@@ -126,10 +126,12 @@ def create(config, profile, accept):
     sets_file = os.path.join(shakeconfig_data_path, 'gmpe_sets.conf')
     config_file = os.path.join(shakeconfig_data_path, 'model.conf')
     select_file = os.path.join(shakeconfig_data_path, 'select.conf')
+    products_file = os.path.join(shakeconfig_data_path, 'products.conf')
 
     layer_dir = os.path.join(shakeconfig_data_path, 'layers')
     install_layer_dir = os.path.join(install_path, 'layers')
-
+    install_data_dir = os.path.join(install_path, 'data')
+    
     if not os.path.isfile(os.path.join(config_path, 'modules.conf')):
         shutil.copy(module_file, config_path)
     if not os.path.isfile(os.path.join(config_path, 'gmpe_sets.conf')):
@@ -138,9 +140,14 @@ def create(config, profile, accept):
         shutil.copy(config_file, config_path)
     if not os.path.isfile(os.path.join(config_path, 'select.conf')):
         shutil.copy(select_file, config_path)
+    if not os.path.isfile(os.path.join(config_path, 'products.conf')):
+        shutil.copy(products_file, config_path)
 
     if not os.path.isdir(install_layer_dir):
         shutil.copytree(layer_dir, install_layer_dir)
+
+    if not os.path.isdir(install_data_dir):
+        os.mkdir(install_data_dir)
 
     if profile == 'default' or profile == 'test':
         # put northridge in the data directory
@@ -156,12 +163,12 @@ def create(config, profile, accept):
             vs30_file = os.path.join(shakeconfig_data_path,'northridge_vs30.grd')
             data_event_file = os.path.join(event_path, 'event.xml')
             data_config_file = os.path.join(event_path, 'model_zc.conf')
-            vs30_event_file = os.path.join(event_path, 'vs30.grd')
+            vs30_data_file = os.path.join(install_data_dir, 'vs30.grd')
             shutil.copy(data_file, event_path)
             shutil.copyfile(event_file, data_event_file)
             shutil.copy(rupture_file, event_path)
             shutil.copyfile(event_config_file, data_config_file)
-            shutil.copyfile(vs30_file, vs30_event_file)
+            shutil.copyfile(vs30_file, vs30_data_file)
         
     if 'profiles' not in config:
         config['profiles'] = {}

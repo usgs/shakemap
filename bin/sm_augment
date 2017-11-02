@@ -15,7 +15,7 @@ import datetime
 import numpy as np
 from configobj import ConfigObj
 
-from shakelib.utils.container import InputContainer
+from shakelib.utils.containers import InputContainer
 from shakemap.utils.config import get_config_paths, get_custom_validator,\
         config_error, check_config, get_configspec
 
@@ -52,12 +52,12 @@ def main(args):
     if not os.path.isfile(hdf_file):
         print('%s does not exist. Use assemble.' % hdf_file)
         sys.exit(1)
-    shake_data = InputContainer.loadFromHDF(hdf_file)
+    shake_data = InputContainer.load(hdf_file)
 
     eventxml = os.path.join(datadir, 'event.xml')
     if os.path.isfile(eventxml):
         if verbose: print('Updating event.xml file...')
-        shake_data.updateEvent(eventxml)
+        shake_data.setEvent(eventxml)
 
     #
     # Get the config from the HDF file and merge in the local configs
@@ -133,7 +133,7 @@ def main(args):
     # Put the updated config back into shake_data.hdf`
     #
     config = shake_config.dict()
-    shake_data.updateConfig(config)
+    shake_data.setConfig(config)
     #
     # Look for additional data files and update the stationlist if found
     #
@@ -142,14 +142,14 @@ def main(args):
         datafiles.append(os.path.join(datadir, 'stationlist.xml'))
     if datafiles:
         if verbose: print('Found additional data files...')
-        shake_data.addData(datafiles)
+        shake_data.addStationData(datafiles)
     #
     # Look for a rupture file and replace the existing one if found
     #
     rupturefiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
     if len(rupturefiles):
         if verbose: print('Found new rupture file...')
-        shake_data.updateRupture(rupturefiles[0])
+        shake_data.setRupture(rupturefiles[0])
     #
     # Sort out the version history. We're working with an existing
     # HDF file, so: if we are the originator, just update the timestamp,
@@ -158,14 +158,14 @@ def main(args):
     timestamp = datetime.datetime.utcnow().strftime('%FT%TZ')
     originator = config['system']['source_network']
 
-    history = shake_data.getHistory()
+    history = shake_data.getVersionHistory()
     if history['history'][-1][1] == originator:
         history['history'][-1][0] = timestamp
     else:
         version = int(history['history'][-1][2]) + 1
         new_line = [timestamp, originator, version]
         history['history'].append(new_line)
-    shake_data.updateHistory(history)
+    shake_data.setVersionHistory(history)
 
 # %%
     shake_data.close()
