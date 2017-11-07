@@ -1,3 +1,7 @@
+import numpy as np
+import numpy.ma as ma
+
+
 # TODO Need to doc all of these functions
 
 def get_period_index_from_imt_str(imtstr, imt_per_ix):
