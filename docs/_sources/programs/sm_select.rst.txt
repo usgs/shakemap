@@ -7,4 +7,5 @@ sm_select
    :filename: bin/sm_select
    :func: get_parser
    :prog: sm_select
+   :nodefaultconst:
 

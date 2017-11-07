@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Collect configuration, station data, finite fault deat, etc., into
+Collect configuration, station data, finite fault data, etc., into
 an InputContainer and write it out as shake_data.hdf.
 """
 

@@ -60,72 +60,64 @@ is essentially "flat" (i.e., all
 of the data objects are contained within the root group). The file
 contains:
 
-+-----------------------+---------+------------------------------------+-----------------+
-| Name                  | Type    | Contents                           | Attributess     |
-+=======================+=========+====================================+=================+
-| config                | group   | ShakeMap configuration             | None            |
-+-----------------------+---------+------------------------------------+-----------------+
-| info.json [1]_        | dataset | ShakeMap metadata in JSON format   | None            |
-+-----------------------+---------+------------------------------------+-----------------+
-| rupture.json [1]_     | dataset | GeoJSON representation of the      | None            |
-|                       |         | finite fault                       |                 |
-+-----------------------+---------+------------------------------------+-----------------+
-| stationlist.json [1]_ | dataset | GeoJSON stationlist                | None            |
-+-----------------------+---------+------------------------------------+-----------------+
-| vs30                  | dataset | Vs30 values at output grid/points  | grid attrs [2]_ |
-+-----------------------+---------+------------------------------------+-----------------+
-| URATPGA [3]_          | dataset | Ratio of PGA stddev to GMPE stddev | grid attrs [2]_ |
-+-----------------------+---------+------------------------------------+-----------------+
-| IMT (multiple)        | dataset | Interpolated data for IMT          | grid attrs [2]_ |
-+-----------------------+---------+------------------------------------+-----------------+
-| IMT_sd (multiple)     | dataset | Stddev of interpolated IMT         | grid attrs [2]_ |
-+-----------------------+---------+------------------------------------+-----------------+
++-----------------------+---------+------------------------------------+------------------+
+| Name                  | Type    | Contents                           | Attributess      |
++=======================+=========+====================================+==================+
+| config                | group   | ShakeMap configuration             | None             |
++-----------------------+---------+------------------------------------+------------------+
+| info.json             | dataset | ShakeMap metadata in JSON format   | None             |
++-----------------------+---------+------------------------------------+------------------+
+| rupture.json          | dataset | GeoJSON representation of the      | None             |
+|                       |         | finite fault                       |                  |
++-----------------------+---------+------------------------------------+------------------+
+| stationlist.json      | dataset | GeoJSON stationlist                | None             |
++-----------------------+---------+------------------------------------+------------------+
+| vs30                  | dataset | Vs30 values at output grid/points  | grid/point attrs |
++-----------------------+---------+------------------------------------+------------------+
+| IMT (multiple)        | dataset | Interpolated data for IMT          | grid/point attrs |
++-----------------------+---------+------------------------------------+------------------+
+| IMT_sd (multiple)     | dataset | Stddev of interpolated IMT         | grid/point attrs |
++-----------------------+---------+------------------------------------+------------------+
 
-.. [1] JSON datasets are stored as continuous strings.
+For grids, the attributes are:
 
++-----------+------------------------------------------------------+
+| Attr name | Contents                                             |
++===========+======================================================+
+| type      | "grid"                                               |
++-----------+------------------------------------------------------+
+| W         | The western boundary of the grid (degrees longitude) |
++-----------+------------------------------------------------------+
+| E         | The eastern boundary of the grid (degrees longitude) |
++-----------+------------------------------------------------------+
+| S         | The southern boundary of the grid (degrees latitude) |
++-----------+------------------------------------------------------+
+| N         | The northern boundary of the grid (degrees latitude) |
++-----------+------------------------------------------------------+
+| nx        | The number of grid points in the x dimension         |
++-----------+------------------------------------------------------+
+| ny        | The number of grid points in the y dimension         |
++-----------+------------------------------------------------------+
+| dx        | The grid interval in the x dimension                 |
++-----------+------------------------------------------------------+
+| dy        | The grid interval in the y dimension                 |
++-----------+------------------------------------------------------+
 
-.. [2] The atributes for grids are:
+For lists of points the attributes are:
 
-   +-----------+------------------------------------------------------+
-   | Attr name | Contents                                             |
-   +===========+======================================================+
-   | type      | "grid"                                               |
-   +-----------+------------------------------------------------------+
-   | W         | The western boundary of the grid (degrees longitude) |
-   +-----------+------------------------------------------------------+
-   | E         | The eastern boundary of the grid (degrees longitude) |
-   +-----------+------------------------------------------------------+
-   | S         | The southern boundary of the grid (degrees latitude) |
-   +-----------+------------------------------------------------------+
-   | N         | The northern boundary of the grid (degrees latitude) |
-   +-----------+------------------------------------------------------+
-   | nx        | The number of grid points in the x dimension         |
-   +-----------+------------------------------------------------------+
-   | ny        | The number of grid points in the y dimension         |
-   +-----------+------------------------------------------------------+
-   | dx        | The grid interval in the x dimension                 |
-   +-----------+------------------------------------------------------+
-   | dy        | The grid interval in the y dimension                 |
-   +-----------+------------------------------------------------------+
++--------------+------------------------------------------------------+
+| Attr name    | Contents                                             |
++==============+======================================================+
+| type         | "points"                                             |
++--------------+------------------------------------------------------+
+| lons         | An array of longitudes corresponding to the points   |
++--------------+------------------------------------------------------+
+| lats         | An array of latitudes corresponding to the points    |
++--------------+------------------------------------------------------+
+| facility_ids | array of identifiers for the points                  |
++--------------+------------------------------------------------------+
 
-   For lists of points the attributes are:
-
-   +--------------+------------------------------------------------------+
-   | Attr name    | Contents                                             |
-   +==============+======================================================+
-   | type         | "points"                                             |
-   +--------------+------------------------------------------------------+
-   | lons         | An array of longitudes corresponding to the points   |
-   +--------------+------------------------------------------------------+
-   | lats         | An array of latitudes corresponding to the points    |
-   +--------------+------------------------------------------------------+
-   | facility_ids | array of identifiers for the points                  |
-   +--------------+------------------------------------------------------+
-
-.. [3] URATPGA is only provided for grids.
-
-
---------------------------------------
+JSON datasets are stored as continuous strings.
 
 There will typically be multiple *IMT* (Intensity Measure Type) and 
 *IMT_sd* (standard deviation of the corresponding IMT) datasets. For instance
