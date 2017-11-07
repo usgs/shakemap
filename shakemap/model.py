@@ -1,3 +1,5 @@
+# TODO Need to doc all of these functions
+
 def get_period_index_from_imt_str(imtstr, imt_per_ix):
         if imtstr == 'PGA':
             return imt_per_ix['0.01']
@@ -6,7 +8,6 @@ def get_period_index_from_imt_str(imtstr, imt_per_ix):
         else:
             return imt_per_ix[imtstr.replace('SA(', '').replace(')', '')]
 
-# TODO Need to doc all of these functions
 def get_period_array(*args):
     imt_per = set()
     for imt_list in args:
