@@ -171,12 +171,12 @@
 
 <div class="viewcode-block" id="MapMaker"><a class="viewcode-back" href="../../../apidoc/shakemap.mapping.mapmaker.html#shakemap.mapping.mapmaker.MapMaker">[docs]</a><span class="k">class</span> <span class="nc">MapMaker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shakemap</span><span class="p">,</span> <span class="n">topofile</span><span class="p">,</span> <span class="n">stations</span><span class="p">,</span> <span class="n">fault</span><span class="p">,</span> <span class="n">layerdict</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">cities</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">topofile</span><span class="p">,</span> <span class="n">stations</span><span class="p">,</span> <span class="n">fault</span><span class="p">,</span> <span class="n">layerdict</span><span class="p">,</span> <span class="n">source</span><span class="p">,</span> <span class="n">cities</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="n">req_keys</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;coast&#39;</span><span class="p">,</span> <span class="s1">&#39;ocean&#39;</span><span class="p">,</span> <span class="s1">&#39;lake&#39;</span><span class="p">,</span> <span class="s1">&#39;country&#39;</span><span class="p">,</span> <span class="s1">&#39;state&#39;</span><span class="p">,</span> <span class="s1">&#39;roads&#39;</span><span class="p">])</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">layerdict</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">req_keys</span><span class="p">))</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">req_keys</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ShakeMapException</span><span class="p">(</span>
                 <span class="s1">&#39;layerdict input must have all keys from </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">req_keys</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span> <span class="o">=</span> <span class="n">shakemap</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="n">container</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">topofile</span> <span class="o">=</span> <span class="n">topofile</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">layerdict</span> <span class="o">=</span> <span class="n">layerdict</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="n">cities</span>
@@ -201,7 +201,7 @@
 
     <span class="k">def</span> <span class="nf">_clipBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># returns a list of GeoJSON-like mapping objects</span>
-        <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getBounds</span><span class="p">()</span>
+        <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getBounds</span><span class="p">()</span>
         <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span>
         <span class="n">bboxpoly</span> <span class="o">=</span> <span class="n">sPolygon</span><span class="p">([(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">),</span> <span class="p">(</span><span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span><span class="p">),</span>
                              <span class="p">(</span><span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">),</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">ymin</span><span class="p">),</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)])</span>
@@ -382,9 +382,9 @@
 
     <span class="k">def</span> <span class="nf">_drawTitle</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">isContour</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="c1"># Add a title</span>
-        <span class="n">hlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
-        <span class="n">hlat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
-        <span class="n">edict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()</span>
+        <span class="n">hlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
+        <span class="n">hlat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
+        <span class="n">edict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()</span>
         <span class="n">eloc</span> <span class="o">=</span> <span class="n">edict</span><span class="p">[</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span>
         <span class="n">timestr</span> <span class="o">=</span> <span class="n">edict</span><span class="p">[</span><span class="s1">&#39;event_timestamp&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1">, %Y %H:%M:%S&#39;</span><span class="p">)</span>
         <span class="n">mag</span> <span class="o">=</span> <span class="n">edict</span><span class="p">[</span><span class="s1">&#39;magnitude&#39;</span><span class="p">]</span>
@@ -467,13 +467,13 @@
         <span class="c1"># get the geodict for the topo file</span>
         <span class="n">topodict</span> <span class="o">=</span> <span class="n">GMTGrid</span><span class="o">.</span><span class="n">getFileGeoDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topofile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># get the geodict for the ShakeMap</span>
-        <span class="n">smdict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span>
+        <span class="n">smdict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span>
         <span class="c1"># get a geodict that is aligned with topo, but inside shakemap</span>
         <span class="n">sampledict</span> <span class="o">=</span> <span class="n">topodict</span><span class="o">.</span><span class="n">getBoundsWithin</span><span class="p">(</span><span class="n">smdict</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">interpolateToGrid</span><span class="p">(</span><span class="n">sampledict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">interpolateToGrid</span><span class="p">(</span><span class="n">sampledict</span><span class="p">)</span>
 
-        <span class="n">gd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span>
+        <span class="n">gd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span>
 
         <span class="c1"># establish the basemap object</span>
         <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setMap</span><span class="p">(</span><span class="n">gd</span><span class="p">)</span>
@@ -485,7 +485,7 @@
         <span class="n">ptopo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projectGrid</span><span class="p">(</span><span class="n">topodata</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
 
         <span class="c1"># get intensity layer and project it</span>
-        <span class="n">imtdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getLayer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imt_layer</span><span class="p">)</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">imtdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getLayer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">imt_layer</span><span class="p">)</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">pimt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projectGrid</span><span class="p">(</span><span class="n">imtdata</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
 
         <span class="c1"># get the draped intensity data</span>
@@ -528,8 +528,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawFault</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>  <span class="c1"># get the fault loaded</span>
 
         <span class="c1"># draw epicenter</span>
-        <span class="n">hlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
-        <span class="n">hlat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
+        <span class="n">hlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
+        <span class="n">hlat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
         <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hlon</span><span class="p">,</span> <span class="n">hlat</span><span class="p">,</span> <span class="s1">&#39;k*&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
                <span class="n">markersize</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">EPICENTER_ZORDER</span><span class="p">)</span>
 
@@ -627,13 +627,13 @@
         <span class="c1"># get the geodict for the topo file</span>
         <span class="n">topodict</span> <span class="o">=</span> <span class="n">GMTGrid</span><span class="o">.</span><span class="n">getFileGeoDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topofile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># get the geodict for the ShakeMap</span>
-        <span class="n">smdict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span>
+        <span class="n">smdict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span>
         <span class="c1"># get a geodict that is aligned with topo, but inside shakemap</span>
         <span class="n">sampledict</span> <span class="o">=</span> <span class="n">topodict</span><span class="o">.</span><span class="n">getBoundsWithin</span><span class="p">(</span><span class="n">smdict</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">interpolateToGrid</span><span class="p">(</span><span class="n">sampledict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">container</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">interpolateToGrid</span><span class="p">(</span><span class="n">sampledict</span><span class="p">)</span>
 
-        <span class="n">gd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span>
+        <span class="n">gd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span>
 
         <span class="c1"># establish the basemap object</span>
         <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_setMap</span><span class="p">(</span><span class="n">gd</span><span class="p">)</span>
@@ -645,7 +645,7 @@
         <span class="n">ptopo</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projectGrid</span><span class="p">(</span><span class="n">topodata</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
 
         <span class="c1"># get contour layer and project it1</span>
-        <span class="n">imtdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getLayer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contour_layer</span><span class="p">)</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">imtdata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getLayer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">contour_layer</span><span class="p">)</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">pimt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projectGrid</span><span class="p">(</span><span class="n">imtdata</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
 
         <span class="c1"># get the draped intensity data</span>
@@ -709,8 +709,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawFault</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>  <span class="c1"># get the fault loaded</span>
 
         <span class="c1"># draw epicenter</span>
-        <span class="n">hlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
-        <span class="n">hlat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">shakemap</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
+        <span class="n">hlon</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span>
+        <span class="n">hlat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getEventDict</span><span class="p">()[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span>
         <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">hlon</span><span class="p">,</span> <span class="n">hlat</span><span class="p">,</span> <span class="s1">&#39;k*&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">fillstyle</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
                <span class="n">markersize</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">mew</span><span class="o">=</span><span class="mf">1.2</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">EPICENTER_ZORDER</span><span class="p">)</span>
 

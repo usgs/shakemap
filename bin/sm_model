@@ -775,7 +775,7 @@ def interp(args):
     #
     # Get the map grade
     #
-    mean_rat, mygrade, sd_rat = get_map_grade(do_grid, outsd, psd, moutgrid)
+    mean_rat, mygrade = get_map_grade(do_grid, outsd, psd, moutgrid)
     # ------------------------------------------------------------------
     # This is the metadata for creating info.json
     # ------------------------------------------------------------------

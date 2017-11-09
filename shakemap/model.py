@@ -1,10 +1,22 @@
 import numpy as np
 import numpy.ma as ma
+"""
+Functions to support sm_model.
+"""
 
-
-# TODO Need to doc all of these functions
 
 def get_period_index_from_imt_str(imtstr, imt_per_ix):
+        """
+        Get the index for the period of the specified IMT.
+
+        Args:
+            imtstr (str): The (OQ-style) IMT string.
+            imt_per_ix (dict): Dictionary relating periods to their 
+                indices.
+
+        Returns:
+            int: The index corresponding to the period of the IMT.
+        """
         if imtstr == 'PGA':
             return imt_per_ix['0.01']
         elif imtstr in ('PGV', 'MMI'):
@@ -13,6 +25,17 @@ def get_period_index_from_imt_str(imtstr, imt_per_ix):
             return imt_per_ix[imtstr.replace('SA(', '').replace(')', '')]
 
 def get_period_array(*args):
+    """
+    Return an array of the periods represented by the IMT list(s) in
+    the input.
+
+    Args:
+        *args (list): One or more lists of IMTs.
+
+    Returns:
+        array: Numpy array of the (sorted) periods represented by the
+        IMTs in the input list(s).
+    """
     imt_per = set()
     for imt_list in args:
         if imt_list is None:
@@ -27,6 +50,19 @@ def get_period_array(*args):
     return np.array(sorted(imt_per))
 
 def get_imts(imtstr, imtset):
+    """
+    Return the input imt or its closest surrogarte (or bracket) found
+    in imtset.
+
+    Args:
+        imtstr (str): An (OQ-style) IMT string.
+        imtsset (set): A set of IMTs to search for imtstr or its closest
+            surrogate (or bracket).
+
+    Returns:
+        tuple: The IMT, it's closest surrogate, or a bracket of periods on
+        either side of the IMT's period, from the IMTs in intset.
+    """
 
     if imtstr in imtset:
         return (imtstr, )
@@ -78,6 +114,23 @@ def get_imts(imtstr, imtset):
 
 def get_sa_bracket(myper, plist, plist_str):
 
+    """
+    For a given period, look through the input periods and return a tuple of
+    a) the single IMT string representing the period itself if it is found in the 
+    input; b) a pair of IMT strings representing the periods bracketing the given 
+    period; or c) the single IMT representing the first or last period in the input 
+    list if the given period is off the end of the list.
+
+    Args:
+        myper (float): The period to search for in the input lists.
+        plist (array): A sorted list of periods as floats.
+        plist_str (array): The periods in 'plist' (above) as strings.
+
+    Returns:
+        tuple: One or two strings representing the IMTs closest to or bracketing
+        the input period.
+
+    """
     if not len(plist):
         return ()
     try:
@@ -93,6 +146,26 @@ def get_sa_bracket(myper, plist, plist_str):
         return ('SA(' + plist_str[i-1] + ')', 'SA(' + plist_str[i] + ')')
 
 def get_sta_imts(imtstr, sdf, ix, imtset):
+    """
+    Get the IMT, its closest surrogate, or its bracket for a stataion
+    in a particular station dataframe, accounting for missing or 
+    flagged data.
+
+    Args:
+        imtstr (str): The desired IMT as an OQ-style string.
+
+        sdf (dict): The dataframe containing the station.
+
+        ix (int): The index of the station in the dataframe.
+
+        imtset (set): The list of IMTs (as OQ-style strings) in the 
+            dataframe.
+
+    Returns:
+        tuple: The IMT, its closest surrogate, or the pair of IMTs
+        bracketing it in period, gathered from the valid data for the
+        station.
+    """
     myimts = set()
     for this_imt in imtset:
         if not np.isnan(sdf[this_imt][ix]) and \
@@ -101,10 +174,30 @@ def get_sta_imts(imtstr, sdf, ix, imtset):
     return get_imts(imtstr, myimts)
 
 def get_map_grade(do_grid, outsd, psd, moutgrid):
+    """
+    Computes a 'grade' for the map. Essentially looks at the ratio of
+    the computed PGA uncertainty to the predicted PGA uncertainty for
+    the area inside the MMI 6 contour. If the maximum MMI is less than
+    6, or the map is not a grid, the grade and mean ratio are set to '-'.
+
+    Args:
+        do_grid (bool): Is the map a grid (True) or a list of points
+            (False)?
+
+        outsd (dict): A dictionary of computed uncertainty arrays.
+
+        psd (dict): A dictionary of predicted uncertainty arrays.
+
+        moutgrid (dict): A dictionary of landmasked output ground
+            motion arrays.
+
+    Returns:
+        tuple: The mean uncertainty ratio and the letter grade
+    """
     mean_rat = '-'
     mygrade = '-'
     if not do_grid or 'PGA' not in outsd:
-        return mean_rat, mygrade, []
+        return mean_rat, mygrade
     sd_rat = outsd['PGA'] / psd['PGA']
     mmimasked = ma.masked_less(moutgrid['MMI'], 6.0)
     mpgasd_rat = ma.masked_array(sd_rat, mask=mmimasked.mask)
@@ -118,5 +211,5 @@ def get_map_grade(do_grid, outsd, psd, moutgrid):
                 break
         if mygrade == '-':
             mygrade = 'F'
-    return mean_rat, mygrade, sd_rat
+    return mean_rat, mygrade
 
