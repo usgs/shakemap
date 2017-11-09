@@ -13,20 +13,23 @@ import shakemap
 
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
 
-def make_xml_grid(container,component,xml_type='grid'):
+def make_xml_grid(hdf_file,product_path):
     """
     Create an XML file containing either the ground motion arrays from sm_model,
     or the uncertainty values for those same ground motions.
     
     Args:
-        container (GridHDFContainer): The container created by sm_model.
-        component (str): An IMT component ('Larger' or 'rotd50', for example.)
-        xml_type (str): A string, either 'grid' or 'uncertainty'.
+        hdf_file (str): The hdf_file containing the ShakeMap results, config, etc.
+        product_path (str): The directory where the grid.xml and uncertainty.xml files 
+                            should be written.
     Returns:
-        (ShakeGrid): A ShakeGrid data structure containing ground motion or uncertain
-        arrays, and associated metadata.
+        (str,str): A tuple of the resulting grid.xml and uncertainty.xml filenames.
     """
 
+    #load the HDF file, get the config information
+    container = OuputContainer.load(hdf_file)
+    config = container.getDictionary('config')
+    
     #get all of the grid layers and the geodict
     gridnames = container.getIMTs(component)
     layers = {}

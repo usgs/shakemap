@@ -63,9 +63,6 @@ def main(args):
     gmpe_sets = ConfigObj(
             os.path.join(install_path, 'config', 'gmpe_sets.conf'),
             configspec=spec_file)
-    products = ConfigObj(
-            os.path.join(install_path, 'config', 'products.conf'),
-            configspec=spec_file)
     global_config = ConfigObj(
             os.path.join(install_path, 'config', 'model.conf'),
             configspec=spec_file)
@@ -89,7 +86,6 @@ def main(args):
     global_config.merge(event_config)
     global_config.merge(modules)
     global_config.merge(gmpe_sets)
-    global_config.merge(products)
 
     results = global_config.validate(validator)
     if not isinstance(results, bool) or not results:

@@ -122,11 +122,17 @@ def create(config, profile, accept):
     if not os.path.isdir(config_path):
         os.mkdir(config_path)
 
+    # create a directory where global log files will be written
+    log_path = os.path.join(install_path, 'logs')
+    if not os.path.isdir(log_path):
+        os.mkdir(log_path)
+
     module_file = os.path.join(shakeconfig_data_path, 'modules.conf')
     sets_file = os.path.join(shakeconfig_data_path, 'gmpe_sets.conf')
     config_file = os.path.join(shakeconfig_data_path, 'model.conf')
     select_file = os.path.join(shakeconfig_data_path, 'select.conf')
     products_file = os.path.join(shakeconfig_data_path, 'products.conf')
+    shake_file = os.path.join(shakeconfig_data_path, 'shake.conf')
 
     layer_dir = os.path.join(shakeconfig_data_path, 'layers')
     install_layer_dir = os.path.join(install_path, 'layers')
@@ -142,6 +148,17 @@ def create(config, profile, accept):
         shutil.copy(select_file, config_path)
     if not os.path.isfile(os.path.join(config_path, 'products.conf')):
         shutil.copy(products_file, config_path)
+
+
+    # let's fill in the global_log file value in the shake.conf before
+    # installing it.
+    shake_conf = ConfigObj(shake_file)
+    logfile = os.path.join(log_path,'shake.log')
+    shake_conf['shake']['handlers']['global_file']['filename'] = logfile
+    conf_file = os.path.join(config_path, 'shake.conf')
+    if not os.path.isfile(os.path.join(config_path, 'shake.conf')):
+        shake_conf.filename = conf_file
+        shake_conf.write()
 
     if not os.path.isdir(install_layer_dir):
         shutil.copytree(layer_dir, install_layer_dir)

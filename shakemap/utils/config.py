@@ -18,15 +18,23 @@ def get_data_path():
     """
     return pkg_resources.resource_filename('shakemap', 'data')
 
-def get_configspec():
+def get_configspec(config=None):
     """
-    Returns the full path to the ShakeMap configspec.conf file.
+    Returns the full path to a ShakeMap config spec file.
+
+    Args:
+      config (str): Name of config spec to find, or None.
 
     Returns:
-        (str): The path to the configspec.
+        (str): The path to a config spec, or 
 
     """
-    return os.path.join(get_data_path(), 'configspec.conf')
+    if config is None:
+        return os.path.join(get_data_path(), 'configspec.conf')
+    fname = os.path.join(get_data_path(),'%sspec.conf' % config)
+    if not os.path.isfile(fname):
+        return FileNotFoundError('No file "%s" exists.' % fname)
+    return fname
 
 
 def get_config_paths():
