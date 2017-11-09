@@ -8,9 +8,13 @@ import sys
 import traceback
 import io
 import socket
+import pkgutil
+import inspect
+import importlib
 
 #local imports
 from shakemap.utils.config import get_config_paths,get_configspec
+import shakemap.coremods
 
 #third party imports
 from configobj import ConfigObj
@@ -33,6 +37,28 @@ REQ_FIELDS = {'logging.handlers.TimedRotatingFileHandler':['level',
                                               'subject',
                                               'class']}
 
+def _get_command_classes():
+    coremods = {
+        name: importlib.import_module(name)
+        for finder, name, ispkg
+        in pkgutil.iter_modules(shakemap.coremods.__path__, 
+                                shakemap.coremods.__name__ + ".")
+    }
+    
+    classes = {}
+    for name, module in coremods.items():
+        for m in inspect.getmembers(module, inspect.isclass):
+            if m[1].__module__ == name:
+                core_class = getattr(module, m[0])
+                cmd = core_class.command_name
+                
+                if not cmd:
+                    continue
+                classes[cmd] = core_class
+    return classes
+    
+_classes_ = _get_command_classes()
+    
 def _clean_shake_dict(config):
     for handlerkey,handler in config['handlers'].items():
         myclass = handler['class']
@@ -58,7 +84,14 @@ def get_parser():
     The default behavior is to run silently, logging all output to configured log files
     and exceptions to email (if configured.)
     '''
-    parser = argparse.ArgumentParser(description=description)
+
+    epilog = 'Available commands:\n'
+    for key,core_class in _classes_.items():
+        epilog += '  %s\n' % inspect.getdoc(core_class)
+    
+    parser = argparse.ArgumentParser(description=description,
+                                     epilog=epilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('eventid',
                         help='The id of the event to process.')
     parser.add_argument('cmds',nargs='+',
@@ -67,6 +100,8 @@ def get_parser():
                         help='Print all informational messages.')
     parser.add_argument('-q', '--quiet', action='store_true',
                         help='Print only errors.')
+    parser.add_argument('-l', '--log', action='store_true',
+                        help='Log all output.')
     return parser
 
 def _get_config():
@@ -87,10 +122,10 @@ def _get_config():
     _clean_shake_dict(log_config)
     return log_config
 
-def _get_logger(args):
+def _get_logger(args,config):
     if args.debug or args.quiet or not args.log:
-        format = shake_conf['shake']['formatters']['standard']['format']
-        datefmt = shake_conf['shake']['formatters']['standard']['datefmt']
+        format = config['formatters']['standard']['format']
+        datefmt = config['formatters']['standard']['datefmt']
         #create a console handler, with verbosity setting chosen by user
         if args.debug:
             level = logging.DEBUG
@@ -99,23 +134,28 @@ def _get_logger(args):
         else: #default interactive
             level = logging.INFO
         logging.basicConfig(format=format,datefmt=datefmt,level=level)
-    elif:
+    else:
         event_log_file = os.path.join(data_path,args.eventid,'shake.log')
         log_config['handlers']['event_file']['filename'] = event_log_file
         tmp = logging.config.dictConfig(log_config)
 
-    log_name = list(log_config['loggers'].keys())[0]
+    log_name = list(config['loggers'].keys())[0]
     logger = logging.getLogger(log_name)
     return logger
 
+
 def main(args):
     log_config = _get_config()
-    logger = _get_logger(args)
-
+    logger = _get_logger(args,log_config)
+    
     try:
         for cmd in args.cmds:
+            if cmd not in _classes_:
+                raise KeyError('Command %s not found in ShakeMap.' % cmd)
+        
+        for cmd in args.cmds:
             logger.info('Running command %s' % cmd)
-            cmd_class = _get_command_class(cmd)
+            cmd_class = _classes_[cmd]
             cmd_obj = cmd_class(args.eventid)
             cmd_obj.execute()
             logger.info('Finished running command %s' % cmd)
