@@ -25,6 +25,7 @@
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakemap.model" href="shakemap.model.html" />
     <link rel="prev" title="shakemap.utils.layers" href="shakemap.utils.layers.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -61,12 +62,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0a API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="shakemap.mapping.html">shakemap.mapping</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakemap.products.html">shakemap.products</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.config.html">shakemap.utils.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.utils</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="shakemap.model.html">shakemap.model</a></li>
 </ul>
 </li>
 </ul>
@@ -90,6 +93,39 @@
             
   <div class="section" id="module-shakemap.utils.utils">
 <span id="shakemap-utils-utils"></span><h1>shakemap.utils.utils<a class="headerlink" href="#module-shakemap.utils.utils" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="shakemap.utils.utils.get_object_from_config">
+<code class="descclassname">shakemap.utils.utils.</code><code class="descname">get_object_from_config</code><span class="sig-paren">(</span><em>obj</em>, <em>section</em>, <em>cfg</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#get_object_from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.get_object_from_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function for things (ipe, gmice, ccf) that don’t have a
+fromConfig() constructor yet. Instantiates an instance of a
+class from config entry, ‘name’, that has a corresponding
+‘name’_module dictionary of class name, module path.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>obj</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the parameter in the config file that specifies
+the object to be instantiated.</li>
+<li><strong>section</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The section of the config in which ‘obj’ resides.</li>
+<li><strong>cfg</strong> (<em>dictionary</em>) – The configuration file in which ‘obj’ and the
+module definitions reside.</li>
+<li><strong>args</strong> – Additional arguments that will be passed to the constructor
+of the thing being instantiated.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An instance of the object specified by the ‘obj’ parameter
+in the config file..</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)">object</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="function">
 <dt id="shakemap.utils.utils.query_yes_no">
 <code class="descclassname">shakemap.utils.utils.</code><code class="descname">query_yes_no</code><span class="sig-paren">(</span><em>question</em>, <em>default='yes'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#query_yes_no"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.query_yes_no" title="Permalink to this definition">¶</a></dt>

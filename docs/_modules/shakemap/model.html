@@ -1,0 +1,313 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakemap.model &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../index.html">
+    <img class="logo" src="../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakemap.model</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Functions to support sm_model.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="get_period_index_from_imt_str"><a class="viewcode-back" href="../../apidoc/shakemap.model.html#shakemap.model.get_period_index_from_imt_str">[docs]</a><span class="k">def</span> <span class="nf">get_period_index_from_imt_str</span><span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">imt_per_ix</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get the index for the period of the specified IMT.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imtstr (str): The (OQ-style) IMT string.</span>
+<span class="sd">            imt_per_ix (dict): Dictionary relating periods to their </span>
+<span class="sd">                indices.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            int: The index corresponding to the period of the IMT.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s1">&#39;PGA&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">imt_per_ix</span><span class="p">[</span><span class="s1">&#39;0.01&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">imt_per_ix</span><span class="p">[</span><span class="s1">&#39;1.0&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">imt_per_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)]</span></div>
+
+<div class="viewcode-block" id="get_period_array"><a class="viewcode-back" href="../../apidoc/shakemap.model.html#shakemap.model.get_period_array">[docs]</a><span class="k">def</span> <span class="nf">get_period_array</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return an array of the periods represented by the IMT list(s) in</span>
+<span class="sd">    the input.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        *args (list): One or more lists of IMTs.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        array: Numpy array of the (sorted) periods represented by the</span>
+<span class="sd">        IMTs in the input list(s).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">imt_per</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">imt_list</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">imt_list</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="n">imt_list</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s1">&#39;PGA&#39;</span><span class="p">:</span>
+                <span class="n">imt_per</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">0.01</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">or</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+                <span class="n">imt_per</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">imt_per</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">imtstr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">imt_per</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="get_imts"><a class="viewcode-back" href="../../apidoc/shakemap.model.html#shakemap.model.get_imts">[docs]</a><span class="k">def</span> <span class="nf">get_imts</span><span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">imtset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the input imt or its closest surrogarte (or bracket) found</span>
+<span class="sd">    in imtset.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        imtstr (str): An (OQ-style) IMT string.</span>
+<span class="sd">        imtsset (set): A set of IMTs to search for imtstr or its closest</span>
+<span class="sd">            surrogate (or bracket).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: The IMT, it&#39;s closest surrogate, or a bracket of periods on</span>
+<span class="sd">        either side of the IMT&#39;s period, from the IMTs in intset.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="n">imtset</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="n">salist</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">imtset</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">)]</span>
+    <span class="n">periodlist</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">salist</span><span class="p">]</span>
+    <span class="n">periodlist</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">periodlist</span><span class="p">)</span>
+    <span class="n">periodlist_str</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">periodlist</span><span class="p">]</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># If we&#39;re here, then we know that IMT isn&#39;t in the inputs. Try</span>
+    <span class="c1"># some alternatives.</span>
+    <span class="c1">#</span>
+    <span class="k">if</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s1">&#39;PGA&#39;</span><span class="p">:</span>
+        <span class="c1">#</span>
+        <span class="c1"># Use the highest frequency in the inputs, otherwise use PGV</span>
+        <span class="c1">#</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">salist</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;SA(&#39;</span> <span class="o">+</span> <span class="n">periodlist_str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="p">)</span>
+        <span class="k">elif</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">in</span> <span class="n">imtset</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">()</span>
+    <span class="k">elif</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+        <span class="c1">#</span>
+        <span class="c1"># Use 1.0 sec SA (or its bracket) if it&#39;s there, otherwise</span>
+        <span class="c1"># use PGA</span>
+        <span class="c1">#</span>
+        <span class="n">sa_tuple</span> <span class="o">=</span> <span class="n">get_sa_bracket</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">periodlist</span><span class="p">,</span> <span class="n">periodlist_str</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sa_tuple</span> <span class="o">!=</span> <span class="p">():</span>
+            <span class="k">return</span> <span class="n">sa_tuple</span>
+        <span class="k">if</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">in</span> <span class="n">imtset</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;PGA&#39;</span><span class="p">,</span> <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">()</span>
+    <span class="k">elif</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+        <span class="c1">#</span>
+        <span class="c1"># Use PGV if it&#39;s there, otherwise use 1.0 sec SA (or its</span>
+        <span class="c1"># bracket)</span>
+        <span class="c1">#</span>
+        <span class="k">if</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">in</span> <span class="n">imtset</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">get_sa_bracket</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">periodlist</span><span class="p">,</span> <span class="n">periodlist_str</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">imtstr</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">):</span>
+        <span class="n">myper</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">imtstr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">get_sa_bracket</span><span class="p">(</span><span class="n">myper</span><span class="p">,</span> <span class="n">periodlist</span><span class="p">,</span> <span class="n">periodlist_str</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown IMT </span><span class="si">%s</span><span class="s1"> in get_imt_bracket&#39;</span> <span class="o">%</span> <span class="n">imtstr</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_sa_bracket"><a class="viewcode-back" href="../../apidoc/shakemap.model.html#shakemap.model.get_sa_bracket">[docs]</a><span class="k">def</span> <span class="nf">get_sa_bracket</span><span class="p">(</span><span class="n">myper</span><span class="p">,</span> <span class="n">plist</span><span class="p">,</span> <span class="n">plist_str</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For a given period, look through the input periods and return a tuple of</span>
+<span class="sd">    a) the single IMT string representing the period itself if it is found in the </span>
+<span class="sd">    input; b) a pair of IMT strings representing the periods bracketing the given </span>
+<span class="sd">    period; or c) the single IMT representing the first or last period in the input </span>
+<span class="sd">    list if the given period is off the end of the list.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        myper (float): The period to search for in the input lists.</span>
+<span class="sd">        plist (array): A sorted list of periods as floats.</span>
+<span class="sd">        plist_str (array): The periods in &#39;plist&#39; (above) as strings.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: One or two strings representing the IMTs closest to or bracketing</span>
+<span class="sd">        the input period.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">plist</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;SA(&#39;</span> <span class="o">+</span> <span class="n">plist_str</span><span class="p">[</span><span class="n">plist</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">myper</span><span class="p">)]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">plist</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">&gt;</span> <span class="n">myper</span><span class="p">:</span>
+            <span class="k">break</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">v</span> <span class="o">&lt;</span> <span class="n">myper</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;SA(&#39;</span> <span class="o">+</span> <span class="n">plist_str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;SA(&#39;</span> <span class="o">+</span> <span class="n">plist_str</span><span class="p">[</span><span class="n">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;SA(&#39;</span> <span class="o">+</span> <span class="n">plist_str</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_sta_imts"><a class="viewcode-back" href="../../apidoc/shakemap.model.html#shakemap.model.get_sta_imts">[docs]</a><span class="k">def</span> <span class="nf">get_sta_imts</span><span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">sdf</span><span class="p">,</span> <span class="n">ix</span><span class="p">,</span> <span class="n">imtset</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the IMT, its closest surrogate, or its bracket for a stataion</span>
+<span class="sd">    in a particular station dataframe, accounting for missing or </span>
+<span class="sd">    flagged data.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        imtstr (str): The desired IMT as an OQ-style string.</span>
+
+<span class="sd">        sdf (dict): The dataframe containing the station.</span>
+
+<span class="sd">        ix (int): The index of the station in the dataframe.</span>
+
+<span class="sd">        imtset (set): The list of IMTs (as OQ-style strings) in the </span>
+<span class="sd">            dataframe.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: The IMT, its closest surrogate, or the pair of IMTs</span>
+<span class="sd">        bracketing it in period, gathered from the valid data for the</span>
+<span class="sd">        station.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">myimts</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">this_imt</span> <span class="ow">in</span> <span class="n">imtset</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="n">this_imt</span><span class="p">][</span><span class="n">ix</span><span class="p">])</span> <span class="ow">and</span> \
+           <span class="ow">not</span> <span class="n">sdf</span><span class="p">[</span><span class="n">this_imt</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">][</span><span class="n">ix</span><span class="p">]:</span>
+            <span class="n">myimts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">this_imt</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">get_imts</span><span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">myimts</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="get_map_grade"><a class="viewcode-back" href="../../apidoc/shakemap.model.html#shakemap.model.get_map_grade">[docs]</a><span class="k">def</span> <span class="nf">get_map_grade</span><span class="p">(</span><span class="n">do_grid</span><span class="p">,</span> <span class="n">outsd</span><span class="p">,</span> <span class="n">psd</span><span class="p">,</span> <span class="n">moutgrid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Computes a &#39;grade&#39; for the map. Essentially looks at the ratio of</span>
+<span class="sd">    the computed PGA uncertainty to the predicted PGA uncertainty for</span>
+<span class="sd">    the area inside the MMI 6 contour. If the maximum MMI is less than</span>
+<span class="sd">    6, or the map is not a grid, the grade and mean ratio are set to &#39;-&#39;.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        do_grid (bool): Is the map a grid (True) or a list of points</span>
+<span class="sd">            (False)?</span>
+
+<span class="sd">        outsd (dict): A dictionary of computed uncertainty arrays.</span>
+
+<span class="sd">        psd (dict): A dictionary of predicted uncertainty arrays.</span>
+
+<span class="sd">        moutgrid (dict): A dictionary of landmasked output ground</span>
+<span class="sd">            motion arrays.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: The mean uncertainty ratio and the letter grade</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mean_rat</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+    <span class="n">mygrade</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">do_grid</span> <span class="ow">or</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">outsd</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">mean_rat</span><span class="p">,</span> <span class="n">mygrade</span><span class="p">,</span> <span class="p">[]</span>
+    <span class="n">sd_rat</span> <span class="o">=</span> <span class="n">outsd</span><span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">psd</span><span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">]</span>
+    <span class="n">mmimasked</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_less</span><span class="p">(</span><span class="n">moutgrid</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">],</span> <span class="mf">6.0</span><span class="p">)</span>
+    <span class="n">mpgasd_rat</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_array</span><span class="p">(</span><span class="n">sd_rat</span><span class="p">,</span> <span class="n">mask</span><span class="o">=</span><span class="n">mmimasked</span><span class="o">.</span><span class="n">mask</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">mpgasd_rat</span><span class="o">.</span><span class="n">mask</span><span class="p">):</span>
+        <span class="n">gvals</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.96</span><span class="p">,</span> <span class="mf">0.98</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">,</span> <span class="mf">1.25</span><span class="p">]</span>
+        <span class="n">grades</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;A&#39;</span><span class="p">,</span> <span class="s1">&#39;B&#39;</span><span class="p">,</span> <span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="s1">&#39;D&#39;</span><span class="p">,</span> <span class="s1">&#39;F&#39;</span><span class="p">]</span>
+        <span class="n">mean_rat</span> <span class="o">=</span> <span class="n">mpgasd_rat</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">ix</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gvals</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">mean_rat</span> <span class="o">&lt;=</span> <span class="n">val</span><span class="p">:</span>
+                <span class="n">mygrade</span> <span class="o">=</span> <span class="n">grades</span><span class="p">[</span><span class="n">ix</span><span class="p">]</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">mygrade</span> <span class="o">==</span> <span class="s1">&#39;-&#39;</span><span class="p">:</span>
+            <span class="n">mygrade</span> <span class="o">=</span> <span class="s1">&#39;F&#39;</span>
+    <span class="k">return</span> <span class="n">mean_rat</span><span class="p">,</span> <span class="n">mygrade</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
