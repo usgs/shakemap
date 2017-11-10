@@ -4,19 +4,19 @@ Read shake_result.hdf and produce a set of GeoJSON contours in the
 event's 'products' directory.
 """
 
+#stdlib imports
 import sys
 import os.path
 import argparse
-import json
+import logging
 
-import geojson as gj
-from geojson import FeatureCollection, Feature, MultiLineString
-import numpy as np
-from skimage import measure
-from scipy.ndimage.filters import median_filter
-
+#neic imports
 from shakelib.utils.containers import OutputContainer
 from shakemap.utils.config import get_config_paths
+from shakemap.products.contour import contour_to_files
+
+#third party imports
+from configobj import ConfigObj
 
 def get_parser():
     description = '''
@@ -25,15 +25,13 @@ def get_parser():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('eventid',
                         help='The id of the event to process.')
-    parser.add_argument('-v', '--verbose', action='store_true',
-                        help='Print informational messages.')
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='Print all informational messages.')
+    parser.add_argument('-q', '--quiet', action='store_true',
+                        help='Print only errors.')
     return parser
 
-#%%
-#args = type('Dummy', (object,), {'eventid' : 'wenchuan',
-#                                 'verbose' : True})
-#if True:
-def contour(args):
+def main(args):
     verbose = args.verbose
     #
     # Find the shake_data file
@@ -47,103 +45,38 @@ def contour(args):
     if not os.path.isfile(datafile):
         print('%s is not a valid shake result file.' % datafile)
         sys.exit(1)
-    #
+
+    # set up logging
+    logdir = os.path.join(data_path, args.eventid, 'current', 'log')
+    if not os.path.isdir(logdir):
+        os.mkdir(logdir)
+    logfile = os.path.join(logdir,'sm_contour.log')
+    logger = logging.getLogger('shakelog')
+    logger.setLevel(logging.DEBUG)
+    fh = logging.FileHandler(logfile)
+    fh.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    fh.setFormatter(formatter)
+    logger.addHandler(fh)
+
+        
     # Open the OutputContainer and extract the data
-    #
-    oc = OutputContainer.load(datafile)
-    config = oc.getDictionary('config')
-    component = config['interp']['component']
-    jsonstr = oc.getString('info.json')
-    infojson = json.loads(jsonstr)
-    ggmd = {
-        'event_id': args.eventid,
-        'latitude': infojson['input']['event_information']['latitude'],
-        'longitude': infojson['input']['event_information']['longitude']
-    }
-#    grid_dict = {}
-    contour_dict = {}
-    for imtype in oc.getIMTs(component):
-        imtdict = oc.getIMT(imtype,component)
-        gridobj = imtdict['mean']
-        grid = gridobj.getData()
-        metadata = gridobj.getGeoDict().asDict()
-        #
-        # Filter the contours. Sigma should be a parameter.
-        #
-        if imtype == 'MMI':
-            sgrid = grid
-            fgrid = median_filter(sgrid, size=10)
-            gmin = int(np.min(fgrid)) + 1   # Because you dont contour
-                                            # below the smallest value
-            gmax = int(np.max(fgrid)) + 1   # Because range ends at stop - 1
-            gdd = 1
-            units = 'mmi'
-        elif imtype == 'PGV':
-            sgrid = np.exp(grid)
-            fgrid = median_filter(sgrid, size=10)
-            gmin = int(np.min(fgrid) / 10) * 10 + 10
-            gmax = int(np.max(fgrid) / 10) * 10 + 10
-            gdd = 10
-            units = 'cms'
-        else:
-            sgrid = np.exp(grid) * 100.0
-            fgrid = median_filter(sgrid, size=10)
-            gmin = int(np.min(fgrid) / 10) * 10 + 10
-            gmax = int(np.max(fgrid) / 10) * 10 + 10
-            gdd = 10
-            units = 'pctg'
+    container = OutputContainer.load(datafile)
 
-        if verbose:
-            print('%s: sgrid max=%f, fgrid max=%f' %
-                  (imtype, np.max(sgrid), np.max(fgrid)))
-        lonstart = metadata['xmin']
-        latstart = metadata['ymin']
-        lonspan = np.abs(metadata['xmax'] - lonstart)
-        latspan = np.abs(metadata['ymax'] - latstart)
-        nlon = metadata['nx']
-        nlat = metadata['ny']
+    # get the path to the products.conf file, load the config
+    config_file = os.path.join(install_path, 'config', 'products.conf')
+    config = ConfigObj(config_file)
 
-        contour_dict[imtype] = {}
-        feature_list = []
-        for cval in range(gmin, gmax, gdd):
-            contours = measure.find_contours(fgrid, cval)
-            #
-            # Convert coords to geographic coordinates; the coordinates
-            # are returned in row, column order (i.e., (y, x))
-            #
-            new_contours = []
-            plot_contours = []
-            for ic, coords in enumerate(contours):
-                if len(coords) <= 20:
-                    continue
-                contours[ic][:, 1] = coords[:, 1] * lonspan / nlon + lonstart
-                contours[ic][:, 0] = (nlat - coords[:, 0]) * latspan / nlat + latstart
-                plot_contours.append(contours[ic])
-                new_contours.append(contours[ic].tolist())
+    # create contour files
+    contour_to_files(container,config,datadir)
 
-            if len(new_contours):
-                mls = MultiLineString(new_contours)
-                props = {'value': cval, 'units': units}
-                feature = Feature(geometry=mls, properties=props)
-                feature_list.append(feature)
-#                contour_dict[imtype][cval] = plot_contours
-        bbox = [metadata['xmin'], metadata['ymin'], metadata['xmax'], metadata['ymax']]
-        fc = FeatureCollection(feature_list, bbox=bbox, metadata=ggmd)
-        file = 'cont_' + \
-               imtype.replace('.', 'p')\
-                     .replace('(', '')\
-                     .replace(')', '')\
-                     .lower() + \
-               '.json'
-        with open(os.path.join(datadir, file), 'w') as fd:
-            print(gj.dumps(fc), file=fd)
-#        grid_dict[imtype] = fgrid
+    if verbose:
+        print('Contour files created in %s.' % datadir)
+    fh.close()
+    
 
-
-
-# %%
 if __name__ == '__main__':
     parser = get_parser()
     pargs = parser.parse_args()
-    contour(pargs)
+    main(pargs)
     sys.exit(0)

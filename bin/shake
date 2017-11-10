@@ -1,0 +1,171 @@
+#!/usr/bin/env python
+
+#stdlib imports
+import logging.config
+import os.path
+import argparse
+import sys
+import traceback
+import io
+import socket
+import pkgutil
+import inspect
+import importlib
+
+#local imports
+from shakemap.utils.config import get_config_paths,get_configspec
+import shakemap.coremods
+
+#third party imports
+from configobj import ConfigObj
+from validate import Validator, ValidateError
+
+REQ_FIELDS = {'logging.handlers.TimedRotatingFileHandler':['level',
+                                                           'formatter',
+                                                           'class',
+                                                           'when',
+                                                           'filename'],
+              'logging.FileHandler':['level',
+                                     'formatter',
+                                     'class',
+                                     'filename'],
+              'logging.handlers.SMTPHandler':['level',
+                                              'formatter',
+                                              'mailhost',
+                                              'fromaddr',
+                                              'toaddrs',
+                                              'subject',
+                                              'class']}
+
+def _get_command_classes():
+    coremods = {
+        name: importlib.import_module(name)
+        for finder, name, ispkg
+        in pkgutil.iter_modules(shakemap.coremods.__path__, 
+                                shakemap.coremods.__name__ + ".")
+    }
+    
+    classes = {}
+    for name, module in coremods.items():
+        for m in inspect.getmembers(module, inspect.isclass):
+            if m[1].__module__ == name:
+                core_class = getattr(module, m[0])
+                cmd = core_class.command_name
+                
+                if not cmd:
+                    continue
+                classes[cmd] = core_class
+    return classes
+    
+_classes_ = _get_command_classes()
+    
+def _clean_shake_dict(config):
+    for handlerkey,handler in config['handlers'].items():
+        myclass = handler['class']
+        req_fields = REQ_FIELDS[myclass]
+        for key,value in handler.items():
+            if key not in req_fields:
+                del handler[key]
+
+def _format_error_info(exception,eventid):
+    stringio = io.StringIO()
+    ex_type, ex, tb = sys.exc_info()
+    traceback.print_tb(tb,file=stringio)
+    stack_trace = stringio.getvalue()
+    stringio.close()
+    hostname = socket.gethostname()
+    error_msg = '\nHost: %s\nEvent ID: %s\nException: %s' % (hostname,eventid,stack_trace)
+    return error_msg
+                
+def get_parser():
+    description = '''
+    Run all configured ShakeMap programs.
+
+    The default behavior is to run silently, logging all output to configured log files
+    and exceptions to email (if configured.)
+    '''
+
+    epilog = 'Available commands:\n'
+    for key,core_class in _classes_.items():
+        epilog += '  %s\n' % inspect.getdoc(core_class)
+    
+    parser = argparse.ArgumentParser(description=description,
+                                     epilog=epilog,
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('eventid',
+                        help='The id of the event to process.')
+    parser.add_argument('cmds',nargs='+',
+                        help='The commands to run.')
+    parser.add_argument('-d', '--debug', action='store_true',
+                        help='Print all informational messages.')
+    parser.add_argument('-q', '--quiet', action='store_true',
+                        help='Print only errors.')
+    parser.add_argument('-l', '--log', action='store_true',
+                        help='Log all output.')
+    return parser
+
+def _get_config():
+    install_path, data_path = get_config_paths()
+    conf_file = os.path.join(install_path,'config','shake.conf')
+    spec_file = get_configspec(config='shake')
+    shake_conf = ConfigObj(conf_file,
+                           configspec=spec_file,
+                           interpolation='template')
+    
+    val = Validator()
+    results = shake_conf.validate(val)
+    if not isinstance(results, bool) or not results:
+        config_error(global_config, results)
+
+
+    log_config = shake_conf['shake']
+    _clean_shake_dict(log_config)
+    return log_config
+
+def _get_logger(args,config):
+    if args.debug or args.quiet or not args.log:
+        format = config['formatters']['standard']['format']
+        datefmt = config['formatters']['standard']['datefmt']
+        #create a console handler, with verbosity setting chosen by user
+        if args.debug:
+            level = logging.DEBUG
+        elif args.quiet:
+            level = logging.ERROR
+        else: #default interactive
+            level = logging.INFO
+        logging.basicConfig(format=format,datefmt=datefmt,level=level)
+    else:
+        event_log_file = os.path.join(data_path,args.eventid,'shake.log')
+        log_config['handlers']['event_file']['filename'] = event_log_file
+        tmp = logging.config.dictConfig(log_config)
+
+    log_name = list(config['loggers'].keys())[0]
+    logger = logging.getLogger(log_name)
+    return logger
+
+
+def main(args):
+    log_config = _get_config()
+    logger = _get_logger(args,log_config)
+    
+    try:
+        for cmd in args.cmds:
+            if cmd not in _classes_:
+                raise KeyError('Command %s not found in ShakeMap.' % cmd)
+        
+        for cmd in args.cmds:
+            logger.info('Running command %s' % cmd)
+            cmd_class = _classes_[cmd]
+            cmd_obj = cmd_class(args.eventid)
+            cmd_obj.execute()
+            logger.info('Finished running command %s' % cmd)
+
+    except Exception as e:
+        error_msg = _format_error_info(e,args.eventid)
+        logger.error(error_msg) #should get sent by email and logged
+        
+if __name__ == '__main__':
+    parser = get_parser()
+    pargs = parser.parse_args()
+    main(pargs)
+    sys.exit(0)
