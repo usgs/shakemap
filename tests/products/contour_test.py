@@ -47,31 +47,31 @@ def test_contour():
 
     
 #TODO - test with variety of shakemaps, incl those spanning 180 meridian.
-def test_contour_files():
-    outfolder = tempfile.mkdtemp()
-    try:
-        install_path, data_path = get_config_paths()
-        homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-        datafile = os.path.join(homedir,'..','data','shake_result.hdf')
-        container = OutputContainer.load(datafile)
-        config_file = os.path.join(install_path, 'config', 'products.conf')
-        config = ConfigObj(config_file)
-        contour_to_files(container,config,outfolder,None)
-        jsonfiles = os.listdir(outfolder)
-        cmpfiles = ['us19940117123055_MMI_Larger.json',
-                    'us19940117123055_PGA_Larger.json',
-                    'us19940117123055_PGV_Larger.json',
-                    'us19940117123055_PSA0p3_Larger.json',
-                    'us19940117123055_PSA1p0_Larger.json',
-                    'us19940117123055_PSA3p0_Larger.json']
-        assert sorted(jsonfiles) == cmpfiles
-    except Exception as e:
-        raise(e)
-    finally:
-        shutil.rmtree(outfolder) #remove outfolder and all files in it
+# def test_contour_files():
+#     outfolder = tempfile.mkdtemp()
+#     try:
+#         install_path, data_path = get_config_paths()
+#         homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
+#         datafile = os.path.join(homedir,'..','data','shake_result.hdf')
+#         container = OutputContainer.load(datafile)
+#         config_file = os.path.join(install_path, 'config', 'products.conf')
+#         config = ConfigObj(config_file)
+#         contour_to_files(container,config,outfolder,None)
+#         jsonfiles = os.listdir(outfolder)
+#         cmpfiles = ['us19940117123055_MMI_Larger.json',
+#                     'us19940117123055_PGA_Larger.json',
+#                     'us19940117123055_PGV_Larger.json',
+#                     'us19940117123055_PSA0p3_Larger.json',
+#                     'us19940117123055_PSA1p0_Larger.json',
+#                     'us19940117123055_PSA3p0_Larger.json']
+#         assert sorted(jsonfiles) == cmpfiles
+#     except Exception as e:
+#         raise(e)
+#     finally:
+#         shutil.rmtree(outfolder) #remove outfolder and all files in it
                     
 
 if __name__ == '__main__':
     test_intervals()
     test_contour()
-    test_contour_files()
+    #test_contour_files()

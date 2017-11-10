@@ -376,41 +376,6 @@ def test_model():
         test_restore()
 
 ########################################################################
-# Test sm_contour
-########################################################################
-def test_contour():
-    # Create a profile for testing other programs
-    test_setup()
-
-    try:
-        installpath, datapath = get_config_paths()
-        #
-        # Run in verbose mode to hit that code
-        #
-        program = os.path.join(shakedir, 'bin', 'sm_contour')
-        cp = subprocess.run([program, 'nc72282711', '-v'], shell=False)
-        assert not cp.returncode
-        #
-        # Run a nonexistent event to hit the error-handling code
-        #
-        cp = subprocess.run([program, 'not_an_event'], shell=False)
-        assert cp.returncode
-        #
-        # Remove the products directory to hit that code
-        #
-        hdf_file = os.path.join(datapath, 'nc72282711', 'current', 
-                                'products', 'shake_result.hdf')
-        os.rename(hdf_file, hdf_file + '_safe')
-
-        cp = subprocess.run([program, 'nc72282711'], shell=False)
-        assert cp.returncode
-        os.rename(hdf_file + '_safe', hdf_file)
-    except Exception as e:
-        raise(e)
-    finally:
-        test_restore()
-
-########################################################################
 # Put the user's profile back the way it was when we started
 ########################################################################
 def test_restore():
