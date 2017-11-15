@@ -12,7 +12,6 @@ import copy
 from time import gmtime, strftime
 import json
 import warnings
-import re
 
 import numpy as np
 import numpy.ma as ma
@@ -28,68 +27,28 @@ from shakelib.distance import Distance, get_distance
 from shakelib.multigmpe import MultiGMPE
 from shakelib.virtualipe import VirtualIPE
 from shakelib.utils.utils import get_extent
-from shakelib.utils.containers import InputContainer,OutputContainer
+from shakelib.utils.containers import InputContainer, OutputContainer
 
-from mapio.gridcontainer import GridHDFContainer
 from mapio.geodict import GeoDict
 from mapio.grid2d import Grid2D
 from shakelib.utils.distance import geodetic_distance_fast
 
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.utils import get_object_from_config
-from shakemap.model import (get_period_index_from_imt_str, 
-                            get_period_array, get_imts, 
-                            get_sa_bracket, get_sta_imts, 
-                            get_map_grade)
+from shakemap.model import (get_period_index_from_imt_str,
+                            get_period_array,
+                            get_sta_imts,
+                            get_map_grade, get_layer_info,
+                            gmas, get_default_std_inter)
 
 from shakemap._version import get_versions
 
-#we need a way to get units information about intensity measure types
-#and translate between openquake naming convention and ShakeMap grid naming
-#convention.
-def get_layer_info(layer):
-    layer_out = layer
-    layer_units = ''
-    layer_digits = 4 #number of significant digits
-    if layer.endswith('_sd') and layer.startswith('SA'):
-        tlayer = layer.replace('_sd','')
-        match = re.match(r'^SA\(([^)]+?)\)$', tlayer)
-        try:
-            period = float(match.group(1))
-        except:
-            x = 1
-        layer_out = ('PSA%0.1f_sd' % period).replace('.','p')
-        layer_units = 'sd'
-    elif layer.startswith('SA'):
-        match = re.match(r'^SA\(([^)]+?)\)$', layer)
-        period = float(match.group(1))
-        layer_out = ('PSA%0.1f' % period).replace('.','p')
-        layer_units = 'ln(g)'
-    elif layer.startswith('PGA'):
-        if layer.endswith('_sd'):
-            layer_units = 'sd'
-        else:
-            layer_units = 'ln(g)'
-    elif layer.startswith('PGV'):
-        if layer.endswith('_sd'):
-            layer_units = 'sd'
-        else:
-            layer_units = 'ln(cm/s)'
-    elif layer.startswith('MMI'):
-        if layer.endswith('_sd'):
-            layer_units = 'sd'
-        else:
-            layer_units = 'intensity'
-        layer_digits = 2
-    elif layer.startswith('vs30'):
-        if layer.endswith('_sd'):
-            layer_units = 'sd'
-        else:
-            layer_units = 'm/s'
-    else:
-        pass
-
-    return (layer_out,layer_units,layer_digits)
+#
+# TODO: Some constants; these should maybe be in a configuration
+# or in a constants module or be GMICE-specific.
+#
+SM_CONSTS = {'default_mmi_std': 0.3,
+             'min_mmi_convert': 4.0}
 
 
 def get_parser():
@@ -106,33 +65,9 @@ directory in the ShakeMap data directory of the current profile.
 
 
 # %%
-#
-# Helper function to call get_mean_and_stddevs for the
-# appropriate object given the IMT
-#
-def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
-    if 'MMI' in oqimt:
-        pe = ipe
-    else:
-        pe = gmpe
-    return pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
-
-
-#
-# This is a stand-in for tau when the gmpe set doesn't provide it
-# It is an educated guess based on the NGA-east work and BC Hydro
-# gmpe. It's not perfect, but probably isn't too far off. It is
-# only used when the GMPEs don't provide a breakdown of the
-# uncertainty terms.
-#
-def get_std_inter():
-    return 0.35
-
-
-# %%
-# args = type('Dummy', (object,), {'eventid': 'nc72282711',
-#                                  'verbose': True})
-# if True:
+#args = type('Dummy', (object,), {'eventid': 'nc72282711',
+#                                 'verbose': True})
+#if True:
 def interp(args):
     verbose = args.verbose
     #
@@ -149,7 +84,7 @@ def interp(args):
         sys.exit(1)
     # ------------------------------------------------------------------
     # Make the input container and extract the config
-    #------------------------------------------------------------------
+    # ------------------------------------------------------------------
     ic = InputContainer.load(datafile)
     config = ic.getConfig()
     # ------------------------------------------------------------------
@@ -179,7 +114,7 @@ def interp(args):
     # Outlier parameters
     # ------------------------------------------------------------------
     outlier_deviation_level = config['data']['outlier']['max_deviation']
-    outlier_max_mag = config['data']['outlier']['max_mag']
+    outlier_max_mag         = config['data']['outlier']['max_mag']
     # ------------------------------------------------------------------
     # These are the IMTs we want to make
     # ------------------------------------------------------------------
@@ -235,7 +170,6 @@ def interp(args):
 
         sx_out_soil = sites_obj_out.getSitesContext({'lats': lats,
                                                      'lons': lons})
-
     else:
         #
         # GRID: Figure out the grid parameters and get output points
@@ -253,15 +187,11 @@ def interp(args):
                                          defaultVs30=vs30default,
                                          vs30File=vs30_file)
         smnx, smny = sites_obj_out.getNxNy()
-
         sx_out_soil = sites_obj_out.getSitesContext()
         lons, lats = np.meshgrid(sx_out_soil.lons, sx_out_soil.lats)
-        lons = np.flipud(lons)
-        lats = np.flipud(lats)
-        lons = lons.flatten()
-        lats = lats.flatten()
+        lons = np.flipud(lons).flatten()
+        lats = np.flipud(lats).flatten()
         depths = np.zeros_like(lats)
-
         dist_obj_out = Distance.fromSites(default_gmpe, sites_obj_out,
                                           rupture_obj)
 
@@ -292,12 +222,11 @@ def interp(args):
     sx_dict = {'df1': None, 'df2': None}
     dx_dict = {'df1': None, 'df2': None}
     if stations is not None:
-        # TODO: make the argument instrumented=bool
-        df_dict['df1'] = stations.getStationDataframe(1)
-        df_dict['df2'] = stations.getStationDataframe(0)
+        df_dict['df1'] = stations.getStationDictionary(instrumented=True)
+        df_dict['df2'] = stations.getStationDictionary(instrumented=False)
         #
-        # Get the sites and distance contexts for each dataframe then
-        # compute the predictions for the IMTs in that dataframe.
+        # Make the sites and distance contexts for each dictionary then
+        # compute the predictions for the IMTs in that dictionary.
         #
         for ndf, df in df_dict.items():
             if not df:
@@ -305,7 +234,7 @@ def interp(args):
                 imt_in_dict[ndf] = set()
                 continue
             #
-            # Get lists of the input IMTs
+            # Make lists of the input IMTs
             #
             imt_in_str_dict[ndf] = set(
                     [x for x in df.keys() if x in ('PGA', 'PGV', 'MMI') or
@@ -333,24 +262,24 @@ def interp(args):
                 pmean, pstddev = gmas(ipe, gmpe, sx_dict[ndf], rx,
                                       dx_dict[ndf], oqimt, stddev_types)
                 df[imtstr + '_pred'] = pmean
-                df[imtstr + '_pred_sd_total'] = pstddev[0]
+                df[imtstr + '_pred_sigma'] = pstddev[0]
                 if total_sd_only is True:
-                    tau_guess = get_std_inter()
-                    df[imtstr + '_pred_sd_inter'] = np.full_like(
+                    tau_guess = get_default_std_inter()
+                    df[imtstr + '_pred_tau'] = np.full_like(
                             df[imtstr + '_pred'], tau_guess)
-                    df[imtstr + '_pred_sd_intra'] = np.sqrt(pstddev[0]**2 -
+                    df[imtstr + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
                                                             tau_guess**2)
                 else:
-                    df[imtstr + '_pred_sd_inter'] = pstddev[1]
-                    df[imtstr + '_pred_sd_intra'] = pstddev[2]
+                    df[imtstr + '_pred_tau'] = pstddev[1]
+                    df[imtstr + '_pred_phi'] = pstddev[2]
                 #
                 # Compute the total residual
                 #
                 df[imtstr + '_residual'] = df[imtstr] - df[imtstr + '_pred']
-                #
+                # ----------------------------------------------------------
                 # Do the outlier flagging if we don't have a fault and
                 # the event magnitude is over the limit
-                #
+                # ----------------------------------------------------------
                 if not isinstance(rupture_obj, PointRupture) or \
                    rx.mag <= outlier_max_mag:
                     #
@@ -358,15 +287,14 @@ def interp(args):
                     #
                     np.seterr(invalid='ignore')
                     flagged = np.abs(df[imtstr + '_residual']) > \
-                        outlier_deviation_level * df[imtstr + '_pred_sd_total']
+                        outlier_deviation_level * df[imtstr + '_pred_sigma']
                     np.seterr(invalid='warn')
                     if verbose:
                         print('IMT: %s, flagged: %d' %
                               (imtstr, np.sum(flagged)))
                     df[imtstr + '_outliers'] = flagged
                 else:
-                    # TODO: should this be False??
-                    df[imtstr + '_outliers'] = np.full(df[imtstr].shape, True,
+                    df[imtstr + '_outliers'] = np.full(df[imtstr].shape, False,
                                                        dtype=np.bool)
                 #
                 # Make the uncertainty arrays for any IMTs that don't
@@ -374,8 +302,7 @@ def interp(args):
                 #
                 if (imtstr + '_sd') not in df:
                     if imtstr == 'MMI':
-                        # TODO: Make this a constant somewhere
-                        sdval = 0.3
+                        sdval = SM_CONSTS['default_mmi_std']
                     else:
                         sdval = 0.0
                     df[imtstr + '_sd'] = np.full_like(df['lon'], sdval)
@@ -415,9 +342,7 @@ def interp(args):
                 df2[imtstr], _ = gmice.getGMfromMI(df2['MMI'], oqimt,
                                                    dists=df2['rrup'],
                                                    mag=rx.mag)
-                # TODO: make this a constant somehwere
-                # or build it into the gmice
-                df2[imtstr][df2['MMI'] < 4.0] = np.nan
+                df2[imtstr][df2['MMI'] < SM_CONSTS['min_mmi_convert']] = np.nan
                 np.seterr(invalid='warn')
                 df2[imtstr + '_sd'] = np.full_like(df2['MMI'],
                                                    gmice.getMI2GMsd()[oqimt])
@@ -429,16 +354,16 @@ def interp(args):
                 pmean, pstddev = gmas(ipe, gmpe, sx_dict['df2'], rx,
                                       dx_dict['df2'], oqimt, stddev_types)
                 df2[imtstr + '_pred'] = pmean
-                df2[imtstr + '_pred_sd_total'] = pstddev[0]
+                df2[imtstr + '_pred_sigma'] = pstddev[0]
                 if total_sd_only is True:
-                    tau_guess = get_std_inter()
-                    df2[imtstr + '_pred_sd_inter'] = np.full_like(
+                    tau_guess = get_default_std_inter()
+                    df2[imtstr + '_pred_tau'] = np.full_like(
                             df2[imtstr + '_pred'], tau_guess)
-                    df2[imtstr + '_pred_sd_intra'] = np.sqrt(pstddev[0]**2 -
-                                                             tau_guess**2)
+                    df2[imtstr + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
+                                                        tau_guess**2)
                 else:
-                    df2[imtstr + '_pred_sd_inter'] = pstddev[1]
-                    df2[imtstr + '_pred_sd_intra'] = pstddev[2]
+                    df2[imtstr + '_pred_tau'] = pstddev[1]
+                    df2[imtstr + '_pred_phi'] = pstddev[2]
                 df2[imtstr + '_residual'] = df2[str(oqimt)] - pmean
                 df2[imtstr + '_outliers'] = np.full(pmean.shape, False,
                                                     dtype=np.bool)
@@ -485,16 +410,16 @@ def interp(args):
                                   dx_dict['df1'], imt.from_string('MMI'),
                                   stddev_types)
             df1['MMI' + '_pred'] = pmean
-            df1['MMI' + '_pred_sd_total'] = pstddev[0]
+            df1['MMI' + '_pred_sigma'] = pstddev[0]
             if total_sd_only is True:
-                tau_guess = get_std_inter()
-                df1['MMI' + '_pred_sd_inter'] = np.full_like(
+                tau_guess = get_default_std_inter()
+                df1['MMI' + '_pred_tau'] = np.full_like(
                         df1['MMI' + '_pred'], tau_guess)
-                df1['MMI' + '_pred_sd_intra'] = np.sqrt(pstddev[0]**2 -
-                                                        tau_guess**2)
+                df1['MMI' + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
+                                                   tau_guess**2)
             else:
-                df1['MMI' + '_pred_sd_inter'] = pstddev[1]
-                df1['MMI' + '_pred_sd_intra'] = pstddev[2]
+                df1['MMI' + '_pred_tau'] = pstddev[1]
+                df1['MMI' + '_pred_phi'] = pstddev[2]
             df1['MMI' + '_residual'] = df1['MMI'] - pmean
             df1['MMI' + '_outliers'] = np.full(pmean.shape, False,
                                                dtype=np.bool)
@@ -513,21 +438,24 @@ def interp(args):
     # First do the bias for all of the input and output IMTs. Hold on
     # to some of the products that will be used for the interpolation.
     #
-    bias = {}
-    sigma_2_eta = {}
+    nominal_bias = {}
+    bias_num = {}   # The numerator term of the bias
+    bias_den = {}   # The denominator term of the bias
     outgrid = {}
     outsd = {}
     psd = {}
+    tsd = {}
 
+    sta_period_ix = {}
     sta_lons_rad = {}
     sta_lats_rad = {}
     sta_resids = {}
-    sta_period_ix = {}
-    sta_sigs = {}
-    sta_sigs_total = {}
-    sta_sigs_inter = {}
+    sta_phi = {}
+    sta_sig_total = {}
+    sta_tau = {}
+    sta_imtstr = {}
     corr_adj = {}
-    sigma22inv = {}
+    corr22 = {}
 
     #
     # Compute a bias for all of the IMTs in the inputs and outputs
@@ -546,48 +474,53 @@ def interp(args):
         #
         # Fill the station arrays
         #
-        sta_lons_rad[imtstr] = np.array([])
-        sta_lats_rad[imtstr] = np.array([])
-        sta_resids[imtstr] = np.array([])
-        sta_sigs[imtstr] = np.array([])
-        sta_sigs_total[imtstr] = np.array([])
-        sta_sigs_inter[imtstr] = np.array([])
-        sta_period_ix[imtstr] = np.array([], dtype=np.int64)
+        period_ix = []
+        lons_rad = []
+        lats_rad = []
+        resids = []
+        phi = []
+        sig_total = []
+        tau = []
+        imtlist = []
         for ndf, sdf in df_dict.items():
             if not sdf:
                 continue
             for i in range(np.size(sdf['lon'])):
                 for imtin in get_sta_imts(imtstr, sdf, i,
                                           imt_in_str_dict[ndf]):
+                    imtlist.append(imtin)
                     inperiod_ix = get_period_index_from_imt_str(
                             imtin, imt_per_ix)
-                    sta_lons_rad[imtstr] = np.append(sta_lons_rad[imtstr],
-                                                     sdf['lon_rad'][i])
-                    sta_lats_rad[imtstr] = np.append(sta_lats_rad[imtstr],
-                                                     sdf['lat_rad'][i])
-                    sta_resids[imtstr] = np.append(sta_resids[imtstr],
-                                           sdf[imtin + '_residual'][i])
-                    sdarr = sdf[imtin + '_pred_sd_intra'][i]
-                    sta_sigs[imtstr] = np.append(sta_sigs[imtstr], sdarr)
-                    sta_sigs_inter[imtstr] = np.append(sta_sigs_inter[imtstr],
-                                  sdf[imtin + '_pred_sd_inter'][i])
-                    sta_sigs_total[imtstr] = np.append(sta_sigs_total[imtstr],
-                                  np.sqrt(sdarr**2 + sdf[imtin + '_sd'][i]**2))
-                    sta_period_ix[imtstr] = np.append(sta_period_ix[imtstr],
-                                                      inperiod_ix)
-        if np.size(sta_lons_rad[imtstr]) == 0:
-            bias[imtstr] = 0.0
-            sigma_2_eta[imtstr] = 0.0
+                    period_ix.append(inperiod_ix)
+                    lons_rad.append(sdf['lon_rad'][i])
+                    lats_rad.append(sdf['lat_rad'][i])
+                    resids.append(sdf[imtin + '_residual'][i])
+                    tau.append(sdf[imtin + '_pred_tau'][i])
+                    _phi = sdf[imtin + '_pred_phi'][i]
+                    phi.append(_phi)
+                    sig_total.append(
+                            np.sqrt(_phi**2 + sdf[imtin + '_sd'][i]**2))
+        sta_imtstr[imtstr] = np.array(imtlist)
+        sta_period_ix[imtstr] = np.array(period_ix).reshape((-1, 1))
+        sta_lons_rad[imtstr] = np.array(lons_rad).reshape((-1, 1))
+        sta_lats_rad[imtstr] = np.array(lats_rad).reshape((-1, 1))
+        sta_resids[imtstr] = np.array(resids).reshape((-1, 1))
+        sta_tau[imtstr] = np.array(tau).reshape((-1, 1))
+        sta_phi[imtstr] = np.array(phi).reshape((-1, 1))
+        sta_sig_total[imtstr] = np.array(sig_total).reshape((-1, 1))
+        if len(lons_rad) == 0:
+            bias_num[imtstr] = 0.0
+            bias_den[imtstr] = 0.0
             continue
-        sta_lons_rad[imtstr] = sta_lons_rad[imtstr].reshape((-1, 1))
-        sta_lats_rad[imtstr] = sta_lats_rad[imtstr].reshape((-1, 1))
-        sta_resids[imtstr] = sta_resids[imtstr].reshape((-1, 1))
-        sta_sigs[imtstr] = sta_sigs[imtstr].reshape((-1, 1))
-        sta_sigs_total[imtstr] = sta_sigs_total[imtstr].reshape((-1, 1))
-        sta_period_ix[imtstr] = sta_period_ix[imtstr].reshape((-1, 1))
-        corr_adj[imtstr] = (sta_sigs[imtstr] / sta_sigs_total[imtstr])
+        #
+        # This builds the omega factors to apply to the covariance
+        #
+        corr_adj[imtstr] = (sta_phi[imtstr] / sta_sig_total[imtstr])
         corr_adj22 = corr_adj[imtstr] * corr_adj[imtstr].T
         np.fill_diagonal(corr_adj22, 1.0)
+        #
+        # Build the covariance matrix of the residuals
+        #
         dist22 = geodetic_distance_fast(sta_lons_rad[imtstr],
                                         sta_lats_rad[imtstr],
                                         sta_lons_rad[imtstr].T,
@@ -595,32 +528,36 @@ def interp(args):
         d22_rows, d22_cols = np.shape(dist22)  # should be square
         t1_22 = np.tile(sta_period_ix[imtstr], (1, d22_cols))
         t2_22 = np.tile(sta_period_ix[imtstr].T, (d22_rows, 1))
-        corr22 = ccf.getCorrelation(t1_22, t2_22, dist22) * corr_adj22
-        sigma22 = corr22 * (sta_sigs[imtstr] * sta_sigs[imtstr].T)
-        sigma22inv[imtstr] = np.linalg.pinv(sigma22)
+        corr22[imtstr] = ccf.getCorrelation(t1_22, t2_22, dist22) * corr_adj22
+        sigma22 = corr22[imtstr] * (sta_phi[imtstr] * sta_phi[imtstr].T)
+        sigma22inv = np.linalg.pinv(sigma22)
         #
-        # Compute the bias and apply it to the predictions and the
-        # residuals
+        # Compute the bias numerator and denominator pieces
         #
         if do_bias and (not isinstance(rupture_obj, PointRupture)
                         or rx.mag <= bias_max_mag):
-            ONE = np.ones_like(sta_resids[imtstr])
-            tau = np.mean(sta_sigs_inter[imtstr])
-            sigma_2_eta[imtstr] = 1.0 / (1 / tau**2 +
-                           ONE.T.dot(sigma22inv[imtstr].dot(ONE)))
-            bias[imtstr] = ONE.T.dot(
-                    sigma22inv[imtstr].dot(sta_resids[imtstr])) * \
-                    sigma_2_eta[imtstr]
-            if bias[imtstr] > bias_max_dsigma:
-                bias[imtstr] = 0.0
-                sigma_2_eta[imtstr] = 0.0
+            #
+            # Get the correlation between the inputs and outputs
+            #
+            out_ix_arr = np.full_like(sta_period_ix[imtstr], outperiod_ix)
+            dist_arr = np.zeros_like(out_ix_arr, dtype=float)
+            P = ccf.getCorrelation(sta_period_ix[imtstr], out_ix_arr, dist_arr)
+            bias_den[imtstr] = P.T.dot(sigma22inv.dot(P))
+            bias_num[imtstr] = P.T.dot(sigma22inv.dot(P * sta_resids[imtstr]))
         else:
-            bias[imtstr] = 0.0
-            sigma_2_eta[imtstr] = 0.0
+            bias_num[imtstr] = 0.0
+            bias_den[imtstr] = 0.0
+
+        nom_tau = np.mean(sta_tau[imtstr].flatten())
+        nom_variance = 1.0 / ((1.0 / nom_tau**2) + bias_den[imtstr])
+        nominal_bias[imtstr] = bias_num[imtstr] * nom_variance
         bias_time = time.time() - time1
         if verbose:
-            print('%s: bias %f stddev %f; %d stations (time=%f sec)' %
-                  (imtstr, bias[imtstr], np.sqrt(sigma_2_eta[imtstr]),
+            #
+            # Print the nominal values of the bias and its stddev
+            #
+            print('%s: nom bias %f nom stddev %f; %d stations (time=%f sec)' %
+                  (imtstr, nominal_bias[imtstr], np.sqrt(nom_variance),
                    np.size(sta_lons_rad[imtstr]), bias_time))
     #
     # End bias
@@ -643,48 +580,51 @@ def interp(args):
             gmpe = MultiGMPE.from_config(config, filter_imt=oqimt)
         pout_mean, pout_sd = gmas(ipe, gmpe, sx_out_soil, rx, dx_out, oqimt,
                                   stddev_types)
-        if bias[imtstr]:
-            if total_sd_only is True:
-                psd[imtstr] = np.sqrt(pout_sd[0]**2 - get_std_inter()**2)
-            else:
-                psd[imtstr] = pout_sd[2]
-        else:
-            psd[imtstr] = pout_sd[0]
-        pout_sd2 = np.power(psd[imtstr], 2.0)
-
-        #
-        # Bias the predictions
-        #
-        pout_mean += bias[imtstr]
         #
         # If there are no data, just use the unbiased prediction
+        # and the total stddev
         #
         if np.size(sta_lons_rad[imtstr]) == 0:
             outgrid[imtstr] = pout_mean
             outsd[imtstr] = pout_sd[0]
             continue
         #
-        # Remake the residual array now that we (may) have a bias
+        # Get an array of the within-event standard deviations for the
+        # output IMT at the output points
         #
-        if bias[imtstr] != 0:
-            sta_resids[imtstr] = np.array([])
-            for ndf, sdf in df_dict.items():
-                if not sdf:
-                    continue
-                for i in range(np.size(sdf['lon'])):
-                    for imtin in get_sta_imts(imtstr, sdf, i,
-                                              imt_in_str_dict[ndf]):
-                        sta_resids[imtstr] = np.append(
-                                sta_resids[imtstr],
-                                sdf[imtin + '_residual'][i] - bias[imtin])
-        sta_resids[imtstr] = sta_resids[imtstr].reshape((-1, 1))
+        if total_sd_only is True:
+            psd[imtstr] = np.sqrt(pout_sd[0]**2 - get_default_std_inter()**2)
+            tsd[imtstr] = np.full_like(psd[imtstr], get_default_std_inter())
+        else:
+            psd[imtstr] = pout_sd[2]
+            tsd[imtstr] = pout_sd[1]
+        pout_sd2 = np.power(psd[imtstr], 2.0)
+        #
+        # Bias the predictions, and add the residual variance to
+        # phi
+        #
+        out_bias_var = 1.0 / ((1.0 / tsd[imtstr]**2) + bias_den[imtstr])
+        out_bias = bias_num[imtstr] * out_bias_var
+        pout_mean += out_bias
+        psd[imtstr] = np.sqrt(psd[imtstr]**2 + out_bias_var)
+        #
+        # Unbias the residual array
+        #
+        for i in range(np.size(sta_lons_rad[imtstr])):
+            imtin = sta_imtstr[imtstr][i]
+            in_bias_var = 1.0 / ((1.0 / sta_tau[imtstr][i, 0]**2) + bias_den[imtin])
+            in_bias = bias_num[imtin] * in_bias_var
+            sta_resids[imtstr][i, 0] -= in_bias
+            sta_phi[imtstr][i, 0] = np.sqrt(sta_phi[imtstr][i, 0]**2 + in_bias_var)
         #
         # Now do the MVN itself...
         #
-        dtime = 0
-        mtime = 0
-        ddtime = 0
-        ctime = stime = atime = 0
+        dtime = mtime = ddtime = ctime = stime = atime = 0
+        #
+        # Rebuild sigma22_inv now that we have updated phi
+        #
+        sigma22 = corr22[imtstr] * (sta_phi[imtstr] * sta_phi[imtstr].T)
+        sigma22inv = np.linalg.pinv(sigma22)
 
         ampgrid = np.zeros_like(pout_mean)
         sdgrid = np.zeros_like(pout_mean)
@@ -707,20 +647,22 @@ def interp(args):
             ctime += time.time() - time4
             time4 = time.time()
             sdarr = psd[imtstr][iy, :].reshape((1, -1))
-            ss = sta_sigs[imtstr]
+            ss = sta_phi[imtstr]
             sigma12 = ne.evaluate("corr12 * corr_adj12 * (ss * sdarr)").T
             stime += time.time() - time4
             time4 = time.time()
-            rcmatrix = sigma12.dot(sigma22inv[imtstr])
+            rcmatrix = sigma12.dot(sigma22inv)
             dtime += time.time() - time4
             time4 = time.time()
-            ampgrid[iy, :] = pout_mean[iy, :] + ((corr_adj12.T *
-                   rcmatrix).dot(sta_resids[imtstr])).reshape((-1,))
+            ampgrid[iy, :] = \
+                pout_mean[iy, :] + \
+                (corr_adj12.T *
+                 rcmatrix).dot(sta_resids[imtstr]).reshape((-1,))
             atime += time.time() - time4
             time4 = time.time()
     #        sdgrid[ss:se] = pout_sd2[ss:se] - np.diag(rcmatrix.dot(sigma12))
-            sdgrid[iy, :] = pout_sd2[iy, :] - \
-                    np.sum(rcmatrix * sigma12, axis=1)
+            sdgrid[iy, :] = \
+                pout_sd2[iy, :] - np.sum(rcmatrix * sigma12, axis=1)
             mtime += time.time() - time4
 
         outgrid[imtstr] = ampgrid
@@ -747,7 +689,7 @@ def interp(args):
     # ------------------------------------------------------------------
     # Might as well stick the whole config in the result
     # ------------------------------------------------------------------
-    oc.setDictionary('config',config)
+    oc.setDictionary('config', config)
 
     #
     # We're going to need masked arrays of the output grids later, so
@@ -770,8 +712,9 @@ def interp(args):
     for imtout in imt_out_set_str:
         if imtout == refimt:
             continue
-        moutgrid[imtout] = ma.masked_array(outgrid[imtout],
-                mask=copy.copy(moutgrid[refimt].mask))
+        moutgrid[imtout] = \
+            ma.masked_array(outgrid[imtout],
+                            mask=copy.copy(moutgrid[refimt].mask))
     #
     # Get the map grade
     #
@@ -820,7 +763,7 @@ def interp(args):
             units = 'ln(g)'
         info[op][gm][myimt]['units'] = units
         info[op][gm][myimt]['bias'] = \
-            str(bias[myimt]) if myimt in bias else '-'
+            str(nominal_bias[myimt]) if myimt in nominal_bias else '-'
         info[op][gm][myimt]['max_grid'] = str(np.max(outgrid[myimt]))
         info[op][gm][myimt]['max'] = str(np.max(moutgrid[myimt]))
     info[op][mi] = {}
@@ -899,12 +842,12 @@ def interp(args):
     info[pp][sr]['vs30default'] = str(vs30default)
     info[pp][sr]['site_correction'] = 'GMPE native'
 
-    oc.setString('info.json',json.dumps(info))
+    oc.setString('info.json', json.dumps(info))
 
     # ------------------------------------------------------------------
     # Add the rupture JSON as a text string
     # ------------------------------------------------------------------
-    oc.setString('rupture.json',json.dumps(rupture_obj._geojson))
+    oc.setString('rupture.json', json.dumps(rupture_obj._geojson))
 
     # ------------------------------------------------------------------
     # Add the station data. The stationlist object has the original
@@ -979,7 +922,7 @@ def interp(args):
     else:
         sjdict = {}
 
-    oc.setString('stationlist.json',json.dumps(sjdict))
+    oc.setString('stationlist.json', json.dumps(sjdict))
 
     # ------------------------------------------------------------------
     # Add the output grids or points to the output; include some
@@ -996,8 +939,8 @@ def interp(args):
         metadata['dx'] = smdx
         metadata['dy'] = smdy
         gdict = GeoDict(metadata)
-        layername,units,digits = get_layer_info('vs30')
-        vs30 = Grid2D(sx_out_soil.vs30,gdict)
+        layername, units, digits = get_layer_info('vs30')
+        vs30 = Grid2D(sx_out_soil.vs30, gdict)
         vs30_metadata = {}
         vs30_metadata['units'] = units
         vs30_metadata['digits'] = digits
@@ -1005,20 +948,20 @@ def interp(args):
 
         for key, value in outgrid.items():
             component = config['interp']['component']
-            #set the data grid
-            mean_grid = Grid2D(value,gdict)
-            mean_layername,units,digits = get_layer_info(key)
-            mean_metadata = {'units' : units,
-                             'digits' : digits}
+            # set the data grid
+            mean_grid = Grid2D(value, gdict)
+            mean_layername, units, digits = get_layer_info(key)
+            mean_metadata = {'units': units,
+                             'digits': digits}
 
-            #set the uncertainty grid
-            std_layername,units,digits = get_layer_info(key+'_sd')
-            std_metadata = {'units' : units,
-                            'digits' : digits}
-            std_grid = Grid2D(outsd[key],gdict.copy())
+            # set the uncertainty grid
+            std_layername, units, digits = get_layer_info(key+'_sd')
+            std_metadata = {'units': units,
+                            'digits': digits}
+            std_grid = Grid2D(outsd[key], gdict.copy())
             oc.setIMT(mean_layername,
-                      mean_grid,mean_metadata,
-                      std_grid,std_metadata,
+                      mean_grid, mean_metadata,
+                      std_grid, std_metadata,
                       component)
 
     else:
@@ -1026,9 +969,11 @@ def interp(args):
         metadata['lons'] = lons.flatten()
         metadata['lats'] = lats.flatten()
         metadata['facility_ids'] = [x.encode('ascii') for x in idents]
-        oc.setArray('vs30',vs30.flatten(), metadata=metadata)
+        oc.setArray('vs30', vs30.flatten(), metadata=metadata)
 
     oc.close()
+
+# %%
     if verbose:
         print('done')
     # ------------------------------------------------------------------
@@ -1041,5 +986,3 @@ if __name__ == '__main__':
     parser = get_parser()
     pargs = parser.parse_args()
     interp(pargs)
-
-

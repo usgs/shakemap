@@ -1,3 +1,5 @@
+import re
+
 import numpy as np
 import numpy.ma as ma
 """
@@ -11,7 +13,7 @@ def get_period_index_from_imt_str(imtstr, imt_per_ix):
 
         Args:
             imtstr (str): The (OQ-style) IMT string.
-            imt_per_ix (dict): Dictionary relating periods to their 
+            imt_per_ix (dict): Dictionary relating periods to their
                 indices.
 
         Returns:
@@ -23,6 +25,7 @@ def get_period_index_from_imt_str(imtstr, imt_per_ix):
             return imt_per_ix['1.0']
         else:
             return imt_per_ix[imtstr.replace('SA(', '').replace(')', '')]
+
 
 def get_period_array(*args):
     """
@@ -48,6 +51,7 @@ def get_period_array(*args):
             else:
                 imt_per.add(float(imtstr.replace('SA(', '').replace(')', '')))
     return np.array(sorted(imt_per))
+
 
 def get_imts(imtstr, imtset):
     """
@@ -112,14 +116,16 @@ def get_imts(imtstr, imtset):
     else:
         raise ValueError('Unknown IMT %s in get_imt_bracket' % imtstr)
 
+
 def get_sa_bracket(myper, plist, plist_str):
 
     """
     For a given period, look through the input periods and return a tuple of
-    a) the single IMT string representing the period itself if it is found in the 
-    input; b) a pair of IMT strings representing the periods bracketing the given 
-    period; or c) the single IMT representing the first or last period in the input 
-    list if the given period is off the end of the list.
+    a) the single IMT string representing the period itself if it is found
+    in the input; b) a pair of IMT strings representing the periods
+    bracketing the given period; or c) the single IMT representing the first
+    or last period in the input list if the given period is off the end of
+    the list.
 
     Args:
         myper (float): The period to search for in the input lists.
@@ -127,8 +133,8 @@ def get_sa_bracket(myper, plist, plist_str):
         plist_str (array): The periods in 'plist' (above) as strings.
 
     Returns:
-        tuple: One or two strings representing the IMTs closest to or bracketing
-        the input period.
+        tuple: One or two strings representing the IMTs closest to or
+        bracketing the input period.
 
     """
     if not len(plist):
@@ -145,10 +151,11 @@ def get_sa_bracket(myper, plist, plist_str):
     else:
         return ('SA(' + plist_str[i-1] + ')', 'SA(' + plist_str[i] + ')')
 
+
 def get_sta_imts(imtstr, sdf, ix, imtset):
     """
     Get the IMT, its closest surrogate, or its bracket for a stataion
-    in a particular station dataframe, accounting for missing or 
+    in a particular station dataframe, accounting for missing or
     flagged data.
 
     Args:
@@ -158,7 +165,7 @@ def get_sta_imts(imtstr, sdf, ix, imtset):
 
         ix (int): The index of the station in the dataframe.
 
-        imtset (set): The list of IMTs (as OQ-style strings) in the 
+        imtset (set): The list of IMTs (as OQ-style strings) in the
             dataframe.
 
     Returns:
@@ -172,6 +179,7 @@ def get_sta_imts(imtstr, sdf, ix, imtset):
            not sdf[this_imt + '_outliers'][ix]:
             myimts.add(this_imt)
     return get_imts(imtstr, myimts)
+
 
 def get_map_grade(do_grid, outsd, psd, moutgrid):
     """
@@ -213,3 +221,54 @@ def get_map_grade(do_grid, outsd, psd, moutgrid):
             mygrade = 'F'
     return mean_rat, mygrade
 
+
+# we need a way to get units information about intensity measure types
+# and translate between openquake naming convention and ShakeMap grid naming
+# convention.
+def get_layer_info(layer):
+    layer_out = layer
+    layer_units = ''
+    layer_digits = 4  # number of significant digits
+    if layer.startswith('SA'):
+        match = re.match(r'^SA\(([^)]+?)\)', layer)
+        period = float(match.group(1))
+        layer_out = ('PSA%g' % period).replace('.', 'p')
+        if layer.endswith('_sd'):
+            layer_out = layer_out.replace('$', '_sd')
+        layer_units = 'ln(g)'
+    elif layer.startswith('PGA'):
+        layer_units = 'ln(g)'
+    elif layer.startswith('PGV'):
+        layer_units = 'ln(cm/s)'
+    elif layer.startswith('MMI'):
+        layer_units = 'intensity'
+        layer_digits = 2
+    elif layer.startswith('vs30'):
+        layer_units = 'm/s'
+    else:
+        raise ValueError('Unknown layer type: %s' % layer)
+
+    return (layer_out, layer_units, layer_digits)
+
+
+#
+# Helper function to call get_mean_and_stddevs for the
+# appropriate object given the IMT
+#
+def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
+    if 'MMI' in oqimt:
+        pe = ipe
+    else:
+        pe = gmpe
+    return pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
+
+
+#
+# This is a stand-in for tau when the gmpe set doesn't provide it
+# It is an educated guess based on the NGA-east work and BC Hydro
+# gmpe. It's not perfect, but probably isn't too far off. It is
+# only used when the GMPEs don't provide a breakdown of the
+# uncertainty terms.
+#
+def get_default_std_inter():
+    return 0.35
