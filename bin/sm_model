@@ -268,7 +268,7 @@ def interp(args):
                     df[imtstr + '_pred_tau'] = np.full_like(
                             df[imtstr + '_pred'], tau_guess)
                     df[imtstr + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
-                                                            tau_guess**2)
+                                                       tau_guess**2)
                 else:
                     df[imtstr + '_pred_tau'] = pstddev[1]
                     df[imtstr + '_pred_phi'] = pstddev[2]
@@ -612,10 +612,12 @@ def interp(args):
         #
         for i in range(np.size(sta_lons_rad[imtstr])):
             imtin = sta_imtstr[imtstr][i]
-            in_bias_var = 1.0 / ((1.0 / sta_tau[imtstr][i, 0]**2) + bias_den[imtin])
+            in_bias_var = 1.0 / ((1.0 / sta_tau[imtstr][i, 0]**2) +
+                                 bias_den[imtin])
             in_bias = bias_num[imtin] * in_bias_var
             sta_resids[imtstr][i, 0] -= in_bias
-            sta_phi[imtstr][i, 0] = np.sqrt(sta_phi[imtstr][i, 0]**2 + in_bias_var)
+            sta_phi[imtstr][i, 0] = np.sqrt(sta_phi[imtstr][i, 0]**2 +
+                                            in_bias_var)
         #
         # Now do the MVN itself...
         #

@@ -204,7 +204,7 @@ def get_map_grade(do_grid, outsd, psd, moutgrid):
     """
     mean_rat = '-'
     mygrade = '-'
-    if not do_grid or 'PGA' not in outsd:
+    if not do_grid or 'PGA' not in outsd or 'PGA' not in psd:
         return mean_rat, mygrade
     sd_rat = outsd['PGA'] / psd['PGA']
     mmimasked = ma.masked_less(moutgrid['MMI'], 6.0)

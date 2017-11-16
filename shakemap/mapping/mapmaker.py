@@ -332,9 +332,9 @@ class MapMaker(object):
 
     def _drawStations(self, m, fill=False, imt='pga'):
         # get the locations and values of the MMI observations
-        mmidf = self.stations.getStationDataframe(0)
+        mmidf = self.stations.getStationDictionary(instrumented=False)
         # get the locations and values of the instrumented observations
-        instdf = self.stations.getStationDataframe(1)
+        instdf = self.stations.getStationDictionary(instrumented=True)
         if imt in ('mmi', 'pga', 'pgv'):
             dimt = imt.upper()
         else:
