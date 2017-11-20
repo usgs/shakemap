@@ -5,6 +5,7 @@ import json
 import logging
 import glob
 import warnings
+import io
 
 #third party imports
 from shapely.geometry import MultiLineString,mapping
@@ -12,10 +13,12 @@ import fiona
 import numpy as np
 from skimage import measure
 from scipy.ndimage.filters import median_filter
+from shakelib.utils.containers import OutputContainer
+from configobj import ConfigObj
 
 #local imports
 from .base import CoreModule
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import get_config_paths,get_logging_config
 
 FORMATS = {'shapefile':('ESRI Shapefile','shp'),
            'geojson':('GeoJSON','json')}
@@ -27,7 +30,7 @@ class ContourModule(CoreModule):
     """
     command_name = 'contour'
     def execute(self):
-        install_path, data_path = get_config_paths()
+        install_path, data_path = get_config_paths(testing=self._testing)
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
         if not os.path.isdir(datadir):
             print('%s is not a valid directory.' % datadir)
@@ -45,6 +48,7 @@ class ContourModule(CoreModule):
         config = ConfigObj(config_file)
 
         # create contour files
+        self.logger.info('Contouring to files...')
         contour_to_files(container,config,datadir)
 
 def contour(container,imtype,component,intervals=None,
@@ -122,7 +126,7 @@ def contour(container,imtype,component,intervals=None,
                                'properties':props})
     return line_strings
 
-def contour_to_files(container,config,output_dir,logger=None):
+def contour_to_files(container,config,output_dir):
     """Generate contours of all configured IMT values.
 
     Args:
@@ -173,9 +177,7 @@ def contour_to_files(container,config,output_dir,logger=None):
         imtype_spec = config['products']['contours']['IMTS'][imtype]
         filter_size = int(imtype_spec['filter_size'])
         for component in components:
-            
-            
-            fname = '%s_%s_%s.%s' % (event_info['event_id'],imtype,component,extension)
+            fname = '%s_%s.%s' % (imtype,component,extension)
             filename = os.path.join(output_dir,fname)
             if os.path.isfile(filename):
                 fpath,fext = os.path.splitext(filename)
@@ -184,22 +186,31 @@ def contour_to_files(container,config,output_dir,logger=None):
                     os.remove(fname)
 
             # fiona spews a warning here when driver is geojson
-            # can't seem to catch this warning...
-            vector_file = fiona.open(filename,'w',
-                                     driver=driver,
-                                     schema=schema,
-                                     crs=crs)
-            
-            intervals = None
-            if 'intervals' in imtype_spec:
-                intervals = [float(i) for i in imtype_spec['intervals']]
+            # this warning appears to be un-catchable using
+            # with warnings.catch_warnings()
+            # or
+            # logging.captureWarning()
+            # or
+            # even redirecting stderr/stdout to IO streams
+            # not sure where the warning is coming from,
+            # but there appears to be no way to stop it...
+            with fiona.drivers():
+                vector_file = fiona.open(filename,'w',
+                                         driver=driver,
+                                         schema=schema,
+                                         crs=crs)
 
-            line_strings = contour(container,imtype,component,intervals)
-            for feature in line_strings:
-              vector_file.write(feature)
 
-            logger.debug('Writing contour file %s' % filename)
-            vector_file.close()
+                intervals = None
+                if 'intervals' in imtype_spec:
+                    intervals = [float(i) for i in imtype_spec['intervals']]
+
+                line_strings = contour(container,imtype,component,intervals)
+                for feature in line_strings:
+                  vector_file.write(feature)
+
+                logger.debug('Writing contour file %s' % filename)
+                vector_file.close()
 
 def _get_default_intervals(fgrid,interval_type='log'):
     logger = logging.getLogger(__name__)

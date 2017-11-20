@@ -13,29 +13,16 @@ import inspect
 import importlib
 
 #local imports
-from shakemap.utils.config import get_config_paths,get_configspec
+from shakemap.utils.config import(get_config_paths,
+                                  get_configspec,
+                                  get_shake_config,
+                                  get_logging_config,
+                                  get_logger)
 import shakemap.coremods
 
 #third party imports
 from configobj import ConfigObj
 from validate import Validator, ValidateError
-
-REQ_FIELDS = {'logging.handlers.TimedRotatingFileHandler':['level',
-                                                           'formatter',
-                                                           'class',
-                                                           'when',
-                                                           'filename'],
-              'logging.FileHandler':['level',
-                                     'formatter',
-                                     'class',
-                                     'filename'],
-              'logging.handlers.SMTPHandler':['level',
-                                              'formatter',
-                                              'mailhost',
-                                              'fromaddr',
-                                              'toaddrs',
-                                              'subject',
-                                              'class']}
 
 def _get_command_classes():
     coremods = {
@@ -50,6 +37,8 @@ def _get_command_classes():
         for m in inspect.getmembers(module, inspect.isclass):
             if m[1].__module__ == name:
                 core_class = getattr(module, m[0])
+                if not hasattr(core_class,'command_name'):
+                    continue
                 cmd = core_class.command_name
                 
                 if not cmd:
@@ -59,14 +48,6 @@ def _get_command_classes():
     
 _classes_ = _get_command_classes()
     
-def _clean_shake_dict(config):
-    for handlerkey,handler in config['handlers'].items():
-        myclass = handler['class']
-        req_fields = REQ_FIELDS[myclass]
-        for key,value in handler.items():
-            if key not in req_fields:
-                del handler[key]
-
 def _format_error_info(exception,eventid):
     stringio = io.StringIO()
     ex_type, ex, tb = sys.exc_info()
@@ -104,49 +85,17 @@ def get_parser():
                         help='Log all output.')
     return parser
 
-def _get_config():
-    install_path, data_path = get_config_paths()
-    conf_file = os.path.join(install_path,'config','shake.conf')
-    spec_file = get_configspec(config='shake')
-    shake_conf = ConfigObj(conf_file,
-                           configspec=spec_file,
-                           interpolation='template')
-    
-    val = Validator()
-    results = shake_conf.validate(val)
-    if not isinstance(results, bool) or not results:
-        config_error(global_config, results)
-
-
-    log_config = shake_conf['shake']
-    _clean_shake_dict(log_config)
-    return log_config
-
-def _get_logger(args,config):
-    if args.debug or args.quiet or not args.log:
-        format = config['formatters']['standard']['format']
-        datefmt = config['formatters']['standard']['datefmt']
-        #create a console handler, with verbosity setting chosen by user
-        if args.debug:
-            level = logging.DEBUG
-        elif args.quiet:
-            level = logging.ERROR
-        else: #default interactive
-            level = logging.INFO
-        logging.basicConfig(format=format,datefmt=datefmt,level=level)
-    else:
-        event_log_file = os.path.join(data_path,args.eventid,'shake.log')
-        log_config['handlers']['event_file']['filename'] = event_log_file
-        tmp = logging.config.dictConfig(log_config)
-
-    log_name = list(config['loggers'].keys())[0]
-    logger = logging.getLogger(log_name)
-    return logger
-
-
 def main(args):
-    log_config = _get_config()
-    logger = _get_logger(args,log_config)
+    install_path,data_path = get_config_paths()
+    log_option = None
+    if args.debug:
+        log_option = 'debug'
+    if args.quiet:
+        log_option = 'quiet'
+    if args.log:
+        log_option = 'log'
+        
+    logger = get_logger(args.eventid,log_option=log_option)
     
     try:
         for cmd in args.cmds:

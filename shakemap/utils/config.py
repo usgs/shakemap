@@ -1,10 +1,44 @@
+#stdlib imports
 import os.path
 import pkg_resources
+import logging
 
 # third party libraries
 import numpy as np
 from configobj import ConfigObj, flatten_errors
 from validate import Validator, ValidateError
+
+REQ_FIELDS = {'logging.handlers.TimedRotatingFileHandler':['level',
+                                                           'formatter',
+                                                           'class',
+                                                           'when',
+                                                           'filename'],
+              'logging.FileHandler':['level',
+                                     'formatter',
+                                     'class',
+                                     'filename'],
+              'logging.handlers.SMTPHandler':['level',
+                                              'formatter',
+                                              'mailhost',
+                                              'fromaddr',
+                                              'toaddrs',
+                                              'subject',
+                                              'class']}
+
+def get_shake_config():
+    install_path, data_path = get_config_paths()
+    conf_file = os.path.join(install_path,'config','shake.conf')
+    spec_file = get_configspec(config='shake')
+    shake_conf = ConfigObj(conf_file,
+                           configspec=spec_file,
+                           interpolation='template')
+    
+    val = Validator()
+    results = shake_conf.validate(val)
+    if not isinstance(results, bool) or not results:
+        config_error(global_config, results)
+
+    return shake_conf
 
 def get_data_path():
     """
@@ -37,7 +71,7 @@ def get_configspec(config=None):
     return fname
 
 
-def get_config_paths():
+def get_config_paths(testing=False):
     """
     Returns two paths based on the currently selected profile in the 
     user's ~/.shakemap/profile.conf: 1) the path to the ShakeMap
@@ -47,13 +81,20 @@ def get_config_paths():
         (str, str): The paths to the ShakeMap install directory
         and the data directory.
     """
-    config_file = os.path.join(os.path.expanduser('~'), '.shakemap', 
-                               'profiles.conf')
-    config = ConfigObj(config_file)
-    profile_name = config['profile']
-    profile = config['profiles'][profile_name]
-    install = profile['install_path']
-    data = profile['data_path']
+    if not testing:
+        config_file = os.path.join(os.path.expanduser('~'), '.shakemap', 
+                                   'profiles.conf')
+        config = ConfigObj(config_file)
+        profile_name = config['profile']
+
+
+        profile = config['profiles'][profile_name]
+        install = profile['install_path']
+        data = profile['data_path']
+    else:
+        thisdir = os.path.dirname(os.path.abspath(__file__))
+        install = os.path.join(thisdir,'..','..','tests','data','install','config')
+        data = os.path.join(thisdir,'..','..','tests','data','eventdata')
     return (install,data)
 
 def get_custom_validator():
@@ -410,3 +451,60 @@ def cfg_float(value):
         print("'%s' is not a float" % (value))
         raise ValidateError()
     return fval
+
+def get_logger(eventid,log_option=None):
+    """Return the logger instance for ShakeMap.  Only use once!
+
+    Args:
+      eventid (str): Event ID.
+      log_option (str): One of 'log','quiet', 'debug', or None.
+
+    """
+    install_path,data_path = get_config_paths()
+    config = get_logging_config()
+    if log_option == 'debug' or log_option == 'quiet' or log_option is None:
+        format = config['formatters']['standard']['format']
+        datefmt = config['formatters']['standard']['datefmt']
+        #create a console handler, with verbosity setting chosen by user
+        if log_option == 'debug':
+            level = logging.DEBUG
+        elif log_option == 'quiet':
+            level = logging.ERROR
+        elif log_option is None: #default interactive
+            level = logging.INFO
+
+        logdict = {'version':1,
+                   'formatters':{'standard':{'format':format,
+                                             'datefmt':datefmt}},
+                   'handlers':{'stream':{'level':level,
+                                         'formatter':'standard',
+                                         'class':'logging.StreamHandler'}},
+                   'loggers':{'shake_log':{'handlers':['stream'],
+                                           'level':level,
+                                           'propagate':False}}}
+                                
+        logging.config.dictConfig(logdict)
+        logger = logging.getLogger('shake_log')
+    else:
+        event_log_file = os.path.join(data_path,eventid,'shake.log')
+        config['handlers']['event_file']['filename'] = event_log_file
+        tmp = logging.config.dictConfig(config)
+        log_name = list(config['loggers'].keys())[0]
+        logger = logging.getLogger(log_name)
+    
+    return logger
+    
+
+def get_logging_config():
+    shake_conf = get_shake_config()
+    log_config = shake_conf['shake']
+    _clean_shake_dict(log_config)
+    return log_config
+
+def _clean_shake_dict(config):
+    for handlerkey,handler in config['handlers'].items():
+        myclass = handler['class']
+        req_fields = REQ_FIELDS[myclass]
+        for key,value in handler.items():
+            if key not in req_fields:
+                del handler[key]
