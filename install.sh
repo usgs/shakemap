@@ -22,7 +22,7 @@ unamestr=`uname`
 if [ "$unamestr" == 'Linux' ]; then
     DEPARRAY=(numpy=1.11 \
               scipy=0.19.1 \
-              matplotlib=2.0.2 \
+              matplotlib=1.5.3 \
               rasterio=1.0a2 \
               pandas=0.20.3 \
               xlrd=1.0.0 \
@@ -49,7 +49,7 @@ if [ "$unamestr" == 'Linux' ]; then
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     DEPARRAY=(numpy=1.13.1 \
               scipy=0.19.1 \
-              matplotlib=2.0.2 \
+              matplotlib=1.5.3 \
               rasterio=1.0a9 \
               pandas=0.20.3 \
               xlrd=1.0.0 \
