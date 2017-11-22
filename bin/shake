@@ -11,6 +11,7 @@ import socket
 import pkgutil
 import inspect
 import importlib
+import time
 
 #local imports
 from shakemap.utils.config import(get_config_paths,
@@ -25,6 +26,12 @@ from configobj import ConfigObj
 from validate import Validator, ValidateError
 
 def _get_command_classes():
+    """Create a dictionary of classname:class to be used in main().
+
+    Returns:
+        (dict): Dictionary of classname:class where each class
+            is a subclass of shakemap.coremods.base.CoreModule.
+    """
     coremods = {
         name: importlib.import_module(name)
         for finder, name, ispkg
@@ -49,21 +56,34 @@ def _get_command_classes():
 _classes_ = _get_command_classes()
     
 def _format_error_info(exception,eventid):
+    """Format exception information and stack trace into a coherent multi-line string.
+
+    Args:
+        exception (Exception): Python Exception (or child thereof) instance.
+        eventid (str): ShakeMap event ID (i.e., us2018abcd).
+    Returns:
+        str: Multiline string containing: Hostname,eventid,Exception string, 
+             and stack trace.
+
+    """
     stringio = io.StringIO()
     ex_type, ex, tb = sys.exc_info()
     traceback.print_tb(tb,file=stringio)
     stack_trace = stringio.getvalue()
     stringio.close()
     hostname = socket.gethostname()
-    error_msg = '\nHost: %s\nEvent ID: %s\nException: %s' % (hostname,eventid,stack_trace)
+    fmt = '\nHost: %s\nEvent ID: %s\nException: %s\nStack Trace: %s'
+    error_msg = fmt % (hostname,eventid,str(exception),stack_trace)
     return error_msg
                 
 def get_parser():
+    """Internal method to get argparse parser instance.
+
+    Returns:
+        (ArgumentParser): argparse argument parser.
+    """
     description = '''
     Run all configured ShakeMap programs.
-
-    The default behavior is to run silently, logging all output to configured log files
-    and exceptions to email (if configured.)
     '''
 
     epilog = 'Available commands:\n'
@@ -86,6 +106,13 @@ def get_parser():
     return parser
 
 def main(args):
+    """Loop over input commands and call module.execute() for each matching command.
+
+    Args:
+        (ArgumentParser): argparse argument parser.
+        
+
+    """
     install_path,data_path = get_config_paths()
     log_option = None
     if args.debug:
@@ -94,20 +121,23 @@ def main(args):
         log_option = 'quiet'
     if args.log:
         log_option = 'log'
-        
+
     logger = get_logger(args.eventid,log_option=log_option)
     
     try:
         for cmd in args.cmds:
             if cmd not in _classes_:
-                raise KeyError('Command %s not found in ShakeMap.' % cmd)
+                raise KeyError('Command "%s" not found in ShakeMap.' % cmd)
         
         for cmd in args.cmds:
             logger.info('Running command %s' % cmd)
             cmd_class = _classes_[cmd]
             cmd_obj = cmd_class(args.eventid)
+            t1 = time.time()
             cmd_obj.execute()
-            logger.info('Finished running command %s' % cmd)
+            t2 = time.time()
+            elapsed = t2 - t1
+            logger.info('Finished running command %s: Elapsed %.2f secs' % (cmd,elapsed))
 
     except Exception as e:
         error_msg = _format_error_info(e,args.eventid)

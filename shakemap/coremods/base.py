@@ -11,12 +11,11 @@ class CoreModule(object):
 
     """
     command_name = ''
-    def __init__(self,eventid,testing=False):
+    def __init__(self,eventid):
         """Instantiate a CoreModule class with an event ID.
 
         """
         self._eventid = eventid
-        self._testing = testing
         log_config = get_logging_config()
         log_name = log_config['loggers'].keys()[0]
         self.logger = logging.getLogger(log_name)

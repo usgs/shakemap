@@ -12,7 +12,7 @@ shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 ########################################################################
 # Test sm_profile
 ########################################################################
-def test_profile():
+def tmp_test_profile():
     #
     # Rename existing profile(s)
     #
@@ -139,7 +139,7 @@ def test_profile():
 ########################################################################
 # Test sm_assemble
 ########################################################################
-def test_assemble():
+def tmp_test_assemble():
     # Create a profile for testing other programs
     test_setup()
 
@@ -220,7 +220,7 @@ def test_assemble():
 ########################################################################
 # Test sm_augment
 ########################################################################
-def test_augment():
+def tmp_test_augment():
     # Create a profile for testing other programs
     test_setup()
 
@@ -300,7 +300,7 @@ def test_augment():
 ########################################################################
 # Test sm_model
 ########################################################################
-def test_model():
+def tmp_test_model():
     # Create a profile for testing other programs
     test_setup()
 
@@ -378,14 +378,14 @@ def test_model():
 ########################################################################
 # Put the user's profile back the way it was when we started
 ########################################################################
-def test_restore():
+def tmp_test_restore():
     smrc = os.path.join(os.path.expanduser('~'), '.shakemap')
     if os.path.isdir(smrc):
         shutil.rmtree(smrc)
     if os.path.isdir(smrc + '_safe'):
         os.rename(smrc + '_safe', smrc)
 
-def test_setup():
+def tmp_test_setup():
     #
     # Create a profile for testing other programs
     # We leave this in place for later tests
@@ -409,9 +409,10 @@ def test_setup():
 # main program
 ########################################################################
 if __name__ == '__main__':
-    test_profile()
-    test_assemble()
-    test_augment()
-    test_model()
-    test_contour()
-    #test_restore()
+    pass
+    # test_profile()
+    # test_assemble()
+    # test_augment()
+    # test_model()
+    # test_contour()
+    # test_restore()

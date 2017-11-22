@@ -27,6 +27,7 @@ from shakelib.distance import Distance, get_distance
 from shakelib.multigmpe import MultiGMPE
 from shakelib.virtualipe import VirtualIPE
 from shakelib.utils.utils import get_extent
+from shakelib.utils.imt_string import oq_to_file
 from shakelib.utils.containers import InputContainer, OutputContainer
 from shakelib.utils.distance import geodetic_distance_fast
 
@@ -52,19 +53,25 @@ class ModelModule(CoreModule):
     command_name = 'model'
 
     def execute(self):
-        verbose = True
+        """Interpolate ground motions to a grid or list of locations.
+
+        Raises:
+            NotADirectoryError: When the event data directory does not exist.
+            FileNotFoundError: When the the shake_data HDF file does not exist.
+        """
         #
         # Find the shake_data file
         #
+        self.logger.info('Inside model')
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current')
         if not os.path.isdir(datadir):
-            print('%s is not a valid directory.' % datadir)
-            sys.exit(1)
+            NotADirectoryError('%s is not a valid directory.' % datadir)
+            
         datafile = os.path.join(datadir, 'shake_data.hdf')
         if not os.path.isfile(datafile):
-            print('%s is not a valid shake data file.' % datafile)
-            sys.exit(1)
+            raise FileNotFoundError('%s does not exist.' % datafile)
+        
         # ------------------------------------------------------------------
         # Make the input container and extract the config
         # ------------------------------------------------------------------
@@ -276,9 +283,9 @@ class ModelModule(CoreModule):
                             np.abs(df[imtstr + '_residual']) > \
                             outlier_deviation_level * df[imtstr + '_pred_sigma']
                         np.seterr(invalid='warn')
-                        if verbose:
-                            print('IMT: %s, flagged: %d' %
-                                  (imtstr, np.sum(flagged)))
+
+                        self.logger.info('IMT: %s, flagged: %d' %
+                                    (imtstr, np.sum(flagged)))
                         df[imtstr + '_outliers'] = flagged
                     else:
                         df[imtstr + '_outliers'] = np.full(df[imtstr].shape,
@@ -545,13 +552,12 @@ class ModelModule(CoreModule):
             nom_variance = 1.0 / ((1.0 / nom_tau**2) + bias_den[imtstr])
             nominal_bias[imtstr] = bias_num[imtstr] * nom_variance
             bias_time = time.time() - time1
-            if verbose:
-                #
-                # Print the nominal values of the bias and its stddev
-                #
-                print('%s: nom bias %f nom stddev %f; %d stations (time=%f sec)' %
-                      (imtstr, nominal_bias[imtstr], np.sqrt(nom_variance),
-                       np.size(sta_lons_rad[imtstr]), bias_time))
+            #
+            # Print the nominal values of the bias and its stddev
+            #
+            self.logger.info('%s: nom bias %f nom stddev %f; %d stations (time=%f sec)' %
+                 (imtstr, nominal_bias[imtstr], np.sqrt(nom_variance),
+                 np.size(sta_lons_rad[imtstr]), bias_time))
         #
         # End bias
         #
@@ -665,14 +671,14 @@ class ModelModule(CoreModule):
             outgrid[imtstr] = ampgrid
             sdgrid[sdgrid < 0] = 0
             outsd[imtstr] = np.sqrt(sdgrid)
-            if verbose:
-                print('\ttime for %s distance=%f' % (imtstr, ddtime))
-                print('\ttime for %s correlation=%f' % (imtstr, ctime))
-                print('\ttime for %s sigma=%f' % (imtstr, stime))
-                print('\ttime for %s rcmatrix=%f' % (imtstr, dtime))
-                print('\ttime for %s amp calc=%f' % (imtstr, atime))
-                print('\ttime for %s sd calc=%f' % (imtstr, mtime))
-                print('total time for %s=%f' % (imtstr, time.time() - time1))
+            
+            self.logger.info('\ttime for %s distance=%f' % (imtstr, ddtime))
+            self.logger.info('\ttime for %s correlation=%f' % (imtstr, ctime))
+            self.logger.info('\ttime for %s sigma=%f' % (imtstr, stime))
+            self.logger.info('\ttime for %s rcmatrix=%f' % (imtstr, dtime))
+            self.logger.info('\ttime for %s amp calc=%f' % (imtstr, atime))
+            self.logger.info('\ttime for %s sd calc=%f' % (imtstr, mtime))
+            self.logger.info('total time for %s=%f' % (imtstr, time.time() - time1))
 
     # %%
         # ------------------------------------------------------------------
@@ -962,7 +968,7 @@ class ModelModule(CoreModule):
                 std_metadata = {'units': units,
                                 'digits': digits}
                 std_grid = Grid2D(outsd[key], gdict.copy())
-                oc.setIMT(mean_layername,
+                oc.setIMT(key,
                           mean_grid, mean_metadata,
                           std_grid, std_metadata,
                           component)
@@ -976,8 +982,7 @@ class ModelModule(CoreModule):
 
         oc.close()
 
-        if verbose:
-            print('done')
+        self.logger.info('done')
         # ------------------------------------------------------------------
         # End interp()
         # ------------------------------------------------------------------
@@ -1205,12 +1210,13 @@ def get_layer_info(layer):
     layer_out = layer
     layer_units = ''
     layer_digits = 4  # number of significant digits
+    
+    if layer.endswith('_sd'):
+        layer_out = oq_to_file(layer.replace('_sd',''))
+        layer_out = layer_out + '_sd'
+    else:
+        layer_out = oq_to_file(layer)
     if layer.startswith('SA'):
-        match = re.match(r'^SA\(([^)]+?)\)', layer)
-        period = float(match.group(1))
-        layer_out = ('PSA%g' % period).replace('.', 'p')
-        if layer.endswith('_sd'):
-            layer_out = layer_out.replace('$', '_sd')
         layer_units = 'ln(g)'
     elif layer.startswith('PGA'):
         layer_units = 'ln(g)'

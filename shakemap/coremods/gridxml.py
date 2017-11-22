@@ -6,6 +6,7 @@ import logging
 import glob
 import warnings
 from datetime import datetime
+import re
 
 #third party imports
 from shapely.geometry import MultiLineString,mapping
@@ -14,6 +15,7 @@ import numpy as np
 from skimage import measure
 from scipy.ndimage.filters import median_filter
 from shakelib.utils.containers import OutputContainer
+from shakelib.utils.imt_string import oq_to_file
 from mapio.shake import ShakeGrid
 
 #local imports
@@ -29,21 +31,65 @@ COMPONENT = 'Larger'
 
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
 
+def _oq_to_gridxml(oqimt):
+    """Convert openquake IMT nomenclature to grid.xml friendly form.
+    
+    Note: The grid.xml form only handles periods up to 9.9, after
+    that there is no way to tell the difference between 10.0 and 1.0.
+
+    Examples:
+    SA(1.0) (Spectral Acceleration at 1 second) -> PSA10
+    SA(0.3) (Spectral Acceleration at 0.3 second) -> PSA03
+    SA(15.0) (Spectral Acceleration at 15 seconds) -> NOT SUPPORTED
+    SA(3) (Spectral Acceleration at 3 seconds) -> PSA30
+    SA(.5) (Spectral Acceleration at 0.5 seconds) -> PSA05
+    Args:
+        oqimt (str): Openquake IMT nomenclature string.
+    Returns:
+        str: grid.xml friendly IMT string.
+    Raises:
+        ValueError: when there is no corresponding filename-friendly
+            IMT representation, or when frequency exceeds 9.9.
+    """
+    if oqimt in ['PGA', 'PGV', 'MMI']:
+        return oqimt
+    float_pattern = r"[-+]?\d*\.\d+|\d+"
+    periods = re.findall(float_pattern, oqimt)
+    if not len(periods):
+        fmt = 'IMT string "%s" has no file-name friendly representation.'
+        raise ValueError(fmt % oqimt)
+    period = periods[0]
+    if period.find('.') < 0:
+        integer = period
+        fraction = '0'
+    else:
+        integer, fraction = period.split('.')
+        if not len(integer):
+            integer = '0'
+    if int(integer) >= 10:
+        raise ValueError('Periods >= than 10 seconds not supported.')
+    fileimt = 'PSA%s%s' % (integer, fraction)
+    return fileimt
+
 class GridXMLModule(CoreModule):
     """contour - Generate contours of all configured IMT values.
     """
     command_name = 'gridxml'
     def execute(self):
+        """Create grid.xml and uncertainty.xml files.
+
+        Raises:
+            NotADirectoryError: When the event data directory does not exist.
+            FileNotFoundError: When the the shake_result HDF file does not exist.
+        """
         logger = logging.getLogger(__name__)
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
         if not os.path.isdir(datadir):
-            print('%s is not a valid directory.' % datadir)
-            sys.exit(1)
+            raise NotADirectoryError('%s is not a valid directory.' % datadir)
         datafile = os.path.join(datadir, 'shake_result.hdf')
         if not os.path.isfile(datafile):
-            print('%s is not a valid shake result file.' % datafile)
-            sys.exit(1)
+            raise FileNotFoundError('%s does not exist.' % datafile)
         
         # Open the OutputContainer and extract the data
         container = OutputContainer.load(datafile)
@@ -55,6 +101,7 @@ class GridXMLModule(CoreModule):
         xml_types = ['grid','uncertainty']
         for xml_type in xml_types:
             for gridname in gridnames:
+                imt_field = _oq_to_gridxml(gridname)
                 imtdict = container.getIMT(gridname,COMPONENT)
                 if xml_type == 'grid':
                     grid = imtdict['mean']
@@ -75,9 +122,9 @@ class GridXMLModule(CoreModule):
                     units = '%g'
                 else:
                     pass
-                layers[gridname] = grid_data
+                layers[imt_field] = grid_data
 
-                field_keys[gridname] = (units,digits)
+                field_keys[imt_field] = (units,digits)
             geodict = grid.getGeoDict()
 
             config = container.getDictionary('config')

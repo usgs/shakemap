@@ -25,20 +25,15 @@ REQ_FIELDS = {'logging.handlers.TimedRotatingFileHandler':['level',
                                               'subject',
                                               'class']}
 
-def get_shake_config():
-    install_path, data_path = get_config_paths()
-    conf_file = os.path.join(install_path,'config','shake.conf')
-    spec_file = get_configspec(config='shake')
-    shake_conf = ConfigObj(conf_file,
-                           configspec=spec_file,
-                           interpolation='template')
+# mapping of string versions of logging module logging levels
+# to the corresponding constants.
+LOG_LEVELS = {'DEBUG':logging.DEBUG,
+              'INFO':logging.INFO,
+              'WARNING':logging.WARNING,
+              'ERROR':logging.ERROR,
+              'CRITICAL':logging.CRITICAL}
     
-    val = Validator()
-    results = shake_conf.validate(val)
-    if not isinstance(results, bool) or not results:
-        config_error(global_config, results)
 
-    return shake_conf
 
 def get_data_path():
     """
@@ -452,13 +447,38 @@ def cfg_float(value):
         raise ValidateError()
     return fval
 
+
+def get_shake_config():
+    """Return a dictionary containing input required to run the shake program, including logging.
+
+    See https://docs.python.org/3.5/library/logging.config.html.
+    
+    Returns:
+       (dict): Dictionary containing shake config information.
+    """
+    install_path, data_path = get_config_paths()
+    conf_file = os.path.join(install_path,'config','shake.conf')
+    spec_file = get_configspec(config='shake')
+    shake_conf = ConfigObj(conf_file,
+                           configspec=spec_file,
+                           interpolation='template')
+    
+    val = Validator()
+    results = shake_conf.validate(val)
+    if not isinstance(results, bool) or not results:
+        config_error(global_config, results)
+
+    return shake_conf
+
 def get_logger(eventid,log_option=None):
     """Return the logger instance for ShakeMap.  Only use once!
 
     Args:
-      eventid (str): Event ID.
-      log_option (str): One of 'log','quiet', 'debug', or None.
-
+        (str): Event ID.
+        (str): One of 'log','quiet', 'debug', or None.
+    
+    Returns:
+        (Logger): logging Logger instance.
     """
     install_path,data_path = get_config_paths()
     config = get_logging_config()
@@ -479,29 +499,65 @@ def get_logger(eventid,log_option=None):
                    'handlers':{'stream':{'level':level,
                                          'formatter':'standard',
                                          'class':'logging.StreamHandler'}},
-                   'loggers':{'shake_log':{'handlers':['stream'],
+                   'loggers':{'':{'handlers':['stream'],
                                            'level':level,
-                                           'propagate':False}}}
+                                           'propagate':True}}}
                                 
         logging.config.dictConfig(logdict)
-        logger = logging.getLogger('shake_log')
     else:
         event_log_file = os.path.join(data_path,eventid,'shake.log')
         config['handlers']['event_file']['filename'] = event_log_file
-        tmp = logging.config.dictConfig(config)
-        log_name = list(config['loggers'].keys())[0]
-        logger = logging.getLogger(log_name)
+        global_log_file = os.path.join(install_path,'logs','shake.log')
+        config['handlers']['global_file']['filename'] = global_log_file
+        logging.config.dictConfig(config)
+        log_cfg = list(config['loggers'])
+    #get the root logger, otherwise we can't log in sub-libraries
+    logger = logging.getLogger()
     
     return logger
     
 
 def get_logging_config():
+    """Extract logging configuration from shake config.
+
+    See this URL for example of config.
+    https://gist.github.com/st4lk/6287746
+
+    See https://docs.python.org/3.5/library/logging.config.html
+
+    Returns:
+        (dict): Dictionary suitable for use with logging.config.dictConfig().
+    """
+    
     shake_conf = get_shake_config()
     log_config = shake_conf['shake']
-    _clean_shake_dict(log_config)
+    _clean_log_dict(log_config)
+
+    # Here follows a bit of trickery...
+    # To have a logger point to the root logger using the dictConfig() method,
+    # you need to have the logger have a name equal to the empty string ''.
+    # Our logging dictionary is originally specified using ConfigObj, which
+    # does not allow for empty section headers.  So, we need to get all of the
+    # information from the logger we specify, copy it into a logger dictionary with
+    # an empty key, and then delete the original logger from the config dictionary.
+    # Whew.
+    log_name = log_config['loggers'].keys()[0]
+    log_config['loggers'][''] = log_config['loggers'][log_name]
+    del log_config['loggers'][log_name]
     return log_config
 
-def _clean_shake_dict(config):
+def _clean_log_dict(config):
+    """Clean up dictionary returned by ConfigObj into form suitable for logging.
+
+    Basically, ConfigObj.validate wants all sections that are Handlers (for example)
+    to have the same fields, so it fills them in with default values.  However,
+    if you try to give a StreamHandler a filename parameter, it generates an error,
+    hence the code below.
+    
+    Returns:
+        (dict): Dictionary suitable for use with logging.config.dictConfig().
+
+    """
     for handlerkey,handler in config['handlers'].items():
         myclass = handler['class']
         req_fields = REQ_FIELDS[myclass]

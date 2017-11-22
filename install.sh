@@ -20,17 +20,59 @@ conda config --append channels ioos # for rasterio v 1.0a2
 
 unamestr=`uname`
 if [ "$unamestr" == 'Linux' ]; then
-    DEPARRAY=(numpy=1.11 scipy=0.19.1 matplotlib=2.0.2 rasterio=1.0a2 \
-        pandas=0.20.3 h5py=2.7.0 gdal=2.1.4 pytest=3.2.0 pytest-cov=2.5.1 \
-        cartopy=0.15.1 fiona=1.7.8 numexpr=2.6.2 configobj=5.0.6 \
-        decorator=4.1.2 jupyter=1.0.0 shapely=1.5.17 descartes=1.1.0 \
-        affine=2.1.0 basemap=1.1.0 geojson=2.0.0 scikit-image=0.13.0)
+    DEPARRAY=(numpy=1.11 \
+              scipy=0.19.1 \
+              matplotlib=2.0.2 \
+              rasterio=1.0a2 \
+              pandas=0.20.3 \
+              xlrd=1.0.0 \
+              xlwt=1.2.0 \
+              openpyxl=2.5.0a2 \
+              xlsxwriter=0.9.8 \
+              h5py=2.7.0 \
+              gdal=2.1.4 \
+              pytest=3.2.0 \
+              pytest-cov=2.5.1 \
+              cartopy=0.15.1 \
+              fiona=1.7.8 \
+              numexpr=2.6.2 \
+              configobj=5.0.6 \
+              decorator=4.1.2 \
+              jupyter=1.0.0 \
+              shapely=1.5.17 \
+              descartes=1.1.0 \
+              affine=2.1.0 \
+              basemap=1.1.0 \
+              geojson=2.0.0 \
+              scikit-image=0.13.0 \
+              obspy=1.0.3)
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
-    DEPARRAY=(numpy=1.13.1 scipy=0.19.1 matplotlib=2.0.2 rasterio=1.0a9 \
-        pandas=0.20.3 h5py=2.7.0 gdal=2.1.4 pytest=3.2.0 pytest-cov=2.5.1 \
-        cartopy=0.15.1 fiona=1.7.8 numexpr=2.6.2 configobj=5.0.6 \
-        decorator=4.1.2 jupyter=1.0.0 shapely=1.5.17 descartes=1.1.0 \
-        affine=2.1.0 basemap=1.1.0 geojson=2.0.0 scikit-image=0.13.0)
+    DEPARRAY=(numpy=1.13.1 \
+              scipy=0.19.1 \
+              matplotlib=2.0.2 \
+              rasterio=1.0a9 \
+              pandas=0.20.3 \
+              xlrd=1.0.0 \
+              xlwt=1.2.0 \
+              openpyxl=2.5.0a2 \
+              xlsxwriter=0.9.8 \
+              h5py=2.7.0 \
+              gdal=2.1.4 \
+              pytest=3.2.0 \
+              pytest-cov=2.5.1 \
+              cartopy=0.15.1 \
+              fiona=1.7.8 \
+              numexpr=2.6.2 \
+              configobj=5.0.6 \
+              decorator=4.1.2 \
+              jupyter=1.0.0 \
+              shapely=1.5.17 \
+              descartes=1.1.0 \
+              affine=2.1.0 \
+              basemap=1.1.0 \
+              geojson=2.0.0 \
+              scikit-image=0.13.0 \
+              obspy=1.0.3)
 fi
 
 # Is the Travis flag set?
@@ -86,6 +128,11 @@ pip -q install \
 echo "Installing shakelib..."
 pip -q install \
     https://github.com/usgs/shakelib/archive/master.zip
+
+# Get libcomcat
+echo "Installing libcomcat..."
+pip -q install \
+    https://github.com/usgs/libcomcat/archive/master.zip
 
 # This package
 echo "Installing shakelib..."
