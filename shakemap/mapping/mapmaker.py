@@ -90,7 +90,7 @@ def getProjectedPatches(polygon, m, edgecolor=WATERCOLOR):
 
 class MapMaker(object):
 
-    def __init__(self, container, topofile, stations, fault, layerdict, source, cities=None):
+    def __init__(self, container, topofile, layerdict,cities):
         req_keys = set(['coast', 'ocean', 'lake', 'country', 'state', 'roads'])
         if len(set(layerdict.keys()).intersection(req_keys)) != len(req_keys):
             raise ShakeMapException(
@@ -104,8 +104,8 @@ class MapMaker(object):
         self.cities_per_grid = CITIES_PER_GRID
         self.imt_layer = None
         self.contour_layer = None
-        self.intensity_colormap = None
-        self.contour_colormap = None
+        self.intensity_colormap = ColorPalette.fromPreset('mmi')
+        self.contour_colormap = ColorPalette.fromPreset('shaketopo')
         self.stations = stations
         self.fault = fault
         self.source = source

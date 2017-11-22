@@ -5,6 +5,7 @@ import json
 import logging
 import glob
 import warnings
+import io
 
 #third party imports
 from shapely.geometry import MultiLineString,mapping
@@ -12,10 +13,13 @@ import fiona
 import numpy as np
 from skimage import measure
 from scipy.ndimage.filters import median_filter
+from shakelib.utils.containers import OutputContainer
+from shakelib.utils.imt_string import oq_to_file, file_to_oq
+from configobj import ConfigObj
 
 #local imports
 from .base import CoreModule
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import get_config_paths,get_logging_config
 
 FORMATS = {'shapefile':('ESRI Shapefile','shp'),
            'geojson':('GeoJSON','json')}
@@ -27,15 +31,19 @@ class ContourModule(CoreModule):
     """
     command_name = 'contour'
     def execute(self):
+        """Create contour files for all configured IMT values.
+
+        Raises:
+            NotADirectoryError: When the event data directory does not exist.
+            FileNotFoundError: When the the shake_result HDF file does not exist.
+        """
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
         if not os.path.isdir(datadir):
-            print('%s is not a valid directory.' % datadir)
-            sys.exit(1)
+            raise NotADirectoryError('%s is not a valid directory.' % datadir)
         datafile = os.path.join(datadir, 'shake_result.hdf')
         if not os.path.isfile(datafile):
-            print('%s is not a valid shake result file.' % datafile)
-            sys.exit(1)
+            raise FileNotFoundError('%s does not exist.' % datafile)
 
         # Open the OutputContainer and extract the data
         container = OutputContainer.load(datafile)
@@ -45,7 +53,8 @@ class ContourModule(CoreModule):
         config = ConfigObj(config_file)
 
         # create contour files
-        contour_to_files(container,config,datadir)
+        self.logger.info('Contouring to files...')
+        contour_to_files(container,config,datadir,self.logger)
 
 def contour(container,imtype,component,intervals=None,
             filter_size=DEFAULT_FILTER_SIZE):
@@ -60,10 +69,10 @@ def contour(container,imtype,component,intervals=None,
       filter_size (int): Integer filter (see
                          https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)
     Returns:
-      List of dictionaries containing two fields:
-        - geometry: GeoJSON-like representation of one of the objects in
+        list: List of dictionaries containing two fields:
+            - geometry: GeoJSON-like representation of one of the objects in
                     https://toblerity.org/fiona/manual.html#geometry-types
-        - properties: Dictionary of properties describing that feature.
+            - properties: Dictionary of properties describing that feature.
     """
     imtdict = container.getIMT(imtype,component)
     gridobj = imtdict['mean']
@@ -122,27 +131,20 @@ def contour(container,imtype,component,intervals=None,
                                'properties':props})
     return line_strings
 
-def contour_to_files(container,config,output_dir,logger=None):
+def contour_to_files(container,config,output_dir,logger):
     """Generate contours of all configured IMT values.
 
     Args:
       container (OutputContainer): OutputContainer with ShakeMap output data.
       config (dict): Product configuration information (from product.conf).
       output_dir (str): Path to directory where output files will be written.
-      logger (np.ndarray or None): Array of intervals for IMT, or None.a
-      filter_size (int): Integer filter (see
-                         https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)
-    Returns:
-      List of dictionaries containing two fields:
-        - geometry: GeoJSON-like representation of one of the objects in
-                    https://toblerity.org/fiona/manual.html#geometry-types
-        - properties: Dictionary of properties describing that feature.
-    """
+      logger (logging.Logger): Python logging Logger instance.
 
-    #set up logging
-    logger = logging.getLogger('shakelog')
-    logging.captureWarnings(True) #this doesn't do anything
-    
+    Raises:
+        LookupError: When configured file format is not supported, or
+            when configured IMT is not found in container.
+        
+    """
     verbose = True
     jsonstr = container.getString('info.json')
     infojson = json.loads(jsonstr)
@@ -164,18 +166,17 @@ def contour_to_files(container,config,output_dir,logger=None):
     crs = {'no_defs': True, 'ellps': 'WGS84', 'datum': 'WGS84', 'proj': 'longlat'}
     
     for imtype in imtlist:
+        fileimt = oq_to_file(imtype)
         try:
             components = container.getComponents(imtype)
         except LookupError as look_error:
             fmt = 'No IMT called %s in container %s. Skipping.'
-            sys.stderr.write(fmt % (imtype,container.getFileName()))
+            logger.warn(fmt % (imtype,container.getFileName()))
             continue
         imtype_spec = config['products']['contours']['IMTS'][imtype]
         filter_size = int(imtype_spec['filter_size'])
         for component in components:
-            
-            
-            fname = '%s_%s_%s.%s' % (event_info['event_id'],imtype,component,extension)
+            fname = '%s_%s.%s' % (fileimt,component,extension)
             filename = os.path.join(output_dir,fname)
             if os.path.isfile(filename):
                 fpath,fext = os.path.splitext(filename)
@@ -184,27 +185,42 @@ def contour_to_files(container,config,output_dir,logger=None):
                     os.remove(fname)
 
             # fiona spews a warning here when driver is geojson
-            # can't seem to catch this warning...
-            vector_file = fiona.open(filename,'w',
-                                     driver=driver,
-                                     schema=schema,
-                                     crs=crs)
-            
-            intervals = None
-            if 'intervals' in imtype_spec:
-                intervals = [float(i) for i in imtype_spec['intervals']]
+            # this warning appears to be un-catchable using
+            # with warnings.catch_warnings()
+            # or
+            # logging.captureWarning()
+            # or
+            # even redirecting stderr/stdout to IO streams
+            # not sure where the warning is coming from,
+            # but there appears to be no way to stop it...
+            with fiona.drivers():
+                vector_file = fiona.open(filename,'w',
+                                         driver=driver,
+                                         schema=schema,
+                                         crs=crs)
 
-            line_strings = contour(container,imtype,component,intervals)
-            for feature in line_strings:
-              vector_file.write(feature)
 
-            logger.debug('Writing contour file %s' % filename)
-            vector_file.close()
+                intervals = None
+                if 'intervals' in imtype_spec:
+                    intervals = [float(i) for i in imtype_spec['intervals']]
+
+                line_strings = contour(container,imtype,component,intervals)
+                for feature in line_strings:
+                  vector_file.write(feature)
+
+                logger.debug('Writing contour file %s' % filename)
+                vector_file.close()
 
 def _get_default_intervals(fgrid,interval_type='log'):
-    logger = logging.getLogger(__name__)
-    #logger.setLevel(logging.DEBUG)
-    logger.debug('Inside get_default_intervals')
+    """Get default intervals for any IMT.
+    
+    Args:
+        fgrid (ndarray): Numpy array containing IMT (MMI,PGA, etc.) data.
+        interval_type (str): Either 'log' or 'linear'.
+    
+    Returns:
+        ndarray: Numpy array with contour intervals for input IMT.
+    """
     if interval_type == 'log':
         #get the range of the input data
         dmin = fgrid.min()

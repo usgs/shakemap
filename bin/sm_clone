@@ -1,0 +1,119 @@
+#!/usr/bin/env python
+
+#stdlib imports
+import sys
+import os.path
+import tempfile
+from xml.etree.ElementTree import Element, ElementTree
+from datetime import datetime
+import shutil
+import json
+import argparse
+
+#third party imports
+from libcomcat.search import get_event_by_id
+
+#local imports
+from shakemap.utils.config import get_config_paths, get_custom_validator,\
+        config_error, check_config, get_configspec
+
+def get_parser():
+    description = '''
+    Download ShakeMap data from NEIC Comcat into a local data directory.
+
+    Usage:
+    %(prog)s EVENTID
+     
+    Where eventid is a ComCat event ID.  For example, for this event:
+    https://earthquake.usgs.gov/earthquakes/eventpage/us2000ar20
+    The event ID is us2000ar20.
+    '''
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('eventid', 
+                        help='ID of the event to process')
+    parser.add_argument('-f','--force', action='store_true',
+                        help='Force overwrite of event data.')
+    return parser
+
+
+def _write_event_xml(infodict,event_dir):
+    """Write event.xml file given dictionary derived from info.json.
+
+    Args:
+        infodict (dict): Dictionary derived from info.json.
+        event_dir (str): Path to directory where event data is stored.
+
+    """
+    event_info = infodict['input']['event_information']
+    
+    otime = datetime.strptime(event_info['origin_time'],'%Y-%m-%dT%H:%M:%SZ')
+    eqdict = {'id': event_info['event_id'],
+              'lat': '%.4f' % event_info['latitude'],
+              'lon': '%.4f' % event_info['longitude'],
+              'depth': '%.1f' % event_info['depth'],
+              'mag': '%.1f' % event_info['magnitude'],
+              'year': '%i' % otime.year,
+              'month': '%i' % otime.month,
+              'day': '%i' % otime.day,
+              'hour': '%i' % otime.hour,
+              'minute': '%i' % otime.minute,
+              'second': '%i' % otime.second,
+              'timezone':'GMT',
+              'locstring': event_info['event_description']}
+    eq = Element('earthquake',eqdict)
+    xmlfile = os.path.join(event_dir,'event.xml')
+    tree = ElementTree(eq)
+    tree.write(xmlfile)
+
+def main(args):
+    install_path, data_path = get_config_paths()
+    if not os.path.isdir(data_path):
+        print('%s is not a valid directory.' % data_path)
+        sys.exit(1)
+    
+    #check to see if the event directory exists
+    event_dir = os.path.join(data_path,args.eventid,'current')
+    if not os.path.isdir(event_dir):
+        os.makedirs(event_dir)
+    else:
+        if not args.force:
+            print('Event directory %s already exists.  Use -f option to overwrite.' % event_dir)
+            sys.exit(1)
+        shutil.rmtree(event_dir)
+        os.makedirs(event_dir)
+
+    detail = get_event_by_id(args.eventid)
+    if not detail.hasProduct('shakemap'):
+        print('Event %s has no ShakeMap product.  Exiting.' % args.eventid)
+        sys.exit(1)
+    shakemap = detail.getProducts('shakemap')[0]
+    tmpdir = None
+    try:
+        tmpdir = tempfile.mkdtemp()
+        info_file = os.path.join(tmpdir,'info.json')
+        shakemap.getContent('info.json',filename=info_file)
+        infodict = json.load(open(info_file,'r'))
+        _write_event_xml(infodict,event_dir)
+        data_file = os.path.join(event_dir,'%s_dat.xml' % args.eventid)
+        shakemap.getContent('stationlist.xml',filename=data_file)
+        fault_files = shakemap.getContentsMatching('fault.txt')
+        if len(fault_files):
+            data_file = os.path.join(event_dir,fault_files[0])
+            shakemap.getContent(fault_files[0],filename=data_file)
+        print('Wrote %i files to %s.' % (len(os.listdir(event_dir)),event_dir))
+    except Exception as e:
+        pass
+    finally:
+        if tmpdir is not None:
+            shutil.rmtree(tmpdir)
+                         
+
+
+if __name__ == '__main__':
+    parser = get_parser()
+    pargs = parser.parse_args()
+    main(pargs)
+    
+
+    
+        
