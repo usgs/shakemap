@@ -15,7 +15,8 @@ from shakemap.utils.config import get_config_paths,get_logging_config
 ALLLOWED_FORMATS = ['json']
 
 class RuptureModule(CoreModule):
-    """rupture - Write rupture.json.
+    """
+    rupture - Write rupture.json.
     """
     command_name = 'rupture'
     def execute(self):

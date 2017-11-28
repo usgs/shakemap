@@ -15,11 +15,13 @@ from shakemap.utils.config import get_config_paths,get_logging_config
 ALLLOWED_FORMATS = ['json']
 
 class InfoModule(CoreModule):
-    """contour - Generate contours of all configured IMT values.
+    """
+    info - Extract info.json from shake_result.hdf and write it as a file.
     """
     command_name = 'info'
     def execute(self):
-        """Write info.json metadata file.
+        """
+        Write info.json metadata file.
 
         Raises:
             NotADirectoryError: When the event data directory does not exist.
@@ -32,7 +34,7 @@ class InfoModule(CoreModule):
         datafile = os.path.join(datadir, 'shake_result.hdf')
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
-            
+
         # Open the OutputContainer and extract the data
         container = OutputContainer.load(datafile)
 
@@ -44,7 +46,8 @@ class InfoModule(CoreModule):
         formats = config['products']['info']['formats']
         for fformat in formats:
             if fformat not in ALLLOWED_FORMATS:
-                logger.warn('Specified format %s not in list of defined formats.  Skipping.' % fformat)
+                self.logger.warn('Specified format %s not in list of defined '
+                                 'formats.  Skipping.' % fformat)
                 continue
             if fformat == 'json':
                 self.logger.info('Writing info.json file...')
@@ -53,5 +56,4 @@ class InfoModule(CoreModule):
                 f = open(info_file,'wt')
                 f.write(infostring)
                 f.close()
-        
 

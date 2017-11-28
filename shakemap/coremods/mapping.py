@@ -78,6 +78,9 @@ BORDER_ZORDER = 1001
 
 
 class MappingModule(CoreModule):
+    """
+    mapping - Generate maps of the IMTs found in shake_result.hdf.
+    """
     command_name = 'mapping'
     def execute(self):
         """

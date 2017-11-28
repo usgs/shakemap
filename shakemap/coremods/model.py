@@ -66,7 +66,7 @@ class ModelModule(CoreModule):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current')
         if not os.path.isdir(datadir):
-            NotADirectoryError('%s is not a valid directory.' % datadir)
+            raise NotADirectoryError('%s is not a valid directory.' % datadir)
             
         datafile = os.path.join(datadir, 'shake_data.hdf')
         if not os.path.isfile(datafile):
@@ -672,12 +672,12 @@ class ModelModule(CoreModule):
             sdgrid[sdgrid < 0] = 0
             outsd[imtstr] = np.sqrt(sdgrid)
             
-            self.logger.info('\ttime for %s distance=%f' % (imtstr, ddtime))
-            self.logger.info('\ttime for %s correlation=%f' % (imtstr, ctime))
-            self.logger.info('\ttime for %s sigma=%f' % (imtstr, stime))
-            self.logger.info('\ttime for %s rcmatrix=%f' % (imtstr, dtime))
-            self.logger.info('\ttime for %s amp calc=%f' % (imtstr, atime))
-            self.logger.info('\ttime for %s sd calc=%f' % (imtstr, mtime))
+            self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
+            self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))
+            self.logger.debug('\ttime for %s sigma=%f' % (imtstr, stime))
+            self.logger.debug('\ttime for %s rcmatrix=%f' % (imtstr, dtime))
+            self.logger.debug('\ttime for %s amp calc=%f' % (imtstr, atime))
+            self.logger.debug('\ttime for %s sd calc=%f' % (imtstr, mtime))
             self.logger.info('total time for %s=%f' % (imtstr, time.time() - time1))
 
     # %%

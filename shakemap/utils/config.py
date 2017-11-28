@@ -1,7 +1,9 @@
 #stdlib imports
+import os
 import os.path
 import pkg_resources
 import logging
+import logging.config
 
 # third party libraries
 import numpy as np
@@ -32,7 +34,6 @@ LOG_LEVELS = {'DEBUG':logging.DEBUG,
               'WARNING':logging.WARNING,
               'ERROR':logging.ERROR,
               'CRITICAL':logging.CRITICAL}
-    
 
 
 def get_data_path():
@@ -46,6 +47,7 @@ def get_data_path():
 
     """
     return pkg_resources.resource_filename('shakemap', 'data')
+
 
 def get_configspec(config=None):
     """
@@ -66,31 +68,34 @@ def get_configspec(config=None):
     return fname
 
 
-def get_config_paths(testing=False):
+def get_config_paths():
     """
     Returns two paths based on the currently selected profile in the 
     user's ~/.shakemap/profile.conf: 1) the path to the ShakeMap
     installation directory; 2) the path to the data directory.
 
+    If this function is called within a pytest process, it will 
+    return the paths to the repository's test install and data
+    directories.
+
     Returns:
         (str, str): The paths to the ShakeMap install directory
         and the data directory.
     """
-    if not testing:
+    if 'CALLED_FROM_PYTEST' in os.environ:
+        base_path = os.path.join(get_data_path(), '..', '..', 'tests', 'data')
+        install = os.path.join(base_path, 'install')
+        data = os.path.join(base_path, 'eventdata')
+    else:
         config_file = os.path.join(os.path.expanduser('~'), '.shakemap', 
                                    'profiles.conf')
         config = ConfigObj(config_file)
         profile_name = config['profile']
-
-
         profile = config['profiles'][profile_name]
         install = profile['install_path']
         data = profile['data_path']
-    else:
-        thisdir = os.path.dirname(os.path.abspath(__file__))
-        install = os.path.join(thisdir,'..','..','tests','data','install','config')
-        data = os.path.join(thisdir,'..','..','tests','data','eventdata')
-    return (install,data)
+    return (install, data)
+
 
 def get_custom_validator():
     """
@@ -113,6 +118,7 @@ def get_custom_validator():
     validator = Validator(fdict)
     return validator
 
+
 def config_error(config, results):
     """
     Parse the results of a ConfigObj validation and print the errors.
@@ -128,6 +134,8 @@ def config_error(config, results):
     Returns:
         (Nothing): Nothing
 
+    Raises:
+        RuntimeError: Should always raise this exception.
     """
     errs = 0
     for (section_list, key, _) in flatten_errors(config, results):
@@ -144,7 +152,8 @@ def config_error(config, results):
                     ('was' if errs == 1 else 'were', errs, 
                      'error' if errs == 1 else 'errors'))
 
-def check_config(config):
+
+def check_config(config, logger):
     """
     Checks that the gmpe, gmice, ipe, ccf, and component parameters
     in config are defined in their respective sections. Raises a 
@@ -152,31 +161,34 @@ def check_config(config):
 
     Args:
         config (ConfigObj): A ConfigObj instance.
+        logger (logger): The logger to which to write complaints.
 
     Returns:
         (Nothing): Nothing.
 
     """
     if config['modeling']['gmpe'] not in config['gmpe_sets']:
-        print('Configuration error: gmpe %s not in gmpe_sets' %
-              (config['modeling']['gmpe']))
+        logger.error('Configuration error: gmpe %s not in gmpe_sets' %
+                     (config['modeling']['gmpe']))
         raise ValidateError()
     if config['modeling']['gmice'] not in config['gmice_modules']:
-        print('Configuration error: gmice %s not in gmice_modules' %
-              (config['modeling']['gmice']))
+        logger.error('Configuration error: gmice %s not in gmice_modules' %
+                     (config['modeling']['gmice']))
         raise ValidateError()
     if config['modeling']['ipe'] not in config['ipe_modules']:
-        print('Configuration error: ipe %s not in ipe_modules' %
-              (config['modeling']['ipe']))
+        logger.error('Configuration error: ipe %s not in ipe_modules' %
+                     (config['modeling']['ipe']))
         raise ValidateError()
     if config['modeling']['ccf'] not in config['ccf_modules']:
-        print('Configuration error: ccf %s not in ccf_modules' %
-              (config['modeling']['ccf']))
+        logger.error('Configuration error: ccf %s not in ccf_modules' %
+                     (config['modeling']['ccf']))
         raise ValidateError()
     if config['interp']['component'] not in config['component_modules']:
-        print('Configuration error: component %s not in component_modules' %
-              (config['interp']['component']))
+        logger.error('Configuration error: component %s not in '
+                     'component_modules' %
+                     (config['interp']['component']))
         raise ValidateError()
+
 
 def annotatedfloat_type(value):
     """
@@ -209,6 +221,7 @@ def annotatedfloat_type(value):
         except:
             raise ValidateError(value)
     return out
+
 
 def weight_list(value, min):
     """
@@ -263,6 +276,7 @@ def weight_list(value, min):
 
     return out
 
+
 def gmpe_list(value, min):
     """
     Checks to see if value is a list of strings at least min elements long.
@@ -290,6 +304,7 @@ def gmpe_list(value, min):
             raise ValidateError()
 
     return value
+
 
 def extent_list(value):
     """
@@ -332,6 +347,7 @@ def extent_list(value):
 
     return out
 
+
 def file_type(value):
     """
     Checks to see if value is a valid file or an empty string.
@@ -351,6 +367,7 @@ def file_type(value):
         raise ValidateError(value)
     return value
 
+
 def directory_type(value):
     """
     Checks to see if value is a valid directory or an empty string.
@@ -368,6 +385,7 @@ def directory_type(value):
     if not os.path.isdir(value):
         raise ValidateError(value)
     return value
+
 
 def status_string(value, min):
     """
@@ -388,6 +406,7 @@ def status_string(value, min):
     if value not in ('automatic', 'released', 'reviewed'):
         raise ValidateError(value)
     return value
+
 
 def cfg_float_list(value):
     """
@@ -422,6 +441,7 @@ def cfg_float_list(value):
             raise ValidateError()
         fvalue.append(fval)
     return fvalue
+
 
 def cfg_float(value):
     """
@@ -470,6 +490,7 @@ def get_shake_config():
 
     return shake_conf
 
+
 def get_logger(eventid,log_option=None):
     """Return the logger instance for ShakeMap.  Only use once!
 
@@ -505,9 +526,16 @@ def get_logger(eventid,log_option=None):
                                 
         logging.config.dictConfig(logdict)
     else:
-        event_log_file = os.path.join(data_path,eventid,'shake.log')
+        event_log_dir = os.path.join(data_path, eventid)
+        if not os.path.isdir(event_log_dir):
+            raise NotADirectoryError("Can't open log file: event %s "
+                                     "not found" % eventid)
+        event_log_file = os.path.join(event_log_dir, 'shake.log')
         config['handlers']['event_file']['filename'] = event_log_file
-        global_log_file = os.path.join(install_path,'logs','shake.log')
+        global_log_dir = os.path.join(install_path, 'logs')
+        if not os.path.isdir(global_log_dir):
+            os.makedirs(global_log_dir, exist_ok=True)
+        global_log_file = os.path.join(global_log_dir, 'shake.log')
         config['handlers']['global_file']['filename'] = global_log_file
         logging.config.dictConfig(config)
         log_cfg = list(config['loggers'])
@@ -545,6 +573,7 @@ def get_logging_config():
     log_config['loggers'][''] = log_config['loggers'][log_name]
     del log_config['loggers'][log_name]
     return log_config
+
 
 def _clean_log_dict(config):
     """Clean up dictionary returned by ConfigObj into form suitable for logging.

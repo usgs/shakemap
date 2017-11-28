@@ -15,7 +15,8 @@ from shakemap.utils.config import get_config_paths,get_logging_config
 ALLLOWED_FORMATS = ['json']
 
 class StationModule(CoreModule):
-    """contour - Generate contours of all configured IMT values.
+    """
+    stations - Generate stationlist.json from shake_result.hdf.
     """
     command_name = 'stations'
     def execute(self):
