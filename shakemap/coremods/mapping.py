@@ -28,6 +28,7 @@ from shapely.geometry import GeometryCollection
 from shapely.geometry import Polygon as sPolygon
 from shapely.geometry import shape as sShape
 from shapely.geometry import mapping
+from shapely.errors import TopologicalError
 
 import numpy as np
 from descartes import PolygonPatch
@@ -64,11 +65,12 @@ NCONTOURS = 6
 VERT_EXAG = 0.1
 
 # all of the zorder values for different plotted parameters
+# elements with a higher zorder will plot on top of lower elements.
 IMG_ZORDER = 1
 STATIONS_ZORDER = 250
-CITIES_ZORDER = 100
-FAULT_ZORDER = 500
-EPICENTER_ZORDER = 500
+CITIES_ZORDER = 900
+FAULT_ZORDER = 1100
+EPICENTER_ZORDER = 1100
 CONTOUR_ZORDER = 800
 ROAD_ZORDER = 5
 SCALE_ZORDER = 1500
@@ -113,7 +115,6 @@ class MappingModule(CoreModule):
         layerdict['ocean'] = layers['oceans']
         layerdict['lake'] = layers['lakes']
         layerdict['country'] = layers['countries']
-        layerdict['roads'] = layers['roads']
         layerdict['state'] = layers['states']
         topofile = layers['topography']
         cities = layers['cities']
@@ -203,7 +204,7 @@ class MapMaker(object):
         Raises:
             KeyError: When any of layerdict keys are missing.
         """
-        req_keys = set(['coast', 'ocean', 'lake', 'country', 'state', 'roads'])
+        req_keys = set(['coast', 'ocean', 'lake', 'country', 'state'])
         if len(set(layerdict.keys()).intersection(req_keys)) != len(req_keys):
             raise KeyError(
                 'layerdict input must have all keys from %s' % str(req_keys))
@@ -283,18 +284,19 @@ class MapMaker(object):
                              (xmax, ymin), (xmin, ymin), (xmin, ymax)])
         self.vectors = {}
         for key, value in self.layerdict.items():
-            if key == 'roads':
-                vshapes = self._selectRoads(value,bbox)
-            else:
-                vshapes = []
-                f = fiona.open(value, 'r')
-                shapes = f.items(bbox=bbox)
-                for shapeidx, shape in shapes:
-                    tshape = sShape(shape['geometry'])
+            vshapes = []
+            f = fiona.open(value, 'r')
+            shapes = f.items(bbox=bbox)
+            for shapeidx, shape in shapes:
+                tshape = sShape(shape['geometry'])
+                try:
                     intshape = tshape.intersection(bboxpoly)
-                    vshapes.append(intshape)
-                self.logger.debug('Filename is %s' % value)
-                f.close()
+                except TopologicalError as te:
+                    self.logger.warn('Failure to grab %s segment: "%s"' % (key,str(te)))
+                    continue
+                vshapes.append(intshape)
+            self.logger.debug('Filename is %s' % value)
+            f.close()
             self.vectors[key] = vshapes
 
     def setCityGrid(self, nx=2, ny=2, cities_per_grid=10):
