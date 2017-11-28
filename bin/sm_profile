@@ -148,6 +148,8 @@ def create(config, profile, accept):
         shutil.copy(select_file, config_path)
     if not os.path.isfile(os.path.join(config_path, 'products.conf')):
         shutil.copy(products_file, config_path)
+    if not os.path.isfile(os.path.join(config_path, 'shake.conf')):
+        shutil.copy(shake_file, config_path)
 
     if not os.path.isdir(install_layer_dir):
         shutil.copytree(layer_dir, install_layer_dir)
