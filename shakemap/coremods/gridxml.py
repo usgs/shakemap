@@ -33,7 +33,7 @@ TIMEFMT = '%Y-%m-%d %H:%M:%S'
 
 def _oq_to_gridxml(oqimt):
     """Convert openquake IMT nomenclature to grid.xml friendly form.
-    
+
     Note: The grid.xml form only handles periods up to 9.9, after
     that there is no way to tell the difference between 10.0 and 1.0.
 
@@ -72,7 +72,8 @@ def _oq_to_gridxml(oqimt):
     return fileimt
 
 class GridXMLModule(CoreModule):
-    """contour - Generate contours of all configured IMT values.
+    """
+    gridxml - Create grid.xml and uncertainty.xml files from shake_result.hdf.
     """
     command_name = 'gridxml'
     def execute(self):
@@ -90,7 +91,7 @@ class GridXMLModule(CoreModule):
         datafile = os.path.join(datadir, 'shake_result.hdf')
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
-        
+
         # Open the OutputContainer and extract the data
         container = OutputContainer.load(datafile)
 

@@ -10,6 +10,7 @@ Files:
 """
 
 #stdlib imports
+import os
 import argparse
 from configobj import ConfigObj
 import os.path
@@ -26,7 +27,8 @@ def get_parser():
 
 These ShakeMap profiles allow one user to have multiple ShakeMap profiles
 (installations) on the same machine.  These profiles can all be configured 
-differently, if desired.
+differently, if desired. By default the profiles reside in the file
+'~/.shakemap/profiles.conf'.
 '''
     parser = argparse.ArgumentParser(description=desc, epilog='\n\n')
     parser.add_argument('-s', '--switch', metavar='PROFILE',
@@ -42,6 +44,8 @@ differently, if desired.
                              'deleting a profile.')
     parser.add_argument('-p', '--preserve', action='store_true',
                         help='Preserve data when deleting a profile')
+    parser.add_argument('-f', '--file', type=str,
+                        help='Specify an alternate file in which the profiles (will) reside')
     return parser
 
 current_markers = {True:'**Current Profile**',False:''}
@@ -89,10 +93,13 @@ def make_dir(pathstr, default, accept):
             break
     return (ppath, make_ok)
     
-def create(config, profile, accept):
+def create(config, profile, accept, ppath):
     shakeconfig_data_path = get_data_path()
 
-    profile_path = os.path.join(os.path.expanduser('~'), 'ShakeMap', profile)
+    if ppath:
+        profile_path = os.path.join(ppath, profile)
+    else:
+        profile_path = os.path.join(os.path.expanduser('~'), 'ShakeMap', profile)
     default_install = os.path.join(profile_path,'install')
     default_data = os.path.join(profile_path,'data')
     print('You will be prompted to supply two directories for this '
@@ -186,11 +193,16 @@ def create(config, profile, accept):
     sprofile = ShakeProfile(profile,config['profiles'][profile])
     print('\nCreated profile: %s' % (sprofile))
         
-def main(pparser,args):
-    configdir = os.path.join(os.path.expanduser('~'), '.shakemap')
-    if not os.path.isdir(configdir):
-        pathlib.Path(configdir).mkdir(exist_ok=True)
-    configfile = os.path.join(configdir, 'profiles.conf')
+def main(pparser, args):
+    if args.file:
+        configfile = args.file
+        ppath = os.path.dirname(configfile)
+    else:
+        configdir = os.path.join(os.path.expanduser('~'), '.shakemap')
+        if not os.path.isdir(configdir):
+            pathlib.Path(configdir).mkdir(exist_ok=True)
+        configfile = os.path.join(configdir, 'profiles.conf')
+        ppath = ''
     if not os.path.isfile(configfile):
         pathlib.Path(configfile).touch(exist_ok=True)
         
@@ -203,7 +215,7 @@ def main(pparser,args):
                    'profiles.')
             print(msg % (profile, configfile, pparser.prog))
             sys.exit(1)
-        create(config, profile, args.accept)
+        create(config, profile, args.accept, ppath)
         sys.exit(0)
         
     check_config(config)

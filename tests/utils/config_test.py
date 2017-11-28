@@ -6,6 +6,7 @@ import textwrap
 import sys
 import pytest
 import copy
+import logging
 
 from configobj import ConfigObj
 
@@ -17,6 +18,11 @@ from validate import ValidateError
 import shakemap.utils.config as config
 
 def test_config():
+
+    #
+    # get_logger()
+    #
+    logger = config.get_logger('nc72282711', log_option='debug')
 
     #
     # Some stuff we just call and see if it bombs out
@@ -46,30 +52,30 @@ def test_config():
 
     assert isinstance(results, bool) and results
 
-    config.check_config(c1)
+    config.check_config(c1, logger)
     #
     # Break the config
     #
     ctest = copy.deepcopy(c1)
     ctest['interp']['component'] = 'NotAComponent'
     with pytest.raises(ValidateError):
-        config.check_config(ctest)
+        config.check_config(ctest, logger)
     ctest = copy.deepcopy(c1)
     ctest['modeling']['ccf'] = 'NotACCF'
     with pytest.raises(ValidateError):
-        config.check_config(ctest)
+        config.check_config(ctest, logger)
     ctest = copy.deepcopy(c1)
     ctest['modeling']['ipe'] = 'NotAnIPE'
     with pytest.raises(ValidateError):
-        config.check_config(ctest)
+        config.check_config(ctest, logger)
     ctest = copy.deepcopy(c1)
     ctest['modeling']['gmice'] = 'NotAGMICE'
     with pytest.raises(ValidateError):
-        config.check_config(ctest)
+        config.check_config(ctest, logger)
     ctest = copy.deepcopy(c1)
     ctest['modeling']['gmpe'] = 'NotAGMPE'
     with pytest.raises(ValidateError):
-        config.check_config(ctest)
+        config.check_config(ctest, logger)
 
     ctest = copy.deepcopy(c1)
     ctest['modeling']['gmpe'] = 47
