@@ -20,58 +20,66 @@ conda config --append channels ioos # for rasterio v 1.0a2
 
 unamestr=`uname`
 if [ "$unamestr" == 'Linux' ]; then
-    DEPARRAY=(numpy=1.11 \
-              scipy=0.19.1 \
+    DEPARRAY=(numpy=1.13.3 \
+              scipy=1.0.0 \
               matplotlib=1.5.3 \
-              rasterio=1.0a2 \
-              pandas=0.20.3 \
+              rasterio=0.36.0 \
+              pandas=0.21.0 \
               xlrd=1.0.0 \
               xlwt=1.2.0 \
               openpyxl=2.5.0a2 \
               xlsxwriter=0.9.8 \
-              h5py=2.7.0 \
+              h5py=2.7.1 \
               gdal=2.1.4 \
-              pytest=3.2.0 \
+              pytest=3.2.5 \
               pytest-cov=2.5.1 \
               cartopy=0.15.1 \
-              fiona=1.7.8 \
+              fiona=1.7.10 \
               numexpr=2.6.2 \
+              pycrypto=2.6.1 \
+              paramiko=2.3.1 \
+              psutil=5.4.0 \
               configobj=5.0.6 \
               decorator=4.1.2 \
               jupyter=1.0.0 \
-              shapely=1.5.17 \
+              shapely=1.6.2 \
               descartes=1.1.0 \
               affine=2.1.0 \
               basemap=1.1.0 \
               geojson=2.0.0 \
               scikit-image=0.13.0 \
+              beautifulsoup4=4.6.0 \
               obspy=1.0.3)
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
-    DEPARRAY=(numpy=1.13.1 \
-              scipy=0.19.1 \
+    DEPARRAY=(numpy=1.13.3 \
+              scipy=1.0.0 \
               matplotlib=1.5.3 \
-              rasterio=1.0a9 \
-              pandas=0.20.3 \
+              rasterio=0.36.0 \
+              pandas=0.21.0 \
               xlrd=1.0.0 \
               xlwt=1.2.0 \
               openpyxl=2.5.0a2 \
               xlsxwriter=0.9.8 \
-              h5py=2.7.0 \
+              h5py=2.7.1 \
               gdal=2.1.4 \
-              pytest=3.2.0 \
+              pytest=3.2.5 \
               pytest-cov=2.5.1 \
               cartopy=0.15.1 \
-              fiona=1.7.8 \
+              fiona=1.7.10 \
               numexpr=2.6.2 \
+              pycrypto=2.6.1 \
+              paramiko=2.3.1 \
+              psutil=5.4.0 \
               configobj=5.0.6 \
               decorator=4.1.2 \
               jupyter=1.0.0 \
-              shapely=1.5.17 \
+              shapely=1.6.2 \
               descartes=1.1.0 \
               affine=2.1.0 \
               basemap=1.1.0 \
               geojson=2.0.0 \
               scikit-image=0.13.0 \
+              beautifulsoup4=4.6.0 \
               obspy=1.0.3)
 fi
 
@@ -106,6 +114,11 @@ echo "with the following dependencies:"
 echo ${DEPARRAY[*]}
 conda create --name $VENV python=$PYVER ${DEPARRAY[*]} -y
 
+if [ $? -ne 0 ]; then
+    echo "Failed to create conda environment.  Resolve any conflicts, then try again."
+    exit
+fi
+
 # Activate the new environment
 echo "Activating the $VENV virtual environment"
 source activate $VENV
@@ -139,7 +152,7 @@ echo "Installing shakelib..."
 pip install -e .
 
 # Install default profile
-python bin/sm_profile -c default -a
+#python bin/sm_profile -c default -a
 
 # Tell the user they have to activate this environment
 echo "Type 'source activate $VENV' to use this new virtual environment."
