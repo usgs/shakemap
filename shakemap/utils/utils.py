@@ -1,6 +1,7 @@
 import sys
 from importlib import import_module
 
+
 def get_object_from_config(obj, section, cfg, *args):
     """
     Helper function for things (ipe, gmice, ccf) that don't have a
@@ -12,19 +13,20 @@ def get_object_from_config(obj, section, cfg, *args):
         obj (str): Name of the parameter in the config file that specifies
             the object to be instantiated.
         section (str): The section of the config in which 'obj' resides.
-        cfg (dictionary): The configuration file in which 'obj' and the 
+        cfg (dictionary): The configuration file in which 'obj' and the
             module definitions reside.
         args: Additional arguments that will be passed to the constructor
             of the thing being instantiated.
-    
+
     Returns:
         object: An instance of the object specified by the 'obj' parameter
-        in the config file..
+            in the config file..
     """
     cls_abbr = cfg[section][obj]
     mods = obj + '_modules'
     (cname, mpath) = cfg[mods][cls_abbr]
     return getattr(import_module(mpath), cname)(*args)
+
 
 #
 # This is from stackoverflow where it was reproduced from Recipe 577058

@@ -25,7 +25,7 @@ DEFAULT_FILTER_SIZE = 10
 
 class RasterModule(CoreModule):
     """
-    raster - Generate GIS raster files of all configured IMT values.
+    **raster** -- Generate GIS raster files of all configured IMT values.
     """
     command_name = 'raster'
     def execute(self):

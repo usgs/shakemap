@@ -82,6 +82,7 @@
 <span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
 
+
 <div class="viewcode-block" id="get_object_from_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.utils.html#shakemap.utils.utils.get_object_from_config">[docs]</a><span class="k">def</span> <span class="nf">get_object_from_config</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Helper function for things (ipe, gmice, ccf) that don&#39;t have a</span>
@@ -93,19 +94,20 @@
 <span class="sd">        obj (str): Name of the parameter in the config file that specifies</span>
 <span class="sd">            the object to be instantiated.</span>
 <span class="sd">        section (str): The section of the config in which &#39;obj&#39; resides.</span>
-<span class="sd">        cfg (dictionary): The configuration file in which &#39;obj&#39; and the </span>
+<span class="sd">        cfg (dictionary): The configuration file in which &#39;obj&#39; and the</span>
 <span class="sd">            module definitions reside.</span>
 <span class="sd">        args: Additional arguments that will be passed to the constructor</span>
 <span class="sd">            of the thing being instantiated.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        object: An instance of the object specified by the &#39;obj&#39; parameter</span>
-<span class="sd">        in the config file..</span>
+<span class="sd">            in the config file..</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cls_abbr</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">obj</span><span class="p">]</span>
     <span class="n">mods</span> <span class="o">=</span> <span class="n">obj</span> <span class="o">+</span> <span class="s1">&#39;_modules&#39;</span>
     <span class="p">(</span><span class="n">cname</span><span class="p">,</span> <span class="n">mpath</span><span class="p">)</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">mods</span><span class="p">][</span><span class="n">cls_abbr</span><span class="p">]</span>
     <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">import_module</span><span class="p">(</span><span class="n">mpath</span><span class="p">),</span> <span class="n">cname</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
+
 
 <span class="c1">#</span>
 <span class="c1"># This is from stackoverflow where it was reproduced from Recipe 577058</span>

@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-#stdlib imports
-import logging.config
-import os.path
+# stdlib imports
 import argparse
 import sys
 import traceback
@@ -13,17 +11,12 @@ import inspect
 import importlib
 import time
 
-#local imports
-from shakemap.utils.config import(get_config_paths,
-                                  get_configspec,
-                                  get_shake_config,
-                                  get_logging_config,
-                                  get_logger)
+# local imports
+from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import get_logger
+
 import shakemap.coremods
 
-#third party imports
-from configobj import ConfigObj
-from validate import Validator, ValidateError
 
 def _get_command_classes():
     """Create a dictionary of classname:class to be used in main().
@@ -35,47 +28,52 @@ def _get_command_classes():
     coremods = {
         name: importlib.import_module(name)
         for finder, name, ispkg
-        in pkgutil.iter_modules(shakemap.coremods.__path__, 
+        in pkgutil.iter_modules(shakemap.coremods.__path__,
                                 shakemap.coremods.__name__ + ".")
     }
-    
+
     classes = {}
     for name, module in coremods.items():
         for m in inspect.getmembers(module, inspect.isclass):
             if m[1].__module__ == name:
                 core_class = getattr(module, m[0])
-                if not hasattr(core_class,'command_name'):
+                if not hasattr(core_class, 'command_name'):
                     continue
                 cmd = core_class.command_name
-                
+
                 if not cmd:
                     continue
                 classes[cmd] = core_class
     return classes
-    
+
+
 _classes_ = _get_command_classes()
-    
-def _format_error_info(exception,eventid):
-    """Format exception information and stack trace into a coherent multi-line string.
+
+
+def _format_error_info(exception, eventid):
+    """
+    Format exception information and stack trace into a coherent multi-line
+    string.
 
     Args:
         exception (Exception): Python Exception (or child thereof) instance.
         eventid (str): ShakeMap event ID (i.e., us2018abcd).
     Returns:
-        str: Multiline string containing: Hostname,eventid,Exception string, 
+        str: Multiline string containing: Hostname,eventid,Exception string,
              and stack trace.
 
     """
     stringio = io.StringIO()
     ex_type, ex, tb = sys.exc_info()
-    traceback.print_tb(tb,file=stringio)
+    traceback.print_tb(tb, file=stringio)
     stack_trace = stringio.getvalue()
     stringio.close()
     hostname = socket.gethostname()
     fmt = '\nHost: %s\nEvent ID: %s\nException: %s\nStack Trace: %s'
-    error_msg = fmt % (hostname,eventid,str(exception),stack_trace)
+    error_msg = fmt % (hostname, eventid, str(exception), stack_trace)
     return error_msg
-                
+
+
 def get_parser():
     """Internal method to get argparse parser instance.
 
@@ -88,14 +86,15 @@ def get_parser():
 
     epilog = 'Available commands:\n'
     for key, core_class in sorted(_classes_.items()):
-        epilog += '  %s\n' % inspect.getdoc(core_class)
-    
-    parser = argparse.ArgumentParser(description=description,
-                                     epilog=epilog,
-                                     formatter_class=argparse.RawDescriptionHelpFormatter)
+        epilog += '    - %s\n' % inspect.getdoc(core_class)
+
+    parser = argparse.ArgumentParser(
+            description=description,
+            epilog=epilog,
+            formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('eventid',
                         help='The id of the event to process.')
-    parser.add_argument('cmds',nargs='+',
+    parser.add_argument('cmds', nargs='+',
                         help='The commands to run.')
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Print all informational messages.')
@@ -105,15 +104,18 @@ def get_parser():
                         help='Log all output.')
     return parser
 
+
 def main(args):
-    """Loop over input commands and call module.execute() for each matching command.
+    """
+    Loop over input commands and call module.execute() for each matching
+    command.
 
     Args:
         (ArgumentParser): argparse argument parser.
-        
+
 
     """
-    install_path,data_path = get_config_paths()
+    install_path, data_path = get_config_paths()
     log_option = None
     if args.debug:
         log_option = 'debug'
@@ -122,13 +124,13 @@ def main(args):
     if args.log:
         log_option = 'log'
 
-    logger = get_logger(args.eventid,log_option=log_option)
-    
+    logger = get_logger(args.eventid, log_option=log_option)
+
     try:
         for cmd in args.cmds:
             if cmd not in _classes_:
                 raise KeyError('Command "%s" not found in ShakeMap.' % cmd)
-        
+
         for cmd in args.cmds:
             logger.info('Running command %s' % cmd)
             cmd_class = _classes_[cmd]
@@ -137,13 +139,15 @@ def main(args):
             cmd_obj.execute()
             t2 = time.time()
             elapsed = t2 - t1
-            logger.info('Finished running command %s: Elapsed %.2f secs' % (cmd,elapsed))
+            logger.info('Finished running command %s: Elapsed %.2f secs'
+                        % (cmd, elapsed))
 
     except Exception as e:
-        error_msg = _format_error_info(e,args.eventid)
-        logger.error(error_msg) #should get sent by email and logged
+        error_msg = _format_error_info(e, args.eventid)
+        logger.error(error_msg)  # should get sent by email and logged
         sys.exit(1)
-        
+
+
 if __name__ == '__main__':
     parser = get_parser()
     pargs = parser.parse_args()

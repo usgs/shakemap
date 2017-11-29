@@ -4,15 +4,8 @@ shakemap
 
 .. toctree::
 
-    shakemap.mapping
-    shakemap.products
+    shakemap.coremods
     shakemap.utils
-
-Submodules
-
-.. toctree::
-
-   shakemap.model
 
 Module contents
 

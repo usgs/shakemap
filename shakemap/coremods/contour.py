@@ -28,7 +28,7 @@ DEFAULT_FILTER_SIZE = 10
 
 class ContourModule(CoreModule):
     """
-    contour - Generate contours of all configured IMT values.
+    **contour** -- Generate contours of all configured IMT values.
     """
     command_name = 'contour'
     def execute(self):
@@ -62,18 +62,18 @@ def contour(container,imtype,component,intervals=None,
     """Generate contours of a specific IMT and return as a Shapely MultiLineString object.
 
     Args:
-      container (OutputContainer): OutputContainer with ShakeMap output data.
-      imtype (str): String containing the name of an Intensity Measure Type 
-                    found in container.
-      component (str): Intensity Measure component found in container.
-      intervals (np.ndarray or None): Array of intervals for IMT, or None.
-      filter_size (int): Integer filter (see
-                         https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)
+        container (OutputContainer): OutputContainer with ShakeMap output data.
+        imtype (str): String containing the name of an Intensity Measure Type 
+                      found in container.
+        component (str): Intensity Measure component found in container.
+        intervals (np.ndarray or None): Array of intervals for IMT, or None.
+        filter_size (int): Integer filter (see
+            https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)
     Returns:
         list: List of dictionaries containing two fields:
-            - geometry: GeoJSON-like representation of one of the objects in
-                    https://toblerity.org/fiona/manual.html#geometry-types
-            - properties: Dictionary of properties describing that feature.
+                - geometry: GeoJSON-like representation of one of the objects in
+                  https://toblerity.org/fiona/manual.html#geometry-types
+                - properties: Dictionary of properties describing that feature.
     """
     imtdict = container.getIMT(imtype,component)
     gridobj = imtdict['mean']

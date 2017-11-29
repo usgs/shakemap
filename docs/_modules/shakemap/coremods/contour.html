@@ -1,0 +1,352 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakemap.coremods.contour &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakemap.coremods.contour</h1><div class="highlight"><pre>
+<span></span><span class="c1">#stdlib imports</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">io</span>
+
+<span class="c1">#third party imports</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">MultiLineString</span><span class="p">,</span><span class="n">mapping</span>
+<span class="kn">import</span> <span class="nn">fiona</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">skimage</span> <span class="k">import</span> <span class="n">measure</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage.filters</span> <span class="k">import</span> <span class="n">median_filter</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">OutputContainer</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span><span class="p">,</span> <span class="n">file_to_oq</span>
+<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
+
+<span class="c1">#local imports</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span><span class="n">get_logging_config</span>
+
+<span class="n">FORMATS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;shapefile&#39;</span><span class="p">:(</span><span class="s1">&#39;ESRI Shapefile&#39;</span><span class="p">,</span><span class="s1">&#39;shp&#39;</span><span class="p">),</span>
+           <span class="s1">&#39;geojson&#39;</span><span class="p">:(</span><span class="s1">&#39;GeoJSON&#39;</span><span class="p">,</span><span class="s1">&#39;json&#39;</span><span class="p">)}</span>
+
+<span class="n">DEFAULT_FILTER_SIZE</span> <span class="o">=</span> <span class="mi">10</span>
+
+<div class="viewcode-block" id="ContourModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.ContourModule">[docs]</a><span class="k">class</span> <span class="nc">ContourModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    **contour** -- Generate contours of all configured IMT values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;contour&#39;</span>
+<div class="viewcode-block" id="ContourModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.ContourModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create contour files for all configured IMT values.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotADirectoryError: When the event data directory does not exist.</span>
+<span class="sd">            FileNotFoundError: When the the shake_result HDF file does not exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">datadir</span><span class="p">)</span>
+        <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
+
+        <span class="c1"># Open the OutputContainer and extract the data</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="n">OutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
+
+        <span class="c1"># get the path to the products.conf file, load the config</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+
+        <span class="c1"># create contour files</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Contouring to files...&#39;</span><span class="p">)</span>
+        <span class="n">contour_to_files</span><span class="p">(</span><span class="n">container</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">datadir</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span></div></div>
+
+<div class="viewcode-block" id="contour"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.contour">[docs]</a><span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span><span class="n">imtype</span><span class="p">,</span><span class="n">component</span><span class="p">,</span><span class="n">intervals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">filter_size</span><span class="o">=</span><span class="n">DEFAULT_FILTER_SIZE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate contours of a specific IMT and return as a Shapely MultiLineString object.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        container (OutputContainer): OutputContainer with ShakeMap output data.</span>
+<span class="sd">        imtype (str): String containing the name of an Intensity Measure Type </span>
+<span class="sd">                      found in container.</span>
+<span class="sd">        component (str): Intensity Measure component found in container.</span>
+<span class="sd">        intervals (np.ndarray or None): Array of intervals for IMT, or None.</span>
+<span class="sd">        filter_size (int): Integer filter (see</span>
+<span class="sd">            https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        list: List of dictionaries containing two fields:</span>
+<span class="sd">                - geometry: GeoJSON-like representation of one of the objects in</span>
+<span class="sd">                  https://toblerity.org/fiona/manual.html#geometry-types</span>
+<span class="sd">                - properties: Dictionary of properties describing that feature.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMT</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span><span class="n">component</span><span class="p">)</span>
+    <span class="n">gridobj</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">gridobj</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">gridobj</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+        <span class="n">sgrid</span> <span class="o">=</span> <span class="n">grid</span>
+        <span class="n">fgrid</span> <span class="o">=</span> <span class="n">median_filter</span><span class="p">(</span><span class="n">sgrid</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">filter_size</span><span class="p">)</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;mmi&#39;</span>
+    <span class="k">elif</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+        <span class="n">sgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
+        <span class="n">fgrid</span> <span class="o">=</span> <span class="n">median_filter</span><span class="p">(</span><span class="n">sgrid</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;cms&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">sgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="o">*</span> <span class="mf">100.0</span>
+        <span class="n">fgrid</span> <span class="o">=</span> <span class="n">median_filter</span><span class="p">(</span><span class="n">sgrid</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+        <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;pctg&#39;</span>
+
+    
+    <span class="k">if</span> <span class="n">intervals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;log&#39;</span>
+        <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+            <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span>
+        <span class="n">intervals</span> <span class="o">=</span> <span class="n">_get_default_intervals</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span><span class="n">interval_type</span> <span class="o">=</span> <span class="n">interval_type</span><span class="p">)</span>
+
+    <span class="n">lonstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmin&#39;</span><span class="p">]</span>
+    <span class="n">latstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ymin&#39;</span><span class="p">]</span>
+    <span class="n">lonspan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmax&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">lonstart</span><span class="p">)</span>
+    <span class="n">latspan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ymax&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">latstart</span><span class="p">)</span>
+    <span class="n">nlon</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx&#39;</span><span class="p">]</span>
+    <span class="n">nlat</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ny&#39;</span><span class="p">]</span>
+
+    <span class="n">line_strings</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1">#dictionary of MultiLineStrings and props</span>
+
+    <span class="k">for</span> <span class="n">cval</span> <span class="ow">in</span> <span class="n">intervals</span><span class="p">:</span>
+        <span class="n">contours</span> <span class="o">=</span> <span class="n">measure</span><span class="o">.</span><span class="n">find_contours</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span> <span class="n">cval</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># Convert coords to geographic coordinates; the coordinates</span>
+        <span class="c1"># are returned in row, column order (i.e., (y, x))</span>
+        <span class="c1">#</span>
+        <span class="n">new_contours</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">plot_contours</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">ic</span><span class="p">,</span> <span class="n">coords</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">contours</span><span class="p">):</span> <span class="c1">#coords is a line segment</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">:</span> <span class="c1">#skipping little contour islands?</span>
+                <span class="k">continue</span>
+
+            <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">lonspan</span> <span class="o">/</span> <span class="n">nlon</span> <span class="o">+</span> <span class="n">lonstart</span>
+            <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">nlat</span> <span class="o">-</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">latspan</span> <span class="o">/</span> <span class="n">nlat</span> <span class="o">+</span> <span class="n">latstart</span>
+            <span class="n">plot_contours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">])</span>
+            <span class="n">new_contours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_contours</span><span class="p">):</span>
+            <span class="n">mls</span> <span class="o">=</span> <span class="n">MultiLineString</span><span class="p">(</span><span class="n">new_contours</span><span class="p">)</span>
+            <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">cval</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">}</span>
+            <span class="n">line_strings</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span><span class="n">mapping</span><span class="p">(</span><span class="n">mls</span><span class="p">),</span>
+                               <span class="s1">&#39;properties&#39;</span><span class="p">:</span><span class="n">props</span><span class="p">})</span>
+    <span class="k">return</span> <span class="n">line_strings</span></div>
+
+<div class="viewcode-block" id="contour_to_files"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.contour_to_files">[docs]</a><span class="k">def</span> <span class="nf">contour_to_files</span><span class="p">(</span><span class="n">container</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">output_dir</span><span class="p">,</span><span class="n">logger</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate contours of all configured IMT values.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      container (OutputContainer): OutputContainer with ShakeMap output data.</span>
+<span class="sd">      config (dict): Product configuration information (from product.conf).</span>
+<span class="sd">      output_dir (str): Path to directory where output files will be written.</span>
+<span class="sd">      logger (logging.Logger): Python logging Logger instance.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        LookupError: When configured file format is not supported, or</span>
+<span class="sd">            when configured IMT is not found in container.</span>
+<span class="sd">        </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">verbose</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="n">jsonstr</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
+    <span class="n">infojson</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonstr</span><span class="p">)</span>
+    <span class="n">event_info</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;event_id&#39;</span><span class="p">:</span> <span class="n">infojson</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">],</span>
+                  <span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">infojson</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">],</span>
+                  <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">infojson</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]}</span>
+
+    <span class="n">contour_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">imtlist</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;contours&#39;</span><span class="p">][</span><span class="s1">&#39;IMTS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
+    <span class="n">file_format</span> <span class="o">=</span>  <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;contours&#39;</span><span class="p">][</span><span class="s1">&#39;format&#39;</span><span class="p">]</span>
+    <span class="c1">#open a file for writing</span>
+    <span class="k">if</span> <span class="n">file_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FORMATS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;File format </span><span class="si">%s</span><span class="s1"> not supported for contours.&#39;</span> <span class="o">%</span> <span class="n">file_format</span><span class="p">)</span>
+    <span class="n">driver</span><span class="p">,</span><span class="n">extension</span> <span class="o">=</span> <span class="n">FORMATS</span><span class="p">[</span><span class="n">file_format</span><span class="p">]</span>
+    <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span><span class="s1">&#39;MultiLineString&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;properties&#39;</span><span class="p">:{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="s1">&#39;float&#39;</span><span class="p">,</span>
+                            <span class="s1">&#39;units&#39;</span><span class="p">:</span><span class="s1">&#39;str&#39;</span><span class="p">}}</span>
+    <span class="n">crs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no_defs&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;ellps&#39;</span><span class="p">:</span> <span class="s1">&#39;WGS84&#39;</span><span class="p">,</span> <span class="s1">&#39;datum&#39;</span><span class="p">:</span> <span class="s1">&#39;WGS84&#39;</span><span class="p">,</span> <span class="s1">&#39;proj&#39;</span><span class="p">:</span> <span class="s1">&#39;longlat&#39;</span><span class="p">}</span>
+    
+    <span class="k">for</span> <span class="n">imtype</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
+        <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">components</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">LookupError</span> <span class="k">as</span> <span class="n">look_error</span><span class="p">:</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;No IMT called </span><span class="si">%s</span><span class="s1"> in container </span><span class="si">%s</span><span class="s1">. Skipping.&#39;</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtype</span><span class="p">,</span><span class="n">container</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
+            <span class="k">continue</span>
+        <span class="n">imtype_spec</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;contours&#39;</span><span class="p">][</span><span class="s1">&#39;IMTS&#39;</span><span class="p">][</span><span class="n">imtype</span><span class="p">]</span>
+        <span class="n">filter_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">imtype_spec</span><span class="p">[</span><span class="s1">&#39;filter_size&#39;</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fileimt</span><span class="p">,</span><span class="n">component</span><span class="p">,</span><span class="n">extension</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span><span class="n">fname</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+                <span class="n">fpath</span><span class="p">,</span><span class="n">fext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                <span class="n">flist</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">fpath</span><span class="o">+</span><span class="s1">&#39;.*&#39;</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">flist</span><span class="p">:</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+
+            <span class="c1"># fiona spews a warning here when driver is geojson</span>
+            <span class="c1"># this warning appears to be un-catchable using</span>
+            <span class="c1"># with warnings.catch_warnings()</span>
+            <span class="c1"># or</span>
+            <span class="c1"># logging.captureWarning()</span>
+            <span class="c1"># or</span>
+            <span class="c1"># even redirecting stderr/stdout to IO streams</span>
+            <span class="c1"># not sure where the warning is coming from,</span>
+            <span class="c1"># but there appears to be no way to stop it...</span>
+            <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">drivers</span><span class="p">():</span>
+                <span class="n">vector_file</span> <span class="o">=</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">,</span>
+                                         <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span>
+                                         <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">,</span>
+                                         <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span>
+
+
+                <span class="n">intervals</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="k">if</span> <span class="s1">&#39;intervals&#39;</span> <span class="ow">in</span> <span class="n">imtype_spec</span><span class="p">:</span>
+                    <span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">imtype_spec</span><span class="p">[</span><span class="s1">&#39;intervals&#39;</span><span class="p">]]</span>
+
+                <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span><span class="n">imtype</span><span class="p">,</span><span class="n">component</span><span class="p">,</span><span class="n">intervals</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">line_strings</span><span class="p">:</span>
+                  <span class="n">vector_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Writing contour file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="n">vector_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<span class="k">def</span> <span class="nf">_get_default_intervals</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span><span class="n">interval_type</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get default intervals for any IMT.</span>
+<span class="sd">    </span>
+<span class="sd">    Args:</span>
+<span class="sd">        fgrid (ndarray): Numpy array containing IMT (MMI,PGA, etc.) data.</span>
+<span class="sd">        interval_type (str): Either &#39;log&#39; or &#39;linear&#39;.</span>
+<span class="sd">    </span>
+<span class="sd">    Returns:</span>
+<span class="sd">        ndarray: Numpy array with contour intervals for input IMT.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">interval_type</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+        <span class="c1">#get the range of the input data</span>
+        <span class="n">dmin</span> <span class="o">=</span> <span class="n">fgrid</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">dmax</span> <span class="o">=</span> <span class="n">fgrid</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+        <span class="c1">#create an array of intervals at 1&#39;s and 3&#39;s</span>
+        <span class="n">intervals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>
+            <span class="n">intervals</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">10</span><span class="o">**</span><span class="n">i</span><span class="p">,(</span><span class="mi">10</span><span class="o">**</span><span class="n">i</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="p">]</span>
+        <span class="n">intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">intervals</span><span class="p">)</span>
+
+        <span class="c1">#subtract the intervals from the lowest value in the data</span>
+        <span class="n">diffs</span> <span class="o">=</span> <span class="n">dmin</span> <span class="o">-</span> <span class="n">intervals</span>
+
+        <span class="c1">#find the index of the largest negative value in diffs</span>
+        <span class="n">ibottom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diffs</span> <span class="o">==</span> <span class="n">diffs</span><span class="p">[</span><span class="n">diffs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cmin</span> <span class="o">=</span> <span class="n">intervals</span><span class="p">[</span><span class="n">ibottom</span><span class="p">]</span>
+
+        <span class="c1">#find the index</span>
+        <span class="n">diffs</span> <span class="o">=</span> <span class="n">dmax</span> <span class="o">-</span> <span class="n">intervals</span>
+        <span class="n">diffmin</span> <span class="o">=</span> <span class="n">diffs</span><span class="p">[</span><span class="n">diffs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
+        <span class="n">itop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diffs</span> <span class="o">==</span> <span class="n">diffmin</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">cmax</span> <span class="o">=</span> <span class="n">intervals</span><span class="p">[</span><span class="n">itop</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">intervals</span><span class="p">[</span><span class="n">ibottom</span><span class="p">:</span><span class="n">itop</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Because you dont contour below the smallest value</span>
+        <span class="n">gmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">fgrid</span><span class="p">))</span>
+        <span class="c1"># Because you don&#39;t contour above the largest value</span>
+        <span class="n">gmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fgrid</span><span class="p">))</span>
+        <span class="n">intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">gmin</span><span class="p">,</span><span class="n">gmax</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">intervals</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

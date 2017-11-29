@@ -26,7 +26,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Positional Arguments" href="sm_select.html" />
-    <link rel="prev" title="sm_model" href="sm_model.html" />
+    <link rel="prev" title="sm_clone" href="sm_clone.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -60,10 +60,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="programs.html">ShakeMap 4.0a Command Line Interface</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="sm_assemble.html">sm_assemble</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sm_augment.html">sm_augment</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sm_contour.html">sm_contour</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sm_model.html">sm_model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shake.html">shake</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_clone.html">sm_clone</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">sm_profile</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
 </ul>
@@ -98,9 +96,11 @@
 <div>Manage ShakeMap profiles.</div></blockquote>
 <p>These ShakeMap profiles allow one user to have multiple ShakeMap profiles
 (installations) on the same machine.  These profiles can all be configured 
-differently, if desired.</p>
+differently, if desired. By default the profiles reside in the file
+‘~/.shakemap/profiles.conf’.</p>
 </p>
 <div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">sm_profile</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">PROFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">c</span> <span class="n">PROFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="n">PROFILE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span><span class="p">]</span>
+                  <span class="p">[</span><span class="o">-</span><span class="n">f</span> <span class="n">FILE</span><span class="p">]</span>
 </pre></div>
 </div>
 <div class="section" id="Named Arguments">
@@ -127,6 +127,9 @@ differently, if desired.</p>
 <tr><td class="option-group">
 <kbd>-p, --preserve</kbd></td>
 <td>Preserve data when deleting a profile</td></tr>
+<tr><td class="option-group">
+<kbd>-f, --file</kbd></td>
+<td>Specify an alternate file in which the profiles (will) reside</td></tr>
 </tbody>
 </table>
 </div>

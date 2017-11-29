@@ -1,0 +1,169 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shake &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="sm_clone" href="sm_clone.html" />
+    <link rel="prev" title="ShakeMap Programs" href="programs.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="programs.html">ShakeMap 4.0a Command Line Interface</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">shake</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="sm_clone.html">sm_clone</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_profile.html">sm_profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_select.html">Positional Arguments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_select.html#Named Arguments">Named Arguments</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="shake">
+<span id="id1"></span><h1>shake<a class="headerlink" href="#shake" title="Permalink to this headline">¶</a></h1>
+<p><blockquote>
+<div>Run all configured ShakeMap programs.</div></blockquote>
+</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">shake</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">q</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="n">eventid</span> <span class="n">cmds</span> <span class="p">[</span><span class="n">cmds</span> <span class="o">...</span><span class="p">]</span>
+</pre></div>
+</div>
+<div class="section" id="Positional Arguments">
+<h2>Positional Arguments<a class="headerlink" href="#Positional Arguments" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>eventid</kbd></td>
+<td>The id of the event to process.</td></tr>
+<tr><td class="option-group">
+<kbd>cmds</kbd></td>
+<td>The commands to run.</td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="Named Arguments">
+<h2>Named Arguments<a class="headerlink" href="#Named Arguments" title="Permalink to this headline">¶</a></h2>
+<table class="docutils option-list" frame="void" rules="none">
+<col class="option" />
+<col class="description" />
+<tbody valign="top">
+<tr><td class="option-group">
+<kbd>-d, --debug</kbd></td>
+<td>Print all informational messages.</td></tr>
+<tr><td class="option-group">
+<kbd>-q, --quiet</kbd></td>
+<td>Print only errors.</td></tr>
+<tr><td class="option-group">
+<kbd>-l, --log</kbd></td>
+<td>Log all output.</td></tr>
+</tbody>
+</table>
+</div>
+<p><dl class="docutils">
+<dt>Available commands:</dt>
+<dd><ul class="first last simple">
+<li><strong>assemble</strong> – Assemble ShakeMap input data into an HDF package.</li>
+<li><strong>augment</strong> – Incorporate additional content to the ShakeMap input file.</li>
+<li><strong>contour</strong> – Generate contours of all configured IMT values.</li>
+<li><strong>gridxml</strong> – Create grid.xml and uncertainty.xml files from shake_result.hdf.</li>
+<li><strong>info</strong> – Extract info.json from shake_result.hdf and write it as a file.</li>
+<li><strong>mapping</strong> – Generate maps of the IMTs found in shake_result.hdf.</li>
+<li><strong>model</strong> – Interpolate ground motions to a grid or list of locations.</li>
+<li><strong>raster</strong> – Generate GIS raster files of all configured IMT values.</li>
+<li><strong>rupture</strong> – Write rupture.json.</li>
+<li><strong>stations</strong> – Generate stationlist.json from shake_result.hdf.</li>
+</ul>
+</dd>
+</dl>
+</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

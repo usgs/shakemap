@@ -1,7 +1,7 @@
-shakemap\.mapping\.mapmaker
+shakemap\.coremods\.rupture
 ==================================
 
-.. automodule:: shakemap.mapping.mapmaker
+.. automodule:: shakemap.coremods.rupture
     :members:
     :undoc-members:
     :show-inheritance:

@@ -34,6 +34,13 @@ def main(args):
     #-------------------------------------------------------------
     # run the api doc command; this creates the .rst files
     #-------------------------------------------------------------
+
+    # First clear out the apidoc directory
+    for f in os.listdir(API_DIR):
+        fpath = os.path.join(API_DIR, f)
+        if os.path.isfile(fpath):
+            os.unlink(fpath)
+    
     sys.stderr.write('Building shakemap API documentation (REST)...\n')
     sphinx_cmd = 'sphinx-apidoc -o %s -f -e -d 12 -H "%s" -A "%s"'\
                  ' -V %s -T %s' % (API_DIR, PACKAGE, AUTHORS, verstr,
