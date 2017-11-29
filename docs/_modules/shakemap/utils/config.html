@@ -79,13 +79,51 @@
           <div class="body" role="main">
             
   <h1>Source code for shakemap.utils.config</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os.path</span>
+<span></span><span class="c1"># stdlib imports</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">logging.config</span>
 
 <span class="c1"># third party libraries</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span><span class="p">,</span> <span class="n">flatten_errors</span>
 <span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="n">Validator</span><span class="p">,</span> <span class="n">ValidateError</span>
+
+<span class="n">REQ_FIELDS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;logging.handlers.TimedRotatingFileHandler&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">&#39;level&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;formatter&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;when&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;filename&#39;</span>
+    <span class="p">],</span>
+    <span class="s1">&#39;logging.FileHandler&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">&#39;level&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;formatter&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;filename&#39;</span><span class="p">],</span>
+    <span class="s1">&#39;logging.handlers.SMTPHandler&#39;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="s1">&#39;level&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;formatter&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;mailhost&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;fromaddr&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;toaddrs&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;subject&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;class&#39;</span><span class="p">]</span>
+<span class="p">}</span>
+
+<span class="c1"># mapping of string versions of logging module logging levels</span>
+<span class="c1"># to the corresponding constants.</span>
+<span class="n">LOG_LEVELS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;DEBUG&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">,</span>
+    <span class="s1">&#39;INFO&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
+    <span class="s1">&#39;WARNING&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+    <span class="s1">&#39;ERROR&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span><span class="p">,</span>
+    <span class="s1">&#39;CRITICAL&#39;</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">CRITICAL</span>
+<span class="p">}</span>
+
 
 <div class="viewcode-block" id="get_data_path"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_data_path">[docs]</a><span class="k">def</span> <span class="nf">get_data_path</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -94,40 +132,59 @@
 <span class="sd">    files.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (str): The full path to the data directory.</span>
+<span class="sd">        str: The full path to the data directory.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;shakemap&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="get_configspec"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_configspec">[docs]</a><span class="k">def</span> <span class="nf">get_configspec</span><span class="p">():</span>
+
+<div class="viewcode-block" id="get_configspec"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_configspec">[docs]</a><span class="k">def</span> <span class="nf">get_configspec</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns the full path to the ShakeMap configspec.conf file.</span>
+<span class="sd">    Returns the full path to a ShakeMap config spec file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">      config (str): Name of config spec to find, or None.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (str): The path to the configspec.</span>
+<span class="sd">        str: The path to a config spec, or</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;configspec.conf&#39;</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;configspec.conf&#39;</span><span class="p">)</span>
+    <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">spec.conf&#39;</span> <span class="o">%</span> <span class="n">config</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;No file &quot;</span><span class="si">%s</span><span class="s1">&quot; exists.&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fname</span></div>
 
 
 <div class="viewcode-block" id="get_config_paths"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_config_paths">[docs]</a><span class="k">def</span> <span class="nf">get_config_paths</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Returns two paths based on the currently selected profile in the </span>
+<span class="sd">    Returns two paths based on the currently selected profile in the</span>
 <span class="sd">    user&#39;s ~/.shakemap/profile.conf: 1) the path to the ShakeMap</span>
 <span class="sd">    installation directory; 2) the path to the data directory.</span>
+
+<span class="sd">    If this function is called within a pytest process, it will</span>
+<span class="sd">    return the paths to the repository&#39;s test install and data</span>
+<span class="sd">    directories.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        (str, str): The paths to the ShakeMap install directory</span>
 <span class="sd">        and the data directory.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.shakemap&#39;</span><span class="p">,</span> 
-                               <span class="s1">&#39;profiles.conf&#39;</span><span class="p">)</span>
-    <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
-    <span class="n">profile_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profile&#39;</span><span class="p">]</span>
-    <span class="n">profile</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profiles&#39;</span><span class="p">][</span><span class="n">profile_name</span><span class="p">]</span>
-    <span class="n">install</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;install_path&#39;</span><span class="p">]</span>
-    <span class="n">data</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;data_path&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">install</span><span class="p">,</span><span class="n">data</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="s1">&#39;CALLED_FROM_PYTEST&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;tests&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+        <span class="n">install</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;install&#39;</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;eventdata&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.shakemap&#39;</span><span class="p">,</span>
+                                   <span class="s1">&#39;profiles.conf&#39;</span><span class="p">)</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+        <span class="n">profile_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profile&#39;</span><span class="p">]</span>
+        <span class="n">profile</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profiles&#39;</span><span class="p">][</span><span class="n">profile_name</span><span class="p">]</span>
+        <span class="n">install</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;install_path&#39;</span><span class="p">]</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;data_path&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">install</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="get_custom_validator"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_custom_validator">[docs]</a><span class="k">def</span> <span class="nf">get_custom_validator</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -135,7 +192,7 @@
 <span class="sd">    files.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (:class:`Validator`): A Validator object.</span>
+<span class="sd">        :class:`Validator`: A Validator object.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">fdict</span> <span class="o">=</span> <span class="p">{</span>
@@ -150,70 +207,77 @@
     <span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">fdict</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">validator</span></div>
 
+
 <div class="viewcode-block" id="config_error"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.config_error">[docs]</a><span class="k">def</span> <span class="nf">config_error</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parse the results of a ConfigObj validation and print the errors.</span>
-<span class="sd">    Throws a RuntimeError exception  upon completion if any errors or </span>
+<span class="sd">    Throws a RuntimeError exception  upon completion if any errors or</span>
 <span class="sd">    missing sections are encountered.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        config (ConfigObj): The ConfigObj instance representing the </span>
+<span class="sd">        config (ConfigObj): The ConfigObj instance representing the</span>
 <span class="sd">            parsed config.</span>
 <span class="sd">        results (dict): The dictionary returned by the validation of</span>
-<span class="sd">        the &#39;config&#39; arguments.</span>
+<span class="sd">            the &#39;config&#39; arguments.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (Nothing): Nothing</span>
+<span class="sd">        Nothing: Nothing</span>
 
+<span class="sd">    Raises:</span>
+<span class="sd">        RuntimeError: Should always raise this exception.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">errs</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="p">(</span><span class="n">section_list</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">_</span><span class="p">)</span> <span class="ow">in</span> <span class="n">flatten_errors</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The &quot;</span><span class="si">%s</span><span class="s1">&quot; key in the section &quot;</span><span class="si">%s</span><span class="s1">&quot; failed validation&#39;</span> <span class="o">%</span> 
-                    <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">section_list</span><span class="p">)))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The &quot;</span><span class="si">%s</span><span class="s1">&quot; key in the section &quot;</span><span class="si">%s</span><span class="s1">&quot; failed validation&#39;</span>
+                  <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">section_list</span><span class="p">)))</span>
             <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The following section was missing:</span><span class="si">%s</span><span class="s1"> &#39;</span> <span class="o">%</span> 
-                    <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">section_list</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The following section was missing:</span><span class="si">%s</span><span class="s1"> &#39;</span>
+                  <span class="o">%</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">section_list</span><span class="p">))</span>
             <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="n">errs</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;There </span><span class="si">%s</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> in configuration.&#39;</span> <span class="o">%</span>
-                    <span class="p">(</span><span class="s1">&#39;was&#39;</span> <span class="k">if</span> <span class="n">errs</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;were&#39;</span><span class="p">,</span> <span class="n">errs</span><span class="p">,</span> 
-                     <span class="s1">&#39;error&#39;</span> <span class="k">if</span> <span class="n">errs</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;errors&#39;</span><span class="p">))</span></div>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;There </span><span class="si">%s</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> in configuration.&#39;</span>
+                           <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;was&#39;</span> <span class="k">if</span> <span class="n">errs</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;were&#39;</span><span class="p">,</span> <span class="n">errs</span><span class="p">,</span>
+                              <span class="s1">&#39;error&#39;</span> <span class="k">if</span> <span class="n">errs</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;errors&#39;</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="check_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.check_config">[docs]</a><span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+
+<div class="viewcode-block" id="check_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.check_config">[docs]</a><span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks that the gmpe, gmice, ipe, ccf, and component parameters</span>
-<span class="sd">    in config are defined in their respective sections. Raises a </span>
+<span class="sd">    in config are defined in their respective sections. Raises a</span>
 <span class="sd">    ValidateError exception if an error is encountered.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        config (ConfigObj): A ConfigObj instance.</span>
+<span class="sd">        logger (logger): The logger to which to write complaints.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (Nothing): Nothing.</span>
+<span class="sd">        Nothing: Nothing.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;gmpe_sets&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: gmpe </span><span class="si">%s</span><span class="s1"> not in gmpe_sets&#39;</span> <span class="o">%</span>
-              <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Configuration error: gmpe </span><span class="si">%s</span><span class="s1"> not in gmpe_sets&#39;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmice&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;gmice_modules&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: gmice </span><span class="si">%s</span><span class="s1"> not in gmice_modules&#39;</span> <span class="o">%</span>
-              <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmice&#39;</span><span class="p">]))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Configuration error: gmice </span><span class="si">%s</span><span class="s1"> not in gmice_modules&#39;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmice&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ipe&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;ipe_modules&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: ipe </span><span class="si">%s</span><span class="s1"> not in ipe_modules&#39;</span> <span class="o">%</span>
-              <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ipe&#39;</span><span class="p">]))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Configuration error: ipe </span><span class="si">%s</span><span class="s1"> not in ipe_modules&#39;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ipe&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ccf&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;ccf_modules&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: ccf </span><span class="si">%s</span><span class="s1"> not in ccf_modules&#39;</span> <span class="o">%</span>
-              <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ccf&#39;</span><span class="p">]))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Configuration error: ccf </span><span class="si">%s</span><span class="s1"> not in ccf_modules&#39;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ccf&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;component_modules&#39;</span><span class="p">]:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Configuration error: component </span><span class="si">%s</span><span class="s1"> not in component_modules&#39;</span> <span class="o">%</span>
-              <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Configuration error: component </span><span class="si">%s</span><span class="s1"> not in &#39;</span>
+                     <span class="s1">&#39;component_modules&#39;</span> <span class="o">%</span>
+                     <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span></div>
+
 
 <div class="viewcode-block" id="annotatedfloat_type"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.annotatedfloat_type">[docs]</a><span class="k">def</span> <span class="nf">annotatedfloat_type</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -224,11 +288,11 @@
 <span class="sd">    Raises a ValidateError exception on failure.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        value (str): A string representing a float or a float appended </span>
-<span class="sd">        with &#39;d&#39;, &#39;m&#39;, or &#39;c&#39; (for degrees, minutes, seconds).</span>
+<span class="sd">        value (str): A string representing a float or a float appended</span>
+<span class="sd">            with &#39;d&#39;, &#39;m&#39;, or &#39;c&#39; (for degrees, minutes, seconds).</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (float): The input value converted to decimal degrees.</span>
+<span class="sd">        float: The input value converted to decimal degrees.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
@@ -247,17 +311,18 @@
             <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
+
 <div class="viewcode-block" id="weight_list"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.weight_list">[docs]</a><span class="k">def</span> <span class="nf">weight_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks to see if value is a list of floats at least min elements long,</span>
-<span class="sd">    and whose values add up to 1.0.  Raises a ValidateError exception on </span>
+<span class="sd">    and whose values add up to 1.0.  Raises a ValidateError exception on</span>
 <span class="sd">    failure.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value (str): A string representing a list of floats.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (list): The input string converted to a list of floats.</span>
+<span class="sd">        list: The input string converted to a list of floats.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -300,17 +365,18 @@
 
     <span class="k">return</span> <span class="n">out</span></div>
 
+
 <div class="viewcode-block" id="gmpe_list"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.gmpe_list">[docs]</a><span class="k">def</span> <span class="nf">gmpe_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks to see if value is a list of strings at least min elements long.</span>
-<span class="sd">    The entries are not checked for their validity as GMPEs. Raises a </span>
+<span class="sd">    The entries are not checked for their validity as GMPEs. Raises a</span>
 <span class="sd">    ValidateError exception on failure.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value (str): A string representing a list of GMPEs.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (list): The input string converted to a list of GMPEs.</span>
+<span class="sd">        list: The input string converted to a list of GMPEs.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -328,6 +394,7 @@
 
     <span class="k">return</span> <span class="n">value</span></div>
 
+
 <div class="viewcode-block" id="extent_list"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.extent_list">[docs]</a><span class="k">def</span> <span class="nf">extent_list</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks to see if value is an empty list or a list of four floats,</span>
@@ -336,11 +403,11 @@
 <span class="sd">    ValidateError exception on failure.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        value (str): A string representing a list of geographic </span>
+<span class="sd">        value (str): A string representing a list of geographic</span>
 <span class="sd">            coordinates.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (list): The input string converted to a list of floats.</span>
+<span class="sd">        list: The input string converted to a list of floats.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -363,11 +430,12 @@
        <span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">360.0</span> <span class="ow">or</span> <span class="n">out</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">360.0</span> <span class="ow">or</span> \
        <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">90.0</span> <span class="ow">or</span> <span class="n">out</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">90.0</span> <span class="ow">or</span> \
        <span class="n">out</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">90.0</span> <span class="ow">or</span> <span class="n">out</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">90.0</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid extent: &quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> 
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid extent: &quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span>
               <span class="s2">&quot; : -360 &lt;= longitude &lt;= 360, -90 &lt;= latitude &lt;= 90&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">out</span></div>
+
 
 <div class="viewcode-block" id="file_type"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.file_type">[docs]</a><span class="k">def</span> <span class="nf">file_type</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -378,7 +446,7 @@
 <span class="sd">        value (str): A string representing the path to a file.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (string): The input string.</span>
+<span class="sd">        str: The input string.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
@@ -387,6 +455,7 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;file &#39;</span><span class="si">%s</span><span class="s2">&#39; is not a valid file&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">value</span></div>
+
 
 <div class="viewcode-block" id="directory_type"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.directory_type">[docs]</a><span class="k">def</span> <span class="nf">directory_type</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -397,7 +466,7 @@
 <span class="sd">        value (str): A string representing the path to a directory.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (string): The input string.</span>
+<span class="sd">        str: The input string.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
@@ -406,18 +475,18 @@
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">value</span></div>
 
+
 <div class="viewcode-block" id="status_string"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.status_string">[docs]</a><span class="k">def</span> <span class="nf">status_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Checks to see if value is one of the ShakeMap status string of</span>
-<span class="sd">    &#39;automatic&#39;, &#39;released&#39;, or &#39;reviewed.  Raises a ValidateError </span>
+<span class="sd">    &#39;automatic&#39;, &#39;released&#39;, or &#39;reviewed.  Raises a ValidateError</span>
 <span class="sd">    exception on failure.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value (str): A status string.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (string): The input string. &#39;automatic&#39; is returned if</span>
-<span class="sd">        value is empty.</span>
+<span class="sd">        str: The input string. &#39;automatic&#39; is returned if value is empty.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
@@ -426,10 +495,11 @@
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">value</span></div>
 
+
 <div class="viewcode-block" id="cfg_float_list"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.cfg_float_list">[docs]</a><span class="k">def</span> <span class="nf">cfg_float_list</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Converts (if possible) the input list (or string) to a list</span>
-<span class="sd">    of floats. Raises ValidateError if the input can&#39;t be </span>
+<span class="sd">    of floats. Raises ValidateError if the input can&#39;t be</span>
 <span class="sd">    converted to a list of floats.</span>
 
 <span class="sd">    Args:</span>
@@ -437,7 +507,7 @@
 <span class="sd">            converted to a list of floats.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (list): The input converted to a list of floats.</span>
+<span class="sd">        list: The input converted to a list of floats.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValidateError</span>
@@ -460,16 +530,17 @@
         <span class="n">fvalue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fval</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fvalue</span></div>
 
+
 <div class="viewcode-block" id="cfg_float"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.cfg_float">[docs]</a><span class="k">def</span> <span class="nf">cfg_float</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Converts (if possible) the input string to a float. Raises </span>
+<span class="sd">    Converts (if possible) the input string to a float. Raises</span>
 <span class="sd">    ValidateError if the input can&#39;t be converted to a float.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        value (str): A string to be converted to a float.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (float): The input converted to a float.</span>
+<span class="sd">        float: The input converted to a float.</span>
 
 <span class="sd">    Raises:</span>
 <span class="sd">        ValidateError</span>
@@ -483,6 +554,149 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a float&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">fval</span></div>
+
+
+<div class="viewcode-block" id="get_shake_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_shake_config">[docs]</a><span class="k">def</span> <span class="nf">get_shake_config</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a dictionary containing input required to run the shake program,</span>
+<span class="sd">    including logging.</span>
+
+<span class="sd">    See https://docs.python.org/3.5/library/logging.config.html.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       dict: Dictionary containing shake config information.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
+    <span class="n">conf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;shake.conf&#39;</span><span class="p">)</span>
+    <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="s1">&#39;shake&#39;</span><span class="p">)</span>
+    <span class="n">shake_conf</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">conf_file</span><span class="p">,</span>
+                           <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">,</span>
+                           <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;template&#39;</span><span class="p">)</span>
+
+    <span class="n">val</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">()</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">shake_conf</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+        <span class="n">config_error</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">shake_conf</span></div>
+
+
+<div class="viewcode-block" id="get_logger"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_logger">[docs]</a><span class="k">def</span> <span class="nf">get_logger</span><span class="p">(</span><span class="n">eventid</span><span class="p">,</span> <span class="n">log_option</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the logger instance for ShakeMap.  Only use once!</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        eventid (str): Event ID.</span>
+<span class="sd">        log_option (str): One of &#39;log&#39;,&#39;quiet&#39;, &#39;debug&#39;, or None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Logger: logging Logger instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">get_logging_config</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;debug&#39;</span> <span class="ow">or</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;quiet&#39;</span> <span class="ow">or</span> <span class="n">log_option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">format</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;formatters&#39;</span><span class="p">][</span><span class="s1">&#39;standard&#39;</span><span class="p">][</span><span class="s1">&#39;format&#39;</span><span class="p">]</span>
+        <span class="n">datefmt</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;formatters&#39;</span><span class="p">][</span><span class="s1">&#39;standard&#39;</span><span class="p">][</span><span class="s1">&#39;datefmt&#39;</span><span class="p">]</span>
+        <span class="c1"># create a console handler, with verbosity setting chosen by user</span>
+        <span class="k">if</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;debug&#39;</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+        <span class="k">elif</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;quiet&#39;</span><span class="p">:</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
+        <span class="k">elif</span> <span class="n">log_option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># default interactive</span>
+            <span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
+
+        <span class="n">logdict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;version&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="s1">&#39;formatters&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;standard&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;format&#39;</span><span class="p">:</span> <span class="nb">format</span><span class="p">,</span>
+                    <span class="s1">&#39;datefmt&#39;</span><span class="p">:</span> <span class="n">datefmt</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;stream&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">level</span><span class="p">,</span>
+                    <span class="s1">&#39;formatter&#39;</span><span class="p">:</span> <span class="s1">&#39;standard&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;class&#39;</span><span class="p">:</span> <span class="s1">&#39;logging.StreamHandler&#39;</span>
+                <span class="p">}</span>
+            <span class="p">},</span>
+            <span class="s1">&#39;loggers&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;handlers&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;stream&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;level&#39;</span><span class="p">:</span> <span class="n">level</span><span class="p">,</span>
+                    <span class="s1">&#39;propagate&#39;</span><span class="p">:</span> <span class="kc">True</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">logdict</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">event_log_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">event_log_dir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t open log file: event </span><span class="si">%s</span><span class="s2"> &quot;</span>
+                                     <span class="s2">&quot;not found&quot;</span> <span class="o">%</span> <span class="n">eventid</span><span class="p">)</span>
+        <span class="n">event_log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event_log_dir</span><span class="p">,</span> <span class="s1">&#39;shake.log&#39;</span><span class="p">)</span>
+        <span class="n">config</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;event_file&#39;</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_log_file</span>
+        <span class="n">global_log_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;logs&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">global_log_dir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">global_log_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">global_log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">global_log_dir</span><span class="p">,</span> <span class="s1">&#39;shake.log&#39;</span><span class="p">)</span>
+        <span class="n">config</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;global_file&#39;</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">global_log_file</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="n">log_cfg</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">])</span>
+    <span class="c1"># get the root logger, otherwise we can&#39;t log in sub-libraries</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">logger</span></div>
+
+
+<div class="viewcode-block" id="get_logging_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_logging_config">[docs]</a><span class="k">def</span> <span class="nf">get_logging_config</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Extract logging configuration from shake config.</span>
+
+<span class="sd">    See this URL for example of config.</span>
+<span class="sd">    https://gist.github.com/st4lk/6287746</span>
+
+<span class="sd">    See https://docs.python.org/3.5/library/logging.config.html</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary suitable for use with logging.config.dictConfig().</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">shake_conf</span> <span class="o">=</span> <span class="n">get_shake_config</span><span class="p">()</span>
+    <span class="n">log_config</span> <span class="o">=</span> <span class="n">shake_conf</span><span class="p">[</span><span class="s1">&#39;shake&#39;</span><span class="p">]</span>
+    <span class="n">_clean_log_dict</span><span class="p">(</span><span class="n">log_config</span><span class="p">)</span>
+
+    <span class="c1"># Here follows a bit of trickery...</span>
+    <span class="c1"># To have a logger point to the root logger using the dictConfig() method,</span>
+    <span class="c1"># you need to have the logger have a name equal to the empty string &#39;&#39;.</span>
+    <span class="c1"># Our logging dictionary is originally specified using ConfigObj, which</span>
+    <span class="c1"># does not allow for empty section headers.  So, we need to get all of the</span>
+    <span class="c1"># information from the logger we specify, copy it into a logger dictionary with</span>
+    <span class="c1"># an empty key, and then delete the original logger from the config dictionary.</span>
+    <span class="c1"># Whew.</span>
+    <span class="n">log_name</span> <span class="o">=</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="n">log_name</span><span class="p">]</span>
+    <span class="k">del</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="n">log_name</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">log_config</span></div>
+
+
+<span class="k">def</span> <span class="nf">_clean_log_dict</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Clean up dictionary returned by ConfigObj into form suitable for logging.</span>
+
+<span class="sd">    Basically, ConfigObj.validate wants all sections that are Handlers (for example)</span>
+<span class="sd">    to have the same fields, so it fills them in with default values.  However,</span>
+<span class="sd">    if you try to give a StreamHandler a filename parameter, it generates an error,</span>
+<span class="sd">    hence the code below.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary suitable for use with logging.config.dictConfig().</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">handlerkey</span><span class="p">,</span><span class="n">handler</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">myclass</span> <span class="o">=</span> <span class="n">handler</span><span class="p">[</span><span class="s1">&#39;class&#39;</span><span class="p">]</span>
+        <span class="n">req_fields</span> <span class="o">=</span> <span class="n">REQ_FIELDS</span><span class="p">[</span><span class="n">myclass</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span><span class="n">value</span> <span class="ow">in</span> <span class="n">handler</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">req_fields</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">handler</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 </pre></div>
 
           </div>

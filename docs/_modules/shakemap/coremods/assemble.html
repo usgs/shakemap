@@ -1,0 +1,290 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakemap.coremods.assemble &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakemap.coremods.assemble</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Collect configuration, station data, finite fault data, etc., into</span>
+<span class="sd">an InputContainer and write it out as shake_data.hdf.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="c1">#stdlib imports</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+
+<span class="c1">#third party imports</span>
+<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
+
+<span class="c1">#local imports</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">InputContainer</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span> <span class="n">get_custom_validator</span><span class="p">,</span>\
+                <span class="n">config_error</span><span class="p">,</span> <span class="n">check_config</span><span class="p">,</span> <span class="n">get_configspec</span>
+
+
+<div class="viewcode-block" id="AssembleModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.assemble.html#shakemap.coremods.assemble.AssembleModule">[docs]</a><span class="k">class</span> <span class="nc">AssembleModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    **assemble** -- Assemble ShakeMap input data into an HDF package.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;assemble&#39;</span>
+<div class="viewcode-block" id="AssembleModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.assemble.html#shakemap.coremods.assemble.AssembleModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Assemble ShakeMap input data and write and InputContainer named</span>
+<span class="sd">        shake_data.hdf in the event&#39;s &#39;current&#39; directory.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotADirectoryError: When the event data directory does not</span>
+<span class="sd">                exist.</span>
+<span class="sd">            FileNotFoundError: When the the event&#39;s event.xml file does</span>
+<span class="sd">                not exist.</span>
+<span class="sd">            RuntimeError: When there are problems parsing the configuration.</span>
+<span class="sd">            ValidateError: When there are configuration items missing or mis-</span>
+<span class="sd">                configured.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">datadir</span><span class="p">)</span>
+
+        <span class="n">eventxml</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;event.xml&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for event.xml file...&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">eventxml</span><span class="p">)</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># Look for global configs in install_path/config</span>
+        <span class="c1">#</span>
+        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">()</span>
+        <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Looking for configuration files...&#39;</span><span class="p">)</span>
+        <span class="n">modules</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;modules.conf&#39;</span><span class="p">),</span>
+                <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+        <span class="n">gmpe_sets</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;gmpe_sets.conf&#39;</span><span class="p">),</span>
+                <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+        <span class="n">global_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;model.conf&#39;</span><span class="p">),</span>
+                <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># this is the event specific model.conf (may not be present)</span>
+        <span class="c1"># prefer model.conf to model_zc.conf</span>
+        <span class="c1">#</span>
+        <span class="n">event_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model.conf&#39;</span><span class="p">)</span>
+        <span class="n">event_config_zc_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model_zc.conf&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">event_config_file</span><span class="p">):</span>
+            <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">event_config_file</span><span class="p">,</span>
+                                     <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">event_config_zc_file</span><span class="p">):</span>
+            <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">event_config_zc_file</span><span class="p">,</span>
+                                     <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">()</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># start merging event_config</span>
+        <span class="c1">#</span>
+        <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">event_config</span><span class="p">)</span>
+        <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
+        <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">gmpe_sets</span><span class="p">)</span>
+
+        <span class="n">results</span> <span class="o">=</span> <span class="n">global_config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">config_error</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+
+        <span class="n">check_config</span><span class="p">(</span><span class="n">global_config</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># The vs30 file may have macros in it</span>
+        <span class="c1">#</span>
+        <span class="n">vs30file</span> <span class="o">=</span> <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;vs30file&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">vs30file</span><span class="p">:</span>
+            <span class="n">vs30file</span> <span class="o">=</span> <span class="n">vs30file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;INSTALL_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">install_path</span><span class="p">)</span>
+            <span class="n">vs30file</span> <span class="o">=</span> <span class="n">vs30file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;DATA_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+            <span class="n">vs30file</span> <span class="o">=</span> <span class="n">vs30file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;EVENT_ID&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">vs30file</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;vs30 file &#39;</span><span class="si">%s</span><span class="s2">&#39; is not a valid file&quot;</span> <span class="o">%</span>
+                                        <span class="n">vs30file</span><span class="p">)</span>
+            <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;vs30file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">vs30file</span>
+        <span class="c1">#</span>
+        <span class="c1"># If there is a prediction_location-&gt;file file, then we need</span>
+        <span class="c1"># to expand any macros</span>
+        <span class="c1">#</span>
+        <span class="k">if</span> <span class="s1">&#39;file&#39;</span> <span class="ow">in</span> <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">]:</span>
+            <span class="n">loc_file</span> <span class="o">=</span> <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">loc_file</span> <span class="ow">and</span> <span class="n">loc_file</span> <span class="o">!=</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>      <span class="c1"># &#39;None&#39; is a string here</span>
+                <span class="n">loc_file</span> <span class="o">=</span> <span class="n">loc_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;INSTALL_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">install_path</span><span class="p">)</span>
+                <span class="n">loc_file</span> <span class="o">=</span> <span class="n">loc_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;DATA_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+                <span class="n">loc_file</span> <span class="o">=</span> <span class="n">loc_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;EVENT_ID&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">loc_file</span><span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;prediction file &#39;</span><span class="si">%s</span><span class="s2">&#39; is not &quot;</span>
+                                            <span class="s2">&quot;a valid file&quot;</span> <span class="o">%</span> <span class="n">loc_file</span><span class="p">)</span>
+                <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loc_file</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="n">global_config</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for data files...&#39;</span><span class="p">)</span>
+        <span class="n">datafiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_dat.xml&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;stationlist.xml&#39;</span><span class="p">)):</span>
+            <span class="n">datafiles</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;stationlist.xml&#39;</span><span class="p">))</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for rupture files...&#39;</span><span class="p">)</span>
+        <span class="n">rupturefiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_fault.txt&#39;</span><span class="p">))</span>
+        <span class="n">rupturefile</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rupturefiles</span><span class="p">):</span>
+            <span class="n">rupturefile</span> <span class="o">=</span> <span class="n">rupturefiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1">#</span>
+        <span class="c1"># Sort out the version history. Get the most recent backup file and</span>
+        <span class="c1"># extract the existing history. Then add a new line for this run.</span>
+        <span class="c1">#</span>
+        <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%F</span><span class="s1">T%TZ&#39;</span><span class="p">)</span>
+        <span class="n">originator</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;source_network&#39;</span><span class="p">]</span>
+        <span class="n">backup_dirs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+                <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;.backup*&#39;</span><span class="p">)),</span>
+                <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">backup_dirs</span><span class="p">):</span>
+            <span class="c1">#</span>
+            <span class="c1"># Backup files exist so find the latest one and extract its</span>
+            <span class="c1"># history, then add a new line that increments the version</span>
+            <span class="c1">#</span>
+            <span class="n">bu_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">backup_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)</span>
+            <span class="n">bu_ic</span> <span class="o">=</span> <span class="n">InputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">bu_file</span><span class="p">)</span>
+            <span class="n">history</span> <span class="o">=</span> <span class="n">bu_ic</span><span class="o">.</span><span class="n">getVersionHistory</span><span class="p">()</span>
+            <span class="n">bu_ic</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">version</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
+                    <span class="n">backup_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;.backup&#39;</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+            <span class="n">version</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="n">version</span><span class="p">]</span>
+            <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_line</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)):</span>
+            <span class="c1">#</span>
+            <span class="c1"># No backups are available, but there is an existing shake_data</span>
+            <span class="c1"># file. Extract its history and update the timestamp and</span>
+            <span class="c1"># source network (but leave the version alone).</span>
+            <span class="c1">#</span>
+            <span class="n">bu_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)</span>
+            <span class="n">bu_ic</span> <span class="o">=</span> <span class="n">InputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">bu_file</span><span class="p">)</span>
+            <span class="n">history</span> <span class="o">=</span> <span class="n">bu_ic</span><span class="o">.</span><span class="n">getVersionHistory</span><span class="p">()</span>
+            <span class="n">bu_ic</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]]</span>
+            <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_line</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#</span>
+            <span class="c1"># No backup and no existing file. Make this version 1</span>
+            <span class="c1">#</span>
+            <span class="n">history</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;history&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+            <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_line</span><span class="p">)</span>
+
+        <span class="n">hdf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating input container...&#39;</span><span class="p">)</span>
+        <span class="n">shake_data</span> <span class="o">=</span> <span class="n">InputContainer</span><span class="o">.</span><span class="n">createFromInput</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">,</span>
+                                                    <span class="n">config</span><span class="p">,</span>
+                                                    <span class="n">eventxml</span><span class="p">,</span>
+                                                    <span class="n">rupturefile</span><span class="p">,</span>
+                                                    <span class="n">datafiles</span><span class="o">=</span><span class="n">datafiles</span><span class="p">,</span>
+                                                    <span class="n">version_history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created HDF5 input container in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                         <span class="n">shake_data</span><span class="o">.</span><span class="n">getFileName</span><span class="p">())</span>
+        <span class="n">shake_data</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

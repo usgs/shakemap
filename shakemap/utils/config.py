@@ -1,4 +1,4 @@
-#stdlib imports
+# stdlib imports
 import os
 import os.path
 import pkg_resources
@@ -10,30 +10,38 @@ import numpy as np
 from configobj import ConfigObj, flatten_errors
 from validate import Validator, ValidateError
 
-REQ_FIELDS = {'logging.handlers.TimedRotatingFileHandler':['level',
-                                                           'formatter',
-                                                           'class',
-                                                           'when',
-                                                           'filename'],
-              'logging.FileHandler':['level',
-                                     'formatter',
-                                     'class',
-                                     'filename'],
-              'logging.handlers.SMTPHandler':['level',
-                                              'formatter',
-                                              'mailhost',
-                                              'fromaddr',
-                                              'toaddrs',
-                                              'subject',
-                                              'class']}
+REQ_FIELDS = {
+    'logging.handlers.TimedRotatingFileHandler': [
+        'level',
+        'formatter',
+        'class',
+        'when',
+        'filename'
+    ],
+    'logging.FileHandler': [
+        'level',
+        'formatter',
+        'class',
+        'filename'],
+    'logging.handlers.SMTPHandler': [
+        'level',
+        'formatter',
+        'mailhost',
+        'fromaddr',
+        'toaddrs',
+        'subject',
+        'class']
+}
 
 # mapping of string versions of logging module logging levels
 # to the corresponding constants.
-LOG_LEVELS = {'DEBUG':logging.DEBUG,
-              'INFO':logging.INFO,
-              'WARNING':logging.WARNING,
-              'ERROR':logging.ERROR,
-              'CRITICAL':logging.CRITICAL}
+LOG_LEVELS = {
+    'DEBUG': logging.DEBUG,
+    'INFO': logging.INFO,
+    'WARNING': logging.WARNING,
+    'ERROR': logging.ERROR,
+    'CRITICAL': logging.CRITICAL
+}
 
 
 def get_data_path():
@@ -43,7 +51,7 @@ def get_data_path():
     files.
 
     Returns:
-        (str): The full path to the data directory.
+        str: The full path to the data directory.
 
     """
     return pkg_resources.resource_filename('shakemap', 'data')
@@ -57,12 +65,12 @@ def get_configspec(config=None):
       config (str): Name of config spec to find, or None.
 
     Returns:
-        (str): The path to a config spec, or 
+        str: The path to a config spec, or
 
     """
     if config is None:
         return os.path.join(get_data_path(), 'configspec.conf')
-    fname = os.path.join(get_data_path(),'%sspec.conf' % config)
+    fname = os.path.join(get_data_path(), '%sspec.conf' % config)
     if not os.path.isfile(fname):
         return FileNotFoundError('No file "%s" exists.' % fname)
     return fname
@@ -70,11 +78,11 @@ def get_configspec(config=None):
 
 def get_config_paths():
     """
-    Returns two paths based on the currently selected profile in the 
+    Returns two paths based on the currently selected profile in the
     user's ~/.shakemap/profile.conf: 1) the path to the ShakeMap
     installation directory; 2) the path to the data directory.
 
-    If this function is called within a pytest process, it will 
+    If this function is called within a pytest process, it will
     return the paths to the repository's test install and data
     directories.
 
@@ -87,7 +95,7 @@ def get_config_paths():
         install = os.path.join(base_path, 'install')
         data = os.path.join(base_path, 'eventdata')
     else:
-        config_file = os.path.join(os.path.expanduser('~'), '.shakemap', 
+        config_file = os.path.join(os.path.expanduser('~'), '.shakemap',
                                    'profiles.conf')
         config = ConfigObj(config_file)
         profile_name = config['profile']
@@ -103,7 +111,7 @@ def get_custom_validator():
     files.
 
     Returns:
-        (:class:`Validator`): A Validator object.
+        :class:`Validator`: A Validator object.
 
     """
     fdict = {
@@ -122,17 +130,17 @@ def get_custom_validator():
 def config_error(config, results):
     """
     Parse the results of a ConfigObj validation and print the errors.
-    Throws a RuntimeError exception  upon completion if any errors or 
+    Throws a RuntimeError exception  upon completion if any errors or
     missing sections are encountered.
 
     Args:
-        config (ConfigObj): The ConfigObj instance representing the 
+        config (ConfigObj): The ConfigObj instance representing the
             parsed config.
         results (dict): The dictionary returned by the validation of
-        the 'config' arguments.
+            the 'config' arguments.
 
     Returns:
-        (Nothing): Nothing
+        Nothing: Nothing
 
     Raises:
         RuntimeError: Should always raise this exception.
@@ -140,23 +148,23 @@ def config_error(config, results):
     errs = 0
     for (section_list, key, _) in flatten_errors(config, results):
         if key is not None:
-            print('The "%s" key in the section "%s" failed validation' % 
-                    (key, ', '.join(section_list)))
+            print('The "%s" key in the section "%s" failed validation'
+                  % (key, ', '.join(section_list)))
             errs += 1
         else:
-            print('The following section was missing:%s ' % 
-                    ', '.join(section_list))
+            print('The following section was missing:%s '
+                  % ', '.join(section_list))
             errs += 1
     if errs:
-        raise RuntimeError('There %s %d %s in configuration.' %
-                    ('was' if errs == 1 else 'were', errs, 
-                     'error' if errs == 1 else 'errors'))
+        raise RuntimeError('There %s %d %s in configuration.'
+                           % ('was' if errs == 1 else 'were', errs,
+                              'error' if errs == 1 else 'errors'))
 
 
 def check_config(config, logger):
     """
     Checks that the gmpe, gmice, ipe, ccf, and component parameters
-    in config are defined in their respective sections. Raises a 
+    in config are defined in their respective sections. Raises a
     ValidateError exception if an error is encountered.
 
     Args:
@@ -164,7 +172,7 @@ def check_config(config, logger):
         logger (logger): The logger to which to write complaints.
 
     Returns:
-        (Nothing): Nothing.
+        Nothing: Nothing.
 
     """
     if config['modeling']['gmpe'] not in config['gmpe_sets']:
@@ -199,11 +207,11 @@ def annotatedfloat_type(value):
     Raises a ValidateError exception on failure.
 
     Args:
-        value (str): A string representing a float or a float appended 
-        with 'd', 'm', or 'c' (for degrees, minutes, seconds).
+        value (str): A string representing a float or a float appended
+            with 'd', 'm', or 'c' (for degrees, minutes, seconds).
 
     Returns:
-        (float): The input value converted to decimal degrees.
+        float: The input value converted to decimal degrees.
 
     """
     try:
@@ -226,14 +234,14 @@ def annotatedfloat_type(value):
 def weight_list(value, min):
     """
     Checks to see if value is a list of floats at least min elements long,
-    and whose values add up to 1.0.  Raises a ValidateError exception on 
+    and whose values add up to 1.0.  Raises a ValidateError exception on
     failure.
 
     Args:
         value (str): A string representing a list of floats.
 
     Returns:
-        (list): The input string converted to a list of floats.
+        list: The input string converted to a list of floats.
 
     """
 
@@ -280,14 +288,14 @@ def weight_list(value, min):
 def gmpe_list(value, min):
     """
     Checks to see if value is a list of strings at least min elements long.
-    The entries are not checked for their validity as GMPEs. Raises a 
+    The entries are not checked for their validity as GMPEs. Raises a
     ValidateError exception on failure.
 
     Args:
         value (str): A string representing a list of GMPEs.
 
     Returns:
-        (list): The input string converted to a list of GMPEs.
+        list: The input string converted to a list of GMPEs.
 
     """
 
@@ -314,11 +322,11 @@ def extent_list(value):
     ValidateError exception on failure.
 
     Args:
-        value (str): A string representing a list of geographic 
+        value (str): A string representing a list of geographic
             coordinates.
 
     Returns:
-        (list): The input string converted to a list of floats.
+        list: The input string converted to a list of floats.
 
     """
 
@@ -341,7 +349,7 @@ def extent_list(value):
        out[2] < -360.0 or out[2] > 360.0 or \
        out[1] < -90.0 or out[1] > 90.0 or \
        out[3] < -90.0 or out[3] > 90.0:
-        print("Invalid extent: ", value, 
+        print("Invalid extent: ", value,
               " : -360 <= longitude <= 360, -90 <= latitude <= 90")
         raise ValidateError()
 
@@ -357,7 +365,7 @@ def file_type(value):
         value (str): A string representing the path to a file.
 
     Returns:
-        (string): The input string.
+        str: The input string.
 
     """
     if not value or value == 'None':
@@ -377,7 +385,7 @@ def directory_type(value):
         value (str): A string representing the path to a directory.
 
     Returns:
-        (string): The input string.
+        str: The input string.
 
     """
     if not value or value == 'None':
@@ -390,15 +398,14 @@ def directory_type(value):
 def status_string(value, min):
     """
     Checks to see if value is one of the ShakeMap status string of
-    'automatic', 'released', or 'reviewed.  Raises a ValidateError 
+    'automatic', 'released', or 'reviewed.  Raises a ValidateError
     exception on failure.
 
     Args:
         value (str): A status string.
 
     Returns:
-        (string): The input string. 'automatic' is returned if
-        value is empty.
+        str: The input string. 'automatic' is returned if value is empty.
 
     """
     if not value:
@@ -411,7 +418,7 @@ def status_string(value, min):
 def cfg_float_list(value):
     """
     Converts (if possible) the input list (or string) to a list
-    of floats. Raises ValidateError if the input can't be 
+    of floats. Raises ValidateError if the input can't be
     converted to a list of floats.
 
     Args:
@@ -419,7 +426,7 @@ def cfg_float_list(value):
             converted to a list of floats.
 
     Returns:
-        (list): The input converted to a list of floats.
+        list: The input converted to a list of floats.
 
     Raises:
         ValidateError
@@ -445,14 +452,14 @@ def cfg_float_list(value):
 
 def cfg_float(value):
     """
-    Converts (if possible) the input string to a float. Raises 
+    Converts (if possible) the input string to a float. Raises
     ValidateError if the input can't be converted to a float.
 
     Args:
         value (str): A string to be converted to a float.
 
     Returns:
-        (float): The input converted to a float.
+        float: The input converted to a float.
 
     Raises:
         ValidateError
@@ -469,20 +476,22 @@ def cfg_float(value):
 
 
 def get_shake_config():
-    """Return a dictionary containing input required to run the shake program, including logging.
+    """
+    Return a dictionary containing input required to run the shake program,
+    including logging.
 
     See https://docs.python.org/3.5/library/logging.config.html.
-    
+
     Returns:
-       (dict): Dictionary containing shake config information.
+       dict: Dictionary containing shake config information.
     """
     install_path, data_path = get_config_paths()
-    conf_file = os.path.join(install_path,'config','shake.conf')
+    conf_file = os.path.join(install_path, 'config', 'shake.conf')
     spec_file = get_configspec(config='shake')
     shake_conf = ConfigObj(conf_file,
                            configspec=spec_file,
                            interpolation='template')
-    
+
     val = Validator()
     results = shake_conf.validate(val)
     if not isinstance(results, bool) or not results:
@@ -491,39 +500,53 @@ def get_shake_config():
     return shake_conf
 
 
-def get_logger(eventid,log_option=None):
+def get_logger(eventid, log_option=None):
     """Return the logger instance for ShakeMap.  Only use once!
 
     Args:
-        (str): Event ID.
-        (str): One of 'log','quiet', 'debug', or None.
-    
+        eventid (str): Event ID.
+        log_option (str): One of 'log','quiet', 'debug', or None.
+
     Returns:
-        (Logger): logging Logger instance.
+        Logger: logging Logger instance.
     """
-    install_path,data_path = get_config_paths()
+    install_path, data_path = get_config_paths()
     config = get_logging_config()
     if log_option == 'debug' or log_option == 'quiet' or log_option is None:
         format = config['formatters']['standard']['format']
         datefmt = config['formatters']['standard']['datefmt']
-        #create a console handler, with verbosity setting chosen by user
+        # create a console handler, with verbosity setting chosen by user
         if log_option == 'debug':
             level = logging.DEBUG
         elif log_option == 'quiet':
             level = logging.ERROR
-        elif log_option is None: #default interactive
+        elif log_option is None:  # default interactive
             level = logging.INFO
 
-        logdict = {'version':1,
-                   'formatters':{'standard':{'format':format,
-                                             'datefmt':datefmt}},
-                   'handlers':{'stream':{'level':level,
-                                         'formatter':'standard',
-                                         'class':'logging.StreamHandler'}},
-                   'loggers':{'':{'handlers':['stream'],
-                                           'level':level,
-                                           'propagate':True}}}
-                                
+        logdict = {
+            'version': 1,
+            'formatters': {
+                'standard': {
+                    'format': format,
+                    'datefmt': datefmt
+                }
+            },
+            'handlers': {
+                'stream': {
+                    'level': level,
+                    'formatter': 'standard',
+                    'class': 'logging.StreamHandler'
+                }
+            },
+            'loggers': {
+                '': {
+                    'handlers': ['stream'],
+                    'level': level,
+                    'propagate': True
+                }
+            }
+        }
+
         logging.config.dictConfig(logdict)
     else:
         event_log_dir = os.path.join(data_path, eventid)
@@ -539,11 +562,11 @@ def get_logger(eventid,log_option=None):
         config['handlers']['global_file']['filename'] = global_log_file
         logging.config.dictConfig(config)
         log_cfg = list(config['loggers'])
-    #get the root logger, otherwise we can't log in sub-libraries
+    # get the root logger, otherwise we can't log in sub-libraries
     logger = logging.getLogger()
-    
+
     return logger
-    
+
 
 def get_logging_config():
     """Extract logging configuration from shake config.
@@ -554,9 +577,9 @@ def get_logging_config():
     See https://docs.python.org/3.5/library/logging.config.html
 
     Returns:
-        (dict): Dictionary suitable for use with logging.config.dictConfig().
+        dict: Dictionary suitable for use with logging.config.dictConfig().
     """
-    
+
     shake_conf = get_shake_config()
     log_config = shake_conf['shake']
     _clean_log_dict(log_config)
@@ -582,9 +605,9 @@ def _clean_log_dict(config):
     to have the same fields, so it fills them in with default values.  However,
     if you try to give a StreamHandler a filename parameter, it generates an error,
     hence the code below.
-    
+
     Returns:
-        (dict): Dictionary suitable for use with logging.config.dictConfig().
+        dict: Dictionary suitable for use with logging.config.dictConfig().
 
     """
     for handlerkey,handler in config['handlers'].items():

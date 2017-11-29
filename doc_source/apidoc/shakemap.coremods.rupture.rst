@@ -1,7 +1,7 @@
-shakemap\.products\.genprod
+shakemap\.coremods\.rupture
 ==================================
 
-.. automodule:: shakemap.products.genprod
+.. automodule:: shakemap.coremods.rupture
     :members:
     :undoc-members:
     :show-inheritance:

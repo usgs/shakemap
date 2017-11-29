@@ -22,7 +22,7 @@ from shakemap.utils.config import get_config_paths, get_custom_validator,\
 
 class AssembleModule(CoreModule):
     """
-    assemble - Assemble ShakeMap input data into an HDF package.
+    **assemble** -- Assemble ShakeMap input data into an HDF package.
     """
     command_name = 'assemble'
     def execute(self):
@@ -32,12 +32,12 @@ class AssembleModule(CoreModule):
 
         Raises:
             NotADirectoryError: When the event data directory does not
-            exist.
+                exist.
             FileNotFoundError: When the the event's event.xml file does
-            not exist.
+                not exist.
             RuntimeError: When there are problems parsing the configuration.
             ValidateError: When there are configuration items missing or mis-
-            configured.
+                configured.
         """
 
         install_path, data_path = get_config_paths()

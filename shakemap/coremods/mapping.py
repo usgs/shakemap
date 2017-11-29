@@ -3,51 +3,41 @@
 # stdlib
 import os.path
 import time
-from functools import partial
 from collections import OrderedDict
-import logging
 import json
 from datetime import datetime
-import glob
 
 # third party
 import fiona
 
 from configobj import ConfigObj
 
-from matplotlib.patches import Polygon
 from matplotlib.colors import LightSource
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 
-from shapely.ops import transform
 from shapely.geometry import MultiPolygon
 from shapely.geometry import MultiLineString
 from shapely.geometry import LineString
 from shapely.geometry import GeometryCollection
 from shapely.geometry import Polygon as sPolygon
 from shapely.geometry import shape as sShape
-from shapely.geometry import mapping
 from shapely.errors import TopologicalError
 
 import numpy as np
 from descartes import PolygonPatch
 from scipy.ndimage import gaussian_filter
-import pyproj
 import pandas as pd
 
-#neic imports
+# neic imports
 from mapio.gmt import GMTGrid
 from impactutils.colors.cpalette import ColorPalette
 from mapio.basemapcity import BasemapCities
-from impactutils.mapping.mapcity import MapCities
-from shakelib.utils.exception import ShakeLibException
-from shakelib.utils.imt_string import oq_to_file, file_to_oq
-from shakelib.gmice.wgrw12 import WGRW12
 from shakelib.utils.containers import OutputContainer
 from shakelib.rupture.origin import Origin
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.rupture.factory import rupture_from_dict_and_origin
+from shakelib.utils.imt_string import oq_to_file
 
 # local imports
 from shakemap.utils.config import get_config_paths
@@ -81,14 +71,16 @@ BORDER_ZORDER = 1001
 
 class MappingModule(CoreModule):
     """
-    mapping - Generate maps of the IMTs found in shake_result.hdf.
+    **mapping** -- Generate maps of the IMTs found in shake_result.hdf.
     """
     command_name = 'mapping'
+
     def execute(self):
         """
         Raises:
             NotADirectoryError: When the event data directory does not exist.
-            FileNotFoundError: When the the shake_result HDF file does not exist.
+            FileNotFoundError: When the the shake_result HDF file does not
+                exist.
         """
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
@@ -108,7 +100,7 @@ class MappingModule(CoreModule):
         # create contour files
         self.logger.info('Mapping...')
 
-        #get all of the pieces needed for the mapmaker
+        # get all of the pieces needed for the mapmaker
         layerdict = {}
         layers = config['products']['mapping']['layers']
         layerdict['coast'] = layers['coasts']
@@ -118,22 +110,25 @@ class MappingModule(CoreModule):
         layerdict['state'] = layers['states']
         topofile = layers['topography']
         cities = layers['cities']
-        mapmaker = MapMaker(container,topofile,layerdict,cities,self.logger)
+        mapmaker = MapMaker(container, topofile, layerdict, cities,
+                            self.logger)
         self.logger.info('Drawing intensity map...')
         intensity_map = mapmaker.drawIntensityMap(datadir)
         self.logger.info('Created intensity map %s' % intensity_map)
         for imt in config['products']['mapping']['imts']:
             self.logger.info('Drawing %s contour map...' % imt)
-            contour_file = mapmaker.drawContourMap(imt,datadir)
+            contour_file = mapmaker.drawContourMap(imt, datadir)
             self.logger.info('Created contour map %s' % contour_file)
 
+
 def getProjectedPolygon(polygon, m):
-    """Project a lat/lon polygon into the projection defined by Basemap instance.
+    """
+    Project a lat/lon polygon into the projection defined by Basemap instance.
 
     Args:
         polygon (Polygon): Shapely polygon.
         m (Basemap): Basemap instance.
-        
+
     Returns:
         Polygon: Shapely polygon, with vertices projected.
     """
@@ -163,18 +158,20 @@ def getProjectedPatches(polygon, m, edgecolor=WATERCOLOR):
     Returns:
         list: List of Descartes PolygonPatch objects.
     """
-    
+
     patches = []
     if isinstance(polygon, MultiPolygon):
         for p in polygon:
             ppolygon = getProjectedPolygon(p, m)
-            patch = PolygonPatch(ppolygon, facecolor=WATERCOLOR, edgecolor=edgecolor,
-                                 zorder=OCEAN_ZORDER, linewidth=1, fill=True, visible=True)
+            patch = PolygonPatch(ppolygon, facecolor=WATERCOLOR,
+                                 edgecolor=edgecolor, zorder=OCEAN_ZORDER,
+                                 linewidth=1, fill=True, visible=True)
             patches.append(patch)
     else:
         ppolygon = getProjectedPolygon(polygon, m)
-        patch = PolygonPatch(ppolygon, facecolor=WATERCOLOR, edgecolor=edgecolor,
-                             zorder=OCEAN_ZORDER, linewidth=1, fill=True, visible=True)
+        patch = PolygonPatch(ppolygon, facecolor=WATERCOLOR,
+                             edgecolor=edgecolor, zorder=OCEAN_ZORDER,
+                             linewidth=1, fill=True, visible=True)
         patches.append(patch)
 
     return patches
@@ -185,22 +182,26 @@ class MapMaker(object):
 
     """
 
-    def __init__(self, container, topofile, layerdict,cities_file,logger):
+    def __init__(self, container, topofile, layerdict, cities_file, logger):
         """Initialize MapMaker object.
 
         Args:
-            container (OutputContainer): OutputContainer object containing model results.
+            container (OutputContainer): OutputContainer object containing
+                model results.
             topofile (str): Path to file containing global topography grid.
             layerdict (dict): Dictionary containing fields:
+
                 - coast: Global coastline shapefile.
                 - ocean: Global ocean shapefile.
                 - lake: Global lakes shapefile.
                 - country: Global country boundaries shapefile.
                 - state: Global state (or equivalent) boundaries shapefile.
-                - roads: Global roads directory containing directories with regional shapefiles.
+                - roads: Global roads directory containing directories with
+                  regional shapefiles.
+
             cities_file (str): Path to geonames cities1000.txt file.
             logger (Logger): Python logging instance.
-        
+
         Raises:
             KeyError: When any of layerdict keys are missing.
         """
@@ -222,17 +223,20 @@ class MapMaker(object):
         station_dict = json.loads(station_string)
         self.stations = station_dict
         rupture_dict = json.loads(container.getString('rupture.json'))
-        info_dict = json.loads(container.getString('info.json'))['input']['event_information']
-        event_dict = {'eventsourcecode':info_dict['event_id'],
-                      'lat':float(info_dict['latitude']),
-                      'lon':float(info_dict['longitude']),
-                      'depth':float(info_dict['depth']),
-                      'mag':float(info_dict['magnitude'])}
+        info_dict = json.loads(
+            container.getString('info.json'))['input']['event_information']
+        event_dict = {
+                'eventsourcecode': info_dict['event_id'],
+                'lat': float(info_dict['latitude']),
+                'lon': float(info_dict['longitude']),
+                'depth': float(info_dict['depth']),
+                'mag': float(info_dict['magnitude'])
+        }
         origin = Origin(event_dict)
         if rupture_dict['features'][0]['geometry']['type'] == 'Point':
             rupture = PointRupture(origin)
         else:
-            rupture = rupture_from_dict_and_origin(rupture_dict,origin)
+            rupture = rupture_from_dict_and_origin(rupture_dict, origin)
         self.fault = rupture
         self.fig_width = FIG_WIDTH
         self.fig_height = FIG_HEIGHT
@@ -244,25 +248,25 @@ class MapMaker(object):
         t2 = time.time()
         self.logger.debug('%.1f seconds to clip vectors.' % (t2 - t1))
 
-    def _selectRoads(self,roads_folder,bbox):
+    def _selectRoads(self, roads_folder, bbox):
         """Select road shapes from roads directory.
 
         Args:
             roads_folder (str): Path to folder containing global roads data.
             bbox (tuple): Tuple of map bounds (xmin,ymin,xmax,ymax).
-            
+
         Returns:
             list: list of Shapely geometries.
         """
         vshapes = []
-        xmin,ymin,xmax,ymax = bbox
+        xmin, ymin, xmax, ymax = bbox
         bboxpoly = sPolygon([(xmin, ymax), (xmax, ymax),
                              (xmax, ymin), (xmin, ymin), (xmin, ymax)])
         for root, dirs, files in os.walk(roads_folder):
             for fname in files:
                 if fname.endswith('.shp'):
-                    filename = os.path.join(root,fname)
-                    with fiona.open(filename,'r') as f:
+                    filename = os.path.join(root, fname)
+                    with fiona.open(filename, 'r') as f:
                         shapes = f.items(bbox=bbox)
                         for shapeidx, shape in shapes:
                             tshape = sShape(shape['geometry'])
@@ -270,15 +274,16 @@ class MapMaker(object):
                             vshapes.append(intshape)
 
         return vshapes
-        
+
     def _clipBounds(self):
         """Clip input vector data to bounds of map.
         """
         # returns a list of GeoJSON-like mapping objects
         comp = self.container.getComponents('MMI')[0]
-        imtdict = self.container.getIMT('MMI',comp)
+        imtdict = self.container.getIMT('MMI', comp)
         geodict = imtdict['mean'].getGeoDict()
-        xmin, xmax, ymin, ymax = (geodict.xmin,geodict.xmax,geodict.ymin,geodict.ymax)
+        xmin, xmax, ymin, ymax = (geodict.xmin, geodict.xmax,
+                                  geodict.ymin, geodict.ymax)
         bbox = (xmin, ymin, xmax, ymax)
         bboxpoly = sPolygon([(xmin, ymax), (xmax, ymax),
                              (xmax, ymin), (xmin, ymin), (xmin, ymax)])
@@ -292,7 +297,8 @@ class MapMaker(object):
                 try:
                     intshape = tshape.intersection(bboxpoly)
                 except TopologicalError as te:
-                    self.logger.warn('Failure to grab %s segment: "%s"' % (key,str(te)))
+                    self.logger.warn('Failure to grab %s segment: "%s"'
+                                     % (key, str(te)))
                     continue
                 vshapes.append(intshape)
             self.logger.debug('Filename is %s' % value)
@@ -305,7 +311,8 @@ class MapMaker(object):
         Args:
             nx (int): Number of columns in grid.
             ny (int): Number of rows in grid.
-            cities_per_grid (int): Maximum number of cities to plot in each grid cell.
+            cities_per_grid (int): Maximum number of cities to plot in each
+                grid cell.
         """
         self.city_cols = nx
         self.city_rows = ny
@@ -323,19 +330,23 @@ class MapMaker(object):
 
     def setCityList(self, dataframe):
         """Set the city list to an input dataframe.
-        
+
         Args:
             dataframe (DataFrame): Pandas DataFrame whose columns include:
-                - name Name of the city (required).
-                - lat Latitude of city (required).
-                - lon Longitude of city (required).
-                - pop Population of city (optional).
-                - iscap Boolean indicating capital status (optional).
-                - placement String indicating where city label 
-                       should be placed relative to city coordinates, 
-                       one of: E,W,N,S,NE,SE,SW,NW (optional).
-                -xoff Longitude offset for label relative to city coordinates (optional).
-                -yoff Latitude offset for label relative to city coordinates (optional).
+
+                - name: Name of the city (required).
+                - lat: Latitude of city (required).
+                - lon: Longitude of city (required).
+                - pop: Population of city (optional).
+                - iscap: Boolean indicating capital status (optional).
+                - placement: String indicating where city label should be
+                  placed relative to city coordinates, one of: E, W, N, S, NE,
+                  SE, SW, NW.
+                  (optional).
+                - xoff: Longitude offset for label relative to city coordinates
+                  (optional).
+                - yoff: Latitude offset for label relative to city coordinates
+                  (optional).
 
         """
         self.cities = BaseMapCities(dataframe)  # may raise exception
@@ -347,8 +358,9 @@ class MapMaker(object):
         """Define the map extents, figure size, etc.
 
         Args:
-            gd (GeoDict): MapIO GeoDict defining bounds/resolution of input ShakeMap.
-        
+            gd (GeoDict): MapIO GeoDict defining bounds/resolution of input
+            ShakeMap.
+
         Returns:
             Basemap: Basemap instance, Mercator projection.
         """
@@ -357,15 +369,16 @@ class MapMaker(object):
         f = plt.figure(figsize=(self.fig_width, self.fig_height))
         ax = f.add_axes([0.1, 0.1, 0.8, 0.8])
 
-        m = Basemap(llcrnrlon=gd.xmin, llcrnrlat=gd.ymin, urcrnrlon=gd.xmax, urcrnrlat=gd.ymax,
-                    rsphere=(6378137.00, 6356752.3142),
+        m = Basemap(llcrnrlon=gd.xmin, llcrnrlat=gd.ymin, urcrnrlon=gd.xmax,
+                    urcrnrlat=gd.ymax, rsphere=(6378137.00, 6356752.3142),
                     resolution=BASEMAP_RESOLUTION, projection='merc',
-                    lat_0=clat, lon_0=clon, lat_ts=clat, ax=ax, suppress_ticks=True)
+                    lat_0=clat, lon_0=clon, lat_ts=clat, ax=ax,
+                    suppress_ticks=True)
         return m
 
     def _projectGrid(self, data, m, gd):
         """Project 2D array to map projection.
-        
+
         Args:
             data (ndarray): 2D Numpy array to be projected.
             m (Basemap): Basemap instance.
@@ -382,21 +395,22 @@ class MapMaker(object):
         # backwards so it plots right side up
         lats = np.linspace(gd.ymax, gd.ymin, gd.ny)
         llons1, llats1 = np.meshgrid(lons, lats)
-        pdata = m.transform_scalar(np.flipud(data), lons, lats[::-1], gd.nx, gd.ny, returnxy=False,
+        pdata = m.transform_scalar(np.flipud(data), lons, lats[::-1],
+                                   gd.nx, gd.ny, returnxy=False,
                                    checkbounds=False, order=1, masked=False)
         return pdata
 
     def _getDraped(self, data, topodata):
         """Get array of data "draped" on topography.
-        
+
         Args:
             data (ndarray): 2D Numpy array.
             topodata (ndarray): 2D Numpy array.
-            
+
         Returns:
             ndarray: Numpy array of data draped on topography.
         """
-        
+
         maxvalue = self.intensity_colormap.vmax
         mmisc = data / maxvalue
         rgba_img = self.intensity_colormap.cmap(mmisc)
@@ -428,7 +442,7 @@ class MapMaker(object):
         for shape in allshapes:
             # shape is a geojson-like mapping thing
             try:
-                if hasattr(shape,'exterior'):
+                if hasattr(shape, 'exterior'):
                     blon, blat = zip(*shape.exterior.coords[:])
                 else:
                     blon, blat = zip(*shape.coords[:])
@@ -442,8 +456,6 @@ class MapMaker(object):
                         m.plot(bx, by, 'k', zorder=BORDER_ZORDER)
                     except NotImplementedError:
                         continue
-            
-            
 
     def _drawRoads(self, m):
         """Draw all roads on the map.
@@ -459,7 +471,7 @@ class MapMaker(object):
         ymax = xmax
         for shape in allshapes:
             # shape is a shapely geometry
-            if isinstance(shape, (MultiLineString,GeometryCollection)):
+            if isinstance(shape, (MultiLineString, GeometryCollection)):
                 blon = []
                 blat = []
                 for mshape in shape:
@@ -508,35 +520,37 @@ class MapMaker(object):
             for ppatch in ppatches:
                 m.ax.add_patch(ppatch)
 
-    def _drawMapScale(self,m,gd):
+    def _drawMapScale(self, m, gd):
         """Draw a map scale in the lower left corner of the map.
 
         Args:
             m (Basemap): Basemap instance.
             gd (GeoDict): MapIO GeoDict instance.
         """
-        #where to set the center of the scale bar
+        # where to set the center of the scale bar
         scalex = gd.xmin + (gd.xmax - gd.xmin) / 5.0
         scaley = gd.ymin + (gd.ymax - gd.ymin) / 10.0
 
-        #how tall should scale bar be, in map units (km)?
-        bbox = m.ax.get_window_extent().transformed(m.ax.figure.dpi_scale_trans.inverted())
+        # how tall should scale bar be, in map units (km)?
+        bbox = m.ax.get_window_extent().transformed(
+                m.ax.figure.dpi_scale_trans.inverted())
         height = bbox.height
         yoff = (0.01 * (m.ymax - m.ymin))
 
-        #where should scale apply (center of map)
+        # where should scale apply (center of map)
         clon = (gd.xmin + gd.xmax) / 2.0
         clat = (gd.ymin + gd.ymax) / 2.0
-            
-        # figure out a scalebar length that is approximately 30% of total width in km
-        map_width = (m.xmax - m.xmin)/1000 #km
-        lengths = np.array([25,50,75,100,125,150,175,200,250])
+
+        # figure out a scalebar length that is approximately 30% of total
+        # width in km
+        map_width = (m.xmax - m.xmin)/1000  # km
+        lengths = np.array([25, 50, 75, 100, 125, 150, 175, 200, 250])
         lfracs = lengths/map_width
         length = lengths[np.abs(lfracs - 0.3).argmin()]
-        
+
         m.drawmapscale(scalex, scaley, clon, clat, length,
                        barstyle='fancy', yoffset=yoff, zorder=SCALE_ZORDER)
-            
+
     def _drawCoastlines(self, m, gd):
         """Draw all coastlines on the map.
 
@@ -547,11 +561,11 @@ class MapMaker(object):
         """
         coasts = self.vectors['coast']
         for coast in coasts:  # these are polygons?
-            if isinstance(coast,sPolygon):
+            if isinstance(coast, sPolygon):
                 clon, clat = zip(*coast.exterior.coords[:])
                 cx, cy = m(clon, clat)
                 m.plot(cx, cy, 'k', zorder=BORDER_ZORDER)
-            elif isinstance(coast,LineString):
+            elif isinstance(coast, LineString):
                 clon, clat = zip(*coast.coords[:])
                 cx, cy = m(clon, clat)
                 m.plot(cx, cy, 'k', zorder=BORDER_ZORDER)
@@ -572,9 +586,11 @@ class MapMaker(object):
         par = np.arange(np.ceil(gd.ymin), np.floor(gd.ymax) + 1, 1.0)
         mer = np.arange(np.ceil(gd.xmin), np.floor(gd.xmax) + 1, 1.0)
         merdict = m.drawmeridians(mer, labels=[0, 0, 0, 1], fontsize=10,
-                                  linewidth=0.5, color='gray', zorder=GRATICULE_ZORDER)
+                                  linewidth=0.5, color='gray',
+                                  zorder=GRATICULE_ZORDER)
         pardict = m.drawparallels(par, labels=[1, 0, 0, 0], fontsize=10,
-                                  linewidth=0.5, color='gray', zorder=GRATICULE_ZORDER)
+                                  linewidth=0.5, color='gray',
+                                  zorder=GRATICULE_ZORDER)
 
         # loop over meridian and parallel dicts, change/increase font, draw
         # ticks
@@ -603,7 +619,8 @@ class MapMaker(object):
         """Draw the map title.
 
         Args:
-            imt (str): IMT that is being drawn on the map ('MMI','PGV','PGA','SA(x.y)')
+            imt (str): IMT that is being drawn on the map ('MMI', 'PGV',
+                'PGA', 'SA(x.y)').
             isContour (bool): If true, use input imt, otherwise use MMI.
 
         """
@@ -611,9 +628,11 @@ class MapMaker(object):
         origin = self.fault.getOrigin()
         hlon = origin.lon
         hlat = origin.lat
-        edict = json.loads(self.container.getString('info.json'))['input']['event_information']
+        edict = json.loads(self.container.getString(
+                'info.json'))['input']['event_information']
         eloc = edict['event_description']
-        etime = datetime.strptime(edict['origin_time'],'%Y-%m-%d %H:%M:%S')
+        etime = datetime.strptime(
+                    edict['origin_time'], '%Y-%m-%d %H:%M:%S')
         timestr = etime.strftime('%b %d, %Y %H:%M:%S')
         mag = origin.mag
         if hlon < 0:
@@ -627,19 +646,19 @@ class MapMaker(object):
         dep = origin.depth
         eid = edict['event_id']
         tpl = (timestr, mag, latstr, lonstr, dep, eid)
-        fmt  = 'USGS ShakeMap (%s): %s\n %s UTC M%.1f %s %s Depth: %.1fkm ID:%s'
-        tstr = fmt % (imt, eloc,timestr, mag, latstr, lonstr, dep, eid)
+        fmt = ('USGS ShakeMap (%s): %s\n %s UTC M%.1f %s %s '
+               'Depth: %.1fkm ID:%s')
+        tstr = fmt % (imt, eloc, timestr, mag, latstr, lonstr, dep, eid)
         # plt.suptitle('USGS ShakeMap (%s): %s' % (layername, eloc),
         #              fontsize=14, verticalalignment='bottom', y=0.95)
         # plt.title('%s UTC M%.1f %s %s Depth: %.1fkm ID:%s' %
         #           tpl, fontsize=10, verticalalignment='bottom')
-        #plt.rc('text', usetex=True)
-        #matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
-        plt.title(tstr,fontsize=10, verticalalignment='bottom')
+        # plt.rc('text', usetex=True)
+        # matplotlib.rcParams['text.latex.preamble']=[r"\usepackage{amsmath}"]
+        plt.title(tstr, fontsize=10, verticalalignment='bottom')
         # plt.title(r"\TeX\ is Number "
         #   r"$\displaystyle\sum_{n=1}^\infty\frac{-e^{i\pi}}{2^n}$!",
         #   fontsize=16, color='gray')
-        
 
     def _drawStations(self, m, fill=False, imt='PGA'):
         """Draw station locations on the map.
@@ -648,8 +667,6 @@ class MapMaker(object):
             m (Basemap): Basemap instance.
             fill (bool): Whether or not to fill symbols.
             imt (str): One of ('MMI', 'PGA', 'PGV', or 'PSAxpy')
-        
-
         """
         if imt in ('MMI', 'PGA', 'PGV'):
             dimt = imt
@@ -658,12 +675,14 @@ class MapMaker(object):
             dimt = 'sa(' + perstr[0] + '.' + perstr[2] + ')'
 
         # get the locations and values of the MMI observations
-        mmi_dict = {'lat':[],'lon':[],'mmi':[]}
-        inst_dict = {'lat':[],'lon':[],dimt:[]}
-        # get the locations and values of the observed/instrumented observations
+        mmi_dict = {'lat': [], 'lon': [], 'mmi': []}
+        inst_dict = {'lat': [], 'lon': [], dimt: []}
+        # get the locations and values of the observed/instrumented
+        # observations
         for feature in self.stations['features']:
-            lon,lat = feature['geometry']['coordinates']
-            if feature['properties']['network'].lower() in ['dyfi', 'mmi', 'intensity', 'ciim']:
+            lon, lat = feature['geometry']['coordinates']
+            net = feature['properties']['network'].lower()
+            if net in ['dyfi', 'mmi', 'intensity', 'ciim']:
                 channel = feature['properties']['channels'][0]
                 for amplitude in channel['amplitudes']:
                     if amplitude['name'] != 'mmi':
@@ -682,7 +701,7 @@ class MapMaker(object):
 
         mmidf = pd.DataFrame(mmi_dict)
         instdf = pd.DataFrame(inst_dict)
-        
+
         if not fill:
             # plot MMI as small circles
             mmilat = mmidf['lat'].as_matrix()
@@ -702,7 +721,7 @@ class MapMaker(object):
                 mmi = mmidf['mmi'][idx]
                 mcolor = self.intensity_colormap.getDataColor(mmi)
                 m.plot(mlon, mlat, 'o', latlon=True,
-                       markerfacecolor=mcolor, markeredgecolor='k', 
+                       markerfacecolor=mcolor, markeredgecolor='k',
                        markersize=4, zorder=STATIONS_ZORDER)
 
             for idx, value in enumerate(instdf['lat']):
@@ -711,7 +730,7 @@ class MapMaker(object):
                 dmmi = instdf[dimt][idx]
                 mcolor = self.intensity_colormap.getDataColor(dmmi)
                 m.plot(mlon, mlat, '^', latlon=True,
-                       markerfacecolor=mcolor, markeredgecolor='k', 
+                       markerfacecolor=mcolor, markeredgecolor='k',
                        markersize=6, zorder=STATIONS_ZORDER)
 
     def _drawFault(self, m):
@@ -727,11 +746,14 @@ class MapMaker(object):
         m.plot(x, y, 'k', lw=2, zorder=FAULT_ZORDER)
 
     def drawIntensityMap(self, outfolder):
-        """Render the MMI data as intensity draped over topography, with oceans, coastlines, etc.
+        """
+        Render the MMI data as intensity draped over topography, with oceans,
+        coastlines, etc.
 
         Args:
-            outfolder (str): Path to directory where output map should be saved.
-            
+            outfolder (str): Path to directory where output map should be
+                saved.
+
         Returns:
             str: Path to output intensity map.
         """
@@ -741,8 +763,8 @@ class MapMaker(object):
         topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
         # get the geodict for the ShakeMap
         comp = self.container.getComponents('MMI')[0]
-        imtdict = self.container.getIMT('MMI',comp)
-        mmigrid = imtdict['mean'] 
+        imtdict = self.container.getIMT('MMI', comp)
+        mmigrid = imtdict['mean']
         smdict = mmigrid.getGeoDict()
         # get a geodict that is aligned with topo, but inside shakemap
         sampledict = topodict.getBoundsWithin(smdict)
@@ -794,7 +816,7 @@ class MapMaker(object):
         self._drawGraticules(m, gd)
 
         # draw map scale
-        self._drawMapScale(m,gd)
+        self._drawMapScale(m, gd)
 
         # draw fault polygon, if present
         self._drawFault(m)  # get the fault loaded
@@ -812,16 +834,16 @@ class MapMaker(object):
         if self.city_cols is not None:
             self.cities = self.cities.limitByBounds(
                 (gd.xmin, gd.xmax, gd.ymin, gd.ymax))
-            self.cities = self.cities.limitByGrid(nx=self.city_cols, ny=self.city_rows,
-                                                  cities_per_grid=self.cities_per_grid)
-            #self.logger.debug("Available fonts: ", self.cities._fontlist)
+            self.cities = self.cities.limitByGrid(
+                    nx=self.city_cols, ny=self.city_rows,
+                    cities_per_grid=self.cities_per_grid)
+            # self.logger.debug("Available fonts: ", self.cities._fontlist)
             if 'Times New Roman' in self.cities._fontlist:
                 font = 'Times New Roman'
             else:
                 font = 'DejaVu Sans'
             self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
-
 
         # draw title and supertitle
         self._drawTitle('MMI')
@@ -839,7 +861,7 @@ class MapMaker(object):
 
     def _getShaded(self, ptopo):
         """Get shaded topography.
-        
+
         Args:
             ptopo (ndarray): Numpy array of projected topography data.
 
@@ -866,7 +888,7 @@ class MapMaker(object):
         """Round number to nearest level desired precision.
 
         Example: round_to(22.1,10) => 20.
-        
+
         Args:
             n (float): Input number to round.
             precision (int): Desired precision.
@@ -885,7 +907,7 @@ class MapMaker(object):
             dmin (float): Minimum value of data to contour.
             dmax (float): Maximum value of data to contour.
             imt (str): String IMT (one of PGV,PGA, etc.)
-            
+
         Returns:
             ndarray: Numpy array of contour levels.
 
@@ -926,24 +948,26 @@ class MapMaker(object):
         return levels
 
     def drawContourMap(self, imt, outfolder, cmin=None, cmax=None):
-        """Render IMT data as contours over topography, with oceans, coastlines, etc.
+        """
+        Render IMT data as contours over topography, with oceans, coastlines,
+        etc.
 
         Args:
-            outfolder (str): Path to directory where output map should be saved.
-            
+            outfolder (str): Path to directory where output map should be
+                saved.
+
         Returns:
             str: Path to output IMT map.
         """
         if self.contour_colormap is None:
-            raise ShakeMapException(
-                'MapMaker.setGMTColormap() has not been called.')
+            raise Exception('MapMaker.setGMTColormap() has not been called.')
         t0 = time.time()
         # resample shakemap to topogrid
         # get the geodict for the topo file
         topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
         # get the geodict for the ShakeMap
         comp = self.container.getComponents(imt)[0]
-        imtdict = self.container.getIMT(imt,comp)
+        imtdict = self.container.getIMT(imt, comp)
         imtgrid = imtdict['mean']
         smdict = imtgrid.getGeoDict()
         # get a geodict that is aligned with topo, but inside shakemap
@@ -965,14 +989,14 @@ class MapMaker(object):
         # get contour layer and project it1
         imtdata = imtgrid.getData().copy()
 
-        #convert units if necessary
+        # convert units if necessary
         if imt == 'MMI':
             pass
         elif imt == 'PGV':
             imtdata = np.exp(imtdata)
         else:
             imtdata = np.exp(imtdata)*100
-        
+
         pimt = self._projectGrid(imtdata, m, gd)
 
         # get the draped intensity data
@@ -1024,7 +1048,7 @@ class MapMaker(object):
         self._drawStations(m, fill=True, imt=imt)
 
         # draw map scale
-        self._drawMapScale(m,gd)
+        self._drawMapScale(m, gd)
 
         # draw fault polygon, if present
         self._drawFault(m)  # get the fault loaded
@@ -1042,8 +1066,9 @@ class MapMaker(object):
         if self.city_cols is not None:
             self.cities = self.cities.limitByBounds(
                 (gd.xmin, gd.xmax, gd.ymin, gd.ymax))
-            self.cities = self.cities.limitByGrid(nx=self.city_cols, ny=self.city_rows,
-                                                  cities_per_grid=self.cities_per_grid)
+            self.cities = self.cities.limitByGrid(
+                    nx=self.city_cols, ny=self.city_rows,
+                    cities_per_grid=self.cities_per_grid)
             if 'Times New Roman' in self.cities._fontlist:
                 font = 'Times New Roman'
             else:

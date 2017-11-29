@@ -22,7 +22,7 @@ from shakemap.utils.config import get_config_paths, get_custom_validator,\
 
 class AugmentModule(CoreModule):
     """
-    augment - Incorporate additional content to the ShakeMap input file.
+    **augment** -- Incorporate additional content to the ShakeMap input file.
     """
     command_name = 'augment'
     def execute(self):
@@ -33,12 +33,12 @@ class AugmentModule(CoreModule):
 
         Raises:
             NotADirectoryError: When the event data directory does not
-            exist.
+                exist.
             FileNotFoundError: When the the event's event.xml file does
-            not exist.
+                not exist.
             RuntimeError: When there are problems parsing the configuration.
             ValidateError: When there are configuration items missing or mis-
-            configured.
+                configured.
         """
 
         install_path, data_path = get_config_paths()

@@ -90,18 +90,19 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="k">import</span> <span class="n">min_distance_to_segment</span>
 
+
 <div class="viewcode-block" id="nearest_edge"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.nearest_edge">[docs]</a><span class="k">def</span> <span class="nf">nearest_edge</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">poly</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return the distance from a point to the nearest edge of a </span>
-<span class="sd">    polygon. </span>
+<span class="sd">    Return the distance from a point to the nearest edge of a</span>
+<span class="sd">    polygon.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        elon, elat (float): The longitude and latitude of the reference</span>
-<span class="sd">            point.</span>
-<span class="sd">        poly (Polygon): An instance of a shapely Polygon. </span>
+<span class="sd">        elon (float): The longitude of the reference point.</span>
+<span class="sd">        elat (float): The latitude of the reference point.</span>
+<span class="sd">        poly (Polygon): An instance of a shapely Polygon.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (float): The distance (in km) from the reference point to the</span>
+<span class="sd">        float: The distance (in km) from the reference point to the</span>
 <span class="sd">        nearest edge (or vertex) of the polygon.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">elon_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">elon</span><span class="p">])</span>
@@ -109,29 +110,30 @@
     <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">xy</span>
     <span class="n">nearest</span> <span class="o">=</span> <span class="mf">99999.</span>
     <span class="k">for</span> <span class="n">ix</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
-        <span class="n">dd</span> <span class="o">=</span> <span class="n">min_distance_to_segment</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">ix</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ix</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> 
-                                     <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">ix</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ix</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span> 
+        <span class="n">dd</span> <span class="o">=</span> <span class="n">min_distance_to_segment</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="n">ix</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ix</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span>
+                                     <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">ix</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span><span class="n">ix</span><span class="o">+</span><span class="mi">1</span><span class="p">]),</span>
                                      <span class="n">elon_arr</span><span class="p">,</span> <span class="n">elat_arr</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dd</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="n">nearest</span><span class="p">:</span>
             <span class="n">nearest</span> <span class="o">=</span> <span class="n">dd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">nearest</span></div>
 
+
 <div class="viewcode-block" id="dist_to_layer"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.dist_to_layer">[docs]</a><span class="k">def</span> <span class="nf">dist_to_layer</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">geom</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the distance from a point to the polygon(s) in a layer; zero if</span>
-<span class="sd">    the point is inside the polygon. If the nearest edge of the polygon is </span>
-<span class="sd">    greater than 5000 km from the point, the point cannot be inside the </span>
-<span class="sd">    polygon and the distance reported will be the distance to the nearest </span>
+<span class="sd">    the point is inside the polygon. If the nearest edge of the polygon is</span>
+<span class="sd">    greater than 5000 km from the point, the point cannot be inside the</span>
+<span class="sd">    polygon and the distance reported will be the distance to the nearest</span>
 <span class="sd">    edge. So don&#39;t make polygons too big.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        elon, elat (float): The longitude and latitude of the reference</span>
-<span class="sd">            point.</span>
+<span class="sd">        elon (float): The longitude of the reference point.</span>
+<span class="sd">        elat (float): The latitude of the reference point.</span>
 <span class="sd">        geom (Polygon or MultiPolygon): An instance of a shapely Polygon</span>
 <span class="sd">            or MultiPolygon.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (float): The distance (in km) from the reference point to the</span>
+<span class="sd">        float: The distance (in km) from the reference point to the</span>
 <span class="sd">        nearest polygon in the layer. The distance will be zero if the</span>
 <span class="sd">        point lies inside the polygon.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -158,27 +160,28 @@
             <span class="k">break</span>
     <span class="k">return</span> <span class="n">min_dist</span></div>
 
+
 <div class="viewcode-block" id="get_layer_distances"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.get_layer_distances">[docs]</a><span class="k">def</span> <span class="nf">get_layer_distances</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">layer_dir</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return the distances from a point to the nearest polygon in each </span>
+<span class="sd">    Return the distances from a point to the nearest polygon in each</span>
 <span class="sd">    layer file found in &#39;layer_dir&#39;. The distance will be zero if</span>
-<span class="sd">    the point is inside a polygon. If the nearest edge of a polygon is </span>
-<span class="sd">    greater than 5000 km from the point, the point cannot be inside the </span>
-<span class="sd">    polygon and the distance reported will be the distance to the </span>
+<span class="sd">    the point is inside a polygon. If the nearest edge of a polygon is</span>
+<span class="sd">    greater than 5000 km from the point, the point cannot be inside the</span>
+<span class="sd">    polygon and the distance reported will be the distance to the</span>
 <span class="sd">    nearest edge. So don&#39;t make polygons too big.</span>
 
 <span class="sd">    The layer files should be written in Well-Known Text (with .wkt</span>
-<span class="sd">    extensions), and should contain either a single POLYGON or </span>
+<span class="sd">    extensions), and should contain either a single POLYGON or</span>
 <span class="sd">    MULTIPOLYGON object. The layer name will be the file&#39;s basename.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        elon, elat (float): The longitude and latitude of the reference</span>
-<span class="sd">            point.</span>
+<span class="sd">        elon (float): The longitude of the reference point.</span>
+<span class="sd">        elat (float): The latitude of the reference point.</span>
 <span class="sd">        layer_dir (str): The path to the directory containg the layer</span>
 <span class="sd">            files.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        (dict): A dictionary where the keys are the layer names, and the</span>
+<span class="sd">        dict: A dictionary where the keys are the layer names, and the</span>
 <span class="sd">        values are the distance (in km) from the reference point to the</span>
 <span class="sd">        nearest polygon in the layer. The distance will be zero if the</span>
 <span class="sd">        point lies inside the polygon.</span>
@@ -188,43 +191,43 @@
     <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">layer_files</span><span class="p">:</span>
         <span class="n">layer_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">fd</span><span class="p">:</span>
-            <span class="n">data</span><span class="o">=</span><span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">fd</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">geom</span> <span class="o">=</span> <span class="n">shapely</span><span class="o">.</span><span class="n">wkt</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">dist_dict</span><span class="p">[</span><span class="n">layer_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dist_to_layer</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">geom</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dist_dict</span></div>
 
+
 <span class="c1">#</span>
 <span class="c1"># This is a dummy function. It needs to be replaced with the actual</span>
-<span class="c1"># function that gives the distance from the earthquake to the tectonic </span>
-<span class="c1"># regions # and, if the region is subduction, gives the probabilities </span>
+<span class="c1"># function that gives the distance from the earthquake to the tectonic</span>
+<span class="c1"># regions # and, if the region is subduction, gives the probabilities</span>
 <span class="c1"># for the event types.</span>
 <span class="c1">#</span>
 <div class="viewcode-block" id="get_tectonic_regions"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.get_tectonic_regions">[docs]</a><span class="k">def</span> <span class="nf">get_tectonic_regions</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">edepth</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
     <span class="n">strec_out</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;focal_mech&#39;</span> <span class="p">:</span> <span class="s1">&#39;ALL&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;tectonic_regions&#39;</span> <span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;acr&#39;</span> <span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;distance&#39;</span> <span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+        <span class="s1">&#39;focal_mech&#39;</span><span class="p">:</span> <span class="s1">&#39;ALL&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;tectonic_regions&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;acr&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
             <span class="p">},</span>
-            <span class="s1">&#39;scr&#39;</span> <span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;distance&#39;</span> <span class="p">:</span> <span class="mf">1500.0</span><span class="p">,</span>
+            <span class="s1">&#39;scr&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="mf">1500.0</span><span class="p">,</span>
             <span class="p">},</span>
-            <span class="s1">&#39;subduction&#39;</span> <span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;distance&#39;</span> <span class="p">:</span> <span class="mf">1400.0</span><span class="p">,</span>
-                <span class="s1">&#39;probabilities&#39;</span> <span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;crustal&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                    <span class="s1">&#39;interface&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                    <span class="s1">&#39;intraslab&#39;</span> <span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+            <span class="s1">&#39;subduction&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="mf">1400.0</span><span class="p">,</span>
+                <span class="s1">&#39;probabilities&#39;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s1">&#39;crustal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                    <span class="s1">&#39;intraslab&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="p">},</span>
-            <span class="s1">&#39;volcanic&#39;</span> <span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;distance&#39;</span> <span class="p">:</span> <span class="mf">2300.0</span><span class="p">,</span>
+            <span class="s1">&#39;volcanic&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="mf">2300.0</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">}</span>
     <span class="p">}</span>
 
     <span class="k">return</span> <span class="n">strec_out</span></div>
-
 </pre></div>
 
           </div>

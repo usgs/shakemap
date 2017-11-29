@@ -123,6 +123,9 @@ fi
 echo "Activating the $VENV virtual environment"
 source activate $VENV
 
+# Some sphinx extensions
+pip -q install sphinx-argparse
+
 # OpenQuake v2.5.0
 echo "Downloading OpenQuake v2.5.0..."
 curl --max-time 60 --retry 3 -L \

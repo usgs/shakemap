@@ -2,10 +2,7 @@
 Process a ShakeMap, based on the configuration and data found in
 shake_data.hdf, and produce output in shake_result.hdf.
 """
-import re
-import logging
 import warnings
-import sys
 import os.path
 import time as time
 import copy
@@ -48,7 +45,7 @@ SM_CONSTS = {'default_mmi_std': 0.3,
 
 class ModelModule(CoreModule):
     """
-    model - Interpolate ground motions to a grid or list of locations.
+    **model** -- Interpolate ground motions to a grid or list of locations.
     """
     command_name = 'model'
 
@@ -67,11 +64,11 @@ class ModelModule(CoreModule):
         datadir = os.path.join(data_path, self._eventid, 'current')
         if not os.path.isdir(datadir):
             raise NotADirectoryError('%s is not a valid directory.' % datadir)
-            
+
         datafile = os.path.join(datadir, 'shake_data.hdf')
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
-        
+
         # ------------------------------------------------------------------
         # Make the input container and extract the config
         # ------------------------------------------------------------------
@@ -114,8 +111,8 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         rupture_obj = ic.getRupture()
         if 'mechanism' in config['modeling']:
-            rupture_obj._origin.setMechanism(mech=
-                                             config['modeling']['mechanism'])
+            rupture_obj._origin.setMechanism(
+                    mech=config['modeling']['mechanism'])
         rx = rupture_obj.getRuptureContext([default_gmpe])
         if rx.rake is None:
             rx.rake = 0
@@ -671,7 +668,7 @@ class ModelModule(CoreModule):
             outgrid[imtstr] = ampgrid
             sdgrid[sdgrid < 0] = 0
             outsd[imtstr] = np.sqrt(sdgrid)
-            
+
             self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
             self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))
             self.logger.debug('\ttime for %s sigma=%f' % (imtstr, stime))
@@ -1181,7 +1178,7 @@ def get_map_grade(do_grid, outsd, psd, moutgrid):
             motion arrays.
 
     Returns:
-        tuple: The mean uncertainty ratio and the letter grade
+        tuple: The mean uncertainty ratio and the letter grade.
     """
     mean_rat = '-'
     mygrade = '-'
@@ -1207,10 +1204,26 @@ def get_map_grade(do_grid, outsd, psd, moutgrid):
 # and translate between openquake naming convention and ShakeMap grid naming
 # convention.
 def get_layer_info(layer):
+    """
+    We need a way to get units information about intensity measure types
+    and translate between OpenQuake naming convention and ShakeMap grid naming
+    convention.
+
+    Args:
+        layer (str): ShakeMap grid name.
+
+    Returns:
+        tuple: Tuple including:
+
+            - OpenQuake naming convention,
+            - units,
+            - significant digits.
+
+    """
     layer_out = layer
     layer_units = ''
     layer_digits = 4  # number of significant digits
-    
+
     if layer.endswith('_sd'):
         layer_out = oq_to_file(layer.replace('_sd',''))
         layer_out = layer_out + '_sd'
@@ -1238,6 +1251,27 @@ def get_layer_info(layer):
 # appropriate object given the IMT
 #
 def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
+    """
+    This is a helper function to call get_mean_and_stddevs for the
+    appropriate object given the IMT.
+
+    Args:
+        ipe: An IPE instance.
+        gmpe: A GMPE instance.
+        sx: Sites context.
+        rx: Rupture context.
+        dx: Distance context.
+        oqimt: List of OpenQuake IMTs.
+        stddev_types: list of OpenQuake standard deviation types.
+
+    Returns:
+        tuple: Tuple of two items:
+
+            - Numpy array of means,
+            - List of numpy array of standard deviations corresponding to the
+              requested stddev_types.
+
+    """
     if 'MMI' in oqimt:
         pe = ipe
     else:
@@ -1253,4 +1287,11 @@ def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
 # uncertainty terms.
 #
 def get_default_std_inter():
+    """
+    This is a stand-in for tau when the gmpe set doesn't provide it
+    It is an educated guess based on the NGA-east work and BC Hydro
+    gmpe. It's not perfect, but probably isn't too far off. It is
+    only used when the GMPEs don't provide a breakdown of the
+    uncertainty terms.
+    """
     return 0.35
