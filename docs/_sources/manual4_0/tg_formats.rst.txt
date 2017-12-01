@@ -128,4 +128,5 @@ There will typically be multiple *IMT* (Intensity Measure Type) and
 Developers will likely want to access **shake_result.hdf** through
 the `shakelib OutputContainer class 
 <https://usgs.github.io/shakelib/shakelib.utils.container.html>`_.
-Also see, for example, *sm_contour* for some basic access patterns.
+Also see, for example, the *contour* module [:meth:`shakemap.coremods.contour`]
+for some basic access patterns.

@@ -66,16 +66,27 @@
 <li class="toctree-l5"><a class="reference internal" href="#overview">2.1.1. Overview</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#programs">2.1.2. Programs</a><ul>
 <li class="toctree-l6"><a class="reference internal" href="#sm-profile">2.1.2.1. sm_profile</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#sm-assemble">2.1.2.2. sm_assemble</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#sm-augment">2.1.2.3. sm_augment</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#sm-model">2.1.2.4. sm_model</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#sm-contour">2.1.2.5. sm_contour</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#sm-select">2.1.2.6. sm_select</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#shake">2.1.2.2. shake</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#shake-modules">2.1.2.3. shake Modules</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#select">2.1.2.3.1. select</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#assemble">2.1.2.3.2. assemble</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#augment">2.1.2.3.3. augment</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#model">2.1.2.3.4. model</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#contour">2.1.2.3.5. contour</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#gridxml">2.1.2.3.6. gridxml</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#info">2.1.2.3.7. info</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#mapping">2.1.2.3.8. mapping</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#raster">2.1.2.3.9. raster</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#rupture">2.1.2.3.10. rupture</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#stations">2.1.2.3.11. stations</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="tg_formats.html">2.2. Data Formats</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.3. Guidelines for Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>
@@ -114,7 +125,7 @@ computing resources. <a class="pageref" href="#architecture-overview">Figure  1<
 idealized implementation where data preparation, processing, and rendering
 all take place within separate computational units. The processing
 sequence starts when an earthquake is identified and a decision is made
-to produce a ShakeMap. The process <strong>sm_assemble</strong>
+to produce a ShakeMap. The process <strong>shake assemble</strong>
 collects the available information about the event (origin and rupture
 parameters, seismic data, etc.) as well as ShakeMap configuration
 information (which may include information about the event’s
@@ -123,11 +134,11 @@ produces a file, <em>shake_data.hdf</em>, containing all of these parameters. Th
 file may be injected into a messaging system, but may also be used locally
 by subsequent processes.</p>
 <div class="figure align-left" id="id2">
-<span id="architecture-overview"></span><a class="reference internal image-reference" href="../_images/sm4.png"><img alt="../_images/sm4.png" src="../_images/sm4.png" style="width: 650px;" /></a>
+<span id="architecture-overview"></span><a class="reference internal image-reference" href="../_images/sm4.png"><img alt="../_images/sm4.png" src="../_images/sm4.png" style="width: 700px;" /></a>
 <p class="caption"><span class="caption-text">Figure 1: Overview of ShakeMap architecture.</span></p>
 </div>
 <p>The processing continues when <em>shake_data.hdf</em> becomes available. The ShakeMap
-program <strong>sm_model</strong> reads <em>shake_data.hdf</em> and produces output in the file
+process <strong>shake model</strong> reads <em>shake_data.hdf</em> and produces output in the file
 <em>shake_result.hdf</em>. This result can then be fed into a messaging system for
 delivery to consumers. Some consumers, however, have more sophisticated
 requirements than can be accommodated by simply processing <em>shake_result.hdf</em>
@@ -137,18 +148,18 @@ ground motions at a variety of spectral periods and at specific locations that
 may not fall on or within the grid produced by the authoritative ShakeMap
 system. ShakeCast operators may also have data not available to the
 authoritative system. Remote processing systems can receive <em>shake_data.hdf</em>
-from a messaging system, and run the program <strong>sm_augment</strong> to add their own
+from a messaging system, and run the program <strong>shake augment</strong> to add their own
 data and configuration choices to those contained in <em>shake_data.hdf</em>
-(see <a class="pageref" href="#shake-consumer">Figure  2</a>). They may then run <strong>sm_model</strong> to
+(see <a class="pageref" href="#shake-consumer">Figure  2</a>). They may then run <strong>shake model</strong> to
 generate a <em>shake_result.hdf</em> specific to their needs.</p>
 <div class="figure align-left" id="id3">
-<span id="shake-consumer"></span><a class="reference internal image-reference" href="../_images/consumer.png"><img alt="../_images/consumer.png" src="../_images/consumer.png" style="width: 650px;" /></a>
+<span id="shake-consumer"></span><a class="reference internal image-reference" href="../_images/consumer.png"><img alt="../_images/consumer.png" src="../_images/consumer.png" style="width: 700px;" /></a>
 <p class="caption"><span class="caption-text">Figure 2: An example of a consumer of the <em>shake_data.hdf</em> product.</span></p>
 </div>
-<p>Rendering begins when <em>shake_result.hdf</em> becomes available. A set of programs
-can be developed to read <em>shake_result.hdf</em> and produce the variety of products
-for which ShakeMap is known. These programs may be wrapped together under the
-general title <strong>sm_genex</strong> (ShakeMap GENerate EXport). <strong>sm_genex</strong> may produce
+<p>Rendering begins when <em>shake_result.hdf</em> becomes available. A set of modules
+exist (or may be developed) to read <em>shake_result.hdf</em> and produce the variety
+of products for which ShakeMap is known.
+These <strong>shake</strong> modules may produce
 the products locally (i.e., by the same system that generates <em>shake_result.hdf</em>)
 and transfer them to consumers via a messaging system or other means.</p>
 <p>An alternative approach, however, is to create a web service that delivers
@@ -156,12 +167,12 @@ the products when they are requested. This approach is illustrated in
 <a class="pageref" href="#shake-web">Figure  3</a>. When the website is notified of the existence
 of <em>shake_result.hdf</em>, it can begin the process of creating a “page” for the
 event. It requests any necessary products from the web service, which in turn
-generates those products from <em>shake_result.hdf</em> (via <strong>sm_genex</strong>). As
+generates those products from <em>shake_result.hdf</em> (via <strong>shake</strong> modules). As
 products are needed (e.g., from users viewing or requesting downloads) they
 are produced on the fly by the web service. Once generated, products may be
 cached by the web system to improve performance.</p>
 <div class="figure align-left" id="id4">
-<span id="shake-web"></span><a class="reference internal image-reference" href="../_images/web.png"><img alt="../_images/web.png" src="../_images/web.png" style="width: 650px;" /></a>
+<span id="shake-web"></span><a class="reference internal image-reference" href="../_images/web.png"><img alt="../_images/web.png" src="../_images/web.png" style="width: 700px;" /></a>
 <p class="caption"><span class="caption-text">Figure 3: An example of a website using a web service to retrieve products. The web
 service produces products from <em>shake_result.hdf</em>.</span></p>
 </div>
@@ -174,22 +185,25 @@ the authoritative ShakeMap system or through a web service.</p>
 </div>
 <div class="section" id="programs">
 <h2>2.1.2. Programs<a class="headerlink" href="#programs" title="Permalink to this headline">¶</a></h2>
-<p>The core components of ShakeMap are a set of command line programs. These
+<p>The core components of ShakeMap are a set of command line programs, the
+most important of which is <strong>shake</strong>, and a set of modules for <strong>shake</strong>.
+These
 programs allow the operator to set up a ShakeMap environment, collect
 data and configurations into inputs (i.e., <em>shake_data.hdf</em>), and
 generate ShakeMap grids and their associated products.</p>
 <div class="section" id="sm-profile">
 <h3>2.1.2.1. sm_profile<a class="headerlink" href="#sm-profile" title="Permalink to this headline">¶</a></h3>
-<p>The user will need to run <strong>sm_assemble</strong> at least once to create a
+<p>The user will need to run <strong>sm_profile</strong> at least once to create a
 ShakeMap
 environment, referred to as a ‘profile.’ This environment consists of two
 directories – one for
 event data, and another for configuration files and associated support
-products (Vs30 grid, geographic information, etc.) – and a configuration
+products (Vs30 grid, geographic features, etc.) – and a configuration
 file that points to them. The profile data resides in a file called
 <em>profiles.conf</em> in a subdirectory, <em>.shakemap</em>, of the user’s home
-directory. Other ShakeMap programs read the profile
-information in this configuration file and use it to find event and
+directory. The user may choose another location for the profile file
+by using the ‘–f’ option to <strong>sm_profile</strong>. Other ShakeMap programs
+read the profile information and use it to find event and
 configuration information.</p>
 <p>The data directory (‘&lt;data_dir&gt;’) contains event subdirectories (named
 with their event IDs) and their associated subdirectories:</p>
@@ -203,6 +217,7 @@ with their event IDs) and their associated subdirectories:</p>
             <span class="n">products</span><span class="o">/</span>
                 <span class="n">shake_result</span><span class="o">.</span><span class="n">hdf</span>
                 <span class="o">...</span>
+        <span class="n">shake</span><span class="o">.</span><span class="n">log</span>
         <span class="o">.</span><span class="n">backup0001</span><span class="o">/</span>
             <span class="n">event</span><span class="o">.</span><span class="n">xml</span>
             <span class="o">...</span>
@@ -226,6 +241,10 @@ user supplied geographic or other system specific data:</p>
         <span class="o">...</span>
     <span class="n">site_data</span><span class="o">/</span>
         <span class="n">vs30</span><span class="o">.</span><span class="n">grid</span>
+    <span class="n">logs</span><span class="o">/</span>
+        <span class="n">shake</span><span class="o">.</span><span class="n">log</span>
+        <span class="n">shake</span><span class="o">.</span><span class="n">log</span><span class="o">.&lt;</span><span class="n">timestamp</span><span class="o">&gt;</span>
+        <span class="o">...</span>
     <span class="o">&lt;</span><span class="n">other_directory</span><span class="o">&gt;/</span>
         <span class="p">(</span><span class="n">additional</span> <span class="n">data</span> <span class="n">files</span><span class="p">)</span>
     <span class="o">...</span>
@@ -234,112 +253,35 @@ user supplied geographic or other system specific data:</p>
 <p>Macros within the configuration system allow the user to specify the
 root data and install directories when setting configuration
 parameters.</p>
-<p>The user may have more than one profile, and switch between them with
+<p>The user may have more than one profile, and can switch between them with
 <strong>sm_profile</strong>. This allows the user to have different configurations
 and data repositories for different event sets (e.g., real time events,
 scenarios, and historic events). See the
 <a class="reference internal" href="../programs/sm_profile.html#sm-profile"><span class="std std-ref">sm_profile man page</span></a> for usage and a list of options.</p>
 </div>
-<div class="section" id="sm-assemble">
-<h3>2.1.2.2. sm_assemble<a class="headerlink" href="#sm-assemble" title="Permalink to this headline">¶</a></h3>
-<p><strong>sm_assemble</strong> collects event and configuration data and creates the
-file <em>shake_data.hdf</em>. It first reads <em>event.xml</em> and stores it in a
-data structure. <strong>sm_assemble</strong> then reads the configuration files</p>
-<div class="line-block">
-<div class="line">&lt;install_dir&gt;/modules.conf</div>
-<div class="line">&lt;install_dir&gt;/gmpe_sets.conf</div>
-<div class="line">&lt;install_dir&gt;/model.conf</div>
+<div class="section" id="shake">
+<h3>2.1.2.2. shake<a class="headerlink" href="#shake" title="Permalink to this headline">¶</a></h3>
+<p>The primary ShakeMap program is called <strong>shake</strong>. It takes an event
+ID and a list of modules as arguments. The modules do the work of
+assembling the input data, producing interpolated grids, and deriving
+products from the grids and associated metadata. See the
+<a class="reference internal" href="../programs/shake.html#shake"><span class="std std-ref">shake man page</span></a> or run <strong>shake –help</strong> for a list
+of available modules.</p>
 </div>
-<p>and assembles them into a single configuration. It then reads</p>
-<div class="line-block">
-<div class="line">&lt;data_dir&gt;/&lt;evnt_id&gt;/current&gt;/model.conf (or model_zc.conf).</div>
-</div>
-<p>Any parameter set in the event-specific <em>model.conf</em> will override
-parameters set in the other configuration files. Note: if both
-<em>model.conf</em> and <em>model_zc.conf</em> exist in the event directory,
-<em>model.conf</em> will be processed and <em>model_zc.conf</em> will be ignored.</p>
-<p><strong>sm_assemble</strong> then reads any files with a <em>_dat.xml</em> extension
-and assembles them into a station list. See ??? for a description
-of the data file format. Similarly, <strong>sm_assmeble</strong> will read a
-file with the <em>_fault.txt</em> (or <em>_fault.json</em>) extension and
-process it as a specification of a finite rupture. See ??? for
-a description of the rupture file formats. Note: only one rupture
-file should be present in the event’s input directory. If more
-than one file exists, only the first (lexicographically) will we
-processed.</p>
-<p>If no backups exist (i.e., event subdirectories named <em>.backup????</em>)
-then the ShakeMap history from an existing <em>shake_data.hdf</em> is
-extracted and updated. If there is no current <em>shake_data.hdf</em>, the
-history for the event is initiated. If backups do exist, then the
-history is extracted from the most current backup and appended
-with the current timestamp, originator, and version.</p>
-<p><strong>sm_assemble</strong> then consolidated all of this data and writes
-<em>shake_data.hdf</em> in the event’s <em>current</em> directory. If <em>shake_data.hdf</em>
-already exists in that location, it will be overwritten.</p>
-<p>See the <span class="xref std std-ref">sm_assemble man page</span> for usage.</p>
-<div class="figure align-left" id="id5">
-<span id="shake-assemble"></span><a class="reference internal image-reference" href="../_images/assemble.png"><img alt="../_images/assemble.png" src="../_images/assemble.png" style="width: 650px;" /></a>
-<p class="caption"><span class="caption-text">Figure 4: Data flow of the <em>sm_assemble</em> process.</span></p>
-</div>
-</div>
-<div class="section" id="sm-augment">
-<h3>2.1.2.3. sm_augment<a class="headerlink" href="#sm-augment" title="Permalink to this headline">¶</a></h3>
-<p><strong>sm_augment</strong> behaves very similar to <strong>sm_assemble</strong> except that it
-will first read <em>shake_data.hdf</em> from the event’s <em>current</em> directory.
-If <em>exven.xml</em> exists in the event’s <em>current</em> directory, its data will
-replace the data in the existing <em>shake_data.hdf</em>.</p>
-<p>The configuration data in <em>shake_data.hdf</em> is used as a starting point,
-and any configuration data from the system configuration files or the
-event’s <em>model.conf</em> (or <em>model_zc.conf</em>) will then be added to it. Where
-there are conflicts, the system configuration parameters will override
-those found in <em>shake_data.hdf</em>. The event-specific configuration
-parameters from the local system retain the highest priority.</p>
-<p>Data files (i.e., files in the event’s <em>current</em> directory that have
-the <em>_dat.xml</em> extension) will be added to any data already found in
-<em>shake_data.hdf</em>. If a fault file is found in the local directory, it
-will replace the existing fault data in <em>shake_data.hdf</em>.</p>
-<p>The history information will be updated to reflect the update time and
-originator (if applicable).</p>
-<p>See the <span class="xref std std-ref">sm_augment man page</span> for usage.</p>
-</div>
-<div class="section" id="sm-model">
-<h3>2.1.2.4. sm_model<a class="headerlink" href="#sm-model" title="Permalink to this headline">¶</a></h3>
-<p><strong>sm_model</strong> reads the data in <em>shake_data.hdf</em> and produces an
-interpolated ShakeMap. Depending upon the settings found in <em>model.conf</em>,
-the interpolation product may be a grid or a set of points. See
-<em>model.conf</em> for additional options and documentation.</p>
-<p>A great deal of this manual is devoted to the way the interpolation is
-performed, and the effect of various configuration options. See the
-relevant sections for more.</p>
-<p><strong>sm_model</strong> writes a file, <em>shake_result.hdf</em>, in the <em>products</em>
-subdirectory of the event’s <em>current</em> directory. Aside from interpolated
-grids (or lists of points) for each intensity measure type, and their
-associated uncertainties, <strong>sm_model</strong> also writes ShakeMap metadata
-(‘<em>info.json</em>’), station data (‘<em>stationlist.json</em>’), the finite
-fault information (‘<em>rupture.json</em>’), and the entire configuration
-object into <em>shake_result.hdf</em>. See ??? for more on the format and
-content of <em>shake_result.hdf</em>.</p>
-<p>See the <span class="xref std std-ref">sm_model man page</span> for usage.</p>
-</div>
-<div class="section" id="sm-contour">
-<h3>2.1.2.5. sm_contour<a class="headerlink" href="#sm-contour" title="Permalink to this headline">¶</a></h3>
-<p><strong>sm_contour</strong> reads an event’s <em>shake_result.hdf</em> and produces iso-seismal
-contours for each of the intensity measure types found therein. The contours
-are written as GeoJSON to files called <em>&lt;imt_type&gt;_cont.json</em> in the event’s
-<em>current/products</em> subdirectory.</p>
-<p>See the <span class="xref std std-ref">sm_contour man page</span> for usage.</p>
-</div>
-<div class="section" id="sm-select">
-<h3>2.1.2.6. sm_select<a class="headerlink" href="#sm-select" title="Permalink to this headline">¶</a></h3>
-<p><strong>sm_select</strong> reads an event’s <em>event.xml</em> file for origin information
+<div class="section" id="shake-modules">
+<h3>2.1.2.3. shake Modules<a class="headerlink" href="#shake-modules" title="Permalink to this headline">¶</a></h3>
+<p>Below is a description of many of the modules available to <strong>shake</strong>:</p>
+<div class="section" id="select">
+<h4>2.1.2.3.1. select<a class="headerlink" href="#select" title="Permalink to this headline">¶</a></h4>
+<p><strong>select</strong> reads an event’s <em>event.xml</em> file for origin information
 and then constructs a GMPE set for the event based on the event’s residence
 within,
 and proximity to, a set of predefined tectonic regions. The GMPE set, and the
 selection of that GMPE set for use in processing, are written to
 <em>model_zc.conf</em> in the event’s <em>current</em> directory.</p>
-<p>The behavior of <strong>sm_select</strong> is controlled by the <em>select.conf</em>
+<p>The behavior of <strong>select</strong> is controlled by the <em>select.conf</em>
 configuration file. See the documentation in <em>select.conf</em> for more on
-customizing <strong>sm_select</strong>.</p>
+customizing <strong>select</strong>.</p>
 <p>The tectonic regions, and additional geographic layers, that the event
 may fall within are defined by the STREC configuration. See the STREC
 documentation for information on adding additional layers, then use
@@ -361,20 +303,21 @@ question.</p>
 <p>For example, if an earthquake occurred within the ‘scr’ region, but
 was 40 km from the “acr” region, and the ‘acr’ region’s horizontal
 buffer was 100 km, then the ‘scr’ region would be given a weight
-of 1.0, and the ‘acr’ would be given (100 - 40) / 100 = 0.6. Normalizing
+of 1.0, and the ‘acr’ region would be given (100 - 40) / 100 = 0.6.
+Normalizing
 by the total, the final weights would be 0.625 ‘scr’ and 0.375 ‘acr’.</p>
 <p>Each region’s GMPE set is in turn comprised of a weighted set of other
 GMPE sets, based on the earthquake’s depth. For each of the non-subduction
 regions,
-<em>sm_select</em> builds a weighted combination of the configured GMPE sets
+<strong>select</strong> builds a weighted combination of the configured GMPE sets
 based on the event’s depth. If the earthquake falls within a subduction
-regions, STREC
+region, STREC
 reports the probabilities that the earthquake is crustal, on the
-subduction interface, or within the subducting slab. <em>sm_select</em>
+subduction interface, or within the subducting slab. <strong>select</strong>
 combines the GMPE sets for each of these regimes, weighted by their
 probabilities, into a subduction GMPE set that is specific to the
 earthquake’s location.</p>
-<p><em>sm_select</em> also considers the earthquake’s presence within, or
+<p><strong>select</strong> also considers the earthquake’s presence within, or
 distance from,
 any number of user-defined geographic layers. If the earthquake is
 within a layer, that layer’s
@@ -406,11 +349,149 @@ determined separately
 and a weighted combination of the two is computed (where the weights
 are based on the distance and the horizontal buffer, as described
 above).</p>
-<p>Unlike the tectonic regions, with the geographic layers only the nearest
-layer is considered. If an earthquake falls
+<p>Unlike the tectonic regions, the geographic layers consider only the
+nearest layer. If an earthquake falls
 within more than one layer (possible if layers are nested), the first one
 encountered in the <em>select.conf</em> is used and any other(s) will be ignored.</p>
-<p>See the <a class="reference internal" href="../programs/sm_select.html#sm-select"><span class="std std-ref">sm_select man page</span></a> for usage.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.select.html#module-shakemap.coremods.select" title="shakemap.coremods.select"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.select()</span></code></a> for more.</p>
+</div>
+<div class="section" id="assemble">
+<h4>2.1.2.3.2. assemble<a class="headerlink" href="#assemble" title="Permalink to this headline">¶</a></h4>
+<p>The <strong>assemble</strong> module collects event and configuration data and creates the
+file <em>shake_data.hdf</em>. It first reads <em>event.xml</em> and stores it in a
+data structure. <strong>sm_assemble</strong> then reads the configuration files</p>
+<div class="line-block">
+<div class="line">&lt;install_dir&gt;/modules.conf</div>
+<div class="line">&lt;install_dir&gt;/gmpe_sets.conf</div>
+<div class="line">&lt;install_dir&gt;/model.conf</div>
+</div>
+<p>and assembles them into a single configuration. It then reads</p>
+<div class="line-block">
+<div class="line">&lt;data_dir&gt;/&lt;evnt_id&gt;/current&gt;/model.conf (or model_zc.conf).</div>
+</div>
+<p>Any parameter set in the event-specific <em>model.conf</em> will override
+parameters set in the other configuration files. Note: if both
+<em>model.conf</em> and <em>model_zc.conf</em> exist in the event directory,
+<em>model.conf</em> will be processed and <em>model_zc.conf</em> will be ignored.</p>
+<p><strong>assemble</strong> then reads any files with a <em>_dat.xml</em> extension
+and assembles them into a station list. See ??? for a description
+of the data file format. Similarly, <strong>assmeble</strong> will read a
+file with the <em>_fault.txt</em> (or <em>_fault.json</em>) extension and
+process it as a specification of a finite rupture. See ??? for
+a description of the rupture file formats. Note: only one rupture
+file should be present in the event’s input directory. If more
+than one file exists, only the first (lexicographically) will we
+processed.</p>
+<p>If no backups exist (i.e., event subdirectories named <em>.backup????</em>)
+then the ShakeMap history from an existing <em>shake_data.hdf</em> is
+extracted and updated. If there is no current <em>shake_data.hdf</em>, the
+history for the event is initiated. If backups do exist, then the
+history is extracted from the most current backup and appended
+with the current timestamp, originator, and version.</p>
+<p><strong>assemble</strong> then consolidated all of this data and writes
+<em>shake_data.hdf</em> in the event’s <em>current</em> directory. If <em>shake_data.hdf</em>
+already exists in that location, it will be overwritten.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.assemble.html#module-shakemap.coremods.assemble" title="shakemap.coremods.assemble"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.assemble()</span></code></a> for more.</p>
+<div class="figure align-left" id="id5">
+<span id="shake-assemble"></span><a class="reference internal image-reference" href="../_images/assemble.png"><img alt="../_images/assemble.png" src="../_images/assemble.png" style="width: 700px;" /></a>
+<p class="caption"><span class="caption-text">Figure 4: Data flow of the <em>assemble</em> module.</span></p>
+</div>
+</div>
+<div class="section" id="augment">
+<h4>2.1.2.3.3. augment<a class="headerlink" href="#augment" title="Permalink to this headline">¶</a></h4>
+<p>The <strong>augment</strong> module behaves very similarly to <strong>assemble</strong> except that it
+will first read <em>shake_data.hdf</em> from the event’s <em>current</em> directory.
+If <em>exven.xml</em> exists in the event’s <em>current</em> directory, its data will
+replace the data in the existing <em>shake_data.hdf</em>.</p>
+<p>The configuration data in <em>shake_data.hdf</em> is used as a starting point,
+and any configuration data from the system configuration files or the
+event’s <em>model.conf</em> (or <em>model_zc.conf</em>) will then be added to it. Where
+there are conflicts, the system configuration parameters will override
+those found in <em>shake_data.hdf</em>. The event-specific configuration
+parameters from the local system retain the highest priority.</p>
+<p>Data files (i.e., files in the event’s <em>current</em> directory that have
+the <em>_dat.xml</em> extension) will be added to any data already found in
+<em>shake_data.hdf</em>. If a fault file is found in the local directory, it
+will replace the existing fault data in <em>shake_data.hdf</em>.</p>
+<p>The history information will be updated to reflect the update time and
+originator (if applicable).</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.augment.html#module-shakemap.coremods.augment" title="shakemap.coremods.augment"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.augment()</span></code></a> for more.</p>
+</div>
+<div class="section" id="model">
+<h4>2.1.2.3.4. model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h4>
+<p>The <strong>model</strong> module reads the data in <em>shake_data.hdf</em> and produces an
+interpolated ShakeMap. Depending upon the settings found in <em>model.conf</em>,
+the interpolation product may be a grid or a set of points. See
+<em>model.conf</em> for additional options and documentation.</p>
+<p>A great deal of this manual is devoted to the way the interpolation is
+performed, and the effect of various configuration options. See the
+relevant sections for more.</p>
+<p><strong>model</strong> writes a file, <em>shake_result.hdf</em>, in the <em>products</em>
+subdirectory of the event’s <em>current</em> directory. Aside from interpolated
+grids (or lists of points) for each intensity measure type, and their
+associated uncertainties, <strong>model</strong> also writes ShakeMap metadata
+(‘<em>info.json</em>’), station data (‘<em>stationlist.json</em>’), the finite
+fault information (‘<em>rupture.json</em>’), and the entire configuration
+object into <em>shake_result.hdf</em>. See <a class="reference internal" href="tg_formats.html#sec-formats-4"><span class="std std-ref">the formats section</span></a>
+of this manual for more on the format and
+content of <em>shake_result.hdf</em>.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.model.html#module-shakemap.coremods.model" title="shakemap.coremods.model"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.model()</span></code></a> for more.</p>
+</div>
+<div class="section" id="contour">
+<h4>2.1.2.3.5. contour<a class="headerlink" href="#contour" title="Permalink to this headline">¶</a></h4>
+<p><strong>contour</strong> reads an event’s <em>shake_result.hdf</em> and produces iso-seismal
+contours for each of the intensity measure types found therein. The contours
+are written as GeoJSON to files called <em>&lt;imt_type&gt;_cont.json</em> in the event’s
+<em>current/products</em> subdirectory.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.contour.html#module-shakemap.coremods.contour" title="shakemap.coremods.contour"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.contour()</span></code></a> for more details.</p>
+</div>
+<div class="section" id="gridxml">
+<h4>2.1.2.3.6. gridxml<a class="headerlink" href="#gridxml" title="Permalink to this headline">¶</a></h4>
+<p><strong>gridxml</strong> reads an event’s <em>shake_result.hdf</em> and produces the legacy
+files <em>grid.xml</em> and <em>uncertainty.xml</em>. See the products section of this
+manual for more on these files. Note that the use of these files is
+deprecated. System designers should extract the relevant information
+directly from <em>shake_result.hdf</em>. See <a class="reference internal" href="tg_formats.html#sec-formats-4"><span class="std std-ref">the formats section</span></a>
+of this manual for more on
+using <em>shake_result.hdf</em>.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.gridxml.html#module-shakemap.coremods.gridxml" title="shakemap.coremods.gridxml"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.gridxml()</span></code></a> for more details.</p>
+</div>
+<div class="section" id="info">
+<h4>2.1.2.3.7. info<a class="headerlink" href="#info" title="Permalink to this headline">¶</a></h4>
+<p><strong>info</strong> reads an event’s <em>shake_result.hdf</em> and produces <em>info.json</em>,
+which contains metadata about the ShakeMap.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.info.html#module-shakemap.coremods.info" title="shakemap.coremods.info"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.info()</span></code></a> for more details.</p>
+</div>
+<div class="section" id="mapping">
+<h4>2.1.2.3.8. mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h4>
+<p><strong>mapping</strong> reads an event’s <em>shake_result.hdf</em> and produces a set of
+maps of the IMTs for use in quality control and evaluation of the
+performance of the system. This module is deprecated. It is not
+intended to produce maps that are the equivalent of ShakeMap 3.5’s
+static maps, and we do not intend to maintain or support it. In
+particular, it uses the <strong>basemap</strong> mapping package, which is
+disappearing in favor of <strong>cartopy</strong>.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.mapping.html#module-shakemap.coremods.mapping" title="shakemap.coremods.mapping"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.mapping()</span></code></a> for more details.</p>
+</div>
+<div class="section" id="raster">
+<h4>2.1.2.3.9. raster<a class="headerlink" href="#raster" title="Permalink to this headline">¶</a></h4>
+<p><strong>raster</strong> reads an event’s <em>shake_result.hdf</em> and produces GIS
+raster files of the mean and standard deviation for each of the
+IMTs in <em>shake_result.hdf</em>.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.raster.html#module-shakemap.coremods.raster" title="shakemap.coremods.raster"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.raster()</span></code></a> for more details.</p>
+</div>
+<div class="section" id="rupture">
+<h4>2.1.2.3.10. rupture<a class="headerlink" href="#rupture" title="Permalink to this headline">¶</a></h4>
+<p><strong>rupture</strong> reads an event’s <em>shake_result.hdf</em> and produces a
+file, <em>rupture.json</em> containing the coordinates of the rupture
+plane(s) supplied via the input file <em>&lt;&gt;_fault.txt</em> or <em>&lt;&gt;_fault.json</em>.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.rupture.html#module-shakemap.coremods.rupture" title="shakemap.coremods.rupture"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.rupture()</span></code></a> for more details.</p>
+</div>
+<div class="section" id="stations">
+<h4>2.1.2.3.11. stations<a class="headerlink" href="#stations" title="Permalink to this headline">¶</a></h4>
+<p><strong>stations</strong> reads an event’s <em>shake_result.hdf</em> and produces a
+JSON file, <em>stationlist.json</em>, of the input station data.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.stations.html#module-shakemap.coremods.stations" title="shakemap.coremods.stations"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.stations()</span></code></a> for more details.</p>
 <p class="rubric">Footnotes</p>
 <table class="docutils footnote" frame="void" id="fn1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
@@ -421,6 +502,7 @@ and slab probabilities for events outside of the defined subduction
 zones.</td></tr>
 </tbody>
 </table>
+</div>
 </div>
 </div>
 </div>

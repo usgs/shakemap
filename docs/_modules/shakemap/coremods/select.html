@@ -1,0 +1,399 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakemap.coremods.select &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  <div class="document">
+    
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakemap.coremods.select</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Parse STREC output and create/select a GMPE set for an event.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1">#stdlib imports</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+
+<span class="c1">#third party imports</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
+<span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="n">ValidateError</span>
+
+<span class="c1">#local imports</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">import</span> <span class="nn">shakemap.utils.config</span> <span class="k">as</span> <span class="nn">cfg</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.layers</span> <span class="k">import</span> <span class="n">get_layer_distances</span><span class="p">,</span> <span class="n">get_tectonic_regions</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.origin</span> <span class="k">import</span> <span class="n">Origin</span>
+
+
+<div class="viewcode-block" id="SelectModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.select.html#shakemap.coremods.select.SelectModule">[docs]</a><span class="k">class</span> <span class="nc">SelectModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    select - Parse STREC output, make a GMPE set, create model_zc.conf.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;select&#39;</span>
+<div class="viewcode-block" id="SelectModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.select.html#shakemap.coremods.select.SelectModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">        Parses the output of STREC in accordance with the</span>
+<span class="sd">        configuration file, creates a new GMPE set specific to the event,</span>
+<span class="sd">        and writes model_zc.conf in the event&#39;s &#39;current&#39; directory.</span>
+
+<span class="sd">        Configuration file: select.conf</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotADirectoryError -- the event&#39;s current directory doesn&#39;t exist</span>
+<span class="sd">            FileNotFoundError -- the event.xml file doesn&#39;t exist</span>
+<span class="sd">            ValidateError -- problems with the configuration file</span>
+<span class="sd">            RuntimeError -- various problems matching the event to a gmpe set</span>
+<span class="sd">        &#39;&#39;&#39;</span>
+
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Get the install and data paths and verify that the even directory</span>
+        <span class="c1"># exists</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">get_config_paths</span><span class="p">()</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory&#39;</span> <span class="o">%</span> <span class="n">datadir</span><span class="p">)</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Open event.xml and make an Origin object</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="n">eventxml</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;event.xml&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">eventxml</span><span class="p">)</span>
+        <span class="n">org</span> <span class="o">=</span> <span class="n">Origin</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">)</span>
+
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Get config file from install_path/config, parse and</span>
+        <span class="c1"># validate it</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;select.conf&#39;</span><span class="p">))</span>
+        <span class="n">validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">install_path</span><span class="p">)</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Get the strec results</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="n">strec_out</span> <span class="o">=</span> <span class="n">get_tectonic_regions</span><span class="p">(</span><span class="n">org</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">org</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">org</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span>
+                                         <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Get the default weighting for this event</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="n">cfg_tr</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">]</span>
+        <span class="n">str_tr</span> <span class="o">=</span> <span class="n">strec_out</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">]</span>
+        <span class="n">gmpe_list</span><span class="p">,</span> <span class="n">weight_list</span> <span class="o">=</span> <span class="n">get_gmpes_by_region</span><span class="p">(</span><span class="n">str_tr</span><span class="p">,</span> <span class="n">cfg_tr</span><span class="p">,</span> <span class="n">org</span><span class="p">)</span>
+
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Now look at the geographic layers to see if we need to modify or</span>
+        <span class="c1"># replace the gmpe list</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1">#</span>
+        <span class="c1"># Find the first configured layer the event is within (if any) or the</span>
+        <span class="c1"># closest layer</span>
+        <span class="c1">#</span>
+        <span class="n">min_dist_to_layer</span> <span class="o">=</span> <span class="mf">999999.9</span>
+        <span class="n">nearest_layer_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="s1">&#39;layers&#39;</span> <span class="ow">in</span> <span class="n">config</span> <span class="ow">and</span> <span class="s1">&#39;layer_dir&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">]:</span>
+            <span class="n">layer_dir</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="s1">&#39;layer_dir&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">layer_dir</span> <span class="ow">and</span> <span class="n">layer_dir</span> <span class="o">!=</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+                <span class="n">geo_layers</span> <span class="o">=</span> <span class="n">get_layer_distances</span><span class="p">(</span><span class="n">org</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">org</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">layer_dir</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">geo_layers</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">layer</span> <span class="o">==</span> <span class="s1">&#39;layer_dir&#39;</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">layer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">geo_layers</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Error: cannot find layer </span><span class="si">%s</span><span class="s1"> in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                        <span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">layer_dir</span><span class="p">))</span>
+                    <span class="k">continue</span>
+                <span class="n">ldist</span> <span class="o">=</span> <span class="n">geo_layers</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">ldist</span> <span class="o">&lt;</span> <span class="n">min_dist_to_layer</span><span class="p">:</span>
+                    <span class="n">min_dist_to_layer</span> <span class="o">=</span> <span class="n">ldist</span>
+                    <span class="n">nearest_layer_name</span> <span class="o">=</span> <span class="n">layer</span>
+                    <span class="k">if</span> <span class="n">min_dist_to_layer</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">break</span>
+        <span class="c1">#</span>
+        <span class="c1"># If we are in or near a geographic layer, update the gmpe and weight</span>
+        <span class="c1"># lists</span>
+        <span class="c1">#</span>
+        <span class="k">if</span> <span class="n">nearest_layer_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
+           <span class="p">(</span><span class="n">min_dist_to_layer</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span>
+            <span class="n">min_dist_to_layer</span> <span class="o">&lt;=</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="n">nearest_layer_name</span><span class="p">][</span><span class="s1">&#39;horizontal_buffer&#39;</span><span class="p">]):</span>
+
+            <span class="n">lcfg</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="n">nearest_layer_name</span><span class="p">]</span>
+            <span class="c1">#</span>
+            <span class="c1"># Overwrite the tectonic regions with the layer&#39;s custom region</span>
+            <span class="c1"># settings</span>
+            <span class="c1">#</span>
+            <span class="k">for</span> <span class="n">thing</span> <span class="ow">in</span> <span class="n">lcfg</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">thing</span> <span class="o">==</span> <span class="s1">&#39;horizontal_buffer&#39;</span><span class="p">:</span>
+                    <span class="n">layer_buff</span> <span class="o">=</span> <span class="n">lcfg</span><span class="p">[</span><span class="n">thing</span><span class="p">]</span>
+                    <span class="k">continue</span>
+                <span class="n">layer</span> <span class="o">=</span> <span class="n">thing</span>
+                <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">lcfg</span><span class="p">[</span><span class="n">layer</span><span class="p">]:</span>
+                    <span class="n">cfg_tr</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="n">element</span><span class="p">]</span> <span class="o">=</span> <span class="n">lcfg</span><span class="p">[</span><span class="n">layer</span><span class="p">][</span><span class="n">element</span><span class="p">]</span>
+            <span class="c1">#</span>
+            <span class="c1"># Now get the gmpes and weights for the custom layer</span>
+            <span class="c1">#</span>
+            <span class="n">layer_gmpes</span><span class="p">,</span> <span class="n">layer_weights</span> <span class="o">=</span> <span class="n">get_gmpes_by_region</span><span class="p">(</span><span class="n">str_tr</span><span class="p">,</span> <span class="n">cfg_tr</span><span class="p">,</span> <span class="n">org</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">layer_buff</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1">#</span>
+                <span class="c1"># If we&#39;re here, min_dist_to_layer must be 0, so the weight is 1</span>
+                <span class="c1">#</span>
+                <span class="n">lwgt</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lwgt</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">min_dist_to_layer</span> <span class="o">/</span> <span class="n">layer_buff</span>
+            <span class="c1">#</span>
+            <span class="c1"># If we&#39;re inside the region&#39;s boundaries, we just use the custom</span>
+            <span class="c1"># gmpe and weights. If we are outside the region (but still inside</span>
+            <span class="c1"># the buffer), we blend the custom gmpe and weights with the</span>
+            <span class="c1"># generic ones we computed earlier.</span>
+            <span class="c1">#</span>
+            <span class="k">if</span> <span class="n">min_dist_to_layer</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">layer_gmpes</span>
+                <span class="n">weight_list</span> <span class="o">=</span> <span class="n">layer_weights</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_list</span><span class="p">,</span> <span class="n">layer_gmpes</span><span class="p">)</span>
+                <span class="n">weight_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weight_list</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="n">lwgt</span><span class="p">),</span>
+                                        <span class="n">layer_weights</span> <span class="o">*</span> <span class="n">lwgt</span><span class="p">)</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Create ConfigObj object for output to model_zc.conf</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="n">zc_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model_zc.conf&#39;</span><span class="p">)</span>
+        <span class="n">zc_conf</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">indent_type</span><span class="o">=</span><span class="s1">&#39;    &#39;</span><span class="p">)</span>
+        <span class="n">zc_conf</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">zc_file</span>
+        <span class="c1">#</span>
+        <span class="c1"># Add the new gmpe set to the object</span>
+        <span class="c1">#</span>
+        <span class="n">gmpe_set</span> <span class="o">=</span> <span class="s1">&#39;gmpe_&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;_custom&#39;</span>
+        <span class="n">zc_conf</span><span class="p">[</span><span class="s1">&#39;gmpe_sets&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([</span>
+            <span class="p">(</span><span class="n">gmpe_set</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">([</span>
+                <span class="p">(</span><span class="s1">&#39;gmpes&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">gmpe_list</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;weights&#39;</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">weight_list</span><span class="p">)),</span>
+                <span class="p">(</span><span class="s1">&#39;weights_larage_dist&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;dist_cutoff&#39;</span><span class="p">,</span> <span class="s1">&#39;nan&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;site_gmpes&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">),</span>
+                <span class="p">(</span><span class="s1">&#39;weights_site_gmpes&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">)</span>
+            <span class="p">]))</span>
+        <span class="p">])</span>
+        <span class="c1">#</span>
+        <span class="c1"># Set gmpe to use the new gmpe set</span>
+        <span class="c1">#</span>
+        <span class="n">zc_conf</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([</span>
+            <span class="p">(</span><span class="s1">&#39;gmpe&#39;</span><span class="p">,</span> <span class="n">gmpe_set</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;mechanism&#39;</span><span class="p">,</span> <span class="n">strec_out</span><span class="p">[</span><span class="s1">&#39;focal_mech&#39;</span><span class="p">])</span>
+        <span class="p">])</span>
+
+        <span class="n">zc_conf</span><span class="o">.</span><span class="n">write</span><span class="p">()</span></div></div>
+
+<span class="c1"># ##########################################################################</span>
+<span class="c1"># We can&#39;t use normal ConfigObj validation because there are</span>
+<span class="c1"># inconsistent sub-section structures (i.e., acr, scr, and volcanic</span>
+<span class="c1"># vs. subduction. There are also optional sections with variable</span>
+<span class="c1"># structure (i.e., the layers). So we do our validation and variable</span>
+<span class="c1"># conversion here.</span>
+<span class="c1"># ##########################################################################</span>
+<div class="viewcode-block" id="validate_config"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.select.html#shakemap.coremods.select.validate_config">[docs]</a><span class="k">def</span> <span class="nf">validate_config</span><span class="p">(</span><span class="n">mydict</span><span class="p">,</span> <span class="n">install_path</span><span class="p">):</span>
+
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">mydict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">validate_config</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">install_path</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;horizontal_buffer&#39;</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;vertical_buffer&#39;</span><span class="p">:</span>
+            <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">cfg_float</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;gmpe&#39;</span><span class="p">:</span>
+            <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">gmpe_list</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;min_depth&#39;</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span>
+            <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">cfg_float_list</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;layer_dir&#39;</span><span class="p">:</span>
+            <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;INSTALL_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">install_path</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="s1">&#39;Invalid entry in config: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">))</span>
+    <span class="k">return</span></div>
+
+<span class="c1"># ##########################################################################</span>
+<span class="c1"># Produce a weighted list of GMPE sets based on the earthquake&#39;s presence</span>
+<span class="c1"># in and proximity to the various tectonic regions.</span>
+<span class="c1"># ##########################################################################</span>
+<div class="viewcode-block" id="get_gmpes_by_region"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.select.html#shakemap.coremods.select.get_gmpes_by_region">[docs]</a><span class="k">def</span> <span class="nf">get_gmpes_by_region</span><span class="p">(</span><span class="n">strec_tr</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+
+    <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="n">gmpe_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="n">total_weight</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">reg</span> <span class="ow">in</span> <span class="n">strec_tr</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">reg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cfg</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;error: unknown tectonic_region: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">reg</span><span class="p">))</span>
+        <span class="n">reg_dist</span> <span class="o">=</span> <span class="n">strec_tr</span><span class="p">[</span><span class="n">reg</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">reg</span> <span class="o">==</span> <span class="s1">&#39;subduction&#39;</span><span class="p">:</span>
+            <span class="n">reg_buff</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reg_buff</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">reg</span><span class="p">][</span><span class="s1">&#39;horizontal_buffer&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">reg_dist</span> <span class="o">&gt;</span> <span class="n">reg_buff</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">reg</span> <span class="o">==</span> <span class="s1">&#39;subduction&#39;</span><span class="p">:</span>
+            <span class="n">gmpes</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">get_gmpes_from_probs</span><span class="p">(</span><span class="n">origin</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span>
+                                                  <span class="n">strec_tr</span><span class="p">[</span><span class="n">reg</span><span class="p">],</span>
+                                                  <span class="n">cfg</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gmpes</span><span class="p">,</span> <span class="n">weights</span> <span class="o">=</span> <span class="n">get_gmpes_from_depth</span><span class="p">(</span><span class="n">origin</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="n">reg</span><span class="p">])</span>
+        <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_list</span><span class="p">,</span> <span class="n">gmpes</span><span class="p">)</span>
+        <span class="n">reg_weight</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">reg_dist</span> <span class="o">/</span> <span class="n">reg_buff</span>
+        <span class="n">gmpe_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_weights</span><span class="p">,</span> <span class="n">weights</span> <span class="o">*</span> <span class="n">reg_weight</span><span class="p">)</span>
+        <span class="n">total_weight</span> <span class="o">+=</span> <span class="n">reg_weight</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">gmpe_list</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;error: no valid tectonic_region:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span>
+                           <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">strec_tr</span><span class="p">))</span>
+
+    <span class="n">gmpe_weights</span> <span class="o">/=</span> <span class="n">total_weight</span>
+
+    <span class="k">return</span> <span class="n">gmpe_list</span><span class="p">,</span> <span class="n">gmpe_weights</span></div>
+
+<span class="c1"># ##########################################################################</span>
+<span class="c1"># Produce a GMPE list and weights for subduction events based on the</span>
+<span class="c1"># probabilities of subduction type.</span>
+<span class="c1"># ##########################################################################</span>
+<div class="viewcode-block" id="get_gmpes_from_probs"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.select.html#shakemap.coremods.select.get_gmpes_from_probs">[docs]</a><span class="k">def</span> <span class="nf">get_gmpes_from_probs</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">sreg</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
+
+    <span class="n">cr_prob</span> <span class="o">=</span> <span class="n">sreg</span><span class="p">[</span><span class="s1">&#39;probabilities&#39;</span><span class="p">][</span><span class="s1">&#39;crustal&#39;</span><span class="p">]</span>
+    <span class="n">if_prob</span> <span class="o">=</span> <span class="n">sreg</span><span class="p">[</span><span class="s1">&#39;probabilities&#39;</span><span class="p">][</span><span class="s1">&#39;interface&#39;</span><span class="p">]</span>
+    <span class="n">is_prob</span> <span class="o">=</span> <span class="n">sreg</span><span class="p">[</span><span class="s1">&#39;probabilities&#39;</span><span class="p">][</span><span class="s1">&#39;intraslab&#39;</span><span class="p">]</span>
+    <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="n">gmpe_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="k">if</span> <span class="n">cr_prob</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">if_prob</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">is_prob</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">gmpe_list</span><span class="p">,</span> <span class="n">gmpe_weights</span>
+
+    <span class="k">if</span> <span class="n">cr_prob</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_list</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;subduction&#39;</span><span class="p">][</span><span class="s1">&#39;crustal&#39;</span><span class="p">])</span>
+        <span class="n">gmpe_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_weights</span><span class="p">,</span> <span class="n">cr_prob</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">if_prob</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_list</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;subduction&#39;</span><span class="p">][</span><span class="s1">&#39;interface&#39;</span><span class="p">])</span>
+        <span class="n">gmpe_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_weights</span><span class="p">,</span> <span class="n">if_prob</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">is_prob</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_list</span><span class="p">,</span> <span class="n">cfg</span><span class="p">[</span><span class="s1">&#39;subduction&#39;</span><span class="p">][</span><span class="s1">&#39;intraslab&#39;</span><span class="p">])</span>
+        <span class="n">gmpe_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_weights</span><span class="p">,</span> <span class="n">is_prob</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">gmpe_list</span><span class="p">,</span> <span class="n">gmpe_weights</span></div>
+
+
+<span class="c1"># ##########################################################################</span>
+<span class="c1"># Produce a GMPE list and weights for non-subduction events based on the</span>
+<span class="c1"># depth of the earthquake.</span>
+<span class="c1"># ##########################################################################</span>
+<div class="viewcode-block" id="get_gmpes_from_depth"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.select.html#shakemap.coremods.select.get_gmpes_from_depth">[docs]</a><span class="k">def</span> <span class="nf">get_gmpes_from_depth</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">region</span><span class="p">):</span>
+    <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="n">gmpe_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+    <span class="n">vbuf</span> <span class="o">=</span> <span class="n">region</span><span class="p">[</span><span class="s1">&#39;vertical_buffer&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">ig</span><span class="p">,</span> <span class="n">gmpe</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">region</span><span class="p">[</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;=</span> <span class="n">region</span><span class="p">[</span><span class="s1">&#39;min_depth&#39;</span><span class="p">][</span><span class="n">ig</span><span class="p">]</span> <span class="ow">and</span> <span class="n">depth</span> <span class="o">&lt;=</span> <span class="n">region</span><span class="p">[</span><span class="s1">&#39;max_depth&#39;</span><span class="p">][</span><span class="n">ig</span><span class="p">]:</span>
+            <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_list</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">)</span>
+            <span class="n">gmpe_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_weights</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&gt;</span> <span class="p">(</span><span class="n">region</span><span class="p">[</span><span class="s1">&#39;min_depth&#39;</span><span class="p">][</span><span class="n">ig</span><span class="p">]</span> <span class="o">-</span> <span class="n">vbuf</span><span class="p">)</span> <span class="ow">and</span> <span class="n">depth</span> <span class="o">&lt;</span> <span class="n">region</span><span class="p">[</span><span class="s1">&#39;min_depth&#39;</span><span class="p">][</span><span class="n">ig</span><span class="p">]:</span>
+            <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_list</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">)</span>
+            <span class="n">wgt</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">region</span><span class="p">[</span><span class="s1">&#39;min_depth&#39;</span><span class="p">][</span><span class="n">ig</span><span class="p">]</span> <span class="o">-</span> <span class="n">depth</span><span class="p">)</span> <span class="o">/</span> <span class="n">vbuf</span>
+            <span class="n">gmpe_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_weights</span><span class="p">,</span> <span class="n">wgt</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">depth</span> <span class="o">&lt;</span> <span class="p">(</span><span class="n">region</span><span class="p">[</span><span class="s1">&#39;max_depth&#39;</span><span class="p">][</span><span class="n">ig</span><span class="p">]</span> <span class="o">+</span> <span class="n">vbuf</span><span class="p">)</span> <span class="ow">and</span> <span class="n">depth</span> <span class="o">&gt;</span> <span class="n">region</span><span class="p">[</span><span class="s1">&#39;max_depth&#39;</span><span class="p">][</span><span class="n">ig</span><span class="p">]:</span>
+            <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_list</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">)</span>
+            <span class="n">wgt</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">depth</span> <span class="o">-</span> <span class="n">region</span><span class="p">[</span><span class="s1">&#39;max_depth&#39;</span><span class="p">][</span><span class="n">ig</span><span class="p">])</span> <span class="o">/</span> <span class="n">vbuf</span>
+            <span class="n">gmpe_weights</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gmpe_weights</span><span class="p">,</span> <span class="n">wgt</span><span class="p">)</span>
+            <span class="k">continue</span>
+
+    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">gmpe_list</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;error: no valid gmpe for depth </span><span class="si">%f</span><span class="s1">; region:</span><span class="se">\n</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                           <span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">pprint</span><span class="o">.</span><span class="n">pformat</span><span class="p">(</span><span class="n">region</span><span class="p">)))</span>
+
+    <span class="n">gmpe_weights</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">gmpe_weights</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gmpe_list</span><span class="p">,</span> <span class="n">gmpe_weights</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+    <div class="clearer"></div>
+  </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
