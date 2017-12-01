@@ -46,9 +46,6 @@ Coding Style
 ==========================
 
 In general, follow the PEP-8 style guide: https://www.python.org/dev/peps/pep-0008/
-Yes, your personal style is better in every way and for all
-the right reasons. Do it our way anyway. PEP8.
-
 Modifications/details/re-emphasis:
 
 General:
