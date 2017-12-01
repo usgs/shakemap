@@ -7,5 +7,4 @@ ShakeMap Programs
    shake
    sm_clone
    sm_profile
-   sm_select
 

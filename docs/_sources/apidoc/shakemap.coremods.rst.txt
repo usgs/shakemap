@@ -15,6 +15,7 @@ Submodules
    shakemap.coremods.model
    shakemap.coremods.raster
    shakemap.coremods.rupture
+   shakemap.coremods.select
    shakemap.coremods.stations
 
 Module contents

@@ -14,7 +14,7 @@ California EMA
   The California Emergency Management Agency (formerly the California Office of Emergency Services)
 
 DYFI 
-  Did You Feel It? 
+  Did You Feel It? -- The USGS system for gathering seismic intensity data from the public.
 
 EHP 
   USGS Earthquake Hazard Program
@@ -40,8 +40,8 @@ GSM
 HAZUS
   HAZards US: a loss-estimation program developed by FEMA
 
-IM
-  Intensity Measure: often used as a generic reference to Peak Ground Motions
+IM or IMT
+  Intensity Measure (Type): often used as a generic reference to Peak Ground Motions
 
 IPE
   Intensity Prediction Equation
