@@ -5,7 +5,7 @@ import json
 import logging
 
 #third party imports
-from shakelib.utils.containers import OutputContainer
+from shakelib.utils.containers import ShakeMapOutputContainer
 from configobj import ConfigObj
 
 #local imports
@@ -35,8 +35,8 @@ class InfoModule(CoreModule):
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
 
-        # Open the OutputContainer and extract the data
-        container = OutputContainer.load(datafile)
+        # Open the ShakeMapOutputContainer and extract the data
+        container = ShakeMapOutputContainer.load(datafile)
 
         # get the path to the products.conf file, load the config
         config_file = os.path.join(install_path, 'config', 'products.conf')

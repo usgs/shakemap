@@ -11,7 +11,7 @@ import numpy as np
 
 #neic imports
 from shakemap.utils.config import get_config_paths
-from shakelib.utils.containers import OutputContainer
+from shakelib.utils.containers import ShakeMapOutputContainer
 from shakemap.coremods.contour import _get_default_intervals
 
 def test_intervals():

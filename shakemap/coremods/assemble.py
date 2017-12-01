@@ -15,7 +15,7 @@ from configobj import ConfigObj
 
 #local imports
 from .base import CoreModule
-from shakelib.utils.containers import InputContainer
+from shakelib.utils.containers import ShakeMapInputContainer
 from shakemap.utils.config import get_config_paths, get_custom_validator,\
                 config_error, check_config, get_configspec
 
@@ -27,7 +27,7 @@ class AssembleModule(CoreModule):
     command_name = 'assemble'
     def execute(self):
         """
-        Assemble ShakeMap input data and write and InputContainer named
+        Assemble ShakeMap input data and write and ShakeMapInputContainer named
         shake_data.hdf in the event's 'current' directory.
 
         Raises:
@@ -148,7 +148,7 @@ class AssembleModule(CoreModule):
             # history, then add a new line that increments the version
             #
             bu_file = os.path.join(backup_dirs[0], 'shake_data.hdf')
-            bu_ic = InputContainer.load(bu_file)
+            bu_ic = ShakeMapInputContainer.load(bu_file)
             history = bu_ic.getVersionHistory()
             bu_ic.close()
             version = int(
@@ -164,7 +164,7 @@ class AssembleModule(CoreModule):
             # source network (but leave the version alone).
             #
             bu_file = os.path.join(datadir, 'shake_data.hdf')
-            bu_ic = InputContainer.load(bu_file)
+            bu_ic = ShakeMapInputContainer.load(bu_file)
             history = bu_ic.getVersionHistory()
             bu_ic.close()
             new_line = [timestamp, originator, history['history'][-1][2]]
@@ -180,12 +180,12 @@ class AssembleModule(CoreModule):
         hdf_file = os.path.join(datadir, 'shake_data.hdf')
 
         self.logger.debug('Creating input container...')
-        shake_data = InputContainer.createFromInput(hdf_file,
+        shake_data = ShakeMapInputContainer.createFromInput(hdf_file,
                                                     config,
                                                     eventxml,
-                                                    rupturefile,
-                                                    datafiles=datafiles,
-                                                    version_history=history)
+                                                    history,
+                                                    rupturefile=rupturefile,
+                                                    datafiles=datafiles)
         self.logger.info('Created HDF5 input container in %s' %
                          shake_data.getFileName())
         shake_data.close()

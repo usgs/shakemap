@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import shutil
 
@@ -78,3 +80,6 @@ def test_model():
     with pytest.raises(NotADirectoryError):
         model.execute()
 
+if __name__ == '__main__':
+    os.environ['CALLED_FROM_PYTEST'] = 'True'
+    test_model()

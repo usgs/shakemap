@@ -25,7 +25,7 @@ from shakelib.multigmpe import MultiGMPE
 from shakelib.virtualipe import VirtualIPE
 from shakelib.utils.utils import get_extent
 from shakelib.utils.imt_string import oq_to_file
-from shakelib.utils.containers import InputContainer, OutputContainer
+from shakelib.utils.containers import ShakeMapInputContainer, ShakeMapOutputContainer
 from shakelib.utils.distance import geodetic_distance_fast
 
 from mapio.geodict import GeoDict
@@ -72,7 +72,7 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         # Make the input container and extract the config
         # ------------------------------------------------------------------
-        ic = InputContainer.load(datafile)
+        ic = ShakeMapInputContainer.load(datafile)
         config = ic.getConfig()
         # ------------------------------------------------------------------
         # Instantiate the gmpe, gmice, ipe, and ccf
@@ -109,7 +109,7 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         # Get the rupture object and rupture context
         # ------------------------------------------------------------------
-        rupture_obj = ic.getRupture()
+        rupture_obj = ic.getRuptureObject()
         if 'mechanism' in config['modeling']:
             rupture_obj._origin.setMechanism(
                     mech=config['modeling']['mechanism'])
@@ -684,12 +684,12 @@ class ModelModule(CoreModule):
         product_path = os.path.join(datadir, 'products')
         if not os.path.isdir(product_path):
             os.mkdir(product_path)
-        oc = OutputContainer.create(os.path.join(product_path,
+        oc = ShakeMapOutputContainer.create(os.path.join(product_path,
                                                  'shake_result.hdf'))
         # ------------------------------------------------------------------
         # Might as well stick the whole config in the result
         # ------------------------------------------------------------------
-        oc.setDictionary('config', config)
+        oc.setConfig(config)
 
         #
         # We're going to need masked arrays of the output grids later, so
@@ -852,7 +852,7 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         # Add the rupture JSON as a text string
         # ------------------------------------------------------------------
-        oc.setString('rupture.json', json.dumps(rupture_obj._geojson))
+        oc.setRupture(rupture_obj)
 
         # ------------------------------------------------------------------
         # Add the station data. The stationlist object has the original
@@ -928,7 +928,12 @@ class ModelModule(CoreModule):
         else:
             sjdict = {}
 
-        oc.setString('stationlist.json', json.dumps(sjdict))
+        # oc.setString('stationlist.json', json.dumps(sjdict))
+        # TODO: Make the above code operate on the stations object directly
+        # then insert it into the container.
+        # For now we're getting the version of the StationList object
+        # without all of the predicted values in it.
+        oc.setStationList(stations)
 
         # ------------------------------------------------------------------
         # Add the output grids or points to the output; include some

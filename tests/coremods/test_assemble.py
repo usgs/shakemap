@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import shutil
 
@@ -92,3 +94,6 @@ def test_assemble():
     amod = AssembleModule('northridge_points')
     amod.execute()
 
+if __name__ == '__main__':
+    os.environ['CALLED_FROM_PYTEST'] = 'True'
+    test_assemble()

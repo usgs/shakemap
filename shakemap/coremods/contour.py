@@ -13,7 +13,7 @@ import fiona
 import numpy as np
 from skimage import measure
 from scipy.ndimage.filters import median_filter
-from shakelib.utils.containers import OutputContainer
+from shakelib.utils.containers import ShakeMapOutputContainer
 from shakelib.utils.imt_string import oq_to_file, file_to_oq
 from configobj import ConfigObj
 
@@ -46,8 +46,8 @@ class ContourModule(CoreModule):
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
 
-        # Open the OutputContainer and extract the data
-        container = OutputContainer.load(datafile)
+        # Open the ShakeMapOutputContainer and extract the data
+        container = ShakeMapOutputContainer.load(datafile)
 
         # get the path to the products.conf file, load the config
         config_file = os.path.join(install_path, 'config', 'products.conf')
@@ -62,7 +62,7 @@ def contour(container,imtype,component,intervals=None,
     """Generate contours of a specific IMT and return as a Shapely MultiLineString object.
 
     Args:
-        container (OutputContainer): OutputContainer with ShakeMap output data.
+        container (ShakeMapOutputContainer): ShakeMapOutputContainer with ShakeMap output data.
         imtype (str): String containing the name of an Intensity Measure Type 
                       found in container.
         component (str): Intensity Measure component found in container.
@@ -136,7 +136,7 @@ def contour_to_files(container,config,output_dir,logger):
     """Generate contours of all configured IMT values.
 
     Args:
-      container (OutputContainer): OutputContainer with ShakeMap output data.
+      container (ShakeMapOutputContainer): ShakeMapOutputContainer with ShakeMap output data.
       config (dict): Product configuration information (from product.conf).
       output_dir (str): Path to directory where output files will be written.
       logger (logging.Logger): Python logging Logger instance.

@@ -33,7 +33,7 @@ import pandas as pd
 from mapio.gmt import GMTGrid
 from impactutils.colors.cpalette import ColorPalette
 from mapio.basemapcity import BasemapCities
-from shakelib.utils.containers import OutputContainer
+from shakelib.utils.containers import ShakeMapOutputContainer
 from shakelib.rupture.origin import Origin
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.rupture.factory import rupture_from_dict_and_origin
@@ -90,8 +90,8 @@ class MappingModule(CoreModule):
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
 
-        # Open the OutputContainer and extract the data
-        container = OutputContainer.load(datafile)
+        # Open the ShakeMapOutputContainer and extract the data
+        container = ShakeMapOutputContainer.load(datafile)
 
         # get the path to the products.conf file, load the config
         config_file = os.path.join(install_path, 'config', 'products.conf')
@@ -186,7 +186,7 @@ class MapMaker(object):
         """Initialize MapMaker object.
 
         Args:
-            container (OutputContainer): OutputContainer object containing
+            container (ShakeMapOutputContainer): ShakeMapOutputContainer object containing
                 model results.
             topofile (str): Path to file containing global topography grid.
             layerdict (dict): Dictionary containing fields:
@@ -219,10 +219,10 @@ class MapMaker(object):
         self.cities_per_grid = CITIES_PER_GRID
         self.intensity_colormap = ColorPalette.fromPreset('mmi')
         self.contour_colormap = ColorPalette.fromPreset('shaketopo')
-        station_string = container.getString('stationlist.json')
-        station_dict = json.loads(station_string)
+        station_obj = container.getStationList()
+        station_dict = station_obj.getGeoJson()
         self.stations = station_dict
-        rupture_dict = json.loads(container.getString('rupture.json'))
+        rupture_dict = container.getRuptureDict()
         info_dict = json.loads(
             container.getString('info.json'))['input']['event_information']
         event_dict = {

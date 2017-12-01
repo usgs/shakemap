@@ -5,7 +5,7 @@ import json
 import logging
 
 #third party imports
-from shakelib.utils.containers import OutputContainer
+from shakelib.utils.containers import ShakeMapOutputContainer
 from configobj import ConfigObj
 
 #local imports
@@ -34,8 +34,8 @@ class StationModule(CoreModule):
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
             
-        # Open the OutputContainer and extract the data
-        container = OutputContainer.load(datafile)
+        # Open the ShakeMapOutputContainer and extract the data
+        container = ShakeMapOutputContainer.load(datafile)
 
         # get the path to the products.conf file, load the config
         config_file = os.path.join(install_path, 'config', 'products.conf')
@@ -49,10 +49,10 @@ class StationModule(CoreModule):
                 continue
             if fformat == 'json':
                 self.logger.info('Writing rupture.json file...')
-                stationstring = container.getString('stationlist.json')
+                station_dict = container.getStationList().getGeoJson()
                 station_file = os.path.join(datadir,'stationlist.json')
                 f = open(station_file,'w')
-                f.write(stationstring)
+                json.dump(station_dict,f)
                 f.close()
         
 

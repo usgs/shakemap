@@ -5,7 +5,7 @@ import json
 import logging
 
 #third party imports
-from shakelib.utils.containers import OutputContainer
+from shakelib.utils.containers import ShakeMapOutputContainer
 from configobj import ConfigObj
 
 #local imports
@@ -34,8 +34,8 @@ class RuptureModule(CoreModule):
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
             
-        # Open the OutputContainer and extract the data
-        container = OutputContainer.load(datafile)
+        # Open the ShakeMapOutputContainer and extract the data
+        container = ShakeMapOutputContainer.load(datafile)
         # get the path to the products.conf file, load the config
         config_file = os.path.join(install_path, 'config', 'products.conf')
         config = ConfigObj(config_file)
@@ -48,10 +48,10 @@ class RuptureModule(CoreModule):
                 continue
             if fformat == 'json':
                 self.logger.info('Writing rupture.json file...')
-                rupturestring = container.getString('rupture.json')
+                rupture_dict = container.getRuptureDict()
                 rupture_file = os.path.join(datadir,'rupture.json')
                 f = open(rupture_file,'w')
-                f.write(rupturestring)
+                json.dump(rupture_dict,f)
                 f.close()
         
 
