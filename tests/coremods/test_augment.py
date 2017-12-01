@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os
 import shutil
 import subprocess
@@ -21,13 +22,17 @@ def test_augment():
 
     # This would succeed, but we remove shake_data.hdf (should fail)
     hdf_file = os.path.join(datapath, 'wenchuan', 'current', 'shake_data.hdf')
-    os.rename(hdf_file, hdf_file + '_safe')
+    if os.path.isfile(hdf_file):
+        os.rename(hdf_file, hdf_file + '_safe')
     augment = AugmentModule('wenchuan')
     with pytest.raises(FileNotFoundError):
         augment.execute()
-    os.rename(hdf_file + '_safe', hdf_file)
+    if os.path.isfile(hdf_file):
+        os.rename(hdf_file + '_safe', hdf_file)
 
     # Normal event (should succeed)
+    assemble = AssembleModule('wenchuan')
+    assemble.execute()
     augment = AugmentModule('wenchuan')
     augment.execute()
 
@@ -41,6 +46,8 @@ def test_augment():
     #
     # Make sure the location file substitutions work (should succeed)
     #
+    assemble = AssembleModule('northridge_points')
+    assemble.execute()
     augment = AugmentModule('northridge_points')
     augment.execute()
 
@@ -90,3 +97,6 @@ def test_augment():
     augment.execute()
     os.rename(model_file + '_safe', model_file)
 
+if __name__ == '__main__':
+    os.environ['CALLED_FROM_PYTEST'] = 'True'
+    test_augment()

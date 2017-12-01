@@ -14,7 +14,7 @@ import fiona
 import numpy as np
 from skimage import measure
 from scipy.ndimage.filters import median_filter
-from shakelib.utils.containers import OutputContainer
+from shakelib.utils.containers import ShakeMapOutputContainer
 from shakelib.utils.imt_string import oq_to_file
 from mapio.shake import ShakeGrid
 
@@ -92,8 +92,8 @@ class GridXMLModule(CoreModule):
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
 
-        # Open the OutputContainer and extract the data
-        container = OutputContainer.load(datafile)
+        # Open the ShakeMapOutputContainer and extract the data
+        container = ShakeMapOutputContainer.load(datafile)
 
         #get all of the grid layers and the geodict
         gridnames = container.getIMTs(COMPONENT)
@@ -128,7 +128,7 @@ class GridXMLModule(CoreModule):
                 field_keys[imt_field] = (units,digits)
             geodict = grid.getGeoDict()
 
-            config = container.getDictionary('config')
+            config = container.getConfig()
 
             #event dictionary
             info_data = container.getString('info.json')

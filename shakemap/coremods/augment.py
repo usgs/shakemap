@@ -15,7 +15,7 @@ from configobj import ConfigObj
 
 #local imports
 from .base import CoreModule
-from shakelib.utils.containers import InputContainer
+from shakelib.utils.containers import ShakeMapInputContainer
 from shakemap.utils.config import get_config_paths, get_custom_validator,\
                 config_error, check_config, get_configspec
 
@@ -50,12 +50,7 @@ class AugmentModule(CoreModule):
         if not os.path.isfile(hdf_file):
             raise FileNotFoundError('%s does not exist. Use assemble.' %
                                     hdf_file)
-        shake_data = InputContainer.load(hdf_file)
-
-        eventxml = os.path.join(datadir, 'event.xml')
-        if os.path.isfile(eventxml):
-            self.logger.info('Updating event.xml file...')
-            shake_data.setEvent(eventxml)
+        shake_data = ShakeMapInputContainer.load(hdf_file)
 
         #
         # Get the config from the HDF file and merge in the local configs
@@ -147,9 +142,16 @@ class AugmentModule(CoreModule):
         # Look for a rupture file and replace the existing one if found
         #
         rupturefiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
+        eventxml = os.path.join(datadir, 'event.xml')
+        rupturefile = None
         if len(rupturefiles):
-            self.logger.info('Found new rupture file...')
-            shake_data.setRupture(rupturefiles[0])
+            rupturefile = rupturefiles[0]
+        if not os.path.isfile(eventxml):
+            eventxml = None
+        if rupturefile is not None or eventxml is not None:
+            self.logger.info('Updating rupture/origin information.')
+            shake_data.updateRupture(eventxml = eventxml, rupturefile = rupturefile)
+
         #
         # Sort out the version history. We're working with an existing
         # HDF file, so: if we are the originator, just update the timestamp,
