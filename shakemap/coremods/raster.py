@@ -25,9 +25,11 @@ DEFAULT_FILTER_SIZE = 10
 
 class RasterModule(CoreModule):
     """
-    **raster** -- Generate GIS raster files of all configured IMT values.
+    raster -- Generate GIS raster files of all configured IMT values.
     """
+
     command_name = 'raster'
+
     def execute(self):
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
@@ -47,7 +49,7 @@ class RasterModule(CoreModule):
 
         # create GIS-readable .flt files of imt and uncertainty
         self.logger.info('Creating GIS grids...')
-        layers = config['products']['gisgrids']['layers']
+        layers = config['products']['raster']['layers']
         for layer in layers:
             fileimt = oq_to_file(layer)
             imtdict = container.getIMT(layer,'Larger')

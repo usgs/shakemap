@@ -24,37 +24,66 @@ def test_assemble():
     # Would succeed but we remove event.xml (should fail)
     event_file = os.path.join(datapath, 'wenchuan', 'current', 'event.xml')
     os.rename(event_file, event_file + '_safe')
-    amod = AssembleModule('wenchuan')
-    with pytest.raises(FileNotFoundError):
-        amod.execute()
-    os.rename(event_file + '_safe', event_file)
+    try:
+        amod = AssembleModule('wenchuan')
+        with pytest.raises(FileNotFoundError):
+            amod.execute()
+    finally:
+        os.rename(event_file + '_safe', event_file)
 
     # Normal event (should succeed)
-    amod = AssembleModule('wenchuan')
-    amod.execute()
+    data_file = os.path.join(datapath, 'wenchuan', 'current', 'shake_data.hdf')
+    if os.path.isfile(data_file):
+        os.remove(data_file)
+    try:
+        amod = AssembleModule('wenchuan')
+        amod.execute()
+        #
+        # Run a second time to exercise a different branch of the code
+        #
+        amod.execute()
+    finally:
+        if os.path.isfile(data_file):
+            os.remove(data_file)
 
     # Do an event with model.conf (not model_zc.conf) and no zoneinfo
     # (should succeed)
-    amod = AssembleModule('nc72282711')
-    amod.execute()
+    data_file = os.path.join(datapath, 'nc72282711', 'current', 'shake_data.hdf')
+    if os.path.isfile(data_file):
+        os.remove(data_file)
+    try:
+        amod = AssembleModule('nc72282711')
+        amod.execute()
+    finally:
+        if os.path.isfile(data_file):
+            os.remove(data_file)
 
     # Try not having an event-specific config (should succeed)
     model_file = os.path.join(datapath, 'nc72282711', 'current',
                               'model.conf')
     os.rename(model_file, model_file + '_safe')
-    amod = AssembleModule('nc72282711')
-    amod.execute()
-    os.rename(model_file + '_safe', model_file)
+    data_file = os.path.join(datapath, 'nc72282711', 'current', 'shake_data.hdf')
+    if os.path.isfile(data_file):
+        os.remove(data_file)
+    try:
+        amod = AssembleModule('nc72282711')
+        amod.execute()
+    finally:
+        os.rename(model_file + '_safe', model_file)
+        if os.path.isfile(data_file):
+            os.remove(data_file)
 
-    # Remove the existing hdf file from a no-backup event (should succeed)
+    # Do an event with DYFI data (should succeed)
     hdf_file = os.path.join(datapath, 'nc72282711_dyfi', 'current',
                             'shake_data.hdf')
     if os.path.isfile(hdf_file):
         os.rename(hdf_file, hdf_file + '_safe')
-    amod = AssembleModule('nc72282711_dyfi')
-    amod.execute()
-    if os.path.isfile(hdf_file + '_safe'):
-        os.rename(hdf_file + '_safe', hdf_file)
+    try:
+        amod = AssembleModule('nc72282711_dyfi')
+        amod.execute()
+    finally:
+        if os.path.isfile(hdf_file + '_safe'):
+            os.rename(hdf_file + '_safe', hdf_file)
     
     #
     # Try some bad config files
@@ -64,35 +93,48 @@ def test_assemble():
                               'current', 'model_zc.conf')
     os.rename(model_file, model_file + '_safe')
     shutil.copyfile(model_file + '.bad0', model_file)
-    amod = AssembleModule('nc72282711_nodata_nofault')
-    with pytest.raises(RuntimeError):
-        amod.execute()
-    os.rename(model_file + '_safe', model_file)
+    try:
+        amod = AssembleModule('nc72282711_nodata_nofault')
+        with pytest.raises(RuntimeError):
+            amod.execute()
+    finally:
+        os.rename(model_file + '_safe', model_file)
 
     # Should fail vs30 filename check
     model_file = os.path.join(datapath, 'nc72282711_nodata_nofault', 
                               'current', 'model_zc.conf')
     os.rename(model_file, model_file + '_safe')
     shutil.copyfile(model_file + '.bad1', model_file)
-    amod = AssembleModule('nc72282711_nodata_nofault')
-    with pytest.raises(FileNotFoundError):
-        amod.execute()
-    os.rename(model_file + '_safe', model_file)
+    try:
+        amod = AssembleModule('nc72282711_nodata_nofault')
+        with pytest.raises(FileNotFoundError):
+            amod.execute()
+    finally:
+        os.rename(model_file + '_safe', model_file)
 
     # Should fail prediction locations filename check
     model_file = os.path.join(datapath, 'nc72282711_nodata_nofault', 
                               'current', 'model_zc.conf')
     os.rename(model_file, model_file + '_safe')
     shutil.copyfile(model_file + '.bad2', model_file)
-    amod = AssembleModule('nc72282711_nodata_nofault')
-    with pytest.raises(FileNotFoundError):
-        amod.execute()
-    os.rename(model_file + '_safe', model_file)
+    try:
+        amod = AssembleModule('nc72282711_nodata_nofault')
+        with pytest.raises(FileNotFoundError):
+            amod.execute()
+    finally:
+        os.rename(model_file + '_safe', model_file)
     #
     # Make sure the location file substitutions work (should succeed)
     #
-    amod = AssembleModule('northridge_points')
-    amod.execute()
+    data_file = os.path.join(datapath, 'northridge_points', 'current', 'shake_data.hdf')
+    if os.path.isfile(data_file):
+        os.remove(data_file)
+    try:
+        amod = AssembleModule('northridge_points')
+        amod.execute()
+    finally:
+        if os.path.isfile(data_file):
+            os.remove(data_file)
 
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'

@@ -26,13 +26,15 @@ def test_select():
                              'model_zc.conf')
     if os.path.isfile(conf_file):
         os.remove(conf_file)
-    smod = SelectModule('nc72282711')
-    smod.execute()
-    if not os.path.isfile(conf_file):
-        print('select failed!')
-        assert False
-    else:
-        os.remove(conf_file)
+    try:
+        smod = SelectModule('nc72282711')
+        smod.execute()
+    finally:
+        if not os.path.isfile(conf_file):
+            print('select failed!')
+            assert False
+        else:
+            os.remove(conf_file)
 
 
 if __name__ == '__main__':

@@ -9,10 +9,12 @@ class CoreModule(ABC):
     """
     Base class for any module in coremods which gets called by the shake program.
     """
-    command_name = ''
-    def __init__(self, eventid):
-        """Instantiate a CoreModule class with an event ID.
 
+    command_name = ''
+
+    def __init__(self, eventid):
+        """
+        Instantiate a CoreModule class with an event ID.
         """
         self._eventid = eventid
         log_config = get_logging_config()

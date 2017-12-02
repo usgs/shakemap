@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import os
+import os.path
 import shutil
 
 import pytest
@@ -17,7 +18,7 @@ def test_model():
     installpath, datapath = get_config_paths()
     #
     # This is Northridge for a set of output points (not a grid)
-    # Remove the products directory to hit that code
+    # Remove the products directory to hit the code that makes it
     # (should succeed)
     #
     assemble = AssembleModule('northridge_points')
@@ -63,15 +64,15 @@ def test_model():
     model.execute()
 
     #
-    # This event exists, but we hide the hdf file (should fail)
+    # This event exists, but we hide the input hdf file (should fail)
     #
     hdf_file = os.path.join(datapath, 'nc72282711_dyfi', 'current', 
                             'shake_data.hdf')
-    os.rename(hdf_file, hdf_file + '_safe')
+    if os.path.isfile(hdf_file):
+        os.remove(hdf_file)
     model = ModelModule('nc72282711_dyfi')
     with pytest.raises(FileNotFoundError):
         model.execute()
-    os.rename(hdf_file + '_safe', hdf_file)
 
     #
     # This event doesn't exist (should fail)

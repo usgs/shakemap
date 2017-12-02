@@ -164,27 +164,6 @@ def create(config, profile, accept, ppath):
     if not os.path.isdir(install_data_dir):
         os.mkdir(install_data_dir)
 
-    if profile == 'default' or profile == 'test':
-        # put northridge in the data directory
-        event_path = os.path.join(new_data_path, 'us19940117123055', 'current')
-        if not os.path.isdir(event_path):
-            os.makedirs(event_path)
-
-            # copy files over
-            data_file = os.path.join(shakeconfig_data_path,'northridge_dat.xml')
-            event_file = os.path.join(shakeconfig_data_path,'northridge_event.xml')
-            rupture_file = os.path.join(shakeconfig_data_path,'northridge_fault.txt')
-            event_config_file = os.path.join(shakeconfig_data_path,'northridge_model.conf')
-            vs30_file = os.path.join(shakeconfig_data_path,'northridge_vs30.grd')
-            data_event_file = os.path.join(event_path, 'event.xml')
-            data_config_file = os.path.join(event_path, 'model_zc.conf')
-            vs30_data_file = os.path.join(install_data_dir, 'vs30.grd')
-            shutil.copy(data_file, event_path)
-            shutil.copyfile(event_file, data_event_file)
-            shutil.copy(rupture_file, event_path)
-            shutil.copyfile(event_config_file, data_config_file)
-            shutil.copyfile(vs30_file, vs30_data_file)
-        
     if 'profiles' not in config:
         config['profiles'] = {}
     config['profiles'][profile] = {'install_path': install_path, 

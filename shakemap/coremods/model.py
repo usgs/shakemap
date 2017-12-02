@@ -8,6 +8,7 @@ import time as time
 import copy
 from time import gmtime, strftime
 import json
+import shutil
 
 import numpy as np
 import numpy.ma as ma
@@ -45,8 +46,9 @@ SM_CONSTS = {'default_mmi_std': 0.3,
 
 class ModelModule(CoreModule):
     """
-    **model** -- Interpolate ground motions to a grid or list of locations.
+    model -- Interpolate ground motions to a grid or list of locations.
     """
+
     command_name = 'model'
 
     def execute(self):
@@ -68,6 +70,13 @@ class ModelModule(CoreModule):
         datafile = os.path.join(datadir, 'shake_data.hdf')
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
+
+        #
+        # Clear away results from previous runs
+        #
+        products_path = os.path.join(datadir, 'products')
+        if os.path.isdir(products_path):
+            shutil.rmtree(products_path, ignore_errors=True)
 
         # ------------------------------------------------------------------
         # Make the input container and extract the config

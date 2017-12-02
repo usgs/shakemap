@@ -42,6 +42,7 @@ from shakelib.utils.imt_string import oq_to_file
 # local imports
 from shakemap.utils.config import get_config_paths
 from .base import CoreModule
+from shakemap.utils.utils import path_macro_sub
 
 
 CITY_COLS = 2
@@ -57,22 +58,23 @@ VERT_EXAG = 0.1
 # all of the zorder values for different plotted parameters
 # elements with a higher zorder will plot on top of lower elements.
 IMG_ZORDER = 1
-STATIONS_ZORDER = 250
-CITIES_ZORDER = 900
-FAULT_ZORDER = 1100
-EPICENTER_ZORDER = 1100
-CONTOUR_ZORDER = 800
 ROAD_ZORDER = 5
-SCALE_ZORDER = 1500
-GRATICULE_ZORDER = 1200
+CONTOUR_ZORDER = 800
 OCEAN_ZORDER = 1000
 BORDER_ZORDER = 1001
+FAULT_ZORDER = 1100
+EPICENTER_ZORDER = 1100
+STATIONS_ZORDER = 1150
+CITIES_ZORDER = 1200
+GRATICULE_ZORDER = 1200
+SCALE_ZORDER = 1500
 
 
 class MappingModule(CoreModule):
     """
-    **mapping** -- Generate maps of the IMTs found in shake_result.hdf.
+    mapping -- Generate maps of the IMTs found in shake_result.hdf.
     """
+
     command_name = 'mapping'
 
     def execute(self):
@@ -103,13 +105,13 @@ class MappingModule(CoreModule):
         # get all of the pieces needed for the mapmaker
         layerdict = {}
         layers = config['products']['mapping']['layers']
-        layerdict['coast'] = layers['coasts']
-        layerdict['ocean'] = layers['oceans']
-        layerdict['lake'] = layers['lakes']
-        layerdict['country'] = layers['countries']
-        layerdict['state'] = layers['states']
-        topofile = layers['topography']
-        cities = layers['cities']
+        layerdict['coast'] = path_macro_sub(layers['coasts'], install_path, data_path)
+        layerdict['ocean'] = path_macro_sub(layers['oceans'], install_path, data_path)
+        layerdict['lake'] = path_macro_sub(layers['lakes'], install_path, data_path)
+        layerdict['country'] = path_macro_sub(layers['countries'], install_path, data_path)
+        layerdict['state'] = path_macro_sub(layers['states'], install_path, data_path)
+        topofile = path_macro_sub(layers['topography'], install_path, data_path)
+        cities = path_macro_sub(layers['cities'], install_path, data_path)
         mapmaker = MapMaker(container, topofile, layerdict, cities,
                             self.logger)
         self.logger.info('Drawing intensity map...')
@@ -666,13 +668,9 @@ class MapMaker(object):
         Args:
             m (Basemap): Basemap instance.
             fill (bool): Whether or not to fill symbols.
-            imt (str): One of ('MMI', 'PGA', 'PGV', or 'PSAxpy')
+            imt (str): One of ('MMI', 'PGA', 'PGV', or 'SA(x.y')
         """
-        if imt in ('MMI', 'PGA', 'PGV'):
-            dimt = imt
-        else:
-            perstr = imt.replace('PSA', '')
-            dimt = 'sa(' + perstr[0] + '.' + perstr[2] + ')'
+        dimt = imt.lower()
 
         # get the locations and values of the MMI observations
         mmi_dict = {'lat': [], 'lon': [], 'mmi': []}
@@ -727,10 +725,14 @@ class MapMaker(object):
             for idx, value in enumerate(instdf['lat']):
                 mlat = instdf['lat'][idx]
                 mlon = instdf['lon'][idx]
-                dmmi = instdf[dimt][idx]
-                mcolor = self.intensity_colormap.getDataColor(dmmi)
+                #
+                # TODO: Make the fill color correspond to the mmi
+                # obtained from the IMT.
+                #
+#                dmmi = instdf[dimt][idx]
+#                mcolor = self.intensity_colormap.getDataColor(dmmi)
                 m.plot(mlon, mlat, '^', latlon=True,
-                       markerfacecolor=mcolor, markeredgecolor='k',
+                       markerfacecolor='w', markeredgecolor='k',
                        markersize=6, zorder=STATIONS_ZORDER)
 
     def _drawFault(self, m):

@@ -28,9 +28,11 @@ DEFAULT_FILTER_SIZE = 10
 
 class ContourModule(CoreModule):
     """
-    **contour** -- Generate contours of all configured IMT values.
+    contour -- Generate contours of all configured IMT values.
     """
+
     command_name = 'contour'
+
     def execute(self):
         """Create contour files for all configured IMT values.
 

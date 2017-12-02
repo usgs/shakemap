@@ -16,9 +16,11 @@ ALLLOWED_FORMATS = ['json']
 
 class RuptureModule(CoreModule):
     """
-    **rupture** -- Write rupture.json.
+    rupture -- Write rupture.json.
     """
+
     command_name = 'rupture'
+
     def execute(self):
         """Write rupture.json file.
 

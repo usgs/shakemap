@@ -11,6 +11,9 @@ import inspect
 import importlib
 import time
 
+import matplotlib
+matplotlib.use('Agg')
+
 # local imports
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.config import get_logger
