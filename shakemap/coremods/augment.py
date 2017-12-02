@@ -9,6 +9,7 @@ import os.path
 import logging
 import glob
 import datetime
+import shutil
 
 #third party imports
 from configobj import ConfigObj
@@ -22,9 +23,11 @@ from shakemap.utils.config import get_config_paths, get_custom_validator,\
 
 class AugmentModule(CoreModule):
     """
-    **augment** -- Incorporate additional content to the ShakeMap input file.
+    augment -- Incorporate additional content to the ShakeMap input file.
     """
+
     command_name = 'augment'
+
     def execute(self):
         """
         Augment a ShakeMap input data file with local configs, data, rupture,
@@ -51,6 +54,13 @@ class AugmentModule(CoreModule):
             raise FileNotFoundError('%s does not exist. Use assemble.' %
                                     hdf_file)
         shake_data = ShakeMapInputContainer.load(hdf_file)
+
+        #
+        # Clear away results from previous runs
+        #
+        products_path = os.path.join(datadir, 'products')
+        if os.path.isdir(products_path):
+            shutil.rmtree(products_path, ignore_errors=True)
 
         #
         # Get the config from the HDF file and merge in the local configs

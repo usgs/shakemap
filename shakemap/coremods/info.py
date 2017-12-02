@@ -16,9 +16,11 @@ ALLLOWED_FORMATS = ['json']
 
 class InfoModule(CoreModule):
     """
-    **info** -- Extract info.json from shake_result.hdf and write it as a file.
+    info -- Extract info.json from shake_result.hdf and write it as a file.
     """
+
     command_name = 'info'
+
     def execute(self):
         """
         Write info.json metadata file.

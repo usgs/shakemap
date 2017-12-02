@@ -16,9 +16,11 @@ ALLLOWED_FORMATS = ['json']
 
 class StationModule(CoreModule):
     """
-    **stations** -- Generate stationlist.json from shake_result.hdf.
+    stations -- Generate stationlist.json from shake_result.hdf.
     """
+
     command_name = 'stations'
+
     def execute(self):
         """Write stationlist.json file.
 

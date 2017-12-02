@@ -6,6 +6,7 @@ import sys
 import os.path
 import logging
 import pprint
+import shutil
 from collections import OrderedDict
 
 #third party imports
@@ -24,7 +25,9 @@ class SelectModule(CoreModule):
     """
     select - Parse STREC output, make a GMPE set, create model_zc.conf.
     """
+
     command_name = 'select'
+
     def execute(self):
         '''
         Parses the output of STREC in accordance with the
@@ -55,6 +58,13 @@ class SelectModule(CoreModule):
         if not os.path.isfile(eventxml):
             raise FileNotFoundError('%s does not exist.' % eventxml)
         org = Origin.fromFile(eventxml)
+
+        #
+        # Clear away results from previous runs
+        #
+        products_path = os.path.join(datadir, 'products')
+        if os.path.isdir(products_path):
+            shutil.rmtree(products_path, ignore_errors=True)
 
         # ---------------------------------------------------------------------
         # Get config file from install_path/config, parse and

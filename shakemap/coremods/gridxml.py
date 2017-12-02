@@ -73,9 +73,11 @@ def _oq_to_gridxml(oqimt):
 
 class GridXMLModule(CoreModule):
     """
-    **gridxml** -- Create grid.xml and uncertainty.xml files from shake_result.hdf.
+    gridxml -- Create grid.xml and uncertainty.xml files from shake_result.hdf.
     """
+
     command_name = 'gridxml'
+
     def execute(self):
         """Create grid.xml and uncertainty.xml files.
 

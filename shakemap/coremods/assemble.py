@@ -9,6 +9,7 @@ import os.path
 import logging
 import glob
 import datetime
+import shutil
 
 #third party imports
 from configobj import ConfigObj
@@ -22,9 +23,11 @@ from shakemap.utils.config import get_config_paths, get_custom_validator,\
 
 class AssembleModule(CoreModule):
     """
-    **assemble** -- Assemble ShakeMap input data into an HDF package.
+    assemble -- Assemble ShakeMap input data into an HDF package.
     """
+
     command_name = 'assemble'
+
     def execute(self):
         """
         Assemble ShakeMap input data and write and ShakeMapInputContainer named
@@ -49,6 +52,13 @@ class AssembleModule(CoreModule):
         self.logger.debug('Looking for event.xml file...')
         if not os.path.isfile(eventxml):
             raise FileNotFoundError('%s does not exist.' % eventxml)
+
+        #
+        # Clear away results from previous runs
+        #
+        products_path = os.path.join(datadir, 'products')
+        if os.path.isdir(products_path):
+            shutil.rmtree(products_path, ignore_errors=True)
 
         #
         # Look for global configs in install_path/config
