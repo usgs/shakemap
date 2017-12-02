@@ -13,7 +13,7 @@ from shakemap.coremods.assemble import AssembleModule
 ########################################################################
 # Test sm_model
 ########################################################################
-def test_model():
+def test_model_1():
 
     installpath, datapath = get_config_paths()
     #
@@ -30,6 +30,8 @@ def test_model():
     model = ModelModule('northridge_points')
     model.execute()
 
+def test_model_2():
+
     #
     # This is a small grid with station data only (should succeed)
     #
@@ -37,6 +39,8 @@ def test_model():
     assemble.execute()
     model = ModelModule('nc72282711')
     model.execute()
+
+def test_model_3():
 
     #
     # This is a small grid with DYFI data only (should succeed)
@@ -46,6 +50,8 @@ def test_model():
     model = ModelModule('nc72282711_dyfi')
     model.execute()
 
+def test_model_4():
+
     #
     # Run with no data and no fault, and use the default extent.
     #
@@ -53,6 +59,8 @@ def test_model():
     assemble.execute()
     model = ModelModule('nc72282711_nodata_nofault')
     model.execute()
+
+def test_model_5():
 
     #
     # Set the bias and outlier magnitude limits low to test additional
@@ -63,6 +71,9 @@ def test_model():
     model = ModelModule('nc72282711_nofault')
     model.execute()
 
+def test_model_6():
+
+    installpath, datapath = get_config_paths()
     #
     # This event exists, but we hide the input hdf file (should fail)
     #
@@ -74,6 +85,8 @@ def test_model():
     with pytest.raises(FileNotFoundError):
         model.execute()
 
+def test_model_7():
+
     #
     # This event doesn't exist (should fail)
     #
@@ -83,4 +96,10 @@ def test_model():
 
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'
-    test_model()
+    test_model_1()
+    test_model_2()
+    test_model_3()
+    test_model_4()
+    test_model_5()
+    test_model_6()
+    test_model_7()
