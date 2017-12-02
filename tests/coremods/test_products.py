@@ -49,8 +49,8 @@ def test_products():
         mod.execute()
         mod = StationModule('nc72282711')
         mod.execute()
-        mod = MappingModule('nc72282711')
-        mod.execute()
+#        mod = MappingModule('nc72282711')
+#        mod.execute()
     finally:
         data_file = os.path.join(datapath, 'nc72282711', 'current',
                                  'shake_data.hdf')
