@@ -90,22 +90,25 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 
 <span class="c1">#third party imports</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 
 <span class="c1">#local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">InputContainer</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapInputContainer</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span> <span class="n">get_custom_validator</span><span class="p">,</span>\
                 <span class="n">config_error</span><span class="p">,</span> <span class="n">check_config</span><span class="p">,</span> <span class="n">get_configspec</span>
 
 
 <div class="viewcode-block" id="AugmentModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.augment.html#shakemap.coremods.augment.AugmentModule">[docs]</a><span class="k">class</span> <span class="nc">AugmentModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    **augment** -- Incorporate additional content to the ShakeMap input file.</span>
+<span class="sd">    augment -- Incorporate additional content to the ShakeMap input file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;augment&#39;</span>
+
 <div class="viewcode-block" id="AugmentModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.augment.html#shakemap.coremods.augment.AugmentModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Augment a ShakeMap input data file with local configs, data, rupture,</span>
@@ -131,12 +134,14 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist. Use assemble.&#39;</span> <span class="o">%</span>
                                     <span class="n">hdf_file</span><span class="p">)</span>
-        <span class="n">shake_data</span> <span class="o">=</span> <span class="n">InputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">)</span>
+        <span class="n">shake_data</span> <span class="o">=</span> <span class="n">ShakeMapInputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">)</span>
 
-        <span class="n">eventxml</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;event.xml&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updating event.xml file...&#39;</span><span class="p">)</span>
-            <span class="n">shake_data</span><span class="o">.</span><span class="n">setEvent</span><span class="p">(</span><span class="n">eventxml</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># Clear away results from previous runs</span>
+        <span class="c1">#</span>
+        <span class="n">products_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">products_path</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">products_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1">#</span>
         <span class="c1"># Get the config from the HDF file and merge in the local configs</span>
@@ -228,9 +233,16 @@
         <span class="c1"># Look for a rupture file and replace the existing one if found</span>
         <span class="c1">#</span>
         <span class="n">rupturefiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_fault.txt&#39;</span><span class="p">))</span>
+        <span class="n">eventxml</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;event.xml&#39;</span><span class="p">)</span>
+        <span class="n">rupturefile</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rupturefiles</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Found new rupture file...&#39;</span><span class="p">)</span>
-            <span class="n">shake_data</span><span class="o">.</span><span class="n">setRupture</span><span class="p">(</span><span class="n">rupturefiles</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">rupturefile</span> <span class="o">=</span> <span class="n">rupturefiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">):</span>
+            <span class="n">eventxml</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">rupturefile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">eventxml</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Updating rupture/origin information.&#39;</span><span class="p">)</span>
+            <span class="n">shake_data</span><span class="o">.</span><span class="n">updateRupture</span><span class="p">(</span><span class="n">eventxml</span> <span class="o">=</span> <span class="n">eventxml</span><span class="p">,</span> <span class="n">rupturefile</span> <span class="o">=</span> <span class="n">rupturefile</span><span class="p">)</span>
+
         <span class="c1">#</span>
         <span class="c1"># Sort out the version history. We&#39;re working with an existing</span>
         <span class="c1"># HDF file, so: if we are the originator, just update the timestamp,</span>

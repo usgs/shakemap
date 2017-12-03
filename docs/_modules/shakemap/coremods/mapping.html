@@ -114,7 +114,7 @@
 <span class="kn">from</span> <span class="nn">mapio.gmt</span> <span class="k">import</span> <span class="n">GMTGrid</span>
 <span class="kn">from</span> <span class="nn">impactutils.colors.cpalette</span> <span class="k">import</span> <span class="n">ColorPalette</span>
 <span class="kn">from</span> <span class="nn">mapio.basemapcity</span> <span class="k">import</span> <span class="n">BasemapCities</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">OutputContainer</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.origin</span> <span class="k">import</span> <span class="n">Origin</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.point_rupture</span> <span class="k">import</span> <span class="n">PointRupture</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.factory</span> <span class="k">import</span> <span class="n">rupture_from_dict_and_origin</span>
@@ -123,6 +123,7 @@
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">path_macro_sub</span>
 
 
 <span class="n">CITY_COLS</span> <span class="o">=</span> <span class="mi">2</span>
@@ -138,22 +139,23 @@
 <span class="c1"># all of the zorder values for different plotted parameters</span>
 <span class="c1"># elements with a higher zorder will plot on top of lower elements.</span>
 <span class="n">IMG_ZORDER</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="n">STATIONS_ZORDER</span> <span class="o">=</span> <span class="mi">250</span>
-<span class="n">CITIES_ZORDER</span> <span class="o">=</span> <span class="mi">900</span>
-<span class="n">FAULT_ZORDER</span> <span class="o">=</span> <span class="mi">1100</span>
-<span class="n">EPICENTER_ZORDER</span> <span class="o">=</span> <span class="mi">1100</span>
-<span class="n">CONTOUR_ZORDER</span> <span class="o">=</span> <span class="mi">800</span>
 <span class="n">ROAD_ZORDER</span> <span class="o">=</span> <span class="mi">5</span>
-<span class="n">SCALE_ZORDER</span> <span class="o">=</span> <span class="mi">1500</span>
-<span class="n">GRATICULE_ZORDER</span> <span class="o">=</span> <span class="mi">1200</span>
+<span class="n">CONTOUR_ZORDER</span> <span class="o">=</span> <span class="mi">800</span>
 <span class="n">OCEAN_ZORDER</span> <span class="o">=</span> <span class="mi">1000</span>
 <span class="n">BORDER_ZORDER</span> <span class="o">=</span> <span class="mi">1001</span>
+<span class="n">FAULT_ZORDER</span> <span class="o">=</span> <span class="mi">1100</span>
+<span class="n">EPICENTER_ZORDER</span> <span class="o">=</span> <span class="mi">1100</span>
+<span class="n">STATIONS_ZORDER</span> <span class="o">=</span> <span class="mi">1150</span>
+<span class="n">CITIES_ZORDER</span> <span class="o">=</span> <span class="mi">1200</span>
+<span class="n">GRATICULE_ZORDER</span> <span class="o">=</span> <span class="mi">1200</span>
+<span class="n">SCALE_ZORDER</span> <span class="o">=</span> <span class="mi">1500</span>
 
 
 <div class="viewcode-block" id="MappingModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MappingModule">[docs]</a><span class="k">class</span> <span class="nc">MappingModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    **mapping** -- Generate maps of the IMTs found in shake_result.hdf.</span>
+<span class="sd">    mapping -- Generate maps of the IMTs found in shake_result.hdf.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;mapping&#39;</span>
 
 <div class="viewcode-block" id="MappingModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MappingModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -171,8 +173,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
 
-        <span class="c1"># Open the OutputContainer and extract the data</span>
-        <span class="n">container</span> <span class="o">=</span> <span class="n">OutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
+        <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 
         <span class="c1"># get the path to the products.conf file, load the config</span>
         <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
@@ -184,13 +186,13 @@
         <span class="c1"># get all of the pieces needed for the mapmaker</span>
         <span class="n">layerdict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">layers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">]</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;coast&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;coasts&#39;</span><span class="p">]</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;ocean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;oceans&#39;</span><span class="p">]</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;lake&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;lakes&#39;</span><span class="p">]</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;countries&#39;</span><span class="p">]</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;states&#39;</span><span class="p">]</span>
-        <span class="n">topofile</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">]</span>
-        <span class="n">cities</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;cities&#39;</span><span class="p">]</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;coast&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;coasts&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;ocean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;oceans&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;lake&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;lakes&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;countries&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;states&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">topofile</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">cities</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;cities&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
         <span class="n">mapmaker</span> <span class="o">=</span> <span class="n">MapMaker</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">topofile</span><span class="p">,</span> <span class="n">layerdict</span><span class="p">,</span> <span class="n">cities</span><span class="p">,</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Drawing intensity map...&#39;</span><span class="p">)</span>
@@ -267,7 +269,7 @@
         <span class="sd">&quot;&quot;&quot;Initialize MapMaker object.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            container (OutputContainer): OutputContainer object containing</span>
+<span class="sd">            container (ShakeMapOutputContainer): ShakeMapOutputContainer object containing</span>
 <span class="sd">                model results.</span>
 <span class="sd">            topofile (str): Path to file containing global topography grid.</span>
 <span class="sd">            layerdict (dict): Dictionary containing fields:</span>
@@ -300,10 +302,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="n">CITIES_PER_GRID</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">intensity_colormap</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">contour_colormap</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;shaketopo&#39;</span><span class="p">)</span>
-        <span class="n">station_string</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;stationlist.json&#39;</span><span class="p">)</span>
-        <span class="n">station_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">station_string</span><span class="p">)</span>
+        <span class="n">station_obj</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getStationList</span><span class="p">()</span>
+        <span class="n">station_dict</span> <span class="o">=</span> <span class="n">station_obj</span><span class="o">.</span><span class="n">getGeoJson</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stations</span> <span class="o">=</span> <span class="n">station_dict</span>
-        <span class="n">rupture_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;rupture.json&#39;</span><span class="p">))</span>
+        <span class="n">rupture_dict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getRuptureDict</span><span class="p">()</span>
         <span class="n">info_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span>
             <span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">))[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]</span>
         <span class="n">event_dict</span> <span class="o">=</span> <span class="p">{</span>
@@ -747,13 +749,9 @@
 <span class="sd">        Args:</span>
 <span class="sd">            m (Basemap): Basemap instance.</span>
 <span class="sd">            fill (bool): Whether or not to fill symbols.</span>
-<span class="sd">            imt (str): One of (&#39;MMI&#39;, &#39;PGA&#39;, &#39;PGV&#39;, or &#39;PSAxpy&#39;)</span>
+<span class="sd">            imt (str): One of (&#39;MMI&#39;, &#39;PGA&#39;, &#39;PGV&#39;, or &#39;SA(x.y&#39;)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">imt</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">,</span> <span class="s1">&#39;PGA&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV&#39;</span><span class="p">):</span>
-            <span class="n">dimt</span> <span class="o">=</span> <span class="n">imt</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">perstr</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;PSA&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="n">dimt</span> <span class="o">=</span> <span class="s1">&#39;sa(&#39;</span> <span class="o">+</span> <span class="n">perstr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">perstr</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;)&#39;</span>
+        <span class="n">dimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
         <span class="c1"># get the locations and values of the MMI observations</span>
         <span class="n">mmi_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;mmi&#39;</span><span class="p">:</span> <span class="p">[]}</span>
@@ -808,10 +806,14 @@
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">instdf</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]):</span>
                 <span class="n">mlat</span> <span class="o">=</span> <span class="n">instdf</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
                 <span class="n">mlon</span> <span class="o">=</span> <span class="n">instdf</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
-                <span class="n">dmmi</span> <span class="o">=</span> <span class="n">instdf</span><span class="p">[</span><span class="n">dimt</span><span class="p">][</span><span class="n">idx</span><span class="p">]</span>
-                <span class="n">mcolor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">intensity_colormap</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">dmmi</span><span class="p">)</span>
+                <span class="c1">#</span>
+                <span class="c1"># TODO: Make the fill color correspond to the mmi</span>
+                <span class="c1"># obtained from the IMT.</span>
+                <span class="c1">#</span>
+<span class="c1">#                dmmi = instdf[dimt][idx]</span>
+<span class="c1">#                mcolor = self.intensity_colormap.getDataColor(dmmi)</span>
                 <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">mlon</span><span class="p">,</span> <span class="n">mlat</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                       <span class="n">markerfacecolor</span><span class="o">=</span><span class="n">mcolor</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span>
+                       <span class="n">markerfacecolor</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">markeredgecolor</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span>
                        <span class="n">markersize</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">STATIONS_ZORDER</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_drawFault</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>

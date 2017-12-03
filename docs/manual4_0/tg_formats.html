@@ -123,7 +123,7 @@ The Python interface, h5py, is documented on the
 <a class="reference external" href="http://www.h5py.org/">h5py web site</a>.</p>
 <p>For ShakeMap, the two main data files (<em>shake_data.hdf</em> and
 <em>shake_result.hdf</em>) are accessed through the methods of the
-shakelib classes <strong>InputContainer</strong> and <strong>OutputContainer</strong>.
+shakelib classes <strong>ShakeMapInputContainer</strong> and <strong>ShakeMapOutputContainer</strong>.
 For documentation see the <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">shakelib container module</a>.</p>
 </div>
 <div class="section" id="shake-data-hdf">
@@ -138,69 +138,89 @@ with <em>sm_assemble</em> (and possibly modified by <em>sm_augment</em>).</p>
 <p>It is generally not necessary for operators to access this file other
 than through the interfaces of <em>sm_assemble</em> and <em>sm_augment</em>. For
 developers, the file
-is accessed through the shakelib <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">InputContainer interface</a>.</p>
+is accessed through the shakelib <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">ShakeMapInputContainer interface</a>.</p>
 </div>
 <div class="section" id="shake-result-hdf">
 <h2>2.2.3. shake_result.hdf<a class="headerlink" href="#shake-result-hdf" title="Permalink to this headline">¶</a></h2>
 <p>The primary output product of <strong>sm_model</strong> is the HDF5 file
 <em>shake_result.hdf</em>. There are some differences depending on whether
-<strong>sm_model</strong> produces output grids or lists of points. <em>shake_result.hdf</em>
-is essentially “flat” (i.e., all
-of the data objects are contained within the root group). The file
-contains:</p>
+<strong>sm_model</strong> produces output grids or lists of points.  HDF5 files
+consist of <em>Groups</em> or <em>DataSets</em>.  Groups can contain other groups
+or datasets, and can contain a dictionary-like set of <em>attributes</em>.
+Datasets consist of arrays holding data values, and
+metadata in the form of attributes.  A very good introduction to
+the HDF5 data format can be found here:</p>
+<p><a class="reference external" href="https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf">https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf</a></p>
+<p><em>shake_result.hdf</em> consists of a number of groups and datasets. Our
+implementation of HDF5 uses groups to contain Python dictionaries,
+strings, and numpy arrays.  Dictionaries are stored as recursive groups.
+For example, a Python <em>config</em> dictionary consisting of the following information:</p>
+<dl class="docutils">
+<dt>d = {‘name’:’config’,</dt>
+<dd>‘gmpe_set’:{‘Active_Crustal’:’Campbell2003’},
+‘depth’:34.0,
+}</dd>
+</dl>
+<p>would be stored in a group called <strong>__dictionary_config__</strong>, with attributes
+‘name’ and ‘depth’.  There will be a sub-group called ‘gmpe_set’, with an attribute
+called ‘Active_Crustal’.  Groups like this can contain any number (within reason)
+of dictionaries, which can consist of a number of Python data types (strings, numbers,
+numpy arrays, etc.) <em>shake_result.hdf</em> contains the following elements:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="27%" />
-<col width="10%" />
-<col width="42%" />
+<col width="11%" />
+<col width="15%" />
+<col width="26%" />
 <col width="21%" />
 </colgroup>
 <thead valign="bottom">
 <tr class="row-odd"><th class="head">Name</th>
-<th class="head">Type</th>
-<th class="head">Contents</th>
-<th class="head">Attributess</th>
+<th class="head">HDF Type</th>
+<th class="head">Python Type</th>
+<th class="head" colspan="2">Contents</th>
 </tr>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>config</td>
 <td>group</td>
-<td>ShakeMap configuration</td>
-<td>None</td>
+<td>dictionary</td>
+<td colspan="2">ShakeMap configuration</td>
 </tr>
 <tr class="row-odd"><td>info.json</td>
-<td>dataset</td>
-<td>ShakeMap metadata in JSON format</td>
-<td>None</td>
+<td>group</td>
+<td>string</td>
+<td colspan="2">ShakeMap metadata in JSON format</td>
 </tr>
 <tr class="row-even"><td>rupture.json</td>
-<td>dataset</td>
-<td>GeoJSON representation of the
+<td>group</td>
+<td>string</td>
+<td colspan="2">GeoJSON representation of the
 finite fault</td>
-<td>None</td>
 </tr>
 <tr class="row-odd"><td>stationlist.json</td>
 <td>dataset</td>
-<td>GeoJSON stationlist</td>
-<td>None</td>
+<td>string</td>
+<td colspan="2">GeoJSON stationlist</td>
 </tr>
 <tr class="row-even"><td>vs30</td>
 <td>dataset</td>
-<td>Vs30 values at output grid/points</td>
-<td>grid/point attrs</td>
+<td>ndarray</td>
+<td colspan="2">Vs30 values at output grid/points</td>
 </tr>
 <tr class="row-odd"><td>IMT (multiple)</td>
-<td>dataset</td>
-<td>Interpolated data for IMT</td>
-<td>grid/point attrs</td>
-</tr>
-<tr class="row-even"><td>IMT_sd (multiple)</td>
-<td>dataset</td>
-<td>Stddev of interpolated IMT</td>
-<td>grid/point attrs</td>
+<td>group</td>
+<td>dictionary</td>
+<td colspan="2">Interpolated data for IMT</td>
 </tr>
 </tbody>
 </table>
+<p>Each IMT dataset (MMI,PGA,etc.) is stored as a group containing two datasets, the mean values
+for each cell and the standard deviations.  MMI data for the component ‘Larger’ will be stored
+under a group called <strong>__imt_MMI_Larger__</strong>. The mean array will be stored as
+<strong>__mean_MMI_Larger__</strong>, and the standard deviation array will be stored as
+<strong>__std_MMI_Larger__</strong>.  All IMT grid datasets will be accompanied by a dictionary of
+attributes:</p>
 <p>For grids, the attributes are:</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -213,31 +233,34 @@ finite fault</td>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>type</td>
-<td>“grid”</td>
+<tr class="row-even"><td>units</td>
+<td>Physical units of IMT or standard deviation.</td>
 </tr>
-<tr class="row-odd"><td>W</td>
-<td>The western boundary of the grid (degrees longitude)</td>
+<tr class="row-odd"><td>digits</td>
+<td>Number of significant digits to use for the values.</td>
 </tr>
-<tr class="row-even"><td>E</td>
+<tr class="row-even"><td>xmin</td>
 <td>The eastern boundary of the grid (degrees longitude)</td>
 </tr>
-<tr class="row-odd"><td>S</td>
+<tr class="row-odd"><td>xmax</td>
+<td>The eastern boundary of the grid (degrees longitude)</td>
+</tr>
+<tr class="row-even"><td>ymin</td>
 <td>The southern boundary of the grid (degrees latitude)</td>
 </tr>
-<tr class="row-even"><td>N</td>
+<tr class="row-odd"><td>ymax</td>
 <td>The northern boundary of the grid (degrees latitude)</td>
 </tr>
-<tr class="row-odd"><td>nx</td>
+<tr class="row-even"><td>nx</td>
 <td>The number of grid points in the x dimension</td>
 </tr>
-<tr class="row-even"><td>ny</td>
+<tr class="row-odd"><td>ny</td>
 <td>The number of grid points in the y dimension</td>
 </tr>
-<tr class="row-odd"><td>dx</td>
+<tr class="row-even"><td>dx</td>
 <td>The grid interval in the x dimension</td>
 </tr>
-<tr class="row-even"><td>dy</td>
+<tr class="row-odd"><td>dy</td>
 <td>The grid interval in the y dimension</td>
 </tr>
 </tbody>
@@ -274,10 +297,13 @@ finite fault</td>
 <em>PGA</em>, <em>PGA_sd</em>, <em>PGV</em>, <em>PGV_sd</em>, <em>MMI</em>, <em>MMI_sd</em>, and various <em>SA(#num)</em> and
 <em>SA(#num)_sd</em> [where #num is the period as a floating point number; e.g.,
 <em>SA(1.0)</em>].</p>
-<p>Developers will likely want to access <strong>shake_result.hdf</strong> through
+<p>Python developers will likely want to access <strong>shake_result.hdf</strong> through
 the <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">shakelib OutputContainer class</a>.
 Also see, for example, the <em>contour</em> module [<a class="reference internal" href="../apidoc/shakemap.coremods.contour.html#module-shakemap.coremods.contour" title="shakemap.coremods.contour"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.contour()</span></code></a>]
 for some basic access patterns.</p>
+<p>Matlab developers can use the function <strong>read_shake_data.m</strong>, which is included in
+the repository for ShakeMap
+(<a class="reference external" href="https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m">https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m</a>).</p>
 </div>
 </div>
 

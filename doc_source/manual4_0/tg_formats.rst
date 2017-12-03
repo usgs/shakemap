@@ -84,18 +84,18 @@ numpy arrays, etc.) *shake_result.hdf* contains the following elements:
 | Name                  | HDF Type| Python Type | Contents                                |
 +=======================+=========+=============+=========================================+
 | config                | group   | dictionary  | ShakeMap configuration                  |
-+-----------------------+---------+-------------------------------------------------------+
++-----------------------+---------+-------------+-----------------------------------------+
 | info.json             | group   | string      | ShakeMap metadata in JSON format        |
-+-----------------------+---------+-------------------------------------------------------+
++-----------------------+---------+-------------+-----------------------------------------+
 | rupture.json          | group   | string      | GeoJSON representation of the           |
 |                       |         |             | finite fault                            |
 +-----------------------+---------+-------------+-----------------------------------------+
 | stationlist.json      | dataset | string      | GeoJSON stationlist                     |
-+-----------------------+---------+------------------------------------+------------------+
++-----------------------+---------+-------------+----------------------+------------------+
 | vs30                  | dataset | ndarray     | Vs30 values at output grid/points       | 
-+-----------------------+---------+------------------------------------+------------------+
++-----------------------+---------+-------------+----------------------+------------------+
 | IMT (multiple)        | group   | dictionary  | Interpolated data for IMT               |
-+-----------------------+---------+------------------------------------+------------------+
++-----------------------+---------+-------------+----------------------+------------------+
 
 Each IMT dataset (MMI,PGA,etc.) is stored as a group containing two datasets, the mean values
 for each cell and the standard deviations.  MMI data for the component 'Larger' will be stored

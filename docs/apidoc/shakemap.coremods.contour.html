@@ -104,7 +104,7 @@
 <dt id="shakemap.coremods.contour.ContourModule">
 <em class="property">class </em><code class="descclassname">shakemap.coremods.contour.</code><code class="descname">ContourModule</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/contour.html#ContourModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.contour.ContourModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
-<p><strong>contour</strong> – Generate contours of all configured IMT values.</p>
+<p>contour – Generate contours of all configured IMT values.</p>
 <p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="attribute">
 <dt id="shakemap.coremods.contour.ContourModule.command_name">
@@ -140,7 +140,7 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>container</strong> (<em>OutputContainer</em>) – OutputContainer with ShakeMap output data.</li>
+<li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – ShakeMapOutputContainer with ShakeMap output data.</li>
 <li><strong>imtype</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – String containing the name of an Intensity Measure Type
 found in container.</li>
 <li><strong>component</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Intensity Measure component found in container.</li>
@@ -178,7 +178,7 @@ found in container.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>container</strong> (<em>OutputContainer</em>) – OutputContainer with ShakeMap output data.</li>
+<li><strong>container</strong> (<em>ShakeMapOutputContainer</em>) – ShakeMapOutputContainer with ShakeMap output data.</li>
 <li><strong>config</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Product configuration information (from product.conf).</li>
 <li><strong>output_dir</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to directory where output files will be written.</li>
 <li><strong>logger</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/logging.html#logging.Logger" title="(in Python v3.6)"><em>logging.Logger</em></a>) – Python logging Logger instance.</li>

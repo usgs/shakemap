@@ -90,25 +90,28 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 
 <span class="c1">#third party imports</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 
 <span class="c1">#local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">InputContainer</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapInputContainer</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span> <span class="n">get_custom_validator</span><span class="p">,</span>\
                 <span class="n">config_error</span><span class="p">,</span> <span class="n">check_config</span><span class="p">,</span> <span class="n">get_configspec</span>
 
 
 <div class="viewcode-block" id="AssembleModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.assemble.html#shakemap.coremods.assemble.AssembleModule">[docs]</a><span class="k">class</span> <span class="nc">AssembleModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    **assemble** -- Assemble ShakeMap input data into an HDF package.</span>
+<span class="sd">    assemble -- Assemble ShakeMap input data into an HDF package.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;assemble&#39;</span>
+
 <div class="viewcode-block" id="AssembleModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.assemble.html#shakemap.coremods.assemble.AssembleModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Assemble ShakeMap input data and write and InputContainer named</span>
+<span class="sd">        Assemble ShakeMap input data and write and ShakeMapInputContainer named</span>
 <span class="sd">        shake_data.hdf in the event&#39;s &#39;current&#39; directory.</span>
 
 <span class="sd">        Raises:</span>
@@ -130,6 +133,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for event.xml file...&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">eventxml</span><span class="p">)</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># Clear away results from previous runs</span>
+        <span class="c1">#</span>
+        <span class="n">products_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">products_path</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">products_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1">#</span>
         <span class="c1"># Look for global configs in install_path/config</span>
@@ -229,7 +239,7 @@
             <span class="c1"># history, then add a new line that increments the version</span>
             <span class="c1">#</span>
             <span class="n">bu_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">backup_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)</span>
-            <span class="n">bu_ic</span> <span class="o">=</span> <span class="n">InputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">bu_file</span><span class="p">)</span>
+            <span class="n">bu_ic</span> <span class="o">=</span> <span class="n">ShakeMapInputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">bu_file</span><span class="p">)</span>
             <span class="n">history</span> <span class="o">=</span> <span class="n">bu_ic</span><span class="o">.</span><span class="n">getVersionHistory</span><span class="p">()</span>
             <span class="n">bu_ic</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="n">version</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
@@ -245,7 +255,7 @@
             <span class="c1"># source network (but leave the version alone).</span>
             <span class="c1">#</span>
             <span class="n">bu_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)</span>
-            <span class="n">bu_ic</span> <span class="o">=</span> <span class="n">InputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">bu_file</span><span class="p">)</span>
+            <span class="n">bu_ic</span> <span class="o">=</span> <span class="n">ShakeMapInputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">bu_file</span><span class="p">)</span>
             <span class="n">history</span> <span class="o">=</span> <span class="n">bu_ic</span><span class="o">.</span><span class="n">getVersionHistory</span><span class="p">()</span>
             <span class="n">bu_ic</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]]</span>
@@ -261,12 +271,12 @@
         <span class="n">hdf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating input container...&#39;</span><span class="p">)</span>
-        <span class="n">shake_data</span> <span class="o">=</span> <span class="n">InputContainer</span><span class="o">.</span><span class="n">createFromInput</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">,</span>
+        <span class="n">shake_data</span> <span class="o">=</span> <span class="n">ShakeMapInputContainer</span><span class="o">.</span><span class="n">createFromInput</span><span class="p">(</span><span class="n">hdf_file</span><span class="p">,</span>
                                                     <span class="n">config</span><span class="p">,</span>
                                                     <span class="n">eventxml</span><span class="p">,</span>
-                                                    <span class="n">rupturefile</span><span class="p">,</span>
-                                                    <span class="n">datafiles</span><span class="o">=</span><span class="n">datafiles</span><span class="p">,</span>
-                                                    <span class="n">version_history</span><span class="o">=</span><span class="n">history</span><span class="p">)</span>
+                                                    <span class="n">history</span><span class="p">,</span>
+                                                    <span class="n">rupturefile</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">,</span>
+                                                    <span class="n">datafiles</span><span class="o">=</span><span class="n">datafiles</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created HDF5 input container in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
                          <span class="n">shake_data</span><span class="o">.</span><span class="n">getFileName</span><span class="p">())</span>
         <span class="n">shake_data</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>

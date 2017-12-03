@@ -86,7 +86,7 @@
 <span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="c1">#third party imports</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">OutputContainer</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 
 <span class="c1">#local imports</span>
@@ -97,9 +97,11 @@
 
 <div class="viewcode-block" id="StationModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.stations.html#shakemap.coremods.stations.StationModule">[docs]</a><span class="k">class</span> <span class="nc">StationModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    **stations** -- Generate stationlist.json from shake_result.hdf.</span>
+<span class="sd">    stations -- Generate stationlist.json from shake_result.hdf.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;stations&#39;</span>
+
 <div class="viewcode-block" id="StationModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.stations.html#shakemap.coremods.stations.StationModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Write stationlist.json file.</span>
 
@@ -115,8 +117,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
             
-        <span class="c1"># Open the OutputContainer and extract the data</span>
-        <span class="n">container</span> <span class="o">=</span> <span class="n">OutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
+        <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 
         <span class="c1"># get the path to the products.conf file, load the config</span>
         <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
@@ -130,10 +132,10 @@
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">fformat</span> <span class="o">==</span> <span class="s1">&#39;json&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing rupture.json file...&#39;</span><span class="p">)</span>
-                <span class="n">stationstring</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;stationlist.json&#39;</span><span class="p">)</span>
+                <span class="n">station_dict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getStationList</span><span class="p">()</span><span class="o">.</span><span class="n">getGeoJson</span><span class="p">()</span>
                 <span class="n">station_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="s1">&#39;stationlist.json&#39;</span><span class="p">)</span>
                 <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">station_file</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
-                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">stationstring</span><span class="p">)</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">station_dict</span><span class="p">,</span><span class="n">f</span><span class="p">)</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
         
 
