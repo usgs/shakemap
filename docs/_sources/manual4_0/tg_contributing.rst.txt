@@ -46,9 +46,6 @@ Coding Style
 ==========================
 
 In general, follow the PEP-8 style guide: https://www.python.org/dev/peps/pep-0008/
-Yes, your personal style is better in every way and for all
-the right reasons. Do it our way anyway. PEP8.
-
 Modifications/details/re-emphasis:
 
 General:
@@ -358,7 +355,7 @@ branch.
 
 For the uninitiated this workflow may seem a bit convoluted, but it
 has proven to work well for many projects. When in doubt, a good rule
-of thumb is: **never commit to master**. That means that all 
+of thumb is: **Never commit to master**. That means that all 
 development should take place within feature branches, and the 
 local master branch is updated only by pulling from the upstream
 repository.

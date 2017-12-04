@@ -89,6 +89,7 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">gmtime</span><span class="p">,</span> <span class="n">strftime</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
@@ -106,7 +107,7 @@
 <span class="kn">from</span> <span class="nn">shakelib.virtualipe</span> <span class="k">import</span> <span class="n">VirtualIPE</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.utils</span> <span class="k">import</span> <span class="n">get_extent</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">InputContainer</span><span class="p">,</span> <span class="n">OutputContainer</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapInputContainer</span><span class="p">,</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.distance</span> <span class="k">import</span> <span class="n">geodetic_distance_fast</span>
 
 <span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
@@ -126,8 +127,9 @@
 
 <div class="viewcode-block" id="ModelModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.ModelModule">[docs]</a><span class="k">class</span> <span class="nc">ModelModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    **model** -- Interpolate ground motions to a grid or list of locations.</span>
+<span class="sd">    model -- Interpolate ground motions to a grid or list of locations.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;model&#39;</span>
 
 <div class="viewcode-block" id="ModelModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.ModelModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -150,10 +152,17 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
 
+        <span class="c1">#</span>
+        <span class="c1"># Clear away results from previous runs</span>
+        <span class="c1">#</span>
+        <span class="n">products_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">products_path</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">products_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Make the input container and extract the config</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="n">ic</span> <span class="o">=</span> <span class="n">InputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
+        <span class="n">ic</span> <span class="o">=</span> <span class="n">ShakeMapInputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getConfig</span><span class="p">()</span>
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Instantiate the gmpe, gmice, ipe, and ccf</span>
@@ -190,7 +199,7 @@
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Get the rupture object and rupture context</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="n">rupture_obj</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getRupture</span><span class="p">()</span>
+        <span class="n">rupture_obj</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getRuptureObject</span><span class="p">()</span>
         <span class="k">if</span> <span class="s1">&#39;mechanism&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">]:</span>
             <span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">setMechanism</span><span class="p">(</span>
                     <span class="n">mech</span><span class="o">=</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;mechanism&#39;</span><span class="p">])</span>
@@ -765,12 +774,12 @@
         <span class="n">product_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">product_path</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">product_path</span><span class="p">)</span>
-        <span class="n">oc</span> <span class="o">=</span> <span class="n">OutputContainer</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">product_path</span><span class="p">,</span>
+        <span class="n">oc</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">product_path</span><span class="p">,</span>
                                                  <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">))</span>
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Might as well stick the whole config in the result</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="n">oc</span><span class="o">.</span><span class="n">setDictionary</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="n">oc</span><span class="o">.</span><span class="n">setConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
         <span class="c1">#</span>
         <span class="c1"># We&#39;re going to need masked arrays of the output grids later, so</span>
@@ -933,7 +942,7 @@
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Add the rupture JSON as a text string</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="n">oc</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;rupture.json&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_geojson</span><span class="p">))</span>
+        <span class="n">oc</span><span class="o">.</span><span class="n">setRupture</span><span class="p">(</span><span class="n">rupture_obj</span><span class="p">)</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Add the station data. The stationlist object has the original</span>
@@ -1009,7 +1018,12 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sjdict</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">oc</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;stationlist.json&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">sjdict</span><span class="p">))</span>
+        <span class="c1"># oc.setString(&#39;stationlist.json&#39;, json.dumps(sjdict))</span>
+        <span class="c1"># TODO: Make the above code operate on the stations object directly</span>
+        <span class="c1"># then insert it into the container.</span>
+        <span class="c1"># For now we&#39;re getting the version of the StationList object</span>
+        <span class="c1"># without all of the predicted values in it.</span>
+        <span class="n">oc</span><span class="o">.</span><span class="n">setStationList</span><span class="p">(</span><span class="n">stations</span><span class="p">)</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Add the output grids or points to the output; include some</span>

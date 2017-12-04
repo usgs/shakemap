@@ -87,6 +87,7 @@
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
 <span class="c1">#third party imports</span>
@@ -105,7 +106,9 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    select - Parse STREC output, make a GMPE set, create model_zc.conf.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;select&#39;</span>
+
 <div class="viewcode-block" id="SelectModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.select.html#shakemap.coremods.select.SelectModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">        Parses the output of STREC in accordance with the</span>
@@ -136,6 +139,13 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">eventxml</span><span class="p">)</span>
         <span class="n">org</span> <span class="o">=</span> <span class="n">Origin</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">)</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># Clear away results from previous runs</span>
+        <span class="c1">#</span>
+        <span class="n">products_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">products_path</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">products_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Get config file from install_path/config, parse and</span>

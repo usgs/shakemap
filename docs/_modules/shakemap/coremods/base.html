@@ -90,10 +90,12 @@
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for any module in coremods which gets called by the shake program.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Instantiate a CoreModule class with an event ID.</span>
 
+    <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiate a CoreModule class with an event ID.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span> <span class="o">=</span> <span class="n">eventid</span>
         <span class="n">log_config</span> <span class="o">=</span> <span class="n">get_logging_config</span><span class="p">()</span>

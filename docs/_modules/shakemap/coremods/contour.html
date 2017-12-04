@@ -94,7 +94,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">skimage</span> <span class="k">import</span> <span class="n">measure</span>
 <span class="kn">from</span> <span class="nn">scipy.ndimage.filters</span> <span class="k">import</span> <span class="n">median_filter</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">OutputContainer</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span><span class="p">,</span> <span class="n">file_to_oq</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 
@@ -109,9 +109,11 @@
 
 <div class="viewcode-block" id="ContourModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.ContourModule">[docs]</a><span class="k">class</span> <span class="nc">ContourModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    **contour** -- Generate contours of all configured IMT values.</span>
+<span class="sd">    contour -- Generate contours of all configured IMT values.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;contour&#39;</span>
+
 <div class="viewcode-block" id="ContourModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.ContourModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create contour files for all configured IMT values.</span>
 
@@ -127,8 +129,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
 
-        <span class="c1"># Open the OutputContainer and extract the data</span>
-        <span class="n">container</span> <span class="o">=</span> <span class="n">OutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
+        <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 
         <span class="c1"># get the path to the products.conf file, load the config</span>
         <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
@@ -143,7 +145,7 @@
     <span class="sd">&quot;&quot;&quot;Generate contours of a specific IMT and return as a Shapely MultiLineString object.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        container (OutputContainer): OutputContainer with ShakeMap output data.</span>
+<span class="sd">        container (ShakeMapOutputContainer): ShakeMapOutputContainer with ShakeMap output data.</span>
 <span class="sd">        imtype (str): String containing the name of an Intensity Measure Type </span>
 <span class="sd">                      found in container.</span>
 <span class="sd">        component (str): Intensity Measure component found in container.</span>
@@ -217,7 +219,7 @@
     <span class="sd">&quot;&quot;&quot;Generate contours of all configured IMT values.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">      container (OutputContainer): OutputContainer with ShakeMap output data.</span>
+<span class="sd">      container (ShakeMapOutputContainer): ShakeMapOutputContainer with ShakeMap output data.</span>
 <span class="sd">      config (dict): Product configuration information (from product.conf).</span>
 <span class="sd">      output_dir (str): Path to directory where output files will be written.</span>
 <span class="sd">      logger (logging.Logger): Python logging Logger instance.</span>
