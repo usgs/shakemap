@@ -61,21 +61,25 @@ class ContourModule(CoreModule):
 
 def contour(container,imtype,component,intervals=None,
             filter_size=DEFAULT_FILTER_SIZE):
-    """Generate contours of a specific IMT and return as a Shapely MultiLineString object.
+    """
+    Generate contours of a specific IMT and return as a Shapely 
+    MultiLineString object.
 
     Args:
-        container (ShakeMapOutputContainer): ShakeMapOutputContainer with ShakeMap output data.
-        imtype (str): String containing the name of an Intensity Measure Type 
-                      found in container.
+        container (ShakeMapOutputContainer): ShakeMapOutputContainer
+            with ShakeMap output data.
+        imtype (str): String containing the name of an Intensity 
+            Measure Type found in container.
         component (str): Intensity Measure component found in container.
         intervals (np.ndarray or None): Array of intervals for IMT, or None.
         filter_size (int): Integer filter (see
             https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)
     Returns:
         list: List of dictionaries containing two fields:
-                - geometry: GeoJSON-like representation of one of the objects in
-                  https://toblerity.org/fiona/manual.html#geometry-types
-                - properties: Dictionary of properties describing that feature.
+                - geometry: GeoJSON-like representation of one of the objects
+                  in https://toblerity.org/fiona/manual.html#geometry-types
+                - properties: Dictionary of properties describing that
+                  feature.
     """
     imtdict = container.getIMT(imtype,component)
     gridobj = imtdict['mean']
@@ -99,7 +103,7 @@ def contour(container,imtype,component,intervals=None,
         interval_type = 'log'
         if imtype == 'MMI':
             interval_type = 'linear'
-        intervals = _get_default_intervals(fgrid,interval_type = interval_type)
+        intervals = _get_default_intervals(fgrid, interval_type = interval_type)
 
     lonstart = metadata['xmin']
     latstart = metadata['ymin']
@@ -122,8 +126,8 @@ def contour(container,imtype,component,intervals=None,
             if len(coords) <= 20: #skipping little contour islands?
                 continue
 
-            contours[ic][:, 1] = coords[:, 1] * lonspan / nlon + lonstart
-            contours[ic][:, 0] = (nlat - coords[:, 0]) * latspan / nlat + latstart
+            contours[ic][:, 0] = coords[:, 1] * lonspan / nlon + lonstart
+            contours[ic][:, 1] = (nlat - coords[:, 0]) * latspan / nlat + latstart
             plot_contours.append(contours[ic])
             new_contours.append(contours[ic].tolist())
 
@@ -152,8 +156,8 @@ def contour_to_files(container,config,output_dir,logger):
     jsonstr = container.getString('info.json')
     infojson = json.loads(jsonstr)
     event_info = {'event_id': infojson['input']['event_information']['event_id'],
-                  'latitude': infojson['input']['event_information']['latitude'],
-                  'longitude': infojson['input']['event_information']['longitude']}
+                  'longitude': infojson['input']['event_information']['longitude'],
+                  'latitude': infojson['input']['event_information']['latitude']}
 
     contour_dict = {}
     imtlist = config['products']['contours']['IMTS'].keys()
@@ -162,7 +166,7 @@ def contour_to_files(container,config,output_dir,logger):
     #open a file for writing
     if file_format not in FORMATS:
         raise LookupError('File format %s not supported for contours.' % file_format)
-    driver,extension = FORMATS[file_format]
+    driver, extension = FORMATS[file_format]
     schema = {'geometry':'MultiLineString',
               'properties':{'value':'float',
                             'units':'str'}}
@@ -179,10 +183,10 @@ def contour_to_files(container,config,output_dir,logger):
         imtype_spec = config['products']['contours']['IMTS'][imtype]
         filter_size = int(imtype_spec['filter_size'])
         for component in components:
-            fname = '%s_%s.%s' % (fileimt,component,extension)
+            fname = '%s_%s.%s' % (fileimt, component, extension)
             filename = os.path.join(output_dir,fname)
             if os.path.isfile(filename):
-                fpath,fext = os.path.splitext(filename)
+                fpath, fext = os.path.splitext(filename)
                 flist = glob.glob(fpath+'.*')
                 for fname in flist:
                     os.remove(fname)
@@ -207,7 +211,7 @@ def contour_to_files(container,config,output_dir,logger):
                 if 'intervals' in imtype_spec:
                     intervals = [float(i) for i in imtype_spec['intervals']]
 
-                line_strings = contour(container,imtype,component,intervals)
+                line_strings = contour(container, imtype, component, intervals)
                 for feature in line_strings:
                   vector_file.write(feature)
 

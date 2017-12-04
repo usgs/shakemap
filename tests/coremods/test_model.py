@@ -33,12 +33,16 @@ def test_model_1():
 def test_model_2():
 
     #
-    # This is a small grid with station data only (should succeed)
+    # This is a small grid with station data and dyfi data (should succeed)
     #
-    assemble = AssembleModule('nc72282711')
-    assemble.execute()
-    model = ModelModule('nc72282711')
-    model.execute()
+    # Removing this test because we effectively run it when 
+    # testing the other product modules.
+    #
+#    assemble = AssembleModule('nc72282711')
+#    assemble.execute()
+#    model = ModelModule('nc72282711')
+#    model.execute()
+    pass
 
 def test_model_3():
 
