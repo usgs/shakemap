@@ -60,10 +60,9 @@ including to someone who uses or sells the code commercially.</p>
 provide significant coverage (&gt;90%). All existing tests must
 pass or the PR will be rejected.</p>
 <p>Documentation is also required. In addition to being
-well-commented, make sure your code has Google-style
-docstrings (see:
-<a class="reference external" href="http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html">http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html</a>)
-that describe the functions and all inputs,
+well-commented, make sure your code has
+<a class="reference external" href="http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html">Google-style docstrings</a>
+describe functions and all inputs,
 outputs, and possible exceptions raised. See the section
 “Coding Style” below for more.</p>
 <p>There is a program, <em>makedocs.py</em> at the top level of the
@@ -79,24 +78,30 @@ request.</p>
 </ul>
 <div class="section" id="coding-style">
 <h2>2.3.1. Coding Style<a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h2>
-<p>In general, follow the PEP-8 style guide: <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">https://www.python.org/dev/peps/pep-0008/</a>
+<p>In general, follow the <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP-8 style guide</a>.
 Modifications/details/re-emphasis:</p>
-<p>General:</p>
+<p><strong>General</strong></p>
 <ul class="simple">
 <li>Put spaces after commas</li>
-<li>Really, put spaces after commas</li>
+<li><em>Really</em>, put spaces after commas</li>
 <li>Put spaces after commas. Seriously.</li>
 <li>Put spaces after the beginning ‘#’ of comments</li>
 <li>Comment heavily with useful comments</li>
 <li>Document everything</li>
 <li>Keep imports on separate lines to the extent that this is reasonable</li>
+<li><a class="reference external" href="https://github.com/hhatto/autopep8">autopep8</a> is useful for fixing
+simple whitespace issues (we do not use the more aggressive options).</li>
+<li>Some of us also use the <a class="reference external" href="https://pythonhosted.org/spyder/">spyder</a> IDE, which helps catch many errors
+and style issues. It also has an option for automatically removing
+trailing whitespace.</li>
 <li>Put spaces after commas</li>
 </ul>
+<p><strong>Names</strong></p>
 <p>Program names should be:</p>
 <ul class="simple">
 <li>Lowercase, underscored when necessary</li>
-<li>Without .py suffix (grind, not grind.py)</li>
-<li>Verbs (grind, not grinder)</li>
+<li>Without .py suffix (<code class="docutils literal"><span class="pre">model</span></code>, not <code class="docutils literal"><span class="pre">model.py</span></code>)</li>
+<li>Verbs (<code class="docutils literal"><span class="pre">model</span></code>, not <code class="docutils literal"><span class="pre">modeler</span></code>)</li>
 </ul>
 <p>Package names should be:</p>
 <ul class="simple">
@@ -112,7 +117,7 @@ Modifications/details/re-emphasis:</p>
 </ul>
 <p>Class names should be:</p>
 <ul class="simple">
-<li>Camel-cased, starting with uppercase character (MapCalculator)</li>
+<li>Camel-cased, starting with uppercase character (<code class="docutils literal"><span class="pre">MapCalculator</span></code>)</li>
 <li>Nouns</li>
 </ul>
 <p>Instance method names should be:</p>
@@ -121,14 +126,14 @@ Modifications/details/re-emphasis:</p>
 (Unless superclass uses another style. In that case, follow the
 superclass style.)</li>
 <li>Verbs</li>
-<li>Reasonably descriptive (calcDistance() is ok, does not need to
-be calculateDistance())</li>
+<li>Reasonably descriptive (<code class="docutils literal"><span class="pre">calcDistance</span></code> is ok, does not need to
+be <code class="docutils literal"><span class="pre">calculateDistance</span></code>)</li>
 <li>If not meant to be used by external users, hidden with single
 or double underscores</li>
 </ul>
 <p>Class method names should be:</p>
 <ul class="simple">
-<li>Camel-cased, starting with lowercase character [calcRxDistance()]</li>
+<li>Camel-cased, starting with lowercase character (<code class="docutils literal"><span class="pre">calcRxDistance</span></code>)</li>
 <li>If not meant to be used by external users, hidden with single or
 double underscores.</li>
 </ul>
@@ -170,14 +175,11 @@ are probably bad here).</li>
 <li>Possibly hidden with single or double underscores anyway just
 to keep them private.</li>
 </ul>
-<p>Code formatting should follow at least these conventions:</p>
+<p><strong>Misc</strong></p>
 <ul class="simple">
-<li>80 character line limit</li>
-<li>4 <em>space</em> indentation for code blocks (not tabs) - most Python
+<li>Please follow the 80 character line limit when possible</li>
+<li>4 <em>space</em> indentation for code blocks (not tabs)–most Python
 aware editors should support this out of the box</li>
-</ul>
-<p>Other suggestions:</p>
-<ul class="simple">
 <li>Whitespace and indentation should follow PEP 8 style guide</li>
 <li>Single letter class and function names are discouraged;
 single-letter variable names should be restricted to things
@@ -185,33 +187,23 @@ like indices in loops and arrays and should never be “l”,
 “I”, or “O” (lowercase L, uppercase i, and uppercase o,
 respectively).</li>
 </ul>
-<p>Exception Handling:</p>
-<ul>
-<li><p class="first">Prefer the built-in Python exceptions where applicable.  The
-full list is found here:
-<a class="reference external" href="https://docs.python.org/3.5/library/exceptions.html#exceptions.IOError">https://docs.python.org/3.5/library/exceptions.html#exceptions.IOError</a>,
-but the exceptions most likely to be used are:</p>
+<p><strong>Exception Handling</strong></p>
 <ul class="simple">
+<li>Prefer the built-in Python exceptions where applicable.  The
+full list is found <a class="reference external" href="https://docs.python.org/3.5/library/exceptions.html#exceptions.IOError">here</a>,
+but the exceptions most likely to be used are:<ul>
 <li>KeyError – Invalid key (as in dict or dict-like object)</li>
 <li>IndexError – Invalid index (asking for 11th element of 10 element sequence)</li>
 <li>TypeError – Operation or function applied to wrong type.</li>
 <li>ValueError – Value out of range (i.e., magnitude &gt; 10)</li>
 <li>FileNotFoundError – Kinda self-explanatory</li>
 </ul>
-<p>If none of these apply, use a ShakeMapException (location to
-be defined later).</p>
 </li>
-<li><p class="first">Regardless of Exception type, use a descriptive error message
+<li>Regardless of Exception type, use a descriptive error message
 so the user or developer has a good idea of what exactly the
-problem was.</p>
-</li>
+problem was.</li>
 </ul>
-<p>Documentation:</p>
-<ul class="simple">
-<li>Use the Google-style docstrings as described here:
-<a class="reference external" href="http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html">http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html</a></li>
-</ul>
-<p>File layout:</p>
+<p><strong>File layout</strong></p>
 <ul class="simple">
 <li>Imports:<ul>
 <li>Stdlib imports first</li>
@@ -224,73 +216,75 @@ after the imports</li>
 <li>Following the globals, the primary class and/or functions
 of a module should come first. Secondary and helper classes
 should follow the primary class. Helper functions and other
-“invisible” stuff should follow. The “__main__” block (if
+“invisible” stuff should follow. The <code class="docutils literal"><span class="pre">&quot;__main__&quot;</span></code> block (if
 any) should come last</li>
 </ul>
 <p>Example:</p>
 <p>A code module called mapcalc.py in a package (directory) called calculators:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>#!/usr/bin/env python
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
 
-from shakemap.utils.exception import ShakeMapException
+<span class="n">CONSTANT</span> <span class="o">=</span> <span class="mf">5.0</span>
 
-CONSTANT = 5.0
 
-def convenience_calculator(value):
-    “””
-    Return the input value multiplied by 5.0.
+<span class="k">def</span> <span class="nf">convenience_calculator</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the input value multiplied by 5.0.</span>
 
-    Args:
-        Input numeric value.
+<span class="sd">    Args:</span>
+<span class="sd">        value (float): Input numeric value.</span>
 
-    Returns:
-        (float): The product of the input value and the number 5.0.
-    “””
-    return value * 5.0
+<span class="sd">    Returns:</span>
+<span class="sd">        float: The product of the input value and the number 5.0.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">value</span> <span class="o">*</span> <span class="n">CONSTANT</span>
 
-class MapCalculator(object):
-    “””
-    This is the one-line description of this class.
 
-    This is the multi-line,
-    detailed description of the purpose of this class.
-    “””
-    CALC_VERSION = ‘1.1’
-    __HIDDEN_CLASS_VARIABLE = 2
-    def __init__(self):
-        “””
-        Create an instance of the MapCalculator class.
-        ”””
-        self.calc_string = ‘reverse polish’
+<span class="k">class</span> <span class="nc">DummyClass</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the one-line description of this class.</span>
 
-    def doThingsWithMagnitude(self, mag, mystr):
-        “””
-        Do mysterious things with magnitude.
+<span class="sd">    This is the multi-line,</span>
+<span class="sd">    detailed description of the purpose of this class.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">CALC_VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.1&#39;</span>
+    <span class="n">__HIDDEN_CLASS_VARIABLE</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calc_string</span><span class="o">=</span><span class="s1">&#39;not zero&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create an instance of the DummyClass class.</span>
 
-        More detailed description of the weird and
-        wonderful things that will be done with magnitude.
+<span class="sd">        Args:</span>
+<span class="sd">            calc_string (str): A string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calc_string</span> <span class="o">=</span> <span class="n">calc_string</span>
 
-        Args:
-            mag (float):
-                Input numeric magnitude value, should be 0 &lt; mag &lt; 10.
-            mystr (str):
-                String input which we will ignore.
+    <span class="k">def</span> <span class="nf">doThingsWithMagnitude</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">mystr</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Do mysterious things with magnitude.</span>
 
-        Returns:
-            (float): 0.0 or 1.0 depending on which is
-            defined in the constructor.
+<span class="sd">        More detailed description of the weird and</span>
+<span class="sd">        wonderful things that will be done with magnitude.</span>
 
-        Raises:
-            ValueError -- If input magnitude is outside the
-                accepted range.
-        “””
-        if mag &lt; 0 or mag &gt; 10:
-            msg = ‘Input magnitudes must be between 0 and 10.’
-            raise ValueError(msg)
-        if self.calc_string == ‘reverse polish’:
-            calc_result = 1.0 * CONSTANT
-        else:
-            calc_result = 0.0
-        return calc_result
+<span class="sd">        Args:</span>
+<span class="sd">            mag (float): Input numeric magnitude value, should</span>
+<span class="sd">                be 0 &lt; mag &lt; 10.</span>
+<span class="sd">            mystr (str): String input that isn&#39;t used.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: 0.0 or (CONSTANT * mag), depending on the calc_string</span>
+<span class="sd">            defined in the constructor.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If input magnitude is outside the</span>
+<span class="sd">                accepted range.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">mag</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">mag</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Input magnitudes must be between 0 and 10.&#39;</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">calc_string</span> <span class="o">==</span> <span class="s1">&#39;not zero&#39;</span><span class="p">:</span>
+            <span class="n">calc_result</span> <span class="o">=</span> <span class="n">mag</span> <span class="o">*</span> <span class="n">CONSTANT</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">calc_result</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">return</span> <span class="n">calc_result</span>
 </pre></div>
 </div>
 </div>
@@ -325,9 +319,9 @@ branch:</p>
 $ git branch branch-name
 $ git checkout branch-name
 $ vim file1 file2 file3
-$ git commit -am ‘Modified three files to implement ticket-number.’
+$ git commit -am &#39;Modified three files to implement ticket-number.&#39;
 $ vim test1 test2 test3
-$ git commit -am ‘Wrote/updated tests for files changed.’
+$ git commit -am &#39;Wrote/updated tests for files changed.&#39;
 </pre></div>
 </div>
 <p>It is important to note that completing the feature involves both
@@ -387,23 +381,39 @@ repository.</p>
 <div class="section" id="core-modules">
 <h2>2.3.3. Core Modules<a class="headerlink" href="#core-modules" title="Permalink to this headline">¶</a></h2>
 <p>Most developers will be primarily interested in developing modules
-for the <strong>shake</strong>
-program. The source for these modules may be found in the directory
+for the <code class="docutils literal"><span class="pre">shake</span></code> program.
+The source for these modules may be found in the directory
 <em>shakemap/coremods</em>. All of the core modules consist of classes that
 inherit from the CoreModule abstract class found in <em>base.py</em>. When
 developing a new module class, the
-developer must set the class variable <strong>command_name</strong>, and the
+developer must set the class variable <code class="docutils literal"><span class="pre">command_name</span></code>, and the
 docstring for the new class should specify this command name followed
 by a brief, one-line description of the module’s function. The
-developer must then define the <strong>execute()</strong> function to perform the
+developer must then define the <code class="docutils literal"><span class="pre">execute</span></code> function to perform the
 action of the new module. The event ID will be found in
-<strong>self._eventid</strong> and the module should log to <strong>self.logger</strong>. The
-docstring for the <strong>execute()</strong> module should be a more substantial
-explanation of the module’s function and outputs than is found in the
-class docstring. See the source for <em>contour.py</em> or
-<em>info.py</em> for examples of the way core modules are implemented.</p>
-<p>If a module is properly implemented, the <strong>shake</strong> program will discover
+<code class="docutils literal"><span class="pre">self._eventid</span></code>. The docstring for the <code class="docutils literal"><span class="pre">execute</span></code> module should
+be a more substantial explanation of the module’s function and outputs
+than is found in the class docstring. See the source for <em>contour.py</em>
+or <em>info.py</em> for examples of the way core modules are implemented.</p>
+<p>If a module is properly implemented, the <code class="docutils literal"><span class="pre">shake</span></code> program will discover
 it automatically and include it in the list of available modules.</p>
+</div>
+<div class="section" id="logging">
+<h2>2.3.4. Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
+<p>Modules should log to <code class="docutils literal"><span class="pre">self.logger</span></code>. We encourage logging generally
+useful information as <code class="docutils literal"><span class="pre">self.logger.info</span></code>, particularly anything that
+might normally be put in as a <code class="docutils literal"><span class="pre">print</span></code> statement. We also encourage
+logging copious amounts of potentially useful information as
+<code class="docutils literal"><span class="pre">logger.debug</span></code>. Examples include from the <code class="docutils literal"><span class="pre">model</span></code> core module
+include:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Inside model&#39;</span><span class="p">)</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: nom bias </span><span class="si">%f</span><span class="s1"> nom stddev </span><span class="si">%f</span><span class="s1">; </span><span class="si">%d</span><span class="s1"> stations (time=</span><span class="si">%f</span><span class="s1"> sec)&#39;</span>
+                 <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">nominal_bias</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">nom_variance</span><span class="p">),</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]),</span> <span class="n">bias_time</span><span class="p">))</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time for </span><span class="si">%s</span><span class="s1"> distance=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">ddtime</span><span class="p">))</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time for </span><span class="si">%s</span><span class="s1"> correlation=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">ctime</span><span class="p">))</span>
+</pre></div>
+</div>
 </div>
 </div>
 
@@ -442,6 +452,7 @@ it automatically and include it in the list of available modules.</p>
 <li class="toctree-l5"><a class="reference internal" href="#coding-style">2.3.1. Coding Style</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#workflow">2.3.2. Workflow</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#core-modules">2.3.3. Core Modules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#logging">2.3.4. Logging</a></li>
 </ul>
 </li>
 </ul>

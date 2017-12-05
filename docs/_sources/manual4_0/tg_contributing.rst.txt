@@ -23,10 +23,10 @@ provide significant coverage (>90%). All existing tests must
 pass or the PR will be rejected.
 
 Documentation is also required. In addition to being 
-well-commented, make sure your code has Google-style 
-docstrings (see: 
-http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html)
-that describe the functions and all inputs, 
+well-commented, make sure your code has
+`Google-style docstrings
+<http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html>`_
+describe functions and all inputs, 
 outputs, and possible exceptions raised. See the section
 "Coding Style" below for more.
 
@@ -45,25 +45,34 @@ See below for details on:
 Coding Style
 ==========================
 
-In general, follow the PEP-8 style guide: https://www.python.org/dev/peps/pep-0008/
+In general, follow the `PEP-8 style guide
+<https://www.python.org/dev/peps/pep-0008/>`_.
 Modifications/details/re-emphasis:
 
-General:
+**General**
 
 - Put spaces after commas
-- Really, put spaces after commas
+- *Really*, put spaces after commas
 - Put spaces after commas. Seriously.
-- Put spaces after the beginning ‘#’ of comments
+- Put spaces after the beginning '#' of comments
 - Comment heavily with useful comments
 - Document everything
 - Keep imports on separate lines to the extent that this is reasonable
+- `autopep8 <https://github.com/hhatto/autopep8>`_ is useful for fixing
+  simple whitespace issues (we do not use the more aggressive options).
+- Some of us also use the `spyder
+  <https://pythonhosted.org/spyder/>`_ IDE, which helps catch many errors
+  and style issues. It also has an option for automatically removing
+  trailing whitespace.
 - Put spaces after commas
+
+**Names**
 
 Program names should be:
 
 - Lowercase, underscored when necessary
-- Without .py suffix (grind, not grind.py)
-- Verbs (grind, not grinder)
+- Without .py suffix (``model``, not ``model.py``)
+- Verbs (``model``, not ``modeler``)
 
 Package names should be:
 
@@ -79,7 +88,7 @@ Module names should be:
 
 Class names should be:
 
-- Camel-cased, starting with uppercase character (MapCalculator)
+- Camel-cased, starting with uppercase character (``MapCalculator``)
 - Nouns
 
 Instance method names should be:
@@ -88,14 +97,14 @@ Instance method names should be:
   (Unless superclass uses another style. In that case, follow the 
   superclass style.)
 - Verbs
-- Reasonably descriptive (calcDistance() is ok, does not need to 
-  be calculateDistance())
+- Reasonably descriptive (``calcDistance`` is ok, does not need to 
+  be ``calculateDistance``)
 - If not meant to be used by external users, hidden with single 
   or double underscores
 
 Class method names should be:
 
-- Camel-cased, starting with lowercase character [calcRxDistance()]
+- Camel-cased, starting with lowercase character (``calcRxDistance``)
 - If not meant to be used by external users, hidden with single or 
   double underscores.
 
@@ -117,8 +126,8 @@ Global variable/constant names should be:
 - ALL_CAPS with underscores if necessary
 - Hidden with leading single or double underscores if not meant to 
   be used outside their module (which, really, they shouldn’t be.) 
-  The ALL_CAPS convention should be enough to tell people “do not 
-  modify this.”
+  The ALL_CAPS convention should be enough to tell people "do not 
+  modify this."
 
 Class variable names should be:
 
@@ -126,7 +135,7 @@ Class variable names should be:
 - If not meant to be public, probably hidden with single or double 
   underscores and wrapped with getter function (setter functions 
   are probably bad here).  The ALL_CAPS convention should be enough 
-  to tell people “do not modify this.”
+  to tell people "do not modify this."
 
 Class instance variable names should be:
 
@@ -137,26 +146,23 @@ Class instance variable names should be:
 - Possibly hidden with single or double underscores anyway just 
   to keep them private.
 
-Code formatting should follow at least these conventions:
+**Misc**
 
-- 80 character line limit
-- 4 *space* indentation for code blocks (not tabs) - most Python 
+- Please follow the 80 character line limit when possible
+- 4 *space* indentation for code blocks (not tabs)--most Python 
   aware editors should support this out of the box
-
-Other suggestions:
-
 - Whitespace and indentation should follow PEP 8 style guide
 - Single letter class and function names are discouraged; 
   single-letter variable names should be restricted to things 
-  like indices in loops and arrays and should never be “l”, 
-  “I”, or “O” (lowercase L, uppercase i, and uppercase o, 
+  like indices in loops and arrays and should never be "l", 
+  "I", or "O" (lowercase L, uppercase i, and uppercase o, 
   respectively). 
 
-Exception Handling:
+**Exception Handling**
 
 - Prefer the built-in Python exceptions where applicable.  The 
-  full list is found here: 
-  https://docs.python.org/3.5/library/exceptions.html#exceptions.IOError, 
+  full list is found `here
+  <https://docs.python.org/3.5/library/exceptions.html#exceptions.IOError>`_, 
   but the exceptions most likely to be used are:
 
   - KeyError -- Invalid key (as in dict or dict-like object)
@@ -165,19 +171,11 @@ Exception Handling:
   - ValueError -- Value out of range (i.e., magnitude > 10)
   - FileNotFoundError -- Kinda self-explanatory
 
-  If none of these apply, use a ShakeMapException (location to 
-  be defined later).
-
 - Regardless of Exception type, use a descriptive error message 
   so the user or developer has a good idea of what exactly the 
   problem was.
 
-Documentation:
-
-- Use the Google-style docstrings as described here: 
-  http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html 
-
-File layout:
+**File layout**
 
 - Imports:
 
@@ -191,72 +189,76 @@ File layout:
 - Following the globals, the primary class and/or functions 
   of a module should come first. Secondary and helper classes 
   should follow the primary class. Helper functions and other 
-  “invisible” stuff should follow. The “__main__” block (if 
+  "invisible" stuff should follow. The ``"__main__"`` block (if 
   any) should come last
 
 Example:
 
-A code module called mapcalc.py in a package (directory) called calculators::
+A code module called mapcalc.py in a package (directory) called calculators:
+
+.. code-block:: python
 
   #!/usr/bin/env python
 
-  from shakemap.utils.exception import ShakeMapException
-
   CONSTANT = 5.0
 
+
   def convenience_calculator(value):
-      “””
+      """
       Return the input value multiplied by 5.0.
     
       Args:
-          Input numeric value.
+          value (float): Input numeric value.
 
       Returns:
-          (float): The product of the input value and the number 5.0.
-      “””
-      return value * 5.0
+          float: The product of the input value and the number 5.0.
+      """
+      return value * CONSTANT
 
-  class MapCalculator(object):
-      “””
+
+  class DummyClass(object):
+      """
       This is the one-line description of this class.
-      
+
       This is the multi-line,
       detailed description of the purpose of this class.
-      “””
-      CALC_VERSION = ‘1.1’
+      """
+      CALC_VERSION = '1.1'
       __HIDDEN_CLASS_VARIABLE = 2
-      def __init__(self):
-          “””
-          Create an instance of the MapCalculator class.
-          ”””
-          self.calc_string = ‘reverse polish’
+      def __init__(self, calc_string='not zero'):
+          """
+          Create an instance of the DummyClass class.
+
+          Args:
+              calc_string (str): A string.
+          """
+          self.calc_string = calc_string
   
       def doThingsWithMagnitude(self, mag, mystr):
-          “””
+          """
           Do mysterious things with magnitude.
   
           More detailed description of the weird and 
           wonderful things that will be done with magnitude.
              
           Args:
-              mag (float):
-                  Input numeric magnitude value, should be 0 < mag < 10.
-              mystr (str):
-                  String input which we will ignore.
+              mag (float): Input numeric magnitude value, should 
+                  be 0 < mag < 10.
+              mystr (str): String input that isn't used.
 
           Returns:
-              (float): 0.0 or 1.0 depending on which is 
+              float: 0.0 or (CONSTANT * mag), depending on the calc_string
               defined in the constructor.
 
           Raises: 
-              ValueError -- If input magnitude is outside the 
+              ValueError: If input magnitude is outside the 
                   accepted range.
-          “””
-          if mag < 0 or mag > 10:
-              msg = ‘Input magnitudes must be between 0 and 10.’
+          """
+          if mag <= 0 or mag >= 10:
+              msg = 'Input magnitudes must be between 0 and 10.'
               raise ValueError(msg)
-          if self.calc_string == ‘reverse polish’:
-              calc_result = 1.0 * CONSTANT
+          if self.calc_string == 'not zero':
+              calc_result = mag * CONSTANT
           else:
               calc_result = 0.0
           return calc_result
@@ -299,9 +301,9 @@ branch::
   $ git branch branch-name
   $ git checkout branch-name
   $ vim file1 file2 file3
-  $ git commit -am ‘Modified three files to implement ticket-number.’
+  $ git commit -am 'Modified three files to implement ticket-number.'
   $ vim test1 test2 test3
-  $ git commit -am ‘Wrote/updated tests for files changed.’
+  $ git commit -am 'Wrote/updated tests for files changed.'
 
 It is important to note that completing the feature involves both 
 completing and testing the feature implementation. Having an automated 
@@ -340,7 +342,7 @@ GitHub.
 
 The developer now creates a pull request for this feature. This is done by 
 logging into their account on GitHub, navigating to their fork of the 
-repository, and clicking on the “Pull Request” button on that page. Once
+repository, and clicking on the "Pull Request" button on that page. Once
 the pull request has been merged by the ShakeMap repositiory admins,
 the developer may delete the feature branch on GitHub and their local 
 maching. Then, the developer should rebase their master branch from 
@@ -365,21 +367,42 @@ Core Modules
 =============
 
 Most developers will be primarily interested in developing modules 
-for the **shake** 
-program. The source for these modules may be found in the directory
+for the ``shake`` program.
+The source for these modules may be found in the directory
 *shakemap/coremods*. All of the core modules consist of classes that
 inherit from the CoreModule abstract class found in *base.py*. When
 developing a new module class, the 
-developer must set the class variable **command_name**, and the 
+developer must set the class variable ``command_name``, and the 
 docstring for the new class should specify this command name followed 
 by a brief, one-line description of the module's function. The 
-developer must then define the **execute()** function to perform the 
+developer must then define the ``execute`` function to perform the 
 action of the new module. The event ID will be found in
-**self._eventid** and the module should log to **self.logger**. The
-docstring for the **execute()** module should be a more substantial
-explanation of the module's function and outputs than is found in the
-class docstring. See the source for *contour.py* or
-*info.py* for examples of the way core modules are implemented.
+``self._eventid``. The docstring for the ``execute`` module should
+be a more substantial explanation of the module's function and outputs
+than is found in the class docstring. See the source for *contour.py*
+or *info.py* for examples of the way core modules are implemented.
 
-If a module is properly implemented, the **shake** program will discover
+If a module is properly implemented, the ``shake`` program will discover
 it automatically and include it in the list of available modules.
+
+
+Logging
+========
+Modules should log to ``self.logger``. We encourage logging generally
+useful information as ``self.logger.info``, particularly anything that
+might normally be put in as a ``print`` statement. We also encourage
+logging copious amounts of potentially useful information as
+``logger.debug``. Examples include from the ``model`` core module
+include:
+
+.. code-block:: python
+
+    self.logger.info('Inside model')
+    self.logger.info('%s: nom bias %f nom stddev %f; %d stations (time=%f sec)'
+                     % (imtstr, nominal_bias[imtstr], np.sqrt(nom_variance),
+                        np.size(sta_lons_rad[imtstr]), bias_time))
+    self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
+    self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))
+	
+
+
