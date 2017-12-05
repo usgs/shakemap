@@ -35,95 +35,9 @@
 
   </head>
   <body>
-  <div class="document">
-    
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../index.html">
-    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
-    
-    <h1 class="logo logo-name">ShakeMap Documentation</h1>
-    
-  </a>
-</p>
+  
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="tg_software.html">2.1. ShakeMap Software Overview</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_philosophy.html">2.2. Philosophy of Estimating and Interpolating Ground Motions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_parameters.html">2.3. Recorded Ground-motion Parameters</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_predictions.html">2.4. Ground Motion and Intensity Predictions</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">2.5. ShakeMap Processing</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#data-preparation">2.5.1. Data preparation</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#flagged-stations">2.5.1.1. Flagged Stations</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#converting-mmi-to-pgm-and-pgm-to-mmi">2.5.1.2. Converting MMI to PGM and PGM to MMI</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#site-corrections">2.5.1.3. Site Corrections</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="#site-characterization-map">2.5.1.3.1. Site Characterization Map</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#amplification-factors">2.5.1.3.2. Amplification Factors</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#correct-data-to-rock">2.5.1.3.3. Correct Data to “Rock”</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="#event-bias">2.5.2. Event Bias</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#interpolation">2.5.3. Interpolation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#amplify-ground-motions">2.5.4. Amplify Ground Motions</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#differences-in-handling-mmi">2.5.5. Differences in Handling MMI</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#fault-considerations">2.5.6. Fault Considerations</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#median-distance-and-finite-faults">2.5.6.1. Median Distance and Finite Faults</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#fault-dimensions">2.5.6.2. Fault Dimensions</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#directivity">2.5.6.3. Directivity</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="#additional-considerations">2.5.7. Additional Considerations</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#user-supplied-estimate-grids">2.5.7.1. User-supplied Estimate Grids</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#uncertainty">2.5.7.2. Uncertainty</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="tg_intensity.html">2.6. Representing Macroseismic Intensity on Maps</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_choice_of_parameters.html">2.7. Discussion of Chosen Map Parameters (Intensity Measures)</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User’s Guide</a></li>
-<li class="toctree-l2"><a class="reference internal" href="software_guide.html">4. Software &amp; Implementation Guide</a></li>
-<li class="toctree-l2"><a class="reference internal" href="regionals.html">5. Regional Operations</a></li>
-<li class="toctree-l2"><a class="reference internal" href="future_directions.html">6. Future Directions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="acknowledgments.html">7. Acknowledgments</a></li>
-<li class="toctree-l2"><a class="reference internal" href="references.html">8. References &amp; Bibliography</a></li>
-<li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-</ul>
-
-
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
@@ -770,8 +684,95 @@ system described in the <a class="reference internal" href="users_guide.html#use
           </div>
         </div>
       </div>
-    <div class="clearer"></div>
-  </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">ShakeMap 3.5 Manual</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tg_software.html">2.1. ShakeMap Software Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_philosophy.html">2.2. Philosophy of Estimating and Interpolating Ground Motions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_parameters.html">2.3. Recorded Ground-motion Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_predictions.html">2.4. Ground Motion and Intensity Predictions</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">2.5. ShakeMap Processing</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#data-preparation">2.5.1. Data preparation</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#flagged-stations">2.5.1.1. Flagged Stations</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#converting-mmi-to-pgm-and-pgm-to-mmi">2.5.1.2. Converting MMI to PGM and PGM to MMI</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#site-corrections">2.5.1.3. Site Corrections</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#site-characterization-map">2.5.1.3.1. Site Characterization Map</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#amplification-factors">2.5.1.3.2. Amplification Factors</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#correct-data-to-rock">2.5.1.3.3. Correct Data to “Rock”</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#event-bias">2.5.2. Event Bias</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#interpolation">2.5.3. Interpolation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#amplify-ground-motions">2.5.4. Amplify Ground Motions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#differences-in-handling-mmi">2.5.5. Differences in Handling MMI</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fault-considerations">2.5.6. Fault Considerations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#median-distance-and-finite-faults">2.5.6.1. Median Distance and Finite Faults</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#fault-dimensions">2.5.6.2. Fault Dimensions</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#directivity">2.5.6.3. Directivity</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="#additional-considerations">2.5.7. Additional Considerations</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#user-supplied-estimate-grids">2.5.7.1. User-supplied Estimate Grids</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#uncertainty">2.5.7.2. Uncertainty</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tg_intensity.html">2.6. Representing Macroseismic Intensity on Maps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_choice_of_parameters.html">2.7. Discussion of Chosen Map Parameters (Intensity Measures)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="users_guide.html">3. User’s Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="software_guide.html">4. Software &amp; Implementation Guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="regionals.html">5. Regional Operations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="future_directions.html">6. Future Directions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="acknowledgments.html">7. Acknowledgments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="references.html">8. References &amp; Bibliography</a></li>
+<li class="toctree-l2"><a class="reference internal" href="glossary.html">9. Glossary</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
     <div class="footer">
       
       

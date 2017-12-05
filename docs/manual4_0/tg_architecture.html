@@ -35,83 +35,9 @@
 
   </head>
   <body>
-  <div class="document">
-    
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../index.html">
-    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
-    
-    <h1 class="logo logo-name">ShakeMap Documentation</h1>
-    
-  </a>
-</p>
+  
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="title_page.html">ShakeMap 4 Manual</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="index.html">Table of Contents</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
-<li class="toctree-l4 current"><a class="current reference internal" href="#">2.1. Software Architecture</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#overview">2.1.1. Overview</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#programs">2.1.2. Programs</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="#sm-profile">2.1.2.1. sm_profile</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#shake">2.1.2.2. shake</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#shake-modules">2.1.2.3. shake Modules</a><ul>
-<li class="toctree-l7"><a class="reference internal" href="#select">2.1.2.3.1. select</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#assemble">2.1.2.3.2. assemble</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#augment">2.1.2.3.3. augment</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#model">2.1.2.3.4. model</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#contour">2.1.2.3.5. contour</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#gridxml">2.1.2.3.6. gridxml</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#info">2.1.2.3.7. info</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#mapping">2.1.2.3.8. mapping</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#raster">2.1.2.3.9. raster</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#rupture">2.1.2.3.10. rupture</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#stations">2.1.2.3.11. stations</a></li>
-</ul>
-</li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="tg_formats.html">2.2. Data Formats</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.3. Guidelines for Contributors</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>
-<li class="toctree-l3"><a class="reference internal" href="glossary.html">4. Glossary</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-</ul>
-
-
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
@@ -185,8 +111,7 @@ the authoritative ShakeMap system or through a web service.</p>
 </div>
 <div class="section" id="programs">
 <h2>2.1.2. Programs<a class="headerlink" href="#programs" title="Permalink to this headline">¶</a></h2>
-<p>The core components of ShakeMap are a set of command line programs, the
-most important of which is <strong>shake</strong>, and a set of modules for <strong>shake</strong>.
+<p>The core components of ShakeMap are a set of command line programs.
 These
 programs allow the operator to set up a ShakeMap environment, collect
 data and configurations into inputs (i.e., <em>shake_data.hdf</em>), and
@@ -212,7 +137,7 @@ with their event IDs) and their associated subdirectories:</p>
         <span class="n">current</span><span class="o">/</span>
             <span class="n">event</span><span class="o">.</span><span class="n">xml</span>
             <span class="o">*</span><span class="n">_dat</span><span class="o">.</span><span class="n">xml</span>
-            <span class="o">*</span><span class="n">_fault</span><span class="o">.</span><span class="n">txt</span> <span class="p">(</span><span class="ow">or</span> <span class="o">.</span><span class="n">json</span><span class="p">)</span>
+            <span class="o">*</span><span class="n">_fault</span><span class="o">.</span><span class="n">txt</span> <span class="p">(</span><span class="ow">or</span> <span class="n">rupture</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
             <span class="n">model</span><span class="o">.</span><span class="n">conf</span> <span class="p">(</span><span class="ow">or</span> <span class="n">model_zc</span><span class="o">.</span><span class="n">conf</span><span class="p">)</span>
             <span class="n">products</span><span class="o">/</span>
                 <span class="n">shake_result</span><span class="o">.</span><span class="n">hdf</span>
@@ -267,6 +192,13 @@ assembling the input data, producing interpolated grids, and deriving
 products from the grids and associated metadata. See the
 <a class="reference internal" href="../programs/shake.html#shake"><span class="std std-ref">shake man page</span></a> or run <strong>shake –help</strong> for a list
 of available modules.</p>
+<p>The behavior of <strong>shake</strong> and many of its modules are controlled by
+the configuration files <em>shake.conf</em> and <em>products.conf</em>. <em>shake.conf</em>
+is largely concerned with the way logging is handled. See <em>shake.conf</em>
+for details. <em>products.conf</em> controls the behavior of many of the
+core modules that produce ShakeMap products. See the documentation
+within the file for more information. Both files should be in the
+user’s current profile’s <em>INSTALL_DIR/config</em> directory.</p>
 </div>
 <div class="section" id="shake-modules">
 <h3>2.1.2.3. shake Modules<a class="headerlink" href="#shake-modules" title="Permalink to this headline">¶</a></h3>
@@ -276,7 +208,8 @@ of available modules.</p>
 <p><strong>select</strong> reads an event’s <em>event.xml</em> file for origin information
 and then constructs a GMPE set for the event based on the event’s residence
 within,
-and proximity to, a set of predefined tectonic regions. The GMPE set, and the
+and proximity to, a set of predefined tectonic regions and user-defined
+geographic areas. The GMPE set, and the
 selection of that GMPE set for use in processing, are written to
 <em>model_zc.conf</em> in the event’s <em>current</em> directory.</p>
 <p>The behavior of <strong>select</strong> is controlled by the <em>select.conf</em>
@@ -422,7 +355,16 @@ originator (if applicable).</p>
 <p>The <strong>model</strong> module reads the data in <em>shake_data.hdf</em> and produces an
 interpolated ShakeMap. Depending upon the settings found in <em>model.conf</em>,
 the interpolation product may be a grid or a set of points. See
-<em>model.conf</em> for additional options and documentation.</p>
+<em>model.conf</em> for additional options and documentation. The <em>model.conf</em>
+file in the user’s current profile (i.e., <em>INSTALL_DIR/config/model.conf</em>)
+will be read first, and then if <em>model.conf</em> or <em>model_zc.conf</em> exists
+in the event’s <em>current</em> directory, then the parameters set therein will
+override those in the profile’s <em>model.conf</em>. If both <em>model.conf</em> and
+<em>model_zc.conf</em> exist in the event’s <em>current</em> directory, <em>model.conf</em>
+will be read and <em>model_zc.conf</em> will be ignored. <strong>model</strong> also reads
+the configuration files <em>gmpe_sets.conf</em> and <em>modules.conf</em>, which
+reside in the current profile’s <em>INSTALL_DIR/config</em> directory. See
+the documentation within those files for more information.</p>
 <p>A great deal of this manual is devoted to the way the interpolation is
 performed, and the effect of various configuration options. See the
 relevant sections for more.</p>
@@ -443,7 +385,8 @@ content of <em>shake_result.hdf</em>.</p>
 contours for each of the intensity measure types found therein. The contours
 are written as GeoJSON to files called <em>&lt;imt_type&gt;_cont.json</em> in the event’s
 <em>current/products</em> subdirectory.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.contour.html#module-shakemap.coremods.contour" title="shakemap.coremods.contour"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.contour()</span></code></a> for more details.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.contour.html#module-shakemap.coremods.contour" title="shakemap.coremods.contour"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.contour()</span></code></a> for more details. Contour parameters
+may be specified in the <em>products.conf</em> configuration file.</p>
 </div>
 <div class="section" id="gridxml">
 <h4>2.1.2.3.6. gridxml<a class="headerlink" href="#gridxml" title="Permalink to this headline">¶</a></h4>
@@ -471,7 +414,9 @@ intended to produce maps that are the equivalent of ShakeMap 3.5’s
 static maps, and we do not intend to maintain or support it. In
 particular, it uses the <strong>basemap</strong> mapping package, which is
 disappearing in favor of <strong>cartopy</strong>.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.mapping.html#module-shakemap.coremods.mapping" title="shakemap.coremods.mapping"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.mapping()</span></code></a> for more details.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.mapping.html#module-shakemap.coremods.mapping" title="shakemap.coremods.mapping"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.mapping()</span></code></a> for more details. See the
+configuration file <em>products.conf</em> for information on configuring
+the <strong>mapping</strong> module.</p>
 </div>
 <div class="section" id="raster">
 <h4>2.1.2.3.9. raster<a class="headerlink" href="#raster" title="Permalink to this headline">¶</a></h4>
@@ -511,8 +456,83 @@ zones.</td></tr>
           </div>
         </div>
       </div>
-    <div class="clearer"></div>
-  </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="title_page.html">ShakeMap 4 Manual</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Table of Contents</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">2.1. Software Architecture</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#overview">2.1.1. Overview</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#programs">2.1.2. Programs</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#sm-profile">2.1.2.1. sm_profile</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#shake">2.1.2.2. shake</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#shake-modules">2.1.2.3. shake Modules</a><ul>
+<li class="toctree-l7"><a class="reference internal" href="#select">2.1.2.3.1. select</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#assemble">2.1.2.3.2. assemble</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#augment">2.1.2.3.3. augment</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#model">2.1.2.3.4. model</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#contour">2.1.2.3.5. contour</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#gridxml">2.1.2.3.6. gridxml</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#info">2.1.2.3.7. info</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#mapping">2.1.2.3.8. mapping</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#raster">2.1.2.3.9. raster</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#rupture">2.1.2.3.10. rupture</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#stations">2.1.2.3.11. stations</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="tg_formats.html">2.2. Data Formats</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.3. Guidelines for Contributors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>
+<li class="toctree-l3"><a class="reference internal" href="glossary.html">4. Glossary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
     <div class="footer">
       
       

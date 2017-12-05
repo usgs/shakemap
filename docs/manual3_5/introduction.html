@@ -35,8 +35,55 @@
 
   </head>
   <body>
-  <div class="document">
-    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="introduction">
+<span id="id1"></span><h1>1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>This online ShakeMap Manual (<a class="reference internal" href="../manual4_0/references.html#worden2016b"><span class="std std-ref">Worden and Wald, 2016</span></a>), is a
+significant update of the
+original (<a class="reference internal" href="../manual4_0/references.html#wald2005"><span class="std std-ref">Wald et al., 2005</span></a>) ShakeMap Manual. The
+Manual is now dynamic and served online. We employ Python document
+generator <a class="reference external" href="http://sphinx-doc.org/">Sphinx</a>, with the source
+under <a class="reference external" href="http://github.com/">GitHub</a> version control. These web pages
+are rendered with the <a class="reference external" href="http://github.com/snide/sphinx_rtd_theme">Sphinx RTD theme</a>.
+A <a class="reference external" href="_static/ShakeMapManual.pdf">PDF version</a> of this manual is available.</p>
+<div class="figure align-right" id="id4">
+<a class="reference external image-reference" href="NapaShakeMapExample(URIorreferencename)"><img alt="ShakeMap Napa" src="../_images/Napa_ShakeMap_cover.png" style="width: 403.0px; height: 439.5px;" /></a>
+<p class="caption"><span class="caption-text">Figure 1: 2014 M6.0 Napa, CA, earthquake intensity ShakeMap.</span></p>
+</div>
+<p><a class="reference external" href="http://earthquake.usgs.gov/shakemap/">ShakeMap®</a>,
+developed by the U.S. Geological Survey (USGS), facilitates communication of
+earthquake information beyond just magnitude and location. By rapidly mapping out
+earthquake ground motions, ShakeMap portrays the distribution and severity of shaking.
+This information is critical for gauging the extent of the areas affected, determining which areas
+are potentially hardest hit, and allowing for rapid estimation of losses. Key to
+ShakeMap’s success, algorithms were developed that take advantage of any high-quality
+recorded ground motions—and any available macroseismic intensity data—to provide
+ground-truth constraints on shaking. Yet ShakeMap also utilizes best practices
+for both interpolating recordings and—critically—providing
+event-specific estimates of shaking in areas where observations are sparse or nonexistent. Thus, ShakeMap portrays
+the best possible description of shaking by employing a combination of recorded and
+estimated shaking values.</p>
+<p>This Manual provides background on technical aspects of ShakeMap including: 1) information on
+the wide range of products and formats ShakeMap produces, 2) the uses of these products,
+and 3) guidance for
+ShakeMap developers and operators. Readers interested in understanding how
+ShakeMaps works can navigate to the <a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a>. Those who want to use
+ShakeMap products and understand their varied forms can jump to the <a class="reference internal" href="users_guide.html#users-guide"><span class="std std-ref">User’s Guide</span></a>.
+If your goal is to install and operate ShakeMap, see the <a class="reference internal" href="software_guide.html#software-guide"><span class="std std-ref">Software &amp; Implementation Guide</span></a>. The
+<a class="reference internal" href="software_guide.html#software-guide"><span class="std std-ref">Software &amp; Implementation Guide</span></a> also points users to the ShakeMap software distribution and
+<a class="reference external" href="http://usgs.github.io/shakemap/_static/SoftwareGuideV3_5.pdf">Software Guide</a>.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <p class="logo">
@@ -87,54 +134,8 @@
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="introduction">
-<span id="id1"></span><h1>1. Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
-<p>This online ShakeMap Manual (<a class="reference internal" href="../manual4_0/references.html#worden2016b"><span class="std std-ref">Worden and Wald, 2016</span></a>), is a
-significant update of the
-original (<a class="reference internal" href="../manual4_0/references.html#wald2005"><span class="std std-ref">Wald et al., 2005</span></a>) ShakeMap Manual. The
-Manual is now dynamic and served online. We employ Python document
-generator <a class="reference external" href="http://sphinx-doc.org/">Sphinx</a>, with the source
-under <a class="reference external" href="http://github.com/">GitHub</a> version control. These web pages
-are rendered with the <a class="reference external" href="http://github.com/snide/sphinx_rtd_theme">Sphinx RTD theme</a>.
-A <a class="reference external" href="_static/ShakeMapManual.pdf">PDF version</a> of this manual is available.</p>
-<div class="figure align-right" id="id4">
-<a class="reference external image-reference" href="NapaShakeMapExample(URIorreferencename)"><img alt="ShakeMap Napa" src="../_images/Napa_ShakeMap_cover.png" style="width: 403.0px; height: 439.5px;" /></a>
-<p class="caption"><span class="caption-text">Figure 1: 2014 M6.0 Napa, CA, earthquake intensity ShakeMap.</span></p>
-</div>
-<p><a class="reference external" href="http://earthquake.usgs.gov/shakemap/">ShakeMap®</a>,
-developed by the U.S. Geological Survey (USGS), facilitates communication of
-earthquake information beyond just magnitude and location. By rapidly mapping out
-earthquake ground motions, ShakeMap portrays the distribution and severity of shaking.
-This information is critical for gauging the extent of the areas affected, determining which areas
-are potentially hardest hit, and allowing for rapid estimation of losses. Key to
-ShakeMap’s success, algorithms were developed that take advantage of any high-quality
-recorded ground motions—and any available macroseismic intensity data—to provide
-ground-truth constraints on shaking. Yet ShakeMap also utilizes best practices
-for both interpolating recordings and—critically—providing
-event-specific estimates of shaking in areas where observations are sparse or nonexistent. Thus, ShakeMap portrays
-the best possible description of shaking by employing a combination of recorded and
-estimated shaking values.</p>
-<p>This Manual provides background on technical aspects of ShakeMap including: 1) information on
-the wide range of products and formats ShakeMap produces, 2) the uses of these products,
-and 3) guidance for
-ShakeMap developers and operators. Readers interested in understanding how
-ShakeMaps works can navigate to the <a class="reference internal" href="technical_guide.html#technical-guide"><span class="std std-ref">Technical Guide</span></a>. Those who want to use
-ShakeMap products and understand their varied forms can jump to the <a class="reference internal" href="users_guide.html#users-guide"><span class="std std-ref">User’s Guide</span></a>.
-If your goal is to install and operate ShakeMap, see the <a class="reference internal" href="software_guide.html#software-guide"><span class="std std-ref">Software &amp; Implementation Guide</span></a>. The
-<a class="reference internal" href="software_guide.html#software-guide"><span class="std std-ref">Software &amp; Implementation Guide</span></a> also points users to the ShakeMap software distribution and
-<a class="reference external" href="http://usgs.github.io/shakemap/_static/SoftwareGuideV3_5.pdf">Software Guide</a>.</p>
-</div>
-
-
-          </div>
-        </div>
-      </div>
-    <div class="clearer"></div>
-  </div>
+      <div class="clearer"></div>
+    </div>
     <div class="footer">
       
       

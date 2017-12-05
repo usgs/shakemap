@@ -15,5 +15,5 @@ setup(name='shakemap',
       package_data={'shakemap': [os.path.join('tests', 'data', '*'),
                                  os.path.join('data', '*'),
                                  ]},
-      scripts=['bin/sm_clone', 'bin/sm_profile'],
+      scripts=['bin/shake', 'bin/sm_clone', 'bin/sm_profile'],
       )

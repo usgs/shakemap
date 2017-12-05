@@ -36,16 +36,17 @@ For documentation see the `shakelib container module
 shake_data.hdf
 ================
 
-**shake_data.hdf** is the input to *sm_model*. It is built by bringing 
+*shake_data.hdf* is the input to the **model** module. It is built by 
+bringing 
 together the various ShakeMap configuration files (found in both the 
-current profile's ``install/config`` path, and in the event's ``current``
+current profile's *install/config* path, and in the event's *current*
 directory. It also aggregates information from the event's rupture file
-(if one exists), ``event.xml``, and the data files -- all found in the 
-event's ``current`` directory. **shake_data.hdf** is usually created 
-with *sm_assemble* (and possibly modified by *sm_augment*). 
+(if one exists), *event.xml*, and the data files -- all found in the 
+event's *current* directory. **shake_data.hdf** is usually created 
+with the **assemble** module (and possibly modified by **augment**). 
 
 It is generally not necessary for operators to access this file other
-than through the interfaces of *sm_assemble* and *sm_augment*. For
+than through the interfaces of **assemble** and **augment**. For
 developers, the file
 is accessed through the shakelib `ShakeMapInputContainer interface 
 <https://usgs.github.io/shakelib/shakelib.utils.container.html>`_.
@@ -53,9 +54,9 @@ is accessed through the shakelib `ShakeMapInputContainer interface
 shake_result.hdf
 ================
 
-The primary output product of **sm_model** is the HDF5 file 
+The primary output product of the **model** module is the HDF5 file 
 *shake_result.hdf*. There are some differences depending on whether 
-**sm_model** produces output grids or lists of points.  HDF5 files
+**model** produces output grids or lists of points.  HDF5 files
 consist of *Groups* or *DataSets*.  Groups can contain other groups
 or datasets, and can contain a dictionary-like set of *attributes*.
 Datasets consist of arrays holding data values, and
@@ -67,14 +68,17 @@ https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf
 *shake_result.hdf* consists of a number of groups and datasets. Our
 implementation of HDF5 uses groups to contain Python dictionaries,
 strings, and numpy arrays.  Dictionaries are stored as recursive groups.
-For example, a Python *config* dictionary consisting of the following information:
+For example, a Python *config* dictionary consisting of the following information::
 
-d = {'name':'config',
-     'gmpe_set':{'Active_Crustal':'Campbell2003'},
-     'depth':34.0,
-     }
+  d = {
+       'name': 'config',
+       'gmpe_set': {
+           'Active_Crustal': 'Campbell2003'
+        },
+       'depth': 34.0,
+  }
 
-would be stored in a group called **__dictionary_config__**, with attributes
+would be stored in a group called ``__dictionary_config__``, with attributes
 'name' and 'depth'.  There will be a sub-group called 'gmpe_set', with an attribute
 called 'Active_Crustal'.  Groups like this can contain any number (within reason)
 of dictionaries, which can consist of a number of Python data types (strings, numbers,
@@ -99,9 +103,9 @@ numpy arrays, etc.) *shake_result.hdf* contains the following elements:
 
 Each IMT dataset (MMI,PGA,etc.) is stored as a group containing two datasets, the mean values
 for each cell and the standard deviations.  MMI data for the component 'Larger' will be stored
-under a group called **__imt_MMI_Larger__**. The mean array will be stored as
-**__mean_MMI_Larger__**, and the standard deviation array will be stored as
-**__std_MMI_Larger__**.  All IMT grid datasets will be accompanied by a dictionary of
+under a group called ``__imt_MMI_Larger__``. The mean array will be stored as
+``__mean_MMI_Larger__``, and the standard deviation array will be stored as
+``__std_MMI_Larger__``.  All IMT grid datasets will be accompanied by a dictionary of
 attributes:
 
 
@@ -153,12 +157,12 @@ There will typically be multiple *IMT* (Intensity Measure Type) and
 *SA(#num)_sd* [where #num is the period as a floating point number; e.g., 
 *SA(1.0)*]. 
 
-Python developers will likely want to access **shake_result.hdf** through
+Python developers will likely want to access *shake_result.hdf* through
 the `shakelib OutputContainer class 
 <https://usgs.github.io/shakelib/shakelib.utils.container.html>`_.
 Also see, for example, the *contour* module [:meth:`shakemap.coremods.contour`]
 for some basic access patterns.
 
-Matlab developers can use the function **read_shake_data.m**, which is included in
+Matlab developers can use the function *read_shake_data.m*, which is included in
 the repository for ShakeMap
 (https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m).

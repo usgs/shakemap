@@ -33,47 +33,9 @@
 
   </head>
   <body>
-  <div class="document">
-    
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../../../index.html">
-    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
-    
-    <h1 class="logo logo-name">ShakeMap Documentation</h1>
-    
-  </a>
-</p>
+  
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-</ul>
-
-
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
@@ -142,21 +104,25 @@
 
 <div class="viewcode-block" id="contour"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.contour">[docs]</a><span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span><span class="n">imtype</span><span class="p">,</span><span class="n">component</span><span class="p">,</span><span class="n">intervals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
             <span class="n">filter_size</span><span class="o">=</span><span class="n">DEFAULT_FILTER_SIZE</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Generate contours of a specific IMT and return as a Shapely MultiLineString object.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate contours of a specific IMT and return as a Shapely </span>
+<span class="sd">    MultiLineString object.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        container (ShakeMapOutputContainer): ShakeMapOutputContainer with ShakeMap output data.</span>
-<span class="sd">        imtype (str): String containing the name of an Intensity Measure Type </span>
-<span class="sd">                      found in container.</span>
+<span class="sd">        container (ShakeMapOutputContainer): ShakeMapOutputContainer</span>
+<span class="sd">            with ShakeMap output data.</span>
+<span class="sd">        imtype (str): String containing the name of an Intensity </span>
+<span class="sd">            Measure Type found in container.</span>
 <span class="sd">        component (str): Intensity Measure component found in container.</span>
 <span class="sd">        intervals (np.ndarray or None): Array of intervals for IMT, or None.</span>
 <span class="sd">        filter_size (int): Integer filter (see</span>
 <span class="sd">            https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        list: List of dictionaries containing two fields:</span>
-<span class="sd">                - geometry: GeoJSON-like representation of one of the objects in</span>
-<span class="sd">                  https://toblerity.org/fiona/manual.html#geometry-types</span>
-<span class="sd">                - properties: Dictionary of properties describing that feature.</span>
+<span class="sd">                - geometry: GeoJSON-like representation of one of the objects</span>
+<span class="sd">                  in https://toblerity.org/fiona/manual.html#geometry-types</span>
+<span class="sd">                - properties: Dictionary of properties describing that</span>
+<span class="sd">                  feature.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMT</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span><span class="n">component</span><span class="p">)</span>
     <span class="n">gridobj</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
@@ -180,7 +146,7 @@
         <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;log&#39;</span>
         <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
             <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span>
-        <span class="n">intervals</span> <span class="o">=</span> <span class="n">_get_default_intervals</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span><span class="n">interval_type</span> <span class="o">=</span> <span class="n">interval_type</span><span class="p">)</span>
+        <span class="n">intervals</span> <span class="o">=</span> <span class="n">_get_default_intervals</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span> <span class="n">interval_type</span> <span class="o">=</span> <span class="n">interval_type</span><span class="p">)</span>
 
     <span class="n">lonstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmin&#39;</span><span class="p">]</span>
     <span class="n">latstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ymin&#39;</span><span class="p">]</span>
@@ -203,8 +169,8 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">:</span> <span class="c1">#skipping little contour islands?</span>
                 <span class="k">continue</span>
 
-            <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">lonspan</span> <span class="o">/</span> <span class="n">nlon</span> <span class="o">+</span> <span class="n">lonstart</span>
-            <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">nlat</span> <span class="o">-</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">latspan</span> <span class="o">/</span> <span class="n">nlat</span> <span class="o">+</span> <span class="n">latstart</span>
+            <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">lonspan</span> <span class="o">/</span> <span class="n">nlon</span> <span class="o">+</span> <span class="n">lonstart</span>
+            <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">nlat</span> <span class="o">-</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">latspan</span> <span class="o">/</span> <span class="n">nlat</span> <span class="o">+</span> <span class="n">latstart</span>
             <span class="n">plot_contours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">])</span>
             <span class="n">new_contours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 
@@ -233,8 +199,8 @@
     <span class="n">jsonstr</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
     <span class="n">infojson</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonstr</span><span class="p">)</span>
     <span class="n">event_info</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;event_id&#39;</span><span class="p">:</span> <span class="n">infojson</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">],</span>
-                  <span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">infojson</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">],</span>
-                  <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">infojson</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]}</span>
+                  <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">infojson</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">],</span>
+                  <span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">infojson</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]}</span>
 
     <span class="n">contour_dict</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">imtlist</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;contours&#39;</span><span class="p">][</span><span class="s1">&#39;IMTS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
@@ -243,7 +209,7 @@
     <span class="c1">#open a file for writing</span>
     <span class="k">if</span> <span class="n">file_format</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">FORMATS</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;File format </span><span class="si">%s</span><span class="s1"> not supported for contours.&#39;</span> <span class="o">%</span> <span class="n">file_format</span><span class="p">)</span>
-    <span class="n">driver</span><span class="p">,</span><span class="n">extension</span> <span class="o">=</span> <span class="n">FORMATS</span><span class="p">[</span><span class="n">file_format</span><span class="p">]</span>
+    <span class="n">driver</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">FORMATS</span><span class="p">[</span><span class="n">file_format</span><span class="p">]</span>
     <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span><span class="s1">&#39;MultiLineString&#39;</span><span class="p">,</span>
               <span class="s1">&#39;properties&#39;</span><span class="p">:{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span><span class="s1">&#39;float&#39;</span><span class="p">,</span>
                             <span class="s1">&#39;units&#39;</span><span class="p">:</span><span class="s1">&#39;str&#39;</span><span class="p">}}</span>
@@ -260,10 +226,10 @@
         <span class="n">imtype_spec</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;contours&#39;</span><span class="p">][</span><span class="s1">&#39;IMTS&#39;</span><span class="p">][</span><span class="n">imtype</span><span class="p">]</span>
         <span class="n">filter_size</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">imtype_spec</span><span class="p">[</span><span class="s1">&#39;filter_size&#39;</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
-            <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fileimt</span><span class="p">,</span><span class="n">component</span><span class="p">,</span><span class="n">extension</span><span class="p">)</span>
+            <span class="n">fname</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">fileimt</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">extension</span><span class="p">)</span>
             <span class="n">filename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span><span class="n">fname</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-                <span class="n">fpath</span><span class="p">,</span><span class="n">fext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                <span class="n">fpath</span><span class="p">,</span> <span class="n">fext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
                 <span class="n">flist</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">fpath</span><span class="o">+</span><span class="s1">&#39;.*&#39;</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">flist</span><span class="p">:</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
@@ -288,7 +254,7 @@
                 <span class="k">if</span> <span class="s1">&#39;intervals&#39;</span> <span class="ow">in</span> <span class="n">imtype_spec</span><span class="p">:</span>
                     <span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">imtype_spec</span><span class="p">[</span><span class="s1">&#39;intervals&#39;</span><span class="p">]]</span>
 
-                <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span><span class="n">imtype</span><span class="p">,</span><span class="n">component</span><span class="p">,</span><span class="n">intervals</span><span class="p">)</span>
+                <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">intervals</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">line_strings</span><span class="p">:</span>
                   <span class="n">vector_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
 
@@ -340,8 +306,47 @@
           </div>
         </div>
       </div>
-    <div class="clearer"></div>
-  </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
     <div class="footer">
       
       

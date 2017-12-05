@@ -35,8 +35,61 @@
 
   </head>
   <body>
-  <div class="document">
-    
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakemap.coremods.augment">
+<span id="shakemap-coremods-augment"></span><h1>shakemap.coremods.augment<a class="headerlink" href="#module-shakemap.coremods.augment" title="Permalink to this headline">¶</a></h1>
+<p>Reads shake_data.hdf from the event’s current directory and adds local
+configs, data, etc., then writes a new shake_data.hdf.</p>
+<dl class="class">
+<dt id="shakemap.coremods.augment.AugmentModule">
+<em class="property">class </em><code class="descclassname">shakemap.coremods.augment.</code><code class="descname">AugmentModule</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
+<p>augment – Incorporate additional content to the ShakeMap input file.</p>
+<p>Instantiate a CoreModule class with an event ID.</p>
+<dl class="attribute">
+<dt id="shakemap.coremods.augment.AugmentModule.command_name">
+<code class="descname">command_name</code><em class="property"> = 'augment'</em><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule.command_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="shakemap.coremods.augment.AugmentModule.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule.execute" title="Permalink to this definition">¶</a></dt>
+<dd><p>Augment a ShakeMap input data file with local configs, data, rupture,
+etc. The version history will only be incremented if the originator
+differs from the originator in the previous line of the history.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#NotADirectoryError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">NotADirectoryError</span></code></a> – When the event data directory does not
+exist.</li>
+<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#FileNotFoundError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">FileNotFoundError</span></code></a> – When the the event’s event.xml file does
+not exist.</li>
+<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> – When there are problems parsing the configuration.</li>
+<li><code class="xref py py-exc docutils literal"><span class="pre">ValidateError</span></code> – When there are configuration items missing or mis-
+configured.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
 <p class="logo">
@@ -94,60 +147,8 @@
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
       </div>
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="module-shakemap.coremods.augment">
-<span id="shakemap-coremods-augment"></span><h1>shakemap.coremods.augment<a class="headerlink" href="#module-shakemap.coremods.augment" title="Permalink to this headline">¶</a></h1>
-<p>Reads shake_data.hdf from the event’s current directory and adds local
-configs, data, etc., then writes a new shake_data.hdf.</p>
-<dl class="class">
-<dt id="shakemap.coremods.augment.AugmentModule">
-<em class="property">class </em><code class="descclassname">shakemap.coremods.augment.</code><code class="descname">AugmentModule</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
-<p>augment – Incorporate additional content to the ShakeMap input file.</p>
-<p>Instantiate a CoreModule class with an event ID.</p>
-<dl class="attribute">
-<dt id="shakemap.coremods.augment.AugmentModule.command_name">
-<code class="descname">command_name</code><em class="property"> = 'augment'</em><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule.command_name" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="shakemap.coremods.augment.AugmentModule.execute">
-<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule.execute" title="Permalink to this definition">¶</a></dt>
-<dd><p>Augment a ShakeMap input data file with local configs, data, rupture,
-etc. The version history will only be incremented if the originator
-differs from the originator in the previous line of the history.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#NotADirectoryError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">NotADirectoryError</span></code></a> – When the event data directory does not
-exist.</li>
-<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#FileNotFoundError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">FileNotFoundError</span></code></a> – When the the event’s event.xml file does
-not exist.</li>
-<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> – When there are problems parsing the configuration.</li>
-<li><code class="xref py py-exc docutils literal"><span class="pre">ValidateError</span></code> – When there are configuration items missing or mis-
-configured.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-</div>
-
-
-          </div>
-        </div>
-      </div>
-    <div class="clearer"></div>
-  </div>
+      <div class="clearer"></div>
+    </div>
     <div class="footer">
       
       
