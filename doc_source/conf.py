@@ -132,8 +132,9 @@ html_theme_options = {
         'sidebar_collapse': True,
         'show_powered_by': False,
         'show_related': False,
-        'fixed_sidebar': True,
+        'fixed_sidebar': False,
         'sidebar_includehidden': True,
+        'sidebar_width': '250px',
         }
 
 # Add any paths that contain custom themes here, relative to this directory.

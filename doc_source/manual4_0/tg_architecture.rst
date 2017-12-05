@@ -89,8 +89,7 @@ the authoritative ShakeMap system or through a web service.
 Programs
 ========
 
-The core components of ShakeMap are a set of command line programs, the
-most important of which is **shake**, and a set of modules for **shake**. 
+The core components of ShakeMap are a set of command line programs.
 These 
 programs allow the operator to set up a ShakeMap environment, collect 
 data and configurations into inputs (i.e., *shake_data.hdf*), and
@@ -120,7 +119,7 @@ with their event IDs) and their associated subdirectories::
             current/
                 event.xml
                 *_dat.xml
-                *_fault.txt (or .json)
+                *_fault.txt (or rupture.json)
                 model.conf (or model_zc.conf)
                 products/
                     shake_result.hdf
@@ -177,6 +176,14 @@ products from the grids and associated metadata. See the
 :ref:`shake man page <shake>` or run **shake --help** for a list
 of available modules. 
 
+The behavior of **shake** and many of its modules are controlled by 
+the configuration files *shake.conf* and *products.conf*. *shake.conf*
+is largely concerned with the way logging is handled. See *shake.conf*
+for details. *products.conf* controls the behavior of many of the
+core modules that produce ShakeMap products. See the documentation
+within the file for more information. Both files should be in the 
+user's current profile's *INSTALL_DIR/config* directory.
+
 shake Modules
 -------------
 
@@ -188,7 +195,8 @@ select
 **select** reads an event's *event.xml* file for origin information
 and then constructs a GMPE set for the event based on the event's residence 
 within,
-and proximity to, a set of predefined tectonic regions. The GMPE set, and the
+and proximity to, a set of predefined tectonic regions and user-defined
+geographic areas. The GMPE set, and the
 selection of that GMPE set for use in processing, are written to 
 *model_zc.conf* in the event's *current* directory.
 
@@ -358,7 +366,16 @@ model
 The **model** module reads the data in *shake_data.hdf* and produces an
 interpolated ShakeMap. Depending upon the settings found in *model.conf*,
 the interpolation product may be a grid or a set of points. See
-*model.conf* for additional options and documentation.
+*model.conf* for additional options and documentation. The *model.conf* 
+file in the user's current profile (i.e., *INSTALL_DIR/config/model.conf*)
+will be read first, and then if *model.conf* or *model_zc.conf* exists
+in the event's *current* directory, then the parameters set therein will
+override those in the profile's *model.conf*. If both *model.conf* and
+*model_zc.conf* exist in the event's *current* directory, *model.conf*
+will be read and *model_zc.conf* will be ignored. **model** also reads
+the configuration files *gmpe_sets.conf* and *modules.conf*, which
+reside in the current profile's *INSTALL_DIR/config* directory. See
+the documentation within those files for more information.
 
 A great deal of this manual is devoted to the way the interpolation is
 performed, and the effect of various configuration options. See the 
@@ -384,7 +401,8 @@ contours for each of the intensity measure types found therein. The contours
 are written as GeoJSON to files called *<imt_type>_cont.json* in the event's 
 *current/products* subdirectory.
 
-See :meth:`shakemap.coremods.contour` for more details.
+See :meth:`shakemap.coremods.contour` for more details. Contour parameters
+may be specified in the *products.conf* configuration file.
 
 gridxml
 ```````
@@ -418,7 +436,9 @@ static maps, and we do not intend to maintain or support it. In
 particular, it uses the **basemap** mapping package, which is 
 disappearing in favor of **cartopy**.
 
-See :meth:`shakemap.coremods.mapping` for more details.
+See :meth:`shakemap.coremods.mapping` for more details. See the
+configuration file *products.conf* for information on configuring
+the **mapping** module.
 
 raster
 ```````

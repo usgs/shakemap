@@ -35,66 +35,9 @@
 
   </head>
   <body>
-  <div class="document">
-    
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<p class="logo">
-  <a href="../index.html">
-    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
-    
-    <h1 class="logo logo-name">ShakeMap Documentation</h1>
-    
-  </a>
-</p>
+  
 
-
-
-
-
-
-
-
-<h3>Navigation</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="title_page.html">ShakeMap 4 Manual</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="index.html">Table of Contents</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html">2.1. Software Architecture</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">2.2. Data Formats</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#about-the-hdf5-file-format">2.2.1. About the HDF5 File Format</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#shake-data-hdf">2.2.2. shake_data.hdf</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#shake-result-hdf">2.2.3. shake_result.hdf</a></li>
-</ul>
-</li>
-<li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.3. Guidelines for Contributors</a></li>
-</ul>
-</li>
-<li class="toctree-l3"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>
-<li class="toctree-l3"><a class="reference internal" href="glossary.html">4. Glossary</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-</ul>
-
-
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
-      </div>
+    <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
           <div class="body" role="main">
@@ -128,23 +71,24 @@ For documentation see the <a class="reference external" href="https://usgs.githu
 </div>
 <div class="section" id="shake-data-hdf">
 <h2>2.2.2. shake_data.hdf<a class="headerlink" href="#shake-data-hdf" title="Permalink to this headline">¶</a></h2>
-<p><strong>shake_data.hdf</strong> is the input to <em>sm_model</em>. It is built by bringing
+<p><em>shake_data.hdf</em> is the input to the <strong>model</strong> module. It is built by
+bringing
 together the various ShakeMap configuration files (found in both the
-current profile’s <code class="docutils literal"><span class="pre">install/config</span></code> path, and in the event’s <code class="docutils literal"><span class="pre">current</span></code>
+current profile’s <em>install/config</em> path, and in the event’s <em>current</em>
 directory. It also aggregates information from the event’s rupture file
-(if one exists), <code class="docutils literal"><span class="pre">event.xml</span></code>, and the data files – all found in the
-event’s <code class="docutils literal"><span class="pre">current</span></code> directory. <strong>shake_data.hdf</strong> is usually created
-with <em>sm_assemble</em> (and possibly modified by <em>sm_augment</em>).</p>
+(if one exists), <em>event.xml</em>, and the data files – all found in the
+event’s <em>current</em> directory. <strong>shake_data.hdf</strong> is usually created
+with the <strong>assemble</strong> module (and possibly modified by <strong>augment</strong>).</p>
 <p>It is generally not necessary for operators to access this file other
-than through the interfaces of <em>sm_assemble</em> and <em>sm_augment</em>. For
+than through the interfaces of <strong>assemble</strong> and <strong>augment</strong>. For
 developers, the file
 is accessed through the shakelib <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">ShakeMapInputContainer interface</a>.</p>
 </div>
 <div class="section" id="shake-result-hdf">
 <h2>2.2.3. shake_result.hdf<a class="headerlink" href="#shake-result-hdf" title="Permalink to this headline">¶</a></h2>
-<p>The primary output product of <strong>sm_model</strong> is the HDF5 file
+<p>The primary output product of the <strong>model</strong> module is the HDF5 file
 <em>shake_result.hdf</em>. There are some differences depending on whether
-<strong>sm_model</strong> produces output grids or lists of points.  HDF5 files
+<strong>model</strong> produces output grids or lists of points.  HDF5 files
 consist of <em>Groups</em> or <em>DataSets</em>.  Groups can contain other groups
 or datasets, and can contain a dictionary-like set of <em>attributes</em>.
 Datasets consist of arrays holding data values, and
@@ -155,13 +99,16 @@ the HDF5 data format can be found here:</p>
 implementation of HDF5 uses groups to contain Python dictionaries,
 strings, and numpy arrays.  Dictionaries are stored as recursive groups.
 For example, a Python <em>config</em> dictionary consisting of the following information:</p>
-<dl class="docutils">
-<dt>d = {‘name’:’config’,</dt>
-<dd>‘gmpe_set’:{‘Active_Crustal’:’Campbell2003’},
-‘depth’:34.0,
-}</dd>
-</dl>
-<p>would be stored in a group called <strong>__dictionary_config__</strong>, with attributes
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span>
+     <span class="s1">&#39;gmpe_set&#39;</span><span class="p">:</span> <span class="p">{</span>
+         <span class="s1">&#39;Active_Crustal&#39;</span><span class="p">:</span> <span class="s1">&#39;Campbell2003&#39;</span>
+      <span class="p">},</span>
+     <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="mf">34.0</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>would be stored in a group called <code class="docutils literal"><span class="pre">__dictionary_config__</span></code>, with attributes
 ‘name’ and ‘depth’.  There will be a sub-group called ‘gmpe_set’, with an attribute
 called ‘Active_Crustal’.  Groups like this can contain any number (within reason)
 of dictionaries, which can consist of a number of Python data types (strings, numbers,
@@ -217,9 +164,9 @@ finite fault</td>
 </table>
 <p>Each IMT dataset (MMI,PGA,etc.) is stored as a group containing two datasets, the mean values
 for each cell and the standard deviations.  MMI data for the component ‘Larger’ will be stored
-under a group called <strong>__imt_MMI_Larger__</strong>. The mean array will be stored as
-<strong>__mean_MMI_Larger__</strong>, and the standard deviation array will be stored as
-<strong>__std_MMI_Larger__</strong>.  All IMT grid datasets will be accompanied by a dictionary of
+under a group called <code class="docutils literal"><span class="pre">__imt_MMI_Larger__</span></code>. The mean array will be stored as
+<code class="docutils literal"><span class="pre">__mean_MMI_Larger__</span></code>, and the standard deviation array will be stored as
+<code class="docutils literal"><span class="pre">__std_MMI_Larger__</span></code>.  All IMT grid datasets will be accompanied by a dictionary of
 attributes:</p>
 <p>For grids, the attributes are:</p>
 <table border="1" class="docutils">
@@ -297,11 +244,11 @@ attributes:</p>
 <em>PGA</em>, <em>PGA_sd</em>, <em>PGV</em>, <em>PGV_sd</em>, <em>MMI</em>, <em>MMI_sd</em>, and various <em>SA(#num)</em> and
 <em>SA(#num)_sd</em> [where #num is the period as a floating point number; e.g.,
 <em>SA(1.0)</em>].</p>
-<p>Python developers will likely want to access <strong>shake_result.hdf</strong> through
+<p>Python developers will likely want to access <em>shake_result.hdf</em> through
 the <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">shakelib OutputContainer class</a>.
 Also see, for example, the <em>contour</em> module [<a class="reference internal" href="../apidoc/shakemap.coremods.contour.html#module-shakemap.coremods.contour" title="shakemap.coremods.contour"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.contour()</span></code></a>]
 for some basic access patterns.</p>
-<p>Matlab developers can use the function <strong>read_shake_data.m</strong>, which is included in
+<p>Matlab developers can use the function <em>read_shake_data.m</em>, which is included in
 the repository for ShakeMap
 (<a class="reference external" href="https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m">https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m</a>).</p>
 </div>
@@ -311,8 +258,66 @@ the repository for ShakeMap
           </div>
         </div>
       </div>
-    <div class="clearer"></div>
-  </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="title_page.html">ShakeMap 4 Manual</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Table of Contents</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html">2.1. Software Architecture</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">2.2. Data Formats</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#about-the-hdf5-file-format">2.2.1. About the HDF5 File Format</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shake-data-hdf">2.2.2. shake_data.hdf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shake-result-hdf">2.2.3. shake_result.hdf</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.3. Guidelines for Contributors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>
+<li class="toctree-l3"><a class="reference internal" href="glossary.html">4. Glossary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
     <div class="footer">
       
       
