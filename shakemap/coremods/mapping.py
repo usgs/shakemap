@@ -105,12 +105,18 @@ class MappingModule(CoreModule):
         # get all of the pieces needed for the mapmaker
         layerdict = {}
         layers = config['products']['mapping']['layers']
-        layerdict['coast'] = path_macro_sub(layers['coasts'], install_path, data_path)
-        layerdict['ocean'] = path_macro_sub(layers['oceans'], install_path, data_path)
-        layerdict['lake'] = path_macro_sub(layers['lakes'], install_path, data_path)
-        layerdict['country'] = path_macro_sub(layers['countries'], install_path, data_path)
-        layerdict['state'] = path_macro_sub(layers['states'], install_path, data_path)
-        topofile = path_macro_sub(layers['topography'], install_path, data_path)
+        layerdict['coast'] = path_macro_sub(
+            layers['coasts'], install_path, data_path)
+        layerdict['ocean'] = path_macro_sub(
+            layers['oceans'], install_path, data_path)
+        layerdict['lake'] = path_macro_sub(
+            layers['lakes'], install_path, data_path)
+        layerdict['country'] = path_macro_sub(
+            layers['countries'], install_path, data_path)
+        layerdict['state'] = path_macro_sub(
+            layers['states'], install_path, data_path)
+        topofile = path_macro_sub(
+            layers['topography'], install_path, data_path)
         cities = path_macro_sub(layers['cities'], install_path, data_path)
         mapmaker = MapMaker(container, topofile, layerdict, cities,
                             self.logger)
@@ -150,7 +156,8 @@ def getProjectedPolygon(polygon, m):
 
 
 def getProjectedPatches(polygon, m, edgecolor=WATERCOLOR):
-    """Project polygon into Descartes PolygonPatch objects.
+    """
+    Project polygon into Descartes PolygonPatch objects.
 
     Args:
         polygon (Polygon): Shapely Polygon or MultiPolygon object.
@@ -188,8 +195,8 @@ class MapMaker(object):
         """Initialize MapMaker object.
 
         Args:
-            container (ShakeMapOutputContainer): ShakeMapOutputContainer object containing
-                model results.
+            container (ShakeMapOutputContainer): ShakeMapOutputContainer object
+                containing model results.
             topofile (str): Path to file containing global topography grid.
             layerdict (dict): Dictionary containing fields:
 
@@ -228,11 +235,11 @@ class MapMaker(object):
         info_dict = json.loads(
             container.getString('info.json'))['input']['event_information']
         event_dict = {
-                'eventsourcecode': info_dict['event_id'],
-                'lat': float(info_dict['latitude']),
-                'lon': float(info_dict['longitude']),
-                'depth': float(info_dict['depth']),
-                'mag': float(info_dict['magnitude'])
+            'eventsourcecode': info_dict['event_id'],
+            'lat': float(info_dict['latitude']),
+            'lon': float(info_dict['longitude']),
+            'depth': float(info_dict['depth']),
+            'mag': float(info_dict['magnitude'])
         }
         origin = Origin(event_dict)
         if rupture_dict['features'][0]['geometry']['type'] == 'Point':
@@ -278,7 +285,8 @@ class MapMaker(object):
         return vshapes
 
     def _clipBounds(self):
-        """Clip input vector data to bounds of map.
+        """
+        Clip input vector data to bounds of map.
         """
         # returns a list of GeoJSON-like mapping objects
         comp = self.container.getComponents('MMI')[0]
@@ -298,7 +306,8 @@ class MapMaker(object):
                 tshape = sShape(shape['geometry'])
                 try:
                     intshape = tshape.intersection(bboxpoly)
-                except TopologicalError as te:
+#                except TopologicalError as te:
+                except Exception as te:
                     self.logger.warn('Failure to grab %s segment: "%s"'
                                      % (key, str(te)))
                     continue
@@ -351,7 +360,7 @@ class MapMaker(object):
                   (optional).
 
         """
-        self.cities = BaseMapCities(dataframe)  # may raise exception
+        self.cities = BasemapCities(dataframe)  # may raise exception
         self.city_rows = None
         self.city_cols = None
         self.cities_per_grid = None
@@ -534,9 +543,6 @@ class MapMaker(object):
         scaley = gd.ymin + (gd.ymax - gd.ymin) / 10.0
 
         # how tall should scale bar be, in map units (km)?
-        bbox = m.ax.get_window_extent().transformed(
-                m.ax.figure.dpi_scale_trans.inverted())
-        height = bbox.height
         yoff = (0.01 * (m.ymax - m.ymin))
 
         # where should scale apply (center of map)
@@ -545,9 +551,9 @@ class MapMaker(object):
 
         # figure out a scalebar length that is approximately 30% of total
         # width in km
-        map_width = (m.xmax - m.xmin)/1000  # km
+        map_width = (m.xmax - m.xmin) / 1000  # km
         lengths = np.array([25, 50, 75, 100, 125, 150, 175, 200, 250])
-        lfracs = lengths/map_width
+        lfracs = lengths / map_width
         length = lengths[np.abs(lfracs - 0.3).argmin()]
 
         m.drawmapscale(scalex, scaley, clon, clat, length,
@@ -631,10 +637,10 @@ class MapMaker(object):
         hlon = origin.lon
         hlat = origin.lat
         edict = json.loads(self.container.getString(
-                'info.json'))['input']['event_information']
+            'info.json'))['input']['event_information']
         eloc = edict['event_description']
         etime = datetime.strptime(
-                    edict['origin_time'], '%Y-%m-%d %H:%M:%S')
+            edict['origin_time'], '%Y-%m-%d %H:%M:%S')
         timestr = etime.strftime('%b %d, %Y %H:%M:%S')
         mag = origin.mag
         if hlon < 0:
@@ -837,8 +843,8 @@ class MapMaker(object):
             self.cities = self.cities.limitByBounds(
                 (gd.xmin, gd.xmax, gd.ymin, gd.ymax))
             self.cities = self.cities.limitByGrid(
-                    nx=self.city_cols, ny=self.city_rows,
-                    cities_per_grid=self.cities_per_grid)
+                nx=self.city_cols, ny=self.city_rows,
+                cities_per_grid=self.cities_per_grid)
             # self.logger.debug("Available fonts: ", self.cities._fontlist)
             if 'Times New Roman' in self.cities._fontlist:
                 font = 'Times New Roman'
@@ -997,7 +1003,7 @@ class MapMaker(object):
         elif imt == 'PGV':
             imtdata = np.exp(imtdata)
         else:
-            imtdata = np.exp(imtdata)*100
+            imtdata = np.exp(imtdata) * 100
 
         pimt = self._projectGrid(imtdata, m, gd)
 
@@ -1069,8 +1075,8 @@ class MapMaker(object):
             self.cities = self.cities.limitByBounds(
                 (gd.xmin, gd.xmax, gd.ymin, gd.ymax))
             self.cities = self.cities.limitByGrid(
-                    nx=self.city_cols, ny=self.city_rows,
-                    cities_per_grid=self.cities_per_grid)
+                nx=self.city_cols, ny=self.city_rows,
+                cities_per_grid=self.cities_per_grid)
             if 'Times New Roman' in self.cities._fontlist:
                 font = 'Times New Roman'
             else:

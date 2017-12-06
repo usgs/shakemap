@@ -17,6 +17,7 @@ from validate import ValidateError
 
 import shakemap.utils.config as config
 
+
 def test_config():
 
     #
@@ -241,6 +242,7 @@ def test_config():
         res = config.cfg_float('None')
     with pytest.raises(ValidateError):
         res = config.cfg_float('thing')
+
 
 if __name__ == '__main__':
     test_config()

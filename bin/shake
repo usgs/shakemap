@@ -22,7 +22,8 @@ import shakemap.coremods
 
 
 def _get_command_classes():
-    """Create a dictionary of classname:class to be used in main().
+    """
+    Create a dictionary of classname:class to be used in main().
 
     Returns:
         (dict): Dictionary of classname:class where each class
@@ -78,7 +79,8 @@ def _format_error_info(exception, eventid):
 
 
 def get_parser():
-    """Internal method to get argparse parser instance.
+    """
+    Internal method to get argparse parser instance.
 
     Returns:
         (ArgumentParser): argparse argument parser.
@@ -92,9 +94,9 @@ def get_parser():
         epilog += '    - %s\n' % inspect.getdoc(core_class)
 
     parser = argparse.ArgumentParser(
-            description=description,
-            epilog=epilog,
-            formatter_class=argparse.RawDescriptionHelpFormatter)
+        description=description,
+        epilog=epilog,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('eventid',
                         help='The id of the event to process.')
     parser.add_argument('cmds', nargs='+',

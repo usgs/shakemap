@@ -9,7 +9,7 @@ Files:
 
 """
 
-#stdlib imports
+# stdlib imports
 import os
 import argparse
 from configobj import ConfigObj
@@ -18,15 +18,16 @@ import sys
 import shutil
 import pathlib
 
-#shakemap imports
+# shakemap imports
 from shakemap.utils.config import get_data_path
 from shakemap.utils.utils import query_yes_no
+
 
 def get_parser():
     desc = ''' Manage ShakeMap profiles.
 
 These ShakeMap profiles allow one user to have multiple ShakeMap profiles
-(installations) on the same machine.  These profiles can all be configured 
+(installations) on the same machine.  These profiles can all be configured
 differently, if desired. By default the profiles reside in the file
 '~/.shakemap/profiles.conf'.
 '''
@@ -40,15 +41,18 @@ differently, if desired. By default the profiles reside in the file
     parser.add_argument('-d', '--delete', metavar='PROFILE',
                         help='Delete existing profile PROFILE.')
     parser.add_argument('-a', '--accept', action='store_true',
-                        help='Accept the defaults when creating or '\
+                        help='Accept the defaults when creating or '
                              'deleting a profile.')
     parser.add_argument('-p', '--preserve', action='store_true',
                         help='Preserve data when deleting a profile')
     parser.add_argument('-f', '--file', type=str,
-                        help='Specify an alternate file in which the profiles (will) reside')
+                        help='Specify an alternate file in which the '
+                             'profiles (will) reside')
     return parser
 
-current_markers = {True:'**Current Profile**',False:''}
+
+current_markers = {True: '**Current Profile**', False: ''}
+
 
 class ShakeProfile(object):
     def __init__(self, name, indict, is_current=False):
@@ -63,11 +67,13 @@ class ShakeProfile(object):
                self.data_path)
         return fmt % tpl
 
+
 def check_config(config):
     if 'profiles' not in config:
         print('There are currently no profiles. Use "shakeprofile '
               '-c <profile>" to create one.')
         sys.exit(1)
+
 
 def make_dir(pathstr, default, accept):
     max_tries = 3
@@ -92,16 +98,18 @@ def make_dir(pathstr, default, accept):
         if ntries > max_tries:
             break
     return (ppath, make_ok)
-    
+
+
 def create(config, profile, accept, ppath):
     shakeconfig_data_path = get_data_path()
 
     if ppath:
         profile_path = os.path.join(ppath, profile)
     else:
-        profile_path = os.path.join(os.path.expanduser('~'), 'ShakeMap', profile)
-    default_install = os.path.join(profile_path,'install')
-    default_data = os.path.join(profile_path,'data')
+        profile_path = os.path.join(
+            os.path.expanduser('~'), 'ShakeMap', profile)
+    default_install = os.path.join(profile_path, 'install')
+    default_data = os.path.join(profile_path, 'data')
     print('You will be prompted to supply two directories for this '
           'ShakeMap profile:')
     print(' - An *installation* path, under which will be created '
@@ -111,7 +119,7 @@ def create(config, profile, accept, ppath):
     print(' - A *data* path, under which will be created directories '
           'for each')
     print('   event processed.\n')
-    install_path, install_ok = make_dir('install path', default_install, 
+    install_path, install_ok = make_dir('install path', default_install,
                                         accept)
     if not install_ok:
         print('Please try to find a path that can be created on this '
@@ -144,7 +152,7 @@ def create(config, profile, accept, ppath):
     layer_dir = os.path.join(shakeconfig_data_path, 'layers')
     install_layer_dir = os.path.join(install_path, 'layers')
     install_data_dir = os.path.join(install_path, 'data')
-    
+
     if not os.path.isfile(os.path.join(config_path, 'modules.conf')):
         shutil.copy(module_file, config_path)
     if not os.path.isfile(os.path.join(config_path, 'gmpe_sets.conf')):
@@ -166,14 +174,15 @@ def create(config, profile, accept, ppath):
 
     if 'profiles' not in config:
         config['profiles'] = {}
-    config['profiles'][profile] = {'install_path': install_path, 
+    config['profiles'][profile] = {'install_path': install_path,
                                    'data_path': new_data_path}
 #    config.filename = configfile
     config['profile'] = profile
     config.write()
-    sprofile = ShakeProfile(profile,config['profiles'][profile])
+    sprofile = ShakeProfile(profile, config['profiles'][profile])
     print('\nCreated profile: %s' % (sprofile))
-        
+
+
 def main(pparser, args):
     if args.file:
         configfile = args.file
@@ -186,7 +195,7 @@ def main(pparser, args):
         ppath = ''
     if not os.path.isfile(configfile):
         pathlib.Path(configfile).touch(exist_ok=True)
-        
+
     config = ConfigObj(configfile)
 
     if args.create:
@@ -198,20 +207,20 @@ def main(pparser, args):
             sys.exit(1)
         create(config, profile, args.accept, ppath)
         sys.exit(0)
-        
+
     check_config(config)
 
     if args.list:
         profiles = config['profiles']
         current = config['profile']
-        for profname,profdict in profiles.items():
+        for profname, profdict in profiles.items():
             is_current = False
             if profname == current:
                 is_current = True
             sprofile = ShakeProfile(profname, profdict, is_current=is_current)
-            print('\n'+str(sprofile)+'\n')
+            print('\n' + str(sprofile) + '\n')
         sys.exit(0)
-        
+
     if args.switch:
         newprofile = args.switch
         oldprofile = config['profile']
@@ -223,7 +232,7 @@ def main(pparser, args):
         config['profile'] = newprofile
         config.filename = configfile
         config.write()
-        sp = ShakeProfile(newprofile, config['profiles'][newprofile], 
+        sp = ShakeProfile(newprofile, config['profiles'][newprofile],
                           is_current=True)
         print('\nSwitched to profile: \n%s\n' % (str(sp)))
         sys.exit(0)
@@ -244,7 +253,7 @@ def main(pparser, args):
         if not args.preserve:
             shutil.rmtree(install_path, ignore_errors=True)
             shutil.rmtree(data_path, ignore_errors=True)
-                
+
         del config['profiles'][profile]
 
         if config['profiles'].keys() == []:
@@ -255,7 +264,7 @@ def main(pparser, args):
             default = config['profiles'].keys()[0]
             newprofile = ShakeProfile(default, config['profiles'][default])
         config['profile'] = default
-        
+
         config.filename = configfile
         config.write()
         print('Deleted profile %s:' % profile)
@@ -275,16 +284,15 @@ def main(pparser, args):
     if profile not in profiles:
         msg = ('Current profile %s not in %s. Edit your profiles.conf '
                'file to match the specification.')
-        print(msg % (profile,configfile))
+        print(msg % (profile, configfile))
         sys.exit(1)
-    sprofile = ShakeProfile(profile, profiles[profile], 
+    sprofile = ShakeProfile(profile, profiles[profile],
                             is_current=True)
     print(sprofile)
     sys.exit(0)
-    
-        
+
+
 if __name__ == '__main__':
     parser = get_parser()
     pargs = parser.parse_args()
     main(parser, pargs)
-    

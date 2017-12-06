@@ -26,7 +26,8 @@ from shakelib.multigmpe import MultiGMPE
 from shakelib.virtualipe import VirtualIPE
 from shakelib.utils.utils import get_extent
 from shakelib.utils.imt_string import oq_to_file
-from shakelib.utils.containers import ShakeMapInputContainer, ShakeMapOutputContainer
+from shakelib.utils.containers import ShakeMapInputContainer
+from shakelib.utils.containers import ShakeMapOutputContainer
 from shakelib.utils.distance import geodetic_distance_fast
 
 from mapio.geodict import GeoDict
@@ -102,15 +103,15 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         # Bias parameters
         # ------------------------------------------------------------------
-        do_bias         = config['modeling']['bias']['do_bias']
-        bias_max_range  = config['modeling']['bias']['max_range']
-        bias_max_mag    = config['modeling']['bias']['max_mag']
+        do_bias = config['modeling']['bias']['do_bias']
+        bias_max_range = config['modeling']['bias']['max_range']
+        bias_max_mag = config['modeling']['bias']['max_mag']
         bias_max_dsigma = config['modeling']['bias']['max_delta_sigma']
         # ------------------------------------------------------------------
         # Outlier parameters
         # ------------------------------------------------------------------
         outlier_deviation_level = config['data']['outlier']['max_deviation']
-        outlier_max_mag         = config['data']['outlier']['max_mag']
+        outlier_max_mag = config['data']['outlier']['max_mag']
         # ------------------------------------------------------------------
         # These are the IMTs we want to make
         # ------------------------------------------------------------------
@@ -121,7 +122,7 @@ class ModelModule(CoreModule):
         rupture_obj = ic.getRuptureObject()
         if 'mechanism' in config['modeling']:
             rupture_obj._origin.setMechanism(
-                    mech=config['modeling']['mechanism'])
+                mech=config['modeling']['mechanism'])
         rx = rupture_obj.getRuptureContext([default_gmpe])
         if rx.rake is None:
             rx.rake = 0
@@ -145,9 +146,9 @@ class ModelModule(CoreModule):
             #
             do_grid = False
             in_sites = np.genfromtxt(
-                            config['interp']['prediction_location']['file'],
-                            autostrip=True, unpack=True,
-                            dtype=[np.float, np.float, np.float, '<U80'])
+                config['interp']['prediction_location']['file'],
+                autostrip=True, unpack=True,
+                dtype=[np.float, np.float, np.float, '<U80'])
             lons, lats, vs30, idents = zip(*in_sites)
             lons = np.array(lons).reshape(1, -1)
             lats = np.array(lats).reshape(1, -1)
@@ -235,10 +236,10 @@ class ModelModule(CoreModule):
                 # Make lists of the input IMTs
                 #
                 imt_in_str_dict[ndf] = set(
-                        [x for x in df.keys() if x in ('PGA', 'PGV', 'MMI') or
-                         x.startswith('SA(')])
+                    [x for x in df.keys() if x in ('PGA', 'PGV', 'MMI') or
+                     x.startswith('SA(')])
                 imt_in_dict[ndf] = set(
-                        [imt.from_string(x) for x in imt_in_str_dict[ndf]])
+                    [imt.from_string(x) for x in imt_in_str_dict[ndf]])
                 imt_in_str_set |= imt_in_str_dict[ndf]
                 #
                 # Get the sites and distance contexts
@@ -264,7 +265,7 @@ class ModelModule(CoreModule):
                     if total_sd_only is True:
                         tau_guess = get_default_std_inter()
                         df[imtstr + '_pred_tau'] = np.full_like(
-                                df[imtstr + '_pred'], tau_guess)
+                            df[imtstr + '_pred'], tau_guess)
                         df[imtstr + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
                                                            tau_guess**2)
                     else:
@@ -287,11 +288,12 @@ class ModelModule(CoreModule):
                         np.seterr(invalid='ignore')
                         flagged = \
                             np.abs(df[imtstr + '_residual']) > \
-                            outlier_deviation_level * df[imtstr + '_pred_sigma']
+                            outlier_deviation_level * \
+                            df[imtstr + '_pred_sigma']
                         np.seterr(invalid='warn')
 
                         self.logger.info('IMT: %s, flagged: %d' %
-                                    (imtstr, np.sum(flagged)))
+                                         (imtstr, np.sum(flagged)))
                         df[imtstr + '_outliers'] = flagged
                     else:
                         df[imtstr + '_outliers'] = np.full(df[imtstr].shape,
@@ -360,15 +362,15 @@ class ModelModule(CoreModule):
                     if total_sd_only is True:
                         tau_guess = get_default_std_inter()
                         df2[imtstr + '_pred_tau'] = np.full_like(
-                                df2[imtstr + '_pred'], tau_guess)
+                            df2[imtstr + '_pred'], tau_guess)
                         df2[imtstr + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
                                                             tau_guess**2)
                     else:
                         df2[imtstr + '_pred_tau'] = pstddev[1]
                         df2[imtstr + '_pred_phi'] = pstddev[2]
                     df2[imtstr + '_residual'] = df2[str(oqimt)] - pmean
-                    df2[imtstr + '_outliers'] = np.full(pmean.shape, False,
-                                                        dtype=np.bool)
+                    df2[imtstr + '_outliers'] = np.full(
+                            pmean.shape, False, dtype=np.bool)
 
         #
         # Now make derived MMI from the best available PGM; This is ugly and
@@ -417,7 +419,7 @@ class ModelModule(CoreModule):
                 if total_sd_only is True:
                     tau_guess = get_default_std_inter()
                     df1['MMI' + '_pred_tau'] = np.full_like(
-                            df1['MMI' + '_pred'], tau_guess)
+                        df1['MMI' + '_pred'], tau_guess)
                     df1['MMI' + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
                                                        tau_guess**2)
                 else:
@@ -493,7 +495,7 @@ class ModelModule(CoreModule):
                                               imt_in_str_dict[ndf]):
                         imtlist.append(imtin)
                         inperiod_ix = get_period_index_from_imt_str(
-                                imtin, imt_per_ix)
+                            imtin, imt_per_ix)
                         period_ix.append(inperiod_ix)
                         lons_rad.append(sdf['lon_rad'][i])
                         lats_rad.append(sdf['lat_rad'][i])
@@ -502,7 +504,7 @@ class ModelModule(CoreModule):
                         _phi = sdf[imtin + '_pred_phi'][i]
                         phi.append(_phi)
                         sig_total.append(
-                                np.sqrt(_phi**2 + sdf[imtin + '_sd'][i]**2))
+                            np.sqrt(_phi**2 + sdf[imtin + '_sd'][i]**2))
             sta_imtstr[imtstr] = np.array(imtlist)
             sta_period_ix[imtstr] = np.array(period_ix).reshape((-1, 1))
             sta_lons_rad[imtstr] = np.array(lons_rad).reshape((-1, 1))
@@ -561,9 +563,10 @@ class ModelModule(CoreModule):
             #
             # Print the nominal values of the bias and its stddev
             #
-            self.logger.info('%s: nom bias %f nom stddev %f; %d stations (time=%f sec)' %
-                 (imtstr, nominal_bias[imtstr], np.sqrt(nom_variance),
-                 np.size(sta_lons_rad[imtstr]), bias_time))
+            self.logger.info(
+                    '%s: nom bias %f nom stddev %f; %d stations (time=%f sec)'
+                    % (imtstr, nominal_bias[imtstr], np.sqrt(nom_variance),
+                       np.size(sta_lons_rad[imtstr]), bias_time))
         #
         # End bias
         #
@@ -643,10 +646,10 @@ class ModelModule(CoreModule):
                 se = (iy + 1) * smnx
                 time4 = time.time()
                 dist12 = geodetic_distance_fast(
-                        lons_out_rad[ss:se].reshape(1, -1),
-                        lats_out_rad[ss:se].reshape(1, -1),
-                        sta_lons_rad[imtstr],
-                        sta_lats_rad[imtstr])
+                    lons_out_rad[ss:se].reshape(1, -1),
+                    lats_out_rad[ss:se].reshape(1, -1),
+                    sta_lons_rad[imtstr],
+                    sta_lats_rad[imtstr])
                 t2_12 = np.full(dist12.shape, outperiod_ix, dtype=np.int)
                 d12_rows, d12_cols = np.shape(dist12)
                 t1_12 = np.tile(sta_period_ix[imtstr], (1, d12_cols))
@@ -684,7 +687,8 @@ class ModelModule(CoreModule):
             self.logger.debug('\ttime for %s rcmatrix=%f' % (imtstr, dtime))
             self.logger.debug('\ttime for %s amp calc=%f' % (imtstr, atime))
             self.logger.debug('\ttime for %s sd calc=%f' % (imtstr, mtime))
-            self.logger.info('total time for %s=%f' % (imtstr, time.time() - time1))
+            self.logger.info('total time for %s=%f' %
+                             (imtstr, time.time() - time1))
 
     # %%
         # ------------------------------------------------------------------
@@ -693,8 +697,8 @@ class ModelModule(CoreModule):
         product_path = os.path.join(datadir, 'products')
         if not os.path.isdir(product_path):
             os.mkdir(product_path)
-        oc = ShakeMapOutputContainer.create(os.path.join(product_path,
-                                                 'shake_result.hdf'))
+        oc = ShakeMapOutputContainer.create(os.path.join(
+                product_path, 'shake_result.hdf'))
         # ------------------------------------------------------------------
         # Might as well stick the whole config in the result
         # ------------------------------------------------------------------
@@ -759,8 +763,10 @@ class ModelModule(CoreModule):
         info[ip][ei]['seismic_stations'] = \
             str(np.size(df1['lon'])) if df1 else '0'
         info[ip][ei]['src_mech'] = rupture_obj._origin.mech
-        info[ip][ei]['event_description'] = rupture_obj._origin.locstring  ### This AND locaction?
-        info[ip][ei]['event_type'] = rupture_obj._origin.mech              ### This AND src_mech?
+        # This AND locaction?
+        info[ip][ei]['event_description'] = rupture_obj._origin.locstring
+        # This AND src_mech?
+        info[ip][ei]['event_type'] = rupture_obj._origin.mech
         info[op] = {}
         info[op][gm] = {}
         for myimt in imt_out_set_str:
@@ -899,7 +905,7 @@ class ModelModule(CoreModule):
                     station['properties']['pga'] = 'null'
                 if 'PGV' in sdf and not sdf['PGV_outliers'][six]:
                     station['properties']['pgv'] = '%.4f' % \
-                                                (np.exp(sdf['PGV'][six]))
+                        (np.exp(sdf['PGV'][six]))
                 else:
                     station['properties']['pgv'] = 'null'
                 #
@@ -920,8 +926,8 @@ class ModelModule(CoreModule):
                         value = np.exp(myamp) * 100
                         units = '%g'
                     station['properties']['predictions'][key.lower()] = {
-                            'value': value,
-                            'units': units
+                        'value': value,
+                        'units': units
                     }
                 station['properties']['distance'] = '%.2f' % sdf['rrup'][six]
                 for channel in station['properties']['channels']:
@@ -975,7 +981,7 @@ class ModelModule(CoreModule):
                                  'digits': digits}
 
                 # set the uncertainty grid
-                std_layername, units, digits = get_layer_info(key+'_sd')
+                std_layername, units, digits = get_layer_info(key + '_sd')
                 std_metadata = {'units': units,
                                 'digits': digits}
                 std_grid = Grid2D(outsd[key], gdict.copy())
@@ -1000,23 +1006,23 @@ class ModelModule(CoreModule):
 
 
 def get_period_index_from_imt_str(imtstr, imt_per_ix):
-        """
-        Get the index for the period of the specified IMT.
+    """
+    Get the index for the period of the specified IMT.
 
-        Args:
-            imtstr (str): The (OQ-style) IMT string.
-            imt_per_ix (dict): Dictionary relating periods to their
-                indices.
+    Args:
+        imtstr (str): The (OQ-style) IMT string.
+        imt_per_ix (dict): Dictionary relating periods to their
+            indices.
 
-        Returns:
-            int: The index corresponding to the period of the IMT.
-        """
-        if imtstr == 'PGA':
-            return imt_per_ix['0.01']
-        elif imtstr in ('PGV', 'MMI'):
-            return imt_per_ix['1.0']
-        else:
-            return imt_per_ix[imtstr.replace('SA(', '').replace(')', '')]
+    Returns:
+        int: The index corresponding to the period of the IMT.
+    """
+    if imtstr == 'PGA':
+        return imt_per_ix['0.01']
+    elif imtstr in ('PGV', 'MMI'):
+        return imt_per_ix['1.0']
+    else:
+        return imt_per_ix[imtstr.replace('SA(', '').replace(')', '')]
 
 
 def get_period_array(*args):
@@ -1110,7 +1116,6 @@ def get_imts(imtstr, imtset):
 
 
 def get_sa_bracket(myper, plist, plist_str):
-
     """
     For a given period, look through the input periods and return a tuple of
     a) the single IMT string representing the period itself if it is found
@@ -1141,7 +1146,7 @@ def get_sa_bracket(myper, plist, plist_str):
     if i == 0 or v < myper:
         return ('SA(' + plist_str[i] + ')', )
     else:
-        return ('SA(' + plist_str[i-1] + ')', 'SA(' + plist_str[i] + ')')
+        return ('SA(' + plist_str[i - 1] + ')', 'SA(' + plist_str[i] + ')')
 
 
 def get_sta_imts(imtstr, sdf, ix, imtset):
@@ -1239,7 +1244,7 @@ def get_layer_info(layer):
     layer_digits = 4  # number of significant digits
 
     if layer.endswith('_sd'):
-        layer_out = oq_to_file(layer.replace('_sd',''))
+        layer_out = oq_to_file(layer.replace('_sd', ''))
         layer_out = layer_out + '_sd'
     else:
         layer_out = oq_to_file(layer)

@@ -22,7 +22,7 @@ def test_select():
         smod.execute()
 
     # Normal event (should succeed)
-    conf_file = os.path.join(datapath, 'nc72282711', 'current', 
+    conf_file = os.path.join(datapath, 'nc72282711', 'current',
                              'model_zc.conf')
     if os.path.isfile(conf_file):
         os.remove(conf_file)

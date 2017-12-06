@@ -1,18 +1,16 @@
-#stdlib imports
-import sys
+# stdlib imports
 import os.path
-import json
-import logging
 
-#third party imports
+# third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
 from configobj import ConfigObj
 
-#local imports
+# local imports
 from .base import CoreModule
-from shakemap.utils.config import get_config_paths,get_logging_config
+from shakemap.utils.config import get_config_paths
 
 ALLLOWED_FORMATS = ['json']
+
 
 class InfoModule(CoreModule):
     """
@@ -27,7 +25,8 @@ class InfoModule(CoreModule):
 
         Raises:
             NotADirectoryError: When the event data directory does not exist.
-            FileNotFoundError: When the the shake_result HDF file does not exist.
+            FileNotFoundError: When the the shake_result HDF file does not
+                exist.
         """
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
@@ -54,8 +53,7 @@ class InfoModule(CoreModule):
             if fformat == 'json':
                 self.logger.info('Writing info.json file...')
                 infostring = container.getString('info.json')
-                info_file = os.path.join(datadir,'info.json')
-                f = open(info_file,'wt')
+                info_file = os.path.join(datadir, 'info.json')
+                f = open(info_file, 'wt')
                 f.write(infostring)
                 f.close()
-

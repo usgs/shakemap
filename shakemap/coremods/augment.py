@@ -3,22 +3,20 @@ Reads shake_data.hdf from the event's current directory and adds local
 configs, data, etc., then writes a new shake_data.hdf.
 """
 
-#stdlib imports
-import sys
+# stdlib imports
 import os.path
-import logging
 import glob
 import datetime
 import shutil
 
-#third party imports
+# third party imports
 from configobj import ConfigObj
 
-#local imports
+# local imports
 from .base import CoreModule
 from shakelib.utils.containers import ShakeMapInputContainer
 from shakemap.utils.config import get_config_paths, get_custom_validator,\
-                config_error, check_config, get_configspec
+    config_error, check_config, get_configspec
 
 
 class AugmentModule(CoreModule):
@@ -160,7 +158,8 @@ class AugmentModule(CoreModule):
             eventxml = None
         if rupturefile is not None or eventxml is not None:
             self.logger.info('Updating rupture/origin information.')
-            shake_data.updateRupture(eventxml = eventxml, rupturefile = rupturefile)
+            shake_data.updateRupture(
+                eventxml=eventxml, rupturefile=rupturefile)
 
         #
         # Sort out the version history. We're working with an existing
@@ -180,4 +179,3 @@ class AugmentModule(CoreModule):
         shake_data.setVersionHistory(history)
 
         shake_data.close()
-

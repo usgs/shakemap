@@ -1,20 +1,18 @@
 """
 Parse STREC output and create/select a GMPE set for an event.
 """
-#stdlib imports
-import sys
+# stdlib imports
 import os.path
-import logging
 import pprint
 import shutil
 from collections import OrderedDict
 
-#third party imports
+# third party imports
 import numpy as np
 from configobj import ConfigObj
 from validate import ValidateError
 
-#local imports
+# local imports
 from .base import CoreModule
 import shakemap.utils.config as cfg
 from shakemap.utils.layers import get_layer_distances, get_tectonic_regions
@@ -120,7 +118,7 @@ class SelectModule(CoreModule):
         if nearest_layer_name is not None and \
            (min_dist_to_layer == 0 or
             min_dist_to_layer <=
-            config['layers'][nearest_layer_name]['horizontal_buffer']):
+                config['layers'][nearest_layer_name]['horizontal_buffer']):
 
             lcfg = config['layers'][nearest_layer_name]
             #
@@ -137,10 +135,12 @@ class SelectModule(CoreModule):
             #
             # Now get the gmpes and weights for the custom layer
             #
-            layer_gmpes, layer_weights = get_gmpes_by_region(str_tr, cfg_tr, org)
+            layer_gmpes, layer_weights = get_gmpes_by_region(
+                str_tr, cfg_tr, org)
             if layer_buff == 0:
                 #
-                # If we're here, min_dist_to_layer must be 0, so the weight is 1
+                # If we're here, min_dist_to_layer must be 0,
+                # so the weight is 1
                 #
                 lwgt = 1.0
             else:
@@ -195,6 +195,8 @@ class SelectModule(CoreModule):
 # structure (i.e., the layers). So we do our validation and variable
 # conversion here.
 # ##########################################################################
+
+
 def validate_config(mydict, install_path):
 
     for key in mydict:
@@ -217,6 +219,8 @@ def validate_config(mydict, install_path):
 # Produce a weighted list of GMPE sets based on the earthquake's presence
 # in and proximity to the various tectonic regions.
 # ##########################################################################
+
+
 def get_gmpes_by_region(strec_tr, cfg, origin):
 
     gmpe_list = np.array([])
@@ -255,6 +259,8 @@ def get_gmpes_by_region(strec_tr, cfg, origin):
 # Produce a GMPE list and weights for subduction events based on the
 # probabilities of subduction type.
 # ##########################################################################
+
+
 def get_gmpes_from_probs(depth, sreg, cfg):
 
     cr_prob = sreg['probabilities']['crustal']
@@ -308,4 +314,3 @@ def get_gmpes_from_depth(depth, region):
 
     gmpe_weights /= np.sum(gmpe_weights)
     return gmpe_list, gmpe_weights
-

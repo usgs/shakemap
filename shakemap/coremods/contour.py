@@ -1,30 +1,30 @@
-#stdlib imports
-import sys
+# stdlib imports
 import os.path
 import json
-import logging
 import glob
-import warnings
-import io
 
-#third party imports
-from shapely.geometry import MultiLineString,mapping
+# third party imports
+from shapely.geometry import MultiLineString
+from shapely.geometry import mapping
 import fiona
 import numpy as np
 from skimage import measure
 from scipy.ndimage.filters import median_filter
 from shakelib.utils.containers import ShakeMapOutputContainer
-from shakelib.utils.imt_string import oq_to_file, file_to_oq
+from shakelib.utils.imt_string import oq_to_file
 from configobj import ConfigObj
 
-#local imports
+# local imports
 from .base import CoreModule
-from shakemap.utils.config import get_config_paths,get_logging_config
+from shakemap.utils.config import get_config_paths
 
-FORMATS = {'shapefile':('ESRI Shapefile','shp'),
-           'geojson':('GeoJSON','json')}
+FORMATS = {
+    'shapefile': ('ESRI Shapefile', 'shp'),
+    'geojson': ('GeoJSON', 'json')
+}
 
 DEFAULT_FILTER_SIZE = 10
+
 
 class ContourModule(CoreModule):
     """
@@ -38,7 +38,8 @@ class ContourModule(CoreModule):
 
         Raises:
             NotADirectoryError: When the event data directory does not exist.
-            FileNotFoundError: When the the shake_result HDF file does not exist.
+            FileNotFoundError: When the the shake_result HDF file does not
+                exist.
         """
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
@@ -57,18 +58,19 @@ class ContourModule(CoreModule):
 
         # create contour files
         self.logger.info('Contouring to files...')
-        contour_to_files(container,config,datadir,self.logger)
+        contour_to_files(container, config, datadir, self.logger)
 
-def contour(container,imtype,component,intervals=None,
+
+def contour(container, imtype, component, intervals=None,
             filter_size=DEFAULT_FILTER_SIZE):
     """
-    Generate contours of a specific IMT and return as a Shapely 
+    Generate contours of a specific IMT and return as a Shapely
     MultiLineString object.
 
     Args:
         container (ShakeMapOutputContainer): ShakeMapOutputContainer
             with ShakeMap output data.
-        imtype (str): String containing the name of an Intensity 
+        imtype (str): String containing the name of an Intensity
             Measure Type found in container.
         component (str): Intensity Measure component found in container.
         intervals (np.ndarray or None): Array of intervals for IMT, or None.
@@ -81,7 +83,7 @@ def contour(container,imtype,component,intervals=None,
                 - properties: Dictionary of properties describing that
                   feature.
     """
-    imtdict = container.getIMT(imtype,component)
+    imtdict = container.getIMT(imtype, component)
     gridobj = imtdict['mean']
     grid = gridobj.getData()
     metadata = gridobj.getGeoDict().asDict()
@@ -98,12 +100,11 @@ def contour(container,imtype,component,intervals=None,
         fgrid = median_filter(sgrid, size=10)
         units = 'pctg'
 
-    
     if intervals is None:
         interval_type = 'log'
         if imtype == 'MMI':
             interval_type = 'linear'
-        intervals = _get_default_intervals(fgrid, interval_type = interval_type)
+        intervals = _get_default_intervals(fgrid, interval_type=interval_type)
 
     lonstart = metadata['xmin']
     latstart = metadata['ymin']
@@ -112,7 +113,7 @@ def contour(container,imtype,component,intervals=None,
     nlon = metadata['nx']
     nlat = metadata['ny']
 
-    line_strings = [] #dictionary of MultiLineStrings and props
+    line_strings = []  # dictionary of MultiLineStrings and props
 
     for cval in intervals:
         contours = measure.find_contours(fgrid, cval)
@@ -122,27 +123,33 @@ def contour(container,imtype,component,intervals=None,
         #
         new_contours = []
         plot_contours = []
-        for ic, coords in enumerate(contours): #coords is a line segment
-            if len(coords) <= 20: #skipping little contour islands?
+        for ic, coords in enumerate(contours):  # coords is a line segment
+            if len(coords) <= 20:  # skipping little contour islands?
                 continue
 
             contours[ic][:, 0] = coords[:, 1] * lonspan / nlon + lonstart
-            contours[ic][:, 1] = (nlat - coords[:, 0]) * latspan / nlat + latstart
+            contours[ic][:, 1] = (nlat - coords[:, 0]) * \
+                latspan / nlat + latstart
             plot_contours.append(contours[ic])
             new_contours.append(contours[ic].tolist())
 
         if len(new_contours):
             mls = MultiLineString(new_contours)
             props = {'value': cval, 'units': units}
-            line_strings.append({'geometry':mapping(mls),
-                               'properties':props})
+            line_strings.append({
+                'geometry': mapping(mls),
+                'properties': props
+            })
     return line_strings
 
-def contour_to_files(container,config,output_dir,logger):
-    """Generate contours of all configured IMT values.
+
+def contour_to_files(container, config, output_dir, logger):
+    """
+    Generate contours of all configured IMT values.
 
     Args:
-      container (ShakeMapOutputContainer): ShakeMapOutputContainer with ShakeMap output data.
+      container (ShakeMapOutputContainer): ShakeMapOutputContainer with
+          ShakeMap output data.
       config (dict): Product configuration information (from product.conf).
       output_dir (str): Path to directory where output files will be written.
       logger (logging.Logger): Python logging Logger instance.
@@ -150,44 +157,46 @@ def contour_to_files(container,config,output_dir,logger):
     Raises:
         LookupError: When configured file format is not supported, or
             when configured IMT is not found in container.
-        
+
     """
-    verbose = True
     jsonstr = container.getString('info.json')
     infojson = json.loads(jsonstr)
-    event_info = {'event_id': infojson['input']['event_information']['event_id'],
-                  'longitude': infojson['input']['event_information']['longitude'],
-                  'latitude': infojson['input']['event_information']['latitude']}
+    event_info = {
+        'event_id': infojson['input']['event_information']['event_id'],
+        'longitude': infojson['input']['event_information']['longitude'],
+        'latitude': infojson['input']['event_information']['latitude']
+    }
 
-    contour_dict = {}
     imtlist = config['products']['contours']['IMTS'].keys()
 
-    file_format =  config['products']['contours']['format']
-    #open a file for writing
+    file_format = config['products']['contours']['format']
+    # open a file for writing
     if file_format not in FORMATS:
-        raise LookupError('File format %s not supported for contours.' % file_format)
+        raise LookupError(
+            'File format %s not supported for contours.' % file_format)
     driver, extension = FORMATS[file_format]
-    schema = {'geometry':'MultiLineString',
-              'properties':{'value':'float',
-                            'units':'str'}}
-    crs = {'no_defs': True, 'ellps': 'WGS84', 'datum': 'WGS84', 'proj': 'longlat'}
-    
+    schema = {'geometry': 'MultiLineString',
+              'properties': {'value': 'float',
+                             'units': 'str'}}
+    crs = {'no_defs': True, 'ellps': 'WGS84',
+           'datum': 'WGS84', 'proj': 'longlat'}
+
     for imtype in imtlist:
         fileimt = oq_to_file(imtype)
         try:
             components = container.getComponents(imtype)
         except LookupError as look_error:
             fmt = 'No IMT called %s in container %s. Skipping.'
-            logger.warn(fmt % (imtype,container.getFileName()))
+            logger.warn(fmt % (imtype, container.getFileName()))
             continue
         imtype_spec = config['products']['contours']['IMTS'][imtype]
         filter_size = int(imtype_spec['filter_size'])
         for component in components:
             fname = '%s_%s.%s' % (fileimt, component, extension)
-            filename = os.path.join(output_dir,fname)
+            filename = os.path.join(output_dir, fname)
             if os.path.isfile(filename):
                 fpath, fext = os.path.splitext(filename)
-                flist = glob.glob(fpath+'.*')
+                flist = glob.glob(fpath + '.*')
                 for fname in flist:
                     os.remove(fname)
 
@@ -201,11 +210,10 @@ def contour_to_files(container,config,output_dir,logger):
             # not sure where the warning is coming from,
             # but there appears to be no way to stop it...
             with fiona.drivers():
-                vector_file = fiona.open(filename,'w',
+                vector_file = fiona.open(filename, 'w',
                                          driver=driver,
                                          schema=schema,
                                          crs=crs)
-
 
                 intervals = None
                 if 'intervals' in imtype_spec:
@@ -213,48 +221,48 @@ def contour_to_files(container,config,output_dir,logger):
 
                 line_strings = contour(container, imtype, component, intervals)
                 for feature in line_strings:
-                  vector_file.write(feature)
+                    vector_file.write(feature)
 
                 logger.debug('Writing contour file %s' % filename)
                 vector_file.close()
 
-def _get_default_intervals(fgrid,interval_type='log'):
-    """Get default intervals for any IMT.
-    
+
+def _get_default_intervals(fgrid, interval_type='log'):
+    """
+    Get default intervals for any IMT.
+
     Args:
         fgrid (ndarray): Numpy array containing IMT (MMI,PGA, etc.) data.
         interval_type (str): Either 'log' or 'linear'.
-    
+
     Returns:
         ndarray: Numpy array with contour intervals for input IMT.
     """
     if interval_type == 'log':
-        #get the range of the input data
+        # get the range of the input data
         dmin = fgrid.min()
         dmax = fgrid.max()
-        #create an array of intervals at 1's and 3's
+        # create an array of intervals at 1's and 3's
         intervals = []
-        for i in range(-5,5):
-            intervals += [10**i,(10**i)*3]
+        for i in range(-5, 5):
+            intervals += [10**i, (10**i) * 3]
         intervals = np.array(intervals)
 
-        #subtract the intervals from the lowest value in the data
+        # subtract the intervals from the lowest value in the data
         diffs = dmin - intervals
 
-        #find the index of the largest negative value in diffs
+        # find the index of the largest negative value in diffs
         ibottom = np.where(diffs == diffs[diffs < 0].max())[0][0]
-        cmin = intervals[ibottom]
 
-        #find the index
+        # find the index
         diffs = dmax - intervals
         diffmin = diffs[diffs > 0].min()
         itop = np.where(diffs == diffmin)[0][0]
-        cmax = intervals[itop]
-        return intervals[ibottom:itop+1]
+        return intervals[ibottom:itop + 1]
     else:
         # Because you dont contour below the smallest value
         gmin = np.ceil(np.min(fgrid))
         # Because you don't contour above the largest value
         gmax = np.floor(np.max(fgrid))
-        intervals = np.arange(gmin,gmax+1,1)
+        intervals = np.arange(gmin, gmax + 1, 1)
         return intervals

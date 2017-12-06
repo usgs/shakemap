@@ -13,6 +13,8 @@ from shakemap.coremods.assemble import AssembleModule
 ########################################################################
 # Test sm_model
 ########################################################################
+
+
 def test_model_1():
 
     installpath, datapath = get_config_paths()
@@ -23,26 +25,28 @@ def test_model_1():
     #
     assemble = AssembleModule('northridge_points')
     assemble.execute()
-    products_dir = os.path.join(datapath, 'northridge_points', 'current', 
-                            'products')
+    products_dir = os.path.join(datapath, 'northridge_points', 'current',
+                                'products')
     if os.path.isdir(products_dir):
         shutil.rmtree(products_dir)
     model = ModelModule('northridge_points')
     model.execute()
+
 
 def test_model_2():
 
     #
     # This is a small grid with station data and dyfi data (should succeed)
     #
-    # Removing this test because we effectively run it when 
+    # Removing this test because we effectively run it when
     # testing the other product modules.
     #
-#    assemble = AssembleModule('nc72282711')
-#    assemble.execute()
-#    model = ModelModule('nc72282711')
-#    model.execute()
+    #    assemble = AssembleModule('nc72282711')
+    #    assemble.execute()
+    #    model = ModelModule('nc72282711')
+    #    model.execute()
     pass
+
 
 def test_model_3():
 
@@ -54,6 +58,7 @@ def test_model_3():
     model = ModelModule('nc72282711_dyfi')
     model.execute()
 
+
 def test_model_4():
 
     #
@@ -63,6 +68,7 @@ def test_model_4():
     assemble.execute()
     model = ModelModule('nc72282711_nodata_nofault')
     model.execute()
+
 
 def test_model_5():
 
@@ -75,19 +81,21 @@ def test_model_5():
     model = ModelModule('nc72282711_nofault')
     model.execute()
 
+
 def test_model_6():
 
     installpath, datapath = get_config_paths()
     #
     # This event exists, but we hide the input hdf file (should fail)
     #
-    hdf_file = os.path.join(datapath, 'nc72282711_dyfi', 'current', 
+    hdf_file = os.path.join(datapath, 'nc72282711_dyfi', 'current',
                             'shake_data.hdf')
     if os.path.isfile(hdf_file):
         os.remove(hdf_file)
     model = ModelModule('nc72282711_dyfi')
     with pytest.raises(FileNotFoundError):
         model.execute()
+
 
 def test_model_7():
 
@@ -97,6 +105,7 @@ def test_model_7():
     model = ModelModule('not_an_event')
     with pytest.raises(NotADirectoryError):
         model.execute()
+
 
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'

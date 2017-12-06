@@ -14,8 +14,8 @@
 
 import sys
 import os
-#import sphinx_rtd_theme
-#import sphinx_readable_theme
+# import sphinx_rtd_theme
+# import sphinx_readable_theme
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -25,7 +25,7 @@ sys.path.insert(0, os.path.abspath('.'))
 # -- General configuration ------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-#needs_sphinx = '1.0'
+# needs_sphinx = '1.0'
 
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
@@ -51,7 +51,7 @@ templates_path = ['_templates']
 source_suffix = '.rst'
 
 # The encoding of source files.
-#source_encoding = 'utf-8-sig'
+# source_encoding = 'utf-8-sig'
 
 # The master toctree document.
 master_doc = 'index'
@@ -123,19 +123,19 @@ html_theme = 'alabaster'
 # documentation.
 #html_theme_options = {'collapse_navigation': False}
 html_theme_options = {
-        'logo': 'northridge_thumbnail_light_16x9.png',
-        'logo_name': True,
-        'github_button': False,
-        'github_banner': False,
-        'travis_button': False,
-        'codecov_button': False,
-        'sidebar_collapse': True,
-        'show_powered_by': False,
-        'show_related': False,
-        'fixed_sidebar': False,
-        'sidebar_includehidden': True,
-        'sidebar_width': '250px',
-        }
+    'logo': 'northridge_thumbnail_light_16x9.png',
+    'logo_name': True,
+    'github_button': False,
+    'github_banner': False,
+    'travis_button': False,
+    'codecov_button': False,
+    'sidebar_collapse': True,
+    'show_powered_by': False,
+    'show_related': False,
+    'fixed_sidebar': False,
+    'sidebar_includehidden': True,
+    'sidebar_width': '250px',
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
@@ -182,7 +182,7 @@ html_sidebars = {
     '**': [
         'about.html',
         'navigation.html',
-#        'relations.html',
+        #        'relations.html',
         'searchbox.html',
     ]
 }
@@ -382,6 +382,6 @@ autodoc_member_order = 'bysource'
 napoleon_include_special_with_doc = False
 todo_include_todos = True
 
+
 def setup(app):
     app.add_stylesheet('css/custom.css')  # may also be an URL
-

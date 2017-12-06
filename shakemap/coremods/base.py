@@ -1,13 +1,15 @@
-#stdlib imports
+# stdlib imports
 import logging
 from abc import ABC, abstractmethod
 
-#local imports
+# local imports
 from shakemap.utils.config import get_logging_config
+
 
 class CoreModule(ABC):
     """
-    Base class for any module in coremods which gets called by the shake program.
+    Base class for any module in coremods which gets called by the shake
+    program.
     """
 
     command_name = ''

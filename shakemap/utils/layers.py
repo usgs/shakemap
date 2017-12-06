@@ -29,8 +29,8 @@ def nearest_edge(elon, elat, poly):
     x, y = poly.exterior.xy
     nearest = 99999.
     for ix in range(1, len(x) - 1):
-        dd = min_distance_to_segment(np.array(x[ix-1:ix+1]),
-                                     np.array(y[ix-1:ix+1]),
+        dd = min_distance_to_segment(np.array(x[ix - 1:ix + 1]),
+                                     np.array(y[ix - 1:ix + 1]),
                                      elon_arr, elat_arr)
         if np.abs(dd[0]) < nearest:
             nearest = dd[0]

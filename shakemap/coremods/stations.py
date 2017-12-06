@@ -1,18 +1,17 @@
-#stdlib imports
-import sys
+# stdlib imports
 import os.path
 import json
-import logging
 
-#third party imports
+# third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
 from configobj import ConfigObj
 
-#local imports
+# local imports
 from .base import CoreModule
-from shakemap.utils.config import get_config_paths,get_logging_config
+from shakemap.utils.config import get_config_paths
 
 ALLLOWED_FORMATS = ['json']
+
 
 class StationModule(CoreModule):
     """
@@ -26,7 +25,8 @@ class StationModule(CoreModule):
 
         Raises:
             NotADirectoryError: When the event data directory does not exist.
-            FileNotFoundError: When the the shake_result HDF file does not exist.
+            FileNotFoundError: When the the shake_result HDF file does not
+                exist.
         """
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
@@ -35,7 +35,7 @@ class StationModule(CoreModule):
         datafile = os.path.join(datadir, 'shake_result.hdf')
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
-            
+
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
 
@@ -47,14 +47,13 @@ class StationModule(CoreModule):
         formats = config['products']['info']['formats']
         for fformat in formats:
             if fformat not in ALLLOWED_FORMATS:
-                logger.warn('Specified format %s not in list of defined formats.  Skipping.' % fformat)
+                self.logger.warn('Specified format %s not in list of defined '
+                                 'formats.  Skipping.' % fformat)
                 continue
             if fformat == 'json':
                 self.logger.info('Writing rupture.json file...')
                 station_dict = container.getStationList().getGeoJson()
-                station_file = os.path.join(datadir,'stationlist.json')
-                f = open(station_file,'w')
-                json.dump(station_dict,f)
+                station_file = os.path.join(datadir, 'stationlist.json')
+                f = open(station_file, 'w')
+                json.dump(station_dict, f)
                 f.close()
-        
-

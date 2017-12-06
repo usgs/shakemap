@@ -21,6 +21,8 @@ from shakemap.coremods.mapping import MappingModule
 ########################################################################
 # Test sm_model
 ########################################################################
+
+
 def test_products():
 
     installpath, datapath = get_config_paths()
@@ -60,6 +62,7 @@ def test_products():
                                 'products', 'shake_results.hdf')
         if os.path.isfile(res_file):
             os.remove(res_file)
+
 
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'

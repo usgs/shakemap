@@ -9,6 +9,8 @@ shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 ########################################################################
 # Test shake
 ########################################################################
+
+
 def test_shake():
 
     program = os.path.join(shakedir, 'bin', 'shake')
@@ -30,4 +32,3 @@ def test_shake():
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'
     test_shake()
-
