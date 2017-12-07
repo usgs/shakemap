@@ -44,20 +44,18 @@
 <span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">Parse STREC output and create/select a GMPE set for an event.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="c1">#stdlib imports</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">pprint</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
-<span class="c1">#third party imports</span>
+<span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 <span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="n">ValidateError</span>
 
-<span class="c1">#local imports</span>
+<span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">import</span> <span class="nn">shakemap.utils.config</span> <span class="k">as</span> <span class="nn">cfg</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.layers</span> <span class="k">import</span> <span class="n">get_layer_distances</span><span class="p">,</span> <span class="n">get_tectonic_regions</span>
@@ -163,7 +161,7 @@
         <span class="k">if</span> <span class="n">nearest_layer_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
            <span class="p">(</span><span class="n">min_dist_to_layer</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span>
             <span class="n">min_dist_to_layer</span> <span class="o">&lt;=</span>
-            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="n">nearest_layer_name</span><span class="p">][</span><span class="s1">&#39;horizontal_buffer&#39;</span><span class="p">]):</span>
+                <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="n">nearest_layer_name</span><span class="p">][</span><span class="s1">&#39;horizontal_buffer&#39;</span><span class="p">]):</span>
 
             <span class="n">lcfg</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="n">nearest_layer_name</span><span class="p">]</span>
             <span class="c1">#</span>
@@ -180,10 +178,12 @@
             <span class="c1">#</span>
             <span class="c1"># Now get the gmpes and weights for the custom layer</span>
             <span class="c1">#</span>
-            <span class="n">layer_gmpes</span><span class="p">,</span> <span class="n">layer_weights</span> <span class="o">=</span> <span class="n">get_gmpes_by_region</span><span class="p">(</span><span class="n">str_tr</span><span class="p">,</span> <span class="n">cfg_tr</span><span class="p">,</span> <span class="n">org</span><span class="p">)</span>
+            <span class="n">layer_gmpes</span><span class="p">,</span> <span class="n">layer_weights</span> <span class="o">=</span> <span class="n">get_gmpes_by_region</span><span class="p">(</span>
+                <span class="n">str_tr</span><span class="p">,</span> <span class="n">cfg_tr</span><span class="p">,</span> <span class="n">org</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">layer_buff</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="c1">#</span>
-                <span class="c1"># If we&#39;re here, min_dist_to_layer must be 0, so the weight is 1</span>
+                <span class="c1"># If we&#39;re here, min_dist_to_layer must be 0,</span>
+                <span class="c1"># so the weight is 1</span>
                 <span class="c1">#</span>
                 <span class="n">lwgt</span> <span class="o">=</span> <span class="mf">1.0</span>
             <span class="k">else</span><span class="p">:</span>
@@ -238,6 +238,8 @@
 <span class="c1"># structure (i.e., the layers). So we do our validation and variable</span>
 <span class="c1"># conversion here.</span>
 <span class="c1"># ##########################################################################</span>
+
+
 <div class="viewcode-block" id="validate_config"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.select.html#shakemap.coremods.select.validate_config">[docs]</a><span class="k">def</span> <span class="nf">validate_config</span><span class="p">(</span><span class="n">mydict</span><span class="p">,</span> <span class="n">install_path</span><span class="p">):</span>
 
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">mydict</span><span class="p">:</span>
@@ -260,6 +262,8 @@
 <span class="c1"># Produce a weighted list of GMPE sets based on the earthquake&#39;s presence</span>
 <span class="c1"># in and proximity to the various tectonic regions.</span>
 <span class="c1"># ##########################################################################</span>
+
+
 <div class="viewcode-block" id="get_gmpes_by_region"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.select.html#shakemap.coremods.select.get_gmpes_by_region">[docs]</a><span class="k">def</span> <span class="nf">get_gmpes_by_region</span><span class="p">(</span><span class="n">strec_tr</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
 
     <span class="n">gmpe_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
@@ -298,6 +302,8 @@
 <span class="c1"># Produce a GMPE list and weights for subduction events based on the</span>
 <span class="c1"># probabilities of subduction type.</span>
 <span class="c1"># ##########################################################################</span>
+
+
 <div class="viewcode-block" id="get_gmpes_from_probs"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.select.html#shakemap.coremods.select.get_gmpes_from_probs">[docs]</a><span class="k">def</span> <span class="nf">get_gmpes_from_probs</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">sreg</span><span class="p">,</span> <span class="n">cfg</span><span class="p">):</span>
 
     <span class="n">cr_prob</span> <span class="o">=</span> <span class="n">sreg</span><span class="p">[</span><span class="s1">&#39;probabilities&#39;</span><span class="p">][</span><span class="s1">&#39;crustal&#39;</span><span class="p">]</span>
@@ -351,7 +357,6 @@
 
     <span class="n">gmpe_weights</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">gmpe_weights</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gmpe_list</span><span class="p">,</span> <span class="n">gmpe_weights</span></div>
-
 </pre></div>
 
           </div>

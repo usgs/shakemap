@@ -127,7 +127,7 @@ products (Vs30 grid, geographic features, etc.) – and a configuration
 file that points to them. The profile data resides in a file called
 <em>profiles.conf</em> in a subdirectory, <em>.shakemap</em>, of the user’s home
 directory. The user may choose another location for the profile file
-by using the ‘–f’ option to <strong>sm_profile</strong>. Other ShakeMap programs
+by using the <code class="docutils literal"><span class="pre">-f</span></code> option to <strong>sm_profile</strong>. Other ShakeMap programs
 read the profile information and use it to find event and
 configuration information.</p>
 <p>The data directory (‘&lt;data_dir&gt;’) contains event subdirectories (named
@@ -190,7 +190,7 @@ scenarios, and historic events). See the
 ID and a list of modules as arguments. The modules do the work of
 assembling the input data, producing interpolated grids, and deriving
 products from the grids and associated metadata. See the
-<a class="reference internal" href="../programs/shake.html#shake"><span class="std std-ref">shake man page</span></a> or run <strong>shake –help</strong> for a list
+<a class="reference internal" href="../programs/shake.html#shake"><span class="std std-ref">shake man page</span></a> or run <code class="docutils literal"><span class="pre">shake</span> <span class="pre">--help</span></code> for a list
 of available modules.</p>
 <p>The behavior of <strong>shake</strong> and many of its modules are controlled by
 the configuration files <em>shake.conf</em> and <em>products.conf</em>. <em>shake.conf</em>
@@ -258,7 +258,7 @@ parameters (as configured in <em>select.conf</em>) replace the any or all
 of the parameters of the corresponding tectonic regions, and the
 calculation of a weighted GMPE set proceeds as before. For example,
 the layer section of <em>select.conf</em> might contain:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">layers</span><span class="p">]</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="p">[</span><span class="n">layers</span><span class="p">]</span>
     <span class="p">[[</span><span class="n">california</span><span class="p">]]</span>
         <span class="n">horizontal_buffer</span> <span class="o">=</span> <span class="mi">50</span>
         <span class="p">[[[</span><span class="n">scr</span><span class="p">]]</span>
@@ -293,14 +293,14 @@ encountered in the <em>select.conf</em> is used and any other(s) will be ignored
 <p>The <strong>assemble</strong> module collects event and configuration data and creates the
 file <em>shake_data.hdf</em>. It first reads <em>event.xml</em> and stores it in a
 data structure. <strong>sm_assemble</strong> then reads the configuration files</p>
-<div class="line-block">
-<div class="line">&lt;install_dir&gt;/modules.conf</div>
-<div class="line">&lt;install_dir&gt;/gmpe_sets.conf</div>
-<div class="line">&lt;install_dir&gt;/model.conf</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">install_dir</span><span class="o">&gt;/</span><span class="n">modules</span><span class="o">.</span><span class="n">conf</span>
+<span class="o">&lt;</span><span class="n">install_dir</span><span class="o">&gt;/</span><span class="n">gmpe_sets</span><span class="o">.</span><span class="n">conf</span>
+<span class="o">&lt;</span><span class="n">install_dir</span><span class="o">&gt;/</span><span class="n">model</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
 </div>
 <p>and assembles them into a single configuration. It then reads</p>
-<div class="line-block">
-<div class="line">&lt;data_dir&gt;/&lt;evnt_id&gt;/current&gt;/model.conf (or model_zc.conf).</div>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">data_dir</span><span class="o">&gt;/&lt;</span><span class="n">evnt_id</span><span class="o">&gt;/</span><span class="n">current</span><span class="o">&gt;/</span><span class="n">model</span><span class="o">.</span><span class="n">conf</span> <span class="p">(</span><span class="ow">or</span> <span class="n">model_zc</span><span class="o">.</span><span class="n">conf</span><span class="p">)</span><span class="o">.</span>
+</pre></div>
 </div>
 <p>Any parameter set in the event-specific <em>model.conf</em> will override
 parameters set in the other configuration files. Note: if both
@@ -390,9 +390,11 @@ may be specified in the <em>products.conf</em> configuration file.</p>
 </div>
 <div class="section" id="gridxml">
 <h4>2.1.2.3.6. gridxml<a class="headerlink" href="#gridxml" title="Permalink to this headline">¶</a></h4>
-<p><strong>gridxml</strong> reads an event’s <em>shake_result.hdf</em> and produces the legacy
-files <em>grid.xml</em> and <em>uncertainty.xml</em>. See the products section of this
-manual for more on these files. Note that the use of these files is
+<p><strong>gridxml</strong> reads an event’s <em>shake_result.hdf</em> and produces the ShakeMap 3.5
+files <em>grid.xml</em> and <em>uncertainty.xml</em>. Note that these files will eventually
+become deprecated in favor of the new <em>shake_result.hdf</em> file.
+See the products section of this manual for more on these files.
+Note that the use of these files is
 deprecated. System designers should extract the relevant information
 directly from <em>shake_result.hdf</em>. See <a class="reference internal" href="tg_formats.html#sec-formats-4"><span class="std std-ref">the formats section</span></a>
 of this manual for more on
@@ -409,11 +411,12 @@ which contains metadata about the ShakeMap.</p>
 <h4>2.1.2.3.8. mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h4>
 <p><strong>mapping</strong> reads an event’s <em>shake_result.hdf</em> and produces a set of
 maps of the IMTs for use in quality control and evaluation of the
-performance of the system. This module is deprecated. It is not
-intended to produce maps that are the equivalent of ShakeMap 3.5’s
-static maps, and we do not intend to maintain or support it. In
-particular, it uses the <strong>basemap</strong> mapping package, which is
-disappearing in favor of <strong>cartopy</strong>.</p>
+performance of the system. Currently, this module is a placeholder
+for basic visualization purposes. It does not produce reliable
+production-ready maps, equivalent of ShakeMap 3.5’s static maps,
+and we may not maintain or support it in its current form in the
+future. In particular, it uses the <strong>basemap</strong> mapping package,
+which is disappearing in favor of <strong>cartopy</strong>.</p>
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.mapping.html#module-shakemap.coremods.mapping" title="shakemap.coremods.mapping"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.mapping()</span></code></a> for more details. See the
 configuration file <em>products.conf</em> for information on configuring
 the <strong>mapping</strong> module.</p>

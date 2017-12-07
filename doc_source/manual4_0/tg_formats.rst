@@ -61,22 +61,23 @@ consist of *Groups* or *DataSets*.  Groups can contain other groups
 or datasets, and can contain a dictionary-like set of *attributes*.
 Datasets consist of arrays holding data values, and
 metadata in the form of attributes.  A very good introduction to
-the HDF5 data format can be found here:
-
-https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf
+the HDF5 data format can be found
+`here <https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf>`_.
 
 *shake_result.hdf* consists of a number of groups and datasets. Our
 implementation of HDF5 uses groups to contain Python dictionaries,
 strings, and numpy arrays.  Dictionaries are stored as recursive groups.
-For example, a Python *config* dictionary consisting of the following information::
+For example, a Python *config* dictionary consisting of the following information:
 
-  d = {
-       'name': 'config',
-       'gmpe_set': {
-           'Active_Crustal': 'Campbell2003'
+.. code-block:: python
+
+    d = {
+        'name': 'config',
+        'gmpe_set': {
+            'Active_Crustal': 'Campbell2003'
         },
-       'depth': 34.0,
-  }
+        'depth': 34.0,
+    }
 
 would be stored in a group called ``__dictionary_config__``, with attributes
 'name' and 'depth'.  There will be a sub-group called 'gmpe_set', with an attribute
@@ -165,4 +166,5 @@ for some basic access patterns.
 
 Matlab developers can use the function *read_shake_data.m*, which is included in
 the repository for ShakeMap
-(https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m).
+`here <https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m>`_.
+

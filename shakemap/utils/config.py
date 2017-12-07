@@ -87,7 +87,7 @@ def get_config_paths():
     directories.
 
     Returns:
-        (str, str): The paths to the ShakeMap install directory
+        tuple: The paths to the ShakeMap install directory
         and the data directory.
     """
     if 'CALLED_FROM_PYTEST' in os.environ:

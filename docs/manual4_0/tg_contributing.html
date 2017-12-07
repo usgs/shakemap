@@ -219,8 +219,13 @@ should follow the primary class. Helper functions and other
 “invisible” stuff should follow. The <code class="docutils literal"><span class="pre">&quot;__main__&quot;</span></code> block (if
 any) should come last</li>
 </ul>
-<p>Example:</p>
-<p>A code module called mapcalc.py in a package (directory) called calculators:</p>
+<p><strong>Example</strong></p>
+<p>Below is a simple example module with a module-level method
+(<code class="docutils literal"><span class="pre">convenience_calculator</span></code>) and a class (<code class="docutils literal"><span class="pre">DummyClass</span></code>)
+with a class method (<code class="docutils literal"><span class="pre">doThingsWithMagnitude</span></code>). For real code
+examples, see
+<a class="reference external" href="https://github.com/usgs/shakemap/tree/master/shakemap/coremods)">the coremods</a>
+directory on Github.</p>
 <div class="highlight-python"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env python</span>
 
 <span class="n">CONSTANT</span> <span class="o">=</span> <span class="mf">5.0</span>
@@ -248,7 +253,7 @@ any) should come last</li>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">CALC_VERSION</span> <span class="o">=</span> <span class="s1">&#39;1.1&#39;</span>
     <span class="n">__HIDDEN_CLASS_VARIABLE</span> <span class="o">=</span> <span class="mi">2</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calc_string</span><span class="o">=</span><span class="s1">&#39;not zero&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">calc_string</span><span class="o">=</span><span class="s1">&#39;not zero&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create an instance of the DummyClass class.</span>
 

@@ -10,6 +10,7 @@ import pkgutil
 import inspect
 import importlib
 import time
+from collections import OrderedDict
 
 import matplotlib
 matplotlib.use('Agg')
@@ -26,7 +27,7 @@ def _get_command_classes():
     Create a dictionary of classname:class to be used in main().
 
     Returns:
-        (dict): Dictionary of classname:class where each class
+        dict: Dictionary of classname:class where each class
             is a subclass of shakemap.coremods.base.CoreModule.
     """
     coremods = {
@@ -48,7 +49,18 @@ def _get_command_classes():
                 if not cmd:
                     continue
                 classes[cmd] = core_class
-    return classes
+
+    ordered_classes = OrderedDict()
+    ordered_classes['assemble'] = classes['assemble']
+    ordered_classes['augment'] = classes['augment']
+    ordered_classes['model'] = classes['model']
+    keys = sorted(classes.keys())
+    for k in keys:
+        if k in ['assemble', 'augment', 'model']:
+            continue
+        ordered_classes[k] = classes[k]
+
+    return ordered_classes
 
 
 _classes_ = _get_command_classes()
@@ -83,14 +95,14 @@ def get_parser():
     Internal method to get argparse parser instance.
 
     Returns:
-        (ArgumentParser): argparse argument parser.
+        ArgumentParser: argparse argument parser.
     """
     description = '''
     Run all configured ShakeMap programs.
     '''
 
     epilog = 'Available commands:\n'
-    for key, core_class in sorted(_classes_.items()):
+    for key, core_class in _classes_.items():
         epilog += '    - %s\n' % inspect.getdoc(core_class)
 
     parser = argparse.ArgumentParser(
@@ -116,7 +128,7 @@ def main(args):
     command.
 
     Args:
-        (ArgumentParser): argparse argument parser.
+        ArgumentParser: argparse argument parser.
 
 
     """

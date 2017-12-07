@@ -148,12 +148,18 @@
         <span class="c1"># get all of the pieces needed for the mapmaker</span>
         <span class="n">layerdict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">layers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">]</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;coast&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;coasts&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;ocean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;oceans&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;lake&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;lakes&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;countries&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;states&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
-        <span class="n">topofile</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;coast&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
+            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;coasts&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;ocean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
+            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;oceans&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;lake&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
+            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;lakes&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
+            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;countries&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
+            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;states&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">topofile</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
+            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
         <span class="n">cities</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="s1">&#39;cities&#39;</span><span class="p">],</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
         <span class="n">mapmaker</span> <span class="o">=</span> <span class="n">MapMaker</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">topofile</span><span class="p">,</span> <span class="n">layerdict</span><span class="p">,</span> <span class="n">cities</span><span class="p">,</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
@@ -193,7 +199,8 @@
 
 
 <div class="viewcode-block" id="getProjectedPatches"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.getProjectedPatches">[docs]</a><span class="k">def</span> <span class="nf">getProjectedPatches</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Project polygon into Descartes PolygonPatch objects.</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Project polygon into Descartes PolygonPatch objects.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        polygon (Polygon): Shapely Polygon or MultiPolygon object.</span>
@@ -231,8 +238,8 @@
         <span class="sd">&quot;&quot;&quot;Initialize MapMaker object.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            container (ShakeMapOutputContainer): ShakeMapOutputContainer object containing</span>
-<span class="sd">                model results.</span>
+<span class="sd">            container (ShakeMapOutputContainer): ShakeMapOutputContainer object</span>
+<span class="sd">                containing model results.</span>
 <span class="sd">            topofile (str): Path to file containing global topography grid.</span>
 <span class="sd">            layerdict (dict): Dictionary containing fields:</span>
 
@@ -271,11 +278,11 @@
         <span class="n">info_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span>
             <span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">))[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]</span>
         <span class="n">event_dict</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;eventsourcecode&#39;</span><span class="p">:</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;event_id&#39;</span><span class="p">],</span>
-                <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]),</span>
-                <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]),</span>
-                <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]),</span>
-                <span class="s1">&#39;mag&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;magnitude&#39;</span><span class="p">])</span>
+            <span class="s1">&#39;eventsourcecode&#39;</span><span class="p">:</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;event_id&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]),</span>
+            <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]),</span>
+            <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]),</span>
+            <span class="s1">&#39;mag&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;magnitude&#39;</span><span class="p">])</span>
         <span class="p">}</span>
         <span class="n">origin</span> <span class="o">=</span> <span class="n">Origin</span><span class="p">(</span><span class="n">event_dict</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">rupture_dict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Point&#39;</span><span class="p">:</span>
@@ -321,7 +328,8 @@
         <span class="k">return</span> <span class="n">vshapes</span>
 
     <span class="k">def</span> <span class="nf">_clipBounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Clip input vector data to bounds of map.</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clip input vector data to bounds of map.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># returns a list of GeoJSON-like mapping objects</span>
         <span class="n">comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
@@ -341,7 +349,8 @@
                 <span class="n">tshape</span> <span class="o">=</span> <span class="n">sShape</span><span class="p">(</span><span class="n">shape</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">])</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">intshape</span> <span class="o">=</span> <span class="n">tshape</span><span class="o">.</span><span class="n">intersection</span><span class="p">(</span><span class="n">bboxpoly</span><span class="p">)</span>
-                <span class="k">except</span> <span class="n">TopologicalError</span> <span class="k">as</span> <span class="n">te</span><span class="p">:</span>
+<span class="c1">#                except TopologicalError as te:</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">te</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Failure to grab </span><span class="si">%s</span><span class="s1"> segment: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span>
                                      <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">te</span><span class="p">)))</span>
                     <span class="k">continue</span>
@@ -394,7 +403,7 @@
 <span class="sd">                  (optional).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="n">BaseMapCities</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>  <span class="c1"># may raise exception</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="n">BasemapCities</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>  <span class="c1"># may raise exception</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="kc">None</span></div>
@@ -577,9 +586,6 @@
         <span class="n">scaley</span> <span class="o">=</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span> <span class="o">+</span> <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">ymax</span> <span class="o">-</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">)</span> <span class="o">/</span> <span class="mf">10.0</span>
 
         <span class="c1"># how tall should scale bar be, in map units (km)?</span>
-        <span class="n">bbox</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">()</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span>
-                <span class="n">m</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">dpi_scale_trans</span><span class="o">.</span><span class="n">inverted</span><span class="p">())</span>
-        <span class="n">height</span> <span class="o">=</span> <span class="n">bbox</span><span class="o">.</span><span class="n">height</span>
         <span class="n">yoff</span> <span class="o">=</span> <span class="p">(</span><span class="mf">0.01</span> <span class="o">*</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">ymax</span> <span class="o">-</span> <span class="n">m</span><span class="o">.</span><span class="n">ymin</span><span class="p">))</span>
 
         <span class="c1"># where should scale apply (center of map)</span>
@@ -588,9 +594,9 @@
 
         <span class="c1"># figure out a scalebar length that is approximately 30% of total</span>
         <span class="c1"># width in km</span>
-        <span class="n">map_width</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">m</span><span class="o">.</span><span class="n">xmin</span><span class="p">)</span><span class="o">/</span><span class="mi">1000</span>  <span class="c1"># km</span>
+        <span class="n">map_width</span> <span class="o">=</span> <span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">xmax</span> <span class="o">-</span> <span class="n">m</span><span class="o">.</span><span class="n">xmin</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000</span>  <span class="c1"># km</span>
         <span class="n">lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">25</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">75</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">125</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">175</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">250</span><span class="p">])</span>
-        <span class="n">lfracs</span> <span class="o">=</span> <span class="n">lengths</span><span class="o">/</span><span class="n">map_width</span>
+        <span class="n">lfracs</span> <span class="o">=</span> <span class="n">lengths</span> <span class="o">/</span> <span class="n">map_width</span>
         <span class="n">length</span> <span class="o">=</span> <span class="n">lengths</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">lfracs</span> <span class="o">-</span> <span class="mf">0.3</span><span class="p">)</span><span class="o">.</span><span class="n">argmin</span><span class="p">()]</span>
 
         <span class="n">m</span><span class="o">.</span><span class="n">drawmapscale</span><span class="p">(</span><span class="n">scalex</span><span class="p">,</span> <span class="n">scaley</span><span class="p">,</span> <span class="n">clon</span><span class="p">,</span> <span class="n">clat</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span>
@@ -674,10 +680,10 @@
         <span class="n">hlon</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lon</span>
         <span class="n">hlat</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lat</span>
         <span class="n">edict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span>
-                <span class="s1">&#39;info.json&#39;</span><span class="p">))[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]</span>
+            <span class="s1">&#39;info.json&#39;</span><span class="p">))[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]</span>
         <span class="n">eloc</span> <span class="o">=</span> <span class="n">edict</span><span class="p">[</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span>
         <span class="n">etime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
-                    <span class="n">edict</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span>
+            <span class="n">edict</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span>
         <span class="n">timestr</span> <span class="o">=</span> <span class="n">etime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1">, %Y %H:%M:%S&#39;</span><span class="p">)</span>
         <span class="n">mag</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span>
         <span class="k">if</span> <span class="n">hlon</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
@@ -880,8 +886,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">limitByBounds</span><span class="p">(</span>
                 <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">limitByGrid</span><span class="p">(</span>
-                    <span class="n">nx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span><span class="p">,</span>
-                    <span class="n">cities_per_grid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span><span class="p">)</span>
+                <span class="n">nx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span><span class="p">,</span>
+                <span class="n">cities_per_grid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span><span class="p">)</span>
             <span class="c1"># self.logger.debug(&quot;Available fonts: &quot;, self.cities._fontlist)</span>
             <span class="k">if</span> <span class="s1">&#39;Times New Roman&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">_fontlist</span><span class="p">:</span>
                 <span class="n">font</span> <span class="o">=</span> <span class="s1">&#39;Times New Roman&#39;</span>
@@ -1040,7 +1046,7 @@
         <span class="k">elif</span> <span class="n">imt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
             <span class="n">imtdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">imtdata</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">imtdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">imtdata</span><span class="p">)</span><span class="o">*</span><span class="mi">100</span>
+            <span class="n">imtdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">imtdata</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
 
         <span class="n">pimt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_projectGrid</span><span class="p">(</span><span class="n">imtdata</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
 
@@ -1112,8 +1118,8 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">limitByBounds</span><span class="p">(</span>
                 <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">limitByGrid</span><span class="p">(</span>
-                    <span class="n">nx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span><span class="p">,</span>
-                    <span class="n">cities_per_grid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span><span class="p">)</span>
+                <span class="n">nx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span><span class="p">,</span>
+                <span class="n">cities_per_grid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span><span class="p">)</span>
             <span class="k">if</span> <span class="s1">&#39;Times New Roman&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">_fontlist</span><span class="p">:</span>
                 <span class="n">font</span> <span class="o">=</span> <span class="s1">&#39;Times New Roman&#39;</span>
             <span class="k">else</span><span class="p">:</span>

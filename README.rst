@@ -47,7 +47,12 @@ ShakeMap System at the USGS’s National Earthquake Information Center in Golden
 Colorado. The varied nature of its national and international installations has
 required extensive modifications to the original source code. Additional uses of
 ShakeMap, such as for scenario earthquakes and the ShakeMap Atlas, have also
-required ongoing modification of the code. 
+required ongoing modification of the code.
+
+To receive updates on ShakeMap and discuss the software, please join the
+`shake-dev <https://geohazards.usgs.gov/mailman/listinfo/shake-dev.>`_
+mailing list. We also encourage requests, questions, and discussions though
+the Github issues tab associated with this repository.
 
 Installation and Dependencies
 ------------
