@@ -93,18 +93,18 @@ consist of <em>Groups</em> or <em>DataSets</em>.  Groups can contain other group
 or datasets, and can contain a dictionary-like set of <em>attributes</em>.
 Datasets consist of arrays holding data values, and
 metadata in the form of attributes.  A very good introduction to
-the HDF5 data format can be found here:</p>
-<p><a class="reference external" href="https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf">https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf</a></p>
+the HDF5 data format can be found
+<a class="reference external" href="https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf">here</a>.</p>
 <p><em>shake_result.hdf</em> consists of a number of groups and datasets. Our
 implementation of HDF5 uses groups to contain Python dictionaries,
 strings, and numpy arrays.  Dictionaries are stored as recursive groups.
 For example, a Python <em>config</em> dictionary consisting of the following information:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
-     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span>
-     <span class="s1">&#39;gmpe_set&#39;</span><span class="p">:</span> <span class="p">{</span>
-         <span class="s1">&#39;Active_Crustal&#39;</span><span class="p">:</span> <span class="s1">&#39;Campbell2003&#39;</span>
-      <span class="p">},</span>
-     <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="mf">34.0</span><span class="p">,</span>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;gmpe_set&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;Active_Crustal&#39;</span><span class="p">:</span> <span class="s1">&#39;Campbell2003&#39;</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="mf">34.0</span><span class="p">,</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -250,7 +250,7 @@ Also see, for example, the <em>contour</em> module [<a class="reference internal
 for some basic access patterns.</p>
 <p>Matlab developers can use the function <em>read_shake_data.m</em>, which is included in
 the repository for ShakeMap
-(<a class="reference external" href="https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m">https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m</a>).</p>
+<a class="reference external" href="https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m">here</a>.</p>
 </div>
 </div>
 

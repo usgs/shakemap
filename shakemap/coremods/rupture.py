@@ -15,7 +15,7 @@ ALLLOWED_FORMATS = ['json']
 
 class RuptureModule(CoreModule):
     """
-    rupture -- Write rupture.json.
+    rupture -- Generate rupture.json from shake_result.hdf.
     """
 
     command_name = 'rupture'

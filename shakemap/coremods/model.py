@@ -53,7 +53,8 @@ class ModelModule(CoreModule):
     command_name = 'model'
 
     def execute(self):
-        """Interpolate ground motions to a grid or list of locations.
+        """
+        Interpolate ground motions to a grid or list of locations.
 
         Raises:
             NotADirectoryError: When the event data directory does not exist.

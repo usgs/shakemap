@@ -21,7 +21,8 @@ from shakemap.utils.config import get_config_paths, get_custom_validator,\
 
 class AugmentModule(CoreModule):
     """
-    augment -- Incorporate additional content to the ShakeMap input file.
+    augment -- Incorporate additional content into the shake_data.hdf input
+                     file.
     """
 
     command_name = 'augment'

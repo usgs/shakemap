@@ -192,9 +192,14 @@ Class instance variable names should be:
   "invisible" stuff should follow. The ``"__main__"`` block (if 
   any) should come last
 
-Example:
+**Example**
 
-A code module called mapcalc.py in a package (directory) called calculators:
+Below is a simple example module with a module-level method
+(``convenience_calculator``) and a class (``DummyClass``)
+with a class method (``doThingsWithMagnitude``). For real code
+examples, see
+`the coremods <https://github.com/usgs/shakemap/tree/master/shakemap/coremods)>`_
+directory on Github.
 
 .. code-block:: python
 

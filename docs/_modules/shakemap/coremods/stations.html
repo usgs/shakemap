@@ -41,21 +41,20 @@
           <div class="body" role="main">
             
   <h1>Source code for shakemap.coremods.stations</h1><div class="highlight"><pre>
-<span></span><span class="c1">#stdlib imports</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="c1">#third party imports</span>
+<span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 
-<span class="c1">#local imports</span>
+<span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span><span class="n">get_logging_config</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 
 <span class="n">ALLLOWED_FORMATS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;json&#39;</span><span class="p">]</span>
+
 
 <div class="viewcode-block" id="StationModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.stations.html#shakemap.coremods.stations.StationModule">[docs]</a><span class="k">class</span> <span class="nc">StationModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -69,7 +68,8 @@
 
 <span class="sd">        Raises:</span>
 <span class="sd">            NotADirectoryError: When the event data directory does not exist.</span>
-<span class="sd">            FileNotFoundError: When the the shake_result HDF file does not exist.</span>
+<span class="sd">            FileNotFoundError: When the the shake_result HDF file does not</span>
+<span class="sd">                exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
         <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
@@ -78,7 +78,7 @@
         <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
-            
+
         <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 
@@ -90,17 +90,16 @@
         <span class="n">formats</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;info&#39;</span><span class="p">][</span><span class="s1">&#39;formats&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">fformat</span> <span class="ow">in</span> <span class="n">formats</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">fformat</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ALLLOWED_FORMATS</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Specified format </span><span class="si">%s</span><span class="s1"> not in list of defined formats.  Skipping.&#39;</span> <span class="o">%</span> <span class="n">fformat</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Specified format </span><span class="si">%s</span><span class="s1"> not in list of defined &#39;</span>
+                                 <span class="s1">&#39;formats.  Skipping.&#39;</span> <span class="o">%</span> <span class="n">fformat</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">fformat</span> <span class="o">==</span> <span class="s1">&#39;json&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing rupture.json file...&#39;</span><span class="p">)</span>
                 <span class="n">station_dict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getStationList</span><span class="p">()</span><span class="o">.</span><span class="n">getGeoJson</span><span class="p">()</span>
-                <span class="n">station_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="s1">&#39;stationlist.json&#39;</span><span class="p">)</span>
-                <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">station_file</span><span class="p">,</span><span class="s1">&#39;w&#39;</span><span class="p">)</span>
-                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">station_dict</span><span class="p">,</span><span class="n">f</span><span class="p">)</span>
+                <span class="n">station_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;stationlist.json&#39;</span><span class="p">)</span>
+                <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">station_file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+                <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">station_dict</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
                 <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
-        
-
 </pre></div>
 
           </div>

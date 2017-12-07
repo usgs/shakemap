@@ -86,15 +86,31 @@
 <p><dl class="docutils">
 <dt>Available commands:</dt>
 <dd><ul class="first last simple">
-<li>assemble – Assemble ShakeMap input data into an HDF package.</li>
-<li>augment – Incorporate additional content to the ShakeMap input file.</li>
-<li>contour – Generate contours of all configured IMT values.</li>
+<li><dl class="first docutils">
+<dt>assemble – Assemble ShakeMap input data into an HDF package into the</dt>
+<dd>shake_data.hdf input file.</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>augment – Incorporate additional content into the shake_data.hdf input</dt>
+<dd>file.</dd>
+</dl>
+</li>
+<li>model – Interpolate ground motions to a grid or list of locations.</li>
+<li><dl class="first docutils">
+<dt>contour – Generate contours of all configured IMT values from the</dt>
+<dd>shake_result.hdf output file.</dd>
+</dl>
+</li>
 <li>gridxml – Create grid.xml and uncertainty.xml files from shake_result.hdf.</li>
 <li>info – Extract info.json from shake_result.hdf and write it as a file.</li>
 <li>mapping – Generate maps of the IMTs found in shake_result.hdf.</li>
-<li>model – Interpolate ground motions to a grid or list of locations.</li>
-<li>raster – Generate GIS raster files of all configured IMT values.</li>
-<li>rupture – Write rupture.json.</li>
+<li><dl class="first docutils">
+<dt>raster – Generate GIS raster files of all configured IMT values from</dt>
+<dd>shake_result.hdf.</dd>
+</dl>
+</li>
+<li>rupture – Generate rupture.json from shake_result.hdf.</li>
 <li>select - Parse STREC output, make a GMPE set, create model_zc.conf.</li>
 <li>stations – Generate stationlist.json from shake_result.hdf.</li>
 </ul>

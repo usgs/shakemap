@@ -107,7 +107,7 @@ products (Vs30 grid, geographic features, etc.) -- and a configuration
 file that points to them. The profile data resides in a file called
 *profiles.conf* in a subdirectory, *.shakemap*, of the user's home 
 directory. The user may choose another location for the profile file
-by using the '--f' option to **sm_profile**. Other ShakeMap programs 
+by using the ``-f`` option to **sm_profile**. Other ShakeMap programs 
 read the profile information and use it to find event and 
 configuration information.
 
@@ -173,7 +173,7 @@ The primary ShakeMap program is called **shake**. It takes an event
 ID and a list of modules as arguments. The modules do the work of
 assembling the input data, producing interpolated grids, and deriving
 products from the grids and associated metadata. See the 
-:ref:`shake man page <shake>` or run **shake --help** for a list
+:ref:`shake man page <shake>` or run ``shake --help`` for a list
 of available modules. 
 
 The behavior of **shake** and many of its modules are controlled by 
@@ -250,8 +250,10 @@ within a layer, that layer's
 parameters (as configured in *select.conf*) replace the any or all
 of the parameters of the corresponding tectonic regions, and the
 calculation of a weighted GMPE set proceeds as before. For example,
-the layer section of *select.conf* might contain::
+the layer section of *select.conf* might contain:
 
+.. code-block:: python
+		  
     [layers]
         [[california]]
             horizontal_buffer = 50
@@ -291,13 +293,18 @@ The **assemble** module collects event and configuration data and creates the
 file *shake_data.hdf*. It first reads *event.xml* and stores it in a 
 data structure. **sm_assemble** then reads the configuration files
 
-| <install_dir>/modules.conf
-| <install_dir>/gmpe_sets.conf
-| <install_dir>/model.conf
+.. code-block:: python
+
+    <install_dir>/modules.conf
+    <install_dir>/gmpe_sets.conf
+    <install_dir>/model.conf
+
 
 and assembles them into a single configuration. It then reads 
 
-| <data_dir>/<evnt_id>/current>/model.conf (or model_zc.conf).
+.. code-block:: python
+
+    <data_dir>/<evnt_id>/current>/model.conf (or model_zc.conf).
 
 Any parameter set in the event-specific *model.conf* will override 
 parameters set in the other configuration files. Note: if both 
@@ -407,9 +414,11 @@ may be specified in the *products.conf* configuration file.
 gridxml
 ```````
 
-**gridxml** reads an event's *shake_result.hdf* and produces the legacy
-files *grid.xml* and *uncertainty.xml*. See the products section of this
-manual for more on these files. Note that the use of these files is
+**gridxml** reads an event's *shake_result.hdf* and produces the ShakeMap 3.5
+files *grid.xml* and *uncertainty.xml*. Note that these files will eventually
+become deprecated in favor of the new *shake_result.hdf* file.
+See the products section of this manual for more on these files.
+Note that the use of these files is
 deprecated. System designers should extract the relevant information 
 directly from *shake_result.hdf*. See :ref:`the formats section <sec-formats-4>`
 of this manual for more on
@@ -430,11 +439,12 @@ mapping
 
 **mapping** reads an event's *shake_result.hdf* and produces a set of
 maps of the IMTs for use in quality control and evaluation of the
-performance of the system. This module is deprecated. It is not
-intended to produce maps that are the equivalent of ShakeMap 3.5's 
-static maps, and we do not intend to maintain or support it. In
-particular, it uses the **basemap** mapping package, which is 
-disappearing in favor of **cartopy**.
+performance of the system. Currently, this module is a placeholder
+for basic visualization purposes. It does not produce reliable
+production-ready maps, equivalent of ShakeMap 3.5's static maps,
+and we may not maintain or support it in its current form in the
+future. In particular, it uses the **basemap** mapping package,
+which is disappearing in favor of **cartopy**.
 
 See :meth:`shakemap.coremods.mapping` for more details. See the
 configuration file *products.conf* for information on configuring
