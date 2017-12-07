@@ -4,47 +4,46 @@ import argparse
 import os.path
 import sys
 import pathlib
-import glob
-import re
 
 from impactutils.io.cmd import get_command_output
 
+
 def main(args):
 
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     # Some additional useful directories
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     REPO_DIR = os.path.dirname(os.path.abspath(__file__))
     PACKAGE_DIR = os.path.join(REPO_DIR, 'shakemap')
     DOC_SRC_DIR = os.path.join(REPO_DIR, 'doc_source')
     API_DIR = os.path.join(DOC_SRC_DIR, 'apidoc')
     DOCS_DIR = os.path.join(REPO_DIR, 'docs')
 
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     # get the human-friendly version of the ShakeMap version
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     verstr = '4.0a'
 
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     # what is the package called and who are the authors
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     PACKAGE = "ShakeMap 4.0a API"
     AUTHORS = 'Bruce Worden, Eric Thompson, Mike Hearne'
 
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     # run the api doc command; this creates the .rst files
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
 
     # First clear out the apidoc directory
     for f in os.listdir(API_DIR):
         fpath = os.path.join(API_DIR, f)
         if os.path.isfile(fpath):
             os.unlink(fpath)
-    
+
     sys.stderr.write('Building shakemap API documentation (REST)...\n')
     sphinx_cmd = 'sphinx-apidoc -o %s -f -e -d 12 -H "%s" -A "%s"'\
                  ' -V %s -T %s' % (API_DIR, PACKAGE, AUTHORS, verstr,
-                                PACKAGE_DIR)
+                                   PACKAGE_DIR)
     res, stdout, stderr = get_command_output(sphinx_cmd)
 
     if not res:
@@ -54,9 +53,9 @@ def main(args):
         print(stdout.decode('utf-8'))
         print(stderr.decode('utf-8'))
 
-    #--------------------------------------------
+    # --------------------------------------------
     # try to clean up some of the excess labeling
-    #--------------------------------------------
+    # --------------------------------------------
     clean_cmd = "sed -e 's/ module//g' -i '' `find %s/*.rst -type f "\
                 "-maxdepth 0 -print`" % API_DIR
     res, stdout, stderr = get_command_output(clean_cmd)
@@ -70,9 +69,9 @@ def main(args):
                 "-maxdepth 0 -print`" % API_DIR
     res, stdout, stderr = get_command_output(clean_cmd)
 
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     # Go to the api directory and build the html
-    #-------------------------------------------------------------
+    # -------------------------------------------------------------
     sys.stderr.write('Building shakemap manual (HTML)...\n')
     res, stdout, stderr = get_command_output('sphinx-build -a -E %s %s'
                                              % (DOC_SRC_DIR, DOCS_DIR))

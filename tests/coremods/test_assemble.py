@@ -48,7 +48,8 @@ def test_assemble():
 
     # Do an event with model.conf (not model_zc.conf) and no zoneinfo
     # (should succeed)
-    data_file = os.path.join(datapath, 'nc72282711', 'current', 'shake_data.hdf')
+    data_file = os.path.join(datapath, 'nc72282711',
+                             'current', 'shake_data.hdf')
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
@@ -62,7 +63,8 @@ def test_assemble():
     model_file = os.path.join(datapath, 'nc72282711', 'current',
                               'model.conf')
     os.rename(model_file, model_file + '_safe')
-    data_file = os.path.join(datapath, 'nc72282711', 'current', 'shake_data.hdf')
+    data_file = os.path.join(datapath, 'nc72282711',
+                             'current', 'shake_data.hdf')
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
@@ -84,12 +86,12 @@ def test_assemble():
     finally:
         if os.path.isfile(hdf_file + '_safe'):
             os.rename(hdf_file + '_safe', hdf_file)
-    
+
     #
     # Try some bad config files
     #
     # Should fail validation
-    model_file = os.path.join(datapath, 'nc72282711_nodata_nofault', 
+    model_file = os.path.join(datapath, 'nc72282711_nodata_nofault',
                               'current', 'model_zc.conf')
     os.rename(model_file, model_file + '_safe')
     shutil.copyfile(model_file + '.bad0', model_file)
@@ -101,7 +103,7 @@ def test_assemble():
         os.rename(model_file + '_safe', model_file)
 
     # Should fail vs30 filename check
-    model_file = os.path.join(datapath, 'nc72282711_nodata_nofault', 
+    model_file = os.path.join(datapath, 'nc72282711_nodata_nofault',
                               'current', 'model_zc.conf')
     os.rename(model_file, model_file + '_safe')
     shutil.copyfile(model_file + '.bad1', model_file)
@@ -113,7 +115,7 @@ def test_assemble():
         os.rename(model_file + '_safe', model_file)
 
     # Should fail prediction locations filename check
-    model_file = os.path.join(datapath, 'nc72282711_nodata_nofault', 
+    model_file = os.path.join(datapath, 'nc72282711_nodata_nofault',
                               'current', 'model_zc.conf')
     os.rename(model_file, model_file + '_safe')
     shutil.copyfile(model_file + '.bad2', model_file)
@@ -126,7 +128,8 @@ def test_assemble():
     #
     # Make sure the location file substitutions work (should succeed)
     #
-    data_file = os.path.join(datapath, 'northridge_points', 'current', 'shake_data.hdf')
+    data_file = os.path.join(
+        datapath, 'northridge_points', 'current', 'shake_data.hdf')
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
@@ -135,6 +138,7 @@ def test_assemble():
     finally:
         if os.path.isfile(data_file):
             os.remove(data_file)
+
 
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'

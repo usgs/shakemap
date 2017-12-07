@@ -610,9 +610,9 @@ def _clean_log_dict(config):
         dict: Dictionary suitable for use with logging.config.dictConfig().
 
     """
-    for handlerkey,handler in config['handlers'].items():
+    for handlerkey, handler in config['handlers'].items():
         myclass = handler['class']
         req_fields = REQ_FIELDS[myclass]
-        for key,value in handler.items():
+        for key, value in handler.items():
             if key not in req_fields:
                 del handler[key]

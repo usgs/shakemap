@@ -13,6 +13,8 @@ shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 ########################################################################
 # Test sm_profile
 ########################################################################
+
+
 def test_profile():
 
     with tempfile.TemporaryDirectory() as tmpdir:
@@ -36,7 +38,8 @@ def test_profile():
         # Presumably we should test the outputs and results of these actions,
         # but that's a lot of monkeying around for not much benefit
         #
-        cp = subprocess.run([program, '-f', pfile, '-c', 'test_profile1', '-a'], shell=False)
+        cp = subprocess.run([program, '-f', pfile, '-c',
+                             'test_profile1', '-a'], shell=False)
         assert not cp.returncode
         # No args program run (should succeed)
         cp = subprocess.run([program, '-f', pfile], shell=False)
@@ -45,59 +48,67 @@ def test_profile():
         cp = subprocess.run([program, '-f', pfile, '-a'], shell=False)
         assert cp.returncode
         # Create the same profile a second time
-        cp = subprocess.run([program, '-f', pfile, '-c', 'test_profile1', '-a'], shell=False)
+        cp = subprocess.run([program, '-f', pfile, '-c',
+                             'test_profile1', '-a'], shell=False)
         assert cp.returncode
         # List should now work
         cp = subprocess.run([program, '-f', pfile, '-l'], shell=False)
         assert not cp.returncode
         # Make a couple more profiles
-        cp = subprocess.run([program, '-f', pfile, '-c', 'test_profile2', '-a'], shell=False)
+        cp = subprocess.run([program, '-f', pfile, '-c',
+                             'test_profile2', '-a'], shell=False)
         assert not cp.returncode
-        cp = subprocess.run([program, '-f', pfile, '-c', 'test_profile3', '-a'], shell=False)
+        cp = subprocess.run([program, '-f', pfile, '-c',
+                             'test_profile3', '-a'], shell=False)
         assert not cp.returncode
         # List should still work
         cp = subprocess.run([program, '-f', pfile, '-l'], shell=False)
         assert not cp.returncode
         # Delete a profile that doesn't exist (should fail)
-        cp = subprocess.run([program, '-f', pfile, '-d', 'not_a_profile', '-a'], shell=False)
+        cp = subprocess.run([program, '-f', pfile, '-d',
+                             'not_a_profile', '-a'], shell=False)
         assert cp.returncode
         # Delete a profile that we're not set to (should succeed)
-        cp = subprocess.run([program, '-f', pfile, '-d', 'test_profile2', '-a'], shell=False)
+        cp = subprocess.run([program, '-f', pfile, '-d',
+                             'test_profile2', '-a'], shell=False)
         assert not cp.returncode
         # Switch to a profile that doesn't exist (should fail)
         cp = subprocess.run([program, '-f', pfile, '-s', 'dummy'], shell=False)
         assert cp.returncode
         # Switch to a profile that exists (should succeed)
-        cp = subprocess.run([program, '-f', pfile, '-s', 'test_profile1'], shell=False)
+        cp = subprocess.run([program, '-f', pfile, '-s',
+                             'test_profile1'], shell=False)
         assert not cp.returncode
         # Delete profiles that we are set to (should succeed)
-        cp = subprocess.run([program, '-f', pfile, '-d', 'test_profile1', '-a'], shell=False)
+        cp = subprocess.run([program, '-f', pfile, '-d',
+                             'test_profile1', '-a'], shell=False)
         assert not cp.returncode
-        cp = subprocess.run([program, '-f', pfile, '-d', 'test_profile3', '-a'], shell=False)
+        cp = subprocess.run([program, '-f', pfile, '-d',
+                             'test_profile3', '-a'], shell=False)
         assert not cp.returncode
         # Create a profile and accept the defaults (should succeed)
         # Making the 'test' profile, so it will copy Northridge
-        op = subprocess.Popen([program, '-f', pfile, '-c', 'test'], 
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            shell=False)
+        op = subprocess.Popen([program, '-f', pfile, '-c', 'test'],
+                              stdin=subprocess.PIPE,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              shell=False)
         op.communicate('\n\n'.encode('ascii'))
         assert not op.returncode
         # delete it, but change your mind (should succeed)
-        op = subprocess.Popen([program, '-f', pfile, '-d', 'test'], 
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            shell=False)
+        op = subprocess.Popen([program, '-f', pfile, '-d', 'test'],
+                              stdin=subprocess.PIPE,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              shell=False)
         op.communicate('n\n'.encode('ascii'))
         assert not op.returncode
         # now delete it for real (should succeed)
-        op = subprocess.Popen([program, '-f', pfile, '-d', 'test'], 
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            shell=False)
+        op = subprocess.Popen([program, '-f', pfile, '-d', 'test'],
+                              stdin=subprocess.PIPE,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              shell=False)
         op.communicate('\n'.encode('ascii'))
         assert not op.returncode
         # There should now be junk from 'test' and 'test_profileX' (where
@@ -105,30 +116,29 @@ def test_profile():
         # when we fall out of the context of the enclosing 'with' statement
 
         # Create a profile with directories we can't make (should fail)
-        op = subprocess.Popen([program, '-f', pfile, '-c', 'junk_profile'], 
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            shell=False)
+        op = subprocess.Popen([program, '-f', pfile, '-c', 'junk_profile'],
+                              stdin=subprocess.PIPE,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              shell=False)
         ipath = os.path.join(os.path.abspath(os.sep), 'zzxyzzskx') + '\n'
         op.communicate((ipath + ipath + ipath).encode('ascii'))
         assert op.returncode
-    
-        op = subprocess.Popen([program, '-f', pfile, '-c', 'junk_profile'], 
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                            stderr=subprocess.PIPE,
-                            shell=False)
+
+        op = subprocess.Popen([program, '-f', pfile, '-c', 'junk_profile'],
+                              stdin=subprocess.PIPE,
+                              stdout=subprocess.PIPE,
+                              stderr=subprocess.PIPE,
+                              shell=False)
         ipath = os.path.join(shakedir, 'junkprofile', 'install') + '\n'
         dpath = os.path.join(os.path.abspath(os.sep), 'zzxyzzskx') + '\n'
         op.communicate((ipath + dpath + dpath + dpath).encode('ascii'))
         assert op.returncode
-                
-    
+
+
 ########################################################################
 # main program
 ########################################################################
 if __name__ == '__main__':
 
     test_profile()
-

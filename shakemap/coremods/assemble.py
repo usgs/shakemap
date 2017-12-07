@@ -3,22 +3,20 @@ Collect configuration, station data, finite fault data, etc., into
 an InputContainer and write it out as shake_data.hdf.
 """
 
-#stdlib imports
-import sys
+# stdlib imports
 import os.path
-import logging
 import glob
 import datetime
 import shutil
 
-#third party imports
+# third party imports
 from configobj import ConfigObj
 
-#local imports
+# local imports
 from .base import CoreModule
 from shakelib.utils.containers import ShakeMapInputContainer
 from shakemap.utils.config import get_config_paths, get_custom_validator,\
-                config_error, check_config, get_configspec
+    config_error, check_config, get_configspec
 
 
 class AssembleModule(CoreModule):
@@ -67,14 +65,14 @@ class AssembleModule(CoreModule):
         validator = get_custom_validator()
         self.logger.info('Looking for configuration files...')
         modules = ConfigObj(
-                os.path.join(install_path, 'config', 'modules.conf'),
-                configspec=spec_file)
+            os.path.join(install_path, 'config', 'modules.conf'),
+            configspec=spec_file)
         gmpe_sets = ConfigObj(
-                os.path.join(install_path, 'config', 'gmpe_sets.conf'),
-                configspec=spec_file)
+            os.path.join(install_path, 'config', 'gmpe_sets.conf'),
+            configspec=spec_file)
         global_config = ConfigObj(
-                os.path.join(install_path, 'config', 'model.conf'),
-                configspec=spec_file)
+            os.path.join(install_path, 'config', 'model.conf'),
+            configspec=spec_file)
 
         #
         # this is the event specific model.conf (may not be present)
@@ -150,8 +148,8 @@ class AssembleModule(CoreModule):
         timestamp = datetime.datetime.utcnow().strftime('%FT%TZ')
         originator = config['system']['source_network']
         backup_dirs = sorted(
-                glob.glob(os.path.join(datadir, '..', '.backup*')),
-                reverse=True)
+            glob.glob(os.path.join(datadir, '..', '.backup*')),
+            reverse=True)
         if len(backup_dirs):
             #
             # Backup files exist so find the latest one and extract its
@@ -162,8 +160,8 @@ class AssembleModule(CoreModule):
             history = bu_ic.getVersionHistory()
             bu_ic.close()
             version = int(
-                    backup_dirs[0].replace(
-                            os.path.join(datadir, '..', '.backup'), ''))
+                backup_dirs[0].replace(
+                    os.path.join(datadir, '..', '.backup'), ''))
             version += 1
             new_line = [timestamp, originator, version]
             history['history'].append(new_line)
@@ -190,13 +188,13 @@ class AssembleModule(CoreModule):
         hdf_file = os.path.join(datadir, 'shake_data.hdf')
 
         self.logger.debug('Creating input container...')
-        shake_data = ShakeMapInputContainer.createFromInput(hdf_file,
-                                                    config,
-                                                    eventxml,
-                                                    history,
-                                                    rupturefile=rupturefile,
-                                                    datafiles=datafiles)
+        shake_data = ShakeMapInputContainer.createFromInput(
+                hdf_file,
+                config,
+                eventxml,
+                history,
+                rupturefile=rupturefile,
+                datafiles=datafiles)
         self.logger.info('Created HDF5 input container in %s' %
                          shake_data.getFileName())
         shake_data.close()
-
