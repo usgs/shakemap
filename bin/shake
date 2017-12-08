@@ -51,13 +51,8 @@ def _get_command_classes():
                 classes[cmd] = core_class
 
     ordered_classes = OrderedDict()
-    ordered_classes['assemble'] = classes['assemble']
-    ordered_classes['augment'] = classes['augment']
-    ordered_classes['model'] = classes['model']
     keys = sorted(classes.keys())
     for k in keys:
-        if k in ['assemble', 'augment', 'model']:
-            continue
         ordered_classes[k] = classes[k]
 
     return ordered_classes
@@ -98,10 +93,10 @@ def get_parser():
         ArgumentParser: argparse argument parser.
     """
     description = '''
-    Run all configured ShakeMap programs.
+    Run specified ShakeMap modules.
     '''
 
-    epilog = 'Available commands:\n'
+    epilog = 'Available modules:\n'
     for key, core_class in _classes_.items():
         epilog += '    - %s\n' % inspect.getdoc(core_class)
 
@@ -112,7 +107,7 @@ def get_parser():
     parser.add_argument('eventid',
                         help='The id of the event to process.')
     parser.add_argument('cmds', nargs='+',
-                        help='The commands to run.')
+                        help='The modules to run.')
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Print all informational messages.')
     parser.add_argument('-q', '--quiet', action='store_true',

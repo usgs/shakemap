@@ -21,8 +21,7 @@ from shakemap.utils.config import get_config_paths, get_custom_validator,\
 
 class AssembleModule(CoreModule):
     """
-    assemble -- Assemble ShakeMap input data into an HDF package into the
-                      shake_data.hdf input file.
+    assemble -- Assemble ShakeMap input data into the shake_data.hdf input file.
     """
 
     command_name = 'assemble'
