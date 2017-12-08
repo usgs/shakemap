@@ -228,8 +228,7 @@ class MapMaker(object):
         self.cities_per_grid = CITIES_PER_GRID
         self.intensity_colormap = ColorPalette.fromPreset('mmi')
         self.contour_colormap = ColorPalette.fromPreset('shaketopo')
-        station_obj = container.getStationList()
-        station_dict = station_obj.getGeoJson()
+        station_dict = container.getStationDict()
         self.stations = station_dict
         rupture_dict = container.getRuptureDict()
         info_dict = json.loads(
