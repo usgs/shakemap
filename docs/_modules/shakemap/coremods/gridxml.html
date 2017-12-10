@@ -92,7 +92,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">oqimt</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">oqimt</span>
-    <span class="n">float_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;[-+]?\d*\.\d+|\d+&quot;</span>
+    <span class="n">float_pattern</span> <span class="o">=</span> <span class="s2">r&quot;[-+]?\d*\.\d+|\d+&quot;</span>
     <span class="n">periods</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">float_pattern</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">):</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;IMT string &quot;</span><span class="si">%s</span><span class="s1">&quot; has no file-name friendly representation.&#39;</span>
@@ -126,7 +126,7 @@
 <span class="sd">            FileNotFoundError: When the the shake_result HDF file does not</span>
 <span class="sd">                exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
         <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
         <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
@@ -139,6 +139,9 @@
         <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 
         <span class="c1"># get all of the grid layers and the geodict</span>
+        <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;gridxml module can only function on &#39;</span>
+                                      <span class="s1">&#39;gridded data, not sets of points&#39;</span><span class="p">)</span>
         <span class="n">gridnames</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTs</span><span class="p">(</span><span class="n">COMPONENT</span><span class="p">)</span>
         <span class="n">layers</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">field_keys</span> <span class="o">=</span> <span class="p">{}</span>
@@ -146,7 +149,7 @@
         <span class="k">for</span> <span class="n">xml_type</span> <span class="ow">in</span> <span class="n">xml_types</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">gridname</span> <span class="ow">in</span> <span class="n">gridnames</span><span class="p">:</span>
                 <span class="n">imt_field</span> <span class="o">=</span> <span class="n">_oq_to_gridxml</span><span class="p">(</span><span class="n">gridname</span><span class="p">)</span>
-                <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMT</span><span class="p">(</span><span class="n">gridname</span><span class="p">,</span> <span class="n">COMPONENT</span><span class="p">)</span>
+                <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">gridname</span><span class="p">,</span> <span class="n">COMPONENT</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">xml_type</span> <span class="o">==</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
                     <span class="n">grid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
                     <span class="n">metadata</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean_metadata&#39;</span><span class="p">]</span>

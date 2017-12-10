@@ -21,8 +21,8 @@ import openquake.hazardlib.const as oqconst
 from .base import CoreModule
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.sites import Sites
-from shakelib.distance import (Distance, 
-                               get_distance, 
+from shakelib.distance import (Distance,
+                               get_distance,
                                get_distance_measures)
 from shakelib.multigmpe import MultiGMPE
 from shakelib.virtualipe import VirtualIPE
@@ -1072,7 +1072,7 @@ class ModelModule(CoreModule):
                 dm_arr = getattr(dx_out, dm, None)
                 if dm_arr is None:
                     continue
-                oc.setArray('distance_' + dm, dm_arr.flatten(), 
+                oc.setArray('distance_' + dm, dm_arr.flatten(),
                             metadata=distance_metadata)
             #
             # Store the IMTs
@@ -1088,7 +1088,7 @@ class ModelModule(CoreModule):
                 std_layername, units, digits = get_layer_info(key + '_sd')
                 std_metadata = {'units': units,
                                 'digits': digits}
-                oc.setIMTArrays(key, lons.flatten(), lats.flatten(), 
+                oc.setIMTArrays(key, lons.flatten(), lats.flatten(),
                                 ascii_ids, value.flatten(), mean_metadata,
                                 outsd[key].flatten(), std_metadata, component)
 

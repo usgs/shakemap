@@ -187,7 +187,18 @@ user's current profile's *INSTALL_DIR/config* directory.
 shake Modules
 -------------
 
-Below is a description of many of the modules available to **shake**:
+Below is a description of many of the modules available to **shake**. 
+They are ordered in more or less the order they would be called. The 
+module **select** would be run first if the operator wanted to have 
+the ShakeMap system determine the GMPE sets to use based on the 
+event's location and depth. Many operators will have a fixed 
+configuration for their GMPEs, and will therefore not use **select**.
+The operator will then typically run **assemble** or **augment**, to
+create (or update) the *shake_data.hdf* input file,
+followed by **model**. The order of modules after **model** is 
+usually not important as they typically depend upon the output of
+**model** (i.e., *shake_result.hdf*) and not upon the results of
+other modules.
 
 select
 ```````

@@ -102,13 +102,12 @@ numpy arrays, etc.) *shake_result.hdf* contains the following elements:
 | IMT (multiple)        | group   | dictionary  | Interpolated data for IMT               |
 +-----------------------+---------+-------------+----------------------+------------------+
 
-Each IMT dataset (MMI,PGA,etc.) is stored as a group containing two datasets, the mean values
+Each IMT dataset (MMI, PGA, etc.) is stored as a group containing two datasets, the mean values
 for each cell and the standard deviations.  MMI data for the component 'Larger' will be stored
 under a group called ``__imt_MMI_Larger__``. The mean array will be stored as
-``__mean_MMI_Larger__``, and the standard deviation array will be stored as
-``__std_MMI_Larger__``.  All IMT grid datasets will be accompanied by a dictionary of
+``mean``, and the standard deviation array will be stored as
+``std``.  All IMT grid datasets will be accompanied by a dictionary of
 attributes:
-
 
 For grids, the attributes are:
 
@@ -136,27 +135,43 @@ For grids, the attributes are:
 | dy        | The grid interval in the y dimension                 |
 +-----------+------------------------------------------------------+
 
-For lists of points the attributes are:
+For datasets that are lists of points, the storage of IMTS is the same
+as for grids, except that the data are stored as one-dimensional arrays.
+Each IMT group wll also contains datasets ``lons``, ``lats``, 
+and ``ids``, which provide the coordinates of the points in longitude
+and latitude, and their IDs, respectively. For sets of points the metadata
+attributes are:
 
 +--------------+------------------------------------------------------+
 | Attr name    | Contents                                             |
 +==============+======================================================+
-| type         | "points"                                             |
+| units        | Physical units of the IMT                            |
 +--------------+------------------------------------------------------+
-| lons         | An array of longitudes corresponding to the points   |
+| digits       | Number of significant digits to use for the values   |
 +--------------+------------------------------------------------------+
-| lats         | An array of latitudes corresponding to the points    |
-+--------------+------------------------------------------------------+
-| facility_ids | array of identifiers for the points                  |
-+--------------+------------------------------------------------------+
+
+All *shake_result.hdf* files will have a group ``__file_data_type__`` 
+which will have a single attribute ``data_type`` that will be one of
+'points' or 'grid'. This way the user can distinguish between the two
+types of storage.
+
+Regardless of whether the file stores grids or arrays of points, it will
+also contain datasets of various distance parameters. These will be 
+named ``distance_*`` where the wildcard will be replaced with  one of 
+the typical 
+source distance metrics (e.g., 'rrup' for rupture distance, 'rjb' for
+Joyner-Boore distance, 'rhypo' for hypocentral distance, 'rx', 'ry0',
+etc.) 
+Similarly, the Vs30 data are found in a dataset named ``vs30``.
+The metadata for distances and Vs30 consists of 'units' and 'digits'.
 
 JSON datasets are stored as continuous strings.
 
-There will typically be multiple *IMT* (Intensity Measure Type) and 
-*IMT_sd* (standard deviation of the corresponding IMT) datasets. For instance
-*PGA*, *PGA_sd*, *PGV*, *PGV_sd*, *MMI*, *MMI_sd*, and various *SA(#num)* and
-*SA(#num)_sd* [where #num is the period as a floating point number; e.g., 
-*SA(1.0)*]. 
+There will typically be multiple *IMT* (Intensity Measure Type) datasets
+(each containing the mean and standard deviation of the IMT). For instance
+'PGA', 'PGV', 'MMI', and various 'SA(#num)' 
+[where #num is the period as a floating point number; e.g., 
+'SA(1.0)']. 
 
 Python developers will likely want to access *shake_result.hdf* through
 the `shakelib OutputContainer class 

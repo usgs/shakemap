@@ -64,7 +64,9 @@
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.point_rupture</span> <span class="k">import</span> <span class="n">PointRupture</span>
 <span class="kn">from</span> <span class="nn">shakelib.sites</span> <span class="k">import</span> <span class="n">Sites</span>
-<span class="kn">from</span> <span class="nn">shakelib.distance</span> <span class="k">import</span> <span class="n">Distance</span><span class="p">,</span> <span class="n">get_distance</span>
+<span class="kn">from</span> <span class="nn">shakelib.distance</span> <span class="k">import</span> <span class="p">(</span><span class="n">Distance</span><span class="p">,</span>
+                               <span class="n">get_distance</span><span class="p">,</span>
+                               <span class="n">get_distance_measures</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">shakelib.multigmpe</span> <span class="k">import</span> <span class="n">MultiGMPE</span>
 <span class="kn">from</span> <span class="nn">shakelib.virtualipe</span> <span class="k">import</span> <span class="n">VirtualIPE</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.utils</span> <span class="k">import</span> <span class="n">get_extent</span>
@@ -238,6 +240,11 @@
             <span class="n">dist_obj_out</span> <span class="o">=</span> <span class="n">Distance</span><span class="o">.</span><span class="n">fromSites</span><span class="p">(</span><span class="n">default_gmpe</span><span class="p">,</span> <span class="n">sites_obj_out</span><span class="p">,</span>
                                               <span class="n">rupture_obj</span><span class="p">)</span>
 
+        <span class="c1">#</span>
+        <span class="c1"># TODO: This will break if the IPE needs distance measures</span>
+        <span class="c1"># that the GMPE doesn&#39;t; should make this a union of the</span>
+        <span class="c1"># requirements of both</span>
+        <span class="c1">#</span>
         <span class="n">dx_out</span> <span class="o">=</span> <span class="n">dist_obj_out</span><span class="o">.</span><span class="n">getDistanceContext</span><span class="p">()</span>
 
         <span class="n">lons_out_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lons</span><span class="p">)</span>
@@ -371,7 +378,7 @@
     <span class="c1"># %%</span>
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Compute all the IMTs possible from MMI</span>
-        <span class="c1"># This logic needs to be revisited. We should probably make what</span>
+        <span class="c1"># TODO: This logic needs to be revisited. We should probably make what</span>
         <span class="c1"># we have to to do the CMS to make the needed output IMTs, but</span>
         <span class="c1"># for now, we&#39;re just going to use what we have and the ccf.</span>
         <span class="c1"># ------------------------------------------------------------------</span>
@@ -919,6 +926,22 @@
         <span class="c1"># we need to add peak values and flagging that has been done here.</span>
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="k">if</span> <span class="n">stations</span><span class="p">:</span>
+            <span class="c1">#</span>
+            <span class="c1"># First make a dictionary of distances</span>
+            <span class="c1">#</span>
+            <span class="n">dist_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;df1&#39;</span><span class="p">:</span> <span class="p">{},</span> <span class="s1">&#39;df2&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+            <span class="k">for</span> <span class="n">ndf</span><span class="p">,</span> <span class="n">sdf</span> <span class="ow">in</span> <span class="n">df_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">sdf</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">for</span> <span class="n">dm</span> <span class="ow">in</span> <span class="n">get_distance_measures</span><span class="p">():</span>
+                    <span class="n">dm_arr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dx_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">],</span> <span class="n">dm</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">dm_arr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">dist_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">][</span><span class="n">dm</span><span class="p">]</span> <span class="o">=</span> <span class="n">dm_arr</span>
+            <span class="c1">#</span>
+            <span class="c1"># Get the index for each station ID</span>
+            <span class="c1">#</span>
             <span class="n">sjdict</span> <span class="o">=</span> <span class="n">stations</span><span class="o">.</span><span class="n">getGeoJson</span><span class="p">()</span>
             <span class="n">sta_ix</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">ndf</span><span class="p">,</span> <span class="n">sdf</span> <span class="ow">in</span> <span class="n">df_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -926,16 +949,25 @@
                     <span class="n">sta_ix</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">sta_ix</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))))</span>
+            <span class="c1">#</span>
+            <span class="c1"># Now go through the GeoJSON and add various properties and</span>
+            <span class="c1"># amps from the df_dict dictionaries</span>
+            <span class="c1">#</span>
             <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">sjdict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">sta_ix</span><span class="p">[</span><span class="s1">&#39;df1&#39;</span><span class="p">]:</span>
                     <span class="n">sdf</span> <span class="o">=</span> <span class="n">df1</span>
+                    <span class="n">ndf</span> <span class="o">=</span> <span class="s1">&#39;df1&#39;</span>
                     <span class="n">six</span> <span class="o">=</span> <span class="n">sta_ix</span><span class="p">[</span><span class="s1">&#39;df1&#39;</span><span class="p">][</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
                 <span class="k">elif</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">sta_ix</span><span class="p">[</span><span class="s1">&#39;df2&#39;</span><span class="p">]:</span>
                     <span class="n">sdf</span> <span class="o">=</span> <span class="n">df2</span>
+                    <span class="n">ndf</span> <span class="o">=</span> <span class="s1">&#39;df2&#39;</span>
                     <span class="n">six</span> <span class="o">=</span> <span class="n">sta_ix</span><span class="p">[</span><span class="s1">&#39;df2&#39;</span><span class="p">][</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown station </span><span class="si">%s</span><span class="s1"> in stationlist&#39;</span> <span class="o">%</span>
                                      <span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>
+                <span class="c1">#</span>
+                <span class="c1"># Set the &#39;intensity&#39;, &#39;pga&#39;, and &#39;pga&#39; peak properties</span>
+                <span class="c1">#</span>
                 <span class="k">if</span> <span class="s1">&#39;MMI&#39;</span> <span class="ow">in</span> <span class="n">sdf</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;MMI_outliers&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]:</span>
                     <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity&#39;</span><span class="p">]</span> <span class="o">=</span> \
                         <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
@@ -947,6 +979,7 @@
                         <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">])</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;pga&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
+
                 <span class="k">if</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">in</span> <span class="n">sdf</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;PGV_outliers&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]:</span>
                     <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;pgv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> \
                         <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;PGV&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]))</span>
@@ -969,11 +1002,31 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">myamp</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
                         <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span>
+                    <span class="k">if</span> <span class="n">total_sd_only</span><span class="p">:</span>
+                        <span class="n">mytau</span> <span class="o">=</span> <span class="mi">0</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">mytau</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_tau&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
+                    <span class="n">myphi</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_phi&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
+                    <span class="n">mysigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mytau</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">myphi</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                     <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;predictions&#39;</span><span class="p">][</span><span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="o">=</span> <span class="p">{</span>
-                        <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
-                        <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span>
+                            <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
+                            <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
+                            <span class="s1">&#39;tau&#39;</span><span class="p">:</span> <span class="n">mytau</span><span class="p">,</span>
+                            <span class="s1">&#39;phi&#39;</span><span class="p">:</span> <span class="n">myphi</span><span class="p">,</span>
+                            <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="n">mysigma</span><span class="p">,</span>
                     <span class="p">}</span>
+                <span class="c1">#</span>
+                <span class="c1"># Set the generic distance property (this is rrup)</span>
+                <span class="c1">#</span>
                 <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;rrup&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
+                <span class="c1">#</span>
+                <span class="c1"># Set the specific distances properties</span>
+                <span class="c1">#</span>
+                <span class="k">for</span> <span class="n">dm</span><span class="p">,</span> <span class="n">dm_arr</span> <span class="ow">in</span> <span class="n">dist_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distance_&#39;</span> <span class="o">+</span> <span class="n">dm</span><span class="p">]</span> <span class="o">=</span> <span class="n">dm_arr</span><span class="p">[</span><span class="n">six</span><span class="p">]</span>
+                <span class="c1">#</span>
+                <span class="c1"># Set the outlier flags</span>
+                <span class="c1">#</span>
                 <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]:</span>
                     <span class="k">for</span> <span class="n">amp</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">[</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">]:</span>
                         <span class="n">Name</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
@@ -987,12 +1040,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sjdict</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="c1"># oc.setString(&#39;stationlist.json&#39;, json.dumps(sjdict))</span>
-        <span class="c1"># TODO: Make the above code operate on the stations object directly</span>
-        <span class="c1"># then insert it into the container.</span>
-        <span class="c1"># For now we&#39;re getting the version of the StationList object</span>
-        <span class="c1"># without all of the predicted values in it.</span>
-        <span class="n">oc</span><span class="o">.</span><span class="n">setStationList</span><span class="p">(</span><span class="n">stations</span><span class="p">)</span>
+        <span class="n">oc</span><span class="o">.</span><span class="n">setStationDict</span><span class="p">(</span><span class="n">sjdict</span><span class="p">)</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Add the output grids or points to the output; include some</span>
@@ -1009,15 +1057,32 @@
             <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;dx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">smdx</span>
             <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;dy&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">smdy</span>
             <span class="n">gdict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="c1"># Put the Vs30 grid in the output container</span>
+            <span class="c1">#</span>
             <span class="n">layername</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="n">get_layer_info</span><span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">)</span>
             <span class="n">vs30</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">sx_out_soil</span><span class="o">.</span><span class="n">vs30</span><span class="p">,</span> <span class="n">gdict</span><span class="p">)</span>
             <span class="n">vs30_metadata</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">vs30_metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">units</span>
             <span class="n">vs30_metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">digits</span>
             <span class="n">oc</span><span class="o">.</span><span class="n">setGrid</span><span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">,</span> <span class="n">vs30</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">vs30_metadata</span><span class="p">)</span>
-
+            <span class="c1">#</span>
+            <span class="c1"># Now do the distance grids</span>
+            <span class="c1">#</span>
+            <span class="n">dist_metadata</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">dist_metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;km&#39;</span>
+            <span class="n">dist_metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+            <span class="k">for</span> <span class="n">dm</span> <span class="ow">in</span> <span class="n">get_distance_measures</span><span class="p">():</span>
+                <span class="n">dm_arr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dm_arr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">dm_arr_2d</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">dm_arr</span><span class="p">,</span> <span class="n">gdict</span><span class="p">)</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setGrid</span><span class="p">(</span><span class="s1">&#39;distance_&#39;</span> <span class="o">+</span> <span class="n">dm</span><span class="p">,</span> <span class="n">dm_arr_2d</span><span class="p">,</span> <span class="n">metadata</span><span class="o">=</span><span class="n">dist_metadata</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="c1"># Output the data and uncertainty grids</span>
+            <span class="c1">#</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">component</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]</span>
                 <span class="c1"># set the data grid</span>
                 <span class="n">mean_grid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">gdict</span><span class="p">)</span>
                 <span class="n">mean_layername</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="n">get_layer_info</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
@@ -1029,17 +1094,46 @@
                 <span class="n">std_metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
                                 <span class="s1">&#39;digits&#39;</span><span class="p">:</span> <span class="n">digits</span><span class="p">}</span>
                 <span class="n">std_grid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">outsd</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">gdict</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
-                <span class="n">oc</span><span class="o">.</span><span class="n">setIMT</span><span class="p">(</span><span class="n">key</span><span class="p">,</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setIMTGrids</span><span class="p">(</span><span class="n">key</span><span class="p">,</span>
                           <span class="n">mean_grid</span><span class="p">,</span> <span class="n">mean_metadata</span><span class="p">,</span>
                           <span class="n">std_grid</span><span class="p">,</span> <span class="n">std_metadata</span><span class="p">,</span>
                           <span class="n">component</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;points&#39;</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;lons&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lons</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;lats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">lats</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
-            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;facility_ids&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">idents</span><span class="p">]</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">,</span> <span class="n">vs30</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">metadata</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="c1"># Store the Vs30</span>
+            <span class="c1">#</span>
+            <span class="n">vs30_metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;m/s&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;digits&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">,</span> <span class="n">vs30</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">metadata</span><span class="o">=</span><span class="n">vs30_metadata</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="c1"># Store the distances</span>
+            <span class="c1">#</span>
+            <span class="n">distance_metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;km&#39;</span><span class="p">,</span>
+                                 <span class="s1">&#39;digits&#39;</span><span class="p">:</span> <span class="mi">4</span><span class="p">}</span>
+            <span class="k">for</span> <span class="n">dm</span> <span class="ow">in</span> <span class="n">get_distance_measures</span><span class="p">():</span>
+                <span class="n">dm_arr</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">dm</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">dm_arr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;distance_&#39;</span> <span class="o">+</span> <span class="n">dm</span><span class="p">,</span> <span class="n">dm_arr</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                            <span class="n">metadata</span><span class="o">=</span><span class="n">distance_metadata</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="c1"># Store the IMTs</span>
+            <span class="c1">#</span>
+            <span class="n">ascii_ids</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;ascii&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">idents</span><span class="p">])</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="n">component</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">outgrid</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># set the data grid</span>
+                <span class="n">mean_layername</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="n">get_layer_info</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+                <span class="n">mean_metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
+                                 <span class="s1">&#39;digits&#39;</span><span class="p">:</span> <span class="n">digits</span><span class="p">}</span>
+                <span class="c1"># set the uncertainty grid</span>
+                <span class="n">std_layername</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">digits</span> <span class="o">=</span> <span class="n">get_layer_info</span><span class="p">(</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">)</span>
+                <span class="n">std_metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
+                                <span class="s1">&#39;digits&#39;</span><span class="p">:</span> <span class="n">digits</span><span class="p">}</span>
+                <span class="n">oc</span><span class="o">.</span><span class="n">setIMTArrays</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">lons</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">lats</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span>
+                                <span class="n">ascii_ids</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">mean_metadata</span><span class="p">,</span>
+                                <span class="n">outsd</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">std_metadata</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
 
         <span class="n">oc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
