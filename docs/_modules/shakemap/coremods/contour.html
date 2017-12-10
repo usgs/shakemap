@@ -128,8 +128,14 @@
 <span class="sd">                - properties: Dictionary of properties describing that</span>
 <span class="sd">                  feature.</span>
 
+<span class="sd">    Raises:</span>
+<span class="sd">        NotImplementedError -- if the user attempts to contour a data file</span>
+<span class="sd">            with sets of points rather than grids.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMT</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;contour module can only contour &#39;</span>
+                                  <span class="s1">&#39;gridded data, not sets of points&#39;</span><span class="p">)</span>
+    <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
     <span class="n">gridobj</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
     <span class="n">grid</span> <span class="o">=</span> <span class="n">gridobj</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
     <span class="n">metadata</span> <span class="o">=</span> <span class="n">gridobj</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>

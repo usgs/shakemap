@@ -202,7 +202,18 @@ user’s current profile’s <em>INSTALL_DIR/config</em> directory.</p>
 </div>
 <div class="section" id="shake-modules">
 <h3>2.1.2.3. shake Modules<a class="headerlink" href="#shake-modules" title="Permalink to this headline">¶</a></h3>
-<p>Below is a description of many of the modules available to <strong>shake</strong>:</p>
+<p>Below is a description of many of the modules available to <strong>shake</strong>.
+They are ordered in more or less the order they would be called. The
+module <strong>select</strong> would be run first if the operator wanted to have
+the ShakeMap system determine the GMPE sets to use based on the
+event’s location and depth. Many operators will have a fixed
+configuration for their GMPEs, and will therefore not use <strong>select</strong>.
+The operator will then typically run <strong>assemble</strong> or <strong>augment</strong>, to
+create (or update) the <em>shake_data.hdf</em> input file,
+followed by <strong>model</strong>. The order of modules after <strong>model</strong> is
+usually not important as they typically depend upon the output of
+<strong>model</strong> (i.e., <em>shake_result.hdf</em>) and not upon the results of
+other modules.</p>
 <div class="section" id="select">
 <h4>2.1.2.3.1. select<a class="headerlink" href="#select" title="Permalink to this headline">¶</a></h4>
 <p><strong>select</strong> reads an event’s <em>event.xml</em> file for origin information

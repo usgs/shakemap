@@ -52,8 +52,8 @@ class StationModule(CoreModule):
                 continue
             if fformat == 'json':
                 self.logger.info('Writing rupture.json file...')
-                station_dict = container.getStationList().getGeoJson()
-                station_file = os.path.join(datadir, 'stationlist.json')
-                f = open(station_file, 'w')
+                station_dict = container.getStationDict()
+                station_file = os.path.join(datadir,'stationlist.json')
+                f = open(station_file,'w')
                 json.dump(station_dict, f)
                 f.close()

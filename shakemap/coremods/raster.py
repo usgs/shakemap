@@ -39,6 +39,9 @@ class RasterModule(CoreModule):
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
+        if container.getDataType() != 'grid':
+            raise NotImplementedError('raster module can only operate on '
+                                      'gridded data, not sets of points')
 
         # get the path to the products.conf file, load the config
         config_file = os.path.join(install_path, 'config', 'products.conf')
@@ -49,7 +52,7 @@ class RasterModule(CoreModule):
         layers = config['products']['raster']['layers']
         for layer in layers:
             fileimt = oq_to_file(layer)
-            imtdict = container.getIMT(layer, 'Larger')
+            imtdict = container.getIMTGrids(layer, 'Larger')
             mean_grid = imtdict['mean']
             std_grid = imtdict['std']
             mean_gdal = GDALGrid.copyFromGrid(mean_grid)

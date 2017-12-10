@@ -85,8 +85,14 @@ def contour(container, imtype, component, intervals=None,
                 - properties: Dictionary of properties describing that
                   feature.
 
+    Raises:
+        NotImplementedError -- if the user attempts to contour a data file
+            with sets of points rather than grids.
     """
-    imtdict = container.getIMT(imtype, component)
+    if container.getDataType() != 'grid':
+        raise NotImplementedError('contour module can only contour '
+                                  'gridded data, not sets of points')
+    imtdict = container.getIMTGrids(imtype, component)
     gridobj = imtdict['mean']
     grid = gridobj.getData()
     metadata = gridobj.getGeoDict().asDict()

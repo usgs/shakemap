@@ -162,11 +162,11 @@ finite fault</td>
 </tr>
 </tbody>
 </table>
-<p>Each IMT dataset (MMI,PGA,etc.) is stored as a group containing two datasets, the mean values
+<p>Each IMT dataset (MMI, PGA, etc.) is stored as a group containing two datasets, the mean values
 for each cell and the standard deviations.  MMI data for the component ‘Larger’ will be stored
 under a group called <code class="docutils literal"><span class="pre">__imt_MMI_Larger__</span></code>. The mean array will be stored as
-<code class="docutils literal"><span class="pre">__mean_MMI_Larger__</span></code>, and the standard deviation array will be stored as
-<code class="docutils literal"><span class="pre">__std_MMI_Larger__</span></code>.  All IMT grid datasets will be accompanied by a dictionary of
+<code class="docutils literal"><span class="pre">mean</span></code>, and the standard deviation array will be stored as
+<code class="docutils literal"><span class="pre">std</span></code>.  All IMT grid datasets will be accompanied by a dictionary of
 attributes:</p>
 <p>For grids, the attributes are:</p>
 <table border="1" class="docutils">
@@ -212,7 +212,12 @@ attributes:</p>
 </tr>
 </tbody>
 </table>
-<p>For lists of points the attributes are:</p>
+<p>For datasets that are lists of points, the storage of IMTS is the same
+as for grids, except that the data are stored as one-dimensional arrays.
+Each IMT group wll also contains datasets <code class="docutils literal"><span class="pre">lons</span></code>, <code class="docutils literal"><span class="pre">lats</span></code>,
+and <code class="docutils literal"><span class="pre">ids</span></code>, which provide the coordinates of the points in longitude
+and latitude, and their IDs, respectively. For sets of points the metadata
+attributes are:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="21%" />
@@ -224,26 +229,33 @@ attributes:</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>type</td>
-<td>“points”</td>
+<tr class="row-even"><td>units</td>
+<td>Physical units of the IMT</td>
 </tr>
-<tr class="row-odd"><td>lons</td>
-<td>An array of longitudes corresponding to the points</td>
-</tr>
-<tr class="row-even"><td>lats</td>
-<td>An array of latitudes corresponding to the points</td>
-</tr>
-<tr class="row-odd"><td>facility_ids</td>
-<td>array of identifiers for the points</td>
+<tr class="row-odd"><td>digits</td>
+<td>Number of significant digits to use for the values</td>
 </tr>
 </tbody>
 </table>
+<p>All <em>shake_result.hdf</em> files will have a group <code class="docutils literal"><span class="pre">__file_data_type__</span></code>
+which will have a single attribute <code class="docutils literal"><span class="pre">data_type</span></code> that will be one of
+‘points’ or ‘grid’. This way the user can distinguish between the two
+types of storage.</p>
+<p>Regardless of whether the file stores grids or arrays of points, it will
+also contain datasets of various distance parameters. These will be
+named <code class="docutils literal"><span class="pre">distance_*</span></code> where the wildcard will be replaced with  one of
+the typical
+source distance metrics (e.g., ‘rrup’ for rupture distance, ‘rjb’ for
+Joyner-Boore distance, ‘rhypo’ for hypocentral distance, ‘rx’, ‘ry0’,
+etc.)
+Similarly, the Vs30 data are found in a dataset named <code class="docutils literal"><span class="pre">vs30</span></code>.
+The metadata for distances and Vs30 consists of ‘units’ and ‘digits’.</p>
 <p>JSON datasets are stored as continuous strings.</p>
-<p>There will typically be multiple <em>IMT</em> (Intensity Measure Type) and
-<em>IMT_sd</em> (standard deviation of the corresponding IMT) datasets. For instance
-<em>PGA</em>, <em>PGA_sd</em>, <em>PGV</em>, <em>PGV_sd</em>, <em>MMI</em>, <em>MMI_sd</em>, and various <em>SA(#num)</em> and
-<em>SA(#num)_sd</em> [where #num is the period as a floating point number; e.g.,
-<em>SA(1.0)</em>].</p>
+<p>There will typically be multiple <em>IMT</em> (Intensity Measure Type) datasets
+(each containing the mean and standard deviation of the IMT). For instance
+‘PGA’, ‘PGV’, ‘MMI’, and various ‘SA(#num)’
+[where #num is the period as a floating point number; e.g.,
+‘SA(1.0)’].</p>
 <p>Python developers will likely want to access <em>shake_result.hdf</em> through
 the <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">shakelib OutputContainer class</a>.
 Also see, for example, the <em>contour</em> module [<a class="reference internal" href="../apidoc/shakemap.coremods.contour.html#module-shakemap.coremods.contour" title="shakemap.coremods.contour"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.contour()</span></code></a>]

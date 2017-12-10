@@ -21,7 +21,9 @@ import openquake.hazardlib.const as oqconst
 from .base import CoreModule
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.sites import Sites
-from shakelib.distance import Distance, get_distance
+from shakelib.distance import (Distance,
+                               get_distance,
+                               get_distance_measures)
 from shakelib.multigmpe import MultiGMPE
 from shakelib.virtualipe import VirtualIPE
 from shakelib.utils.utils import get_extent
@@ -195,6 +197,11 @@ class ModelModule(CoreModule):
             dist_obj_out = Distance.fromSites(default_gmpe, sites_obj_out,
                                               rupture_obj)
 
+        #
+        # TODO: This will break if the IPE needs distance measures
+        # that the GMPE doesn't; should make this a union of the
+        # requirements of both
+        #
         dx_out = dist_obj_out.getDistanceContext()
 
         lons_out_rad = np.radians(lons)
@@ -328,7 +335,7 @@ class ModelModule(CoreModule):
     # %%
         # ------------------------------------------------------------------
         # Compute all the IMTs possible from MMI
-        # This logic needs to be revisited. We should probably make what
+        # TODO: This logic needs to be revisited. We should probably make what
         # we have to to do the CMS to make the needed output IMTs, but
         # for now, we're just going to use what we have and the ccf.
         # ------------------------------------------------------------------
@@ -876,6 +883,22 @@ class ModelModule(CoreModule):
         # we need to add peak values and flagging that has been done here.
         # ------------------------------------------------------------------
         if stations:
+            #
+            # First make a dictionary of distances
+            #
+            dist_dict = {'df1': {}, 'df2': {}}
+            for ndf, sdf in df_dict.items():
+                if not sdf:
+                    continue
+                for dm in get_distance_measures():
+                    dm_arr = getattr(dx_dict[ndf], dm, None)
+                    if dm_arr is None:
+                        continue
+                    else:
+                        dist_dict[ndf][dm] = dm_arr
+            #
+            # Get the index for each station ID
+            #
             sjdict = stations.getGeoJson()
             sta_ix = {}
             for ndf, sdf in df_dict.items():
@@ -883,16 +906,25 @@ class ModelModule(CoreModule):
                     sta_ix[ndf] = {}
                 else:
                     sta_ix[ndf] = dict(zip(sdf['id'], range(len(sdf['id']))))
+            #
+            # Now go through the GeoJSON and add various properties and
+            # amps from the df_dict dictionaries
+            #
             for station in sjdict['features']:
                 if station['id'] in sta_ix['df1']:
                     sdf = df1
+                    ndf = 'df1'
                     six = sta_ix['df1'][station['id']]
                 elif station['id'] in sta_ix['df2']:
                     sdf = df2
+                    ndf = 'df2'
                     six = sta_ix['df2'][station['id']]
                 else:
                     raise ValueError('Unknown station %s in stationlist' %
                                      (station['id']))
+                #
+                # Set the 'intensity', 'pga', and 'pga' peak properties
+                #
                 if 'MMI' in sdf and not sdf['MMI_outliers'][six]:
                     station['properties']['intensity'] = \
                         '%.1f' % sdf['MMI'][six]
@@ -904,6 +936,7 @@ class ModelModule(CoreModule):
                         '%.4f' % (np.exp(sdf['PGA'][six]) * 100)
                 else:
                     station['properties']['pga'] = 'null'
+
                 if 'PGV' in sdf and not sdf['PGV_outliers'][six]:
                     station['properties']['pgv'] = '%.4f' % \
                         (np.exp(sdf['PGV'][six]))
@@ -926,11 +959,31 @@ class ModelModule(CoreModule):
                     else:
                         value = np.exp(myamp) * 100
                         units = '%g'
+                    if total_sd_only:
+                        mytau = 0
+                    else:
+                        mytau = sdf[key + '_tau'][six]
+                    myphi = sdf[key + '_phi'][six]
+                    mysigma = np.sqrt(mytau**2 + myphi**2)
                     station['properties']['predictions'][key.lower()] = {
-                        'value': value,
-                        'units': units
+                            'value': value,
+                            'units': units,
+                            'tau': mytau,
+                            'phi': myphi,
+                            'sigma': mysigma,
                     }
+                #
+                # Set the generic distance property (this is rrup)
+                #
                 station['properties']['distance'] = '%.2f' % sdf['rrup'][six]
+                #
+                # Set the specific distances properties
+                #
+                for dm, dm_arr in dist_dict[ndf].items():
+                    station['properties']['distance_' + dm] = dm_arr[six]
+                #
+                # Set the outlier flags
+                #
                 for channel in station['properties']['channels']:
                     for amp in channel['amplitudes']:
                         Name = amp['name'].upper()
@@ -944,12 +997,7 @@ class ModelModule(CoreModule):
         else:
             sjdict = {}
 
-        # oc.setString('stationlist.json', json.dumps(sjdict))
-        # TODO: Make the above code operate on the stations object directly
-        # then insert it into the container.
-        # For now we're getting the version of the StationList object
-        # without all of the predicted values in it.
-        oc.setStationList(stations)
+        oc.setStationDict(sjdict)
 
         # ------------------------------------------------------------------
         # Add the output grids or points to the output; include some
@@ -966,15 +1014,32 @@ class ModelModule(CoreModule):
             metadata['dx'] = smdx
             metadata['dy'] = smdy
             gdict = GeoDict(metadata)
+            #
+            # Put the Vs30 grid in the output container
+            #
             layername, units, digits = get_layer_info('vs30')
             vs30 = Grid2D(sx_out_soil.vs30, gdict)
             vs30_metadata = {}
             vs30_metadata['units'] = units
             vs30_metadata['digits'] = digits
             oc.setGrid('vs30', vs30, metadata=vs30_metadata)
-
+            #
+            # Now do the distance grids
+            #
+            dist_metadata = {}
+            dist_metadata['units'] = 'km'
+            dist_metadata['digits'] = 4
+            for dm in get_distance_measures():
+                dm_arr = getattr(dx_out, dm, None)
+                if dm_arr is None:
+                    continue
+                dm_arr_2d = Grid2D(dm_arr, gdict)
+                oc.setGrid('distance_' + dm, dm_arr_2d, metadata=dist_metadata)
+            #
+            # Output the data and uncertainty grids
+            #
+            component = config['interp']['component']
             for key, value in outgrid.items():
-                component = config['interp']['component']
                 # set the data grid
                 mean_grid = Grid2D(value, gdict)
                 mean_layername, units, digits = get_layer_info(key)
@@ -986,17 +1051,46 @@ class ModelModule(CoreModule):
                 std_metadata = {'units': units,
                                 'digits': digits}
                 std_grid = Grid2D(outsd[key], gdict.copy())
-                oc.setIMT(key,
+                oc.setIMTGrids(key,
                           mean_grid, mean_metadata,
                           std_grid, std_metadata,
                           component)
 
         else:
-            metadata['type'] = 'points'
-            metadata['lons'] = lons.flatten()
-            metadata['lats'] = lats.flatten()
-            metadata['facility_ids'] = [x.encode('ascii') for x in idents]
-            oc.setArray('vs30', vs30.flatten(), metadata=metadata)
+            #
+            # Store the Vs30
+            #
+            vs30_metadata = {'units': 'm/s',
+                             'digits': 4}
+            oc.setArray('vs30', vs30.flatten(), metadata=vs30_metadata)
+            #
+            # Store the distances
+            #
+            distance_metadata = {'units': 'km',
+                                 'digits': 4}
+            for dm in get_distance_measures():
+                dm_arr = getattr(dx_out, dm, None)
+                if dm_arr is None:
+                    continue
+                oc.setArray('distance_' + dm, dm_arr.flatten(),
+                            metadata=distance_metadata)
+            #
+            # Store the IMTs
+            #
+            ascii_ids = np.array([x.encode('ascii') for x in idents]).flatten()
+            component = config['interp']['component']
+            for key, value in outgrid.items():
+                # set the data grid
+                mean_layername, units, digits = get_layer_info(key)
+                mean_metadata = {'units': units,
+                                 'digits': digits}
+                # set the uncertainty grid
+                std_layername, units, digits = get_layer_info(key + '_sd')
+                std_metadata = {'units': units,
+                                'digits': digits}
+                oc.setIMTArrays(key, lons.flatten(), lats.flatten(),
+                                ascii_ids, value.flatten(), mean_metadata,
+                                outsd[key].flatten(), std_metadata, component)
 
         oc.close()
 

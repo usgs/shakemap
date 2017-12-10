@@ -82,6 +82,9 @@
 
         <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;raster module can only operate on &#39;</span>
+                                      <span class="s1">&#39;gridded data, not sets of points&#39;</span><span class="p">)</span>
 
         <span class="c1"># get the path to the products.conf file, load the config</span>
         <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
@@ -92,7 +95,7 @@
         <span class="n">layers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;raster&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
             <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
-            <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMT</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="s1">&#39;Larger&#39;</span><span class="p">)</span>
+            <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="s1">&#39;Larger&#39;</span><span class="p">)</span>
             <span class="n">mean_grid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
             <span class="n">std_grid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span>
             <span class="n">mean_gdal</span> <span class="o">=</span> <span class="n">GDALGrid</span><span class="o">.</span><span class="n">copyFromGrid</span><span class="p">(</span><span class="n">mean_grid</span><span class="p">)</span>

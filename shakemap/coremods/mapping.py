@@ -94,6 +94,9 @@ class MappingModule(CoreModule):
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
+        if container.getDataType() != 'grid':
+            raise NotImplementedError('mapping module can only operate on '
+                                      'gridded data, not sets of points')
 
         # get the path to the products.conf file, load the config
         config_file = os.path.join(install_path, 'config', 'products.conf')
@@ -228,8 +231,7 @@ class MapMaker(object):
         self.cities_per_grid = CITIES_PER_GRID
         self.intensity_colormap = ColorPalette.fromPreset('mmi')
         self.contour_colormap = ColorPalette.fromPreset('shaketopo')
-        station_obj = container.getStationList()
-        station_dict = station_obj.getGeoJson()
+        station_dict = container.getStationDict()
         self.stations = station_dict
         rupture_dict = container.getRuptureDict()
         info_dict = json.loads(
@@ -290,7 +292,7 @@ class MapMaker(object):
         """
         # returns a list of GeoJSON-like mapping objects
         comp = self.container.getComponents('MMI')[0]
-        imtdict = self.container.getIMT('MMI', comp)
+        imtdict = self.container.getIMTGrids('MMI', comp)
         geodict = imtdict['mean'].getGeoDict()
         xmin, xmax, ymin, ymax = (geodict.xmin, geodict.xmax,
                                   geodict.ymin, geodict.ymax)
@@ -771,7 +773,7 @@ class MapMaker(object):
         topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
         # get the geodict for the ShakeMap
         comp = self.container.getComponents('MMI')[0]
-        imtdict = self.container.getIMT('MMI', comp)
+        imtdict = self.container.getIMTGrids('MMI', comp)
         mmigrid = imtdict['mean']
         smdict = mmigrid.getGeoDict()
         # get a geodict that is aligned with topo, but inside shakemap
@@ -975,7 +977,7 @@ class MapMaker(object):
         topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
         # get the geodict for the ShakeMap
         comp = self.container.getComponents(imt)[0]
-        imtdict = self.container.getIMT(imt, comp)
+        imtdict = self.container.getIMTGrids(imt, comp)
         imtgrid = imtdict['mean']
         smdict = imtgrid.getGeoDict()
         # get a geodict that is aligned with topo, but inside shakemap
