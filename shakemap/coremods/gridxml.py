@@ -96,6 +96,9 @@ class GridXMLModule(CoreModule):
         container = ShakeMapOutputContainer.load(datafile)
 
         # get all of the grid layers and the geodict
+        if container.getDataType() != 'grid':
+            raise NotImplementedError('gridxml module can only function on '
+                                      'gridded data, not sets of points')
         gridnames = container.getIMTs(COMPONENT)
         layers = {}
         field_keys = {}
@@ -103,7 +106,7 @@ class GridXMLModule(CoreModule):
         for xml_type in xml_types:
             for gridname in gridnames:
                 imt_field = _oq_to_gridxml(gridname)
-                imtdict = container.getIMT(gridname, COMPONENT)
+                imtdict = container.getIMTGrids(gridname, COMPONENT)
                 if xml_type == 'grid':
                     grid = imtdict['mean']
                     metadata = imtdict['mean_metadata']

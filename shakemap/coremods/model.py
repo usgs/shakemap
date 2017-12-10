@@ -913,9 +913,11 @@ class ModelModule(CoreModule):
             for station in sjdict['features']:
                 if station['id'] in sta_ix['df1']:
                     sdf = df1
+                    ndf = 'df1'
                     six = sta_ix['df1'][station['id']]
                 elif station['id'] in sta_ix['df2']:
                     sdf = df2
+                    ndf = 'df2'
                     six = sta_ix['df2'][station['id']]
                 else:
                     raise ValueError('Unknown station %s in stationlist' %
@@ -1026,16 +1028,18 @@ class ModelModule(CoreModule):
             #
             dist_metadata = {}
             dist_metadata['units'] = 'km'
-            dist_metadata['digits'] = 3
+            dist_metadata['digits'] = 4
             for dm in get_distance_measures():
                 dm_arr = getattr(dx_out, dm, None)
                 if dm_arr is None:
                     continue
                 dm_arr_2d = Grid2D(dm_arr, gdict)
                 oc.setGrid('distance_' + dm, dm_arr_2d, metadata=dist_metadata)
-
+            #
+            # Output the data and uncertainty grids
+            #
+            component = config['interp']['component']
             for key, value in outgrid.items():
-                component = config['interp']['component']
                 # set the data grid
                 mean_grid = Grid2D(value, gdict)
                 mean_layername, units, digits = get_layer_info(key)
@@ -1047,17 +1051,46 @@ class ModelModule(CoreModule):
                 std_metadata = {'units': units,
                                 'digits': digits}
                 std_grid = Grid2D(outsd[key], gdict.copy())
-                oc.setIMT(key,
+                oc.setIMTGrids(key,
                           mean_grid, mean_metadata,
                           std_grid, std_metadata,
                           component)
 
         else:
-            metadata['type'] = 'points'
-            metadata['lons'] = lons.flatten()
-            metadata['lats'] = lats.flatten()
-            metadata['facility_ids'] = [x.encode('ascii') for x in idents]
-            oc.setArray('vs30', vs30.flatten(), metadata=metadata)
+            #
+            # Store the Vs30
+            #
+            vs30_metadata = {'units': 'm/s',
+                             'digits': 4}
+            oc.setArray('vs30', vs30.flatten(), metadata=vs30_metadata)
+            #
+            # Store the distances
+            #
+            distance_metadata = {'units': 'km',
+                                 'digits': 4}
+            for dm in get_distance_measures():
+                dm_arr = getattr(dx_out, dm, None)
+                if dm_arr is None:
+                    continue
+                oc.setArray('distance_' + dm, dm_arr.flatten(), 
+                            metadata=distance_metadata)
+            #
+            # Store the IMTs
+            #
+            ascii_ids = np.array([x.encode('ascii') for x in idents]).flatten()
+            component = config['interp']['component']
+            for key, value in outgrid.items():
+                # set the data grid
+                mean_layername, units, digits = get_layer_info(key)
+                mean_metadata = {'units': units,
+                                 'digits': digits}
+                # set the uncertainty grid
+                std_layername, units, digits = get_layer_info(key + '_sd')
+                std_metadata = {'units': units,
+                                'digits': digits}
+                oc.setIMTArrays(key, lons.flatten(), lats.flatten(), 
+                                ascii_ids, value.flatten(), mean_metadata,
+                                outsd[key].flatten(), std_metadata, component)
 
         oc.close()
 
