@@ -5,6 +5,17 @@ echo $PATH
 
 VENV=shakemap
 
+# Is the reset flag set?
+reset=0
+while getopts r FLAG; do
+  case $FLAG in
+    r)
+        reset=1
+        
+      ;;
+  esac
+done
+
 # Is conda installed?
 conda=$(which conda)
 if [ ! "$conda" ] ; then
@@ -14,11 +25,20 @@ if [ ! "$conda" ] ; then
     export PATH="$HOME/miniconda/bin:$PATH"
 fi
 
+# Choose an environment file based on platform
 unamestr=`uname`
 if [ "$unamestr" == 'Linux' ]; then
     env_file=environment_linux.yml
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     env_file=environment_osx.yml
+fi
+
+# If the user has specified the -r (reset) flag, then create an
+# environment based on only the named dependencies, without
+# any versions of packages specified.
+if [ $reset eq 1 ]; then
+    echo "Ignoring platform, letting conda sort out dependencies..."
+    env_file=environment_basic.yml
 fi
 
 # Turn off whatever other virtual environment user might be in
@@ -37,8 +57,14 @@ curl --max-time 60 --retry 3 -L \
 echo "Creating the $VENV virtual environment:"
 conda env create -f $env_file --force
 
+# Bail out at this point if the conda create command fails.
+# Clean up zip files we've downloaded
 if [ $? -ne 0 ]; then
     echo "Failed to create conda environment.  Resolve any conflicts, then try again."
+    echo "Cleaning up zip files..."
+    rm impact-utils.zip
+    rm libcomcat.zip
+    rm mapio.zip
     exit
 fi
 

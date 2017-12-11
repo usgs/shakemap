@@ -1,0 +1,52 @@
+name: shakemap
+channels:
+- conda-forge
+- defaults
+- digitalglobe
+- ioos
+dependencies:
+- affine
+- basemap
+- beautifulsoup4
+- cartopy
+- configobj
+- decorator
+- descartes
+- docutils
+- fiona
+- gdal
+- h5py
+- ipython
+- jupyter
+- matplotlib
+- numexpr
+- numpy
+- obspy
+- pandas
+- psutil
+- pyproj
+- pyshp
+- pytest
+- pytest-cov
+- python=3.5
+- pyyaml
+- pyzmq
+- rasterio
+- requests
+- scikit-image
+- scipy
+- shapely
+- sphinx
+- versioneer
+- pip:
+  - et-xmlfile==1.0.1
+  - ipython-genutils==0.2.0
+  - jupyter-client==5.1.0
+  - jupyter-console==5.2.0
+  - jupyter-core==4.4.0
+  - prompt-toolkit==1.0.15
+  - sphinx-argparse==0.2.1
+  - ./libcomcat.zip
+  - ./mapio.zip
+  - ./impact-utils.zip
+
