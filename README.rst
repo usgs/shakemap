@@ -6,7 +6,11 @@
 .. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/usgs/shakemap
     :alt: Code Coverage Status
-
+.. image:: https://api.codacy.com/project/badge/Grade/1f771008e85041b89b97b6d12d85298a
+    :target: https://www.codacy.com/app/emthompson_2/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
+.. image:: https://badge.waffle.io/usgs/shakemap.svg?columns=all 
+    :target: https://waffle.io/usgs/shakemap 
+    :alt: 'Waffle.io - Columns and their card count'
 
 shakemap
 ========
@@ -15,6 +19,12 @@ development for the next major update to Shakemap. The current version
 of ShakeMap can be found here
 
 - https://vault.gps.caltech.edu/repos/products/shakemap/tags/release-3.5/
+
+
+Documentation
+-------------
+
+The API docs can be found `here <https://usgs.github.io/shakemap/>`_.
 
 
 Introduction
@@ -51,7 +61,7 @@ required ongoing modification of the code.
 
 To receive updates on ShakeMap and discuss the software, please join the
 `shake-dev <https://geohazards.usgs.gov/mailman/listinfo/shake-dev.>`_
-mailing list. We also encourage requests, questions, and discussions though
+mailing list. We also encourage requests, questions, and discussions through
 the Github issues tab associated with this repository.
 
 Installation and Dependencies
@@ -60,8 +70,8 @@ Installation and Dependencies
 - Mac OSX or Linux operating systems
 - Python 3
 - Python libraries: numpy, scipy, rasterio, fiona, xlrd, pandas, basemap,
-  basemap-data-hires, shapely, h5py, gdal, descartes, openquake.engine, neicio,
-  MapIO, matplotlib, jupyter, pytables, lxml
+  shapely, h5py, gdal, descartes, openquake.engine, neicio,
+  MapIO, matplotlib, pytables, lxml
 - The `install.sh` script installs this package and all dependencies. It is
   regularly tested on OSX and Ubuntu.
 
