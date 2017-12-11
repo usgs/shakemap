@@ -965,7 +965,8 @@ class ModelModule(CoreModule):
                         mytau = sdf[key + '_tau'][six]
                     myphi = sdf[key + '_phi'][six]
                     mysigma = np.sqrt(mytau**2 + myphi**2)
-                    station['properties']['predictions'][key.lower()] = {
+                    imt_name = key.lower().replace('_pred', '')
+                    station['properties']['predictions'][imt_name] = {
                             'value': value,
                             'units': units,
                             'tau': mytau,
@@ -979,8 +980,9 @@ class ModelModule(CoreModule):
                 #
                 # Set the specific distances properties
                 #
+                station['properties']['distances'] = {}
                 for dm, dm_arr in dist_dict[ndf].items():
-                    station['properties']['distance_' + dm] = dm_arr[six]
+                    station['properties']['distances'][dm] = dm_arr[six]
                 #
                 # Set the outlier flags
                 #
