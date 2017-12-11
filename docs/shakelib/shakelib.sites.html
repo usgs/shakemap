@@ -1,0 +1,268 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.sites &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakelib.station" href="shakelib.station.html" />
+    <link rel="prev" title="shakelib.multigmpe" href="shakelib.multigmpe.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakelib.sites">
+<span id="shakelib-sites"></span><h1>shakelib.sites<a class="headerlink" href="#module-shakelib.sites" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="shakelib.sites.Sites">
+<em class="property">class </em><code class="descclassname">shakelib.sites.</code><code class="descname">Sites</code><span class="sig-paren">(</span><em>vs30grid</em>, <em>vs30measured_grid=None</em>, <em>backarc=None</em>, <em>defaultVs30=686.0</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>An object to encapsulate information used to generate a GEM
+<a class="reference external" href="https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/gsim/base.py">SitesContext</a>.</p>
+<p>Construct a Sites object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>vs30grid</strong> – MapIO Grid2D object containing Vs30 values.</li>
+<li><strong>vs30measured_grid</strong> – Boolean array indicating whether Vs30 values
+were measured or derived (i.e., from topographic slope).</li>
+<li><strong>backarc</strong> – Boolean array indicating whether site is in the subduction
+<a class="reference external" href="http://earthquake.usgs.gov/learn/glossary/?term=backarc">backarc</a>.</li>
+<li><strong>defaultVs30</strong> – Default Vs30 value to use in locations where Vs30Grid
+is not specified.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="shakelib.sites.Sites.fromBounds">
+<em class="property">classmethod </em><code class="descname">fromBounds</code><span class="sig-paren">(</span><em>xmin</em>, <em>xmax</em>, <em>ymin</em>, <em>ymax</em>, <em>dx</em>, <em>dy</em>, <em>defaultVs30=686.0</em>, <em>vs30File=None</em>, <em>vs30measured_grid=None</em>, <em>backarc=None</em>, <em>padding=False</em>, <em>resample=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.fromBounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.fromBounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Sites object by defining a center point, resolution, extent,
+and Vs30 values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>xmin</strong> – X coordinate of left edge of bounds.</li>
+<li><strong>xmax</strong> – X coordinate of right edge of bounds.</li>
+<li><strong>ymin</strong> – Y coordinate of bottom edge of bounds.</li>
+<li><strong>ymax</strong> – Y coordinate of top edge of bounds.</li>
+<li><strong>dx</strong> – Resolution of desired grid in X direction.</li>
+<li><strong>dy</strong> – Resolution of desired grid in Y direction.</li>
+<li><strong>defaultVs30</strong> – Default Vs30 value to use if vs30File not specified.</li>
+<li><strong>vs30File</strong> – Name of GMT or GDAL format grid file containing Vs30
+values.</li>
+<li><strong>vs30measured_grid</strong> – Boolean grid indicating whether Vs30 values were
+measured or derived (i.e., from slope).</li>
+<li><strong>backarc</strong> – Boolean array indicating whether site is in the subduction
+<a class="reference external" href="http://earthquake.usgs.gov/learn/glossary/?term=backarc">backarc</a>.</li>
+<li><strong>padding</strong> – Boolean indicating whether or not to pad resulting Vs30
+grid out to edges of input bounds. If False, grid will be
+clipped to the extent of the input file.</li>
+<li><strong>resample</strong> – Boolean indicating whether or not the grid should be
+resampled.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="shakelib.sites.Sites.fromCenter">
+<em class="property">classmethod </em><code class="descname">fromCenter</code><span class="sig-paren">(</span><em>cx</em>, <em>cy</em>, <em>xspan</em>, <em>yspan</em>, <em>dx</em>, <em>dy</em>, <em>defaultVs30=686.0</em>, <em>vs30File=None</em>, <em>vs30measured_grid=None</em>, <em>backarc=None</em>, <em>padding=False</em>, <em>resample=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.fromCenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.fromCenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a Sites object by defining a center point, resolution, extent,
+and Vs30 values.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>cx</strong> – X coordinate of desired center point.</li>
+<li><strong>cy</strong> – Y coordinate of desired center point.</li>
+<li><strong>xspan</strong> – Width of desired grid.</li>
+<li><strong>yspan</strong> – Height of desired grid.</li>
+<li><strong>dx</strong> – Resolution of desired grid in X direction.</li>
+<li><strong>dy</strong> – Resolution of desired grid in Y direction.</li>
+<li><strong>defaultVs30</strong> – Default Vs30 value to use if vs30File not specified.</li>
+<li><strong>vs30File</strong> – Name of GMT or GDAL format grid file containing Vs30
+values.</li>
+<li><strong>vs30measured_grid</strong> – Boolean grid indicating whether Vs30 values were
+measured or derived (i.e., from slope).</li>
+<li><strong>backarc</strong> – Boolean array indicating whether site is in the subduction
+<a class="reference external" href="http://earthquake.usgs.gov/learn/glossary/?term=backarc">backarc</a>.</li>
+<li><strong>padding</strong> – Boolean indicating whether or not to pad resulting Vs30
+grid out to edges of input bounds. If False, grid will be
+clipped to the extent of the input file.</li>
+<li><strong>resample</strong> – Boolean indicating whether or not the grid should be
+resampled.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.sites.Sites.getSitesContext">
+<code class="descname">getSitesContext</code><span class="sig-paren">(</span><em>lldict=None</em>, <em>rock_vs30=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.getSitesContext"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.getSitesContext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a SitesContext object by sampling the current Sites object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lldict</strong> – <p>Either</p>
+<ul>
+<li>None, in which case the SitesContext for the complete Sites
+grid is returned, or</li>
+<li>A location dictionary (elements are ‘lats’ and ‘lons’ and
+each is a numpy array). Each element must have the same
+shape. In this case the SitesContext for these locaitons is
+returned.</li>
+</ul>
+</li>
+<li><strong>rock_vs30</strong> – <p>Either</p>
+<ul>
+<li>None, in which case the SitesContext will reflect the Vs30
+grid in the Sites instance, or</li>
+<li>A float for the rock Vs30 value, in which case the
+SitesContext will be constructed for this constant Vs30
+value.</li>
+</ul>
+</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">SitesContext object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal"><span class="pre">ShakeLibException</span></code> – When lat/lon input sequences do not share
+dimensionality.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.sites.Sites.getVs30Grid">
+<code class="descname">getVs30Grid</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.getVs30Grid"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.getVs30Grid" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns: Grid2D object containing Vs30 values for this Sites object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.sites.Sites.getNxNy">
+<code class="descname">getNxNy</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/sites.html#Sites.getNxNy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.sites.Sites.getNxNy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns: The number of grid points in x and y.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">shakelib.sites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

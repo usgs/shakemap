@@ -1,0 +1,181 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.conversions.imt.newmark_hall_1982 &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakelib.conversions.imt.newmark_hall_1982</h1><div class="highlight"><pre>
+<span></span>
+<span class="kn">import</span> <span class="nn">copy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<div class="viewcode-block" id="NewmarkHall1982"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982">[docs]</a><span class="k">class</span> <span class="nc">NewmarkHall1982</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class for conversion between PGA and PSA10 by Newmark and Hall (1982).</span>
+
+<span class="sd">    - PSA10 stands for spectral acceleration with oscillator period of 1.0 sec</span>
+<span class="sd">    - PGV is peak ground velocity.</span>
+
+<span class="sd">    The conversion factor is 37.27*2.54.</span>
+<span class="sd">    Note that 2.54 is the conversion factor to convert from cm/s to in/s and</span>
+<span class="sd">    37.27 is derived from SA(f) = 1.65*(2*pi*V*f)/386.09, where:</span>
+
+<span class="sd">    - SA(f) is spectral acceleration at frequency f (in g)</span>
+<span class="sd">    - f is the frequency of interest</span>
+<span class="sd">    - V is the velocity</span>
+<span class="sd">    - 1.65 is the N&amp;H amplification factor for velocity at 5% damping</span>
+<span class="sd">    - 386.09 is the acceleration of gravity in inches per second per g</span>
+
+<span class="sd">    The sigma factor was computed from an average sigma value determined</span>
+<span class="sd">    by plotting PGV/PSA10 versus Distance for earthquakes with magnitudes</span>
+<span class="sd">    greater than or equal to 5.0.</span>
+
+<span class="sd">    To do</span>
+<span class="sd">        - Inherit from ConvertIMT class.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        Newmark, N. M., &amp; Hall, W. J. (1982). Earthquake spectra and design.</span>
+<span class="sd">        Earthquake Engineering Research Institute, El Cerrito, California.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">__lnfact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">37.27</span> <span class="o">*</span> <span class="mf">2.54</span><span class="p">)</span>
+    <span class="n">__lnsigma</span> <span class="o">=</span> <span class="mf">0.5146578</span>
+
+<div class="viewcode-block" id="NewmarkHall1982.psa102pgv"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.psa102pgv">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">psa102pgv</span><span class="p">(</span><span class="n">psa10</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Convert PSA10 (spectral acceleration with oscillator period of 1.0 sec)</span>
+<span class="sd">        to PGV.</span>
+
+<span class="sd">        **Important:** PSA10 and sigma must be logarithmic units.</span>
+
+<span class="sd">        :param psa10:</span>
+<span class="sd">            Numpy array or float of PSA10 values; units must be natural log</span>
+<span class="sd">            of g.</span>
+<span class="sd">        :param sigma:</span>
+<span class="sd">            Numpy array or float of standard deviation of PGV from a GMPE;</span>
+<span class="sd">            units must be natural log.</span>
+<span class="sd">        :returns:</span>
+<span class="sd">            Two arrays</span>
+<span class="sd">                - Array of PGV iwth natural log of cm/s units.</span>
+<span class="sd">                - Array of its standard deviation with natural log units.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pgv</span> <span class="o">=</span> <span class="n">psa10</span> <span class="o">+</span> <span class="n">NewmarkHall1982</span><span class="o">.</span><span class="n">__lnfact</span>
+
+        <span class="n">sigmaTot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">sigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span>
+                           <span class="p">(</span><span class="n">NewmarkHall1982</span><span class="o">.</span><span class="n">__lnsigma</span> <span class="o">**</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">pgv</span><span class="p">,</span> <span class="n">sigmaTot</span></div>
+
+<div class="viewcode-block" id="NewmarkHall1982.getConversionFactor"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.getConversionFactor">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getConversionFactor</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns:</span>
+<span class="sd">            The Newmark and Hall (1982) multiplicative conversion factor for</span>
+<span class="sd">            convering Sa(1.0) to PGV (cm/s).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">NewmarkHall1982</span><span class="o">.</span><span class="n">__lnfact</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NewmarkHall1982.getLnSigma"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.getLnSigma">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getLnSigma</span><span class="p">():</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        :returns:</span>
+<span class="sd">            The the estimate of the logarithmic standard deviation of the PGV</span>
+<span class="sd">            predicted by Newmark and Hall (1982).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">NewmarkHall1982</span><span class="o">.</span><span class="n">__lnsigma</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../../index.html">
+    <img class="logo" src="../../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

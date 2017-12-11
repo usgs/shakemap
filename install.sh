@@ -140,18 +140,13 @@ echo "Installing impact-utils..."
 pip -q install \
     https://github.com/usgs/earthquake-impact-utils/archive/master.zip
 
-# Get shakelib
-echo "Installing shakelib..."
-pip -q install \
-    https://github.com/usgs/shakelib/archive/master.zip
-
 # Get libcomcat
 echo "Installing libcomcat..."
 pip -q install \
     https://github.com/usgs/libcomcat/archive/master.zip
 
 # This package
-echo "Installing shakelib..."
+echo "Installing shakemap..."
 pip install -e .
 
 # Install default profile

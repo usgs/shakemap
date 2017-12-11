@@ -1,0 +1,463 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.rupture.origin &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakelib.rupture.origin</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># stdlib imports</span>
+<span class="kn">from</span> <span class="nn">xml.dom</span> <span class="k">import</span> <span class="n">minidom</span>
+<span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">time</span>
+
+<span class="c1"># third party</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo</span> <span class="k">import</span> <span class="n">point</span>
+
+<span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="k">import</span> <span class="n">HistoricTime</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="k">import</span> <span class="n">ShakeLibException</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
+
+<span class="n">TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span>
+
+<div class="viewcode-block" id="Origin"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin">[docs]</a><span class="k">class</span> <span class="nc">Origin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The purpose of this class is to read/store event origin information, which</span>
+<span class="sd">    is usually derived from an xml file called &quot;event.xml&quot;. There is also a</span>
+<span class="sd">    mechanism to overwrite information in event.xml with a file in the input</span>
+<span class="sd">    directory called &quot;source.txt&quot;.</span>
+
+<span class="sd">    Note that this class is generally contained within a Rupture instance.</span>
+
+<span class="sd">    Event values are:</span>
+
+<span class="sd">        - eventsourcecode: the event id.</span>
+<span class="sd">        - created: file creation time (Unix epoch - seconds since Jan 1, 1970).</span>
+<span class="sd">        - lat: hypocenter latitude (decimal degrees; -90 to 90).</span>
+<span class="sd">        - lon: hypocenter longitude (decimal degrees; -180 to 180).</span>
+<span class="sd">        - depth: hypocenter depth (km, positive down).</span>
+<span class="sd">        - locstring: a free-form descriptive string of location.</span>
+<span class="sd">        - mag: earthquake magnitude.</span>
+<span class="sd">        - year: 4 digit format.</span>
+<span class="sd">        - month: 1-12.</span>
+<span class="sd">        - day: 1-31.</span>
+<span class="sd">        - hour: 0-23.</span>
+<span class="sd">        - minute: 0-59.</span>
+<span class="sd">        - second: 0-59.</span>
+<span class="sd">        - timezone: abbreviation (i.e., GMT, PST, PDT).</span>
+<span class="sd">        - mech: a string specifying the rupture mechanism; the accepted types</span>
+<span class="sd">          are RS, SS, NM, and ALL, for reverse slip, strike slip, normal, and</span>
+<span class="sd">          unspecified ruptures, respectively.</span>
+
+<span class="sd">    For backward-compatibility, we also check for &#39;type&#39;. If both &#39;mech&#39; and</span>
+<span class="sd">    &#39;type&#39; are missing (or empty strings) then &#39;mech&#39; is set to ALL.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct an Origin object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            event (dict): Dictionary of values. See list above for required</span>
+<span class="sd">            keys.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Origin object.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: When input time is not and cannot be converted to</span>
+<span class="sd">                HistoricTime object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Check for missing keys</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="n">missing</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">ORIGIN_REQUIRED_KEYS</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">req</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+                <span class="n">missing</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">req</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Input event dictionary is missing the following &#39;</span>
+                            <span class="s1">&#39;required keys: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)))</span>
+
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Check some types, ranges, and defaults</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">])</span> <span class="ow">is</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;eventsourcecode must be a string.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">90</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">90</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;lat must be between -90 and 90 degrees.&#39;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">180</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;lat must be between -180 and 180 degrees.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># make sure that time is an HistoricTime instance</span>
+        <span class="k">if</span> <span class="s1">&#39;time&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span><span class="nb">str</span><span class="p">):</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span><span class="n">TIMEFMT</span><span class="p">)</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input time string </span><span class="si">%s</span><span class="s1"> cannot be converted to datetime.&#39;</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s1">&#39;mech&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_MECH</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAKEDICT</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;mech must be SS, NM, RS, or ALL.&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_MECH</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAKEDICT</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;mech must be SS, NM, RS, or ALL.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_MECH</span>
+
+
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Add keys as class attributes</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;rake&#39;</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">v</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span>
+
+        <span class="c1"># What about rake?</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;rake&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;mech&#39;</span><span class="p">):</span>
+                <span class="n">mech</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAKEDICT</span><span class="p">[</span><span class="n">mech</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAKEDICT</span><span class="p">[</span><span class="s1">&#39;ALL&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+<div class="viewcode-block" id="Origin.fromFile"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin.fromFile">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromFile</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">eventxmlfile</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Class method to create a Origin object by specifying an event.xml file,</span>
+<span class="sd">        a rupture file, and a source.txt file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            eventxmlfile (str): Event xml file (see read_event_file()).</span>
+<span class="sd">            sourcefile (str): source.txt file (see read_source()).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Origin object.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="n">read_event_file</span><span class="p">(</span><span class="n">eventxmlfile</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="n">sourcefile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">read_source</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">)</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Origin.getHypo"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin.getHypo">[docs]</a>    <span class="k">def</span> <span class="nf">getHypo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns:</span>
+<span class="sd">           Hypocenter as OpenQuake Point instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">point</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Origin.setMechanism"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin.setMechanism">[docs]</a>    <span class="k">def</span> <span class="nf">setMechanism</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mech</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rake</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dip</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the earthquake mechanism manually (overriding any values read</span>
+<span class="sd">        in from event.xml or source.txt. If rake and dip are not specified,</span>
+<span class="sd">        they will be assigned by mechanism as follows:</span>
+
+<span class="sd">        +-------+--------+-----+</span>
+<span class="sd">        | Mech  |  Rake  | Dip |</span>
+<span class="sd">        +=======+========+=====+</span>
+<span class="sd">        | RS    |    90  |  40 |</span>
+<span class="sd">        +-------+--------+-----+</span>
+<span class="sd">        | NM    |   -90  |  50 |</span>
+<span class="sd">        +-------+--------+-----+</span>
+<span class="sd">        | SS    |     0  |  90 |</span>
+<span class="sd">        +-------+--------+-----+</span>
+<span class="sd">        | ALL   |    45  |  90 |</span>
+<span class="sd">        +-------+--------+-----+</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            mech (str): One of &#39;RS&#39; (reverse), &#39;NM&#39; (normal), &#39;SS&#39; (strike</span>
+<span class="sd">                slip), or &#39;ALL&#39; (unknown).</span>
+<span class="sd">            rake (float): Value between -360 and 360 degrees. If set, will</span>
+<span class="sd">                override default value for mechanism (see table above).</span>
+<span class="sd">            dip (float): Value betweeen 0 and 90 degrees. If set, will override</span>
+<span class="sd">                default value for mechanism (see table above). Value will be</span>
+<span class="sd">                converted to range between -180 and 180 degrees.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">mechs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;RS&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">,</span> <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="mf">40.0</span><span class="p">},</span>
+                 <span class="s1">&#39;NM&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">90.0</span><span class="p">,</span> <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="mf">50.0</span><span class="p">},</span>
+                 <span class="s1">&#39;SS&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">},</span>
+                 <span class="s1">&#39;ALL&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="mf">45.0</span><span class="p">,</span> <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="mf">90.0</span><span class="p">}}</span>
+
+        <span class="k">if</span> <span class="n">mech</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">mechs</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span>
+                <span class="s1">&#39;Mechanism must be one of: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span>
+                    <span class="nb">list</span><span class="p">(</span><span class="n">mechs</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+
+        <span class="k">if</span> <span class="n">dip</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">dip</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">dip</span> <span class="o">&gt;</span> <span class="mi">90</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Dip must be in range 0-90 degrees.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dip</span> <span class="o">=</span> <span class="n">mechs</span><span class="p">[</span><span class="n">mech</span><span class="p">][</span><span class="s1">&#39;dip&#39;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">rake</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">rake</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">180</span><span class="p">:</span>
+                <span class="n">rake</span> <span class="o">+=</span> <span class="mi">360</span>
+            <span class="k">if</span> <span class="n">rake</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+                <span class="n">rake</span> <span class="o">-=</span> <span class="mi">360</span>
+            <span class="k">if</span> <span class="n">rake</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mi">180</span> <span class="ow">or</span> <span class="n">rake</span> <span class="o">&gt;</span> <span class="mi">180</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                    <span class="s1">&#39;Rake must be transformable to be in range -180 to 180 &#39;</span>
+                    <span class="s1">&#39;degrees.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rake</span> <span class="o">=</span> <span class="n">mechs</span><span class="p">[</span><span class="n">mech</span><span class="p">][</span><span class="s1">&#39;rake&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">dip</span> <span class="o">=</span> <span class="n">dip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="n">rake</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mech</span> <span class="o">=</span> <span class="n">mech</span></div></div>
+
+
+<div class="viewcode-block" id="read_event_file"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.read_event_file">[docs]</a><span class="k">def</span> <span class="nf">read_event_file</span><span class="p">(</span><span class="n">eventxml</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read event.xml file from disk, returning a dictionary of attributes.</span>
+<span class="sd">    Input XML format looks like this:</span>
+
+<span class="sd">    .. code-block:: xml</span>
+
+<span class="sd">         &lt;earthquake</span>
+<span class="sd">             id=&quot;2008ryan &quot;</span>
+<span class="sd">             lat=&quot;30.9858&quot;</span>
+<span class="sd">             lon=&quot;103.3639&quot;</span>
+<span class="sd">             mag=&quot;7.9&quot;</span>
+<span class="sd">             year=&quot;2008&quot;</span>
+<span class="sd">             month=&quot;05&quot;</span>
+<span class="sd">             day=&quot;12&quot;</span>
+<span class="sd">             hour=&quot;06&quot;</span>
+<span class="sd">             minute=&quot;28&quot;</span>
+<span class="sd">             second=&quot;01&quot;</span>
+<span class="sd">             timezone=&quot;GMT&quot;</span>
+<span class="sd">             depth=&quot;19.0&quot;</span>
+<span class="sd">             locstring=&quot;EASTERN SICHUAN, CHINA&quot;</span>
+<span class="sd">             created=&quot;1211173621&quot;</span>
+<span class="sd">             otime=&quot;1210573681&quot;</span>
+<span class="sd">             type=&quot;&quot;</span>
+<span class="sd">         /&gt;</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        eventxml (str): Path to event XML file OR file-like object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">       dict: Dictionary with keys:</span>
+<span class="sd">         - eventsourcecode Origin network and origin code (i.e., us2017abcd).</span>
+<span class="sd">         - eventsource Origin network (&quot;us&quot;).</span>
+<span class="sd">         - time Origin time as an HistoricTime object.</span>
+<span class="sd">         - lat Origin latitude</span>
+<span class="sd">         - lon Origin longitude</span>
+<span class="sd">         - depth Origin depth</span>
+<span class="sd">         - mag Origin magnitude</span>
+<span class="sd">         - created Process time as an HistoricTime object.</span>
+<span class="sd">         - locstring Location string</span>
+<span class="sd">         - mechanism Moment mechanism, one of:</span>
+<span class="sd">           - &#39;RS&#39; (Reverse)</span>
+<span class="sd">           - &#39;SS&#39; (Strike-Slip)</span>
+<span class="sd">           - &#39;NM&#39; (Normal)</span>
+<span class="sd">           - &#39;ALL&#39; (Undetermined)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># fill in default values for mechanism, rake and dip</span>
+    <span class="c1"># these may be overriden by values in event.xml, source.txt, or by values</span>
+    <span class="c1"># passed in after reading input data.</span>
+<span class="c1">#    event = {&#39;mech&#39;: DEFAULT_MECH,</span>
+<span class="c1">#             &#39;rake&#39;: DEFAULT_RAKE,</span>
+<span class="c1">#             &#39;dip&#39;: DEFAULT_DIP}</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eventxml</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">minidom</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">eventxml</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">eventxml</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">minidom</span><span class="o">.</span><span class="n">parseString</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="c1"># Turn XML content into dictionary</span>
+    <span class="n">eq</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;earthquake&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">xmldict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">eq</span><span class="o">.</span><span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="n">root</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+
+    <span class="n">eqdict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;network&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;network&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;us&#39;</span> <span class="c1">#??</span>
+
+    <span class="c1">#look for the productcode attribute</span>
+    <span class="k">if</span> <span class="s1">&#39;productcode&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
+
+    <span class="c1"># fix eventsourcecode if not specified correctly</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]):</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span>
+
+    <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">])</span>
+    <span class="n">month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">])</span>
+    <span class="n">day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">])</span>
+    <span class="n">hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">])</span>
+    <span class="n">minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;minute&#39;</span><span class="p">])</span>
+    <span class="n">second</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">])</span>
+    <span class="n">microseconds</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">second</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]))</span><span class="o">*</span><span class="mi">1</span><span class="n">e6</span><span class="p">)</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="p">(</span><span class="n">year</span><span class="p">,</span><span class="n">month</span><span class="p">,</span><span class="n">day</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="n">minute</span><span class="p">,</span><span class="n">second</span><span class="p">,</span><span class="n">microseconds</span><span class="p">)</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">])</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">])</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;mag&#39;</span><span class="p">])</span>
+
+    <span class="c1"># make created field in event.xml optional - set to current UTC time if not</span>
+    <span class="c1"># supplied.</span>
+    <span class="k">if</span> <span class="s1">&#39;created&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">utcfromtimestamp</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
+
+    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="s1">&#39;mech&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">eqdict</span></div>
+
+
+<div class="viewcode-block" id="read_source"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.read_source">[docs]</a><span class="k">def</span> <span class="nf">read_source</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read source.txt file, which has lines like key=value.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        sourcefile: Path to source.txt file OR file-like object</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Dictionary containing key/value pairs from file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">isFile</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">isFile</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">sourcefile</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="c1"># see if this is some sort of number</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">isFile</span><span class="p">:</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">params</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

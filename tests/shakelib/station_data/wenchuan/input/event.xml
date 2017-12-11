@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<shakemap-data code_version="3.5" map_version="1">
+<earthquake id="20080512062801" lat="31.98580" lon="104.36390" mag="7.9" year="2008" month="5" day="12" hour="6" minute="28" second="1" timezone="GMT" depth="19.0" network="us" locstring="Wenchuan, China" created="1485487610" />
+</shakemap-data>

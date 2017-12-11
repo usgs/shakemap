@@ -1,0 +1,236 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.virtualipe &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="shakelib.station" href="shakelib.station.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakelib.virtualipe">
+<span id="shakelib-virtualipe"></span><h1>shakelib.virtualipe<a class="headerlink" href="#module-shakelib.virtualipe" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="shakelib.virtualipe.VirtualIPE">
+<em class="property">class </em><code class="descclassname">shakelib.virtualipe.</code><code class="descname">VirtualIPE</code><a class="reference internal" href="../_modules/shakelib/virtualipe.html#VirtualIPE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">openquake.hazardlib.gsim.base.GMPE</span></code></p>
+<p>Implements a virtual IPE that is the combination of a MultiGMPE
+and a GMICE. Will first attempt to use PGV for the intensities,
+and then will try PGA, and then SA(1.0), and then will bail out.</p>
+<p>Uncertainty is computed by combining the uncertainty of the GMPE
+with the uncertainty of the GMICE. Standard error propagation
+techniques are used (see the ShakeMap manual for a detailed
+explanation). For the intra- and inter-event components of total
+uncertainty, we assign all of GMICE uncertaninty to the intra-event
+term, and none to the inter-event term. This choice is conservative,
+and seems appropriate until GMICE are produced with separate inter-
+and intra-event terms.</p>
+<p>Note that the combined inter- and intra-event uncertainties will
+only approximately equal the total uncertainty because the GMPEs
+will only produce combined uncertainties that are approximately
+equal to their total uncertainty.</p>
+<dl class="attribute">
+<dt id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
+<code class="descname">DEFINED_FOR_INTENSITY_MEASURE_TYPES</code><em class="property"> = {&lt;class 'openquake.hazardlib.imt.MMI'&gt;}</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>The OpenQuake IMT this module can produce (‘MMI’ only).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES">
+<code class="descname">DEFINED_FOR_STANDARD_DEVIATION_TYPES</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd><p>The OpenQuake standard deviation types that may be produced (will
+depend on the GMPE provided).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.virtualipe.VirtualIPE.REQUIRES_DISTANCES">
+<code class="descname">REQUIRES_DISTANCES</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.REQUIRES_DISTANCES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Distance measures required (will depend on the GMPE provided).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT">
+<code class="descname">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT" title="Permalink to this definition">¶</a></dt>
+<dd><p>OpenQuake IMC used (will depend on the GMPE, but “Larger” is
+typical).</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.virtualipe.VirtualIPE.DEFINED_FOR_TECTONIC_REGION_TYPE">
+<code class="descname">DEFINED_FOR_TECTONIC_REGION_TYPE</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.DEFINED_FOR_TECTONIC_REGION_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determined by the GMPE selected.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.virtualipe.VirtualIPE.REQUIRES_RUPTURE_PARAMETERS">
+<code class="descname">REQUIRES_RUPTURE_PARAMETERS</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.REQUIRES_RUPTURE_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determined by the GMPE selected.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.virtualipe.VirtualIPE.REQUIRES_SITES_PARAMETERS">
+<code class="descname">REQUIRES_SITES_PARAMETERS</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.REQUIRES_SITES_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determined by the GMPE selected.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="shakelib.virtualipe.VirtualIPE.fromFuncs">
+<em class="property">classmethod </em><code class="descname">fromFuncs</code><span class="sig-paren">(</span><em>gmpe</em>, <em>gmice</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/virtualipe.html#VirtualIPE.fromFuncs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.fromFuncs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new VirtualIPE object with the specified MultiGMPE and
+GMICE. There is no default constructor, you must use this method.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>gmpe</strong> – An instance of the MultiGMPE object.</li>
+<li><strong>gmice</strong> – An instance of a GMICE object.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A new instance of a VirtualIPE object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#shakelib.virtualipe.VirtualIPE" title="shakelib.virtualipe.VirtualIPE"><code class="xref py py-class docutils literal"><span class="pre">VirtualIPE</span></code></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.virtualipe.VirtualIPE.get_mean_and_stddevs">
+<code class="descname">get_mean_and_stddevs</code><span class="sig-paren">(</span><em>sx</em>, <em>rx</em>, <em>dx</em>, <em>imt</em>, <em>stddev_types</em>, <em>fd=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/virtualipe.html#VirtualIPE.get_mean_and_stddevs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.virtualipe.VirtualIPE.get_mean_and_stddevs" title="Permalink to this definition">¶</a></dt>
+<dd><p>See superclass
+<a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs">method</a>
+for parameter definitions. The only acceptable IMT is MMI.</p>
+<p>Additional subclass argument is “fd”, which is the directivity
+amplification factor in natural log units. This is optional,
+and must be a numpy array with the same dimentions as the
+sites and is added to the ground motions before conversion to
+MMI.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">mmi (ndarray): Ground motions predicted by the MultiGMPE using
+the supplied parameters are converted to MMI using the GMICE.<p>mmi_sd (list of ndarrays): The uncertainty of the combined
+prediction/conversion process. The prediction uncertainty will
+typically be either OpenQuake’s TOTAL or INTRA_EVENT.  But can
+be any set that the MultiGMPE supports. See the ShakeMap manual
+for a detailed discussion of the way the uncertainty is computed.</p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">ndarray, list of ndarray</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">shakelib.virtualipe</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
