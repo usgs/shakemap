@@ -1,0 +1,453 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.rupture.factory &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakelib.rupture.factory</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python3</span>
+
+<span class="c1"># stdlib modules</span>
+<span class="kn">import</span> <span class="nn">json</span>
+
+<span class="c1"># third party imports</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.point</span> <span class="k">import</span> <span class="n">Point</span>
+
+<span class="c1"># local imports</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.point_rupture</span> <span class="k">import</span> <span class="n">PointRupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.quad_rupture</span> <span class="k">import</span> <span class="n">QuadRupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.edge_rupture</span> <span class="k">import</span> <span class="n">EdgeRupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.origin</span> <span class="k">import</span> <span class="n">Origin</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="k">import</span> <span class="n">ShakeLibException</span>
+
+
+<div class="viewcode-block" id="get_rupture"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.get_rupture">[docs]</a><span class="k">def</span> <span class="nf">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a module-level function to read in a rupture file. This allows for</span>
+<span class="sd">    the ShakeMap 3 text file specification or the ShakeMap 4 JSON rupture</span>
+<span class="sd">    format. The ShakeMap 3 (&quot;.txt&quot; extension) only supports QuadRupture style</span>
+<span class="sd">    rupture representation and so this method will always return a QuadRupture</span>
+<span class="sd">    instance. The ShakeMap 4 JSON format supports QuadRupture and EdgeRupture</span>
+<span class="sd">    represenations and so this method detects the rupture class and returns the</span>
+<span class="sd">    appropriate Rupture subclass instance.</span>
+
+<span class="sd">    If file is None (default) then it returns a PointRupture.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        origin (Origin): A ShakeMap origin instance; required because</span>
+<span class="sd">            hypocentral/epicentral distances are computed from the Rupture</span>
+<span class="sd">            class.</span>
+<span class="sd">        file (srt): Path to rupture file (optional).</span>
+<span class="sd">        mesh_dx (float): Target spacing (in km) for rupture discretization;</span>
+<span class="sd">            default is 0.5 km and it is only used if the rupture file is an</span>
+<span class="sd">            EdgeRupture.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Rupture subclass instance.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># -----------------------------------------------------------------</span>
+            <span class="c1"># First, try to read as a json file</span>
+            <span class="c1"># -----------------------------------------------------------------</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">file</span><span class="p">))</span>
+
+            <span class="n">rupt</span> <span class="o">=</span> <span class="n">rupture_from_dict_and_origin</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="n">mesh_dx</span><span class="p">)</span>
+
+        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+            <span class="c1"># -----------------------------------------------------------------</span>
+            <span class="c1"># Reading as json failed, so hopefully it is a ShakeMap 3 text file</span>
+            <span class="c1"># -----------------------------------------------------------------</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">text_to_json</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                <span class="n">rupt</span> <span class="o">=</span> <span class="n">rupture_from_dict_and_origin</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="n">mesh_dx</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unknown rupture file format.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Origin requred if no rupture file is provided.&quot;</span><span class="p">)</span>
+        <span class="n">rupt</span> <span class="o">=</span> <span class="n">PointRupture</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rupt</span></div>
+
+
+<div class="viewcode-block" id="rupture_from_dict_and_origin"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.rupture_from_dict_and_origin">[docs]</a><span class="k">def</span> <span class="nf">rupture_from_dict_and_origin</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Method returns either a QuadRupture or EdgeRupture object based on a</span>
+<span class="sd">    GeoJSON dictionary and an origin. Note that this is very similar to</span>
+<span class="sd">    :func:`rupture_from_dict`, except that method is for</span>
+<span class="sd">    constructing the rupture objects from a dict that already contains the</span>
+<span class="sd">    origin info in the `metadata` field (e.g., from a dict from a Shakemap</span>
+<span class="sd">    container), while this method is for construction of the rupture objects</span>
+<span class="sd">    from a GeoJSON dict that does not yet include that information (e.g., from</span>
+<span class="sd">    a dict that is read in to initially create the shakemap container, along</span>
+<span class="sd">    with an Origin that is derived from `event.xml`).</span>
+
+<span class="sd">    .. seealso:: :func:`rupture_from_dict`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        d (dict): Rupture GeoJSON dictionary.</span>
+<span class="sd">        origin (Origin): A ShakeMap origin object.</span>
+<span class="sd">        mesh_dx (float): Target spacing (in km) for rupture discretization;</span>
+<span class="sd">            default is 0.5 km and it is only used if the rupture file is an</span>
+<span class="sd">            EdgeRupture.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a Rupture subclass.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">validate_json</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="c1"># Is this a QuadRupture or an EdgeRupture?</span>
+    <span class="n">valid_quads</span> <span class="o">=</span> <span class="n">is_quadrupture_class</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">valid_quads</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="n">rupt</span> <span class="o">=</span> <span class="n">QuadRupture</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">rupt</span> <span class="o">=</span> <span class="n">EdgeRupture</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="n">mesh_dx</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rupt</span></div>
+
+
+<div class="viewcode-block" id="rupture_from_dict"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.rupture_from_dict">[docs]</a><span class="k">def</span> <span class="nf">rupture_from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Method returns either a Rupture subclass (QuadRupture, EdgeRupture, or</span>
+<span class="sd">    PointRupture) object based on a GeoJSON dictionary.</span>
+
+<span class="sd">    .. seealso::</span>
+<span class="sd">        :func:`rupture_from_dict_and_origin`</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        d (dict): Rupture GeoJSON dictionary, which must contain origin</span>
+<span class="sd">            information in the &#39;metadata&#39; field.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        a Rupture subclass.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">validate_json</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">Origin</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">])</span>
+
+    <span class="c1"># What type of rupture is this?</span>
+    <span class="n">geo_type</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">geo_type</span> <span class="o">==</span> <span class="s1">&#39;MultiPolygon&#39;</span><span class="p">:</span>
+        <span class="c1"># EdgeRupture will have &#39;mesh_dx&#39; in metadata</span>
+        <span class="k">if</span> <span class="s1">&#39;mesh_dx&#39;</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]:</span>
+            <span class="n">mesh_dx</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;mesh_dx&#39;</span><span class="p">]</span>
+            <span class="n">rupt</span> <span class="o">=</span> <span class="n">EdgeRupture</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="n">mesh_dx</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">rupt</span> <span class="o">=</span> <span class="n">QuadRupture</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">geo_type</span> <span class="o">==</span> <span class="s1">&#39;Point&#39;</span><span class="p">:</span>
+        <span class="n">rupt</span> <span class="o">=</span> <span class="n">PointRupture</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">rupt</span></div>
+
+
+<div class="viewcode-block" id="text_to_json"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.text_to_json">[docs]</a><span class="k">def</span> <span class="nf">text_to_json</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read in old ShakeMap 3 textfile rupture format and convert to GeoJSON.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rupturefile (srt): Path to rupture file OR file-like object in GMT</span>
+<span class="sd">            psxy format, where:</span>
+
+<span class="sd">                * Rupture vertices are space separated lat, lon, depth triplets</span>
+<span class="sd">                  on a single line.</span>
+<span class="sd">                * Rupture groups are separated by lines containing &quot;&gt;&quot;</span>
+<span class="sd">                * Rupture groups must be closed.</span>
+<span class="sd">                * Verticies within a rupture group must start along the top</span>
+<span class="sd">                  edge and move in the strike direction then move to the bottom</span>
+<span class="sd">                  edge and move back in the opposite direction.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: GeoJSON rupture dictionary.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="c1"># First read in the data</span>
+    <span class="c1"># -------------------------------------------------------------------------</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">y</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">z</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">isFile</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">isFile</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;rt&#39;</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+        <span class="n">sline</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">sline</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+            <span class="n">reference</span> <span class="o">+=</span> <span class="n">sline</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">sline</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&gt;&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>  <span class="c1"># start of new line segment</span>
+                <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+                <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+                <span class="n">z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>  <span class="c1"># start of file</span>
+                <span class="k">continue</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">sline</span><span class="o">.</span><span class="n">strip</span><span class="p">()):</span>
+            <span class="k">continue</span>
+        <span class="n">parts</span> <span class="o">=</span> <span class="n">sline</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span>
+                <span class="s1">&#39;Rupture file </span><span class="si">%s</span><span class="s1"> has no depth values.&#39;</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span>
+        <span class="n">y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+        <span class="n">x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">z</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+    <span class="k">if</span> <span class="n">isFile</span><span class="p">:</span>
+        <span class="n">file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># Construct GeoJSON dictionary</span>
+
+    <span class="n">coords</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">poly</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lon</span><span class="p">):</span>
+            <span class="n">coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+            <span class="n">poly</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">poly</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">poly</span> <span class="o">!=</span> <span class="p">[]:</span>
+        <span class="n">coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poly</span><span class="p">)</span>
+
+    <span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;reference&#39;</span><span class="p">:</span><span class="n">reference</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;rupture type&quot;</span><span class="p">:</span> <span class="s2">&quot;rupture extent&quot;</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;MultiPolygon&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">coords</span><span class="p">]</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">]</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">d</span></div>
+
+
+<div class="viewcode-block" id="validate_json"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.validate_json">[docs]</a><span class="k">def</span> <span class="nf">validate_json</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check that the JSON format is acceptable. This is only for requirements</span>
+<span class="sd">    that are common to both QuadRupture and EdgeRupture.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        d (dict): Rupture JSON dictionary.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;FeatureCollection&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;JSON file is not a </span><span class="se">\&quot;</span><span class="s1">FeatureColleciton</span><span class="se">\&quot;</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;JSON file should contain excactly one feature.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;reference&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Json metadata field should contain &#39;</span>
+                        <span class="s1">&#39;</span><span class="se">\&quot;</span><span class="s1">reference</span><span class="se">\&quot;</span><span class="s1"> key.&#39;</span><span class="p">)</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;Feature&#39;</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Feature type should be </span><span class="se">\&quot;</span><span class="s1">Feature</span><span class="se">\&quot;</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+    <span class="n">geom</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">geom</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;MultiPolygon&#39;</span> <span class="ow">and</span>
+            <span class="n">geom</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;Point&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Geometry type should be </span><span class="se">\&quot;</span><span class="s1">MultiPolygon</span><span class="se">\&quot;</span><span class="s1"> &#39;</span>
+                        <span class="s1">&#39;or </span><span class="se">\&quot;</span><span class="s1">Point</span><span class="se">\&quot;</span><span class="s1">.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="s1">&#39;coordinates&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">geom</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Geometry dictionary should contain </span><span class="se">\&quot;</span><span class="s1">coordinates</span><span class="se">\&quot;</span><span class="s1"> &#39;</span>
+                        <span class="s1">&#39;key.&#39;</span><span class="p">)</span>
+
+    <span class="n">polygons</span> <span class="o">=</span> <span class="n">geom</span><span class="p">[</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">geom</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;MultiPolygon&#39;</span><span class="p">:</span>
+        <span class="n">n_polygons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">polygons</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_polygons</span><span class="p">):</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="n">polygons</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">n_points</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Number of points in polyon must be odd.&#39;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;First and last points in polygon must be &#39;</span>
+                                <span class="s1">&#39;identical.&#39;</span><span class="p">)</span>
+
+            <span class="n">n_pairs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">n_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_pairs</span><span class="p">):</span>
+                <span class="c1"># -------------------------------------------------------------</span>
+                <span class="c1"># Points are paired and in each pair the top is first, as in:</span>
+                <span class="c1">#</span>
+                <span class="c1">#      _.-P1-._</span>
+                <span class="c1">#   P0&#39;        &#39;P2---P3</span>
+                <span class="c1">#   |                  \</span>
+                <span class="c1">#   P7---P6----P5-------P4</span>
+                <span class="c1">#</span>
+                <span class="c1"># Pairs: P0-P7, P1-P6, P2-P5, P3-P4</span>
+                <span class="c1"># -------------------------------------------------------------</span>
+                <span class="n">top_depth</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+                <span class="n">bot_depth</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)][</span><span class="mi">2</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">top_depth</span> <span class="o">&gt;=</span> <span class="n">bot_depth</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                        <span class="s1">&#39;Top points must be ordered before bottom points.&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="is_quadrupture_class"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.is_quadrupture_class">[docs]</a><span class="k">def</span> <span class="nf">is_quadrupture_class</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if JSON file fulfills QuadRupture class criteria:</span>
+
+<span class="sd">        - Are top and bottom edges horizontal?</span>
+<span class="sd">        - Are the four points in each quad coplanar?</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        d (dict): Rupture JSON dictionary.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: Can the rupture be represented in the QuadRupture class?</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">isQuad</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">f</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">geom</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+    <span class="n">polygons</span> <span class="o">=</span> <span class="n">geom</span><span class="p">[</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">n_polygons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">polygons</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_polygons</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">polygons</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">n_pairs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">n_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="n">n_quads</span> <span class="o">=</span> <span class="n">n_pairs</span> <span class="o">-</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_quads</span><span class="p">):</span>
+            <span class="c1"># Four points of each quad should be co-planar within a tolerance</span>
+            <span class="n">quad</span> <span class="o">=</span> <span class="p">[</span><span class="n">Point</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="mi">2</span><span class="p">]),</span>
+                    <span class="n">Point</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="n">k</span> <span class="o">+</span> <span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]),</span>
+                    <span class="n">Point</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)][</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)][</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">3</span><span class="p">)][</span><span class="mi">2</span><span class="p">]),</span>
+                    <span class="n">Point</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)][</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)][</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)][</span><span class="mi">2</span><span class="p">])]</span>
+            <span class="n">test</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_quad</span><span class="p">(</span><span class="n">quad</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+                <span class="n">isQuad</span> <span class="o">=</span> <span class="kc">False</span>
+
+            <span class="c1"># Within each quad, top and bottom edges must be horizontal</span>
+            <span class="n">tops</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">quad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">quad</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">tops</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tops</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                              <span class="n">atol</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">DEPTH_TOL</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="n">isQuad</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">bots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">quad</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">quad</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span><span class="p">])</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">bots</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bots</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                              <span class="n">atol</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">DEPTH_TOL</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
+                <span class="n">isQuad</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">return</span> <span class="n">isQuad</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

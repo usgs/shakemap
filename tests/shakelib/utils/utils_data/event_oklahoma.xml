@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<shakemap-data code_version="3.5" map_version="1">
+<earthquake id="oklahoma" lat="35.679" lon="-97.416" mag="4.2" year="2017" month="8" day="3" hour="2" minute="56" second="37" timezone="GMT" depth="2.3" network="us" locstring="6km ENE of Edmond, Oklahoma" created="1502118995" />
+</shakemap-data>

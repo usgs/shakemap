@@ -1,0 +1,291 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.station &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakelib.virtualipe" href="shakelib.virtualipe.html" />
+    <link rel="prev" title="shakelib.sites" href="shakelib.sites.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakelib.station">
+<span id="shakelib-station"></span><h1>shakelib.station<a class="headerlink" href="#module-shakelib.station" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="shakelib.station.StationList">
+<em class="property">class </em><code class="descclassname">shakelib.station.</code><code class="descname">StationList</code><span class="sig-paren">(</span><em>db</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.station.StationList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>A class to facilitate reading ShakeMap formatted XML fies of peak
+amplitudes and MMI, and
+produce tables of station data. Seismic stations are considered to
+be ‘instrumented’; MMI data is not instrumented and is indicated
+in the ShakeMap XML with a <code class="docutils literal"><span class="pre">netid</span></code> attribute of “DYFI,” “MMI,”
+“INTENSITY,” or “CIIM.”</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Typically the user will call the class method <code class="xref py py-meth docutils literal"><span class="pre">fromXML()</span></code>
+to create a <a class="reference internal" href="#shakelib.station.StationList" title="shakelib.station.StationList"><code class="xref py py-class docutils literal"><span class="pre">StationList</span></code></a> object the first time
+a set of station files are processed. (Or, as an alternative,
+the user can call <a class="reference internal" href="#shakelib.station.StationList.loadFromXML" title="shakelib.station.StationList.loadFromXML"><code class="xref py py-meth docutils literal"><span class="pre">loadFromXML()</span></code></a> and <code class="xref py py-meth docutils literal"><span class="pre">fillTables()</span></code>
+sequentially.)
+This will create a database at the location specified by the
+<code class="docutils literal"><span class="pre">dbfile</span></code> parameter to <code class="xref py py-meth docutils literal"><span class="pre">fromXML()</span></code>. Subsequent programs
+can use the default constructor to simply load <code class="docutils literal"><span class="pre">dbfile</span></code>.</p>
+</div>
+<p>The default constructor reads a pre-built SQLite database of
+station data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dbfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A SQLite database file containing pre-processed
+station data.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A <a class="reference internal" href="#shakelib.station.StationList" title="shakelib.station.StationList"><code class="xref py py-class docutils literal"><span class="pre">StationList</span></code></a> object.</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="shakelib.station.StationList.loadFromSQL">
+<em class="property">classmethod </em><code class="descname">loadFromSQL</code><span class="sig-paren">(</span><em>sql</em>, <em>dbfile=':memory:'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.loadFromSQL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.station.StationList.loadFromSQL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new object from saved SQL code (see <a class="reference internal" href="#shakelib.station.StationList.dumpToSQL" title="shakelib.station.StationList.dumpToSQL"><code class="xref py py-meth docutils literal"><span class="pre">dumpToSQL()</span></code></a>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sql</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – SQL code to create and populate the database</li>
+<li><strong>dbfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The path to a file in which the database will reside.
+The default is ‘:memory:’ for an in-memory database.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal"><span class="pre">Stationlist</span></code> object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.station.StationList.dumpToSQL">
+<code class="descname">dumpToSQL</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.dumpToSQL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.station.StationList.dumpToSQL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump the database as a string of SQL code (see <a class="reference internal" href="#shakelib.station.StationList.loadFromSQL" title="shakelib.station.StationList.loadFromSQL"><code class="xref py py-meth docutils literal"><span class="pre">loadFromSQL()</span></code></a>).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A string of SQL sufficient to restore and repopulate the
+database.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="shakelib.station.StationList.loadFromXML">
+<em class="property">classmethod </em><code class="descname">loadFromXML</code><span class="sig-paren">(</span><em>xmlfiles</em>, <em>dbfile=':memory:'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.loadFromXML"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.station.StationList.loadFromXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a StationList object by reading one or more ShakeMap XML input
+files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>xmlfiles</strong> (<em>sequence of str</em>) – Sequence of ShakeMap XML input files to read.</li>
+<li><strong>dbfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to a file into which to write the SQLite database.
+The default is ‘:memory:’ for an in-memory database.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><a class="reference internal" href="#shakelib.station.StationList" title="shakelib.station.StationList"><code class="xref py py-class docutils literal"><span class="pre">StationList</span></code></a> object</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.station.StationList.getGeoJson">
+<code class="descname">getGeoJson</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.getGeoJson"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.station.StationList.getGeoJson" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="shakelib.station.StationList.addData">
+<code class="descname">addData</code><span class="sig-paren">(</span><em>xmlfiles</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.addData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.station.StationList.addData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a StationList object by reading one or more ShakeMap XML input
+files.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>xmlfiles</strong> (<em>sequence of str</em>) – Sequence of ShakeMap XML input files to read.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><a class="reference internal" href="#shakelib.station.StationList" title="shakelib.station.StationList"><code class="xref py py-class docutils literal"><span class="pre">StationList</span></code></a> object</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.station.StationList.getIMTtypes">
+<code class="descname">getIMTtypes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.getIMTtypes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.station.StationList.getIMTtypes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a set of IMT types found in the database</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A set of IMT types</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.station.StationList.getStationDictionary">
+<code class="descname">getStationDictionary</code><span class="sig-paren">(</span><em>instrumented=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#StationList.getStationDictionary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.station.StationList.getStationDictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary of the instrumented or non-instrumented
+stations. The keys describe the parameter, the values are Numpy
+arrays of the parameter in question.</p>
+<p>For the standard set of ShakeMap IMTs (mmi, pga, pgv, psa03, psa10,
+psa30), the keys in the dictionary would be:</p>
+<p>‘id’, ‘network’, ‘code’, ‘name’, ‘lat’, ‘lon’, ‘elev’, ‘vs30’,
+‘instrumented’, ‘PGA’, ‘PGV’, ‘SA(0.3)’, ‘SA(1.0)’, ‘SA(3.0)’</p>
+<p>For the non-instrumented dictionary, the keys would be:</p>
+<p>‘id’, ‘network’, ‘code’, ‘name’, ‘lat’, ‘lon’, ‘elev’, ‘vs30’,
+‘instrumented’, ‘MMI’</p>
+<p>The <strong>id</strong> column is <strong>network</strong> and <strong>code</strong> concatenated with a
+period (“.”) between them.</p>
+<p>All ground motion units are natural log units. Distances are in km.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>instrumented</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Set to True if the dictionary is to contain the instrumented
+stations, or to False if the dictionary is to contain the
+non-instrumented (MMI) stations.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">A dictionary of Numpy arrays.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="shakelib.station.get_imt_period">
+<code class="descclassname">shakelib.station.</code><code class="descname">get_imt_period</code><span class="sig-paren">(</span><em>imt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/station.html#get_imt_period"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.station.get_imt_period" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">shakelib.station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

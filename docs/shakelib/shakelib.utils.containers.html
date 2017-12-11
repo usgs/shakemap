@@ -1,0 +1,676 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.utils.containers &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakelib.utils.distance" href="shakelib.utils.distance.html" />
+    <link rel="prev" title="shakelib.utils" href="shakelib.utils.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakelib.utils.containers">
+<span id="shakelib-utils-containers"></span><h1>shakelib.utils.containers<a class="headerlink" href="#module-shakelib.utils.containers" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="shakelib.utils.containers.ShakeMapContainer">
+<em class="property">class </em><code class="descclassname">shakelib.utils.containers.</code><code class="descname">ShakeMapContainer</code><span class="sig-paren">(</span><em>hdfobj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">mapio.gridcontainer.GridHDFContainer</span></code></p>
+<p>Parent class for InputShakeMapContainer and OutputShakeMapContainer.</p>
+<p>Instantiate an HDFContainer from an open h5py File Object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hdfobj</strong> – Open h5py File Object.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapContainer.setConfig">
+<code class="descname">setConfig</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer.setConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer.setConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add the config as a dictionary to the HDF file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>config</strong> (<em>dict--like</em>) – Dict–like object with configuration
+information.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapContainer.getConfig">
+<code class="descname">getConfig</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer.getConfig"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer.getConfig" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve configuration dictionary from container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Configuration dictionary.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If config dictionary has not been set in
+the container.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapContainer.setRupture">
+<code class="descname">setRupture</code><span class="sig-paren">(</span><em>rupture</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer.setRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer.setRupture" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store Rupture object in container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rupture</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a><em> or </em><a class="reference internal" href="shakelib.rupture.base.html#shakelib.rupture.base.Rupture" title="shakelib.rupture.base.Rupture"><em>Rupture</em></a>) – Rupture object (Point,Quad, or Edge)
+or dictionary representation of same.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> – If input object or dictionary does not
+represent a Rupture object.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapContainer.getRuptureObject">
+<code class="descname">getRuptureObject</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer.getRuptureObject"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer.getRuptureObject" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve Rupture object from container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Instance of (one of) a Point/Quad/EdgeRupture class.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="shakelib.rupture.base.html#shakelib.rupture.base.Rupture" title="shakelib.rupture.base.Rupture">Rupture</a></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If rupture object has not been set in
+the container.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapContainer.getRuptureDict">
+<code class="descname">getRuptureDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer.getRuptureDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer.getRuptureDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve Rupture dictionary from container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Dictionary representatin of (one of) a</dt>
+<dd>Point/Quad/EdgeRupture class.</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If rupture object has not been set in
+the container.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapContainer.setStationList">
+<code class="descname">setStationList</code><span class="sig-paren">(</span><em>stationlist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer.setStationList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer.setStationList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store StationList object in container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stationlist</strong> (<a class="reference internal" href="shakelib.station.html#shakelib.station.StationList" title="shakelib.station.StationList"><em>StationList</em></a>) – StationList object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> – If input object or dictionary is not a StationList object.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapContainer.getStationList">
+<code class="descname">getStationList</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer.getStationList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer.getStationList" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve StationList object from container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">StationList object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="shakelib.station.html#shakelib.station.StationList" title="shakelib.station.StationList">StationList</a></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If stationlist object has not been set in
+the container.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapContainer.setStationDict">
+<code class="descname">setStationDict</code><span class="sig-paren">(</span><em>stationdict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer.setStationDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer.setStationDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store (JSON-like) station dictiionary in container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>stationdict</strong> (<em>dict-like</em>) – Station dict object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#TypeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">TypeError</span></code></a> – If input object is not a dictionary.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapContainer.getStationDict">
+<code class="descname">getStationDict</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer.getStationDict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer.getStationDict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve (JSON-like) station dictionary from container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Station dictionary.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict-like</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If station dictionary has not been set in
+the container.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapContainer.setVersionHistory">
+<code class="descname">setVersionHistory</code><span class="sig-paren">(</span><em>history_dict</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer.setVersionHistory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer.setVersionHistory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a dictionary containing version history in the container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>history_dict</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing version history. ??</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapContainer.getVersionHistory">
+<code class="descname">getVersionHistory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapContainer.getVersionHistory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapContainer.getVersionHistory" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the dictionary containing version history.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Dictionary containing version history, or None.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#AttributeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">AttributeError</span></code></a> – If version history has not been set in
+the container.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="shakelib.utils.containers.ShakeMapInputContainer">
+<em class="property">class </em><code class="descclassname">shakelib.utils.containers.</code><code class="descname">ShakeMapInputContainer</code><span class="sig-paren">(</span><em>hdfobj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapInputContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapInputContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shakelib.utils.containers.ShakeMapContainer" title="shakelib.utils.containers.ShakeMapContainer"><code class="xref py py-class docutils literal"><span class="pre">shakelib.utils.containers.ShakeMapContainer</span></code></a></p>
+<p>HDF container for Shakemap input data.</p>
+<dl class="docutils">
+<dt>This class provides methods for getting and setting information on:</dt>
+<dd><ul class="first last simple">
+<li>configuration</li>
+<li>event (lat,lon,depth,etc.)</li>
+<li>rupture</li>
+<li>station data (can also be updated)</li>
+<li>version history</li>
+</ul>
+</dd>
+</dl>
+<p>Instantiate an HDFContainer from an open h5py File Object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hdfobj</strong> – Open h5py File Object.</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="shakelib.utils.containers.ShakeMapInputContainer.createFromInput">
+<em class="property">classmethod </em><code class="descname">createFromInput</code><span class="sig-paren">(</span><em>filename</em>, <em>config</em>, <em>eventfile</em>, <em>version_history</em>, <em>rupturefile=None</em>, <em>datafiles=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapInputContainer.createFromInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapInputContainer.createFromInput" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate an InputContainer from ShakeMap input data.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to HDF5 file that will be created to encapsulate all
+input data.</li>
+<li><strong>config</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing all configuration information
+necessary for ShakeMap ground motion and other calculations.</li>
+<li><strong>eventfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to ShakeMap event.xml file.</li>
+<li><strong>rupturefile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to ShakeMap rupture text or JSON file.</li>
+<li><strong>datafiles</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of ShakeMap data (DYFI, strong motion) files.</li>
+<li><strong>version_history</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing version history.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Instance of InputContainer.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">InputContainer</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapInputContainer.setStationData">
+<code class="descname">setStationData</code><span class="sig-paren">(</span><em>datafiles</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapInputContainer.setStationData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapInputContainer.setStationData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert observed ground motion data into the container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>datafiles</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to an XML-formatted file containing ground
+motion observations, (macroseismic or instrumented).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapInputContainer.addStationData">
+<code class="descname">addStationData</code><span class="sig-paren">(</span><em>datafiles</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapInputContainer.addStationData"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapInputContainer.addStationData" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add observed ground motion data into the container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>datafiles</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to an XML-formatted file containing ground
+motion observations, (macroseismic or instrumented).</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapInputContainer.updateRupture">
+<code class="descname">updateRupture</code><span class="sig-paren">(</span><em>eventxml=None</em>, <em>rupturefile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapInputContainer.updateRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapInputContainer.updateRupture" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update rupture/origin information in container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>eventxml</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to event.xml file.</li>
+<li><strong>rupturefile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to rupture file (JSON or txt format).</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="shakelib.utils.containers.ShakeMapOutputContainer">
+<em class="property">class </em><code class="descclassname">shakelib.utils.containers.</code><code class="descname">ShakeMapOutputContainer</code><span class="sig-paren">(</span><em>hdfobj</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapOutputContainer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapOutputContainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#shakelib.utils.containers.ShakeMapContainer" title="shakelib.utils.containers.ShakeMapContainer"><code class="xref py py-class docutils literal"><span class="pre">shakelib.utils.containers.ShakeMapContainer</span></code></a></p>
+<p>HDF container for Shakemap output data.</p>
+<p>This class provides methods for getting and setting IMT data.
+The philosophy here is that an IMT consists of both the mean results and
+the standard deviations of those results, thus getIMT() returns a
+dictionary with both, plus metadata for each data layer.</p>
+<p>Instantiate an HDFContainer from an open h5py File Object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>hdfobj</strong> – Open h5py File Object.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapOutputContainer.getDataType">
+<code class="descname">getDataType</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapOutputContainer.getDataType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapOutputContainer.getDataType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the format of the IMT, Vs30, and distance data stored in
+this file: either ‘points’ or ‘grid’. None is returned if no data
+have been set.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Either ‘grid’ or ‘points’ or None.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a> or <a class="reference external" href="http://docs.python.org/3.5/library/constants.html#None" title="(in Python v3.6)">None</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapOutputContainer.setDataType">
+<code class="descname">setDataType</code><span class="sig-paren">(</span><em>datatype</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapOutputContainer.setDataType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapOutputContainer.setDataType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the type of the IMT, Vs30, and distance data stored in this
+file. This function should not be called by the user – the value
+will be set by the first call to setIMTGrids() or setIMTArray().</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>(</strong><strong>str</strong><strong>)</strong> – Either ‘points’ or ‘grid’.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Nothing.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapOutputContainer.setIMTGrids">
+<code class="descname">setIMTGrids</code><span class="sig-paren">(</span><em>imt_name</em>, <em>imt_mean</em>, <em>mean_metadata</em>, <em>imt_std</em>, <em>std_metadata</em>, <em>component</em>, <em>compression=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapOutputContainer.setIMTGrids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapOutputContainer.setIMTGrids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store IMT mean and standard deviation objects as datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>imt_name</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the IMT (MMI, PGA, etc.) to be stored.</li>
+<li><strong>imt_mean</strong> (<em>Grid2D</em>) – Grid2D object of IMT mean values to be stored.</li>
+<li><strong>mean_metadata</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing metadata for mean IMT
+grid.</li>
+<li><strong>imt_std</strong> (<em>Grid2D</em>) – Grid2D object of IMT standard deviation values
+to be stored.</li>
+<li><strong>std_metadata</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing metadata for mean IMT
+grid.</li>
+<li><strong>component</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Component type, i.e. ‘Larger’,’rotd50’,etc.</li>
+<li><strong>compression</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Boolean indicating whether dataset should be
+compressed using the gzip algorithm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HDF Group containing IMT grids and metadata.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapOutputContainer.getIMTGrids">
+<code class="descname">getIMTGrids</code><span class="sig-paren">(</span><em>imt_name</em>, <em>component</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapOutputContainer.getIMTGrids"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapOutputContainer.getIMTGrids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve a Grid2D object and any associated metadata from the container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>imt_name</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the IMT stored in the container.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Dictionary containing 4 items:</dt>
+<dd><ul class="first last simple">
+<li>mean Grid2D object for IMT mean values.</li>
+<li>mean_metadata Dictionary containing any metadata
+describing mean layer.</li>
+<li>std Grid2D object for IMT standard deviation values.</li>
+<li>std_metadata Dictionary containing any metadata describing
+standard deviation layer.</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapOutputContainer.setIMTArrays">
+<code class="descname">setIMTArrays</code><span class="sig-paren">(</span><em>imt_name</em>, <em>lons</em>, <em>lats</em>, <em>ids</em>, <em>imt_mean</em>, <em>mean_metadata</em>, <em>imt_std</em>, <em>std_metadata</em>, <em>component</em>, <em>compression=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapOutputContainer.setIMTArrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapOutputContainer.setIMTArrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store IMT mean and standard deviation objects as datasets.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>imt_name</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of the IMT (MMI, PGA, etc.) to be stored.</li>
+<li><strong>lons</strong> (<em>Numpy array</em>) – Array of longitudes of the IMT data.</li>
+<li><strong>lats</strong> (<em>Numpy array</em>) – Array of latitudes of the IMT data.</li>
+<li><strong>ids</strong> (<em>Numpy array</em>) – Array of ID strings corresponding to the
+locations given by lons and lats.</li>
+<li><strong>imt_mean</strong> (<em>Numpy array</em>) – Array of IMT mean values to be stored.</li>
+<li><strong>mean_metadata</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing metadata for mean IMT
+grid.</li>
+<li><strong>imt_std</strong> (<em>Numpy array</em>) – Array of IMT standard deviation values
+to be stored.</li>
+<li><strong>std_metadata</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing metadata for mean IMT
+grid.</li>
+<li><strong>component</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Component type, i.e. ‘Larger’,’rotd50’,etc.</li>
+<li><strong>compression</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Boolean indicating whether dataset should be
+compressed using the gzip algorithm.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">HDF Group containing IMT arrays and metadata.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapOutputContainer.getIMTArrays">
+<code class="descname">getIMTArrays</code><span class="sig-paren">(</span><em>imt_name</em>, <em>component</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapOutputContainer.getIMTArrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapOutputContainer.getIMTArrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Retrieve the arrays and any associated metadata from the container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>imt_name</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the IMT stored in the container.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Dictionary containing 7 items:</dt>
+<dd><ul class="first last simple">
+<li>’lons’: array of longitude coordinates</li>
+<li>’lats’: array of latitude coordinates</li>
+<li>’ids’: array of IDs corresponding to the coordinates</li>
+<li>’mean’: array of IMT mean values.</li>
+<li>’mean_metadata’: Dictionary containing any metadata
+describing mean layer.</li>
+<li>’std’: array of IMT standard deviation values.</li>
+<li>’std_metadata’: Dictionary containing any metadata
+describing standard deviation layer.</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapOutputContainer.getIMTs">
+<code class="descname">getIMTs</code><span class="sig-paren">(</span><em>component</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapOutputContainer.getIMTs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapOutputContainer.getIMTs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of names of IMTs matching input component type.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>component</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of component (‘Larger’,’rotd50’,etc.)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List of names of IMTs matching component stored in container.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapOutputContainer.getComponents">
+<code class="descname">getComponents</code><span class="sig-paren">(</span><em>imt_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapOutputContainer.getComponents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapOutputContainer.getComponents" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return list of components for given IMT.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>imt_name</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Name of IMT (‘MMI’,’PGA’,etc.)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">List of names of components for given IMT.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.utils.containers.ShakeMapOutputContainer.dropIMT">
+<code class="descname">dropIMT</code><span class="sig-paren">(</span><em>imt_name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapOutputContainer.dropIMT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapOutputContainer.dropIMT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete IMT datasets from container.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>name</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The name of the IMT to be deleted.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakelib.utils.containers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.distance.html">shakelib.utils.distance</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.exception.html">shakelib.utils.exception</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.imt_string.html">shakelib.utils.imt_string</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.utils.utils.html">shakelib.utils.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

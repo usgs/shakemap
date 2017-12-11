@@ -1,0 +1,351 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.rupture.origin &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakelib.rupture.point_rupture" href="shakelib.rupture.point_rupture.html" />
+    <link rel="prev" title="shakelib.rupture.factory" href="shakelib.rupture.factory.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakelib.rupture.origin">
+<span id="shakelib-rupture-origin"></span><h1>shakelib.rupture.origin<a class="headerlink" href="#module-shakelib.rupture.origin" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="shakelib.rupture.origin.Origin">
+<em class="property">class </em><code class="descclassname">shakelib.rupture.origin.</code><code class="descname">Origin</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>The purpose of this class is to read/store event origin information, which
+is usually derived from an xml file called “event.xml”. There is also a
+mechanism to overwrite information in event.xml with a file in the input
+directory called “source.txt”.</p>
+<p>Note that this class is generally contained within a Rupture instance.</p>
+<p>Event values are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>eventsourcecode: the event id.</li>
+<li>created: file creation time (Unix epoch - seconds since Jan 1, 1970).</li>
+<li>lat: hypocenter latitude (decimal degrees; -90 to 90).</li>
+<li>lon: hypocenter longitude (decimal degrees; -180 to 180).</li>
+<li>depth: hypocenter depth (km, positive down).</li>
+<li>locstring: a free-form descriptive string of location.</li>
+<li>mag: earthquake magnitude.</li>
+<li>year: 4 digit format.</li>
+<li>month: 1-12.</li>
+<li>day: 1-31.</li>
+<li>hour: 0-23.</li>
+<li>minute: 0-59.</li>
+<li>second: 0-59.</li>
+<li>timezone: abbreviation (i.e., GMT, PST, PDT).</li>
+<li>mech: a string specifying the rupture mechanism; the accepted types
+are RS, SS, NM, and ALL, for reverse slip, strike slip, normal, and
+unspecified ruptures, respectively.</li>
+</ul>
+</div></blockquote>
+<p>For backward-compatibility, we also check for ‘type’. If both ‘mech’ and
+‘type’ are missing (or empty strings) then ‘mech’ is set to ALL.</p>
+<p>Construct an Origin object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>event</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary of values. See list above for required</li>
+<li><strong>keys.</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Origin object.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">ValueError</span></code></a> – When input time is not and cannot be converted to
+HistoricTime object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="classmethod">
+<dt id="shakelib.rupture.origin.Origin.fromFile">
+<em class="property">classmethod </em><code class="descname">fromFile</code><span class="sig-paren">(</span><em>eventxmlfile</em>, <em>sourcefile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin.fromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin.fromFile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class method to create a Origin object by specifying an event.xml file,
+a rupture file, and a source.txt file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>eventxmlfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Event xml file (see read_event_file()).</li>
+<li><strong>sourcefile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – source.txt file (see read_source()).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Origin object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.rupture.origin.Origin.getHypo">
+<code class="descname">getHypo</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin.getHypo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin.getHypo" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Hypocenter as OpenQuake Point instance.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.rupture.origin.Origin.setMechanism">
+<code class="descname">setMechanism</code><span class="sig-paren">(</span><em>mech=None</em>, <em>rake=None</em>, <em>dip=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin.setMechanism"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin.setMechanism" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the earthquake mechanism manually (overriding any values read
+in from event.xml or source.txt. If rake and dip are not specified,
+they will be assigned by mechanism as follows:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="40%" />
+<col width="25%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Mech</th>
+<th class="head">Rake</th>
+<th class="head">Dip</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>RS</td>
+<td>90</td>
+<td>40</td>
+</tr>
+<tr class="row-odd"><td>NM</td>
+<td>-90</td>
+<td>50</td>
+</tr>
+<tr class="row-even"><td>SS</td>
+<td>0</td>
+<td>90</td>
+</tr>
+<tr class="row-odd"><td>ALL</td>
+<td>45</td>
+<td>90</td>
+</tr>
+</tbody>
+</table>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>mech</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – One of ‘RS’ (reverse), ‘NM’ (normal), ‘SS’ (strike
+slip), or ‘ALL’ (unknown).</li>
+<li><strong>rake</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Value between -360 and 360 degrees. If set, will
+override default value for mechanism (see table above).</li>
+<li><strong>dip</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Value betweeen 0 and 90 degrees. If set, will override
+default value for mechanism (see table above). Value will be
+converted to range between -180 and 180 degrees.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="shakelib.rupture.origin.read_event_file">
+<code class="descclassname">shakelib.rupture.origin.</code><code class="descname">read_event_file</code><span class="sig-paren">(</span><em>eventxml</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#read_event_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.read_event_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read event.xml file from disk, returning a dictionary of attributes.
+Input XML format looks like this:</p>
+<div class="highlight-xml"><div class="highlight"><pre><span></span><span class="nt">&lt;earthquake</span>
+    <span class="na">id=</span><span class="s">&quot;2008ryan &quot;</span>
+    <span class="na">lat=</span><span class="s">&quot;30.9858&quot;</span>
+    <span class="na">lon=</span><span class="s">&quot;103.3639&quot;</span>
+    <span class="na">mag=</span><span class="s">&quot;7.9&quot;</span>
+    <span class="na">year=</span><span class="s">&quot;2008&quot;</span>
+    <span class="na">month=</span><span class="s">&quot;05&quot;</span>
+    <span class="na">day=</span><span class="s">&quot;12&quot;</span>
+    <span class="na">hour=</span><span class="s">&quot;06&quot;</span>
+    <span class="na">minute=</span><span class="s">&quot;28&quot;</span>
+    <span class="na">second=</span><span class="s">&quot;01&quot;</span>
+    <span class="na">timezone=</span><span class="s">&quot;GMT&quot;</span>
+    <span class="na">depth=</span><span class="s">&quot;19.0&quot;</span>
+    <span class="na">locstring=</span><span class="s">&quot;EASTERN SICHUAN, CHINA&quot;</span>
+    <span class="na">created=</span><span class="s">&quot;1211173621&quot;</span>
+    <span class="na">otime=</span><span class="s">&quot;1210573681&quot;</span>
+    <span class="na">type=</span><span class="s">&quot;&quot;</span>
+<span class="nt">/&gt;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>eventxml</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to event XML file OR file-like object.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Dictionary with keys:</dt>
+<dd><ul class="first last simple">
+<li>eventsourcecode Origin network and origin code (i.e., us2017abcd).</li>
+<li>eventsource Origin network (“us”).</li>
+<li>time Origin time as an HistoricTime object.</li>
+<li>lat Origin latitude</li>
+<li>lon Origin longitude</li>
+<li>depth Origin depth</li>
+<li>mag Origin magnitude</li>
+<li>created Process time as an HistoricTime object.</li>
+<li>locstring Location string</li>
+<li>mechanism Moment mechanism, one of:
+- ‘RS’ (Reverse)
+- ‘SS’ (Strike-Slip)
+- ‘NM’ (Normal)
+- ‘ALL’ (Undetermined)</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="shakelib.rupture.origin.read_source">
+<code class="descclassname">shakelib.rupture.origin.</code><code class="descname">read_source</code><span class="sig-paren">(</span><em>sourcefile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#read_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.read_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read source.txt file, which has lines like key=value.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>sourcefile</strong> – Path to source.txt file OR file-like object</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Dictionary containing key/value pairs from file.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.base.html">shakelib.rupture.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.constants.html">shakelib.rupture.constants</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.edge_rupture.html">shakelib.rupture.edge_rupture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.factory.html">shakelib.rupture.factory</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakelib.rupture.origin</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.point_rupture.html">shakelib.rupture.point_rupture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.quad_rupture.html">shakelib.rupture.quad_rupture</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.utils.html">shakelib.rupture.utils</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

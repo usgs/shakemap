@@ -1,0 +1,198 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.correlation.goda_atkinson_2010 &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakelib.correlation.goda_atkinson_2010</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numexpr</span> <span class="k">as</span> <span class="nn">ne</span>
+
+
+<div class="viewcode-block" id="GodaAtkinson2010"><a class="viewcode-back" href="../../../shakelib/shakelib.correlation.goda_atkinson_2010.html#shakelib.correlation.goda_atkinson_2010.GodaAtkinson2010">[docs]</a><span class="k">class</span> <span class="nc">GodaAtkinson2010</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Imlements the Goda and Atkinson (2010) spatial correlation model for IMTs.</span>
+
+<span class="sd">    To do</span>
+<span class="sd">        - Inherit from SpatialCorrelation class.</span>
+
+<span class="sd">    References:</span>
+<span class="sd">        Goda, K., &amp; Atkinson, G. M. (2010). Intraevent spatial correlation of</span>
+<span class="sd">        ground-motion parameters using SK-net data. Bulletin of the</span>
+<span class="sd">        Seismological Society of America, 100(6), 3055-3067.</span>
+<span class="sd">        `[link] &lt;http://www.bssaonline.org/content/100/6/3055.short&gt;`__</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="GodaAtkinson2010.getSpatialCorrelation"><a class="viewcode-back" href="../../../shakelib/shakelib.correlation.goda_atkinson_2010.html#shakelib.correlation.goda_atkinson_2010.GodaAtkinson2010.getSpatialCorrelation">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">getSpatialCorrelation</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Method for evalulating spatial correlation model.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dists (ndarray): Numpy array of distances (km).</span>
+<span class="sd">            imt (IMT): Openquake intensity measure type instance.</span>
+<span class="sd">                `[link] &lt;http://docs.openquake.org/oq-hazardlib/master/imt.html&gt;`__</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            ndarray: Numpy array of correlation values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+        <span class="k">if</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">in</span> <span class="n">imt</span><span class="p">:</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.060</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.283</span>
+            <span class="n">gamma</span> <span class="o">=</span> <span class="mf">5.0</span>
+        <span class="k">elif</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">in</span> <span class="n">imt</span><span class="p">:</span>
+            <span class="c1"># Here we use the average values because there is no PGV in G&amp;A</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.054</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.319</span>
+            <span class="n">gamma</span> <span class="o">=</span> <span class="mf">5.0</span>
+        <span class="k">elif</span> <span class="s1">&#39;SA&#39;</span> <span class="ow">in</span> <span class="n">imt</span><span class="p">:</span>
+            <span class="n">pp</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">period</span>
+            <span class="k">if</span> <span class="n">pp</span> <span class="o">==</span> <span class="mf">0.1</span><span class="p">:</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.062</span>
+                <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.276</span>
+                <span class="n">gamma</span> <span class="o">=</span> <span class="mf">5.0</span>
+            <span class="k">elif</span> <span class="n">pp</span> <span class="o">==</span> <span class="mf">0.2</span><span class="p">:</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.073</span>
+                <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.248</span>
+                <span class="n">gamma</span> <span class="o">=</span> <span class="mf">5.0</span>
+            <span class="k">elif</span> <span class="n">pp</span> <span class="o">==</span> <span class="mf">0.3</span><span class="p">:</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.086</span>
+                <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.219</span>
+                <span class="n">gamma</span> <span class="o">=</span> <span class="mf">5.0</span>
+            <span class="k">elif</span> <span class="n">pp</span> <span class="o">==</span> <span class="mf">0.5</span><span class="p">:</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.073</span>
+                <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.248</span>
+                <span class="n">gamma</span> <span class="o">=</span> <span class="mf">5.0</span>
+            <span class="k">elif</span> <span class="n">pp</span> <span class="o">==</span> <span class="mf">1.0</span><span class="p">:</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.051</span>
+                <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.329</span>
+                <span class="n">gamma</span> <span class="o">=</span> <span class="mf">5.0</span>
+            <span class="k">elif</span> <span class="n">pp</span> <span class="o">==</span> <span class="mf">2.0</span><span class="p">:</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.061</span>
+                <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.421</span>
+                <span class="n">gamma</span> <span class="o">=</span> <span class="mf">3.035</span>
+            <span class="k">elif</span> <span class="n">pp</span> <span class="o">==</span> <span class="mf">3.0</span><span class="p">:</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.092</span>
+                <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.671</span>
+                <span class="n">gamma</span> <span class="o">=</span> <span class="mf">1.189</span>
+            <span class="k">elif</span> <span class="n">pp</span> <span class="o">==</span> <span class="mf">5.0</span><span class="p">:</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.071</span>
+                <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.741</span>
+                <span class="n">gamma</span> <span class="o">=</span> <span class="mf">1.201</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Here we use the average values because we don&#39;t have terms</span>
+                <span class="c1"># for this period</span>
+                <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.054</span>
+                <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.319</span>
+                <span class="n">gamma</span> <span class="o">=</span> <span class="mf">5.0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Again we use the average values because we don&#39;t know the IMT</span>
+            <span class="n">alpha</span> <span class="o">=</span> <span class="mf">0.054</span>
+            <span class="c1"># Variable used within ne.evaluate, not seen by linter</span>
+            <span class="n">beta</span> <span class="o">=</span> <span class="mf">0.319</span>  <span class="c1"># noqa</span>
+            <span class="n">gamma</span> <span class="o">=</span> <span class="mf">5.0</span>
+            <span class="k">pass</span>
+        <span class="n">nal</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">alpha</span>  <span class="c1"># noqa</span>
+        <span class="n">gm1</span> <span class="o">=</span> <span class="n">gamma</span> <span class="o">-</span> <span class="mf">1.0</span>  <span class="c1"># noqa</span>
+<span class="c1">#        cor = 1.0 - np.sqrt(1.0 - np.maximum(</span>
+<span class="c1">#                gamma * np.exp(nal * np.power(dists, beta)) - gm1,</span>
+<span class="c1">#                0))</span>
+<span class="c1">#        tmp = ne.evaluate(&quot;gamma * exp(nal * dists**beta) - gm1&quot;)</span>
+<span class="c1">#        tmp[tmp &lt; 0] = 0</span>
+<span class="c1">#        cor = ne.evaluate(&quot;1.0 - sqrt(1.0 - tmp)&quot;)</span>
+        <span class="n">cor</span> <span class="o">=</span> <span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+            <span class="s2">&quot;1.0 - sqrt(1.0 - (gamma * exp(nal * dists**beta) - gm1))&quot;</span><span class="p">)</span>
+<span class="c1">#        cor[cor &lt; 0] = 0</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">cor</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

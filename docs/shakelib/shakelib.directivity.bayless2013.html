@@ -1,0 +1,208 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.directivity.bayless2013 &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakelib.directivity.rowshandel2013" href="shakelib.directivity.rowshandel2013.html" />
+    <link rel="prev" title="shakelib.directivity" href="shakelib.directivity.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakelib.directivity.bayless2013">
+<span id="shakelib-directivity-bayless2013"></span><h1>shakelib.directivity.bayless2013<a class="headerlink" href="#module-shakelib.directivity.bayless2013" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="shakelib.directivity.bayless2013.Bayless2013">
+<em class="property">class </em><code class="descclassname">shakelib.directivity.bayless2013.</code><code class="descname">Bayless2013</code><span class="sig-paren">(</span><em>origin</em>, <em>rup</em>, <em>lat</em>, <em>lon</em>, <em>depth</em>, <em>T</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/bayless2013.html#Bayless2013"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.bayless2013.Bayless2013" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Implements the Bayless and Somerville (2013) directivity model. This is an
+update to Somerville et al. (1997), which defines some of the input
+parameters.</p>
+<p>Fd is the directivity effect parameter, and it is evaluated as</p>
+<p>Fd = (c0 + c1 * Fgeom) * Tcd * Tmw * Taz</p>
+<p>Note that Fd is intended to be used in GMPEs as:</p>
+<p>ln(IM_dir) = ln(IM) + Fd</p>
+<p>where</p>
+<ul class="simple">
+<li>Fd is the directivity effect</li>
+<li>IM is the intensity measure predicted by the GMPE.</li>
+<li>IM_dir is the directivity-adjusted IM.</li>
+</ul>
+<p>The model is seprated into strike-slip and dip-slip categories:
+SS: (abs(rake) &gt;  0 &amp; abs(rake) &lt; 30) | (abs(rake) &gt; 150 &amp; abs(rake) &lt; 180)
+DS:  abs(rake) &gt; 60 &amp; abs(rake) &lt; 120</p>
+<p>Notes from Somerville et al. (1997):</p>
+<ul class="simple">
+<li>d = length of dipping fault rupturing towards site</li>
+<li>Y = d/W</li>
+<li>s = length of striking fault rupturing towards site</li>
+<li>X = s/L</li>
+</ul>
+<p>Bayless and Somerville state that each quadrilateral should have a pseudo-
+hypocenter:</p>
+<blockquote>
+<div>“Define the pseudo-hypocenter for rupture of successive segments as the
+point on the side edge of the fault segment that is closest to the side
+edge of the previous segment, and that lies half way between the top
+and bottom of the fault. We assume that the fault is segmented along
+strike, not updip. All geometric parameters are computed relative to
+the pseudo-hypocenter.”</div></blockquote>
+<p>To do:</p>
+<blockquote>
+<div><ul class="simple">
+<li>Interpolate for arbitrary periods</li>
+<li>Inherit from Directivity base class.</li>
+</ul>
+</div></blockquote>
+<p class="rubric">References</p>
+<p>Bayless, J., and Somerville, P. (2013). Bayless-Somerville Directivity
+Model, Chapter 3 of PEER Report No. 2013/09, P. Spudich (Editor),
+Pacific Earthquake Engineering Research Center, Berkeley, CA.
+<a class="reference external" href="http://peer.berkeley.edu/publications/peer_reports/reports_2013/webPEER-2013-09-Spudich.pdf">[link]</a></p>
+<p>Somerville, P. G., Smith, N. F., Graves, R. W., and Abrahamson, N. A.
+(1997). Modification of empirical strong ground motion attenuation
+relations to include the amplitude and duration effects of rupture
+directivity, Seismol. Res. Lett. 68, 199–222.
+<a class="reference external" href="http://srl.geoscienceworld.org/content/68/1/199.abstract">[link]</a></p>
+<p>Constructor for bayless2013.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>origin</strong> – Shakemap Origin object.</li>
+<li><strong>rup</strong> – Shakemap Rupture object.</li>
+<li><strong>lat</strong> – Numpy array of latitudes.</li>
+<li><strong>lon</strong> – Numpy array of longitudes.</li>
+<li><strong>depth</strong> – Numpy array of depths (km); down is positive.</li>
+<li><strong>T</strong> – Period; Currently, only acceptable values are
+0.5, 0.75, 1, 1.5, 2, 3, 4, 5, 7.5, 10.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="shakelib.directivity.bayless2013.Bayless2013.getFd">
+<code class="descname">getFd</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/directivity/bayless2013.html#Bayless2013.getFd"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.directivity.bayless2013.Bayless2013.getFd" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Numpy array of Fd; Fd is the directivity amplification factor.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakelib.directivity.bayless2013</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.directivity.rowshandel2013.html">shakelib.directivity.rowshandel2013</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

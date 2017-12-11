@@ -1,0 +1,163 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.utils.imt_string &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakelib.utils.imt_string</h1><div class="highlight"><pre>
+<span></span><span class="c1"># local imports</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<div class="viewcode-block" id="oq_to_file"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.imt_string.html#shakelib.utils.imt_string.oq_to_file">[docs]</a><span class="k">def</span> <span class="nf">oq_to_file</span><span class="p">(</span><span class="n">oqimt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert openquake IMT nomenclature to filename friendly form.</span>
+<span class="sd">    </span>
+<span class="sd">    Examples:</span>
+<span class="sd">    SA(1.0) (Spectral Acceleration at 1 second) -&gt; PSA1p0</span>
+<span class="sd">    SA(0.3) (Spectral Acceleration at 0.3 second) -&gt; PSA0p3</span>
+<span class="sd">    SA(15.0) (Spectral Acceleration at 15 seconds) -&gt; PSA15p0</span>
+<span class="sd">    SA(3) (Spectral Acceleration at 3 seconds) -&gt; PSA3p0</span>
+<span class="sd">    SA(.5) (Spectral Acceleration at 0.5 seconds) -&gt; PSA0p5</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        oqimt (str): Openquake IMT nomenclature string.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Filename friendly IMT string.</span>
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: when there is no corresponding filename-friendly</span>
+<span class="sd">            IMT representation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">oqimt</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">oqimt</span>
+    <span class="n">float_pattern</span> <span class="o">=</span> <span class="s2">r&quot;[-+]?\d*\.\d+|\d+&quot;</span>
+    <span class="n">periods</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">float_pattern</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">):</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;IMT string &quot;</span><span class="si">%s</span><span class="s1">&quot; has no file-name friendly representation.&#39;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">oqimt</span><span class="p">)</span>
+    <span class="n">period</span> <span class="o">=</span> <span class="n">periods</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">period</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">integer</span> <span class="o">=</span> <span class="n">period</span>
+        <span class="n">fraction</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">integer</span><span class="p">,</span> <span class="n">fraction</span> <span class="o">=</span> <span class="n">period</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">integer</span><span class="p">):</span>
+            <span class="n">integer</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+    <span class="n">fileimt</span> <span class="o">=</span> <span class="s1">&#39;PSA</span><span class="si">%s</span><span class="s1">p</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">integer</span><span class="p">,</span> <span class="n">fraction</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">fileimt</span></div>
+
+<div class="viewcode-block" id="file_to_oq"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.imt_string.html#shakelib.utils.imt_string.file_to_oq">[docs]</a><span class="k">def</span> <span class="nf">file_to_oq</span><span class="p">(</span><span class="n">fileimt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convert filename friendly IMT form to openquake form.</span>
+<span class="sd">    </span>
+<span class="sd">    Examples:</span>
+<span class="sd">    PSA1p0 (Spectral Acceleration at 1 second) -&gt; SA(1.0)</span>
+<span class="sd">    PSA0p3 (Spectral Acceleration at 0.3 second) -&gt; SA(0.3)</span>
+<span class="sd">    PSA15p0 (Spectral Acceleration at 15 seconds) -&gt; SA(15.0)</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        fileimt (str): Filename friendly IMT string.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Openquake IMT nomenclature string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">fileimt</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="n">fileimt</span>
+    <span class="k">if</span> <span class="s1">&#39;p&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">fileimt</span><span class="p">:</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid filename-friendly IMT string.&#39;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">fileimt</span><span class="p">)</span>
+    <span class="n">integer</span><span class="p">,</span> <span class="n">fraction</span> <span class="o">=</span> <span class="n">fileimt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;PSA&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">fraction</span><span class="p">):</span>
+        <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid filename-friendly IMT string.&#39;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">fileimt</span><span class="p">)</span>
+    <span class="n">oqimt</span> <span class="o">=</span> <span class="s1">&#39;SA(</span><span class="si">%s</span><span class="s1">.</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">integer</span><span class="p">,</span> <span class="n">fraction</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">oqimt</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

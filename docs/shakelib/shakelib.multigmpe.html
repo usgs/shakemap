@@ -1,0 +1,366 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.multigmpe &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakelib.sites" href="shakelib.sites.html" />
+    <link rel="prev" title="shakelib.distance" href="shakelib.distance.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakelib.multigmpe">
+<span id="shakelib-multigmpe"></span><h1>shakelib.multigmpe<a class="headerlink" href="#module-shakelib.multigmpe" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="shakelib.multigmpe.MultiGMPE">
+<em class="property">class </em><code class="descclassname">shakelib.multigmpe.</code><code class="descname">MultiGMPE</code><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">openquake.hazardlib.gsim.base.GMPE</span></code></p>
+<p>Implements a GMPE that is the combination of multiple GMPEs.</p>
+<p>To do</p>
+<blockquote>
+<div><ul class="simple">
+<li>Allow site to be based on a model that isn’t a GMPE (e.g.,
+Borcherdt).</li>
+</ul>
+</div></blockquote>
+<dl class="attribute">
+<dt id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE">
+<code class="descname">DEFINED_FOR_TECTONIC_REGION_TYPE</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_TECTONIC_REGION_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
+<code class="descname">DEFINED_FOR_INTENSITY_MEASURE_TYPES</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT">
+<code class="descname">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.multigmpe.MultiGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES">
+<code class="descname">DEFINED_FOR_STANDARD_DEVIATION_TYPES</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.multigmpe.MultiGMPE.REQUIRES_SITES_PARAMETERS">
+<code class="descname">REQUIRES_SITES_PARAMETERS</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_SITES_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.multigmpe.MultiGMPE.REQUIRES_RUPTURE_PARAMETERS">
+<code class="descname">REQUIRES_RUPTURE_PARAMETERS</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_RUPTURE_PARAMETERS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakelib.multigmpe.MultiGMPE.REQUIRES_DISTANCES">
+<code class="descname">REQUIRES_DISTANCES</code><em class="property"> = None</em><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.REQUIRES_DISTANCES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="shakelib.multigmpe.MultiGMPE.get_mean_and_stddevs">
+<code class="descname">get_mean_and_stddevs</code><span class="sig-paren">(</span><em>sites</em>, <em>rup</em>, <em>dists</em>, <em>imt</em>, <em>stddev_types</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.get_mean_and_stddevs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.get_mean_and_stddevs" title="Permalink to this definition">¶</a></dt>
+<dd><p>See superclass <a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs">method</a>.</p>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="shakelib.multigmpe.MultiGMPE.from_config">
+<em class="property">classmethod </em><code class="descname">from_config</code><span class="sig-paren">(</span><em>conf</em>, <em>filter_imt=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.from_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.from_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a MultiGMPE from a config file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>conf</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary of config options.</li>
+<li><strong>filter_imt</strong> (<em>IMT</em>) – An optional IMT to filter/reweight the GMPE list.</li>
+<li><strong>verbose</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Print verbose output for debugging.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">MultiGMPE object.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="classmethod">
+<dt id="shakelib.multigmpe.MultiGMPE.from_list">
+<em class="property">classmethod </em><code class="descname">from_list</code><span class="sig-paren">(</span><em>gmpes</em>, <em>weights</em>, <em>imc='Greater of two horizontal'</em>, <em>default_gmpes_for_site=None</em>, <em>default_gmpes_for_site_weights=None</em>, <em>reference_vs30=760</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.from_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.from_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a MultiGMPE instance from lists of GMPEs and weights.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>gmpes</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of OpenQuake
+<a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#built-in-gsims">GMPE</a>
+instances.</li>
+<li><strong>weights</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of weights; must sum to 1.0.</li>
+<li><strong>imc</strong> – Requested intensity measure component. Must be one listed
+<a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC">here</a>.
+The amplitudes returned by the GMPEs will be converted to this
+IMT. Default is ‘GREATER_OF_TWO_HORIZONTAL’, which is used by
+ShakeMap. See discussion in
+<a class="reference external" href="http://usgs.github.io/shakemap/tg_choice_of_parameters.html#use-of-peak-values-rather-than-mean">this section</a>
+of the ShakeMap manual.</li>
+<li><strong>default_gmpes_for_site</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – <p>Optional list of OpenQuake GMPE instance to use as a site term
+for any of the GMPEs that do not have a site term.</p>
+<p class="rubric">Notes</p>
+<ul>
+<li>We do not check for consistency in the reference rock
+defintion, so the user nees to be aware of this issue and
+holds responsibiilty for ensuring compatibility.</li>
+<li>We check whether or not a GMPE has a site term by c
+hecking the REQUIRES_SITES_PARAMETERS slot for vs30.</li>
+</ul>
+</li>
+<li><strong>default_gmpes_for_site_weights</strong> – Weights for default_gmpes_for_site.
+Must sum to one and be same length as default_gmpes_for_site.
+If None, then weights are set to be equal.</li>
+<li><strong>reference_vs30</strong> – Reference rock Vs30 in m/s. We do not check that this matches
+the reference rock in the GMPEs so this is the responsibility
+of the user.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakelib.multigmpe.MultiGMPE.get_site_factors">
+<code class="descname">get_site_factors</code><span class="sig-paren">(</span><em>sites</em>, <em>rup</em>, <em>dists</em>, <em>imt</em>, <em>default=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.get_site_factors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.get_site_factors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for computing site amplification factors from the defalut GMPE
+to be applied to GMPEs which do not have a site term.</p>
+<p><strong>NOTE</strong> Amps are calculated in natural log units and so the ln(amp)
+is returned.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sites</strong> (<em>SitesContext</em>) – Instance of SitesContext.</li>
+<li><strong>rup</strong> (<em>RuptureContext</em>) – Instance of RuptureContext.</li>
+<li><strong>dists</strong> (<em>DistancesContext</em>) – Instance of DistancesContext.</li>
+<li><strong>imt</strong> – An instance openquake.hazardlib.imt.</li>
+<li><strong>default</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Boolean of whether or not to return the
+amplificaiton factors for the gmpes or default_gmpes_for_site.
+This argument is primarily only intended to be used internally
+for when we just need to access the default amplifications to
+apply to those GMPEs that do not have site terms.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">Site amplifications in natural log units.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="shakelib.multigmpe.MultiGMPE.set_sites_depth_parameters">
+<em class="property">static </em><code class="descname">set_sites_depth_parameters</code><span class="sig-paren">(</span><em>sites</em>, <em>gmpe</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#MultiGMPE.set_sites_depth_parameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.MultiGMPE.set_sites_depth_parameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Need to select the appropriate z1pt0 value for different GMPEs.
+Note that these are required site parameters, so even though
+OQ has these equations built into the class in most cases.
+I have submitted an issue to OQ requesting subclasses of these
+methods that do not require the depth parameters in the
+SitesContext to make this easier.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sites</strong> – 1 An OQ sites context.</li>
+<li><strong>gmpe</strong> – An OQ GMPE instance.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">An OQ sites context with the depth parameters set for the
+requested GMPE.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="shakelib.multigmpe.filter_gmpe_list">
+<code class="descclassname">shakelib.multigmpe.</code><code class="descname">filter_gmpe_list</code><span class="sig-paren">(</span><em>gmpes</em>, <em>wts</em>, <em>imt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#filter_gmpe_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.filter_gmpe_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to remove GMPEs from the GMPE list that are not applicable
+to a specific IMT. Rescales the weights to sum to one.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>gmpes</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of GMPE instances.</li>
+<li><strong>wts</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of floats indicating the weight of the GMPEs.</li>
+<li><strong>imt</strong> (<em>IMT</em>) – OQ IMT to filter GMPE list for.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of GMPE instances and list of weights.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="shakelib.multigmpe.get_gmpe_sa_periods">
+<code class="descclassname">shakelib.multigmpe.</code><code class="descname">get_gmpe_sa_periods</code><span class="sig-paren">(</span><em>gmpe</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#get_gmpe_sa_periods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.get_gmpe_sa_periods" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to extract the SA periods defined by a GMPE.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>gmpe</strong> (<em>GMPE</em>) – A GMPE instance.</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Retunrs:</dt>
+<dd>list: List of periods.</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="shakelib.multigmpe.get_gmpe_coef_table">
+<code class="descclassname">shakelib.multigmpe.</code><code class="descname">get_gmpe_coef_table</code><span class="sig-paren">(</span><em>gmpe</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/multigmpe.html#get_gmpe_coef_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.multigmpe.get_gmpe_coef_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method for finding the (or “a”) GMPE table.</p>
+<p class="rubric">Notes</p>
+<ul class="simple">
+<li>The reason for the complexity here is that there can be multiple
+coefficient tables, and some of them may not have the sa_coeffs
+attribute, which is the main reason for getting the table.</li>
+<li>We are also assuming that if there are more than one  coefficient
+table, the range of periods will be the same across all of the
+tables.</li>
+</ul>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>gmpe</strong> (<em>GMPE</em>) – An OQ GMPE instance.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">The associated coefficient table.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">shakelib.multigmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

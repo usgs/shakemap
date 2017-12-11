@@ -1,0 +1,244 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.utils.utils &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakelib.utils.utils</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">Point</span>
+
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="k">import</span> <span class="n">get_orthographic_projection</span>
+
+<span class="kn">from</span> <span class="nn">shakelib.rupture.edge_rupture</span> <span class="k">import</span> <span class="n">EdgeRupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.quad_rupture</span> <span class="k">import</span> <span class="n">QuadRupture</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="k">import</span> <span class="n">Rupture</span>
+
+
+<div class="viewcode-block" id="get_extent"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.utils.html#shakelib.utils.utils.get_extent">[docs]</a><span class="k">def</span> <span class="nf">get_extent</span><span class="p">(</span><span class="n">rupture</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Method to compute map extent from rupture.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rupture (Rupture): A ShakeMap Rupture instance.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: lonmin, lonmax, latmin, latmax rounded to the nearest</span>
+<span class="sd">        arc-minute..</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">rupture</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">Rupture</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;get_extent() takes exactly 1 argument (0 given)&#39;</span><span class="p">)</span>
+
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="p">(</span><span class="n">QuadRupture</span><span class="p">,</span> <span class="n">EdgeRupture</span><span class="p">)):</span>
+        <span class="n">lats</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">lats</span>
+        <span class="n">lons</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">lons</span>
+
+        <span class="c1"># Remove nans</span>
+        <span class="n">lons</span> <span class="o">=</span> <span class="n">lons</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lons</span><span class="p">)]</span>
+        <span class="n">lats</span> <span class="o">=</span> <span class="n">lats</span><span class="p">[</span><span class="o">~</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">lats</span><span class="p">)]</span>
+
+        <span class="n">clat</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">lats</span><span class="p">))</span>
+        <span class="n">clon</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">lons</span><span class="p">)</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">lons</span><span class="p">))</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">clat</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lat</span>
+        <span class="n">clon</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lon</span>
+
+    <span class="n">mag</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span>
+
+    <span class="c1"># Is this a stable or active tectonic event?</span>
+    <span class="c1"># (this could be made an attribute of the ShakeMap Origin class)</span>
+    <span class="n">hypo</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">getHypo</span><span class="p">()</span>
+    <span class="n">stable</span> <span class="o">=</span> <span class="n">is_stable</span><span class="p">(</span><span class="n">hypo</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">hypo</span><span class="o">.</span><span class="n">latitude</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">stable</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mag</span> <span class="o">&lt;</span> <span class="mf">6.48</span><span class="p">:</span>
+            <span class="n">mindist_km</span> <span class="o">=</span> <span class="mf">100.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mindist_km</span> <span class="o">=</span> <span class="mf">27.24</span> <span class="o">*</span> <span class="n">mag</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">250.4</span> <span class="o">*</span> <span class="n">mag</span> <span class="o">+</span> <span class="mf">579.1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mag</span> <span class="o">&lt;</span> <span class="mf">6.10</span><span class="p">:</span>
+            <span class="n">mindist_km</span> <span class="o">=</span> <span class="mf">100.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mindist_km</span> <span class="o">=</span> <span class="mf">63.4</span> <span class="o">*</span> <span class="n">mag</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">465.4</span> <span class="o">*</span> <span class="n">mag</span> <span class="o">+</span> <span class="mf">581.3</span>
+
+    <span class="c1"># Apply an upper limit on extent. This should only matter for large</span>
+    <span class="c1"># magnitudes (&gt; ~8.25) in stable tectonic environments.</span>
+    <span class="k">if</span> <span class="n">mindist_km</span> <span class="o">&gt;</span> <span class="mf">1000.</span><span class="p">:</span>
+        <span class="n">mindist_km</span> <span class="o">=</span> <span class="mf">1000.</span>
+
+    <span class="c1"># Projection</span>
+    <span class="n">proj</span> <span class="o">=</span> <span class="n">get_orthographic_projection</span><span class="p">(</span><span class="n">clon</span> <span class="o">-</span> <span class="mi">4</span><span class="p">,</span> <span class="n">clon</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">clat</span> <span class="o">+</span> <span class="mi">4</span><span class="p">,</span> <span class="n">clat</span> <span class="o">-</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="p">(</span><span class="n">QuadRupture</span><span class="p">,</span> <span class="n">EdgeRupture</span><span class="p">)):</span>
+        <span class="n">ruptx</span><span class="p">,</span> <span class="n">rupty</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ruptx</span><span class="p">,</span> <span class="n">rupty</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">clon</span><span class="p">,</span> <span class="n">clat</span><span class="p">)</span>
+
+    <span class="n">xmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">ruptx</span><span class="p">)</span> <span class="o">-</span> <span class="n">mindist_km</span>
+    <span class="n">ymin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmin</span><span class="p">(</span><span class="n">rupty</span><span class="p">)</span> <span class="o">-</span> <span class="n">mindist_km</span>
+    <span class="n">xmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">ruptx</span><span class="p">)</span> <span class="o">+</span> <span class="n">mindist_km</span>
+    <span class="n">ymax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">rupty</span><span class="p">)</span> <span class="o">+</span> <span class="n">mindist_km</span>
+
+    <span class="c1"># Put a limit on range of aspect ratio</span>
+    <span class="n">dx</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">-</span> <span class="n">xmin</span>
+    <span class="n">dy</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">-</span> <span class="n">ymin</span>
+    <span class="n">ar</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">/</span> <span class="n">dx</span>
+    <span class="k">if</span> <span class="n">ar</span> <span class="o">&gt;</span> <span class="mf">1.25</span><span class="p">:</span>
+        <span class="c1"># Inflate x</span>
+        <span class="n">dx_target</span> <span class="o">=</span> <span class="n">dy</span> <span class="o">/</span> <span class="mf">1.25</span>
+        <span class="n">ddx</span> <span class="o">=</span> <span class="n">dx_target</span> <span class="o">-</span> <span class="n">dx</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="n">xmax</span> <span class="o">+</span> <span class="n">ddx</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">xmin</span> <span class="o">=</span> <span class="n">xmin</span> <span class="o">-</span> <span class="n">ddx</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="k">if</span> <span class="n">ar</span> <span class="o">&lt;</span> <span class="mf">0.6</span><span class="p">:</span>
+        <span class="c1"># inflate y</span>
+        <span class="n">dy_target</span> <span class="o">=</span> <span class="n">dx</span> <span class="o">*</span> <span class="mf">0.6</span>
+        <span class="n">ddy</span> <span class="o">=</span> <span class="n">dy_target</span> <span class="o">-</span> <span class="n">dy</span>
+        <span class="n">ymax</span> <span class="o">=</span> <span class="n">ymax</span> <span class="o">+</span> <span class="n">ddy</span> <span class="o">/</span> <span class="mi">2</span>
+        <span class="n">ymin</span> <span class="o">=</span> <span class="n">ymin</span> <span class="o">-</span> <span class="n">ddy</span> <span class="o">/</span> <span class="mi">2</span>
+
+    <span class="n">lonmin</span><span class="p">,</span> <span class="n">latmin</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">xmin</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ymin</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">lonmax</span><span class="p">,</span> <span class="n">latmax</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">xmax</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">ymax</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># Round coordinates to the nearest minute -- that should make the</span>
+    <span class="c1"># output grid register with common grid resolutions (60c, 30c,</span>
+    <span class="c1"># 15c, 7.5c)</span>
+    <span class="c1">#</span>
+    <span class="k">return</span> <span class="n">_round_coord</span><span class="p">(</span><span class="n">lonmin</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">_round_coord</span><span class="p">(</span><span class="n">lonmax</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> \
+           <span class="n">_round_coord</span><span class="p">(</span><span class="n">latmin</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">_round_coord</span><span class="p">(</span><span class="n">latmax</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+
+
+<span class="k">def</span> <span class="nf">_round_coord</span><span class="p">(</span><span class="n">coord</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Round a number to the nearest arc-minute</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dm</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="mi">60</span>
+    <span class="n">mm</span> <span class="o">=</span> <span class="n">coord</span> <span class="o">/</span> <span class="n">dm</span>
+    <span class="n">imm</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">mm</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">imm</span> <span class="o">*</span> <span class="n">dm</span>
+
+
+<div class="viewcode-block" id="is_stable"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.utils.html#shakelib.utils.utils.is_stable">[docs]</a><span class="k">def</span> <span class="nf">is_stable</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine if point is located in the US stable tectonic region. Uses the</span>
+<span class="sd">    same boundary as the US NSHMP and so this function needs to be modified to</span>
+<span class="sd">    work outside of the US.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lon (float): Lognitude.</span>
+<span class="sd">        lat (float): Latitude.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: Is the point classified as tectonically stable.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">Point</span><span class="p">((</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">))</span>
+    <span class="n">pfile</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;shakelib.utils&#39;</span><span class="p">,</span> 
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;cratons.geojson&#39;</span><span class="p">))</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">cratons</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">coord_list</span> <span class="o">=</span> <span class="n">cratons</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">clist</span> <span class="ow">in</span> <span class="n">coord_list</span><span class="p">:</span>
+        <span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">clist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="n">poly</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

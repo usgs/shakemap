@@ -1,0 +1,748 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.utils.containers &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakelib.utils.containers</h1><div class="highlight"><pre>
+<span></span><span class="ch">#!/usr/bin/env python</span>
+
+<span class="c1"># stdlib imports</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+
+<span class="c1"># third party imports</span>
+<span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
+<span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
+<span class="kn">from</span> <span class="nn">mapio.gridcontainer</span> <span class="k">import</span> <span class="n">GridHDFContainer</span><span class="p">,</span> <span class="n">_split_dset_attrs</span>
+<span class="kn">from</span> <span class="nn">impactutils.io.container</span> <span class="k">import</span> <span class="n">_get_type_list</span>
+
+<span class="c1"># local imports</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.factory</span> <span class="k">import</span> <span class="p">(</span><span class="n">rupture_from_dict</span><span class="p">,</span>
+                                      <span class="n">get_rupture</span><span class="p">,</span>
+                                      <span class="n">rupture_from_dict_and_origin</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture.origin</span> <span class="k">import</span> <span class="n">Origin</span>
+<span class="kn">from</span> <span class="nn">shakelib.station</span> <span class="k">import</span> <span class="n">StationList</span>
+
+<div class="viewcode-block" id="ShakeMapContainer"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer">[docs]</a><span class="k">class</span> <span class="nc">ShakeMapContainer</span><span class="p">(</span><span class="n">GridHDFContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parent class for InputShakeMapContainer and OutputShakeMapContainer.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ShakeMapContainer.setConfig"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setConfig">[docs]</a>    <span class="k">def</span> <span class="nf">setConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add the config as a dictionary to the HDF file.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (dict--like): Dict--like object with configuration</span>
+<span class="sd">                information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;config&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropDictionary</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDictionary</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ShakeMapContainer.getConfig"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getConfig">[docs]</a>    <span class="k">def</span> <span class="nf">getConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve configuration dictionary from container.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Configuration dictionary.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            AttributeError: If config dictionary has not been set in</span>
+<span class="sd">                the container.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;config&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Configuration not set in container.&#39;</span><span class="p">)</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">config</span></div>
+
+<div class="viewcode-block" id="ShakeMapContainer.setRupture"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setRupture">[docs]</a>    <span class="k">def</span> <span class="nf">setRupture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">rupture</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store Rupture object in container.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            rupture (dict or Rupture): Rupture object (Point,Quad, or Edge)</span>
+<span class="sd">                or dictionary representation of same.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: If input object or dictionary does not</span>
+<span class="sd">                represent a Rupture object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;rupture&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_</span> <span class="o">=</span> <span class="n">rupture_from_dict</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input dict does not represent a rupture object.&#39;</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+            <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">_geojson</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">,</span><span class="n">json_str</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ShakeMapContainer.getRuptureObject"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getRuptureObject">[docs]</a>    <span class="k">def</span> <span class="nf">getRuptureObject</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve Rupture object from container.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Rupture: Instance of (one of) a Point/Quad/EdgeRupture class.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            AttributeError: If rupture object has not been set in</span>
+<span class="sd">                the container.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">rupture_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRuptureDict</span><span class="p">()</span>
+        <span class="n">rupture</span> <span class="o">=</span> <span class="n">rupture_from_dict</span><span class="p">(</span><span class="n">rupture_dict</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">rupture</span></div>
+
+<div class="viewcode-block" id="ShakeMapContainer.getRuptureDict"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getRuptureDict">[docs]</a>    <span class="k">def</span> <span class="nf">getRuptureDict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve Rupture dictionary from container.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary representatin of (one of) a</span>
+<span class="sd">                Point/Quad/EdgeRupture class.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            AttributeError: If rupture object has not been set in</span>
+<span class="sd">                the container.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;rupture&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Rupture object not set in container.&#39;</span><span class="p">)</span>
+        <span class="n">rupture_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">rupture_dict</span></div>
+
+<div class="viewcode-block" id="ShakeMapContainer.setStationList"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setStationList">[docs]</a>    <span class="k">def</span> <span class="nf">setStationList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">stationlist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store StationList object in container.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            stationlist (StationList): StationList object.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: If input object or dictionary is not a StationList object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;stations&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropString</span><span class="p">(</span><span class="s1">&#39;stations&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stationlist</span><span class="p">,</span><span class="n">StationList</span><span class="p">):</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input object is not a StationList.&#39;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="n">sql_string</span> <span class="o">=</span> <span class="n">stationlist</span><span class="o">.</span><span class="n">dumpToSQL</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;stations&#39;</span><span class="p">,</span><span class="n">sql_string</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ShakeMapContainer.getStationList"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getStationList">[docs]</a>    <span class="k">def</span> <span class="nf">getStationList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve StationList object from container.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            StationList: StationList object.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            AttributeError: If stationlist object has not been set in</span>
+<span class="sd">                the container.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;stations&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;StationList object not set in container.&#39;</span><span class="p">)</span>
+        <span class="n">sql_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;stations&#39;</span><span class="p">)</span>
+        <span class="n">stationlist</span> <span class="o">=</span> <span class="n">StationList</span><span class="o">.</span><span class="n">loadFromSQL</span><span class="p">(</span><span class="n">sql_string</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">stationlist</span></div>
+
+<div class="viewcode-block" id="ShakeMapContainer.setStationDict"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setStationDict">[docs]</a>    <span class="k">def</span> <span class="nf">setStationDict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stationdict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store (JSON-like) station dictiionary in container.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            stationdict (dict-like): Station dict object.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: If input object is not a dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stationdict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input object is not a dictionary.&#39;</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;stations_dict&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropStrings</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">)</span>
+        <span class="n">stationstring</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">stationdict</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">,</span> <span class="n">stationstring</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ShakeMapContainer.getStationDict"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getStationDict">[docs]</a>    <span class="k">def</span> <span class="nf">getStationDict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve (JSON-like) station dictionary from container.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict-like: Station dictionary.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            AttributeError: If station dictionary has not been set in</span>
+<span class="sd">                the container.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;stations_dict&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Station dictionary not set in container.&#39;</span><span class="p">)</span>
+        <span class="n">stations</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">stations</span></div>
+
+<div class="viewcode-block" id="ShakeMapContainer.setVersionHistory"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setVersionHistory">[docs]</a>    <span class="k">def</span> <span class="nf">setVersionHistory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">history_dict</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store a dictionary containing version history in the container.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            history_dict (dict): Dictionary containing version history. ??</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;version_history&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropDictionary</span><span class="p">(</span><span class="s1">&#39;version_history&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDictionary</span><span class="p">(</span><span class="s1">&#39;version_history&#39;</span><span class="p">,</span> <span class="n">history_dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ShakeMapContainer.getVersionHistory"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getVersionHistory">[docs]</a>    <span class="k">def</span> <span class="nf">getVersionHistory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return the dictionary containing version history.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          dict: Dictionary containing version history, or None.</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            AttributeError: If version history has not been set in</span>
+<span class="sd">                the container.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="s1">&#39;version_history&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Version history not set in container.&#39;</span><span class="p">)</span>
+
+        <span class="n">version_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;version_history&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">version_dict</span></div></div>
+
+
+<div class="viewcode-block" id="ShakeMapInputContainer"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer">[docs]</a><span class="k">class</span> <span class="nc">ShakeMapInputContainer</span><span class="p">(</span><span class="n">ShakeMapContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    HDF container for Shakemap input data.</span>
+
+<span class="sd">    This class provides methods for getting and setting information on:</span>
+<span class="sd">     - configuration</span>
+<span class="sd">     - event (lat,lon,depth,etc.)</span>
+<span class="sd">     - rupture</span>
+<span class="sd">     - station data (can also be updated)</span>
+<span class="sd">     - version history</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="ShakeMapInputContainer.createFromInput"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.createFromInput">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">createFromInput</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventfile</span><span class="p">,</span> <span class="n">version_history</span><span class="p">,</span> <span class="n">rupturefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">datafiles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiate an InputContainer from ShakeMap input data.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filename (str): Path to HDF5 file that will be created to encapsulate all</span>
+<span class="sd">                input data.</span>
+<span class="sd">            config (dict): Dictionary containing all configuration information</span>
+<span class="sd">                necessary for ShakeMap ground motion and other calculations.</span>
+<span class="sd">            eventfile (str): Path to ShakeMap event.xml file.</span>
+<span class="sd">            rupturefile (str): Path to ShakeMap rupture text or JSON file.</span>
+<span class="sd">            datafiles (list): List of ShakeMap data (DYFI, strong motion) files.</span>
+<span class="sd">            version_history (dict): Dictionary containing version history.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            InputContainer: Instance of InputContainer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">setConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># create an origin from the event file</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">Origin</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="n">eventfile</span><span class="p">)</span>
+
+        <span class="c1"># create a rupture object from the origin and the rupture file</span>
+        <span class="c1"># (if present).</span>
+        <span class="n">rupture</span> <span class="o">=</span> <span class="n">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">)</span>
+
+        <span class="c1"># store the rupture object in the container</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">setRupture</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">datafiles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">container</span><span class="o">.</span><span class="n">setStationData</span><span class="p">(</span><span class="n">datafiles</span><span class="p">)</span>
+
+        <span class="n">container</span><span class="o">.</span><span class="n">setVersionHistory</span><span class="p">(</span><span class="n">version_history</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">container</span></div>
+
+<div class="viewcode-block" id="ShakeMapInputContainer.setStationData"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.setStationData">[docs]</a>    <span class="k">def</span> <span class="nf">setStationData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datafiles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Insert observed ground motion data into the container.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          datafiles (str): Path to an XML-formatted file containing ground</span>
+<span class="sd">              motion observations, (macroseismic or instrumented).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">station</span> <span class="o">=</span> <span class="n">StationList</span><span class="o">.</span><span class="n">loadFromXML</span><span class="p">(</span><span class="n">datafiles</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStationList</span><span class="p">(</span><span class="n">station</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ShakeMapInputContainer.addStationData"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.addStationData">[docs]</a>    <span class="k">def</span> <span class="nf">addStationData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datafiles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add observed ground motion data into the container.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            datafiles (str): Path to an XML-formatted file containing ground</span>
+<span class="sd">                motion observations, (macroseismic or instrumented).</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">station</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStationList</span><span class="p">()</span>
+        <span class="n">station</span><span class="o">.</span><span class="n">addData</span><span class="p">(</span><span class="n">datafiles</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStationList</span><span class="p">(</span><span class="n">station</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ShakeMapInputContainer.updateRupture"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.updateRupture">[docs]</a>    <span class="k">def</span> <span class="nf">updateRupture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">eventxml</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rupturefile</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Update rupture/origin information in container.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            eventxml (str): Path to event.xml file.</span>
+<span class="sd">            rupturefile (str): Path to rupture file (JSON or txt format).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">eventxml</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">rupturefile</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># the container is guaranteed to have at least a Point rupture</span>
+        <span class="c1"># and the origin.</span>
+        <span class="n">rupture</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRuptureObject</span><span class="p">()</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">getOrigin</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">eventxml</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">origin</span> <span class="o">=</span> <span class="n">Origin</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">rupturefile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">rupture</span> <span class="o">=</span> <span class="n">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">rupture_dict</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">_geojson</span>
+                <span class="n">rupture</span> <span class="o">=</span> <span class="n">rupture_from_dict_and_origin</span><span class="p">(</span><span class="n">rupture_dict</span><span class="p">,</span><span class="n">origin</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span> <span class="c1">#no event.xml file, but we do have a rupture file</span>
+            <span class="n">rupture</span> <span class="o">=</span> <span class="n">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">setRupture</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="ShakeMapOutputContainer"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer">[docs]</a><span class="k">class</span> <span class="nc">ShakeMapOutputContainer</span><span class="p">(</span><span class="n">ShakeMapContainer</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    HDF container for Shakemap output data.</span>
+
+<span class="sd">    This class provides methods for getting and setting IMT data.</span>
+<span class="sd">    The philosophy here is that an IMT consists of both the mean results and</span>
+<span class="sd">    the standard deviations of those results, thus getIMT() returns a</span>
+<span class="sd">    dictionary with both, plus metadata for each data layer.</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ShakeMapOutputContainer.getDataType"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getDataType">[docs]</a>    <span class="k">def</span> <span class="nf">getDataType</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the format of the IMT, Vs30, and distance data stored in</span>
+<span class="sd">        this file: either &#39;points&#39; or &#39;grid&#39;. None is returned if no data</span>
+<span class="sd">        have been set.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str or None: Either &#39;grid&#39; or &#39;points&#39; or None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__file_data_type__&#39;</span>
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="n">data_type_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">data_type_group</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="ShakeMapOutputContainer.setDataType"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.setDataType">[docs]</a>    <span class="k">def</span> <span class="nf">setDataType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datatype</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the type of the IMT, Vs30, and distance data stored in this</span>
+<span class="sd">        file. This function should not be called by the user -- the value</span>
+<span class="sd">        will be set by the first call to setIMTGrids() or setIMTArray().</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            (str): Either &#39;points&#39; or &#39;grid&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Nothing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">datatype</span> <span class="o">!=</span> <span class="s1">&#39;points&#39;</span> <span class="ow">and</span> <span class="n">datatype</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Trying to set unknown data type: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                            <span class="p">(</span><span class="n">datatype</span><span class="p">))</span>
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__file_data_type__&#39;</span>
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="n">data_type_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
+            <span class="n">current_data_type</span> <span class="o">=</span> <span class="n">data_type_group</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">current_data_type</span> <span class="o">!=</span> <span class="n">datatype</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="s1">&#39;Trying to set data type to </span><span class="si">%s</span><span class="s1">; file already type </span><span class="si">%s</span><span class="s1">&#39;</span>
+                        <span class="o">%</span> <span class="p">(</span><span class="n">datatype</span><span class="p">,</span> <span class="n">current_data_type</span><span class="p">))</span>
+            <span class="c1">#</span>
+            <span class="c1"># Data type is already set; don&#39;t have to do anything</span>
+            <span class="c1">#</span>
+            <span class="k">return</span>
+        <span class="n">data_type_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
+        <span class="n">data_type_group</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datatype</span>
+        <span class="k">return</span></div>
+
+<div class="viewcode-block" id="ShakeMapOutputContainer.setIMTGrids"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.setIMTGrids">[docs]</a>    <span class="k">def</span> <span class="nf">setIMTGrids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">,</span> <span class="n">imt_mean</span><span class="p">,</span> <span class="n">mean_metadata</span><span class="p">,</span>
+                    <span class="n">imt_std</span><span class="p">,</span> <span class="n">std_metadata</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span>
+                    <span class="n">compression</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store IMT mean and standard deviation objects as datasets.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imt_name (str): Name of the IMT (MMI, PGA, etc.) to be stored.</span>
+<span class="sd">            imt_mean (Grid2D): Grid2D object of IMT mean values to be stored.</span>
+<span class="sd">            mean_metadata (dict): Dictionary containing metadata for mean IMT</span>
+<span class="sd">                grid.</span>
+<span class="sd">            imt_std (Grid2D): Grid2D object of IMT standard deviation values</span>
+<span class="sd">                to be stored.</span>
+<span class="sd">            std_metadata (dict): Dictionary containing metadata for mean IMT</span>
+<span class="sd">                grid.</span>
+<span class="sd">            component (str): Component type, i.e. &#39;Larger&#39;,&#39;rotd50&#39;,etc.</span>
+<span class="sd">            compression (bool): Boolean indicating whether dataset should be</span>
+<span class="sd">                compressed using the gzip algorithm.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            HDF Group containing IMT grids and metadata.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;points&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Setting grid data in a file containing points&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDataType</span><span class="p">(</span><span class="s1">&#39;grid&#39;</span><span class="p">)</span>
+
+        <span class="c1"># set up the name of the group holding all the information for the IMT</span>
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;An IMT group called </span><span class="si">%s</span><span class="s1"> already exists.&#39;</span> <span class="o">%</span> <span class="n">imt_name</span><span class="p">)</span>
+        <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
+
+        <span class="c1"># create the data set containing the mean IMT data and metadata</span>
+        <span class="n">mean_data</span> <span class="o">=</span> <span class="n">imt_mean</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
+        <span class="n">mean_set</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">mean_data</span><span class="p">,</span>
+                                            <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mean_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">mean_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">mean_set</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">imt_mean</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">mean_set</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="c1"># create the data set containing the std IMT data and metadata</span>
+        <span class="n">std_data</span> <span class="o">=</span> <span class="n">imt_std</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
+        <span class="n">std_set</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">std_data</span><span class="p">,</span>
+                                           <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">std_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">std_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">std_set</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">imt_std</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">std_set</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="n">imt_group</span></div>
+
+<div class="viewcode-block" id="ShakeMapOutputContainer.getIMTGrids"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTGrids">[docs]</a>    <span class="k">def</span> <span class="nf">getIMTGrids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve a Grid2D object and any associated metadata from the container.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imt_name (str):</span>
+<span class="sd">                The name of the IMT stored in the container.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary containing 4 items:</span>
+<span class="sd">                   - mean Grid2D object for IMT mean values.</span>
+<span class="sd">                   - mean_metadata Dictionary containing any metadata</span>
+<span class="sd">                     describing mean layer.</span>
+<span class="sd">                   - std Grid2D object for IMT standard deviation values.</span>
+<span class="sd">                   - std_metadata Dictionary containing any metadata describing</span>
+<span class="sd">                     standard deviation layer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Requesting grid data from file containing points&#39;</span><span class="p">)</span>
+
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No group called </span><span class="si">%s</span><span class="s1"> in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
+        <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
+
+        <span class="c1"># get the mean data and metadata</span>
+        <span class="n">mean_dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+        <span class="n">mean_data</span> <span class="o">=</span> <span class="n">mean_dset</span><span class="p">[()]</span>
+
+        <span class="n">array_metadata</span><span class="p">,</span> <span class="n">mean_metadata</span> <span class="o">=</span> <span class="n">_split_dset_attrs</span><span class="p">(</span><span class="n">mean_dset</span><span class="p">)</span>
+        <span class="n">mean_geodict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="p">(</span><span class="n">array_metadata</span><span class="p">)</span>
+        <span class="n">mean_grid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">mean_data</span><span class="p">,</span> <span class="n">mean_geodict</span><span class="p">)</span>
+
+        <span class="c1"># get the std data and metadata</span>
+        <span class="n">std_dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span>
+        <span class="n">std_data</span> <span class="o">=</span> <span class="n">std_dset</span><span class="p">[()]</span>
+
+        <span class="n">array_metadata</span><span class="p">,</span> <span class="n">std_metadata</span> <span class="o">=</span> <span class="n">_split_dset_attrs</span><span class="p">(</span><span class="n">std_dset</span><span class="p">)</span>
+        <span class="n">std_geodict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="p">(</span><span class="n">array_metadata</span><span class="p">)</span>
+        <span class="n">std_grid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">std_data</span><span class="p">,</span> <span class="n">std_geodict</span><span class="p">)</span>
+
+        <span class="c1"># create an output dictionary</span>
+        <span class="n">imt_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="n">mean_grid</span><span class="p">,</span>
+            <span class="s1">&#39;mean_metadata&#39;</span><span class="p">:</span> <span class="n">mean_metadata</span><span class="p">,</span>
+            <span class="s1">&#39;std&#39;</span><span class="p">:</span> <span class="n">std_grid</span><span class="p">,</span>
+            <span class="s1">&#39;std_metadata&#39;</span><span class="p">:</span> <span class="n">std_metadata</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">imt_dict</span></div>
+
+<div class="viewcode-block" id="ShakeMapOutputContainer.setIMTArrays"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.setIMTArrays">[docs]</a>    <span class="k">def</span> <span class="nf">setIMTArrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">,</span> <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span>
+                     <span class="n">imt_mean</span><span class="p">,</span> <span class="n">mean_metadata</span><span class="p">,</span>
+                     <span class="n">imt_std</span><span class="p">,</span> <span class="n">std_metadata</span><span class="p">,</span>
+                     <span class="n">component</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store IMT mean and standard deviation objects as datasets.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imt_name (str): Name of the IMT (MMI, PGA, etc.) to be stored.</span>
+<span class="sd">            lons (Numpy array): Array of longitudes of the IMT data.</span>
+<span class="sd">            lats (Numpy array): Array of latitudes of the IMT data.</span>
+<span class="sd">            ids (Numpy array): Array of ID strings corresponding to the</span>
+<span class="sd">                locations given by lons and lats.</span>
+<span class="sd">            imt_mean (Numpy array): Array of IMT mean values to be stored.</span>
+<span class="sd">            mean_metadata (dict): Dictionary containing metadata for mean IMT</span>
+<span class="sd">                grid.</span>
+<span class="sd">            imt_std (Numpy array): Array of IMT standard deviation values</span>
+<span class="sd">                to be stored.</span>
+<span class="sd">            std_metadata (dict): Dictionary containing metadata for mean IMT</span>
+<span class="sd">                grid.</span>
+<span class="sd">            component (str): Component type, i.e. &#39;Larger&#39;,&#39;rotd50&#39;,etc.</span>
+<span class="sd">            compression (bool): Boolean indicating whether dataset should be</span>
+<span class="sd">                compressed using the gzip algorithm.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            HDF Group containing IMT arrays and metadata.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Setting point data in a file containing grids&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDataType</span><span class="p">(</span><span class="s1">&#39;points&#39;</span><span class="p">)</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># Check that all of the arrays are the same</span>
+        <span class="c1"># size</span>
+        <span class="c1">#</span>
+        <span class="k">if</span> <span class="n">lons</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">lats</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> \
+           <span class="n">lons</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">ids</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> \
+           <span class="n">lons</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">imt_mean</span><span class="o">.</span><span class="n">shape</span> <span class="ow">or</span> \
+           <span class="n">lons</span><span class="o">.</span><span class="n">shape</span> <span class="o">!=</span> <span class="n">imt_std</span><span class="o">.</span><span class="n">shape</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;All input arrays must be the same shape&#39;</span><span class="p">)</span>
+
+        <span class="c1"># set up the name of the group holding all the information for the IMT</span>
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;An IMT group called </span><span class="si">%s</span><span class="s1"> already exists.&#39;</span> <span class="o">%</span>
+                            <span class="n">imt_name</span><span class="p">)</span>
+        <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
+
+        <span class="c1"># create data sets containing the longitudes, latitudes, and ids</span>
+        <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;lons&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">lons</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;lats&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">lats</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;ids&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+
+        <span class="c1"># create the data set containing the mean IMT data and metadata</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">imt_mean</span><span class="p">,</span>
+                                           <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mean_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">mean_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="c1"># create the data set containing the std IMT data and metadata</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">imt_std</span><span class="p">,</span>
+                                           <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">std_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">std_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+
+        <span class="k">return</span> <span class="n">imt_group</span></div>
+
+<div class="viewcode-block" id="ShakeMapOutputContainer.getIMTArrays"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTArrays">[docs]</a>    <span class="k">def</span> <span class="nf">getIMTArrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Retrieve the arrays and any associated metadata from the container.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imt_name (str):</span>
+<span class="sd">                The name of the IMT stored in the container.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Dictionary containing 7 items:</span>
+<span class="sd">                   - &#39;lons&#39;: array of longitude coordinates</span>
+<span class="sd">                   - &#39;lats&#39;: array of latitude coordinates</span>
+<span class="sd">                   - &#39;ids&#39;: array of IDs corresponding to the coordinates</span>
+<span class="sd">                   - &#39;mean&#39;: array of IMT mean values.</span>
+<span class="sd">                   - &#39;mean_metadata&#39;: Dictionary containing any metadata</span>
+<span class="sd">                     describing mean layer.</span>
+<span class="sd">                   - &#39;std&#39;: array of IMT standard deviation values.</span>
+<span class="sd">                   - &#39;std_metadata&#39;: Dictionary containing any metadata</span>
+<span class="sd">                     describing standard deviation layer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;points&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Requesting point data from file containing grids&#39;</span><span class="p">)</span>
+
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No group called </span><span class="si">%s</span><span class="s1"> in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
+        <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
+
+        <span class="c1"># get the coordinates and ids</span>
+        <span class="n">dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;lons&#39;</span><span class="p">]</span>
+        <span class="n">lons</span> <span class="o">=</span> <span class="n">dset</span><span class="p">[()]</span>
+        <span class="n">dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;lats&#39;</span><span class="p">]</span>
+        <span class="n">lats</span> <span class="o">=</span> <span class="n">dset</span><span class="p">[()]</span>
+        <span class="n">dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;ids&#39;</span><span class="p">]</span>
+        <span class="n">ids</span> <span class="o">=</span> <span class="n">dset</span><span class="p">[()]</span>
+
+        <span class="c1"># get the mean data and metadata</span>
+        <span class="n">mean_dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+        <span class="n">mean_data</span> <span class="o">=</span> <span class="n">mean_dset</span><span class="p">[()]</span>
+
+        <span class="n">mean_metadata</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">mean_dset</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">mean_metadata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_dset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="c1"># get the std data and metadata</span>
+        <span class="n">std_dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span>
+        <span class="n">std_data</span> <span class="o">=</span> <span class="n">std_dset</span><span class="p">[()]</span>
+
+        <span class="n">std_metadata</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">std_dset</span><span class="o">.</span><span class="n">attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">std_metadata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">std_dset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+        <span class="c1"># create an output dictionary</span>
+        <span class="n">imt_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;lons&#39;</span><span class="p">:</span> <span class="n">lons</span><span class="p">,</span>
+            <span class="s1">&#39;lats&#39;</span><span class="p">:</span> <span class="n">lats</span><span class="p">,</span>
+            <span class="s1">&#39;ids&#39;</span><span class="p">:</span> <span class="n">ids</span><span class="p">,</span>
+            <span class="s1">&#39;mean&#39;</span><span class="p">:</span> <span class="n">mean_data</span><span class="p">,</span>
+            <span class="s1">&#39;mean_metadata&#39;</span><span class="p">:</span> <span class="n">mean_metadata</span><span class="p">,</span>
+            <span class="s1">&#39;std&#39;</span><span class="p">:</span> <span class="n">std_data</span><span class="p">,</span>
+            <span class="s1">&#39;std_metadata&#39;</span><span class="p">:</span> <span class="n">std_metadata</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">imt_dict</span></div>
+
+<div class="viewcode-block" id="ShakeMapOutputContainer.getIMTs"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTs">[docs]</a>    <span class="k">def</span> <span class="nf">getIMTs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of names of IMTs matching input component type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            component (str): Name of component (&#39;Larger&#39;,&#39;rotd50&#39;,etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of names of IMTs matching component stored in container.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">imt_groups</span> <span class="o">=</span> <span class="n">_get_type_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">,</span> <span class="s1">&#39;imt&#39;</span><span class="p">)</span>
+        <span class="n">comp_groups</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">imt_group</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">component</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="n">comp_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imt_group</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">component</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">comp_groups</span></div>
+
+<div class="viewcode-block" id="ShakeMapOutputContainer.getComponents"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getComponents">[docs]</a>    <span class="k">def</span> <span class="nf">getComponents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return list of components for given IMT.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          imt_name (str): Name of IMT (&#39;MMI&#39;,&#39;PGA&#39;,etc.)</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">          list: List of names of components for given IMT.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">_get_type_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">,</span> <span class="s1">&#39;imt_&#39;</span><span class="o">+</span><span class="n">imt_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">components</span></div>
+
+<div class="viewcode-block" id="ShakeMapOutputContainer.dropIMT"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.dropIMT">[docs]</a>    <span class="k">def</span> <span class="nf">dropIMT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete IMT datasets from container.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">          name (str):</span>
+<span class="sd">                The name of the IMT to be deleted.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No group called </span><span class="si">%s</span><span class="s1"> in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
