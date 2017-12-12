@@ -72,8 +72,18 @@ Installation and Dependencies
 - Python libraries: numpy, scipy, rasterio, fiona, xlrd, pandas, basemap,
   shapely, h5py, gdal, descartes, openquake.engine, neicio,
   MapIO, matplotlib, pytables, lxml
-- The `install.sh` script installs this package and all dependencies. It is
+- The ``install.sh`` script installs this package and all dependencies. It is
   regularly tested on OSX and Ubuntu.
+- To install
+
+.. code-block::
+
+    git clone https://github.com/usgs/shakemap.git
+    cd shakemap
+    pip install .
+
+- Note that for development, we have found that the ``-e`` for the pip install
+  is useful.
 
 OQ Hazard Library
 -----------------

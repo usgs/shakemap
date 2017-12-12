@@ -38,7 +38,7 @@ fi
 # any versions of packages specified.
 if [ $reset eq 1 ]; then
     echo "Ignoring platform, letting conda sort out dependencies..."
-    env_file=environment_basic.yml
+    env_file=environment.yml
 fi
 
 # Turn off whatever other virtual environment user might be in
@@ -80,14 +80,14 @@ source activate $VENV
 
 # Conda version
 
-# conda install -y --no-deps -c conda-forge openquake.engine
+conda install -y --no-deps -c conda-forge openquake.engine
 
 # Pip version
 
-curl --max-time 60 --retry 3 -L \
-    https://github.com/gem/oq-engine/archive/v2.5.0.zip -o openquake.zip
-pip -q install --no-deps openquake.zip
-rm openquake.zip
+#curl --max-time 60 --retry 3 -L \
+#    https://github.com/gem/oq-engine/archive/v2.8.0.zip -o openquake.zip
+#pip -q install --no-deps openquake.zip
+#rm openquake.zip
 
 
 # Clean up downloaded packages
