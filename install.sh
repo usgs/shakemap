@@ -77,17 +77,7 @@ source activate $VENV
 # because the requirements are too narrow to work with our other dependencies,
 # but the openquake.hazardlib tests pass with this environment. We need to
 # remember to check this when we change the environemnt.yml file though.
-
-# Conda version
-
 conda install -y --no-deps -c conda-forge openquake.engine
-
-# Pip version
-
-#curl --max-time 60 --retry 3 -L \
-#    https://github.com/gem/oq-engine/archive/v2.8.0.zip -o openquake.zip
-#pip -q install --no-deps openquake.zip
-#rm openquake.zip
 
 
 # Clean up downloaded packages
