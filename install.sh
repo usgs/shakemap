@@ -36,7 +36,7 @@ fi
 # If the user has specified the -r (reset) flag, then create an
 # environment based on only the named dependencies, without
 # any versions of packages specified.
-if [ $reset eq 1 ]; then
+if [ $reset == 1 ]; then
     echo "Ignoring platform, letting conda sort out dependencies..."
     env_file=environment.yml
 fi
