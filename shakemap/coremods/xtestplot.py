@@ -68,6 +68,9 @@ class TestPlot(CoreModule):
                      data['std'], 
                      '-.r', label='stddev')
             plt.xlabel('Longitude')
-            plt.ylabel('%s' % myimt)
+            plt.ylabel('ln(%s) (g)' % myimt)
             plt.legend(loc='best')
-            plt.savefig(os.path.join(datadir, 'testplot_' + myimt + '.pdf'))
+            plt.title(self._eventid)
+            plt.grid()
+            pfile = os.path.join(datadir, self._eventid + '_' + myimt + '.pdf')
+            plt.savefig(pfile)

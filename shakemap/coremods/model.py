@@ -155,10 +155,7 @@ class ModelModule(CoreModule):
                 self.logger.info('Points file is empty; nothing to do')
                 return
             elif np.size(in_sites) == 1:
-                lons, lats, vs30, idents = in_sites.reshape((-1))[0]
-                lons = [lons]
-                lats = [lats]
-                vs30 = [vs30]
+                lons, lats, vs30, idents = in_sites.item()
                 idents = [idents]
             else:
                 lons, lats, vs30, idents = zip(*in_sites)
@@ -309,7 +306,7 @@ class ModelModule(CoreModule):
                             df[imtstr + '_pred_sigma']
                         np.seterr(invalid='warn')
 
-                        self.logger.info('IMT: %s, flagged: %d' %
+                        self.logger.debug('IMT: %s, flagged: %d' %
                                          (imtstr, np.sum(flagged)))
                         df[imtstr + '_outliers'] = flagged
                     else:
@@ -580,7 +577,7 @@ class ModelModule(CoreModule):
             #
             # Print the nominal values of the bias and its stddev
             #
-            self.logger.info(
+            self.logger.debug(
                     '%s: nom bias %f nom stddev %f; %d stations (time=%f sec)'
                     % (imtstr, nominal_bias[imtstr], np.sqrt(nom_variance),
                        np.size(sta_lons_rad[imtstr]), bias_time))
@@ -680,14 +677,6 @@ class ModelModule(CoreModule):
                 sdarr = psd[imtstr][iy, :].reshape((1, -1))
                 # ss is the standard deviation of the stations
                 ss = sta_phi[imtstr]
-#                print('ss:')
-#                print(ss)
-#                print('sdarr:')
-#                print(sdarr)
-#                print('corr_adj12:')
-#                print(corr_adj12)
-#                print('corr12:')
-#                print(corr12)
                 sigma12 = ne.evaluate("corr12 * corr_adj12 * (ss * sdarr)").T
                 stime += time.time() - time4
                 time4 = time.time()
@@ -708,8 +697,6 @@ class ModelModule(CoreModule):
             outgrid[imtstr] = ampgrid
             sdgrid[sdgrid < 0] = 0
             outsd[imtstr] = np.sqrt(sdgrid)
-#            print('Standard deviation predictions:')
-#            print(outsd[imtstr])
 
             self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
             self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))
@@ -717,7 +704,7 @@ class ModelModule(CoreModule):
             self.logger.debug('\ttime for %s rcmatrix=%f' % (imtstr, dtime))
             self.logger.debug('\ttime for %s amp calc=%f' % (imtstr, atime))
             self.logger.debug('\ttime for %s sd calc=%f' % (imtstr, mtime))
-            self.logger.info('total time for %s=%f' %
+            self.logger.debug('total time for %s=%f' %
                              (imtstr, time.time() - time1))
 
     # %%

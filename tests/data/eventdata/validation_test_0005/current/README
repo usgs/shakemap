@@ -1,3 +1,4 @@
-Test with one station, with ln(SA(1.0)) of 1. Plot the spectra.
+This test has two stations at the same location with amps of 1.0 and
+-1.0. . It should produce a zero mean result
 
-Plot with xtestplot_spectra.
+Plot with xtestplot.

@@ -29,14 +29,14 @@ class NullGMPE(GMPE):
     REQUIRES_RUPTURE_PARAMETERS = set(('dip', 'rake', 'mag', 'ztor'))
     REQUIRES_DISTANCES = set(('rrup', 'rjb', 'rx'))
 
-    def __init__(self, mean=0, phi=0.6, tau=0.3):
+    def __init__(self, mean=0, phi=0.8, tau=0.6):
         """
         The default constructor takes three named arguments:
 
         Args:
             mean (float): the mean value returned by the GMPE (default=0)
             phi (float): the within-event standard deviation returned by the 
-                 GMPE (default=0.6)
+                 GMPE (default=0.8)
             tau (float): the between-event standard deviation returned by the 
                  GMPE (default=0.6)
 

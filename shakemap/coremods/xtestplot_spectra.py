@@ -78,6 +78,9 @@ class TestPlotSpectra(CoreModule):
                  stddevlist[indxx], 
                  '-.r', label='stddev')
         plt.xlabel('Period')
-        plt.ylabel('SA(T)')
+        plt.ylabel('ln(SA) (g)')
         plt.legend(loc='best')
-        plt.savefig(os.path.join(datadir, 'spectra_plot.pdf'))
+        plt.title(self._eventid)
+        plt.grid()
+        pfile = os.path.join(datadir, self._eventid + '_spectra_plot.pdf')
+        plt.savefig(pfile)
