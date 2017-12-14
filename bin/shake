@@ -98,6 +98,8 @@ def get_parser():
 
     epilog = 'Available modules:\n'
     for key, core_class in _classes_.items():
+        if key.startswith('xtest'):
+            continue
         epilog += '    - %s\n' % inspect.getdoc(core_class)
 
     parser = argparse.ArgumentParser(

@@ -65,7 +65,6 @@ class ModelModule(CoreModule):
         #
         # Find the shake_data file
         #
-        self.logger.info('Inside model')
         install_path, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current')
         if not os.path.isdir(datadir):
@@ -152,7 +151,17 @@ class ModelModule(CoreModule):
                 config['interp']['prediction_location']['file'],
                 autostrip=True, unpack=True,
                 dtype=[np.float, np.float, np.float, '<U80'])
-            lons, lats, vs30, idents = zip(*in_sites)
+            if np.size(in_sites) == 0:
+                self.logger.info('Points file is empty; nothing to do')
+                return
+            elif np.size(in_sites) == 1:
+                lons, lats, vs30, idents = in_sites.reshape((-1))[0]
+                lons = [lons]
+                lats = [lats]
+                vs30 = [vs30]
+                idents = [idents]
+            else:
+                lons, lats, vs30, idents = zip(*in_sites)
             lons = np.array(lons).reshape(1, -1)
             lats = np.array(lats).reshape(1, -1)
             vs30 = np.array(vs30).reshape(1, -1)
@@ -473,7 +482,7 @@ class ModelModule(CoreModule):
         #
         # Compute a bias for all of the IMTs in the inputs and outputs
         #
-        combined_imt_str = imt_out_set_str
+        combined_imt_str = imt_out_set_str.copy()
         if imt_in_str_dict['df1']:
             combined_imt_str |= imt_in_str_dict['df1']
         if imt_in_str_dict['df2']:
@@ -625,6 +634,7 @@ class ModelModule(CoreModule):
             out_bias = bias_num[imtstr] * out_bias_var
             pout_mean += out_bias
             psd[imtstr] = np.sqrt(psd[imtstr]**2 + out_bias_var)
+            pout_sd2 += out_bias_var
             #
             # Unbias the residual array
             #
@@ -666,8 +676,18 @@ class ModelModule(CoreModule):
                 corr12 = ccf.getCorrelation(t1_12, t2_12, dist12)
                 ctime += time.time() - time4
                 time4 = time.time()
+                # ss is the standard deviation of the sites
                 sdarr = psd[imtstr][iy, :].reshape((1, -1))
+                # ss is the standard deviation of the stations
                 ss = sta_phi[imtstr]
+#                print('ss:')
+#                print(ss)
+#                print('sdarr:')
+#                print(sdarr)
+#                print('corr_adj12:')
+#                print(corr_adj12)
+#                print('corr12:')
+#                print(corr12)
                 sigma12 = ne.evaluate("corr12 * corr_adj12 * (ss * sdarr)").T
                 stime += time.time() - time4
                 time4 = time.time()
@@ -688,6 +708,8 @@ class ModelModule(CoreModule):
             outgrid[imtstr] = ampgrid
             sdgrid[sdgrid < 0] = 0
             outsd[imtstr] = np.sqrt(sdgrid)
+#            print('Standard deviation predictions:')
+#            print(outsd[imtstr])
 
             self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
             self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))
@@ -1095,11 +1117,9 @@ class ModelModule(CoreModule):
                                 outsd[key].flatten(), std_metadata, component)
 
         oc.close()
-
-        self.logger.info('done')
-        # ------------------------------------------------------------------
-        # End interp()
-        # ------------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # End interp()
+    # ------------------------------------------------------------------
 
 
 def get_period_index_from_imt_str(imtstr, imt_per_ix):

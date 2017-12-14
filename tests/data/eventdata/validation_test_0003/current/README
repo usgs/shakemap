@@ -1,0 +1,8 @@
+This test has two stations with the same amp at the same location.
+It should produce the same result (bias, stddev, etc.) as when only
+one of the stations is used.
+
+Plot with xtestplot.
+
+stationlist.xml -- 2 stations
+stationlist.xml.safe -- 1 station

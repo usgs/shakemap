@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # stdlib
 import os.path
 import time
