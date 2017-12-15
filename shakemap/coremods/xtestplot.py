@@ -1,12 +1,9 @@
 # stdlib
 import os.path
-import json
 
 # third party
 
 import matplotlib.pyplot as plt
-
-import numpy as np
 
 # neic imports
 from shakelib.utils.containers import ShakeMapOutputContainer

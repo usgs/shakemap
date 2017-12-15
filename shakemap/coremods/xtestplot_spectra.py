@@ -1,6 +1,5 @@
 # stdlib
 import os.path
-import json
 
 # third party
 
@@ -48,7 +47,7 @@ class TestPlotSpectra(CoreModule):
         stddevlist = []
         periodlist = []
         imtlist = container.getIMTs('Larger')
-        for i, myimt in enumerate(imtlist):
+        for myimt in imtlist:
             if not myimt.startswith('SA('):
                 continue
             ddict = container.getIMTArrays(myimt, 'Larger')
@@ -77,7 +76,7 @@ class TestPlotSpectra(CoreModule):
         plt.semilogx(periodlist[indxx],
                  stddevlist[indxx], 
                  '-.r', label='stddev')
-        plt.xlabel('Period')
+        plt.xlabel('Period (s)')
         plt.ylabel('ln(SA) (g)')
         plt.legend(loc='best')
         plt.title(self._eventid)

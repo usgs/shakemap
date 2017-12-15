@@ -1,6 +1,4 @@
 import numpy as np
-import numexpr as ne
-import itertools as it
 
 class DummyCorrelation(object):
     """
