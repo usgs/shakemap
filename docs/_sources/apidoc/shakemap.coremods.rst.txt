@@ -17,6 +17,8 @@ Submodules
    shakemap.coremods.rupture
    shakemap.coremods.select
    shakemap.coremods.stations
+   shakemap.coremods.xtestplot
+   shakemap.coremods.xtestplot_spectra
 
 Module contents
 

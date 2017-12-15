@@ -4,7 +4,8 @@ import itertools as it
 
 class DummyCorrelation(object):
     """
-    Dummy correlation module for testing purposes.
+    Simplified correlation module for testing purposes. Should not be used
+    in productions runs as it does not produce valid correlations.
     """
 
     def __init__(self, periods):
@@ -12,9 +13,9 @@ class DummyCorrelation(object):
         Initialize the cross-correlation object.
 
         Args:
-            periods (numpy.array): An array of periods that will be requested
-                from the function. Values must be [0.01 -> 10.0], and must me
-                sorted from smallest to largest.
+            periods (ndarray): An array of periods that will be requested
+                from the function. Values must be in the range [0.01, 10.0], 
+                and must me sorted from smallest to largest.
 
         Returns:
             An instance of :class:`DummyCorrelation`.
@@ -30,9 +31,15 @@ class DummyCorrelation(object):
     def getCorrelation(self, ix1, ix2, h):
         """
         Compute the correlation between two periods and a separation distance
-        of h.
+        of h km. The result returned is::
 
-        The indices (ix1 and ix2) and h must have the same dimensions. The
+          rho = T1/T2 * exp(-h/10)
+
+        where rho is the correlation, T1 is the smaller period, T2 is the 
+        larger period, and h is the distance between the points of interest.
+
+        The index arrays (ix1 and ix2) and h array must have the same 
+        dimensions. The
         indices may be equal, and there is no restriction on which one is
         larger. The indices refer to periods in the 'period' argument to the
         class constructor.
@@ -46,9 +53,8 @@ class DummyCorrelation(object):
                 The separation distance between two sites (units of km).
 
         Returns:
-            ndarray:
-                The predicted correlation coefficient. The output array
-                will have the same shape as the inputs.
+            ndarray: The predicted correlation coefficient. The output
+            array will have the same shape as the inputs.
 
         """
         # Verify the validity of input arguments

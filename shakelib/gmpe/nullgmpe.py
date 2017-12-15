@@ -1,5 +1,6 @@
 """
-A GMPE that returns zero everywhere
+A GMPE that returns a constant everywhere. Useful for testing, but
+nothing else.
 """
 import numpy as np
 
@@ -25,22 +26,24 @@ class NullGMPE(GMPE):
         const.StdDev.INTER_EVENT,
         const.StdDev.INTRA_EVENT
     ])
-    REQUIRES_SITES_PARAMETERS = set(('vs30', 'vs30measured', 'z1pt0'))
-    REQUIRES_RUPTURE_PARAMETERS = set(('dip', 'rake', 'mag', 'ztor'))
-    REQUIRES_DISTANCES = set(('rrup', 'rjb', 'rx'))
+    REQUIRES_SITES_PARAMETERS = ()
+    REQUIRES_RUPTURE_PARAMETERS = ()
+    REQUIRES_DISTANCES = set(('rjb',))
 
     def __init__(self, mean=0, phi=0.8, tau=0.6):
         """
         The default constructor takes three named arguments:
 
         Args:
-            mean (float): the mean value returned by the GMPE (default=0)
+            mean (float): the mean value returned by the GMPE (default=0).
+                This value is returned for all locations, regardles of
+                the IMT or the contents of sites, rupture and distance contexts.
             phi (float): the within-event standard deviation returned by the 
                  GMPE (default=0.8)
             tau (float): the between-event standard deviation returned by the 
                  GMPE (default=0.6)
 
-        The total standard deviation returned will be sqrt(phi^2 + tau^2).
+        The total standard deviation returned will be ``sqrt(phi^2 + tau^2)``.
         """
         self.mean = mean
         self.phi = phi
@@ -52,6 +55,10 @@ class NullGMPE(GMPE):
         Implements the OpenQuake GroundShakingIntensityModel 
         get_mean_and_stddevs interface. See superclass 
         `method <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs>`__.
+
+        Returns a constant values for all locations specified in
+        the dists.rbj array, regardless of the contents of that array or
+        any of the other contexts. The imt is also ignored.
         """  # noqa
 
         mean = np.full_like(dists.rjb, self.mean)
