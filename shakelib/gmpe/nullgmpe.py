@@ -26,8 +26,8 @@ class NullGMPE(GMPE):
         const.StdDev.INTER_EVENT,
         const.StdDev.INTRA_EVENT
     ])
-    REQUIRES_SITES_PARAMETERS = ()
-    REQUIRES_RUPTURE_PARAMETERS = ()
+    REQUIRES_SITES_PARAMETERS = set(('vs30',))
+    REQUIRES_RUPTURE_PARAMETERS = set(())
     REQUIRES_DISTANCES = set(('rjb',))
 
     def __init__(self, mean=0, phi=0.8, tau=0.6):
