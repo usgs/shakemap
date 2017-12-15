@@ -106,7 +106,7 @@
         <span class="c1">#</span>
         <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">()</span>
         <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Looking for configuration files...&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for configuration files...&#39;</span><span class="p">)</span>
         <span class="n">modules</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span>
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;modules.conf&#39;</span><span class="p">),</span>
             <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
@@ -238,7 +238,7 @@
                 <span class="n">history</span><span class="p">,</span>
                 <span class="n">rupturefile</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">,</span>
                 <span class="n">datafiles</span><span class="o">=</span><span class="n">datafiles</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created HDF5 input container in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created HDF5 input container in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
                          <span class="n">shake_data</span><span class="o">.</span><span class="n">getFileName</span><span class="p">())</span>
         <span class="n">shake_data</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>

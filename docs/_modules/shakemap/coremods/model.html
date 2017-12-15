@@ -108,7 +108,6 @@
         <span class="c1">#</span>
         <span class="c1"># Find the shake_data file</span>
         <span class="c1">#</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Inside model&#39;</span><span class="p">)</span>
         <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
         <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
@@ -195,7 +194,14 @@
                 <span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">],</span>
                 <span class="n">autostrip</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">unpack</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">dtype</span><span class="o">=</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">,</span> <span class="s1">&#39;&lt;U80&#39;</span><span class="p">])</span>
-            <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">vs30</span><span class="p">,</span> <span class="n">idents</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">in_sites</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">in_sites</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Points file is empty; nothing to do&#39;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">elif</span> <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">in_sites</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">vs30</span><span class="p">,</span> <span class="n">idents</span> <span class="o">=</span> <span class="n">in_sites</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                <span class="n">idents</span> <span class="o">=</span> <span class="p">[</span><span class="n">idents</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">vs30</span><span class="p">,</span> <span class="n">idents</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">in_sites</span><span class="p">)</span>
             <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lons</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">vs30</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">vs30</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
@@ -343,7 +349,7 @@
                             <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span>
                         <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span>
 
-                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;IMT: </span><span class="si">%s</span><span class="s1">, flagged: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;IMT: </span><span class="si">%s</span><span class="s1">, flagged: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>
                                          <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">flagged</span><span class="p">)))</span>
                         <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flagged</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -516,7 +522,7 @@
         <span class="c1">#</span>
         <span class="c1"># Compute a bias for all of the IMTs in the inputs and outputs</span>
         <span class="c1">#</span>
-        <span class="n">combined_imt_str</span> <span class="o">=</span> <span class="n">imt_out_set_str</span>
+        <span class="n">combined_imt_str</span> <span class="o">=</span> <span class="n">imt_out_set_str</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="s1">&#39;df1&#39;</span><span class="p">]:</span>
             <span class="n">combined_imt_str</span> <span class="o">|=</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="s1">&#39;df1&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="s1">&#39;df2&#39;</span><span class="p">]:</span>
@@ -614,7 +620,7 @@
             <span class="c1">#</span>
             <span class="c1"># Print the nominal values of the bias and its stddev</span>
             <span class="c1">#</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
                     <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: nom bias </span><span class="si">%f</span><span class="s1"> nom stddev </span><span class="si">%f</span><span class="s1">; </span><span class="si">%d</span><span class="s1"> stations (time=</span><span class="si">%f</span><span class="s1"> sec)&#39;</span>
                     <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">nominal_bias</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">nom_variance</span><span class="p">),</span>
                        <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]),</span> <span class="n">bias_time</span><span class="p">))</span>
@@ -668,6 +674,7 @@
             <span class="n">out_bias</span> <span class="o">=</span> <span class="n">bias_num</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">out_bias_var</span>
             <span class="n">pout_mean</span> <span class="o">+=</span> <span class="n">out_bias</span>
             <span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">out_bias_var</span><span class="p">)</span>
+            <span class="n">pout_sd2</span> <span class="o">+=</span> <span class="n">out_bias_var</span>
             <span class="c1">#</span>
             <span class="c1"># Unbias the residual array</span>
             <span class="c1">#</span>
@@ -709,7 +716,9 @@
                 <span class="n">corr12</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">t1_12</span><span class="p">,</span> <span class="n">t2_12</span><span class="p">,</span> <span class="n">dist12</span><span class="p">)</span>
                 <span class="n">ctime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
                 <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="c1"># ss is the standard deviation of the sites</span>
                 <span class="n">sdarr</span> <span class="o">=</span> <span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+                <span class="c1"># ss is the standard deviation of the stations</span>
                 <span class="n">ss</span> <span class="o">=</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
                 <span class="n">sigma12</span> <span class="o">=</span> <span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;corr12 * corr_adj12 * (ss * sdarr)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
                 <span class="n">stime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
@@ -738,7 +747,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time for </span><span class="si">%s</span><span class="s1"> rcmatrix=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">dtime</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time for </span><span class="si">%s</span><span class="s1"> amp calc=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">atime</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time for </span><span class="si">%s</span><span class="s1"> sd calc=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">mtime</span><span class="p">))</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;total time for </span><span class="si">%s</span><span class="s1">=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;total time for </span><span class="si">%s</span><span class="s1">=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span>
                              <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time1</span><span class="p">))</span>
 
     <span class="c1"># %%</span>
@@ -1008,7 +1017,8 @@
                         <span class="n">mytau</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_tau&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
                     <span class="n">myphi</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_phi&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
                     <span class="n">mysigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mytau</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">myphi</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-                    <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;predictions&#39;</span><span class="p">][</span><span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">imt_name</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_pred&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;predictions&#39;</span><span class="p">][</span><span class="n">imt_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                             <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
                             <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
                             <span class="s1">&#39;tau&#39;</span><span class="p">:</span> <span class="n">mytau</span><span class="p">,</span>
@@ -1022,8 +1032,9 @@
                 <span class="c1">#</span>
                 <span class="c1"># Set the specific distances properties</span>
                 <span class="c1">#</span>
+                <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distances&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">dm</span><span class="p">,</span> <span class="n">dm_arr</span> <span class="ow">in</span> <span class="n">dist_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distance_&#39;</span> <span class="o">+</span> <span class="n">dm</span><span class="p">]</span> <span class="o">=</span> <span class="n">dm_arr</span><span class="p">[</span><span class="n">six</span><span class="p">]</span>
+                    <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distances&#39;</span><span class="p">][</span><span class="n">dm</span><span class="p">]</span> <span class="o">=</span> <span class="n">dm_arr</span><span class="p">[</span><span class="n">six</span><span class="p">]</span>
                 <span class="c1">#</span>
                 <span class="c1"># Set the outlier flags</span>
                 <span class="c1">#</span>
@@ -1135,12 +1146,10 @@
                                 <span class="n">ascii_ids</span><span class="p">,</span> <span class="n">value</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">mean_metadata</span><span class="p">,</span>
                                 <span class="n">outsd</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">flatten</span><span class="p">(),</span> <span class="n">std_metadata</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
 
-        <span class="n">oc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;done&#39;</span><span class="p">)</span></div></div>
-        <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="c1"># End interp()</span>
-        <span class="c1"># ------------------------------------------------------------------</span>
+        <span class="n">oc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+    <span class="c1"># ------------------------------------------------------------------</span>
+    <span class="c1"># End interp()</span>
+    <span class="c1"># ------------------------------------------------------------------</span>
 
 
 <div class="viewcode-block" id="get_period_index_from_imt_str"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.get_period_index_from_imt_str">[docs]</a><span class="k">def</span> <span class="nf">get_period_index_from_imt_str</span><span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">imt_per_ix</span><span class="p">):</span>

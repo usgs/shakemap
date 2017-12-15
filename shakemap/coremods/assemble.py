@@ -63,7 +63,7 @@ class AssembleModule(CoreModule):
         #
         spec_file = get_configspec()
         validator = get_custom_validator()
-        self.logger.info('Looking for configuration files...')
+        self.logger.debug('Looking for configuration files...')
         modules = ConfigObj(
             os.path.join(install_path, 'config', 'modules.conf'),
             configspec=spec_file)
@@ -195,6 +195,6 @@ class AssembleModule(CoreModule):
                 history,
                 rupturefile=rupturefile,
                 datafiles=datafiles)
-        self.logger.info('Created HDF5 input container in %s' %
+        self.logger.debug('Created HDF5 input container in %s' %
                          shake_data.getFileName())
         shake_data.close()

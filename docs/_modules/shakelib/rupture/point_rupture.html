@@ -296,7 +296,7 @@
             <span class="n">rjb</span> <span class="o">=</span> <span class="n">repi</span> <span class="o">*</span> <span class="n">ratio</span>
             <span class="k">return</span> <span class="n">rjb</span>
 
-        <span class="n">repis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">computeRepi</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
+        <span class="n">repis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computeRepi</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">),</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">mags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">repis</span><span class="p">)</span> <span class="o">*</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span>
         <span class="n">rjb_hat</span> <span class="o">=</span> <span class="n">repi2rjb_tbl</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">mags</span><span class="p">)</span>
 
@@ -436,8 +436,8 @@
             <span class="n">rrup</span> <span class="o">=</span> <span class="n">repi</span> <span class="o">*</span> <span class="n">ratio</span>
             <span class="k">return</span> <span class="n">rrup</span>
 
-        <span class="n">repis</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">computeRepi</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
-        <span class="n">mags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">repis</span><span class="p">)</span> <span class="o">*</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span>
+        <span class="n">repis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computeRepi</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">),</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">mags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
         <span class="n">rrup_hat</span> <span class="o">=</span> <span class="n">repi2rrup_tbl</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">mags</span><span class="p">)</span>
 
         <span class="c1"># -------------------</span>

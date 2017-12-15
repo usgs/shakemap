@@ -253,7 +253,7 @@ class PointRupture(Rupture):
             rjb = repi * ratio
             return rjb
 
-        repis = self.computeRepi(lon, lat, depth)
+        repis = np.clip(self.computeRepi(lon, lat, depth), 0.0001, None)
         mags = np.ones_like(repis) * origin.mag
         rjb_hat = repi2rjb_tbl(repis, mags)
 
@@ -393,8 +393,8 @@ class PointRupture(Rupture):
             rrup = repi * ratio
             return rrup
 
-        repis = self.computeRepi(lon, lat, depth)
-        mags = np.ones_like(repis) * origin.mag
+        repis = np.clip(self.computeRepi(lon, lat, depth), 0.0001, None)
+        mags = np.full_like(repis, origin.mag)
         rrup_hat = repi2rrup_tbl(repis, mags)
 
         # -------------------

@@ -1,0 +1,184 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.correlation.dummy &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakelib.correlation.goda_atkinson_2010" href="shakelib.correlation.goda_atkinson_2010.html" />
+    <link rel="prev" title="shakelib.correlation.boore_2003" href="shakelib.correlation.boore_2003.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakelib.correlation.dummy">
+<span id="shakelib-correlation-dummy"></span><h1>shakelib.correlation.dummy<a class="headerlink" href="#module-shakelib.correlation.dummy" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="shakelib.correlation.dummy.DummyCorrelation">
+<em class="property">class </em><code class="descclassname">shakelib.correlation.dummy.</code><code class="descname">DummyCorrelation</code><span class="sig-paren">(</span><em>periods</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/dummy.html#DummyCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.dummy.DummyCorrelation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<p>Simplified correlation module for testing purposes. Should not be used
+in productions runs as it does not produce valid correlations.</p>
+<p>Initialize the cross-correlation object.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>periods</strong> (<em>ndarray</em>) – An array of periods that will be requested
+from the function. Values must be in the range [0.01, 10.0],
+and must me sorted from smallest to largest.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of <a class="reference internal" href="#shakelib.correlation.dummy.DummyCorrelation" title="shakelib.correlation.dummy.DummyCorrelation"><code class="xref py py-class docutils literal"><span class="pre">DummyCorrelation</span></code></a>.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="shakelib.correlation.dummy.DummyCorrelation.getCorrelation">
+<code class="descname">getCorrelation</code><span class="sig-paren">(</span><em>ix1</em>, <em>ix2</em>, <em>h</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/dummy.html#DummyCorrelation.getCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.dummy.DummyCorrelation.getCorrelation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the correlation between two periods and a separation distance
+of h km. The result returned is:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">rho</span> <span class="o">=</span> <span class="n">T1</span><span class="o">/</span><span class="n">T2</span> <span class="o">*</span> <span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">h</span><span class="o">/</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where rho is the correlation, T1 is the smaller period, T2 is the
+larger period, and h is the distance between the points of interest.</p>
+<p>The index arrays (ix1 and ix2) and h array must have the same
+dimensions. The
+indices may be equal, and there is no restriction on which one is
+larger. The indices refer to periods in the ‘period’ argument to the
+class constructor.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ix1</strong> (<em>ndarray</em>) – The indices of the first period of interest.</li>
+<li><strong>ix2</strong> (<em>ndarrays</em>) – The indices of the second period of interest.</li>
+<li><strong>h</strong> (<em>ndarray</em>) – The separation distance between two sites (units of km).</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The predicted correlation coefficient. The output
+array will have the same shape as the inputs.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">ndarray</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.baker_jayaram_2008.html">shakelib.correlation.baker_jayaram_2008</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.boore_2003.html">shakelib.correlation.boore_2003</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakelib.correlation.dummy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.goda_atkinson_2010.html">shakelib.correlation.goda_atkinson_2010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.loth_baker_2013.html">shakelib.correlation.loth_baker_2013</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
+</ul>
+</li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

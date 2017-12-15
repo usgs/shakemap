@@ -795,17 +795,17 @@ Worden, C.B. and D.J. Wald (2016). ShakeMap Manual Online: technical manual, use
 U. S. Geological Survey. usgs.github.io/shakemap. DOI: 10.5066/F7D21VPQ.
 \
 
-.. _worden2017a:
-
-Worden, C.B., E.M. Thompson, J.W. Baker, B.A. Bradley, N. Luco, and D.J. Wald (2017). 
-Spatial and Spectral Interpolation of Ground Motion Intensity Measure Observations,
-*Bull. Seism. Soc. Am.* In press.
-\
-
 .. _worden2017b:
 
 Worden, C.B., E.M. Thompson, M. Hearne, and D.J. Wald (2017). ShakeMap V4 Manual: technical manual, user's guide, and software guide, 
 U. S. Geological Survey. usgs.github.io/shakemap. DOI: XXX
+\
+
+.. _worden2018:
+
+Worden, C.B., E.M. Thompson, J.W. Baker, B.A. Bradley, N. Luco, and D.J. Wald (2018). 
+Spatial and Spectral Interpolation of Ground Motion Intensity Measure Observations,
+*Bull. Seism. Soc. Am.* In press.
 \
 
 .. _yamakawa1998:
