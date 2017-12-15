@@ -89,6 +89,10 @@ def get_config_paths():
     Returns:
         tuple: The paths to the ShakeMap install directory
         and the data directory.
+
+    Raises:
+        FileNotFoundError -- if the profile file can't be found.
+        ValueError -- If the correct profile can't be foun in profiles.conf.
     """
     if 'CALLED_FROM_PYTEST' in os.environ:
         base_path = os.path.join(get_data_path(), '..', '..', 'tests', 'data')
@@ -97,8 +101,15 @@ def get_config_paths():
     else:
         config_file = os.path.join(os.path.expanduser('~'), '.shakemap',
                                    'profiles.conf')
+        if not os.path.isfile(config_file):
+            raise FileNotFoundError("Can't find a profile file: "
+                                    "have you run sm_profile?")
         config = ConfigObj(config_file)
         profile_name = config['profile']
+        if not profile_name or profile_name == 'None':
+            raise ValueError("No profile set in the profiles.conf file")
+        if not config['profiles'] or profile_name not in config['profiles']:
+            raise ValueError("Profile %s not found in list of profiles")
         profile = config['profiles'][profile_name]
         install = profile['install_path']
         data = profile['data_path']

@@ -9,13 +9,16 @@
 # or it won't work.
 #
 
-#`./shake validation_test_0001 assemble model xtestplot`
-#`./shake validation_test_0002 assemble model xtestplot`
-#`./shake validation_test_0003 assemble model xtestplot`
-#`./shake validation_test_0004 assemble model xtestplot`
-#`./shake validation_test_0005 assemble model xtestplot`
-#`./shake validation_test_0006 assemble model xtestplot`
-#`./shake validation_test_0007 assemble model xtestplot_spectra`
+CALLED_FROM_PYTEST='True'
+export CALLED_FROM_PYTEST
+
+`./shake validation_test_0001 assemble model xtestplot`
+`./shake validation_test_0002 assemble model xtestplot`
+`./shake validation_test_0003 assemble model xtestplot`
+`./shake validation_test_0004 assemble model xtestplot`
+`./shake validation_test_0005 assemble model xtestplot`
+`./shake validation_test_0006 assemble model xtestplot`
+`./shake validation_test_0007 assemble model xtestplot_spectra`
 
 basepath='../tests/data/eventdata'
 filepath='current/products'

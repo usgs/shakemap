@@ -246,11 +246,11 @@ def main(pparser, args):
 
         install_path = config['profiles'][profile]['install_path']
         data_path = config['profiles'][profile]['data_path']
-        question = ('Are you sure you want to delete everything in:\n'
-                    '%s\n--and--\n%s?\n' % (install_path, data_path))
-        if not args.accept and not query_yes_no(question, default='yes'):
-            sys.exit(0)
         if not args.preserve:
+            question = ('Are you sure you want to delete everything in:\n'
+                        '%s\n--and--\n%s?\n' % (install_path, data_path))
+            if not args.accept and not query_yes_no(question, default='yes'):
+                sys.exit(0)
             shutil.rmtree(install_path, ignore_errors=True)
             shutil.rmtree(data_path, ignore_errors=True)
 
