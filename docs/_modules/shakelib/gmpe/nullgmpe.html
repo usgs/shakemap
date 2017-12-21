@@ -69,8 +69,8 @@
         <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">,</span>
         <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTRA_EVENT</span>
     <span class="p">])</span>
-    <span class="n">REQUIRES_SITES_PARAMETERS</span> <span class="o">=</span> <span class="p">()</span>
-    <span class="n">REQUIRES_RUPTURE_PARAMETERS</span> <span class="o">=</span> <span class="p">()</span>
+    <span class="n">REQUIRES_SITES_PARAMETERS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">((</span><span class="s1">&#39;vs30&#39;</span><span class="p">,))</span>
+    <span class="n">REQUIRES_RUPTURE_PARAMETERS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(())</span>
     <span class="n">REQUIRES_DISTANCES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">((</span><span class="s1">&#39;rjb&#39;</span><span class="p">,))</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mean</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">phi</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">tau</span><span class="o">=</span><span class="mf">0.6</span><span class="p">):</span>

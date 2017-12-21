@@ -4,6 +4,7 @@ import xml.etree.ElementTree as ET
 import copy
 from collections import OrderedDict
 import re
+import logging
 
 # third party imports
 import numpy as np
@@ -22,6 +23,7 @@ TABLES = OrderedDict((
          ('lon', 'float'),
          ('elev', 'float'),
          ('vs30', 'float'),
+         ('stddev', 'float'),
          ('instrumented', 'int')
      ))
      ),
@@ -39,7 +41,7 @@ TABLES = OrderedDict((
          ('original_channel', 'str'),
          ('orientation', 'str'),
          ('amp', 'float'),
-         ('uncertainty', 'float'),
+         ('stddev', 'float'),
          ('flag', 'str')
      ))
      )
@@ -352,16 +354,20 @@ class StationList(object):
                 vs30 = station_attributes['vs30']
             else:
                 vs30 = None
+            if 'stddev' in station_attributes:
+                stddev = station_attributes['stddev']
+            else:
+                stddev = 0
 
             instrumented = int(network.lower() not in CIIM_TUPLE)
 
             station_rows.append((sta_id, network, code, name, lat, lon,
-                                 elev, vs30, instrumented))
+                                 elev, vs30, stddev, instrumented))
 
         self.cursor.executemany(
             'INSERT INTO station (id, network, code, name, lat, lon, '
-            'elev, vs30, instrumented) VALUES '
-            '(?, ?, ?, ?, ?, ?, ?, ?, ?)', station_rows
+            'elev, vs30, stddev, instrumented) VALUES '
+            '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', station_rows
         )
         self.db.commit()
 
@@ -398,6 +404,7 @@ class StationList(object):
                     else:
                         amp_set.add(amp_id)
                     amp = imt_dict['value']
+                    stddev = imt_dict['stddev']
                     flag = imt_dict['flag']
                     if np.isnan(amp) or (amp <= 0):
                         amp = 'NULL'
@@ -410,11 +417,12 @@ class StationList(object):
                         amp = np.log(amp / 100.0)
 
                     amp_rows.append((sta_id, imtid, original_channel,
-                                     orientation, amp, flag))
+                                     orientation, amp, stddev, flag))
 
         self.cursor.executemany(
             'INSERT INTO amp (station_id, imt_id, original_channel, '
-            'orientation, amp, flag) VALUES (?, ?, ?, ?, ?, ?)', amp_rows
+            'orientation, amp, stddev, flag) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            amp_rows
         )
         self.db.commit()
         return
@@ -442,12 +450,14 @@ class StationList(object):
         psa30), the keys in the dictionary would be:
 
         'id', 'network', 'code', 'name', 'lat', 'lon', 'elev', 'vs30',
-        'instrumented', 'PGA', 'PGV', 'SA(0.3)', 'SA(1.0)', 'SA(3.0)'
+        'stddev', 'instrumented', 'PGA', 'PGA_sd', 'PGV', 'PGA_sd', 
+        'SA(0.3)', 'SA(0.3)_sd, 'SA(1.0)', 'SA(1.0)_sd, 'SA(3.0)',
+        'SA(3.0)_sd'
 
         For the non-instrumented dictionary, the keys would be:
 
         'id', 'network', 'code', 'name', 'lat', 'lon', 'elev', 'vs30',
-        'instrumented', 'MMI'
+        'stddev', 'instrumented', 'MMI', 'MMI_sd'
 
         The **id** column is **network** and **code** concatenated with a
         period (".") between them.
@@ -485,6 +495,7 @@ class StationList(object):
                (not instrumented and 'MMI' not in imt):
                 continue
             df[imt] = np.full(nstation_rows, np.nan)
+            df[imt + '_sd'] = np.full(nstation_rows, 0.0)
 
         id_dict = dict(zip(df['id'], range(nstation_rows)))
 
@@ -492,7 +503,7 @@ class StationList(object):
         # Get all of the unflagged amps with the proper orientation
         #
         self.cursor.execute(
-            'SELECT a.amp, i.imt_type, a.station_id FROM '
+            'SELECT a.amp, i.imt_type, a.station_id, a.stddev FROM '
             'amp a, station s, imt i WHERE a.flag = "0" '
             'AND s.id = a.station_id '
             'AND a.imt_id = i.id '
@@ -511,8 +522,10 @@ class StationList(object):
             rowidx = id_dict[this_row[2]]
             cval = df[this_row[1]][rowidx]
             amp = this_row[0]
+            stddev = this_row[3]
             if np.isnan(cval) or (cval < amp):
                 df[this_row[1]][rowidx] = amp
+                df[this_row[1] + '_sd'][rowidx] = stddev
 
         return df
 
@@ -575,19 +588,25 @@ class StationList(object):
                 try:
                     value = float(pgm.attrib['value'])
                 except ValueError:
-                    print('Unknown value in XML: ', pgm.attrib['value'],
+                    logging.warn('Unknown value in XML: ', pgm.attrib['value'],
                           ' for amp ', pgm.tag)
                     continue
             else:
-                print('No value for amp ', pgm.tag)
+                logging.warn('No value for amp ', pgm.tag)
                 continue
             if 'flag' in pgm.attrib and pgm.attrib['flag'] != '':
                 flag = pgm.attrib['flag']
             else:
                 flag = '0'
-            pgmdict[key] = {'value': value, 'flag': flag}
+            if 'ln_stddev' in pgm.attrib:
+                stddev = float(pgm.attrib['ln_stddev'])
+            else:
+                stddev = 0
+            pgmdict[key] = {'value': value, 
+                            'flag': flag, 
+                            'stddev': stddev}
             imtset.add(key)
-        return pgmdict, imtset
+        return pgmdict, imtset, imt_translate
 
     def _filter_station(self, xmlfile, stationdict):
         """
@@ -613,9 +632,16 @@ class StationList(object):
                 # DYFI-type station or a station with instruments measuring
                 # PGA, PGV, etc.
                 attributes = station.attrib.copy()
-                netid = attributes['netid']
+                if 'netid' in attributes:
+                    netid = attributes['netid']
+                else:
+                    netid = ''
                 instrumented = int(netid.lower() not in CIIM_TUPLE)
 
+                if 'code' not in attributes:
+                    logging.warn(
+                            'Station does not have station code: skipping')
+                    continue
                 code = attributes['code']
                 if code.startswith(netid + '.'):
                     sta_id = code
@@ -628,11 +654,17 @@ class StationList(object):
                 else:
                     compdict = {}
                 for comp in station:
+                    if 'name' not in comp.attrib:
+                        logging.warn(
+                                'Unnamed component for station %s; skipping'
+                                % (sta_id))
+                        continue
                     compname = comp.attrib['name']
                     if 'Intensity Questionnaire' in str(compname):
                         compdict['mmi'] = {}
                         continue
-                    tpgmdict, ims = self._getGroundMotions(comp, imt_translate)
+                    tpgmdict, ims, imt_translate = \
+                            self._getGroundMotions(comp, imt_translate)
                     if compname in compdict:
                         pgmdict = compdict[compname]
                     else:
@@ -645,8 +677,13 @@ class StationList(object):
                 if ('intensity' in attributes) and (instrumented == 0):
                     if 'mmi' not in compdict:
                         compdict['mmi'] = {}
+                    if 'intensity_stddev' in attributes:
+                        stddev = float(attributes['intensity_stddev'])
+                    else:
+                        stddev = 0
                     compdict['mmi']['MMI'] = \
                         {'value': float(attributes['intensity']),
+                         'stddev': stddev,
                          'flag': '0'}
                     imtset.add('MMI')
                 stationdict[sta_id] = (attributes, copy.copy(compdict))

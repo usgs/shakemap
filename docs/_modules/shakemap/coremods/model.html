@@ -86,8 +86,20 @@
 <span class="c1"># TODO: Some constants; these should maybe be in a configuration</span>
 <span class="c1"># or in a constants module or be GMICE-specific.</span>
 <span class="c1">#</span>
-<span class="n">SM_CONSTS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;default_mmi_std&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
-             <span class="s1">&#39;min_mmi_convert&#39;</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">}</span>
+<span class="c1"># default_mmi_stddev: the standard deviation of MMI values if it</span>
+<span class="c1">#                     is not specified in the input</span>
+<span class="c1"># min_mmi_convert: the minimum MMI to convert to PGM -- low </span>
+<span class="c1">#                  intensities don&#39;t convert very accurately</span>
+<span class="c1"># default_stddev_inter: This is a stand-in for tau when the gmpe set </span>
+<span class="c1">#                       doesn&#39;t provide it. It is an educated guess </span>
+<span class="c1">#                       based on the NGA-east work and BC Hydro gmpe.</span>
+<span class="c1">#                       It&#39;s not perfect, but probably isn&#39;t too far off. </span>
+<span class="c1">#                       It is only used when the GMPEs don&#39;t provide a </span>
+<span class="c1">#                       breakdown of the uncertainty terms.</span>
+<span class="c1">#</span>
+<span class="n">SM_CONSTS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;default_mmi_stddev&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+             <span class="s1">&#39;min_mmi_convert&#39;</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span>
+             <span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">:</span> <span class="mf">0.35</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="ModelModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.ModelModule">[docs]</a><span class="k">class</span> <span class="nc">ModelModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
@@ -294,7 +306,7 @@
                 <span class="c1">#</span>
                 <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
                     <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;PGA&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">)</span> <span class="ow">or</span>
-                     <span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">)])</span>
+                     <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_sd&#39;</span><span class="p">))])</span>
                 <span class="n">imt_in_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
                     <span class="p">[</span><span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]])</span>
                 <span class="n">imt_in_str_set</span> <span class="o">|=</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span>
@@ -320,7 +332,7 @@
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">total_sd_only</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                        <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">get_default_std_inter</span><span class="p">()</span>
+                        <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span>
                         <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
                             <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
                         <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span>
@@ -357,15 +369,11 @@
                                                            <span class="kc">False</span><span class="p">,</span>
                                                            <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
                     <span class="c1">#</span>
-                    <span class="c1"># Make the uncertainty arrays for any IMTs that don&#39;t</span>
-                    <span class="c1"># have them.</span>
+                    <span class="c1"># If uncertainty hasn&#39;t been set for MMI, give it</span>
+                    <span class="c1"># the default value</span>
                     <span class="c1">#</span>
-                    <span class="k">if</span> <span class="p">(</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-                            <span class="n">sdval</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_mmi_std&#39;</span><span class="p">]</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="n">sdval</span> <span class="o">=</span> <span class="mf">0.0</span>
-                        <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">],</span> <span class="n">sdval</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">imtstr</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;MMI_sd&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+                        <span class="n">df</span><span class="p">[</span><span class="s1">&#39;MMI_sd&#39;</span><span class="p">][:]</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_mmi_stddev&#39;</span><span class="p">]</span>
                 <span class="c1">#</span>
                 <span class="c1"># Get the lons/lats in radians while we&#39;re at it</span>
                 <span class="c1">#</span>
@@ -417,7 +425,7 @@
                     <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
                     <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">total_sd_only</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                        <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">get_default_std_inter</span><span class="p">()</span>
+                        <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span>
                         <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
                             <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
                         <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span>
@@ -474,7 +482,7 @@
                 <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
                 <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">total_sd_only</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">get_default_std_inter</span><span class="p">()</span>
+                    <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span>
                     <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
                         <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
                     <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span>
@@ -513,6 +521,7 @@
         <span class="n">sta_lats_rad</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">sta_resids</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">sta_phi</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">sta_sig_extra</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">sta_sig_total</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">sta_tau</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">sta_imtstr</span> <span class="o">=</span> <span class="p">{}</span>
@@ -541,7 +550,7 @@
             <span class="n">lats_rad</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">resids</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">phi</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">sig_total</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">sig_extra</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">tau</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">imtlist</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">ndf</span><span class="p">,</span> <span class="n">sdf</span> <span class="ow">in</span> <span class="n">df_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -560,8 +569,7 @@
                         <span class="n">tau</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="n">imtin</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
                         <span class="n">_phi</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">imtin</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
                         <span class="n">phi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_phi</span><span class="p">)</span>
-                        <span class="n">sig_total</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                            <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">_phi</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sdf</span><span class="p">[</span><span class="n">imtin</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+                        <span class="n">sig_extra</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="n">imtin</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
             <span class="n">sta_imtstr</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">imtlist</span><span class="p">)</span>
             <span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">period_ix</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lons_rad</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -569,7 +577,9 @@
             <span class="n">sta_resids</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">resids</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">sta_tau</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">tau</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
-            <span class="n">sta_sig_total</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sig_total</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">sta_sig_extra</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sig_extra</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+            <span class="n">sta_sig_total</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+                    <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sta_sig_extra</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lons_rad</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">bias_num</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="n">bias_den</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -577,7 +587,7 @@
             <span class="c1">#</span>
             <span class="c1"># This builds the omega factors to apply to the covariance</span>
             <span class="c1">#</span>
-            <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">/</span> <span class="n">sta_sig_total</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
+            <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">/</span> <span class="n">sta_sig_total</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
             <span class="n">corr_adj22</span> <span class="o">=</span> <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
             <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">corr_adj22</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="c1">#</span>
@@ -591,8 +601,9 @@
             <span class="n">t1_22</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">d22_cols</span><span class="p">))</span>
             <span class="n">t2_22</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">d22_rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">corr22</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> \
-                <span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">t1_22</span><span class="p">,</span> <span class="n">t2_22</span><span class="p">,</span> <span class="n">dist22</span><span class="p">)</span> <span class="o">*</span> <span class="n">corr_adj22</span>
-            <span class="n">sigma22</span> <span class="o">=</span> <span class="n">corr22</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+                <span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">t1_22</span><span class="p">,</span> <span class="n">t2_22</span><span class="p">,</span> <span class="n">dist22</span><span class="p">)</span>
+            <span class="n">sigma22</span> <span class="o">=</span> <span class="n">corr22</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">corr_adj22</span> <span class="o">*</span> \
+                    <span class="p">(</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
             <span class="n">sigma22inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">sigma22</span><span class="p">)</span>
             <span class="c1">#</span>
             <span class="c1"># Compute the bias numerator and denominator pieces</span>
@@ -604,11 +615,19 @@
                 <span class="c1">#</span>
                 <span class="n">out_ix_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">outperiod_ix</span><span class="p">)</span>
                 <span class="n">dist_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">out_ix_arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-                <span class="n">P</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">out_ix_arr</span><span class="p">,</span>
-                                       <span class="n">dist_arr</span><span class="p">)</span>
-                <span class="n">bias_den</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">P</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma22inv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span><span class="p">))</span>
+                <span class="n">Z</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">out_ix_arr</span><span class="p">,</span>
+                                       <span class="n">dist_arr</span><span class="p">)</span> 
+                <span class="c1">#</span>
+                <span class="c1"># Scale the correlation factor (Z) by the correlation</span>
+                <span class="c1"># adjustment due to observational uncertainty</span>
+                <span class="c1">#</span>
+                <span class="n">Z</span> <span class="o">*=</span> <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
+                <span class="c1">#</span>
+                <span class="c1"># Compute the bias denominator and numerator terms</span>
+                <span class="c1">#</span>
+                <span class="n">bias_den</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma22inv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span>
                 <span class="n">bias_num</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> \
-                    <span class="n">P</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma22inv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">P</span> <span class="o">*</span> <span class="n">sta_resids</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]))</span>
+                    <span class="n">Z</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma22inv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Z</span> <span class="o">*</span> <span class="n">sta_resids</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">bias_num</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="n">bias_den</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -659,9 +678,9 @@
             <span class="c1">#</span>
             <span class="k">if</span> <span class="n">total_sd_only</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pout_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span>
-                                      <span class="n">get_default_std_inter</span><span class="p">()</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                                      <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                 <span class="n">tsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span>
-                                           <span class="n">get_default_std_inter</span><span class="p">())</span>
+                                           <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">pout_sd</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
                 <span class="n">tsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">pout_sd</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
@@ -676,7 +695,8 @@
             <span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">out_bias_var</span><span class="p">)</span>
             <span class="n">pout_sd2</span> <span class="o">+=</span> <span class="n">out_bias_var</span>
             <span class="c1">#</span>
-            <span class="c1"># Unbias the residual array</span>
+            <span class="c1"># Unbias the station residuals and compute the </span>
+            <span class="c1"># new phi that includes the variance of the bias</span>
             <span class="c1">#</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])):</span>
                 <span class="n">imtin</span> <span class="o">=</span> <span class="n">sta_imtstr</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
@@ -687,14 +707,24 @@
                 <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">i</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
                                                 <span class="n">in_bias_var</span><span class="p">)</span>
             <span class="c1">#</span>
+            <span class="c1"># Update the omega factors to account for the bias and the</span>
+            <span class="c1"># new value of phi</span>
+            <span class="c1">#</span>
+            <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">/</span> \
+                    <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sta_sig_extra</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">corr_adj22</span> <span class="o">=</span> <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">corr_adj22</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+            <span class="c1">#</span>
+            <span class="c1"># Rebuild sigma22_inv now that we have updated phi and </span>
+            <span class="c1"># the correlation adjustment factors</span>
+            <span class="c1">#</span>
+            <span class="n">sigma22</span> <span class="o">=</span> <span class="n">corr22</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">corr_adj22</span> <span class="o">*</span> \
+                    <span class="p">(</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+            <span class="n">sigma22inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">sigma22</span><span class="p">)</span>
+            <span class="c1">#</span>
             <span class="c1"># Now do the MVN itself...</span>
             <span class="c1">#</span>
             <span class="n">dtime</span> <span class="o">=</span> <span class="n">mtime</span> <span class="o">=</span> <span class="n">ddtime</span> <span class="o">=</span> <span class="n">ctime</span> <span class="o">=</span> <span class="n">stime</span> <span class="o">=</span> <span class="n">atime</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="c1">#</span>
-            <span class="c1"># Rebuild sigma22_inv now that we have updated phi</span>
-            <span class="c1">#</span>
-            <span class="n">sigma22</span> <span class="o">=</span> <span class="n">corr22</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
-            <span class="n">sigma22inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">sigma22</span><span class="p">)</span>
 
             <span class="n">ampgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">pout_mean</span><span class="p">)</span>
             <span class="n">sdgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">pout_mean</span><span class="p">)</span>
@@ -716,30 +746,44 @@
                 <span class="n">corr12</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">t1_12</span><span class="p">,</span> <span class="n">t2_12</span><span class="p">,</span> <span class="n">dist12</span><span class="p">)</span>
                 <span class="n">ctime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
                 <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-                <span class="c1"># ss is the standard deviation of the sites</span>
+                <span class="c1"># sdarr is the standard deviation of the output sites</span>
                 <span class="n">sdarr</span> <span class="o">=</span> <span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
                 <span class="c1"># ss is the standard deviation of the stations</span>
                 <span class="n">ss</span> <span class="o">=</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
                 <span class="n">sigma12</span> <span class="o">=</span> <span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;corr12 * corr_adj12 * (ss * sdarr)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
                 <span class="n">stime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
                 <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="c1">#</span>
+                <span class="c1"># Sigma12 * Sigma22^-1 is known as the &#39;regression </span>
+                <span class="c1"># coefficient&#39; matrix (rcmatrix)</span>
+                <span class="c1">#</span>
                 <span class="n">rcmatrix</span> <span class="o">=</span> <span class="n">sigma12</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma22inv</span><span class="p">)</span>
                 <span class="n">dtime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
                 <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="c1">#</span>
+                <span class="c1"># This is the MVN solution for the conditional mean</span>
+                <span class="c1">#</span>
+                <span class="n">adj_resid</span> <span class="o">=</span> <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">sta_resids</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
                 <span class="n">ampgrid</span><span class="p">[</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> \
-                    <span class="n">pout_mean</span><span class="p">[</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> \
-                    <span class="p">(</span><span class="n">corr_adj12</span><span class="o">.</span><span class="n">T</span> <span class="o">*</span>
-                     <span class="n">rcmatrix</span><span class="p">)</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sta_resids</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
+                    <span class="n">pout_mean</span><span class="p">[</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span> <span class="o">+</span> <span class="n">rcmatrix</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">adj_resid</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
                 <span class="n">atime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
                 <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-<span class="c1">#        sdgrid[ss:se] = pout_sd2[ss:se] - np.diag(rcmatrix.dot(sigma12))</span>
+                <span class="c1">#</span>
+                <span class="c1"># We only want the diagonal elements of the conditional</span>
+                <span class="c1"># covariance matrix, so there is no point in doing the </span>
+                <span class="c1"># full solution with the dot product, e.g.:</span>
+                <span class="c1"># sdgrid[ss:se] = pout_sd2[ss:se] - np.diag(rcmatrix.dot(sigma12))</span>
+                <span class="c1">#</span>
                 <span class="n">sdgrid</span><span class="p">[</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span> <span class="o">=</span> \
                     <span class="n">pout_sd2</span><span class="p">[</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">rcmatrix</span> <span class="o">*</span> <span class="n">sigma12</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
                 <span class="n">mtime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
 
             <span class="n">outgrid</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">ampgrid</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">outgrid</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]))</span>
             <span class="n">sdgrid</span><span class="p">[</span><span class="n">sdgrid</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">outsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sdgrid</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">outsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">outsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]))</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time for </span><span class="si">%s</span><span class="s1"> distance=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">ddtime</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time for </span><span class="si">%s</span><span class="s1"> correlation=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">ctime</span><span class="p">))</span>
@@ -1444,23 +1488,6 @@
         <span class="n">pe</span> <span class="o">=</span> <span class="n">gmpe</span>
     <span class="k">return</span> <span class="n">pe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span></div>
 
-
-<span class="c1">#</span>
-<span class="c1"># This is a stand-in for tau when the gmpe set doesn&#39;t provide it</span>
-<span class="c1"># It is an educated guess based on the NGA-east work and BC Hydro</span>
-<span class="c1"># gmpe. It&#39;s not perfect, but probably isn&#39;t too far off. It is</span>
-<span class="c1"># only used when the GMPEs don&#39;t provide a breakdown of the</span>
-<span class="c1"># uncertainty terms.</span>
-<span class="c1">#</span>
-<div class="viewcode-block" id="get_default_std_inter"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.get_default_std_inter">[docs]</a><span class="k">def</span> <span class="nf">get_default_std_inter</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This is a stand-in for tau when the gmpe set doesn&#39;t provide it</span>
-<span class="sd">    It is an educated guess based on the NGA-east work and BC Hydro</span>
-<span class="sd">    gmpe. It&#39;s not perfect, but probably isn&#39;t too far off. It is</span>
-<span class="sd">    only used when the GMPEs don&#39;t provide a breakdown of the</span>
-<span class="sd">    uncertainty terms.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="mf">0.35</span></div>
 </pre></div>
 
           </div>
