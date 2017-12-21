@@ -16,6 +16,8 @@ ShakeMap 4 Manual
 
    index
 
+.. rubric:: :ref:`Table of Contents <index-4>`
+
 .. image::  _static/northridge_logo_light.*
    :alt: ShakeMap Northridge
    :scale: 100 %
@@ -23,8 +25,6 @@ ShakeMap 4 Manual
 
 **written by: C. Bruce Worden, Eric M. Thompson, Michael G. Hearne, 
 and David J. Wald**
-
-.. rubric:: :ref:`Table of Contents <index-4>`
 
 .. Indices and tables
 .. ==================

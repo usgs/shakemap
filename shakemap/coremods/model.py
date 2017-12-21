@@ -736,11 +736,8 @@ class ModelModule(CoreModule):
                 mtime += time.time() - time4
 
             outgrid[imtstr] = ampgrid
-            print(np.max(outgrid[imtstr]))
             sdgrid[sdgrid < 0] = 0
             outsd[imtstr] = np.sqrt(sdgrid)
-            print(np.max(outsd[imtstr]))
-            print(np.min(outsd[imtstr]))
 
             self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
             self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))
