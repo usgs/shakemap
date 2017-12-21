@@ -86,8 +86,8 @@ attempt to open a window displaying the plots. This last step might
 not work on all systems. The plots can be found in
 <em>tests/data/eventdata/validation_test_XXXX/current/products</em> (where
 “<em>XXXX</em>” is the number of the test).</p>
-<div class="section" id="validation-test-0001">
-<h2>2.3.1. Validation Test 0001<a class="headerlink" href="#validation-test-0001" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="test-0001">
+<h2>2.3.1. Test 0001<a class="headerlink" href="#test-0001" title="Permalink to this headline">¶</a></h2>
 <p><a class="pageref" href="#validation-test-one">Figure  1</a> shows the results of Test 0001. This
 test places two observation points along a line.
 As discussed above, the GMPE evaluates to 0 (in log units) everywhere.
@@ -109,8 +109,8 @@ deviation, and the red line shows the conditional standard
 deviation.</span></p>
 </div>
 </div>
-<div class="section" id="validation-test-0002">
-<h2>2.3.2. Validation Test 0002<a class="headerlink" href="#validation-test-0002" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="test-0002">
+<h2>2.3.2. Test 0002<a class="headerlink" href="#test-0002" title="Permalink to this headline">¶</a></h2>
 <p>Test 0002 is shown in <a class="pageref" href="#validation-test-two">Figure  2</a>. In this test,
 one observation has an amplitude of +1.0, the other is –1.0. Because of
 the offsetting observations, the bias is again 0. The figure shows that
@@ -129,8 +129,8 @@ deviation, and the red line shows the conditional standard
 deviation.</span></p>
 </div>
 </div>
-<div class="section" id="validation-test-0003">
-<h2>2.3.3. Validation Test 0003<a class="headerlink" href="#validation-test-0003" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="test-0003">
+<h2>2.3.3. Test 0003<a class="headerlink" href="#test-0003" title="Permalink to this headline">¶</a></h2>
 <p>Validation Test 0003 has a single observation with an amplitude of +1.0
 along a line (see <a class="pageref" href="#validation-test-three">Figure  3</a>). Given the GMPE
 within-event standard deviation of 0.8 and
@@ -153,8 +153,8 @@ deviation, and the red line shows the conditional standard
 deviation.</span></p>
 </div>
 </div>
-<div class="section" id="validation-test-0004">
-<h2>2.3.4. Validation Test 0004<a class="headerlink" href="#validation-test-0004" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="test-0004">
+<h2>2.3.4. Test 0004<a class="headerlink" href="#test-0004" title="Permalink to this headline">¶</a></h2>
 <p>Test 0004 uses an identical set up to Test 0003, except there
 are two observations (of amplitude +1.0) at the same location.
 Because the observations are co-located and of the same period,
@@ -175,8 +175,8 @@ deviation, and the red line shows the conditional standard
 deviation. Compare with <a class="pageref" href="#validation-test-three">Figure  3</a>.</span></p>
 </div>
 </div>
-<div class="section" id="validation-test-0005">
-<h2>2.3.5. Validation Test 0005<a class="headerlink" href="#validation-test-0005" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="test-0005">
+<h2>2.3.5. Test 0005<a class="headerlink" href="#test-0005" title="Permalink to this headline">¶</a></h2>
 <p>Test 0005 also has two co-located observations (see Validation
 Test 0004, above), but here they have
 opposite amplitudes of +1.0 and –1.0. The result, shown in
@@ -194,8 +194,8 @@ deviation, and the red line shows the conditional standard
 deviation.</span></p>
 </div>
 </div>
-<div class="section" id="validation-test-0006">
-<h2>2.3.6. Validation Test 0006<a class="headerlink" href="#validation-test-0006" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="test-0006">
+<h2>2.3.6. Test 0006<a class="headerlink" href="#test-0006" title="Permalink to this headline">¶</a></h2>
 <p><a class="pageref" href="#validation-test-six">Figure  6</a> illustrates Validation Test 0006.
 Forty evenly-spaced observations, all with amplitudes of +1.0 are used.
 Most of the observations are to the left of center of the plot (and
@@ -216,8 +216,8 @@ deviation, and the red line shows the conditional standard
 deviation.</span></p>
 </div>
 </div>
-<div class="section" id="validation-test-0007">
-<h2>2.3.7. Validation Test 0007<a class="headerlink" href="#validation-test-0007" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="test-0007">
+<h2>2.3.7. Test 0007<a class="headerlink" href="#test-0007" title="Permalink to this headline">¶</a></h2>
 <p>Validation Test 0007 uses a single observation with an amplitude
 of +1.0. The observation is of spectral acceleration (SA) at a
 period of 1.0 s. The conditional mean SA was
@@ -242,6 +242,78 @@ The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
 deviation, and the red line shows the conditional standard
 deviation.</span></p>
+</div>
+</div>
+<div class="section" id="test-0008">
+<h2>2.3.8. Test 0008<a class="headerlink" href="#test-0008" title="Permalink to this headline">¶</a></h2>
+<p>Validation Test 0008 has a single observation with an amplitude of 1.0,
+as in Test 0003, however the point is given a non-zero uncertainty.
+In this case the stanard deviation is 0.5 (in natural log units). Thus,
+in <a class="pageref" href="#validation-test-eight">Figure  8</a> we see the maximum amplitude
+is somewhat lesss than 1.0 (0.84472) and the minimum standard deviation
+is somewhat
+less than 0.5 (0.44212, to be exact, which is less than the lesser
+of 0.5 and 0.8, the standard deviations
+of the observation and the prediction, respectively). See Equations 42
+and 43 of <a class="reference internal" href="references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a>) for additional
+discussion. Note also that the bias (0.28800) is less than that of
+Test 0003, and the maximum uncertainty (0.94674) is greater. These
+features are consistent with the uncertainty of the observation and
+with the findings of <a class="reference internal" href="references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a>.
+<a class="pageref" href="#validation-test-eight">Figure  8</a> may be compared with
+<a class="pageref" href="#validation-test-three">Figure  3</a>.</p>
+<div class="figure align-left" id="id8">
+<span id="validation-test-eight"></span><a class="reference internal image-reference" href="../_images/validation_test_0008_PGA.png"><img alt="../_images/validation_test_0008_PGA.png" src="../_images/validation_test_0008_PGA.png" style="width: 700px;" /></a>
+<p class="caption"><span class="caption-text">Figure 8: Validation Test 0008. A single observation with an
+amplitude of +1.0, and a standard deviation of 0.5.
+The black line shows the conditional mean, the blue lines
+show the conditional mean +/– the conditional standard
+deviation, and the red line shows the conditional standard
+deviation. Compare with <a class="pageref" href="#validation-test-three">Figure  3</a>.</span></p>
+</div>
+</div>
+<div class="section" id="test-0009">
+<h2>2.3.9. Test 0009<a class="headerlink" href="#test-0009" title="Permalink to this headline">¶</a></h2>
+<p>Test 0009 (see ) has a single
+observation with an amplitude of 1.0, as with Test 0008, but here
+the standard deviation of the observation is 10.0. This large
+uncertainty (‘large’ relative to the GMPE’s within-event standard
+deviation of 0.8) causes the observation to be downweighted to the
+point that it has very little effect on the conditional mean and
+standard deviation. Despite the downweighting, the conditional
+standard deviation is still somewhat less than 1.0 at the location
+of the observation, as expected.</p>
+<div class="figure align-left" id="id9">
+<span id="validation-test-nine"></span><a class="reference internal image-reference" href="../_images/validation_test_0009_PGA.png"><img alt="../_images/validation_test_0009_PGA.png" src="../_images/validation_test_0009_PGA.png" style="width: 700px;" /></a>
+<p class="caption"><span class="caption-text">Figure 9: Validation Test 0009. A single observation with an
+amplitude of +1.0, and a standard deviation of 10.0.
+The black line shows the conditional mean, the blue lines
+show the conditional mean +/– the conditional standard
+deviation, and the red line shows the conditional standard
+deviation. Compare with <a class="pageref" href="#validation-test-three">Figure  3</a>
+and <a class="pageref" href="#validation-test-eight">Figure  8</a>.</span></p>
+</div>
+</div>
+<div class="section" id="test-0010">
+<h2>2.3.10. Test 0010<a class="headerlink" href="#test-0010" title="Permalink to this headline">¶</a></h2>
+<p>As with Tests 0008 and  0009, Test 0010 (see
+<a class="pageref" href="#validation-test-ten">Figure  10</a>) has a single observation
+with an amplitude of 1.0, but here the standard deviation of the
+observation is a small value (0.05), relative to the GMPE’s
+intra-event standard deviation. In this case, we see that the
+values of the bias and conditional mean and standard deviation are
+almost the same as in Test 0003, in which the standard deviation
+of the observation was 0.</p>
+<div class="figure align-left" id="id10">
+<span id="validation-test-ten"></span><a class="reference internal image-reference" href="../_images/validation_test_0010_PGA.png"><img alt="../_images/validation_test_0010_PGA.png" src="../_images/validation_test_0010_PGA.png" style="width: 700px;" /></a>
+<p class="caption"><span class="caption-text">Figure 10: Validation Test 0010. A single observation with an
+amplitude of +1.0, and a standard deviation of 0.05.
+The black line shows the conditional mean, the blue lines
+show the conditional mean +/– the conditional standard
+deviation, and the red line shows the conditional standard
+deviation. Compare with <a class="pageref" href="#validation-test-three">Figure  3</a>,
+<a class="pageref" href="#validation-test-eight">Figure  8</a>, and
+<a class="pageref" href="#validation-test-nine">Figure  9</a>.</span></p>
 </div>
 </div>
 </div>
@@ -278,13 +350,16 @@ deviation.</span></p>
 <li class="toctree-l4"><a class="reference internal" href="tg_architecture.html">2.1. Software Architecture</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tg_formats.html">2.2. Data Formats</a></li>
 <li class="toctree-l4 current"><a class="current reference internal" href="#">2.3. Validation</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#validation-test-0001">2.3.1. Validation Test 0001</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#validation-test-0002">2.3.2. Validation Test 0002</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#validation-test-0003">2.3.3. Validation Test 0003</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#validation-test-0004">2.3.4. Validation Test 0004</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#validation-test-0005">2.3.5. Validation Test 0005</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#validation-test-0006">2.3.6. Validation Test 0006</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#validation-test-0007">2.3.7. Validation Test 0007</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0001">2.3.1. Test 0001</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0002">2.3.2. Test 0002</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0003">2.3.3. Test 0003</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0004">2.3.4. Test 0004</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0005">2.3.5. Test 0005</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0006">2.3.6. Test 0006</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0007">2.3.7. Test 0007</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0008">2.3.8. Test 0008</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0009">2.3.9. Test 0009</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0010">2.3.10. Test 0010</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.4. Guidelines for Contributors</a></li>

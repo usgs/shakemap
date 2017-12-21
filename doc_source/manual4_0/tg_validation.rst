@@ -50,7 +50,7 @@ not work on all systems. The plots can be found in
 *tests/data/eventdata/validation_test_XXXX/current/products* (where
 "*XXXX*" is the number of the test).
 
-Validation Test 0001
+Test 0001
 ====================
 
 :num:`Figure #validation-test-one` shows the results of Test 0001. This
@@ -80,7 +80,7 @@ MVN implementation is not introducing a bias or other anomalies.
    deviation.
 
 
-Validation Test 0002
+Test 0002
 ====================
 
 Test 0002 is shown in :num:`Figure #validation-test-two`. In this test,
@@ -106,7 +106,7 @@ at great distance from the observations.
    deviation, and the red line shows the conditional standard
    deviation.
 
-Validation Test 0003
+Test 0003
 ====================
 
 Validation Test 0003 has a single observation with an amplitude of +1.0
@@ -136,7 +136,7 @@ about 0.93, as seen in :num:`Figure #validation-test-three`.
    deviation, and the red line shows the conditional standard
    deviation.
 
-Validation Test 0004
+Test 0004
 ====================
 
 Test 0004 uses an identical set up to Test 0003, except there
@@ -165,7 +165,7 @@ has only one observation).
    deviation. Compare with :num:`Figure #validation-test-three`.
 
 
-Validation Test 0005
+Test 0005
 ====================
 
 Test 0005 also has two co-located observations (see Validation
@@ -191,7 +191,7 @@ observation with the mean amplitude of the two observations (i.e.,
    deviation.
 
 
-Validation Test 0006
+Test 0006
 ====================
 
 :num:`Figure #validation-test-six` illustrates Validation Test 0006. 
@@ -219,7 +219,7 @@ value of 0.8.
    deviation, and the red line shows the conditional standard
    deviation.
 
-Validation Test 0007
+Test 0007
 ====================
 
 Validation Test 0007 uses a single observation with an amplitude
@@ -252,3 +252,93 @@ standard deviation (which, in our tests is 1.0).
    show the conditional mean +/-- the conditional standard
    deviation, and the red line shows the conditional standard
    deviation.
+
+Test 0008
+====================
+
+Validation Test 0008 has a single observation with an amplitude of 1.0,
+as in Test 0003, however the point is given a non-zero uncertainty.
+In this case the stanard deviation is 0.5 (in natural log units). Thus,
+in :num:`Figure #validation-test-eight` we see the maximum amplitude 
+is somewhat lesss than 1.0 (0.84472) and the minimum standard deviation 
+is somewhat 
+less than 0.5 (0.44212, to be exact, which is less than the lesser 
+of 0.5 and 0.8, the standard deviations 
+of the observation and the prediction, respectively). See Equations 42
+and 43 of :ref:`Worden et al. (2018) <worden2018>`) for additional
+discussion. Note also that the bias (0.28800) is less than that of
+Test 0003, and the maximum uncertainty (0.94674) is greater. These
+features are consistent with the uncertainty of the observation and
+with the findings of :ref:`Worden et al. (2018) <worden2018>`.
+:num:`Figure #validation-test-eight` may be compared with 
+:num:`Figure #validation-test-three`.
+
+
+.. _validation-test-eight:
+
+.. figure:: _static/validation_test_0008_PGA.*
+   :width: 700
+   :align: left
+
+   Validation Test 0008. A single observation with an
+   amplitude of +1.0, and a standard deviation of 0.5.
+   The black line shows the conditional mean, the blue lines
+   show the conditional mean +/-- the conditional standard
+   deviation, and the red line shows the conditional standard
+   deviation. Compare with :num:`Figure #validation-test-three`.
+
+Test 0009
+====================
+
+Test 0009 (see :num:`Figure #validation-test-0009`) has a single 
+observation with an amplitude of 1.0, as with Test 0008, but here
+the standard deviation of the observation is 10.0. This large 
+uncertainty ('large' relative to the GMPE's within-event standard
+deviation of 0.8) causes the observation to be downweighted to the 
+point that it has very little effect on the conditional mean and 
+standard deviation. Despite the downweighting, the conditional 
+standard deviation is still somewhat less than 1.0 at the location
+of the observation, as expected.
+
+
+.. _validation-test-nine:
+
+.. figure:: _static/validation_test_0009_PGA.*
+   :width: 700
+   :align: left
+
+   Validation Test 0009. A single observation with an
+   amplitude of +1.0, and a standard deviation of 10.0.
+   The black line shows the conditional mean, the blue lines
+   show the conditional mean +/-- the conditional standard
+   deviation, and the red line shows the conditional standard
+   deviation. Compare with :num:`Figure #validation-test-three`
+   and :num:`Figure #validation-test-eight`.
+
+Test 0010
+====================
+
+As with Tests 0008 and  0009, Test 0010 (see 
+:num:`Figure #validation-test-ten`) has a single observation
+with an amplitude of 1.0, but here the standard deviation of the 
+observation is a small value (0.05), relative to the GMPE's 
+intra-event standard deviation. In this case, we see that the
+values of the bias and conditional mean and standard deviation are
+almost the same as in Test 0003, in which the standard deviation
+of the observation was 0. 
+
+
+.. _validation-test-ten:
+
+.. figure:: _static/validation_test_0010_PGA.*
+   :width: 700
+   :align: left
+
+   Validation Test 0010. A single observation with an
+   amplitude of +1.0, and a standard deviation of 0.05.
+   The black line shows the conditional mean, the blue lines
+   show the conditional mean +/-- the conditional standard
+   deviation, and the red line shows the conditional standard
+   deviation. Compare with :num:`Figure #validation-test-three`,
+   :num:`Figure #validation-test-eight`, and 
+   :num:`Figure #validation-test-nine`.

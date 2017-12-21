@@ -132,6 +132,10 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        tuple: The paths to the ShakeMap install directory</span>
 <span class="sd">        and the data directory.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        FileNotFoundError -- if the profile file can&#39;t be found.</span>
+<span class="sd">        ValueError -- If the correct profile can&#39;t be foun in profiles.conf.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="s1">&#39;CALLED_FROM_PYTEST&#39;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
         <span class="n">base_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;tests&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
@@ -140,8 +144,15 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.shakemap&#39;</span><span class="p">,</span>
                                    <span class="s1">&#39;profiles.conf&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t find a profile file: &quot;</span>
+                                    <span class="s2">&quot;have you run sm_profile?&quot;</span><span class="p">)</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
         <span class="n">profile_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profile&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">profile_name</span> <span class="ow">or</span> <span class="n">profile_name</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No profile set in the profiles.conf file&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profiles&#39;</span><span class="p">]</span> <span class="ow">or</span> <span class="n">profile_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profiles&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Profile </span><span class="si">%s</span><span class="s2"> not found in list of profiles&quot;</span><span class="p">)</span>
         <span class="n">profile</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profiles&#39;</span><span class="p">][</span><span class="n">profile_name</span><span class="p">]</span>
         <span class="n">install</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;install_path&#39;</span><span class="p">]</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;data_path&#39;</span><span class="p">]</span>

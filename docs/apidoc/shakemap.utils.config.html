@@ -93,10 +93,18 @@ directories.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The paths to the ShakeMap install directory
-and the data directory.</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The paths to the ShakeMap install directory
+and the data directory.</p>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li>FileNotFoundError – if the profile file can’t be found.</li>
+<li>ValueError – If the correct profile can’t be foun in profiles.conf.</li>
+</ul>
+</td>
 </tr>
 </tbody>
 </table>

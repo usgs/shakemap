@@ -19,6 +19,9 @@ export CALLED_FROM_PYTEST
 `./shake validation_test_0005 assemble model xtestplot`
 `./shake validation_test_0006 assemble model xtestplot`
 `./shake validation_test_0007 assemble model xtestplot_spectra`
+`./shake validation_test_0008 assemble model xtestplot`
+`./shake validation_test_0009 assemble model xtestplot`
+`./shake validation_test_0010 assemble model xtestplot`
 
 basepath='../tests/data/eventdata'
 filepath='current/products'
@@ -29,6 +32,9 @@ ev0004='validation_test_0004'
 ev0005='validation_test_0005'
 ev0006='validation_test_0006'
 ev0007='validation_test_0007'
+ev0008='validation_test_0008'
+ev0009='validation_test_0009'
+ev0010='validation_test_0010'
 
 osname=`uname`
 
@@ -39,7 +45,10 @@ if [[ "$osname" == 'Darwin' ]]; then
           $basepath/$ev0004/$filepath/${ev0004}_PGA.pdf \
           $basepath/$ev0005/$filepath/${ev0005}_PGA.pdf \
           $basepath/$ev0006/$filepath/${ev0006}_PGA.pdf \
-          $basepath/$ev0007/$filepath/${ev0007}_spectra_plot.pdf`
+          $basepath/$ev0007/$filepath/${ev0007}_spectra_plot.pdf \
+          $basepath/$ev0008/$filepath/${ev0008}_PGA.pdf \
+          $basepath/$ev0009/$filepath/${ev0009}_PGA.pdf \
+          $basepath/$ev0010/$filepath/${ev0010}_PGA.pdf`
 else
     `xdg-open $basepath/$ev0001/$filepath/${ev0001}_PGA.pdf \
           $basepath/$ev0002/$filepath/${ev0002}_PGA.pdf \
@@ -47,5 +56,8 @@ else
           $basepath/$ev0004/$filepath/${ev0004}_PGA.pdf \
           $basepath/$ev0005/$filepath/${ev0005}_PGA.pdf \
           $basepath/$ev0006/$filepath/${ev0006}_PGA.pdf \
-          $basepath/$ev0007/$filepath/${ev0007}_spectra_plot.pdf &`
+          $basepath/$ev0007/$filepath/${ev0007}_spectra_plot.pdf \
+          $basepath/$ev0008/$filepath/${ev0008}_PGA.pdf \
+          $basepath/$ev0009/$filepath/${ev0009}_PGA.pdf \
+          $basepath/$ev0010/$filepath/${ev0010}_PGA.pdf &`
 fi

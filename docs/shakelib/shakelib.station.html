@@ -187,10 +187,12 @@ arrays of the parameter in question.</p>
 <p>For the standard set of ShakeMap IMTs (mmi, pga, pgv, psa03, psa10,
 psa30), the keys in the dictionary would be:</p>
 <p>‘id’, ‘network’, ‘code’, ‘name’, ‘lat’, ‘lon’, ‘elev’, ‘vs30’,
-‘instrumented’, ‘PGA’, ‘PGV’, ‘SA(0.3)’, ‘SA(1.0)’, ‘SA(3.0)’</p>
+‘stddev’, ‘instrumented’, ‘PGA’, ‘PGA_sd’, ‘PGV’, ‘PGA_sd’,
+‘SA(0.3)’, ‘SA(0.3)_sd, ‘SA(1.0)’, ‘SA(1.0)_sd, ‘SA(3.0)’,
+‘SA(3.0)_sd’</p>
 <p>For the non-instrumented dictionary, the keys would be:</p>
 <p>‘id’, ‘network’, ‘code’, ‘name’, ‘lat’, ‘lon’, ‘elev’, ‘vs30’,
-‘instrumented’, ‘MMI’</p>
+‘stddev’, ‘instrumented’, ‘MMI’, ‘MMI_sd’</p>
 <p>The <strong>id</strong> column is <strong>network</strong> and <strong>code</strong> concatenated with a
 period (“.”) between them.</p>
 <p>All ground motion units are natural log units. Distances are in km.</p>

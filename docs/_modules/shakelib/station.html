@@ -47,6 +47,7 @@
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -65,6 +66,7 @@
          <span class="p">(</span><span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;elev&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;stddev&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;instrumented&#39;</span><span class="p">,</span> <span class="s1">&#39;int&#39;</span><span class="p">)</span>
      <span class="p">))</span>
      <span class="p">),</span>
@@ -82,7 +84,7 @@
          <span class="p">(</span><span class="s1">&#39;original_channel&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;orientation&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;amp&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
-         <span class="p">(</span><span class="s1">&#39;uncertainty&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
+         <span class="p">(</span><span class="s1">&#39;stddev&#39;</span><span class="p">,</span> <span class="s1">&#39;float&#39;</span><span class="p">),</span>
          <span class="p">(</span><span class="s1">&#39;flag&#39;</span><span class="p">,</span> <span class="s1">&#39;str&#39;</span><span class="p">)</span>
      <span class="p">))</span>
      <span class="p">)</span>
@@ -395,16 +397,20 @@
                 <span class="n">vs30</span> <span class="o">=</span> <span class="n">station_attributes</span><span class="p">[</span><span class="s1">&#39;vs30&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">vs30</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="s1">&#39;stddev&#39;</span> <span class="ow">in</span> <span class="n">station_attributes</span><span class="p">:</span>
+                <span class="n">stddev</span> <span class="o">=</span> <span class="n">station_attributes</span><span class="p">[</span><span class="s1">&#39;stddev&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stddev</span> <span class="o">=</span> <span class="mi">0</span>
 
             <span class="n">instrumented</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">network</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CIIM_TUPLE</span><span class="p">)</span>
 
             <span class="n">station_rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sta_id</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span>
-                                 <span class="n">elev</span><span class="p">,</span> <span class="n">vs30</span><span class="p">,</span> <span class="n">instrumented</span><span class="p">))</span>
+                                 <span class="n">elev</span><span class="p">,</span> <span class="n">vs30</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">instrumented</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
             <span class="s1">&#39;INSERT INTO station (id, network, code, name, lat, lon, &#39;</span>
-            <span class="s1">&#39;elev, vs30, instrumented) VALUES &#39;</span>
-            <span class="s1">&#39;(?, ?, ?, ?, ?, ?, ?, ?, ?)&#39;</span><span class="p">,</span> <span class="n">station_rows</span>
+            <span class="s1">&#39;elev, vs30, stddev, instrumented) VALUES &#39;</span>
+            <span class="s1">&#39;(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&#39;</span><span class="p">,</span> <span class="n">station_rows</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
 
@@ -441,6 +447,7 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">amp_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">amp_id</span><span class="p">)</span>
                     <span class="n">amp</span> <span class="o">=</span> <span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                    <span class="n">stddev</span> <span class="o">=</span> <span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;stddev&#39;</span><span class="p">]</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">amp</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">amp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
                         <span class="n">amp</span> <span class="o">=</span> <span class="s1">&#39;NULL&#39;</span>
@@ -453,11 +460,12 @@
                         <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amp</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span>
 
                     <span class="n">amp_rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sta_id</span><span class="p">,</span> <span class="n">imtid</span><span class="p">,</span> <span class="n">original_channel</span><span class="p">,</span>
-                                     <span class="n">orientation</span><span class="p">,</span> <span class="n">amp</span><span class="p">,</span> <span class="n">flag</span><span class="p">))</span>
+                                     <span class="n">orientation</span><span class="p">,</span> <span class="n">amp</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">flag</span><span class="p">))</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
             <span class="s1">&#39;INSERT INTO amp (station_id, imt_id, original_channel, &#39;</span>
-            <span class="s1">&#39;orientation, amp, flag) VALUES (?, ?, ?, ?, ?, ?)&#39;</span><span class="p">,</span> <span class="n">amp_rows</span>
+            <span class="s1">&#39;orientation, amp, stddev, flag) VALUES (?, ?, ?, ?, ?, ?, ?)&#39;</span><span class="p">,</span>
+            <span class="n">amp_rows</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
         <span class="k">return</span>
@@ -485,12 +493,14 @@
 <span class="sd">        psa30), the keys in the dictionary would be:</span>
 
 <span class="sd">        &#39;id&#39;, &#39;network&#39;, &#39;code&#39;, &#39;name&#39;, &#39;lat&#39;, &#39;lon&#39;, &#39;elev&#39;, &#39;vs30&#39;,</span>
-<span class="sd">        &#39;instrumented&#39;, &#39;PGA&#39;, &#39;PGV&#39;, &#39;SA(0.3)&#39;, &#39;SA(1.0)&#39;, &#39;SA(3.0)&#39;</span>
+<span class="sd">        &#39;stddev&#39;, &#39;instrumented&#39;, &#39;PGA&#39;, &#39;PGA_sd&#39;, &#39;PGV&#39;, &#39;PGA_sd&#39;, </span>
+<span class="sd">        &#39;SA(0.3)&#39;, &#39;SA(0.3)_sd, &#39;SA(1.0)&#39;, &#39;SA(1.0)_sd, &#39;SA(3.0)&#39;,</span>
+<span class="sd">        &#39;SA(3.0)_sd&#39;</span>
 
 <span class="sd">        For the non-instrumented dictionary, the keys would be:</span>
 
 <span class="sd">        &#39;id&#39;, &#39;network&#39;, &#39;code&#39;, &#39;name&#39;, &#39;lat&#39;, &#39;lon&#39;, &#39;elev&#39;, &#39;vs30&#39;,</span>
-<span class="sd">        &#39;instrumented&#39;, &#39;MMI&#39;</span>
+<span class="sd">        &#39;stddev&#39;, &#39;instrumented&#39;, &#39;MMI&#39;, &#39;MMI_sd&#39;</span>
 
 <span class="sd">        The **id** column is **network** and **code** concatenated with a</span>
 <span class="sd">        period (&quot;.&quot;) between them.</span>
@@ -528,6 +538,7 @@
                <span class="p">(</span><span class="ow">not</span> <span class="n">instrumented</span> <span class="ow">and</span> <span class="s1">&#39;MMI&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imt</span><span class="p">):</span>
                 <span class="k">continue</span>
             <span class="n">df</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">nstation_rows</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">)</span>
+            <span class="n">df</span><span class="p">[</span><span class="n">imt</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">nstation_rows</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
 
         <span class="n">id_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">],</span> <span class="nb">range</span><span class="p">(</span><span class="n">nstation_rows</span><span class="p">)))</span>
 
@@ -535,7 +546,7 @@
         <span class="c1"># Get all of the unflagged amps with the proper orientation</span>
         <span class="c1">#</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-            <span class="s1">&#39;SELECT a.amp, i.imt_type, a.station_id FROM &#39;</span>
+            <span class="s1">&#39;SELECT a.amp, i.imt_type, a.station_id, a.stddev FROM &#39;</span>
             <span class="s1">&#39;amp a, station s, imt i WHERE a.flag = &quot;0&quot; &#39;</span>
             <span class="s1">&#39;AND s.id = a.station_id &#39;</span>
             <span class="s1">&#39;AND a.imt_id = i.id &#39;</span>
@@ -554,8 +565,10 @@
             <span class="n">rowidx</span> <span class="o">=</span> <span class="n">id_dict</span><span class="p">[</span><span class="n">this_row</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
             <span class="n">cval</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">this_row</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">rowidx</span><span class="p">]</span>
             <span class="n">amp</span> <span class="o">=</span> <span class="n">this_row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">stddev</span> <span class="o">=</span> <span class="n">this_row</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">cval</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">cval</span> <span class="o">&lt;</span> <span class="n">amp</span><span class="p">):</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">this_row</span><span class="p">[</span><span class="mi">1</span><span class="p">]][</span><span class="n">rowidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">amp</span>
+                <span class="n">df</span><span class="p">[</span><span class="n">this_row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">][</span><span class="n">rowidx</span><span class="p">]</span> <span class="o">=</span> <span class="n">stddev</span>
 
         <span class="k">return</span> <span class="n">df</span></div>
 
@@ -618,19 +631,25 @@
                 <span class="k">try</span><span class="p">:</span>
                     <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pgm</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Unknown value in XML: &#39;</span><span class="p">,</span> <span class="n">pgm</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Unknown value in XML: &#39;</span><span class="p">,</span> <span class="n">pgm</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
                           <span class="s1">&#39; for amp &#39;</span><span class="p">,</span> <span class="n">pgm</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
                     <span class="k">continue</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No value for amp &#39;</span><span class="p">,</span> <span class="n">pgm</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No value for amp &#39;</span><span class="p">,</span> <span class="n">pgm</span><span class="o">.</span><span class="n">tag</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="s1">&#39;flag&#39;</span> <span class="ow">in</span> <span class="n">pgm</span><span class="o">.</span><span class="n">attrib</span> <span class="ow">and</span> <span class="n">pgm</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
                 <span class="n">flag</span> <span class="o">=</span> <span class="n">pgm</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
-            <span class="n">pgmdict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span> <span class="s1">&#39;flag&#39;</span><span class="p">:</span> <span class="n">flag</span><span class="p">}</span>
+            <span class="k">if</span> <span class="s1">&#39;ln_stddev&#39;</span> <span class="ow">in</span> <span class="n">pgm</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">stddev</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pgm</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;ln_stddev&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stddev</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">pgmdict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span> 
+                            <span class="s1">&#39;flag&#39;</span><span class="p">:</span> <span class="n">flag</span><span class="p">,</span> 
+                            <span class="s1">&#39;stddev&#39;</span><span class="p">:</span> <span class="n">stddev</span><span class="p">}</span>
             <span class="n">imtset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">pgmdict</span><span class="p">,</span> <span class="n">imtset</span>
+        <span class="k">return</span> <span class="n">pgmdict</span><span class="p">,</span> <span class="n">imtset</span><span class="p">,</span> <span class="n">imt_translate</span>
 
     <span class="k">def</span> <span class="nf">_filter_station</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmlfile</span><span class="p">,</span> <span class="n">stationdict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -656,9 +675,16 @@
                 <span class="c1"># DYFI-type station or a station with instruments measuring</span>
                 <span class="c1"># PGA, PGV, etc.</span>
                 <span class="n">attributes</span> <span class="o">=</span> <span class="n">station</span><span class="o">.</span><span class="n">attrib</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="n">netid</span> <span class="o">=</span> <span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s1">&#39;netid&#39;</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+                    <span class="n">netid</span> <span class="o">=</span> <span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">netid</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                 <span class="n">instrumented</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">netid</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CIIM_TUPLE</span><span class="p">)</span>
 
+                <span class="k">if</span> <span class="s1">&#39;code&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                            <span class="s1">&#39;Station does not have station code: skipping&#39;</span><span class="p">)</span>
+                    <span class="k">continue</span>
                 <span class="n">code</span> <span class="o">=</span> <span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">code</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">netid</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">):</span>
                     <span class="n">sta_id</span> <span class="o">=</span> <span class="n">code</span>
@@ -671,11 +697,17 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">compdict</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">station</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s1">&#39;name&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">comp</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                        <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                                <span class="s1">&#39;Unnamed component for station </span><span class="si">%s</span><span class="s1">; skipping&#39;</span>
+                                <span class="o">%</span> <span class="p">(</span><span class="n">sta_id</span><span class="p">))</span>
+                        <span class="k">continue</span>
                     <span class="n">compname</span> <span class="o">=</span> <span class="n">comp</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
                     <span class="k">if</span> <span class="s1">&#39;Intensity Questionnaire&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">compname</span><span class="p">):</span>
                         <span class="n">compdict</span><span class="p">[</span><span class="s1">&#39;mmi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
                         <span class="k">continue</span>
-                    <span class="n">tpgmdict</span><span class="p">,</span> <span class="n">ims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getGroundMotions</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">imt_translate</span><span class="p">)</span>
+                    <span class="n">tpgmdict</span><span class="p">,</span> <span class="n">ims</span><span class="p">,</span> <span class="n">imt_translate</span> <span class="o">=</span> \
+                            <span class="bp">self</span><span class="o">.</span><span class="n">_getGroundMotions</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">imt_translate</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">compname</span> <span class="ow">in</span> <span class="n">compdict</span><span class="p">:</span>
                         <span class="n">pgmdict</span> <span class="o">=</span> <span class="n">compdict</span><span class="p">[</span><span class="n">compname</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
@@ -688,8 +720,13 @@
                 <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;intensity&#39;</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">instrumented</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
                     <span class="k">if</span> <span class="s1">&#39;mmi&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">compdict</span><span class="p">:</span>
                         <span class="n">compdict</span><span class="p">[</span><span class="s1">&#39;mmi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">if</span> <span class="s1">&#39;intensity_stddev&#39;</span> <span class="ow">in</span> <span class="n">attributes</span><span class="p">:</span>
+                        <span class="n">stddev</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;intensity_stddev&#39;</span><span class="p">])</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">stddev</span> <span class="o">=</span> <span class="mi">0</span>
                     <span class="n">compdict</span><span class="p">[</span><span class="s1">&#39;mmi&#39;</span><span class="p">][</span><span class="s1">&#39;MMI&#39;</span><span class="p">]</span> <span class="o">=</span> \
                         <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;intensity&#39;</span><span class="p">]),</span>
+                         <span class="s1">&#39;stddev&#39;</span><span class="p">:</span> <span class="n">stddev</span><span class="p">,</span>
                          <span class="s1">&#39;flag&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">}</span>
                     <span class="n">imtset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
                 <span class="n">stationdict</span><span class="p">[</span><span class="n">sta_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">attributes</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">compdict</span><span class="p">))</span>

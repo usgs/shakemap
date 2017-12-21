@@ -43,8 +43,20 @@ from shakemap._version import get_versions
 # TODO: Some constants; these should maybe be in a configuration
 # or in a constants module or be GMICE-specific.
 #
-SM_CONSTS = {'default_mmi_std': 0.3,
-             'min_mmi_convert': 4.0}
+# default_mmi_stddev: the standard deviation of MMI values if it
+#                     is not specified in the input
+# min_mmi_convert: the minimum MMI to convert to PGM -- low 
+#                  intensities don't convert very accurately
+# default_stddev_inter: This is a stand-in for tau when the gmpe set 
+#                       doesn't provide it. It is an educated guess 
+#                       based on the NGA-east work and BC Hydro gmpe.
+#                       It's not perfect, but probably isn't too far off. 
+#                       It is only used when the GMPEs don't provide a 
+#                       breakdown of the uncertainty terms.
+#
+SM_CONSTS = {'default_mmi_stddev': 0.3,
+             'min_mmi_convert': 4.0,
+             'default_stddev_inter': 0.35}
 
 
 class ModelModule(CoreModule):
@@ -251,7 +263,7 @@ class ModelModule(CoreModule):
                 #
                 imt_in_str_dict[ndf] = set(
                     [x for x in df.keys() if x in ('PGA', 'PGV', 'MMI') or
-                     x.startswith('SA(')])
+                     (x.startswith('SA(') and not x.endswith('_sd'))])
                 imt_in_dict[ndf] = set(
                     [imt.from_string(x) for x in imt_in_str_dict[ndf]])
                 imt_in_str_set |= imt_in_str_dict[ndf]
@@ -277,7 +289,7 @@ class ModelModule(CoreModule):
                     df[imtstr + '_pred'] = pmean
                     df[imtstr + '_pred_sigma'] = pstddev[0]
                     if total_sd_only is True:
-                        tau_guess = get_default_std_inter()
+                        tau_guess = SM_CONSTS['default_stddev_inter']
                         df[imtstr + '_pred_tau'] = np.full_like(
                             df[imtstr + '_pred'], tau_guess)
                         df[imtstr + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
@@ -314,15 +326,11 @@ class ModelModule(CoreModule):
                                                            False,
                                                            dtype=np.bool)
                     #
-                    # Make the uncertainty arrays for any IMTs that don't
-                    # have them.
+                    # If uncertainty hasn't been set for MMI, give it
+                    # the default value
                     #
-                    if (imtstr + '_sd') not in df:
-                        if imtstr == 'MMI':
-                            sdval = SM_CONSTS['default_mmi_std']
-                        else:
-                            sdval = 0.0
-                        df[imtstr + '_sd'] = np.full_like(df['lon'], sdval)
+                    if imtstr == 'MMI' and all(df['MMI_sd'] == 0):
+                        df['MMI_sd'][:] = SM_CONSTS['default_mmi_stddev']
                 #
                 # Get the lons/lats in radians while we're at it
                 #
@@ -374,7 +382,7 @@ class ModelModule(CoreModule):
                     df2[imtstr + '_pred'] = pmean
                     df2[imtstr + '_pred_sigma'] = pstddev[0]
                     if total_sd_only is True:
-                        tau_guess = get_default_std_inter()
+                        tau_guess = SM_CONSTS['default_stddev_inter']
                         df2[imtstr + '_pred_tau'] = np.full_like(
                             df2[imtstr + '_pred'], tau_guess)
                         df2[imtstr + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
@@ -431,7 +439,7 @@ class ModelModule(CoreModule):
                 df1['MMI' + '_pred'] = pmean
                 df1['MMI' + '_pred_sigma'] = pstddev[0]
                 if total_sd_only is True:
-                    tau_guess = get_default_std_inter()
+                    tau_guess = SM_CONSTS['default_stddev_inter']
                     df1['MMI' + '_pred_tau'] = np.full_like(
                         df1['MMI' + '_pred'], tau_guess)
                     df1['MMI' + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
@@ -470,6 +478,7 @@ class ModelModule(CoreModule):
         sta_lats_rad = {}
         sta_resids = {}
         sta_phi = {}
+        sta_sig_extra = {}
         sta_sig_total = {}
         sta_tau = {}
         sta_imtstr = {}
@@ -498,7 +507,7 @@ class ModelModule(CoreModule):
             lats_rad = []
             resids = []
             phi = []
-            sig_total = []
+            sig_extra = []
             tau = []
             imtlist = []
             for ndf, sdf in df_dict.items():
@@ -517,8 +526,7 @@ class ModelModule(CoreModule):
                         tau.append(sdf[imtin + '_pred_tau'][i])
                         _phi = sdf[imtin + '_pred_phi'][i]
                         phi.append(_phi)
-                        sig_total.append(
-                            np.sqrt(_phi**2 + sdf[imtin + '_sd'][i]**2))
+                        sig_extra.append(sdf[imtin + '_sd'][i])
             sta_imtstr[imtstr] = np.array(imtlist)
             sta_period_ix[imtstr] = np.array(period_ix).reshape((-1, 1))
             sta_lons_rad[imtstr] = np.array(lons_rad).reshape((-1, 1))
@@ -526,7 +534,9 @@ class ModelModule(CoreModule):
             sta_resids[imtstr] = np.array(resids).reshape((-1, 1))
             sta_tau[imtstr] = np.array(tau).reshape((-1, 1))
             sta_phi[imtstr] = np.array(phi).reshape((-1, 1))
-            sta_sig_total[imtstr] = np.array(sig_total).reshape((-1, 1))
+            sta_sig_extra[imtstr] = np.array(sig_extra).reshape((-1, 1))
+            sta_sig_total[imtstr] = np.sqrt(
+                    sta_phi[imtstr]**2 + sta_sig_extra[imtstr]**2)
             if len(lons_rad) == 0:
                 bias_num[imtstr] = 0.0
                 bias_den[imtstr] = 0.0
@@ -534,7 +544,7 @@ class ModelModule(CoreModule):
             #
             # This builds the omega factors to apply to the covariance
             #
-            corr_adj[imtstr] = (sta_phi[imtstr] / sta_sig_total[imtstr])
+            corr_adj[imtstr] = sta_phi[imtstr] / sta_sig_total[imtstr]
             corr_adj22 = corr_adj[imtstr] * corr_adj[imtstr].T
             np.fill_diagonal(corr_adj22, 1.0)
             #
@@ -548,8 +558,9 @@ class ModelModule(CoreModule):
             t1_22 = np.tile(sta_period_ix[imtstr], (1, d22_cols))
             t2_22 = np.tile(sta_period_ix[imtstr].T, (d22_rows, 1))
             corr22[imtstr] = \
-                ccf.getCorrelation(t1_22, t2_22, dist22) * corr_adj22
-            sigma22 = corr22[imtstr] * (sta_phi[imtstr] * sta_phi[imtstr].T)
+                ccf.getCorrelation(t1_22, t2_22, dist22)
+            sigma22 = corr22[imtstr] * corr_adj22 * \
+                    (sta_phi[imtstr] * sta_phi[imtstr].T)
             sigma22inv = np.linalg.pinv(sigma22)
             #
             # Compute the bias numerator and denominator pieces
@@ -561,11 +572,19 @@ class ModelModule(CoreModule):
                 #
                 out_ix_arr = np.full_like(sta_period_ix[imtstr], outperiod_ix)
                 dist_arr = np.zeros_like(out_ix_arr, dtype=float)
-                P = ccf.getCorrelation(sta_period_ix[imtstr], out_ix_arr,
-                                       dist_arr)
-                bias_den[imtstr] = P.T.dot(sigma22inv.dot(P))
+                Z = ccf.getCorrelation(sta_period_ix[imtstr], out_ix_arr,
+                                       dist_arr) 
+                #
+                # Scale the correlation factor (Z) by the correlation
+                # adjustment due to observational uncertainty
+                #
+                Z *= corr_adj[imtstr]
+                #
+                # Compute the bias denominator and numerator terms
+                #
+                bias_den[imtstr] = Z.T.dot(sigma22inv.dot(Z))
                 bias_num[imtstr] = \
-                    P.T.dot(sigma22inv.dot(P * sta_resids[imtstr]))
+                    Z.T.dot(sigma22inv.dot(Z * sta_resids[imtstr]))
             else:
                 bias_num[imtstr] = 0.0
                 bias_den[imtstr] = 0.0
@@ -616,9 +635,9 @@ class ModelModule(CoreModule):
             #
             if total_sd_only is True:
                 psd[imtstr] = np.sqrt(pout_sd[0]**2 -
-                                      get_default_std_inter()**2)
+                                      SM_CONSTS['default_stddev_inter']**2)
                 tsd[imtstr] = np.full_like(psd[imtstr],
-                                           get_default_std_inter())
+                                           SM_CONSTS['default_stddev_inter'])
             else:
                 psd[imtstr] = pout_sd[2]
                 tsd[imtstr] = pout_sd[1]
@@ -633,7 +652,8 @@ class ModelModule(CoreModule):
             psd[imtstr] = np.sqrt(psd[imtstr]**2 + out_bias_var)
             pout_sd2 += out_bias_var
             #
-            # Unbias the residual array
+            # Unbias the station residuals and compute the 
+            # new phi that includes the variance of the bias
             #
             for i in range(np.size(sta_lons_rad[imtstr])):
                 imtin = sta_imtstr[imtstr][i]
@@ -644,14 +664,24 @@ class ModelModule(CoreModule):
                 sta_phi[imtstr][i, 0] = np.sqrt(sta_phi[imtstr][i, 0]**2 +
                                                 in_bias_var)
             #
+            # Update the omega factors to account for the bias and the
+            # new value of phi
+            #
+            corr_adj[imtstr] = sta_phi[imtstr] / \
+                    np.sqrt(sta_phi[imtstr]**2 + sta_sig_extra[imtstr]**2)
+            corr_adj22 = corr_adj[imtstr] * corr_adj[imtstr].T
+            np.fill_diagonal(corr_adj22, 1.0)
+            #
+            # Rebuild sigma22_inv now that we have updated phi and 
+            # the correlation adjustment factors
+            #
+            sigma22 = corr22[imtstr] * corr_adj22 * \
+                    (sta_phi[imtstr] * sta_phi[imtstr].T)
+            sigma22inv = np.linalg.pinv(sigma22)
+            #
             # Now do the MVN itself...
             #
             dtime = mtime = ddtime = ctime = stime = atime = 0
-            #
-            # Rebuild sigma22_inv now that we have updated phi
-            #
-            sigma22 = corr22[imtstr] * (sta_phi[imtstr] * sta_phi[imtstr].T)
-            sigma22inv = np.linalg.pinv(sigma22)
 
             ampgrid = np.zeros_like(pout_mean)
             sdgrid = np.zeros_like(pout_mean)
@@ -673,23 +703,34 @@ class ModelModule(CoreModule):
                 corr12 = ccf.getCorrelation(t1_12, t2_12, dist12)
                 ctime += time.time() - time4
                 time4 = time.time()
-                # ss is the standard deviation of the sites
+                # sdarr is the standard deviation of the output sites
                 sdarr = psd[imtstr][iy, :].reshape((1, -1))
                 # ss is the standard deviation of the stations
                 ss = sta_phi[imtstr]
                 sigma12 = ne.evaluate("corr12 * corr_adj12 * (ss * sdarr)").T
                 stime += time.time() - time4
                 time4 = time.time()
+                #
+                # Sigma12 * Sigma22^-1 is known as the 'regression 
+                # coefficient' matrix (rcmatrix)
+                #
                 rcmatrix = sigma12.dot(sigma22inv)
                 dtime += time.time() - time4
                 time4 = time.time()
+                #
+                # This is the MVN solution for the conditional mean
+                #
+                adj_resid = corr_adj[imtstr] * sta_resids[imtstr]
                 ampgrid[iy, :] = \
-                    pout_mean[iy, :] + \
-                    (corr_adj12.T *
-                     rcmatrix).dot(sta_resids[imtstr]).reshape((-1,))
+                    pout_mean[iy, :] + rcmatrix.dot(adj_resid).reshape((-1,))
                 atime += time.time() - time4
                 time4 = time.time()
-#        sdgrid[ss:se] = pout_sd2[ss:se] - np.diag(rcmatrix.dot(sigma12))
+                #
+                # We only want the diagonal elements of the conditional
+                # covariance matrix, so there is no point in doing the 
+                # full solution with the dot product, e.g.:
+                # sdgrid[ss:se] = pout_sd2[ss:se] - np.diag(rcmatrix.dot(sigma12))
+                #
                 sdgrid[iy, :] = \
                     pout_sd2[iy, :] - np.sum(rcmatrix * sigma12, axis=1)
                 mtime += time.time() - time4
@@ -1401,20 +1442,3 @@ def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
         pe = gmpe
     return pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
 
-
-#
-# This is a stand-in for tau when the gmpe set doesn't provide it
-# It is an educated guess based on the NGA-east work and BC Hydro
-# gmpe. It's not perfect, but probably isn't too far off. It is
-# only used when the GMPEs don't provide a breakdown of the
-# uncertainty terms.
-#
-def get_default_std_inter():
-    """
-    This is a stand-in for tau when the gmpe set doesn't provide it
-    It is an educated guess based on the NGA-east work and BC Hydro
-    gmpe. It's not perfect, but probably isn't too far off. It is
-    only used when the GMPEs don't provide a breakdown of the
-    uncertainty terms.
-    """
-    return 0.35
