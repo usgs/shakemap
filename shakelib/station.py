@@ -588,11 +588,11 @@ class StationList(object):
                 try:
                     value = float(pgm.attrib['value'])
                 except ValueError:
-                    logging.warn('Unknown value in XML: ', pgm.attrib['value'],
-                          ' for amp ', pgm.tag)
+                    logging.warn('Unknown value in XML: %s for amp: %s' %
+                                 (pgm.attrib['value'], pgm.tag))
                     continue
             else:
-                logging.warn('No value for amp ', pgm.tag)
+                logging.warn('No value for amp %s' % pgm.tag)
                 continue
             if 'flag' in pgm.attrib and pgm.attrib['flag'] != '':
                 flag = pgm.attrib['flag']
