@@ -109,7 +109,6 @@ dependencies:
 - olefile=0.44
 - openblas=0.2.20
 - openjpeg=2.1.2
-- openquake.engine=2.8.0
 - openssl=1.0.2n
 - owslib=0.15.0
 - pandas=0.21.1
