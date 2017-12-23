@@ -470,8 +470,8 @@ class ModelModule(CoreModule):
         bias_den = {}   # The denominator term of the bias
         outgrid = {}
         outsd = {}
-        psd = {}
-        tsd = {}
+        psd = {}        # phi of the output points
+        tsd = {}        # tau of the output points
 
         sta_period_ix = {}
         sta_lons_rad = {}
@@ -510,6 +510,7 @@ class ModelModule(CoreModule):
             sig_extra = []
             tau = []
             imtlist = []
+            rrups = []
             for ndf, sdf in df_dict.items():
                 if not sdf:
                     continue
@@ -527,6 +528,7 @@ class ModelModule(CoreModule):
                         _phi = sdf[imtin + '_pred_phi'][i]
                         phi.append(_phi)
                         sig_extra.append(sdf[imtin + '_sd'][i])
+                        rrups.append(sdf['rrup'][i])
             sta_imtstr[imtstr] = np.array(imtlist)
             sta_period_ix[imtstr] = np.array(period_ix).reshape((-1, 1))
             sta_lons_rad[imtstr] = np.array(lons_rad).reshape((-1, 1))
@@ -542,25 +544,35 @@ class ModelModule(CoreModule):
                 bias_den[imtstr] = 0.0
                 continue
             #
+            # Get the distance-limited set of data
+            #
+            dindx = np.array(rrups) <= bias_max_range
+            sta_phi_dl = sta_phi[imtstr][dindx].reshape((-1, 1))
+            sta_tau_dl = sta_tau[imtstr][dindx].reshape((-1, 1))
+            sta_sig_total_dl = sta_sig_total[imtstr][dindx].reshape((-1, 1))
+            sta_lons_rad_dl = sta_lons_rad[imtstr][dindx].reshape((-1, 1))
+            sta_lats_rad_dl = sta_lats_rad[imtstr][dindx].reshape((-1, 1))
+            sta_period_ix_dl = sta_period_ix[imtstr][dindx].reshape((-1, 1))
+            sta_resids_dl = sta_resids[imtstr][dindx].reshape((-1, 1))
+            #
             # This builds the omega factors to apply to the covariance
             #
-            corr_adj[imtstr] = sta_phi[imtstr] / sta_sig_total[imtstr]
+            corr_adj[imtstr] = sta_phi_dl / sta_sig_total_dl
             corr_adj22 = corr_adj[imtstr] * corr_adj[imtstr].T
             np.fill_diagonal(corr_adj22, 1.0)
             #
             # Build the covariance matrix of the residuals
             #
-            dist22 = geodetic_distance_fast(sta_lons_rad[imtstr],
-                                            sta_lats_rad[imtstr],
-                                            sta_lons_rad[imtstr].T,
-                                            sta_lats_rad[imtstr].T)
+            dist22 = geodetic_distance_fast(sta_lons_rad_dl,
+                                            sta_lats_rad_dl,
+                                            sta_lons_rad_dl.T,
+                                            sta_lats_rad_dl.T)
             d22_rows, d22_cols = np.shape(dist22)  # should be square
-            t1_22 = np.tile(sta_period_ix[imtstr], (1, d22_cols))
-            t2_22 = np.tile(sta_period_ix[imtstr].T, (d22_rows, 1))
-            corr22[imtstr] = \
-                ccf.getCorrelation(t1_22, t2_22, dist22)
+            t1_22 = np.tile(sta_period_ix_dl, (1, d22_cols))
+            t2_22 = np.tile(sta_period_ix_dl.T, (d22_rows, 1))
+            corr22[imtstr] = ccf.getCorrelation(t1_22, t2_22, dist22)
             sigma22 = corr22[imtstr] * corr_adj22 * \
-                    (sta_phi[imtstr] * sta_phi[imtstr].T)
+                    (sta_phi_dl * sta_phi_dl.T)
             sigma22inv = np.linalg.pinv(sigma22)
             #
             # Compute the bias numerator and denominator pieces
@@ -570,9 +582,9 @@ class ModelModule(CoreModule):
                 #
                 # Get the correlation between the inputs and outputs
                 #
-                out_ix_arr = np.full_like(sta_period_ix[imtstr], outperiod_ix)
+                out_ix_arr = np.full_like(sta_period_ix_dl, outperiod_ix)
                 dist_arr = np.zeros_like(out_ix_arr, dtype=float)
-                Z = ccf.getCorrelation(sta_period_ix[imtstr], out_ix_arr,
+                Z = ccf.getCorrelation(sta_period_ix_dl, out_ix_arr,
                                        dist_arr) 
                 #
                 # Scale the correlation factor (Z) by the correlation
@@ -584,12 +596,12 @@ class ModelModule(CoreModule):
                 #
                 bias_den[imtstr] = Z.T.dot(sigma22inv.dot(Z))
                 bias_num[imtstr] = \
-                    Z.T.dot(sigma22inv.dot(Z * sta_resids[imtstr]))
+                    Z.T.dot(sigma22inv.dot(Z * sta_resids_dl))
             else:
                 bias_num[imtstr] = 0.0
                 bias_den[imtstr] = 0.0
 
-            nom_tau = np.mean(sta_tau[imtstr].flatten())
+            nom_tau = np.mean(sta_tau_dl.flatten())
             nom_variance = 1.0 / ((1.0 / nom_tau**2) + bias_den[imtstr])
             nominal_bias[imtstr] = bias_num[imtstr] * nom_variance
             bias_time = time.time() - time1
@@ -671,6 +683,18 @@ class ModelModule(CoreModule):
                     np.sqrt(sta_phi[imtstr]**2 + sta_sig_extra[imtstr]**2)
             corr_adj22 = corr_adj[imtstr] * corr_adj[imtstr].T
             np.fill_diagonal(corr_adj22, 1.0)
+            #
+            # Re-build the covariance matrix of the residuals with
+            # the full set of data
+            #
+            dist22 = geodetic_distance_fast(sta_lons_rad[imtstr],
+                                            sta_lats_rad[imtstr],
+                                            sta_lons_rad[imtstr].T,
+                                            sta_lats_rad[imtstr].T)
+            d22_rows, d22_cols = np.shape(dist22)  # should be square
+            t1_22 = np.tile(sta_period_ix[imtstr], (1, d22_cols))
+            t2_22 = np.tile(sta_period_ix[imtstr].T, (d22_rows, 1))
+            corr22[imtstr] = ccf.getCorrelation(t1_22, t2_22, dist22)
             #
             # Rebuild sigma22_inv now that we have updated phi and 
             # the correlation adjustment factors
