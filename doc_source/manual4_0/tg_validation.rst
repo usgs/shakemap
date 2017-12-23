@@ -352,9 +352,11 @@ the central observation has an amplitude of 0.75, while the
 other four observations have amplitudes of 1.0. All five have 
 a standard 
 deviation of 0.2. The spacing of the higher amplitudes was 
-chosen to exert an strong influence on the central observation, 
-but for its conditional mean to approach its amplitude (0.75) 
-from below, but not reach or exceed it.
+chosen to exert a strong influence on the amplitude at the 
+location of the central observation,
+but despite that influence its conditional mean should approach 
+the observational amplitude (0.75) from below, but not reach or 
+exceed it.
 
 
 .. _validation-test-eleven:
@@ -371,3 +373,34 @@ from below, but not reach or exceed it.
    show the conditional mean +/-- the conditional standard
    deviation, and the red line shows the conditional standard
    deviation.
+
+Test 0012
+====================
+
+Like Test 0011, Test 0012 (see 
+:num:`Figure #validation-test-twelve`) has five observations:
+the central observation has an amplitude of 0.75, while the 
+other four observations have amplitudes of 1.0. All five have 
+a standard 
+deviation of 0.2. Here, though, he spacing of the higher 
+amplitudes was chosen so that the conditional amplitude at 
+the location of
+the central observation would approach the assigned amplitude
+from above. The amplitude should not (quite) reach the 
+observational value (0.75), or go below it.
+
+
+.. _validation-test-twelve:
+
+.. figure:: _static/validation_test_0012_PGA.*
+   :width: 700
+   :align: left
+
+   Validation Test 0012. Five observations: the central
+   observation has an amplitude of 0.75, while the other
+   four have amplitudes of 1.0. All five observations have
+   a standard deviation of 0.2.
+   The black line shows the conditional mean, the blue lines
+   show the conditional mean +/-- the conditional standard
+   deviation, and the red line shows the conditional standard
+   deviation. Compare with :num:`Figure #validation-test-eleven`.
