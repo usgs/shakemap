@@ -51,7 +51,7 @@ class StationModule(CoreModule):
                                  'formats.  Skipping.' % fformat)
                 continue
             if fformat == 'json':
-                self.logger.info('Writing rupture.json file...')
+                self.logger.debug('Writing rupture.json file...')
                 station_dict = container.getStationDict()
                 station_file = os.path.join(datadir,'stationlist.json')
                 f = open(station_file,'w')

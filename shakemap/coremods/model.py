@@ -1002,8 +1002,11 @@ class ModelModule(CoreModule):
                 if 'MMI' in sdf and not sdf['MMI_outliers'][six]:
                     station['properties']['intensity'] = \
                         '%.1f' % sdf['MMI'][six]
+                    station['properties']['intensity_stddev'] = \
+                        '%.1f' % sdf['MMI_sd'][six]
                 else:
                     station['properties']['intensity'] = 'null'
+                    station['properties']['intensity_stddev'] = 'null'
 
                 if 'PGA' in sdf and not sdf['PGA_outliers'][six]:
                     station['properties']['pga'] = \
