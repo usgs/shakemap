@@ -223,6 +223,7 @@ class StationList(object):
                     'location': '',
                     'intensity': None,
                     'intensity_flag': '',
+                    'intensity_stddev': None,
                     'pga': None,
                     'pgv': None,
                     'distance': None,
@@ -234,7 +235,8 @@ class StationList(object):
                 }
             }
             self.cursor.execute(
-                'SELECT a.amp, i.imt_type, a.original_channel, a.flag '
+                'SELECT a.amp, i.imt_type, a.original_channel, '
+                'a.flag, a.stddev '
                 'FROM amp a, imt i '
                 'WHERE a.station_id = "%s" '
                 'AND a.imt_id = i.id' % (str(sta[0]))
@@ -261,7 +263,8 @@ class StationList(object):
                 this_amp = {'name': amp[1].lower(),
                             'value': '%.4f' % value,
                             'units': units,
-                            'flag': str(amp[3])
+                            'flag': str(amp[3]),
+                            'ln_stddev': '%.4f' % amp[4]
                            }
                 channels[amp[2]]['amplitudes'].append(this_amp)
             for channel in channels.values():
@@ -404,17 +407,42 @@ class StationList(object):
                     else:
                         amp_set.add(amp_id)
                     amp = imt_dict['value']
+                    units = imt_dict['units']
                     stddev = imt_dict['stddev']
                     flag = imt_dict['flag']
-                    if np.isnan(amp) or (amp <= 0):
+                    if np.isnan(amp):
                         amp = 'NULL'
                         flag = 'G'
                     elif imt_type == 'MMI':
-                        pass
+                        if amp <= 0:
+                            amp = 'NULL'
+                            flag = 'G'
+                        else:
+                            pass
                     elif imt_type == 'PGV':
-                        amp = np.log(amp)
+                        if units == 'cm/s':
+                            if amp <= 0:
+                                amp = 'NULL'
+                                flag = 'G'
+                            else:
+                                amp = np.log(amp)
+                        elif units == 'ln(cm/s)':
+                            pass
+                        else:
+                            raise ValueError('Unknown units %s in input'
+                                             % units)
                     else:
-                        amp = np.log(amp / 100.0)
+                        if units == '%g':
+                            if amp <= 0:
+                                amp = 'NULL'
+                                flag = 'G'
+                            else:
+                                amp = np.log(amp / 100.0)
+                        elif units == 'ln(g)':
+                            pass
+                        else:
+                            raise ValueError('Unknown units %s in input'
+                                             % units)
 
                     amp_rows.append((sta_id, imtid, original_channel,
                                      orientation, amp, stddev, flag))
@@ -602,9 +630,19 @@ class StationList(object):
                 stddev = float(pgm.attrib['ln_stddev'])
             else:
                 stddev = 0
+            if 'units' in pgm.attrib:
+                units = pgm.attrib['units']
+            else:
+                if key == 'PGV':
+                    units = 'cm/s'
+                elif key == 'MMI':
+                    units = 'intensity'
+                else:
+                    units = '%g'
             pgmdict[key] = {'value': value, 
                             'flag': flag, 
-                            'stddev': stddev}
+                            'stddev': stddev,
+                            'units': units}
             imtset.add(key)
         return pgmdict, imtset, imt_translate
 
@@ -684,7 +722,8 @@ class StationList(object):
                     compdict['mmi']['MMI'] = \
                         {'value': float(attributes['intensity']),
                          'stddev': stddev,
-                         'flag': '0'}
+                         'flag': '0',
+                         'units': 'intensity'}
                     imtset.add('MMI')
                 stationdict[sta_id] = (attributes, copy.copy(compdict))
         return stationdict, imtset
