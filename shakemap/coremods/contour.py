@@ -102,11 +102,11 @@ def contour(container, imtype, component, intervals=None,
         units = 'mmi'
     elif imtype == 'PGV':
         sgrid = np.exp(grid)
-        fgrid = median_filter(sgrid, size=10)
+        fgrid = median_filter(sgrid, size=filter_size)
         units = 'cms'
     else:
         sgrid = np.exp(grid) * 100.0
-        fgrid = median_filter(sgrid, size=10)
+        fgrid = median_filter(sgrid, size=filter_size)
         units = 'pctg'
 
     if intervals is None:
@@ -136,9 +136,10 @@ def contour(container, imtype, component, intervals=None,
             if len(coords) <= 20:  # skipping little contour islands?
                 continue
 
-            contours[ic][:, 0] = coords[:, 1] * lonspan / nlon + lonstart
-            contours[ic][:, 1] = (nlat - coords[:, 0]) * \
-                latspan / nlat + latstart
+            mylons = coords[:, 1] * lonspan / nlon + lonstart
+            mylats = (nlat - coords[:, 0]) * latspan / nlat + latstart
+            contours[ic][:, 0] = mylons[:]
+            contours[ic][:, 1] = mylats[:]
             plot_contours.append(contours[ic])
             new_contours.append(contours[ic].tolist())
 
