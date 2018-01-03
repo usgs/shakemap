@@ -151,72 +151,7 @@ class PointRupture(Rupture):
                 those predictions. If var is False then just the first element
                 of the tuple is returned.
         """
-        origin = self._origin
-        dtype = DistType.Rjb
-
-        # ----------------------------
-        # Sort out ps2ff parameters
-        # ----------------------------
-        mech = origin.mech
-        if not hasattr(origin, '_tectonic_region'):
-            mscale = MagScaling.WC94
-            smech = Mechanism.A
-            aspect = 1.7
-            min_sdepth = 0
-            max_sdepth = 20
-        elif origin._tectonic_region == 'Active Shallow Crust':
-            mscale = MagScaling.HB08
-            aspect = 1.7
-            min_sdepth = 0
-            max_sdepth = 20
-            if mech == 'ALL':
-                # HB08 doesn't have an 'ALL' mechanism, so use WC94
-                mscale = MagScaling.WC94
-                smech = Mechanism.A
-            elif mech == 'RS':
-                smech = Mechanism.R
-            elif mech == 'NM':
-                smech = Mechanism.N
-            elif mech == 'SS':
-                smech = Mechanism.SS
-        elif origin._tectonic_region == 'Stable Shallow Crust':
-            mscale = MagScaling.S14
-            aspect = 1.0
-            min_sdepth = 0
-            max_sdepth = 15
-            if mech == 'ALL':
-                smech = Mechanism.A
-            elif mech == 'RS':
-                smech = Mechanism.R
-            elif mech == 'NM':
-                smech = Mechanism.N
-            elif mech == 'SS':
-                smech = Mechanism.SS
-        else:
-            warnings.warn(
-                'Unsupported tectonic region; using coefficients for unknown'
-                'tectonic region.')
-            mscale = MagScaling.WC94
-            smech = Mechanism.A
-            aspect = 1.7
-            min_sdepth = 0
-            max_sdepth = 20
-
-        p2f = PS2FF.fromParams(dist_type=dtype, mag_scaling=mscale, 
-                               mechanism=smech, AR=aspect, 
-                               min_seis_depth=min_sdepth, 
-                               max_seis_depth=max_sdepth)
-
-        repis = np.clip(self.computeRepi(lon, lat, depth), 0.0001, None)
-        mags = np.full_like(repis, origin.mag)
-
-        rjb_hat = p2f.r2r(repis, mags)
-
-        if var is True:
-            rjbvar = p2f.var(repis, mags)
-            return (rjb_hat, rjbvar)
-        else:
-            return rjb_hat
+        return self._computeRdist('Rjb', lon, lat, depth, var)
 
     def computeRrup(self, lon, lat, depth, var=False):
         """
@@ -230,16 +165,42 @@ class PointRupture(Rupture):
 
         Returns:
             If var is True then this returns a tuple of two arrays: first, the
-                predicted Rjb values, and second an array of the variance of
+                predicted Rrup, and second an array of the variance of
                 those predictions. If var is False then just the first element
                 of the tuple is returned.
         """
-        origin = self._origin
-        dtype = DistType.Rrup
+        return self._computeRdist('Rrup', lon, lat, depth, var)
 
-        # -------------------
-        # Sort out file names
-        # -------------------
+    def _computeRdist(self, rtype, lon, lat, depth, var):
+        """
+        Helper function to actually do the approximate fault distance
+        computations.
+
+        Args:
+            type (str): Either 'Rjb' or 'Rrup'.
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+            var (bool): Also return variance of prediction.
+
+        Returns:
+            If var is True then this returns a tuple of two arrays: first, the
+                predicted approximate fault distance values (either Rjb or 
+                Rrup, depending on the 'type' argument), and second an array of 
+                the variance of those predictions. If var is False then just the 
+                first element of the tuple is returned.
+        """
+        if rtype == 'Rjb':
+            dtype = DistType.Rjb
+        elif rtype == 'Rrup':
+            dtype = DistType.Rrup
+        else:
+            raise ValueError('Unknown distance type in _computeRdist')
+
+        # ----------------------------
+        # Sort out ps2ff parameters
+        # ----------------------------
+        origin = self._origin
         mech = origin.mech
         if not hasattr(origin, '_tectonic_region'):
             mscale = MagScaling.WC94
@@ -285,21 +246,23 @@ class PointRupture(Rupture):
             min_sdepth = 0
             max_sdepth = 20
 
-        p2f = PS2FF.fromParams(dist_type=dtype, mag_scaling=mscale, 
-                               mechanism=smech, AR=aspect, 
-                               min_seis_depth=min_sdepth, 
+        p2f = PS2FF.fromParams(dist_type=dtype,
+                               mag_scaling=mscale,
+                               mechanism=smech,
+                               AR=aspect,
+                               min_seis_depth=min_sdepth,
                                max_seis_depth=max_sdepth)
 
         repis = np.clip(self.computeRepi(lon, lat, depth), 0.0001, None)
         mags = np.full_like(repis, origin.mag)
 
-        rrup_hat = p2f.r2r(repis, mags)
+        r_hat = p2f.r2r(repis, mags)
 
         if var is True:
-            rrupvar = p2f.var(repis, mags)
-            return (rrup_hat, rrupvar)
+            r_var = p2f.var(repis, mags)
+            return (r_hat, r_var)
         else:
-            return rrup_hat
+            return r_hat
 
     def computeGC2(self, lon, lat, depth):
         """
