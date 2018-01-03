@@ -2,13 +2,14 @@ import glob
 import os.path
 from functools import partial
 
+# third party imports
 import pyproj
 from shapely.geometry import Point, Polygon, MultiPolygon
 from shapely.ops import transform
 import shapely.wkt
 import numpy as np
 from openquake.hazardlib.geo.geodetic import min_distance_to_segment
-
+from strec.subtype import SubductionSelector
 
 def nearest_edge(elon, elat, poly):
     """
@@ -115,35 +116,75 @@ def get_layer_distances(elon, elat, layer_dir):
         dist_dict[layer_name] = dist_to_layer(elon, elat, geom)
     return dist_dict
 
+def get_subduction_probabilities(results,depth):
+    # inputs to algorithm
+    kagan = results['KaganAngle'] #can be nan
+    slab_depth = results['SlabModelDepth']
+    slab_depth_error = results['SlabModelDepthUncertainty']
+    focal = results['FocalMechanism']
+    tensor_type = results['TensorType']
+    subtype = results['TectonicSubtype']
+    if np.isnan(kagan):
+        if np.isnan(slab_depth):
+            if subtype == 'SZInter':
+                crustal_prob = 0.1
+                intraslab_prob = 0.1
+                interface_prob = 0.8
+            elif subtype == 'ACR':
+                crustal_prob = 0.8
+                intraslab_prob = 0.1
+                interface_prob = 0.1
+            else:
+                crustal_prob = 0.1
+                intraslab_prob = 0.8
+                interface_prob = 0.1
+        else:
+            # here we don't have kagan angle, but we do have depth to slab
+            
 
-#
-# This is a dummy function. It needs to be replaced with the actual
-# function that gives the distance from the earthquake to the tectonic
-# regions # and, if the region is subduction, gives the probabilities
-# for the event types.
-#
 def get_tectonic_regions(elon, elat, edepth, eid):
-    strec_out = {
-        'focal_mech': 'ALL',
-        'tectonic_regions': {
-            'acr': {
-                'distance': 0.0,
-            },
-            'scr': {
-                'distance': 1500.0,
-            },
-            'subduction': {
-                'distance': 1400.0,
-                'probabilities': {
-                    'crustal': 0,
-                    'interface': 0,
-                    'intraslab': 0,
-                }
-            },
-            'volcanic': {
-                'distance': 2300.0,
-            },
-        }
-    }
+    selector = SubductionSelector()
+    results = selector.getSubductionTypeByID(eid)
+    strec_out = {}
+    strec_out['focal_mech'] = results['FocalMechanism']
+
+    #figure out the probabilities of subduction zone
+    crustal_prob = 0.0
+    interface_prob = 0.0
+    intraslab_prob = 0.0
+    if results['TectonicRegion'] == 'Subduction':
+        crustal_prob,interface_prob,intraslab_prob = get_subduction_probabilities(results,depth)
+    
+    regions = {'acr':{'distance':results['DistanceToActive']},
+               'scr':{'distance':results['DistanceToStable']},
+               'volcanic':{'distance':results['DistanceToVolcanic']},
+               'subduction':{'distance':results['DistanceToSubduction'],
+                             'probabilities':{'crustal':crustal_prob,
+                                              'interface':interface_prob,
+                                              'intraslab':intraslab_prob}}}
+    
+    strec_out['tectonic_regions'] = regions
+    # strec_out = {
+    #     'focal_mech': 'ALL',
+    #     'tectonic_regions': {
+    #         'acr': {
+    #             'distance': 0.0,
+    #         },
+    #         'scr': {
+    #             'distance': 1500.0,
+    #         },
+    #         'subduction': {
+    #             'distance': 1400.0,
+    #             'probabilities': {
+    #                 'crustal': 0,
+    #                 'interface': 0,
+    #                 'intraslab': 0,
+    #             }
+    #         },
+    #         'volcanic': {
+    #             'distance': 2300.0,
+    #         },
+    #     }
+    # }
 
     return strec_out

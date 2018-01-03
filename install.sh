@@ -50,7 +50,9 @@ curl --max-time 60 --retry 3 -L \
 curl --max-time 60 --retry 3 -L \
     https://github.com/usgs/libcomcat/archive/master.zip -o libcomcat.zip
 curl --max-time 60 --retry 3 -L \
-    https://github.com/usgs/MapIO/archive/master.zip -o mapio.zip
+     https://github.com/usgs/MapIO/archive/master.zip -o mapio.zip
+curl --max-time 60 --retry 3 -L \
+     https://github.com/usgs/strec/archive/master.zip -o strec.zip
 
 
 # Create a conda virtual environment
@@ -65,6 +67,7 @@ if [ $? -ne 0 ]; then
     rm impact-utils.zip
     rm libcomcat.zip
     rm mapio.zip
+    rm strec.zip
     exit
 fi
 
@@ -84,6 +87,7 @@ conda install -y --no-deps -c conda-forge openquake.engine
 rm impact-utils.zip
 rm libcomcat.zip
 rm mapio.zip
+rm strec.zip
 
 
 # This package

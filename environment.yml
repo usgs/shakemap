@@ -49,4 +49,4 @@ dependencies:
   - ./libcomcat.zip
   - ./mapio.zip
   - ./impact-utils.zip
-
+  - ./strec.zip
