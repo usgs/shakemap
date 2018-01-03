@@ -11,6 +11,20 @@ import numpy as np
 from openquake.hazardlib.geo.geodetic import min_distance_to_segment
 from strec.subtype import SubductionSelector
 
+# Make depth probability max out at 90% if depth to slab difference == 0,
+# bottom out at 10% when difference == 20 km
+DEPTH_MAX_PROB = 0.9
+DEPTH_AT_MAX_PROB = 0.0
+DEPTH_MIN_PROB = 0.1
+DEPTH_AT_MIN_PROB = 20
+
+# Kagan probability is 100% at 0 degrees kagan angle
+# 10
+KAGAN_MAX_PROB = 1.0
+KAGAN_AT_MAX_PROB = 0.0
+KAGAN_MIN_PROB = 0.1
+KAGAN_AT_MIN_PROB = 60
+
 def nearest_edge(elon, elat, poly):
     """
     Return the distance from a point to the nearest edge of a
@@ -116,6 +130,17 @@ def get_layer_distances(elon, elat, layer_dir):
         dist_dict[layer_name] = dist_to_layer(elon, elat, geom)
     return dist_dict
 
+def get_probability(x,min_prob,xmin,max_prob,xmax):
+    if x >= xmax:
+        prob = max_prob
+    else if x <= xmin:
+        prob = min_prob
+    else: # calculate slope/y-intercept, then probability from that
+        m = (max_prob-min_prob)/(xmax-xmin)
+        b = max_prob - (m * xmax)
+        prob = x * m + b
+    return prob
+
 def get_subduction_probabilities(results,depth):
     # inputs to algorithm
     kagan = results['KaganAngle'] #can be nan
@@ -124,23 +149,44 @@ def get_subduction_probabilities(results,depth):
     focal = results['FocalMechanism']
     tensor_type = results['TensorType']
     subtype = results['TectonicSubtype']
-    if np.isnan(kagan):
-        if np.isnan(slab_depth):
-            if subtype == 'SZInter':
-                crustal_prob = 0.1
-                intraslab_prob = 0.1
-                interface_prob = 0.8
-            elif subtype == 'ACR':
-                crustal_prob = 0.8
-                intraslab_prob = 0.1
-                interface_prob = 0.1
-            else:
-                crustal_prob = 0.1
-                intraslab_prob = 0.8
-                interface_prob = 0.1
+    if np.isnan(slab_depth): # implies no kagan angle either
+        if subtype == 'SZInter':
+            crustal_prob = 0.1
+            intraslab_prob = 0.1
+            interface_prob = 0.8
+        elif subtype == 'ACR':
+            crustal_prob = 0.8
+            intraslab_prob = 0.1
+            interface_prob = 0.1
         else:
-            # here we don't have kagan angle, but we do have depth to slab
-            
+            crustal_prob = 0.1
+            intraslab_prob = 0.8
+            interface_prob = 0.1
+    else:
+        # we have depth to slab
+        ddepth = np.abs(depth-slab_depth)
+        depth_interface_prob = get_probability(ddepth,
+                                               DEPTH_MIN_PROB,
+                                               DEPTH_AT_MIN_PROB,
+                                               DEPTH_MAX_PROB,
+                                               DEPTH_AT_MAX_PROB)
+
+        # if we have Kagan angle, we can modify the depth probability
+        if not np.isnan(kagan):
+            kagan_interface_prob = get_probability(ddepth,
+                                                   KAGAN_MIN_PROB,
+                                                   KAGAN_AT_MIN_PROB,
+                                                   KAGAN_MAX_PROB,
+                                                   KAGAN_AT_MAX_PROB)
+        else:
+            if focal == 'RS': #this makes it more likely to be interface
+                kagan_interface_prob = 0.75
+            else:
+                kagan_interface_prob = 0.5
+        interface_prob = depth_interface_prob * kagan_interface_prob
+        crustal_prob = (1 - interface_prob)/2.0
+        intraslab_prob = (1 - interface_prob)/2.0
+        return (crustal_prob,interface_prob,intraslab_prob)
 
 def get_tectonic_regions(elon, elat, edepth, eid):
     selector = SubductionSelector()
