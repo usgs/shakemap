@@ -233,5 +233,5 @@ dependencies:
   - ./impact-utils.zip
   - ./libcomcat.zip
   - ./mapio.zip
-prefix: /Users/mhearne/anaconda3/envs/shakemap
+  - ./ps2ff.zip
 

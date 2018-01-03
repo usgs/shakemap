@@ -201,5 +201,5 @@ dependencies:
   - ./impact-utils.zip
   - ./libcomcat.zip
   - ./mapio.zip  
-prefix: /home/mhearne/miniconda/envs/shakemap
+  - ./ps2ff.zip  
 

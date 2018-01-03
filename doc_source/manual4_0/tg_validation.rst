@@ -290,7 +290,7 @@ with the findings of :ref:`Worden et al. (2018) <worden2018>`.
 Test 0009
 ====================
 
-Test 0009 (see :num:`Figure #validation-test-0009`) has a single 
+Test 0009 (see :num:`Figure #validation-test-nine`) has a single 
 observation with an amplitude of 1.0, as with Test 0008, but here
 the standard deviation of the observation is 10.0. This large 
 uncertainty ('large' relative to the GMPE's within-event standard
