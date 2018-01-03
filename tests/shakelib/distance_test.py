@@ -23,6 +23,8 @@ from shakelib.sites import Sites
 from shakelib.distance import Distance
 from shakelib.distance import get_distance
 
+do_tests = True
+
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 sys.path.insert(0, shakedir)
@@ -240,8 +242,11 @@ def test_distance_no_rupture():
                     [1.03497272,  0.82517579,  0.69893672,  0.6553167,
                      0.69893672,  0.82517579,  1.03497272]])
 
-    np.testing.assert_allclose(
-        rjb, dctx.rjb, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rjb, dctx.rjb, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rjb))
 
     rrup = np.array([[8.26004043,  8.11921658,  8.11376473,  8.09579991,
                       8.11376473,  8.11921658,  8.26004043],
@@ -258,8 +263,11 @@ def test_distance_no_rupture():
                      [8.26012423,  8.11931772,  8.1137722,  8.09579991,
                       8.1137722,   8.11931772,  8.26012423]])
 
-    np.testing.assert_allclose(
-        rrup, dctx.rrup, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rrup, dctx.rrup, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rrup))
 
     # Souce instance
     #  - Tectonic region unsupported
@@ -281,8 +289,11 @@ def test_distance_no_rupture():
                       0.36677229,  0.50732902,  0.72933979],
                      [1.03497272,  0.82517579,  0.69893672,  0.6553167,
                       0.69893672,  0.82517579,  1.03497272]])
-    np.testing.assert_allclose(
-        rjbt, dctx.rjb, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rjbt, dctx.rjb, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rjb))
 
     # Souce instance
     #  - Tectonic region: active
@@ -308,8 +319,11 @@ def test_distance_no_rupture():
                     [1.10138329,  0.88341918,  0.75080275,  0.70491937,
                      0.75080275,  0.88341918,  1.10138329]])
 
-    np.testing.assert_allclose(
-        rjb, dctx.rjb, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rjb, dctx.rjb, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rjb))
 
     rrup = np.array([[8.72726953,  8.58534811,  8.58323541,  8.5654409,
                       8.58323541,  8.58534811,  8.72726953],
@@ -326,8 +340,11 @@ def test_distance_no_rupture():
                      [8.72735075,  8.58545174,  8.5832426,  8.5654409,
                       8.5832426,   8.58545174,  8.72735075]])
 
-    np.testing.assert_allclose(
-        rrup, dctx.rrup, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rrup, dctx.rrup, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rrup))
 
     # Souce instance
     #  - Tectonic region: active
@@ -353,8 +370,11 @@ def test_distance_no_rupture():
                     [0.94427453,  0.73308353,  0.61027758,  0.56806407,
                      0.61027758,  0.73308353,  0.94427453]])
 
-    np.testing.assert_allclose(
-        rjb, dctx.rjb, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rjb, dctx.rjb, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rjb))
 
     rrup = np.array([[8.81700098,  8.67259556,  8.6707467,  8.65288076,
                       8.6707467,   8.67259556,  8.81700098],
@@ -371,8 +391,11 @@ def test_distance_no_rupture():
                      [8.81708413,  8.67270074,  8.67075389,  8.65288076,
                       8.67075389,  8.67270074,  8.81708413]])
 
-    np.testing.assert_allclose(
-        rrup, dctx.rrup, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rrup, dctx.rrup, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rrup))
 
     # Souce instance
     #  - Tectonic region: active
@@ -404,8 +427,11 @@ def test_distance_no_rupture():
                      0.50845534,
                      0.61136979,  0.79013775]])
 
-    np.testing.assert_allclose(
-        rjb, dctx.rjb, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rjb, dctx.rjb, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rjb))
 
     rrup = np.array([[7.94857792,  7.8097532,  7.80275055,  7.78489184,
                       7.80275055,
@@ -428,8 +454,11 @@ def test_distance_no_rupture():
                       7.80275807,
                       7.80985208,  7.94866209]])
 
-    np.testing.assert_allclose(
-        rrup, dctx.rrup, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rrup, dctx.rrup, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rrup))
 
     # Souce instance
     #  - Tectonic region: active
@@ -462,8 +491,11 @@ def test_distance_no_rupture():
                      1.49782584,
                      1.7000298,  2.00364385]])
 
-    np.testing.assert_allclose(
-        rjb, dctx.rjb, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rjb, dctx.rjb, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rjb))
 
     rrup = np.array([[7.97494557,  7.79806013,  7.76281765,  7.735536,
                       7.76281765,
@@ -520,8 +552,11 @@ def test_distance_no_rupture():
                      0.85269799,
                      1.00469232,  1.2551578]])
 
-    np.testing.assert_allclose(
-        rjb, dctx.rjb, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rjb, dctx.rjb, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rjb))
 
     rrup = np.array([[6.37308879,  6.21401632,  6.17868645,  6.15460391,
                       6.17868645,
@@ -544,8 +579,11 @@ def test_distance_no_rupture():
                       6.17869829,
                       6.21411804,  6.37320723]])
 
-    np.testing.assert_allclose(
-        rrup, dctx.rrup, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rrup, dctx.rrup, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rrup))
 
     # Souce instance
     #  - Tectonic region: stable
@@ -577,8 +615,11 @@ def test_distance_no_rupture():
                      0.6934727,
                      0.83180576,  1.06799812]])
 
-    np.testing.assert_allclose(
-        rjb, dctx.rjb, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rjb, dctx.rjb, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rjb))
 
     rrup = np.array([[6.34187696,  6.18689857,  6.15537676,  6.13263668,
                       6.15537676,
@@ -602,8 +643,11 @@ def test_distance_no_rupture():
                       6.15538781,
                       6.18699823,  6.34199129]])
 
-    np.testing.assert_allclose(
-        rrup, dctx.rrup, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rrup, dctx.rrup, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rrup))
 
     # Souce instance
     #  - Tectonic region: stable
@@ -635,8 +679,11 @@ def test_distance_no_rupture():
                      0.72611052,
                      0.87059985,  1.116207]])
 
-    np.testing.assert_allclose(
-        rjb, dctx.rjb, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rjb, dctx.rjb, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rjb))
 
     rrup = np.array([[6.09163676,  5.92783781,  5.88815939,  5.8632258,
                       5.88815939,
@@ -659,8 +706,11 @@ def test_distance_no_rupture():
                       5.88817184,
                       5.92794056,  6.09176251]])
 
-    np.testing.assert_allclose(
-        rrup, dctx.rrup, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rrup, dctx.rrup, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rrup))
 
     # Souce instance
     #  - Tectonic region: stable
@@ -692,8 +742,11 @@ def test_distance_no_rupture():
                      1.28396831,
                      1.48490175,  1.79813761]])
 
-    np.testing.assert_allclose(
-        rjb, dctx.rjb, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rjb, dctx.rjb, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rjb))
 
     rrup = np.array([[5.27459324,  5.06456452,  4.9821571,  4.94467172,
                       4.9821571,
@@ -716,8 +769,11 @@ def test_distance_no_rupture():
                       4.98217732,
                       5.06468553,  5.27477487]])
 
-    np.testing.assert_allclose(
-        rrup, dctx.rrup, rtol=0, atol=0.01)
+    if do_tests is True:
+        np.testing.assert_allclose(
+            rrup, dctx.rrup, rtol=0, atol=0.01)
+    else:
+        print(repr(dctx.rrup))
 
 
 def test_distance_from_sites_origin():
