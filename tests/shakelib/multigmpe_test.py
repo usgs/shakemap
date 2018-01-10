@@ -155,9 +155,6 @@ def test_from_config_set_of_sets():
             'Pea11': ['PezeshkEtAl2011NEHRPBC',
                       'openquake.hazardlib.gsim.pezeshk_2011']
         },
-        'component_modules': {
-            'RotD50': 'Average Horizontal (RotD50)',
-        },
         'gmpe_sets': {
             'active_crustal': {
                 'gmpes': ['ASK14'],
@@ -256,9 +253,6 @@ def test_from_config_set_of_gmpes():
             'Pea11': ['PezeshkEtAl2011NEHRPBC',
                       'openquake.hazardlib.gsim.pezeshk_2011']
         },
-        'component_modules': {
-            'RotD50': 'Average Horizontal (RotD50)',
-        },
         'gmpe_sets': {
             'stable_continental': {
                 'gmpes': ['C03', 'Pea11'],
@@ -347,9 +341,6 @@ def test_from_config_set_of_sets_3_sec():
                     'openquake.hazardlib.gsim.campbell_2003'],
             'Pea11': ['PezeshkEtAl2011NEHRPBC',
                       'openquake.hazardlib.gsim.pezeshk_2011']
-        },
-        'component_modules': {
-            'RotD50': 'Average Horizontal (RotD50)',
         },
         'gmpe_sets': {
             'active_crustal': {
@@ -444,9 +435,6 @@ def test_from_config_single_gmpe():
         'gmpe_modules': {
             'ASK14': ['AbrahamsonEtAl2014',
                       'openquake.hazardlib.gsim.abrahamson_2014']
-        },
-        'component_modules': {
-            'RotD50': 'Average Horizontal (RotD50)',
         },
         'gmpe_sets': {
             'stable_continental': {

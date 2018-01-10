@@ -210,7 +210,7 @@ class MultiGMPE(GMPE):
             MultiGMPE object.
 
         """
-        IMC = conf['component_modules'][conf['interp']['component']]
+        IMC = getattr(const.IMC, conf['interp']['component'])
         selected_gmpe = conf['modeling']['gmpe']
 
         if verbose is True:
@@ -284,7 +284,7 @@ class MultiGMPE(GMPE):
             MultiGMPE.
 
         """
-        IMC = conf['component_modules'][conf['interp']['component']]
+        IMC = getattr(const.IMC, conf['interp']['component'])
 
         selected_gmpes = conf['gmpe_sets'][set_name]['gmpes']
         selected_gmpe_weights = \

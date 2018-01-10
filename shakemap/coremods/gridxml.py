@@ -15,11 +15,12 @@ from .base import CoreModule
 from shakemap.utils.config import get_config_paths
 import shakemap
 
-# historically, we only had the component we are now calling 'Larger'.
+# historically, we only had the component we are now calling 
+# 'GREATER_OF_TWO_HORIZONTAL'.
 # As we do not intend grid.xml files to be forward compatible with
-# additional layers of information and different components (rotd50, etc.)
+# additional layers of information and different components (RotD50, etc.)
 # we'll hard code this here until grid.xml files experience their heat death.
-COMPONENT = 'Larger'
+COMPONENT = 'GREATER_OF_TWO_HORIZONTAL'
 
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
 
