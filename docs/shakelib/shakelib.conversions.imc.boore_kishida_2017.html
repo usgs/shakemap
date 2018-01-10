@@ -53,7 +53,7 @@ horizontal intensity measure components.</p>
 <p>This class implements the Boore and Kishida (2017) conversions for
 horizontal intensity measure components.</p>
 <p>This class explicitly supports the following subset of the conversions
-provided by B&amp;K:</p>
+provided by B&amp;K (specified as OpenQuake IMCs):</p>
 <blockquote>
 <div><ul class="simple">
 <li>RotD50 &lt;=&gt; GMRotI50</li>
@@ -109,15 +109,15 @@ are to be converted.</li>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>imt</strong> (<em>OpenQuake IMT</em>) – The intensity measure type of the input
 ground motions. Valid IMTs are PGA, PGV, and SA.</li>
-<li><strong>amps</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – A numpy array of the ground motions to be
-converted.</li>
+<li><strong>amps</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – A numpy array of the (logged) ground motions
+to be converted.</li>
 <li><strong>rrups</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – A numpy array of the same shape as amps,
 containing the rupture distances of the ground motions.</li>
 <li><strong>mag</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The earthquake magnitude.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A numpy array of converted ground motions.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A numpy array of converted ground motions (logged).</p>
 </td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></p>
@@ -147,8 +147,8 @@ inflated by both conversions via this method.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>imt</strong> (<em>OpenQuake IMT</em>) – The intensity measure type of the input
 ground motions. Valid IMTs are PGA, PGV, and SA.</li>
-<li><strong>stddevs</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – A numpy array of the standard deviations to be
-converted.</li>
+<li><strong>stddevs</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – A numpy array of the standard deviations of
+the logged ground motions.</li>
 <li><strong>rrups</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Ignored by this method.</li>
 <li><strong>mag</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Ignored by this method.</li>
 </ul>

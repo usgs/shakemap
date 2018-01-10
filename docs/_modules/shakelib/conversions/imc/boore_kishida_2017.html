@@ -54,6 +54,7 @@
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.const</span> <span class="k">import</span> <span class="n">IMC</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.imt</span> <span class="k">import</span> <span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span><span class="p">,</span> <span class="n">SA</span>
 
 
 <div class="viewcode-block" id="BooreKishida2017"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017">[docs]</a><span class="k">class</span> <span class="nc">BooreKishida2017</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -62,7 +63,7 @@
 <span class="sd">    horizontal intensity measure components. </span>
 
 <span class="sd">    This class explicitly supports the following subset of the conversions</span>
-<span class="sd">    provided by B&amp;K:</span>
+<span class="sd">    provided by B&amp;K (specified as OpenQuake IMCs):</span>
 <span class="sd">        </span>
 <span class="sd">        - RotD50 &lt;=&gt; GMRotI50</span>
 <span class="sd">        - RotD50 &lt;=&gt; AVERAGE_HORIZONTAL (i.e., Geometric Mean &quot;as recorded&quot;)</span>
@@ -92,7 +93,6 @@
 <span class="sd">        and between aleatory variabilities for different definitions of the</span>
 <span class="sd">        horizontal component of motion. Bulletin of the Seismological Society</span>
 <span class="sd">        of America, 96(4A), 1512-1522.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">):</span>
@@ -104,7 +104,7 @@
 <span class="sd">                are to be converted.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">filename</span><span class="p">,</span> <span class="n">forward</span> <span class="o">=</span> <span class="n">_imcPairToFile</span><span class="p">(</span><span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">)</span>
+        <span class="n">filename</span><span class="p">,</span> <span class="n">forward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imcPairToFile</span><span class="p">(</span><span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t find a conversion file for </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
                              <span class="p">(</span><span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">))</span>
@@ -123,14 +123,14 @@
 <span class="sd">        Args:</span>
 <span class="sd">            imt (OpenQuake IMT): The intensity measure type of the input</span>
 <span class="sd">                ground motions. Valid IMTs are PGA, PGV, and SA.</span>
-<span class="sd">            amps (array): A numpy array of the ground motions to be </span>
-<span class="sd">                converted.</span>
+<span class="sd">            amps (array): A numpy array of the (logged) ground motions</span>
+<span class="sd">                to be converted. </span>
 <span class="sd">            rrups (array): A numpy array of the same shape as amps, </span>
 <span class="sd">                containing the rupture distances of the ground motions.</span>
 <span class="sd">            mag (float): The earthquake magnitude.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            array: A numpy array of converted ground motions.</span>
+<span class="sd">            array: A numpy array of converted ground motions (logged).</span>
 
 <span class="sd">        Raises:</span>
 <span class="sd">            ValueError: If the IMT is not an allowed type.</span>
@@ -142,12 +142,24 @@
 
         <span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getParamsFromIMT</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
 
-        <span class="n">ln_ratio</span> <span class="o">=</span> <span class="n">c0</span> <span class="o">+</span> <span class="n">r1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">rrups</span> <span class="o">/</span> <span class="mi">50</span><span class="p">)</span> <span class="o">+</span> \
+        <span class="n">rrups_clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rrups</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">mag</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">mag</span> <span class="o">=</span> <span class="mf">2.0</span>
+        <span class="k">elif</span> <span class="n">mag</span> <span class="o">&gt;</span> <span class="mi">9</span><span class="p">:</span>
+            <span class="n">mag</span> <span class="o">=</span> <span class="mf">9.0</span>
+        <span class="n">ln_ratio</span> <span class="o">=</span> <span class="n">c0</span> <span class="o">+</span> <span class="n">r1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">rrups_clipped</span> <span class="o">/</span> <span class="mi">50</span><span class="p">)</span> <span class="o">+</span> \
                    <span class="n">m1</span> <span class="o">*</span> <span class="p">(</span><span class="n">mag</span> <span class="o">-</span> <span class="mf">5.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">m2</span> <span class="o">*</span> <span class="p">(</span><span class="n">mag</span> <span class="o">-</span> <span class="mf">5.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="c1">#</span>
+        <span class="c1"># The B&amp;K file naming convention has things like D100D50, which</span>
+        <span class="c1"># means the parameters give the (log) ratio of RotD100/RotD50,</span>
+        <span class="c1"># but we use the convention that RotD100 would be the input IMC</span>
+        <span class="c1"># and RotD50 would be the output IMC, so we reverse the sense</span>
+        <span class="c1"># of the conversion here.</span>
+        <span class="c1">#</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">:</span>
-            <span class="n">amps</span> <span class="o">=</span> <span class="n">amps</span> <span class="o">+</span> <span class="n">ln_ratio</span>
-        <span class="k">else</span><span class="p">:</span>
             <span class="n">amps</span> <span class="o">=</span> <span class="n">amps</span> <span class="o">-</span> <span class="n">ln_ratio</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">amps</span> <span class="o">=</span> <span class="n">amps</span> <span class="o">+</span> <span class="n">ln_ratio</span>
 
         <span class="k">return</span> <span class="n">amps</span></div>
 
@@ -165,8 +177,8 @@
 <span class="sd">        Args:</span>
 <span class="sd">            imt (OpenQuake IMT): The intensity measure type of the input</span>
 <span class="sd">                ground motions. Valid IMTs are PGA, PGV, and SA.</span>
-<span class="sd">            stddevs (array): A numpy array of the standard deviations to be </span>
-<span class="sd">                converted.</span>
+<span class="sd">            stddevs (array): A numpy array of the standard deviations of</span>
+<span class="sd">                the logged ground motions.</span>
 <span class="sd">            rrups (array): Ignored by this method.</span>
 <span class="sd">            mag (float): Ignored by this method.</span>
 
@@ -193,13 +205,13 @@
 <span class="sd">        parameters for a given IMT.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">PGA</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">PGA</span><span class="p">():</span>
             <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">c0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;c0smooth&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">r1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;r1smooth&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">m1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;m1smooth&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">m2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;m2smooth&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">PGV</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">PGV</span><span class="p">():</span>
             <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">c0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;c0smooth&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">r1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;r1smooth&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
@@ -214,7 +226,7 @@
             <span class="n">m1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">imt_per</span><span class="p">,</span> <span class="n">pa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;m1smooth&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">:])</span>
             <span class="n">m2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">imt_per</span><span class="p">,</span> <span class="n">pa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;m2smooth&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">:])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown IMT: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">imt</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown IMT: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">imt</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span>
 
@@ -236,8 +248,8 @@
         <span class="n">datadir</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;shakelib.conversions.imc&#39;</span><span class="p">,</span>
                                                   <span class="s1">&#39;data&#39;</span><span class="p">)</span>
         <span class="n">conv_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*.csv&#39;</span><span class="p">))</span>
-        <span class="n">stub1</span> <span class="o">=</span> <span class="n">_imcToFilestr</span><span class="p">(</span><span class="n">imc_in</span><span class="p">)</span>
-        <span class="n">stub2</span> <span class="o">=</span> <span class="n">_imcToFilestr</span><span class="p">(</span><span class="n">imc_out</span><span class="p">)</span>
+        <span class="n">stub1</span> <span class="o">=</span> <span class="n">BooreKishida2017</span><span class="o">.</span><span class="n">_imcToFilestr</span><span class="p">(</span><span class="n">imc_in</span><span class="p">)</span>
+        <span class="n">stub2</span> <span class="o">=</span> <span class="n">BooreKishida2017</span><span class="o">.</span><span class="n">_imcToFilestr</span><span class="p">(</span><span class="n">imc_out</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">stub1</span> <span class="o">==</span> <span class="n">stub2</span><span class="p">:</span>
             <span class="c1"># No conversion necessary</span>
             <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;Null&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
@@ -273,7 +285,10 @@
             <span class="k">return</span> <span class="s1">&#39;D100&#39;</span>
         <span class="k">elif</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">GMRotI50</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;GM50&#39;</span>
-        <span class="k">elif</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">AVERAGE_HORIZONTAL</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">AVERAGE_HORIZONTAL</span> <span class="ow">or</span> \
+             <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">HORIZONTAL</span> <span class="ow">or</span> \
+             <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">RANDOM_HORIZONTAL</span> <span class="ow">or</span> \
+             <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">MEDIAN_HORIZONTAL</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;GMAR&#39;</span>
         <span class="k">elif</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;Larger&#39;</span>
