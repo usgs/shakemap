@@ -266,6 +266,7 @@
                     <span class="s1">&#39;location&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;intensity&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                     <span class="s1">&#39;intensity_flag&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;intensity_stddev&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                     <span class="s1">&#39;pga&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                     <span class="s1">&#39;pgv&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                     <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
@@ -277,7 +278,8 @@
                 <span class="p">}</span>
             <span class="p">}</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
-                <span class="s1">&#39;SELECT a.amp, i.imt_type, a.original_channel, a.flag &#39;</span>
+                <span class="s1">&#39;SELECT a.amp, i.imt_type, a.original_channel, &#39;</span>
+                <span class="s1">&#39;a.flag, a.stddev &#39;</span>
                 <span class="s1">&#39;FROM amp a, imt i &#39;</span>
                 <span class="s1">&#39;WHERE a.station_id = &quot;</span><span class="si">%s</span><span class="s1">&quot; &#39;</span>
                 <span class="s1">&#39;AND a.imt_id = i.id&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
@@ -304,7 +306,8 @@
                 <span class="n">this_amp</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">amp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
                             <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">value</span><span class="p">,</span>
                             <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
-                            <span class="s1">&#39;flag&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">amp</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+                            <span class="s1">&#39;flag&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">amp</span><span class="p">[</span><span class="mi">3</span><span class="p">]),</span>
+                            <span class="s1">&#39;ln_stddev&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">amp</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span>
                            <span class="p">}</span>
                 <span class="n">channels</span><span class="p">[</span><span class="n">amp</span><span class="p">[</span><span class="mi">2</span><span class="p">]][</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_amp</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">channels</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
@@ -447,17 +450,42 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">amp_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">amp_id</span><span class="p">)</span>
                     <span class="n">amp</span> <span class="o">=</span> <span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                    <span class="n">units</span> <span class="o">=</span> <span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
                     <span class="n">stddev</span> <span class="o">=</span> <span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;stddev&#39;</span><span class="p">]</span>
                     <span class="n">flag</span> <span class="o">=</span> <span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">amp</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">amp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">amp</span><span class="p">):</span>
                         <span class="n">amp</span> <span class="o">=</span> <span class="s1">&#39;NULL&#39;</span>
                         <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
                     <span class="k">elif</span> <span class="n">imt_type</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-                        <span class="k">pass</span>
+                        <span class="k">if</span> <span class="n">amp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">amp</span> <span class="o">=</span> <span class="s1">&#39;NULL&#39;</span>
+                            <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">pass</span>
                     <span class="k">elif</span> <span class="n">imt_type</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
-                        <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amp</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;cm/s&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">amp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">amp</span> <span class="o">=</span> <span class="s1">&#39;NULL&#39;</span>
+                                <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amp</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;ln(cm/s)&#39;</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown units </span><span class="si">%s</span><span class="s1"> in input&#39;</span>
+                                             <span class="o">%</span> <span class="n">units</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amp</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">amp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">amp</span> <span class="o">=</span> <span class="s1">&#39;NULL&#39;</span>
+                                <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amp</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span>
+                        <span class="k">elif</span> <span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;ln(g)&#39;</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown units </span><span class="si">%s</span><span class="s1"> in input&#39;</span>
+                                             <span class="o">%</span> <span class="n">units</span><span class="p">)</span>
 
                     <span class="n">amp_rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sta_id</span><span class="p">,</span> <span class="n">imtid</span><span class="p">,</span> <span class="n">original_channel</span><span class="p">,</span>
                                      <span class="n">orientation</span><span class="p">,</span> <span class="n">amp</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">flag</span><span class="p">))</span>
@@ -645,9 +673,19 @@
                 <span class="n">stddev</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">pgm</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;ln_stddev&#39;</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">stddev</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">if</span> <span class="s1">&#39;units&#39;</span> <span class="ow">in</span> <span class="n">pgm</span><span class="o">.</span><span class="n">attrib</span><span class="p">:</span>
+                <span class="n">units</span> <span class="o">=</span> <span class="n">pgm</span><span class="o">.</span><span class="n">attrib</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+                    <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;cm/s&#39;</span>
+                <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+                    <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;intensity&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span>
             <span class="n">pgmdict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span> 
                             <span class="s1">&#39;flag&#39;</span><span class="p">:</span> <span class="n">flag</span><span class="p">,</span> 
-                            <span class="s1">&#39;stddev&#39;</span><span class="p">:</span> <span class="n">stddev</span><span class="p">}</span>
+                            <span class="s1">&#39;stddev&#39;</span><span class="p">:</span> <span class="n">stddev</span><span class="p">,</span>
+                            <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">}</span>
             <span class="n">imtset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">pgmdict</span><span class="p">,</span> <span class="n">imtset</span><span class="p">,</span> <span class="n">imt_translate</span>
 
@@ -727,7 +765,8 @@
                     <span class="n">compdict</span><span class="p">[</span><span class="s1">&#39;mmi&#39;</span><span class="p">][</span><span class="s1">&#39;MMI&#39;</span><span class="p">]</span> <span class="o">=</span> \
                         <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;intensity&#39;</span><span class="p">]),</span>
                          <span class="s1">&#39;stddev&#39;</span><span class="p">:</span> <span class="n">stddev</span><span class="p">,</span>
-                         <span class="s1">&#39;flag&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">}</span>
+                         <span class="s1">&#39;flag&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
+                         <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity&#39;</span><span class="p">}</span>
                     <span class="n">imtset</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
                 <span class="n">stationdict</span><span class="p">[</span><span class="n">sta_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">attributes</span><span class="p">,</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">compdict</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">stationdict</span><span class="p">,</span> <span class="n">imtset</span>

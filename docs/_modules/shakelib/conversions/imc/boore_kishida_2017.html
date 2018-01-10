@@ -1,0 +1,344 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.conversions.imc.boore_kishida_2017 &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakelib.conversions.imc.boore_kishida_2017</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module implements BooreKishida2017 class to convert between various</span>
+<span class="sd">horizontal intensity measure components.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">pkg_resources</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.const</span> <span class="k">import</span> <span class="n">IMC</span>
+
+
+<div class="viewcode-block" id="BooreKishida2017"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017">[docs]</a><span class="k">class</span> <span class="nc">BooreKishida2017</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class implements the Boore and Kishida (2017) conversions for</span>
+<span class="sd">    horizontal intensity measure components. </span>
+
+<span class="sd">    This class explicitly supports the following subset of the conversions</span>
+<span class="sd">    provided by B&amp;K:</span>
+<span class="sd">        </span>
+<span class="sd">        - RotD50 &lt;=&gt; GMRotI50</span>
+<span class="sd">        - RotD50 &lt;=&gt; AVERAGE_HORIZONTAL (i.e., Geometric Mean &quot;as recorded&quot;)</span>
+<span class="sd">        - RotD100 &lt;=&gt; RotD50</span>
+<span class="sd">        - RotD50 &lt;=&gt; GREATER_OF_TWO_HORIZONTAL</span>
+<span class="sd">        - RotD100 &lt;=&gt; GREATER_OF_TWO_HORIZONTAL</span>
+<span class="sd">        - GMRotI50 &lt;=&gt; GREATER_OF_TWO_HORIZONTAL</span>
+<span class="sd">        - AVERAGE_HORIZONTAL &lt;=&gt; GREATER_OF_TWO_HORIZONTAL</span>
+
+<span class="sd">    Not supported are IMCs for which there is no OpenQuake equivalent; </span>
+<span class="sd">    also not supported are chained conversions (that is, we do not </span>
+<span class="sd">    support conversions from A to C when conversions from A to B and </span>
+<span class="sd">    B to C are available; these must be done in two steps. For IMCs </span>
+<span class="sd">    not explicitly</span>
+<span class="sd">    supported by B&amp;K, we assume the IMC is equivalent to the geometric</span>
+<span class="sd">    mean (which B&amp;K call GM_AR), based on our reading of</span>
+<span class="sd">    Beyer &amp; Bommer (2006).</span>
+<span class="sd">        </span>
+<span class="sd">    References</span>
+
+<span class="sd">        Boore, D.M. and T. Kishida (2017). Relations between some</span>
+<span class="sd">        horizontal-component ground-motion intensity measures used</span>
+<span class="sd">        in practice. Bulletin of the Seismological Society of </span>
+<span class="sd">        America, 107(1), 334-343, doi: 10.1785/0120160250.</span>
+
+<span class="sd">        Beyer, K., &amp; Bommer, J. J. (2006). Relationships between median values</span>
+<span class="sd">        and between aleatory variabilities for different definitions of the</span>
+<span class="sd">        horizontal component of motion. Bulletin of the Seismological Society</span>
+<span class="sd">        of America, 96(4A), 1512-1522.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Args:</span>
+<span class="sd">            imc_in (OpenQuake IMC): The IMC of the ground motions to be</span>
+<span class="sd">                converted.</span>
+<span class="sd">            imc_out (OpenQuake IMC): The IMC to which the ground motions</span>
+<span class="sd">                are to be converted.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">filename</span><span class="p">,</span> <span class="n">forward</span> <span class="o">=</span> <span class="n">_imcPairToFile</span><span class="p">(</span><span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t find a conversion file for </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span>
+                             <span class="p">(</span><span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">forward</span> <span class="o">=</span> <span class="n">forward</span>
+        <span class="k">if</span> <span class="n">filename</span> <span class="o">==</span> <span class="s1">&#39;Null&#39;</span><span class="p">:</span>
+            <span class="c1"># Null conversion -- imc_in and imc_out are either identical</span>
+            <span class="c1"># or at least functionally equivalent</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pars</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pars</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BooreKishida2017.convertAmps"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmps">[docs]</a>    <span class="k">def</span> <span class="nf">convertAmps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">rrups</span><span class="p">,</span> <span class="n">mag</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return an array of amps converted from one IMC to another.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imt (OpenQuake IMT): The intensity measure type of the input</span>
+<span class="sd">                ground motions. Valid IMTs are PGA, PGV, and SA.</span>
+<span class="sd">            amps (array): A numpy array of the ground motions to be </span>
+<span class="sd">                converted.</span>
+<span class="sd">            rrups (array): A numpy array of the same shape as amps, </span>
+<span class="sd">                containing the rupture distances of the ground motions.</span>
+<span class="sd">            mag (float): The earthquake magnitude.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            array: A numpy array of converted ground motions.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the IMT is not an allowed type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># imc_in and imc_out are the same</span>
+            <span class="k">return</span> <span class="n">amps</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getParamsFromIMT</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
+
+        <span class="n">ln_ratio</span> <span class="o">=</span> <span class="n">c0</span> <span class="o">+</span> <span class="n">r1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">rrups</span> <span class="o">/</span> <span class="mi">50</span><span class="p">)</span> <span class="o">+</span> \
+                   <span class="n">m1</span> <span class="o">*</span> <span class="p">(</span><span class="n">mag</span> <span class="o">-</span> <span class="mf">5.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">m2</span> <span class="o">*</span> <span class="p">(</span><span class="n">mag</span> <span class="o">-</span> <span class="mf">5.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">forward</span><span class="p">:</span>
+            <span class="n">amps</span> <span class="o">=</span> <span class="n">amps</span> <span class="o">+</span> <span class="n">ln_ratio</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">amps</span> <span class="o">=</span> <span class="n">amps</span> <span class="o">-</span> <span class="n">ln_ratio</span>
+
+        <span class="k">return</span> <span class="n">amps</span></div>
+
+<div class="viewcode-block" id="BooreKishida2017.convertStddevs"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertStddevs">[docs]</a>    <span class="k">def</span> <span class="nf">convertStddevs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddevs</span><span class="p">,</span> <span class="n">rrups</span><span class="p">,</span> <span class="n">mag</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return an array of standard deviations converted from one IMC </span>
+<span class="sd">        to another.</span>
+
+<span class="sd">        Note that the action of this method is to always increase the</span>
+<span class="sd">        input standard deviations. Thus, while converting from one IMC</span>
+<span class="sd">        to another and then back again will yield the original ground</span>
+<span class="sd">        motions via convertAmps(), the standard deviations will be </span>
+<span class="sd">        inflated by both conversions via this method.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imt (OpenQuake IMT): The intensity measure type of the input</span>
+<span class="sd">                ground motions. Valid IMTs are PGA, PGV, and SA.</span>
+<span class="sd">            stddevs (array): A numpy array of the standard deviations to be </span>
+<span class="sd">                converted.</span>
+<span class="sd">            rrups (array): Ignored by this method.</span>
+<span class="sd">            mag (float): Ignored by this method.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            array: A numpy array of converted standard deviations.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the IMT is not an allowed type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># imc_in and imc_out are the same</span>
+            <span class="k">return</span> <span class="n">stddevs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getParamsFromIMT</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
+
+        <span class="n">stddevs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">stddevs</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">stddevs</span></div>
+
+    <span class="k">def</span> <span class="nf">_getParamsFromIMT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to return (possibly interpolated) conversion</span>
+<span class="sd">        parameters for a given IMT.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">PGA</span><span class="p">:</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">c0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;c0smooth&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">r1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;r1smooth&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">m1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;m1smooth&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">m2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;m2smooth&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">imt</span> <span class="o">==</span> <span class="n">PGV</span><span class="p">:</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">c0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;c0smooth&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">r1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;r1smooth&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">m1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;m1smooth&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">m2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;m2smooth&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="s1">&#39;SA&#39;</span> <span class="ow">in</span> <span class="n">imt</span><span class="p">:</span>
+            <span class="n">imt_per</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">period</span>
+            <span class="n">pa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;per&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">:]</span>
+            <span class="n">sigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">imt_per</span><span class="p">,</span> <span class="n">pa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="n">c0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">imt_per</span><span class="p">,</span> <span class="n">pa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;c0smooth&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="n">r1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">imt_per</span><span class="p">,</span> <span class="n">pa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;r1smooth&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="n">m1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">imt_per</span><span class="p">,</span> <span class="n">pa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;m1smooth&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="n">m2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">interp</span><span class="p">(</span><span class="n">imt_per</span><span class="p">,</span> <span class="n">pa</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pars</span><span class="p">[</span><span class="s1">&#39;m2smooth&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">:])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Unknown IMT: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">imt</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_imcPairToFile</span><span class="p">(</span><span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to find the name of the file representing</span>
+<span class="sd">        the conversion.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (str, bool): The filename and a boolean &#39;forward&#39; indicating</span>
+<span class="sd">            whether the conversion should be done in the forward (True)</span>
+<span class="sd">            or inverse (False) direction. If filename is None, then no</span>
+<span class="sd">            appropriate conversion file coule be found; if it is the</span>
+<span class="sd">            string &#39;Null&#39;, then imc_in and imc_out evaluated to be the</span>
+<span class="sd">            same.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">datadir</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;shakelib.conversions.imc&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+        <span class="n">conv_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*.csv&#39;</span><span class="p">))</span>
+        <span class="n">stub1</span> <span class="o">=</span> <span class="n">_imcToFilestr</span><span class="p">(</span><span class="n">imc_in</span><span class="p">)</span>
+        <span class="n">stub2</span> <span class="o">=</span> <span class="n">_imcToFilestr</span><span class="p">(</span><span class="n">imc_out</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">stub1</span> <span class="o">==</span> <span class="n">stub2</span><span class="p">:</span>
+            <span class="c1"># No conversion necessary</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;Null&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># Look for the conversion from imc_in -&gt; imc_out</span>
+        <span class="c1">#</span>
+        <span class="n">stub</span> <span class="o">=</span> <span class="n">stub1</span> <span class="o">+</span> <span class="n">stub2</span>
+        <span class="n">filelist</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">conv_files</span> <span class="k">if</span> <span class="n">stub</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filelist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">filelist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">True</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># Now try the conversion from imc_out -&gt; imc_in</span>
+        <span class="c1">#</span>
+        <span class="n">stub</span> <span class="o">=</span> <span class="n">stub2</span> <span class="o">+</span> <span class="n">stub1</span>
+        <span class="n">filelist</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">conv_files</span> <span class="k">if</span> <span class="n">stub</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">filelist</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">filelist</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># Can&#39;t find anything</span>
+        <span class="c1">#</span>
+        <span class="k">return</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_imcToFilestr</span><span class="p">(</span><span class="n">oq_imc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to convert an OpenQuake IMC into part of the</span>
+<span class="sd">        Boore &amp; Kishida file name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">RotD50</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;D50&#39;</span>
+        <span class="k">elif</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">RotD100</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;D100&#39;</span>
+        <span class="k">elif</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">GMRotI50</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;GM50&#39;</span>
+        <span class="k">elif</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">AVERAGE_HORIZONTAL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;GMAR&#39;</span>
+        <span class="k">elif</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s1">&#39;Larger&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1">#</span>
+            <span class="c1"># For less common IMCs, Beyer &amp; Bommer (2006) found most</span>
+            <span class="c1"># of them to be more or less equivalent to geometric mean</span>
+            <span class="c1">#</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Can&#39;t handle IMC </span><span class="si">%s</span><span class="s2">, using GMAR&quot;</span> <span class="o">%</span> <span class="n">oq_imc</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;GMAR&#39;</span></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../../index.html">
+    <img class="logo" src="../../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
