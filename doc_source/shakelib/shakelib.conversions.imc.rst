@@ -6,6 +6,7 @@ Submodules
 .. toctree::
 
    shakelib.conversions.imc.beyer_bommer_2006
+   shakelib.conversions.imc.boore_kishida_2017
 
 Module contents
 

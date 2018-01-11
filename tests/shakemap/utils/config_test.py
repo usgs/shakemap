@@ -58,10 +58,6 @@ def test_config():
     # Break the config
     #
     ctest = copy.deepcopy(c1)
-    ctest['interp']['component'] = 'NotAComponent'
-    with pytest.raises(ValidateError):
-        config.check_config(ctest, logger)
-    ctest = copy.deepcopy(c1)
     ctest['modeling']['ccf'] = 'NotACCF'
     with pytest.raises(ValidateError):
         config.check_config(ctest, logger)

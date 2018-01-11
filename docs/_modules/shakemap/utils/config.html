@@ -217,7 +217,7 @@
 
 <div class="viewcode-block" id="check_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.check_config">[docs]</a><span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Checks that the gmpe, gmice, ipe, ccf, and component parameters</span>
+<span class="sd">    Checks that the gmpe, gmice, ipe, and ccf parameters</span>
 <span class="sd">    in config are defined in their respective sections. Raises a</span>
 <span class="sd">    ValidateError exception if an error is encountered.</span>
 
@@ -244,11 +244,6 @@
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ccf&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;ccf_modules&#39;</span><span class="p">]:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Configuration error: ccf </span><span class="si">%s</span><span class="s1"> not in ccf_modules&#39;</span> <span class="o">%</span>
                      <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ccf&#39;</span><span class="p">]))</span>
-        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;component_modules&#39;</span><span class="p">]:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Configuration error: component </span><span class="si">%s</span><span class="s1"> not in &#39;</span>
-                     <span class="s1">&#39;component_modules&#39;</span> <span class="o">%</span>
-                     <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">]))</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span></div>
 
 

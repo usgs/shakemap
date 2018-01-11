@@ -58,6 +58,9 @@
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
 
+<span class="kn">from</span> <span class="nn">ps2ff.constants</span> <span class="k">import</span> <span class="n">DistType</span><span class="p">,</span> <span class="n">MagScaling</span><span class="p">,</span> <span class="n">Mechanism</span>
+<span class="kn">from</span> <span class="nn">ps2ff.interpolate</span> <span class="k">import</span> <span class="n">PS2FF</span>
+
 
 <div class="viewcode-block" id="PointRupture"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.point_rupture.html#shakelib.rupture.point_rupture.PointRupture">[docs]</a><span class="k">class</span> <span class="nc">PointRupture</span><span class="p">(</span><span class="n">Rupture</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -191,128 +194,7 @@
 <span class="sd">                those predictions. If var is False then just the first element</span>
 <span class="sd">                of the tuple is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cdir</span><span class="p">,</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
-        <span class="n">origin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_origin</span>
-
-        <span class="c1"># -------------------</span>
-        <span class="c1"># Sort out file names</span>
-        <span class="c1"># -------------------</span>
-        <span class="n">mech</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mech</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s1">&#39;_tectonic_region&#39;</span><span class="p">):</span>
-            <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Rjb_WC94_mechA_ar1p0_seis0_20_Ratios.csv&quot;</span><span class="p">)</span>
-            <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Rjb_WC94_mechA_ar1p0_seis0_20_Var.csv&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">origin</span><span class="o">.</span><span class="n">_tectonic_region</span> <span class="o">==</span> <span class="s1">&#39;Active Shallow Crust&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;ALL&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_WC94_mechA_ar1p7_seis0_20_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_WC94_mechA_ar1p7_seis0_20_Var.csv&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;RS&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_WC94_mechR_ar1p7_seis0_20_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_WC94_mechR_ar1p7_seis0_20_Var.csv&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;NM&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_WC94_mechN_ar1p7_seis0_20_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_WC94_mechN_ar1p7_seis0_20_Var.csv&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;SS&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_WC94_mechSS_ar1p7_seis0_20_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_WC94_mechSS_ar1p7_seis0_20_Var.csv&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">origin</span><span class="o">.</span><span class="n">_tectonic_region</span> <span class="o">==</span> <span class="s1">&#39;Stable Shallow Crust&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;ALL&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_S14_mechA_ar1p0_seis0_15_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_S14_mechA_ar1p0_seis0_15_Var.csv&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;RS&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_S14_mechR_ar1p0_seis0_15_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_S14_mechR_ar1p0_seis0_15_Var.csv&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;NM&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_S14_mechN_ar1p0_seis0_15_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_S14_mechN_ar1p0_seis0_15_Var.csv&quot;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;SS&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_S14_mechSS_ar1p0_seis0_15_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rjb_S14_mechSS_ar1p0_seis0_15_Var.csv&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="s1">&#39;Unsupported tectonic region; using coefficients for unknown&#39;</span>
-                <span class="s1">&#39;tectonic region.&#39;</span><span class="p">)</span>
-            <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Rjb_WC94_mechA_ar1p0_seis0_20_Ratios.csv&quot;</span><span class="p">)</span>
-            <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Rjb_WC94_mechA_ar1p0_seis0_20_Var.csv&quot;</span><span class="p">)</span>
-
-        <span class="c1"># -----------------</span>
-        <span class="c1"># Start with ratios</span>
-        <span class="c1"># -----------------</span>
-        <span class="n">repi2rjb_ratios_tbl</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
-        <span class="n">r2rrt_cols</span> <span class="o">=</span> <span class="n">repi2rjb_ratios_tbl</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="n">mag_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="p">(</span><span class="n">r2rrt_cols</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;R\d+\.*\d*&#39;</span><span class="p">,</span> <span class="n">column</span><span class="p">):</span>
-                <span class="n">magnitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
-                    <span class="s1">&#39;R(\d+\.*\d*)&#39;</span><span class="p">,</span> <span class="n">column</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">mag_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">magnitude</span><span class="p">)</span>
-        <span class="n">mag_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mag_list</span><span class="p">)</span>
-        <span class="n">dist_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">repi2rjb_ratios_tbl</span><span class="p">[</span><span class="s1">&#39;Repi_km&#39;</span><span class="p">]))</span>
-        <span class="n">repi2rjb_grid</span> <span class="o">=</span> <span class="n">repi2rjb_ratios_tbl</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
-        <span class="n">repi2rjb_obj</span> <span class="o">=</span> <span class="n">spint</span><span class="o">.</span><span class="n">RectBivariateSpline</span><span class="p">(</span>
-            <span class="n">dist_list</span><span class="p">,</span> <span class="n">mag_list</span><span class="p">,</span> <span class="n">repi2rjb_grid</span><span class="p">,</span> <span class="n">kx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ky</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="k">def</span> <span class="nf">repi2rjb_tbl</span><span class="p">(</span><span class="n">repi</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
-            <span class="n">ratio</span> <span class="o">=</span> <span class="n">repi2rjb_obj</span><span class="o">.</span><span class="n">ev</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">repi</span><span class="p">),</span> <span class="n">M</span><span class="p">)</span>
-            <span class="n">rjb</span> <span class="o">=</span> <span class="n">repi</span> <span class="o">*</span> <span class="n">ratio</span>
-            <span class="k">return</span> <span class="n">rjb</span>
-
-        <span class="n">repis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computeRepi</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">),</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="n">mags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">repis</span><span class="p">)</span> <span class="o">*</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span>
-        <span class="n">rjb_hat</span> <span class="o">=</span> <span class="n">repi2rjb_tbl</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">mags</span><span class="p">)</span>
-
-        <span class="c1"># -------------------</span>
-        <span class="c1"># Additional Variance</span>
-        <span class="c1"># -------------------</span>
-        <span class="n">repi2rjbvar_ratios_tbl</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">vf</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
-        <span class="n">repi2rjbvar_grid</span> <span class="o">=</span> <span class="n">repi2rjbvar_ratios_tbl</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
-        <span class="n">repi2rjbvar_obj</span> <span class="o">=</span> <span class="n">spint</span><span class="o">.</span><span class="n">RectBivariateSpline</span><span class="p">(</span>
-            <span class="n">dist_list</span><span class="p">,</span> <span class="n">mag_list</span><span class="p">,</span> <span class="n">repi2rjbvar_grid</span><span class="p">,</span> <span class="n">kx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ky</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">rjbvar</span> <span class="o">=</span> <span class="n">repi2rjbvar_obj</span><span class="o">.</span><span class="n">ev</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">repis</span><span class="p">),</span> <span class="n">mags</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">rjb_hat</span><span class="p">,</span> <span class="n">rjbvar</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">rjb_hat</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_computeRdist</span><span class="p">(</span><span class="s1">&#39;Rjb&#39;</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="PointRupture.computeRrup"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.point_rupture.html#shakelib.rupture.point_rupture.PointRupture.computeRrup">[docs]</a>    <span class="k">def</span> <span class="nf">computeRrup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -326,133 +208,104 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            If var is True then this returns a tuple of two arrays: first, the</span>
-<span class="sd">                predicted Rjb values, and second an array of the variance of</span>
+<span class="sd">                predicted Rrup, and second an array of the variance of</span>
 <span class="sd">                those predictions. If var is False then just the first element</span>
 <span class="sd">                of the tuple is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cdir</span><span class="p">,</span> <span class="n">tmp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span>
-        <span class="n">origin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_origin</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_computeRdist</span><span class="p">(</span><span class="s1">&#39;Rrup&#39;</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span></div>
 
-        <span class="c1"># -------------------</span>
-        <span class="c1"># Sort out file names</span>
-        <span class="c1"># -------------------</span>
-        <span class="n">rake</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">origin</span><span class="o">.</span><span class="n">rake</span><span class="p">)</span>
-        <span class="n">mech</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">rake_to_mech</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_computeRdist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rtype</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to actually do the approximate fault distance</span>
+<span class="sd">        computations.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            type (str): Either &#39;Rjb&#39; or &#39;Rrup&#39;.</span>
+<span class="sd">            lon (array): Numpy array of longitudes.</span>
+<span class="sd">            lat (array): Numpy array of latitudes.</span>
+<span class="sd">            depth (array): Numpy array of depths (km; positive down).</span>
+<span class="sd">            var (bool): Also return variance of prediction.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            If var is True then this returns a tuple of two arrays: first, the</span>
+<span class="sd">                predicted approximate fault distance values (either Rjb or </span>
+<span class="sd">                Rrup, depending on the &#39;type&#39; argument), and second an array of </span>
+<span class="sd">                the variance of those predictions. If var is False then just the </span>
+<span class="sd">                first element of the tuple is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">rtype</span> <span class="o">==</span> <span class="s1">&#39;Rjb&#39;</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">DistType</span><span class="o">.</span><span class="n">Rjb</span>
+        <span class="k">elif</span> <span class="n">rtype</span> <span class="o">==</span> <span class="s1">&#39;Rrup&#39;</span><span class="p">:</span>
+            <span class="n">dtype</span> <span class="o">=</span> <span class="n">DistType</span><span class="o">.</span><span class="n">Rrup</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown distance type in _computeRdist&#39;</span><span class="p">)</span>
+
+        <span class="c1"># ----------------------------</span>
+        <span class="c1"># Sort out ps2ff parameters</span>
+        <span class="c1"># ----------------------------</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_origin</span>
+        <span class="n">mech</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mech</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s1">&#39;_tectonic_region&#39;</span><span class="p">):</span>
-            <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Rrup_WC94_mechA_ar1p0_seis0-20_Ratios.csv&quot;</span><span class="p">)</span>
-            <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Rrup_WC94_mechA_ar1p0_seis0-20_Var.csv&quot;</span><span class="p">)</span>
+            <span class="n">mscale</span> <span class="o">=</span> <span class="n">MagScaling</span><span class="o">.</span><span class="n">WC94</span>
+            <span class="n">smech</span> <span class="o">=</span> <span class="n">Mechanism</span><span class="o">.</span><span class="n">A</span>
+            <span class="n">aspect</span> <span class="o">=</span> <span class="mf">1.7</span>
+            <span class="n">min_sdepth</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">max_sdepth</span> <span class="o">=</span> <span class="mi">20</span>
         <span class="k">elif</span> <span class="n">origin</span><span class="o">.</span><span class="n">_tectonic_region</span> <span class="o">==</span> <span class="s1">&#39;Active Shallow Crust&#39;</span><span class="p">:</span>
+            <span class="n">mscale</span> <span class="o">=</span> <span class="n">MagScaling</span><span class="o">.</span><span class="n">HB08</span>
+            <span class="n">aspect</span> <span class="o">=</span> <span class="mf">1.7</span>
+            <span class="n">min_sdepth</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">max_sdepth</span> <span class="o">=</span> <span class="mi">20</span>
             <span class="k">if</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;ALL&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_WC94_mechA_ar1p7_seis0-20_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_WC94_mechA_ar1p7_seis0-20_Var.csv&quot;</span><span class="p">)</span>
+                <span class="c1"># HB08 doesn&#39;t have an &#39;ALL&#39; mechanism, so use WC94</span>
+                <span class="n">mscale</span> <span class="o">=</span> <span class="n">MagScaling</span><span class="o">.</span><span class="n">WC94</span>
+                <span class="n">smech</span> <span class="o">=</span> <span class="n">Mechanism</span><span class="o">.</span><span class="n">A</span>
             <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;RS&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_WC94_mechR_ar1p7_seis0-20_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_WC94_mechR_ar1p7_seis0-20_Var.csv&quot;</span><span class="p">)</span>
+                <span class="n">smech</span> <span class="o">=</span> <span class="n">Mechanism</span><span class="o">.</span><span class="n">R</span>
             <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;NM&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_WC94_mechN_ar1p7_seis0-20_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_WC94_mechN_ar1p7_seis0-20_Var.csv&quot;</span><span class="p">)</span>
+                <span class="n">smech</span> <span class="o">=</span> <span class="n">Mechanism</span><span class="o">.</span><span class="n">N</span>
             <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;SS&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_WC94_mechSS_ar1p7_seis0-20_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_WC94_mechSS_ar1p7_seis0-20_Var.csv&quot;</span><span class="p">)</span>
+                <span class="n">smech</span> <span class="o">=</span> <span class="n">Mechanism</span><span class="o">.</span><span class="n">SS</span>
         <span class="k">elif</span> <span class="n">origin</span><span class="o">.</span><span class="n">_tectonic_region</span> <span class="o">==</span> <span class="s1">&#39;Stable Shallow Crust&#39;</span><span class="p">:</span>
+            <span class="n">mscale</span> <span class="o">=</span> <span class="n">MagScaling</span><span class="o">.</span><span class="n">S14</span>
+            <span class="n">aspect</span> <span class="o">=</span> <span class="mf">1.0</span>
+            <span class="n">min_sdepth</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">max_sdepth</span> <span class="o">=</span> <span class="mi">15</span>
             <span class="k">if</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;ALL&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_S14_mechA_ar1p0_seis0-15_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_S14_mechA_ar1p0_seis0-15_Var.csv&quot;</span><span class="p">)</span>
+                <span class="n">smech</span> <span class="o">=</span> <span class="n">Mechanism</span><span class="o">.</span><span class="n">A</span>
             <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;RS&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_S14_mechR_ar1p0_seis0-15_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_S14_mechR_ar1p0_seis0-15_Var.csv&quot;</span><span class="p">)</span>
+                <span class="n">smech</span> <span class="o">=</span> <span class="n">Mechanism</span><span class="o">.</span><span class="n">R</span>
             <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;NM&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_S14_mechN_ar1p0_seis0-15_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_S14_mechN_ar1p0_seis0-15_Var.csv&quot;</span><span class="p">)</span>
+                <span class="n">smech</span> <span class="o">=</span> <span class="n">Mechanism</span><span class="o">.</span><span class="n">N</span>
             <span class="k">elif</span> <span class="n">mech</span> <span class="o">==</span> <span class="s1">&#39;SS&#39;</span><span class="p">:</span>
-                <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_S14_mechSS_ar1p0_seis0-15_Ratios.csv&quot;</span><span class="p">)</span>
-                <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;Rrup_S14_mechSS_ar1p0_seis0-15_Var.csv&quot;</span><span class="p">)</span>
+                <span class="n">smech</span> <span class="o">=</span> <span class="n">Mechanism</span><span class="o">.</span><span class="n">SS</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s1">&#39;Unsupported tectonic region; using coefficients for unknown&#39;</span>
                 <span class="s1">&#39;tectonic region.&#39;</span><span class="p">)</span>
-            <span class="n">rf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Rrup_WC94_mechA_ar1p0_seis0-20_Ratios.csv&quot;</span><span class="p">)</span>
-            <span class="n">vf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">cdir</span><span class="p">,</span> <span class="s2">&quot;ps2ff&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;Rrup_WC94_mechA_ar1p0_seis0-20_Var.csv&quot;</span><span class="p">)</span>
+            <span class="n">mscale</span> <span class="o">=</span> <span class="n">MagScaling</span><span class="o">.</span><span class="n">WC94</span>
+            <span class="n">smech</span> <span class="o">=</span> <span class="n">Mechanism</span><span class="o">.</span><span class="n">A</span>
+            <span class="n">aspect</span> <span class="o">=</span> <span class="mf">1.7</span>
+            <span class="n">min_sdepth</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">max_sdepth</span> <span class="o">=</span> <span class="mi">20</span>
 
-        <span class="c1"># -----------------</span>
-        <span class="c1"># Start with ratios</span>
-        <span class="c1"># -----------------</span>
-        <span class="n">repi2rrup_ratios_tbl</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">rf</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
-        <span class="n">r2rrt_cols</span> <span class="o">=</span> <span class="n">repi2rrup_ratios_tbl</span><span class="o">.</span><span class="n">columns</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="n">mag_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="p">(</span><span class="n">r2rrt_cols</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;R\d+\.*\d*&#39;</span><span class="p">,</span> <span class="n">column</span><span class="p">):</span>
-                <span class="n">magnitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span>
-                    <span class="s1">&#39;R(\d+\.*\d*)&#39;</span><span class="p">,</span> <span class="n">column</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">mag_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">magnitude</span><span class="p">)</span>
-        <span class="n">mag_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mag_list</span><span class="p">)</span>
-        <span class="n">dist_list</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">repi2rrup_ratios_tbl</span><span class="p">[</span><span class="s1">&#39;Repi_km&#39;</span><span class="p">]))</span>
-        <span class="n">repi2rrup_grid</span> <span class="o">=</span> <span class="n">repi2rrup_ratios_tbl</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
-        <span class="n">repi2rrup_obj</span> <span class="o">=</span> <span class="n">spint</span><span class="o">.</span><span class="n">RectBivariateSpline</span><span class="p">(</span>
-            <span class="n">dist_list</span><span class="p">,</span> <span class="n">mag_list</span><span class="p">,</span> <span class="n">repi2rrup_grid</span><span class="p">,</span> <span class="n">kx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ky</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-
-        <span class="k">def</span> <span class="nf">repi2rrup_tbl</span><span class="p">(</span><span class="n">repi</span><span class="p">,</span> <span class="n">M</span><span class="p">):</span>
-            <span class="n">ratio</span> <span class="o">=</span> <span class="n">repi2rrup_obj</span><span class="o">.</span><span class="n">ev</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">repi</span><span class="p">),</span> <span class="n">M</span><span class="p">)</span>
-            <span class="n">rrup</span> <span class="o">=</span> <span class="n">repi</span> <span class="o">*</span> <span class="n">ratio</span>
-            <span class="k">return</span> <span class="n">rrup</span>
+        <span class="n">p2f</span> <span class="o">=</span> <span class="n">PS2FF</span><span class="o">.</span><span class="n">fromParams</span><span class="p">(</span><span class="n">dist_type</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
+                               <span class="n">mag_scaling</span><span class="o">=</span><span class="n">mscale</span><span class="p">,</span>
+                               <span class="n">mechanism</span><span class="o">=</span><span class="n">smech</span><span class="p">,</span>
+                               <span class="n">AR</span><span class="o">=</span><span class="n">aspect</span><span class="p">,</span>
+                               <span class="n">min_seis_depth</span><span class="o">=</span><span class="n">min_sdepth</span><span class="p">,</span>
+                               <span class="n">max_seis_depth</span><span class="o">=</span><span class="n">max_sdepth</span><span class="p">)</span>
 
         <span class="n">repis</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">computeRepi</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">),</span> <span class="mf">0.0001</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">mags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
-        <span class="n">rrup_hat</span> <span class="o">=</span> <span class="n">repi2rrup_tbl</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">mags</span><span class="p">)</span>
 
-        <span class="c1"># -------------------</span>
-        <span class="c1"># Additional Variance</span>
-        <span class="c1"># -------------------</span>
-        <span class="n">repi2rrupvar_ratios_tbl</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">vf</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">&#39;#&#39;</span><span class="p">)</span>
-        <span class="n">repi2rrupvar_grid</span> <span class="o">=</span> <span class="n">repi2rrupvar_ratios_tbl</span><span class="o">.</span><span class="n">values</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:]</span>
-        <span class="n">repi2rrupvar_obj</span> <span class="o">=</span> <span class="n">spint</span><span class="o">.</span><span class="n">RectBivariateSpline</span><span class="p">(</span>
-            <span class="n">dist_list</span><span class="p">,</span> <span class="n">mag_list</span><span class="p">,</span> <span class="n">repi2rrupvar_grid</span><span class="p">,</span> <span class="n">kx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ky</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">rrupvar</span> <span class="o">=</span> <span class="n">repi2rrupvar_obj</span><span class="o">.</span><span class="n">ev</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">repis</span><span class="p">),</span> <span class="n">mags</span><span class="p">)</span>
+        <span class="n">r_hat</span> <span class="o">=</span> <span class="n">p2f</span><span class="o">.</span><span class="n">r2r</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">mags</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">rrup_hat</span><span class="p">,</span> <span class="n">rrupvar</span><span class="p">)</span>
+            <span class="n">r_var</span> <span class="o">=</span> <span class="n">p2f</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">mags</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">r_hat</span><span class="p">,</span> <span class="n">r_var</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">rrup_hat</span></div>
+            <span class="k">return</span> <span class="n">r_hat</span>
 
 <div class="viewcode-block" id="PointRupture.computeGC2"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.point_rupture.html#shakelib.rupture.point_rupture.PointRupture.computeGC2">[docs]</a>    <span class="k">def</span> <span class="nf">computeGC2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

@@ -174,7 +174,7 @@ def config_error(config, results):
 
 def check_config(config, logger):
     """
-    Checks that the gmpe, gmice, ipe, ccf, and component parameters
+    Checks that the gmpe, gmice, ipe, and ccf parameters
     in config are defined in their respective sections. Raises a
     ValidateError exception if an error is encountered.
 
@@ -201,11 +201,6 @@ def check_config(config, logger):
     if config['modeling']['ccf'] not in config['ccf_modules']:
         logger.error('Configuration error: ccf %s not in ccf_modules' %
                      (config['modeling']['ccf']))
-        raise ValidateError()
-    if config['interp']['component'] not in config['component_modules']:
-        logger.error('Configuration error: component %s not in '
-                     'component_modules' %
-                     (config['interp']['component']))
         raise ValidateError()
 
 

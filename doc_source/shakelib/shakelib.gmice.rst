@@ -5,6 +5,7 @@ Submodules
 
 .. toctree::
 
+   shakelib.gmice.wald99
    shakelib.gmice.wgrw12
 
 Module contents

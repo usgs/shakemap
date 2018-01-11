@@ -10,7 +10,7 @@ from openquake.hazardlib.imt import PGA, PGV, SA
 from openquake.hazardlib import const
 
 from shakelib.conversions.imt.newmark_hall_1982 import NewmarkHall1982
-from shakelib.conversions.imc.beyer_bommer_2006 import BeyerBommer2006
+from shakelib.conversions.imc.boore_kishida_2017 import BooreKishida2017
 from shakelib.sites import Sites
 
 
@@ -152,10 +152,18 @@ class MultiGMPE(GMPE):
 
             imc_in = gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
             imc_out = self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
-            lmean = BeyerBommer2006.ampIMCtoIMC(lmean, imc_in, imc_out, imt)
+            bk17 = BooreKishida2017(imc_in, imc_out)
+            lmean = bk17.convertAmps(imt, lmean, dists.rrup, rup.mag)
+            #
+            # The extra sigma from the component conversion appears to 
+            # apply to the total sigma, so the question arises as to
+            # how to apportion it between the intra- and inter-event
+            # sigma. Here we assume it all enters as intra-event sigma.
+            # 
             for j in range(len(lnsd2)):
-                lsd[j] = BeyerBommer2006.sigmaIMCtoIMC(
-                    lsd[j], imc_in, imc_out, imt)
+                if stddev_types[j] == const.StdDev.INTER_EVENT:
+                    continue
+                lsd[j] = bk17.convertStddevs(imt, lsd[j], dists.rrup, rup.mag)
 
             # -----------------------------------------------------------------
             # Compute weighted mean and sd
@@ -202,7 +210,7 @@ class MultiGMPE(GMPE):
             MultiGMPE object.
 
         """
-        IMC = conf['component_modules'][conf['interp']['component']]
+        IMC = getattr(const.IMC, conf['interp']['component'])
         selected_gmpe = conf['modeling']['gmpe']
 
         if verbose is True:
@@ -276,7 +284,7 @@ class MultiGMPE(GMPE):
             MultiGMPE.
 
         """
-        IMC = conf['component_modules'][conf['interp']['component']]
+        IMC = getattr(const.IMC, conf['interp']['component'])
 
         selected_gmpes = conf['gmpe_sets'][set_name]['gmpes']
         selected_gmpe_weights = \

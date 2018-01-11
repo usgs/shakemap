@@ -52,7 +52,7 @@ class RasterModule(CoreModule):
         layers = config['products']['raster']['layers']
         for layer in layers:
             fileimt = oq_to_file(layer)
-            imtdict = container.getIMTGrids(layer, 'Larger')
+            imtdict = container.getIMTGrids(layer, 'GREATER_OF_TWO_HORIZONTAL')
             mean_grid = imtdict['mean']
             std_grid = imtdict['std']
             mean_gdal = GDALGrid.copyFromGrid(mean_grid)
