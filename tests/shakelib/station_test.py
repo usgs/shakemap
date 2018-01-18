@@ -40,8 +40,8 @@ def test_station():
 
     stations = StationList.loadFromXML(xmlfiles, ":memory:")
 
-    df1 = stations.getStationDictionary(instrumented=True)
-    df2 = stations.getStationDictionary(instrumented=False)
+    df1, _ = stations.getStationDictionary(instrumented=True)
+    df2, _ = stations.getStationDictionary(instrumented=False)
 
     ppath = os.path.abspath(os.path.join(datadir, '..', 'database',
                                          'test1.pickle'))
@@ -80,8 +80,8 @@ def test_station():
 
     stations = stations.addData(xmlfiles)
 
-    df1 = stations.getStationDictionary(instrumented=True)
-    df2 = stations.getStationDictionary(instrumented=False)
+    df1, _ = stations.getStationDictionary(instrumented=True)
+    df2, _ = stations.getStationDictionary(instrumented=False)
 
     ppath = os.path.abspath(os.path.join(datadir, '..', 'database',
                                          'test2.pickle'))
@@ -117,8 +117,8 @@ def test_station2():
 
     stations = StationList.loadFromXML(xmlfiles, ":memory:")
 
-    df1 = stations.getStationDictionary(instrumented=True)
-    df2 = stations.getStationDictionary(instrumented=False)
+    df1, _ = stations.getStationDictionary(instrumented=True)
+    df2, _ = stations.getStationDictionary(instrumented=False)
 
     ppath = os.path.abspath(os.path.join(datadir, '..', 'database',
                                          'test3.pickle'))
@@ -144,8 +144,8 @@ def test_station2():
 
         stations2 = StationList.loadFromSQL(sql)
 
-        df1 = stations2.getStationDictionary(instrumented=True)
-        df2 = stations2.getStationDictionary(instrumented=False)
+        df1, _ = stations2.getStationDictionary(instrumented=True)
+        df2, _ = stations2.getStationDictionary(instrumented=False)
 
         compare_dataframes(saved_df1, df1)
         compare_dataframes(saved_df2, df2)
@@ -187,8 +187,8 @@ def test_station4():
 
     stations = StationList.loadFromXML(xmlfiles, ":memory:")
 
-    df1 = stations.getStationDictionary(instrumented=True)  # noqa
-    df2 = stations.getStationDictionary(instrumented=False)  # noqa
+    df1, _ = stations.getStationDictionary(instrumented=True)  # noqa
+    df2, _ = stations.getStationDictionary(instrumented=False)  # noqa
     assert df1 is None
 
 
@@ -213,8 +213,8 @@ def test_station5():
     xmlfiles = [inputfile, inputfile, dyfifile, dyfifile]
     stations2 = StationList.loadFromXML(xmlfiles, ":memory:")
 
-    df1 = stations1.getStationDictionary(instrumented=True)
-    df2 = stations2.getStationDictionary(instrumented=True)
+    df1, _ = stations1.getStationDictionary(instrumented=True)
+    df2, _ = stations2.getStationDictionary(instrumented=True)
 
     compare_dataframes(df1, df2)
 

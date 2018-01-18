@@ -83,11 +83,11 @@ def test_input_container():
         history2 = container2.getVersionHistory()  # noqa
 
         assert dict_equal(config, config2)
-        df1 = station.getStationDictionary(instrumented=False)
-        df2 = station2.getStationDictionary(instrumented=False)
+        df1, _ = station.getStationDictionary(instrumented=False)
+        df2, _ = station2.getStationDictionary(instrumented=False)
         assert dict_equal(df1, df2)
-        df1 = station.getStationDictionary(instrumented=True)
-        df2 = station2.getStationDictionary(instrumented=True)
+        df1, _ = station.getStationDictionary(instrumented=True)
+        df2, _ = station2.getStationDictionary(instrumented=True)
         assert dict_equal(df1, df2)
         assert history['history'][-1][0] == history['history'][-1][0]
         assert history['history'][-1][1] == history['history'][-1][1]
