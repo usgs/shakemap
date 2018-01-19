@@ -233,5 +233,6 @@ dependencies:
   - ./impact-utils.zip
   - ./libcomcat.zip
   - ./mapio.zip
+  - ./strec.zip
 prefix: /Users/mhearne/anaconda3/envs/shakemap
 

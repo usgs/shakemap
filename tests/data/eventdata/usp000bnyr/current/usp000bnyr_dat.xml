@@ -1,0 +1,797 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE shakemap-data [
+<!ELEMENT shakemap-data (earthquake,stationlist)>
+<!ELEMENT stationlist (station+)>
+<!ATTLIST stationlist
+  created	CDATA	#REQUIRED
+>
+
+<!ELEMENT station (comp+)>
+<!ATTLIST station
+  code		CDATA 			#REQUIRED
+  name		CDATA 			#REQUIRED
+  insttype	CDATA 			#REQUIRED
+  lat		CDATA 			#REQUIRED
+  lon		CDATA 			#REQUIRED
+  source	(SCSN|CGS|NSMP) 	'SCSN'
+  netid		CDATA			#REQUIRED
+  commtype	(DIG|ANA) 		'DIG'
+  dist          CDATA                   '10.0'
+  loc		CDATA			''
+>
+
+<!ELEMENT comp (acc,vel,psa*)>
+<!ATTLIST comp
+  name          CDATA  #REQUIRED
+  originalname  CDATA  #IMPLIED
+>
+
+<!ELEMENT acc EMPTY>
+<!ELEMENT vel EMPTY>
+<!ELEMENT psa03 EMPTY>
+<!ELEMENT psa10 EMPTY>
+<!ELEMENT psa30 EMPTY>
+<!ATTLIST acc
+  value  CDATA         #REQUIRED
+  flag   CDATA        ''
+>
+<!ATTLIST vel
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa03
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa10
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa30
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ELEMENT  earthquake EMPTY>
+<!ATTLIST earthquake
+  id 		ID	#REQUIRED
+  lat		CDATA	#REQUIRED
+  lon		CDATA	#REQUIRED
+  mag		CDATA	#REQUIRED
+  year          CDATA   #REQUIRED
+  month         CDATA   #REQUIRED
+  day           CDATA   #REQUIRED
+  hour          CDATA   #REQUIRED
+  minute        CDATA   #REQUIRED
+  second        CDATA   #REQUIRED
+  timezone      CDATA   #REQUIRED
+  depth		CDATA	#REQUIRED
+  type		CDATA	#REQUIRED
+  locstring	CDATA	#REQUIRED
+  pga		CDATA   #REQUIRED
+  pgv		CDATA   #REQUIRED
+  sp03		CDATA   #REQUIRED
+  sp10		CDATA   #REQUIRED
+  sp30		CDATA   #REQUIRED
+  created	CDATA	#REQUIRED
+>
+]>
+<shakemap-data code_version="3.5" map_version="1">
+<earthquake id="20030122020636" lat="18.90000" lon="-104.06300" mag="7.5" year="2003" month="1" day="22" hour="2" minute="6" second="36" timezone="GMT" depth="24" network="us" locstring="Tecoman, Mexico" created="1485593832" />
+<stationlist created="1485593832">
+<station code="CALE" name="Caleta De Campos, Mexico" insttype="UNK" lat="18.071" lon="-102.754" dist="130.979496" source="GUER" netid="G" commtype="UNK" loc="" intensity="4.0">
+<comp name="Z">
+<pga value="2.8673" flag="0" />
+</comp>
+<comp name="N">
+<pga value="1.5000" flag="0" />
+</comp>
+<comp name="E">
+<pga value="2.8367" flag="0" />
+</comp>
+</station>
+<station code="VILE" name="Villita, Mexico" insttype="UNK" lat="18.045" lon="-102.189" dist="184.726477" source="GUER" netid="G" commtype="UNK" loc="" intensity="3.6">
+<comp name="Z">
+<pga value="1.0612" flag="0" />
+</comp>
+<comp name="N">
+<pga value="0.6939" flag="0" />
+</comp>
+<comp name="E">
+<pga value="1.1327" flag="0" />
+</comp>
+</station>
+<station code="UNIO" name="La Union, Mexico" insttype="UNK" lat="17.98" lon="-101.81" dist="223.029559" source="GUER" netid="G" commtype="UNK" loc="" intensity="3.5">
+<comp name="Z">
+<pga value="1.2449" flag="0" />
+</comp>
+<comp name="N">
+<pga value="0.9082" flag="0" />
+</comp>
+<comp name="E">
+<pga value="0.8367" flag="0" />
+</comp>
+</station>
+<station code="AZIH" name="Zihuatanejo, Mexico" insttype="UNK" lat="17.608" lon="-101.462" dist="274.184786" source="GUER" netid="G" commtype="UNK" loc="" intensity="3.3">
+<comp name="Z">
+<pga value="0.5306" flag="0" />
+</comp>
+<comp name="N">
+<pga value="0.5714" flag="0" />
+</comp>
+<comp name="E">
+<pga value="0.4184" flag="0" />
+</comp>
+</station>
+<station code="PET2" name="Petatlan Ii, Mexico" insttype="UNK" lat="17.53" lon="-101.26" dist="296.910559" source="GUER" netid="G" commtype="UNK" loc="" intensity="3.0">
+<comp name="Z">
+<pga value="0.3775" flag="0" />
+</comp>
+<comp name="N">
+<pga value="0.3775" flag="0" />
+</comp>
+<comp name="E">
+<pga value="0.3674" flag="0" />
+</comp>
+</station>
+<station code="COYQ" name="Coyuquilla, Mexico" insttype="UNK" lat="17.38" lon="-101.056" dist="323.664451" source="GUER" netid="G" commtype="UNK" loc="" intensity="3.0">
+<comp name="Z">
+<pga value="0.4898" flag="0" />
+</comp>
+<comp name="N">
+<pga value="0.2755" flag="0" />
+</comp>
+<comp name="E">
+<pga value="0.3469" flag="0" />
+</comp>
+</station>
+<station code="OBS_1" name="Cuyutlan" insttype="Observed" lat="18.9167" lon="-104.0667" dist="29.601450" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="32.24" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="55.20" flag="0" />
+<psa10 value="35.40" flag="0" />
+<psa30 value="6.70" flag="0" />
+</comp>
+</station>
+<station code="OBS_2" name="Los Reyes" insttype="Observed" lat="18.9667" lon="-104.05" dist="31.731727" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="31.63" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="54.65" flag="0" />
+<psa10 value="35.82" flag="0" />
+<psa30 value="6.79" flag="0" />
+</comp>
+</station>
+<station code="OBS_3" name="Santa Rita" insttype="Observed" lat="19" lon="-104.0833" dist="32.268659" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="31.48" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="54.52" flag="0" />
+<psa10 value="35.92" flag="0" />
+<psa30 value="6.81" flag="0" />
+</comp>
+</station>
+<station code="OBS_4" name="Madrid" insttype="Observed" lat="19.0833" lon="-103.8667" dist="39.509968" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="29.77" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="52.94" flag="0" />
+<psa10 value="37.17" flag="0" />
+<psa30 value="7.08" flag="0" />
+</comp>
+</station>
+<station code="OBS_5" name="Pueblo Juarez" insttype="Observed" lat="19.1667" lon="-103.9167" dist="41.506347" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="29.37" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="52.56" flag="0" />
+<psa10 value="37.48" flag="0" />
+<psa30 value="7.14" flag="0" />
+</comp>
+</station>
+<station code="OBS_6" name="Ixtlahuacan" insttype="Observed" lat="19" lon="-103.75" dist="38.795758" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="29.92" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="53.08" flag="0" />
+<psa10 value="37.06" flag="0" />
+<psa30 value="7.05" flag="0" />
+</comp>
+</station>
+<station code="OBS_7" name="Colima" insttype="Observed" lat="19.2333" lon="-103.7167" dist="47.766316" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="28.26" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="51.50" flag="0" />
+<psa10 value="38.38" flag="0" />
+<psa30 value="7.34" flag="0" />
+</comp>
+</station>
+<station code="OBS_8" name="Villa de Alvarez" insttype="Observed" lat="19.25" lon="-103.7333" dist="48.058425" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="28.21" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="51.46" flag="0" />
+<psa10 value="38.42" flag="0" />
+<psa30 value="7.35" flag="0" />
+</comp>
+</station>
+<station code="OBS_9" name="Comala" insttype="Observed" lat="19.3167" lon="-103.75" dist="50.539645" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="27.82" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="51.08" flag="0" />
+<psa10 value="38.75" flag="0" />
+<psa30 value="7.42" flag="0" />
+</comp>
+</station>
+<station code="OBS_10" name="Venustiano Carranza" insttype="Observed" lat="19" lon="-104.1" dist="31.937476" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.5">
+<comp name="DERIVED">
+<pga value="23.13" flag="0" />
+<pgv value="18.77" flag="0" />
+<psa03 value="41.34" flag="0" />
+<psa10 value="24.11" flag="0" />
+<psa30 value="4.64" flag="0" />
+</comp>
+</station>
+<station code="OBS_11" name="Armeria" insttype="Observed" lat="18.9333" lon="-103.9667" dist="32.172779" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="16.91" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="31.27" flag="0" />
+<psa10 value="16.23" flag="0" />
+<psa30 value="3.17" flag="0" />
+</comp>
+</station>
+<station code="OBS_12" name="San Buenaventura" insttype="Observed" lat="19" lon="-104.15" dist="30.943548" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="31.85" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="54.85" flag="0" />
+<psa10 value="35.67" flag="0" />
+<psa30 value="6.76" flag="0" />
+</comp>
+</station>
+<station code="OBS_13" name="Coquimatlan" insttype="Observed" lat="19.2" lon="-103.8" dist="44.963034" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="28.73" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="51.96" flag="0" />
+<psa10 value="37.99" flag="0" />
+<psa30 value="7.25" flag="0" />
+</comp>
+</station>
+<station code="OBS_14" name="Tinajas" insttype="Observed" lat="19.05" lon="-103.5667" dist="44.108100" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="28.88" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="52.10" flag="0" />
+<psa10 value="37.87" flag="0" />
+<psa30 value="7.23" flag="0" />
+</comp>
+</station>
+<station code="OBS_15" name="Tecoman" insttype="Observed" lat="18.9167" lon="-103.8833" dist="33.209984" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="16.76" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="31.13" flag="0" />
+<psa10 value="16.32" flag="0" />
+<psa30 value="3.19" flag="0" />
+</comp>
+</station>
+<station code="OBS_16" name="Manzanillo" insttype="Observed" lat="19.05" lon="-104.3333" dist="29.060254" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="17.39" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="31.74" flag="0" />
+<psa10 value="15.95" flag="0" />
+<psa30 value="3.11" flag="0" />
+</comp>
+</station>
+<station code="OBS_17" name="Cerro de Ortega" insttype="Observed" lat="18.75" lon="-103.7667" dist="29.452321" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="17.33" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="31.68" flag="0" />
+<psa10 value="15.99" flag="0" />
+<psa30 value="3.12" flag="0" />
+</comp>
+</station>
+<station code="OBS_18" name="El Ranchito" insttype="Observed" lat="19.2333" lon="-103.8333" dist="45.497795" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="15.37" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="29.74" flag="0" />
+<psa10 value="17.21" flag="0" />
+<psa30 value="3.38" flag="0" />
+</comp>
+</station>
+<station code="OBS_19" name="Miramar" insttype="Observed" lat="19.1167" lon="-104.3833" dist="31.565383" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="17.00" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="31.36" flag="0" />
+<psa10 value="16.18" flag="0" />
+<psa30 value="3.16" flag="0" />
+</comp>
+</station>
+<station code="OBS_20" name="El Naranjo" insttype="Observed" lat="19.1167" lon="-104.4" dist="31.679955" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="16.98" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="31.34" flag="0" />
+<psa10 value="16.19" flag="0" />
+<psa30 value="3.16" flag="0" />
+</comp>
+</station>
+<station code="OBS_21" name="Camotlan" insttype="Observed" lat="19.2167" lon="-104.2333" dist="37.016231" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="16.27" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="30.64" flag="0" />
+<psa10 value="16.62" flag="0" />
+<psa30 value="3.25" flag="0" />
+</comp>
+</station>
+<station code="OBS_22" name="Tepames" insttype="Observed" lat="19.0833" lon="-103.6167" dist="44.341341" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="28.84" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="52.06" flag="0" />
+<psa10 value="37.90" flag="0" />
+<psa30 value="7.23" flag="0" />
+</comp>
+</station>
+<station code="OBS_23" name="Chavarin" insttype="Observed" lat="19.2" lon="-104.55" dist="41.157305" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="7.0">
+<comp name="DERIVED">
+<pga value="29.44" flag="0" />
+<pgv value="27.02" flag="0" />
+<psa03 value="52.63" flag="0" />
+<psa10 value="37.43" flag="0" />
+<psa30 value="7.13" flag="0" />
+</comp>
+</station>
+<station code="OBS_24" name="Estapilla" insttype="Observed" lat="18.9833" lon="-103.5167" dist="43.501240" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.5">
+<comp name="DERIVED">
+<pga value="21.24" flag="0" />
+<pgv value="18.77" flag="0" />
+<psa03 value="39.53" flag="0" />
+<psa10 value="25.40" flag="0" />
+<psa30 value="4.92" flag="0" />
+</comp>
+</station>
+<station code="OBS_25" name="Cihuatlan" insttype="Observed" lat="19.25" lon="-104.5667" dist="45.198448" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.5">
+<comp name="DERIVED">
+<pga value="11.28" flag="0" />
+<pgv value="9.06" flag="0" />
+<psa03 value="22.54" flag="0" />
+<psa10 value="11.56" flag="0" />
+<psa30 value="2.30" flag="0" />
+</comp>
+</station>
+<station code="OBS_26" name="El Trapiche" insttype="Observed" lat="19.2833" lon="-103.65" dist="51.575362" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.5">
+<comp name="DERIVED">
+<pga value="20.27" flag="0" />
+<pgv value="18.77" flag="0" />
+<psa03 value="38.57" flag="0" />
+<psa10 value="26.14" flag="0" />
+<psa30 value="5.08" flag="0" />
+</comp>
+</station>
+<station code="OBS_27" name="Cofradia de Suchitlan" insttype="Observed" lat="19.4" lon="-103.7" dist="56.519011" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="14.48" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="28.82" flag="0" />
+<psa10 value="17.85" flag="0" />
+<psa30 value="3.52" flag="0" />
+</comp>
+</station>
+<station code="OBS_28" name="Jalipa" insttype="Observed" lat="19.1167" lon="-104.2667" dist="32.789176" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="16.82" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="31.19" flag="0" />
+<psa10 value="16.28" flag="0" />
+<psa30 value="3.18" flag="0" />
+</comp>
+</station>
+<station code="OBS_29" name="Aquila" insttype="Observed" lat="18.6" lon="-103.5" dist="42.730883" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="15.64" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="30.01" flag="0" />
+<psa10 value="17.03" flag="0" />
+<psa30 value="3.34" flag="0" />
+</comp>
+</station>
+<station code="OBS_30" name="Cuauhtemoc" insttype="Observed" lat="19.3333" lon="-103.6" dist="55.806813" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="14.53" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="28.87" flag="0" />
+<psa10 value="17.81" flag="0" />
+<psa30 value="3.52" flag="0" />
+</comp>
+</station>
+<station code="OBS_31" name="Queseria" insttype="Observed" lat="19.3667" lon="-103.5833" dist="58.403028" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="14.35" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="28.68" flag="0" />
+<psa10 value="17.95" flag="0" />
+<psa30 value="3.55" flag="0" />
+</comp>
+</station>
+<station code="OBS_32" name="San Juan de Alima" insttype="Observed" lat="18.5667" lon="-103.6333" dist="32.887966" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="16.81" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="31.17" flag="0" />
+<psa10 value="16.29" flag="0" />
+<psa30 value="3.18" flag="0" />
+</comp>
+</station>
+<station code="OBS_33" name="Minatitlan" insttype="Observed" lat="19.3667" lon="-104.0667" dist="45.638871" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.5">
+<comp name="DERIVED">
+<pga value="11.25" flag="0" />
+<pgv value="9.06" flag="0" />
+<psa03 value="22.51" flag="0" />
+<psa10 value="11.58" flag="0" />
+<psa30 value="2.31" flag="0" />
+</comp>
+</station>
+<station code="OBS_34" name="Villa Victoria" insttype="Observed" lat="18.7833" lon="-103.4" dist="48.289766" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="15.12" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="29.49" flag="0" />
+<psa10 value="17.38" flag="0" />
+<psa30 value="3.42" flag="0" />
+</comp>
+</station>
+<station code="OBS_35" name="Pihuamo" insttype="Observed" lat="19.25" lon="-103.3833" dist="58.201821" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="7.71" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="16.46" flag="0" />
+<psa10 value="8.11" flag="0" />
+<psa30 value="1.65" flag="0" />
+</comp>
+</station>
+<station code="OBS_36" name="Francisco Villa" insttype="Observed" lat="19.3833" lon="-104.9667" dist="81.159635" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="7.03" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="14.61" flag="0" />
+<psa10 value="8.58" flag="0" />
+<psa30 value="1.76" flag="0" />
+</comp>
+</station>
+<station code="OBS_37" name="Tecalitlan" insttype="Observed" lat="19.4667" lon="-103.3" dist="76.704249" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.5">
+<comp name="DERIVED">
+<pga value="9.75" flag="0" />
+<pgv value="9.06" flag="0" />
+<psa03 value="20.88" flag="0" />
+<psa10 value="12.64" flag="0" />
+<psa30 value="2.55" flag="0" />
+</comp>
+</station>
+<station code="OBS_38" name="Union de Tula" insttype="Observed" lat="19.9667" lon="-104.2667" dist="86.719509" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="6.91" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="14.27" flag="0" />
+<psa10 value="8.67" flag="0" />
+<psa30 value="1.78" flag="0" />
+</comp>
+</station>
+<station code="OBS_39" name="Sayula" insttype="Observed" lat="19.8667" lon="-103.6167" dist="95.202723" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="6.73" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="13.81" flag="0" />
+<psa10 value="8.81" flag="0" />
+<psa30 value="1.81" flag="0" />
+</comp>
+</station>
+<station code="OBS_40" name="Zacoalco" insttype="Observed" lat="20.2333" lon="-103.5833" dist="128.891618" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="6.19" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="12.40" flag="0" />
+<psa10 value="9.27" flag="0" />
+<psa30 value="1.92" flag="0" />
+</comp>
+</station>
+<station code="OBS_41" name="Barra de Navidad" insttype="Observed" lat="19.2" lon="-104.6833" dist="48.645704" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="15.09" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="29.45" flag="0" />
+<psa10 value="17.40" flag="0" />
+<psa30 value="3.43" flag="0" />
+</comp>
+</station>
+<station code="OBS_42" name="Casimiro Castillo" insttype="Observed" lat="19.6" lon="-104.4333" dist="61.222590" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.5">
+<comp name="DERIVED">
+<pga value="10.38" flag="0" />
+<pgv value="9.06" flag="0" />
+<psa03 value="21.57" flag="0" />
+<psa10 value="12.16" flag="0" />
+<psa30 value="2.44" flag="0" />
+</comp>
+</station>
+<station code="OBS_43" name="La Huerta" insttype="Observed" lat="19.4667" lon="-104.65" dist="64.117554" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="7.50" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="15.89" flag="0" />
+<psa10 value="8.24" flag="0" />
+<psa30 value="1.68" flag="0" />
+</comp>
+</station>
+<station code="OBS_44" name="Autlan" insttype="Observed" lat="19.7667" lon="-104.3667" dist="70.837708" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="7.30" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="15.34" flag="0" />
+<psa10 value="8.38" flag="0" />
+<psa30 value="1.71" flag="0" />
+</comp>
+</station>
+<station code="OBS_45" name="Tizupan" insttype="Observed" lat="18.225" lon="-103.1208" dist="89.625792" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="4.5">
+<comp name="DERIVED">
+<pga value="5.01" flag="0" />
+<pgv value="4.37" flag="0" />
+<psa03 value="7.14" flag="0" />
+<psa10 value="5.86" flag="0" />
+<psa30 value="1.22" flag="0" />
+</comp>
+</station>
+<station code="OBS_46" name="San Mateo" insttype="Observed" lat="19.5667" lon="-105.0833" dist="102.080801" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="6.60" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="13.47" flag="0" />
+<psa10 value="8.92" flag="0" />
+<psa30 value="1.83" flag="0" />
+</comp>
+</station>
+<station code="OBS_47" name="Tapalpa" insttype="Observed" lat="19.95" lon="-103.7667" dist="95.268588" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="6.73" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="13.81" flag="0" />
+<psa10 value="8.81" flag="0" />
+<psa30 value="1.81" flag="0" />
+</comp>
+</station>
+<station code="OBS_48" name="Tamazula" insttype="Observed" lat="20.0167" lon="-104.0667" dist="91.902911" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="6.0">
+<comp name="DERIVED">
+<pga value="12.66" flag="0" />
+<pgv value="13.04" flag="0" />
+<psa03 value="26.86" flag="0" />
+<psa10 value="19.38" flag="0" />
+<psa30 value="3.86" flag="0" />
+</comp>
+</station>
+<station code="OBS_49" name="Jose Maria Morelos" insttype="Observed" lat="19.6667" lon="-105.1833" dist="116.440639" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="6.37" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="12.86" flag="0" />
+<psa10 value="9.12" flag="0" />
+<psa30 value="1.88" flag="0" />
+</comp>
+</station>
+<station code="OBS_50" name="Chiquiliztlan" insttype="Observed" lat="20.0833" lon="-103.85" dist="103.638443" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="6.57" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="13.40" flag="0" />
+<psa10 value="8.94" flag="0" />
+<psa30 value="1.84" flag="0" />
+</comp>
+</station>
+<station code="OBS_51" name="Apatzingan" insttype="Observed" lat="19.0833" lon="-102.35" dist="139.748899" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="6.05" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="12.05" flag="0" />
+<psa10 value="9.40" flag="0" />
+<psa30 value="1.95" flag="0" />
+</comp>
+</station>
+<station code="OBS_52" name="Atenquique" insttype="Observed" lat="19.5167" lon="-103.4333" dist="74.904239" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="4.0">
+<comp name="DERIVED">
+<pga value="3.86" flag="0" />
+<pgv value="2.70" flag="0" />
+<psa03 value="3.85" flag="0" />
+<psa10 value="3.23" flag="0" />
+<psa30 value="0.58" flag="0" />
+</comp>
+</station>
+<station code="OBS_53" name="Tuxpan" insttype="Observed" lat="19.55" lon="-103.4" dist="78.946036" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="4.0">
+<comp name="DERIVED">
+<pga value="3.80" flag="0" />
+<pgv value="2.70" flag="0" />
+<psa03 value="3.78" flag="0" />
+<psa10 value="3.28" flag="0" />
+<psa30 value="0.59" flag="0" />
+</comp>
+</station>
+<station code="OBS_54" name="Ciudad Guzman" insttype="Observed" lat="19.6833" lon="-103.4833" dist="86.021501" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="4.0">
+<comp name="DERIVED">
+<pga value="3.59" flag="0" />
+<pgv value="2.70" flag="0" />
+<psa03 value="3.67" flag="0" />
+<psa10 value="3.37" flag="0" />
+<psa30 value="0.62" flag="0" />
+</comp>
+</station>
+<station code="OBS_55" name="Tecolotlan" insttype="Observed" lat="20.2167" lon="-104.05" dist="111.810234" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="4.0">
+<comp name="DERIVED">
+<pga value="3.02" flag="0" />
+<pgv value="2.70" flag="0" />
+<psa03 value="3.34" flag="0" />
+<psa10 value="3.67" flag="0" />
+<psa30 value="0.70" flag="0" />
+</comp>
+</station>
+<station code="OBS_56" name="Techaluta" insttype="Observed" lat="20.0667" lon="-103.55" dist="115.697875" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="6.38" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="12.89" flag="0" />
+<psa10 value="9.11" flag="0" />
+<psa30 value="1.88" flag="0" />
+</comp>
+</station>
+<station code="OBS_57" name="Mazamitla" insttype="Observed" lat="19.9167" lon="-103.0333" dist="127.619094" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.5">
+<comp name="DERIVED">
+<pga value="8.47" flag="0" />
+<pgv value="9.06" flag="0" />
+<psa03 value="19.39" flag="0" />
+<psa10 value="13.77" flag="0" />
+<psa30 value="2.81" flag="0" />
+</comp>
+</station>
+<station code="OBS_58" name="Acatlan de Juarez" insttype="Observed" lat="20.4167" lon="-103.5833" dist="145.671752" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="4.0">
+<comp name="DERIVED">
+<pga value="2.54" flag="0" />
+<pgv value="2.70" flag="0" />
+<psa03 value="3.04" flag="0" />
+<psa10 value="4.00" flag="0" />
+<psa30 value="0.80" flag="0" />
+</comp>
+</station>
+<station code="OBS_59" name="Tizapan" insttype="Observed" lat="20.1667" lon="-103.0667" dist="148.549296" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="4.0">
+<comp name="DERIVED">
+<pga value="2.51" flag="0" />
+<pgv value="2.70" flag="0" />
+<psa03 value="3.02" flag="0" />
+<psa10 value="4.03" flag="0" />
+<psa30 value="0.81" flag="0" />
+</comp>
+</station>
+<station code="OBS_60" name="Jiquilpan" insttype="Observed" lat="19.9833" lon="-102.7167" dist="151.507532" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="5.92" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="11.71" flag="0" />
+<psa10 value="9.53" flag="0" />
+<psa30 value="1.98" flag="0" />
+</comp>
+</station>
+<station code="OBS_61" name="El Tuito" insttype="Observed" lat="20.3167" lon="-105.3167" dist="169.298350" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="5.74" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="11.26" flag="0" />
+<psa10 value="9.71" flag="0" />
+<psa30 value="2.02" flag="0" />
+</comp>
+</station>
+<station code="OBS_62" name="Los Reyes de Salgado" insttype="Observed" lat="19.5833" lon="-102.4833" dist="142.511402" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="4.0">
+<comp name="DERIVED">
+<pga value="2.58" flag="0" />
+<pgv value="2.70" flag="0" />
+<psa03 value="3.06" flag="0" />
+<psa10 value="3.97" flag="0" />
+<psa30 value="0.79" flag="0" />
+</comp>
+</station>
+<station code="OBS_63" name="Playa Azul" insttype="Observed" lat="17.9833" lon="-102.3444" dist="173.342215" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="5.70" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="11.16" flag="0" />
+<psa10 value="9.75" flag="0" />
+<psa30 value="2.03" flag="0" />
+</comp>
+</station>
+<station code="OBS_64" name="Nueva Italia" insttype="Observed" lat="19.0167" lon="-102.1" dist="164.450921" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="5.79" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="11.37" flag="0" />
+<psa10 value="9.66" flag="0" />
+<psa30 value="2.01" flag="0" />
+</comp>
+</station>
+<station code="OBS_65" name="Uruapan" insttype="Observed" lat="19.4167" lon="-102.0667" dist="174.424236" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="3.5">
+<comp name="DERIVED">
+<pga value="1.07" flag="0" />
+<pgv value="nan" flag="0" />
+<psa03 value="nan" flag="0" />
+<psa10 value="nan" flag="0" />
+<psa30 value="nan" flag="0" />
+</comp>
+</station>
+<station code="OBS_66" name="Puerto Vallarta" insttype="Observed" lat="20.6167" lon="-105.25" dist="188.705755" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="5.57" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="10.83" flag="0" />
+<psa10 value="9.89" flag="0" />
+<psa30 value="2.06" flag="0" />
+</comp>
+</station>
+<station code="OBS_67" name="Carapan" insttype="Observed" lat="19.8667" lon="-102.05" dist="195.416361" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="5.52" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="10.70" flag="0" />
+<psa10 value="9.95" flag="0" />
+<psa30 value="2.07" flag="0" />
+</comp>
+</station>
+<station code="OBS_68" name="Ixtlan del Rio" insttype="Observed" lat="20.9667" lon="-105.1167" dist="213.207310" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="4.0">
+<comp name="DERIVED">
+<pga value="1.98" flag="0" />
+<pgv value="2.70" flag="0" />
+<psa03 value="2.66" flag="0" />
+<psa10 value="4.56" flag="0" />
+<psa30 value="0.96" flag="0" />
+</comp>
+</station>
+<station code="OBS_69" name="Ario de Rosales" insttype="Observed" lat="19.2" lon="-101.7167" dist="204.800191" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="5.0">
+<comp name="DERIVED">
+<pga value="5.45" flag="0" />
+<pgv value="6.29" flag="0" />
+<psa03 value="10.52" flag="0" />
+<psa10 value="10.03" flag="0" />
+<psa30 value="2.09" flag="0" />
+</comp>
+</station>
+<station code="OBS_70" name="Leon" insttype="Observed" lat="21.1167" lon="-101.6667" dist="314.026223" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="3.5">
+<comp name="DERIVED">
+<pga value="0.75" flag="0" />
+<pgv value="nan" flag="0" />
+<psa03 value="nan" flag="0" />
+<psa10 value="nan" flag="0" />
+<psa30 value="nan" flag="0" />
+</comp>
+</station>
+<station code="OBS_71" name="Campo Acosta" insttype="Observed" lat="19.7667" lon="-105.25" dist="128.136734" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="3.0">
+<comp name="DERIVED">
+<pga value="0.63" flag="0" />
+<pgv value="nan" flag="0" />
+<psa03 value="nan" flag="0" />
+<psa10 value="nan" flag="0" />
+<psa30 value="nan" flag="0" />
+</comp>
+</station>
+<station code="OBS_72" name="San Juan de los Lagos" insttype="Observed" lat="21.25" lon="-102.3" dist="288.610927" source="Zobin &amp; Pizano-Siva (2007)" netid="INTENSITY" commtype="Intensity" loc="" intensity="3.0">
+<comp name="DERIVED">
+<pga value="0.37" flag="0" />
+<pgv value="nan" flag="0" />
+<psa03 value="nan" flag="0" />
+<psa10 value="nan" flag="0" />
+<psa30 value="nan" flag="0" />
+</comp>
+</station>
+
+</stationlist>
+</shakemap-data>
