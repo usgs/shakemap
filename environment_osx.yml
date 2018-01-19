@@ -233,5 +233,6 @@ dependencies:
   - ./impact-utils.zip
   - ./libcomcat.zip
   - ./mapio.zip
-  - ./ps2ff.zip
+  - ./strec.zip
+
 

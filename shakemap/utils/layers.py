@@ -11,20 +11,6 @@ import numpy as np
 from openquake.hazardlib.geo.geodetic import min_distance_to_segment
 from strec.subtype import SubductionSelector
 
-# Make depth probability max out at 90% if depth to slab difference == 0,
-# bottom out at 10% when difference == 20 km
-DEPTH_MAX_PROB = 0.9
-DEPTH_AT_MAX_PROB = 0.0
-DEPTH_MIN_PROB = 0.1
-DEPTH_AT_MIN_PROB = 20
-
-# Kagan probability is 100% at 0 degrees kagan angle
-# 10
-KAGAN_MAX_PROB = 1.0
-KAGAN_AT_MAX_PROB = 0.0
-KAGAN_MIN_PROB = 0.1
-KAGAN_AT_MIN_PROB = 60
-
 def nearest_edge(elon, elat, poly):
     """
     Return the distance from a point to the nearest edge of a
@@ -130,65 +116,97 @@ def get_layer_distances(elon, elat, layer_dir):
         dist_dict[layer_name] = dist_to_layer(elon, elat, geom)
     return dist_dict
 
-def get_probability(x,min_prob,xmin,max_prob,xmax):
-    if x >= xmax:
-        prob = max_prob
-    else if x <= xmin:
-        prob = min_prob
-    else: # calculate slope/y-intercept, then probability from that
-        m = (max_prob-min_prob)/(xmax-xmin)
-        b = max_prob - (m * xmax)
-        prob = x * m + b
+def get_probability(x,x1,p1,x2,p2):
+    if x <= x1:
+        prob = p1
+    elif x >= x2:
+        prob = p2
+    else:
+        slope = (p1-p2)/(x1-x2)
+        intercept = p1 - slope * x1
+        prob = x * slope + intercept
     return prob
 
-def get_subduction_probabilities(results,depth):
-    # inputs to algorithm
+def get_subduction_probabilities(results,depth,config):
+    
+    # inputs to algorithm from STREC
+
+    # the angle between moment tensor and slab
     kagan = results['KaganAngle'] #can be nan
+
+    # Depth to slab
     slab_depth = results['SlabModelDepth']
+
+    # Error in depth to slab
     slab_depth_error = results['SlabModelDepthUncertainty']
-    focal = results['FocalMechanism']
-    tensor_type = results['TensorType']
-    subtype = results['TectonicSubtype']
-    if np.isnan(slab_depth): # implies no kagan angle either
-        if subtype == 'SZInter':
-            crustal_prob = 0.1
-            intraslab_prob = 0.1
-            interface_prob = 0.8
-        elif subtype == 'ACR':
-            crustal_prob = 0.8
-            intraslab_prob = 0.1
-            interface_prob = 0.1
-        else:
-            crustal_prob = 0.1
-            intraslab_prob = 0.8
-            interface_prob = 0.1
+
+    # what is the effective bottom of the interface zone?
+    max_interface_depth = results['SlabModelMaximumDepth']
+
+    # Calculate the probability of interface given the
+    # (absolute value of) difference between hypocenter and depth to slab.
+    dz = np.abs(depth - slab_depth)
+    x1 = config['p_int_hypo']['x1'] + slab_depth_error
+    x2 = config['p_int_hypo']['x2'] + slab_depth_error
+    p1 = config['p_int_hypo']['p1']
+    p2 = config['p_int_hypo']['p2']
+    p_int_hypo = get_probability(dz,x1,p1,x2,p2)
+
+    # Calculate probability of interface given Kagan's angle
+    if np.isfinite(kagan):
+        x1 = config['p_int_kagan']['x1']
+        x2 = config['p_int_kagan']['x2']
+        p1 = config['p_int_kagan']['p1']
+        p2 = config['p_int_kagan']['p2']
+        p_int_kagan = get_probability(kagan,x1,p1,x2,p2)
     else:
-        # we have depth to slab
-        ddepth = np.abs(depth-slab_depth)
-        depth_interface_prob = get_probability(ddepth,
-                                               DEPTH_MIN_PROB,
-                                               DEPTH_AT_MIN_PROB,
-                                               DEPTH_MAX_PROB,
-                                               DEPTH_AT_MAX_PROB)
+        p_int_kagan = config['p_kagan_default']
 
-        # if we have Kagan angle, we can modify the depth probability
-        if not np.isnan(kagan):
-            kagan_interface_prob = get_probability(ddepth,
-                                                   KAGAN_MIN_PROB,
-                                                   KAGAN_AT_MIN_PROB,
-                                                   KAGAN_MAX_PROB,
-                                                   KAGAN_AT_MAX_PROB)
-        else:
-            if focal == 'RS': #this makes it more likely to be interface
-                kagan_interface_prob = 0.75
-            else:
-                kagan_interface_prob = 0.5
-        interface_prob = depth_interface_prob * kagan_interface_prob
-        crustal_prob = (1 - interface_prob)/2.0
-        intraslab_prob = (1 - interface_prob)/2.0
-        return (crustal_prob,interface_prob,intraslab_prob)
+    # Calculate probability that event occurred above bottom of seismogenic
+    # zone, given to us by the Slab model.
+    x1 = max_interface_depth + config['p_int_sz']['x1']
+    x2 = max_interface_depth + config['p_int_sz']['x2']
+    p1 = config['p_int_sz']['p1']
+    p2 = config['p_int_sz']['p2']
+    p_int_sz = get_probability(depth,x1,p1,x2,p2)
 
-def get_tectonic_regions(elon, elat, edepth, eid):
+    # Calculate combined probability of interface
+    p_int = p_int_hypo * p_int_kagan * p_int_sz
+
+    # Calculate probability that the earthquake lies above the slab
+    # and is thus crustal.
+    x1 = config['p_crust_slab']['x1']
+    x2 = config['p_crust_slab']['x2']
+    p1 = config['p_crust_slab']['p1']
+    p2 = config['p_crust_slab']['p2']
+    p_crust_slab = get_probability((depth-slab_depth),x1,p1,x2,p2)
+
+    # Calculate probability that the earthquake lies within the crust
+    x1 = config['p_crust_hypo']['x1']
+    x2 = config['p_crust_hypo']['x2']
+    p1 = config['p_crust_hypo']['p1']
+    p2 = config['p_crust_hypo']['p2']
+    p_crust_hypo = get_probability(depth,x1,p1,x2,p2)
+    
+    # Calculate probability of crustal
+    p_crustal = (1 - p_int) * p_crust_slab * p_crust_hypo
+
+    # Calculate probability of intraslab
+    p_slab = 1 - (p_int + p_crustal)
+        
+
+    probs = {'crustal_probability' : p_crustal,
+             'interface_probability' : p_int,
+             'intraslab_probability' : p_slab,
+             'depth_interface_probability' : p_int_hypo,
+             'kagan_interface_probability' : p_int_kagan,
+             'seismo_zone_interface_probability' : p_int_sz,
+             'above_slab_probability' : p_crust_slab,
+             'within_slab_probability' : p_crust_hypo}
+    
+    return probs
+
+def get_tectonic_regions(elon, elat, edepth, eid,config):
     selector = SubductionSelector()
     results = selector.getSubductionTypeByID(eid)
     strec_out = {}
@@ -198,16 +216,42 @@ def get_tectonic_regions(elon, elat, edepth, eid):
     crustal_prob = 0.0
     interface_prob = 0.0
     intraslab_prob = 0.0
-    if results['TectonicRegion'] == 'Subduction':
-        crustal_prob,interface_prob,intraslab_prob = get_subduction_probabilities(results,depth)
-    
+    depth_interface_prob = 0.0
+    kagan_interface_prob = 0.0
+    sz_interface_prob = 0.0
+    crust_slab_prob = 0.0
+    within_slab_prob = 0.0
+    if not np.isnan(results['SlabModelDepth']):
+        subcfg = config['subduction']
+        probs = get_subduction_probabilities(results,edepth,subcfg)
+        crustal_prob = probs['crustal_probability']
+        interface_prob = probs['interface_probability']
+        intraslab_prob = probs['intraslab_probability']
+        depth_interface_prob = probs['depth_interface_probability']
+        kagan_interface_prob = probs['kagan_interface_probability']
+        sz_interface_prob = probs['seismo_zone_interface_probability']
+        crust_slab_prob = probs['above_slab_probability']
+        within_slab_prob = probs['within_slab_probability']
+        
+         
+    sub_probs = {'crustal':crustal_prob,
+                 'interface':interface_prob,
+                 'intraslab':intraslab_prob,
+                 'depth_interface':depth_interface_prob,
+                 }
+
+    sub_inputs = {'depth' : edepth,
+                  'slab_depth' : results['SlabModelDepth'],
+                  'slab_depth_error' : results['SlabModelDepthUncertainty'] ,
+                  'kagan_angle' : results['KaganAngle'],
+                  'focal_mech' : results['FocalMechanism']}
+        
     regions = {'acr':{'distance':results['DistanceToActive']},
                'scr':{'distance':results['DistanceToStable']},
                'volcanic':{'distance':results['DistanceToVolcanic']},
                'subduction':{'distance':results['DistanceToSubduction'],
-                             'probabilities':{'crustal':crustal_prob,
-                                              'interface':interface_prob,
-                                              'intraslab':intraslab_prob}}}
+                             'probabilities':sub_probs,
+                             'inputs':sub_inputs}}
     
     strec_out['tectonic_regions'] = regions
     # strec_out = {
