@@ -74,30 +74,16 @@ class ModelModule(CoreModule):
             NotADirectoryError: When the event data directory does not exist.
             FileNotFoundError: When the the shake_data HDF file does not exist.
         """
-        #
-        # Find the shake_data file
-        #
-        install_path, data_path = get_config_paths()
-        datadir = os.path.join(data_path, self._eventid, 'current')
-        if not os.path.isdir(datadir):
-            raise NotADirectoryError('%s is not a valid directory.' % datadir)
-
-        datafile = os.path.join(datadir, 'shake_data.hdf')
-        if not os.path.isfile(datafile):
-            raise FileNotFoundError('%s does not exist.' % datafile)
-
-        #
-        # Clear away results from previous runs
-        #
-        products_path = os.path.join(datadir, 'products')
-        if os.path.isdir(products_path):
-            shutil.rmtree(products_path, ignore_errors=True)
 
         # ------------------------------------------------------------------
         # Make the input container and extract the config
         # ------------------------------------------------------------------
-        ic = ShakeMapInputContainer.load(datafile)
+        ic, datadir = get_input_container(self._eventid)
         config = ic.getConfig()
+        # ------------------------------------------------------------------
+        # Clear away results from previous runs
+        # ------------------------------------------------------------------
+        clear_products(datadir)
         # ------------------------------------------------------------------
         # Instantiate the gmpe, gmice, ipe, and ccf
         # Here we make a placeholder gmpe so that we can make the
@@ -195,8 +181,6 @@ class ModelModule(CoreModule):
             # GRID: Figure out the grid parameters and get output points
             #
             do_grid = True
-            smdx = config['interp']['prediction_location']['xres']
-            smdy = config['interp']['prediction_location']['yres']
 
             if config['interp']['prediction_location']['extent']:
                 W, S, E, N = config['interp']['prediction_location']['extent']
@@ -225,9 +209,10 @@ class ModelModule(CoreModule):
         lons_out_rad = np.radians(lons)
         lats_out_rad = np.radians(lats)
         # ------------------------------------------------------------------
-        # Station data
+        # If the gmpe doesn't break down its stardard deviation into
+        # within- and between-event terms, we need to handle things
+        # somewhat differently.
         # ------------------------------------------------------------------
-        stations = ic.getStationList()
         gmpe_sd_types = default_gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
         if len(gmpe_sd_types) == 1:
             total_sd_only = True
@@ -236,37 +221,36 @@ class ModelModule(CoreModule):
             total_sd_only = False
             stddev_types = [oqconst.StdDev.TOTAL, oqconst.StdDev.INTER_EVENT,
                             oqconst.StdDev.INTRA_EVENT]
+        # ------------------------------------------------------------------
+        # Station data
+        # ------------------------------------------------------------------
+        stations = ic.getStationList()
         #
         # df1 holds the instrumented data (PGA, PGV, SA)
         # df2 holds the non-instrumented data (MMI)
         #
-        df_dict = {'df1': None, 'df2': None}
-        imt_in_str_dict = {'df1': None, 'df2': None}
-        imt_in_dict = {'df1': None, 'df2': None}
+        df_dict = {'df1': None,
+                   'df2': None}
+        imt_in_str_dict = {'df1': None,
+                           'df2': None}
+        sx_dict = {'df1': None,
+                   'df2': None}
+        dx_dict = {'df1': None,
+                   'df2': None}
         imt_in_str_set = set()
-        sx_dict = {'df1': None, 'df2': None}
-        dx_dict = {'df1': None, 'df2': None}
         if stations is not None:
-            df_dict['df1'] = stations.getStationDictionary(instrumented=True)
-            df_dict['df2'] = stations.getStationDictionary(instrumented=False)
+            df_dict['df1'], imt_in_str_dict['df1'] = \
+                    stations.getStationDictionary(instrumented=True)
+            df_dict['df2'], imt_in_str_dict['df2'] = \
+                    stations.getStationDictionary(instrumented=False)
+            imt_in_str_set = imt_in_str_dict['df1'] | imt_in_str_dict['df2']
             #
             # Make the sites and distance contexts for each dictionary then
             # compute the predictions for the IMTs in that dictionary.
             #
             for ndf, df in df_dict.items():
                 if not df:
-                    imt_in_str_dict[ndf] = set()
-                    imt_in_dict[ndf] = set()
                     continue
-                #
-                # Make lists of the input IMTs
-                #
-                imt_in_str_dict[ndf] = set(
-                    [x for x in df.keys() if x in ('PGA', 'PGV', 'MMI') or
-                     (x.startswith('SA(') and not x.endswith('_sd'))])
-                imt_in_dict[ndf] = set(
-                    [imt.from_string(x) for x in imt_in_str_dict[ndf]])
-                imt_in_str_set |= imt_in_str_dict[ndf]
                 #
                 # Get the sites and distance contexts
                 #
@@ -303,8 +287,8 @@ class ModelModule(CoreModule):
                     df[imtstr + '_residual'] = \
                         df[imtstr] - df[imtstr + '_pred']
                     # ----------------------------------------------------------
-                    # Do the outlier flagging if we don't have a fault and
-                    # the event magnitude is over the limit
+                    # Do the outlier flagging if we have a fault, or we don't 
+                    # have a fault but the event magnitude is under the limit
                     # ----------------------------------------------------------
                     if not isinstance(rupture_obj, PointRupture) or \
                        rx.mag <= outlier_max_mag:
@@ -467,7 +451,7 @@ class ModelModule(CoreModule):
         #
         nominal_bias = {}
         bias_num = {}   # The numerator term of the bias
-        bias_den = {}   # The denominator term of the bias
+        bias_den = {}   # The denominator term of the bias (w/o the tau term)
         outgrid = {}
         outsd = {}
         psd = {}        # phi of the output points
@@ -500,36 +484,40 @@ class ModelModule(CoreModule):
             #
             outperiod_ix = get_period_index_from_imt_str(imtstr, imt_per_ix)
             #
-            # Fill the station arrays
+            # Fill the station arrays; here we use lists and append to
+            # them because it is much faster than appending to a numpy
+            # array; after the loop, the lists are converted to numpy
+            # arrays:
             #
-            period_ix = []
-            lons_rad = []
-            lats_rad = []
-            resids = []
-            phi = []
-            sig_extra = []
-            tau = []
-            imtlist = []
-            rrups = []
+            imtlist = []    # The input IMT
+            period_ix = []  # The index of the (pseudo-)period of the input IMT
+            lons_rad = []   # longitude (in radians) of the input station
+            lats_rad = []   # latitude (in radians) of the input station
+            resids = []     # The residual of the input IMT
+            tau = []        # The between-event stddev of the input IMT
+            phi = []        # The within-event stddev of the input IMT
+            sig_extra = []  # Additional stddev of the input IMT
+            rrups = []      # The rupture distance of the input station
             for ndf, sdf in df_dict.items():
                 if not sdf:
                     continue
                 for i in range(np.size(sdf['lon'])):
+                    #
+                    # Each station can provide 0, 1, or 2 IMTs:
+                    #
                     for imtin in get_sta_imts(imtstr, sdf, i,
                                               imt_in_str_dict[ndf]):
                         imtlist.append(imtin)
-                        inperiod_ix = get_period_index_from_imt_str(
-                            imtin, imt_per_ix)
-                        period_ix.append(inperiod_ix)
+                        period_ix.append(get_period_index_from_imt_str(
+                            imtin, imt_per_ix))
                         lons_rad.append(sdf['lon_rad'][i])
                         lats_rad.append(sdf['lat_rad'][i])
                         resids.append(sdf[imtin + '_residual'][i])
                         tau.append(sdf[imtin + '_pred_tau'][i])
-                        _phi = sdf[imtin + '_pred_phi'][i]
-                        phi.append(_phi)
+                        phi.append(sdf[imtin + '_pred_phi'][i])
                         sig_extra.append(sdf[imtin + '_sd'][i])
                         rrups.append(sdf['rrup'][i])
-            sta_imtstr[imtstr] = np.array(imtlist)
+            sta_imtstr[imtstr] = imtlist.copy()
             sta_period_ix[imtstr] = np.array(period_ix).reshape((-1, 1))
             sta_lons_rad[imtstr] = np.array(lons_rad).reshape((-1, 1))
             sta_lats_rad[imtstr] = np.array(lats_rad).reshape((-1, 1))
@@ -544,7 +532,8 @@ class ModelModule(CoreModule):
                 bias_den[imtstr] = 0.0
                 continue
             #
-            # Get the distance-limited set of data
+            # Get the distance-limited set of data for use in computing
+            # the bias
             #
             dindx = np.array(rrups) <= bias_max_range
             sta_phi_dl = sta_phi[imtstr][dindx].reshape((-1, 1))
@@ -729,9 +718,10 @@ class ModelModule(CoreModule):
                 time4 = time.time()
                 # sdarr is the standard deviation of the output sites
                 sdarr = psd[imtstr][iy, :].reshape((1, -1))
-                # ss is the standard deviation of the stations
-                ss = sta_phi[imtstr]
-                sigma12 = ne.evaluate("corr12 * corr_adj12 * (ss * sdarr)").T
+                # sdsta is the standard deviation of the stations
+                sdsta = sta_phi[imtstr]
+                sigma12 = ne.evaluate(
+                        "corr12 * corr_adj12 * (sdsta * sdarr)").T
                 stime += time.time() - time4
                 time4 = time.time()
                 #
@@ -952,6 +942,16 @@ class ModelModule(CoreModule):
         oc.setRupture(rupture_obj)
 
         # ------------------------------------------------------------------
+        # Compute a bias for all the IMTs in the data frames
+        # ------------------------------------------------------------------
+        for ndf, sdf in df_dict.items():
+            if sdf == None:
+                continue
+            for myimt in imt_in_str_dict[ndf]:
+                mybias = bias_num[myimt] / \
+                        ((1.0 / sdf[myimt + '_pred_tau']**2) + bias_den[myimt])
+                sdf[myimt + '_bias'] = mybias.flatten()
+        # ------------------------------------------------------------------
         # Add the station data. The stationlist object has the original
         # data and produces a GeoJSON object (a dictionary, really), but
         # we need to add peak values and flagging that has been done here.
@@ -1043,12 +1043,14 @@ class ModelModule(CoreModule):
                     myphi = sdf[key + '_phi'][six]
                     mysigma = np.sqrt(mytau**2 + myphi**2)
                     imt_name = key.lower().replace('_pred', '')
+                    mybias = sdf[imt_name.upper() + '_bias'][six]
                     station['properties']['predictions'][imt_name] = {
                             'value': value,
                             'units': units,
-                            'tau': mytau,
-                            'phi': myphi,
-                            'sigma': mysigma,
+                            'ln_tau': mytau,
+                            'ln_phi': myphi,
+                            'ln_sigma': mysigma,
+                            'ln_bias': mybias,
                     }
                 #
                 # Set the generic distance property (this is rrup)
@@ -1469,3 +1471,46 @@ def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
         pe = gmpe
     return pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
 
+def get_input_container(evid):
+    """
+    Open the input container and return a handle to it, along with
+    the event's current data directory.
+
+    Args:
+        evid (str): The event ID of the desired input.
+
+    Returns:
+        (ShakeMapInputContainer, str): An input container object and the
+        path to the event's data directory.
+
+    Raises:
+        NotADirectoryError: When the event data directory does not exist.
+        FileNotFoundError: When the the shake_data HDF file does not exist.
+    """
+    #
+    # Find the shake_data.hdf file
+    #
+    install_path, data_path = get_config_paths()
+    datadir = os.path.join(data_path, evid, 'current')
+    if not os.path.isdir(datadir):
+        raise NotADirectoryError('%s is not a valid directory.' % datadir)
+
+    datafile = os.path.join(datadir, 'shake_data.hdf')
+    if not os.path.isfile(datafile):
+        raise FileNotFoundError('%s does not exist.' % datafile)
+    ic = ShakeMapInputContainer.load(datafile)
+    return ic, datadir
+
+def clear_products(datadir):
+    """
+    Function to delete an event's products directory if it exists.
+
+    Args:
+        datadir (str): The path to the event's current data directory
+
+    Returns:
+        nothing
+    """
+    products_path = os.path.join(datadir, 'products')
+    if os.path.isdir(products_path):
+        shutil.rmtree(products_path, ignore_errors=True)

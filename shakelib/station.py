@@ -499,7 +499,8 @@ class StationList(object):
                 non-instrumented (MMI) stations.
 
         Returns:
-            dict: A dictionary of Numpy arrays.
+            dict, set: A dictionary of Numpy arrays, and a set specifying
+            the IMTs found in the dictionary..
         """
 
         columns = list(TABLES['station'].keys())
@@ -512,18 +513,20 @@ class StationList(object):
         station_rows = self.cursor.fetchall()
         nstation_rows = len(station_rows)
         if not nstation_rows:
-            return None
+            return None, set()
         station_columns = list(zip(*station_rows))
         df = OrderedDict()
         for ic, col in enumerate(columns):
             df[col] = np.array(station_columns[ic])
 
+        myimts = set()
         for imt in self.getIMTtypes():
             if (instrumented and 'MMI' in imt) or \
                (not instrumented and 'MMI' not in imt):
                 continue
             df[imt] = np.full(nstation_rows, np.nan)
             df[imt + '_sd'] = np.full(nstation_rows, 0.0)
+            myimts.update([imt])
 
         id_dict = dict(zip(df['id'], range(nstation_rows)))
 
@@ -555,7 +558,7 @@ class StationList(object):
                 df[this_row[1]][rowidx] = amp
                 df[this_row[1] + '_sd'][rowidx] = stddev
 
-        return df
+        return df, myimts
 
     @staticmethod
     def _getOrientation(orig_channel):
