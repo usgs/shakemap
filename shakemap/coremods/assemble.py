@@ -51,6 +51,14 @@ class AssembleModule(CoreModule):
         if not os.path.isfile(eventxml):
             raise FileNotFoundError('%s does not exist.' % eventxml)
 
+        # find any source.txt or moment.xml files
+        momentfile = os.path.join(datadir,'moment.xml')
+        sourcefile = os.path.join(datadir,'source.txt')
+        if not os.path.isfile(sourcefile):
+            sourcefile = None
+        if not os.path.isfile(momentfile):
+            momentfile = None
+
         #
         # Clear away results from previous runs
         #
@@ -194,6 +202,8 @@ class AssembleModule(CoreModule):
                 eventxml,
                 history,
                 rupturefile=rupturefile,
+                sourcefile = sourcefile,
+                momentfile = momentfile,
                 datafiles=datafiles)
         self.logger.debug('Created HDF5 input container in %s' %
                          shake_data.getFileName())

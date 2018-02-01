@@ -33,7 +33,7 @@ def get_parser():
     return parser
 
 
-def _write_event_xml(infodict, event_dir):
+def _write_event_xml(network, eventid, infodict, event_dir):
     """
     Write event.xml file given dictionary derived from info.json.
 
@@ -45,7 +45,8 @@ def _write_event_xml(infodict, event_dir):
     event_info = infodict['input']['event_information']
 
     otime = datetime.strptime(event_info['origin_time'], '%Y-%m-%dT%H:%M:%SZ')
-    eqdict = {'id': event_info['event_id'],
+    eqdict = {'id': eventid,
+              'network': network,
               'lat': '%.4f' % event_info['latitude'],
               'lon': '%.4f' % event_info['longitude'],
               'depth': '%.1f' % event_info['depth'],
@@ -93,7 +94,7 @@ def main(args):
         info_file = os.path.join(tmpdir, 'info.json')
         shakemap.getContent('info.json', filename=info_file)
         infodict = json.load(open(info_file, 'r'))
-        _write_event_xml(infodict, event_dir)
+        _write_event_xml(detail['net'],detail.id,infodict, event_dir)
         data_file = os.path.join(event_dir, '%s_dat.xml' % args.eventid)
         shakemap.getContent('stationlist.xml', filename=data_file)
         fault_files = shakemap.getContentsMatching('fault.txt')

@@ -3,9 +3,13 @@
 # stdlib imports
 from xml.dom import minidom
 import time as time
+import warnings
 
 # third party
 from openquake.hazardlib.geo import point
+from obspy.io.quakeml.core import _is_quakeml
+from obspy.core.event import read_events
+from strec.tensor import fill_tensor_from_components
 
 from impactutils.time.ancient_time import HistoricTime
 from shakelib.utils.exception import ShakeLibException
@@ -131,14 +135,15 @@ class Origin(object):
             self.rake = 0.0
 
     @classmethod
-    def fromFile(cls, eventxmlfile, sourcefile=None):
+    def fromFile(cls, eventxmlfile, sourcefile=None, momentfile=None):
         """
         Class method to create a Origin object by specifying an event.xml file,
-        a rupture file, and a source.txt file.
+        a rupture file, a source.txt file, and a moment.xml file.
 
         Args:
             eventxmlfile (str): Event xml file (see read_event_file()).
             sourcefile (str): source.txt file (see read_source()).
+            momentfile (str): moment.xml file (see read_moment_quakeml()).
 
         Returns:
             Origin object.
@@ -148,6 +153,9 @@ class Origin(object):
         params = None
         if sourcefile is not None:
             params = read_source(sourcefile)
+            event.update(params)
+        if momentfile is not None:
+            params = read_moment_quakeml(momentfile)
             event.update(params)
         return cls(event)
 
@@ -325,6 +333,81 @@ def read_event_file(eventxml):
         eqdict['mech'] = xmldict['mech']
     return eqdict
 
+
+def read_moment_quakeml(momentfile):
+    """Read moment parameters from a QuakeML file.
+
+    Args:
+        momentfile (str): Path to a QuakeML file.
+
+    Returns:
+        dict: Empty if momentfile is somehow not valid, or:
+              - moment: 
+                  - NP1:
+                    - strike: float
+                    - dip: float
+                    - rake: float
+                  - NP2:
+                    - strike: float
+                    - dip: float
+                    - rake: float  
+                  - type: string
+                  - source: string
+    """
+    params = {}
+    if not _is_quakeml(momentfile):
+        return params
+
+    # obspy spits out a bunch of warnings we don't care about
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        catalog = read_events(momentfile)
+        
+    if not len(catalog.events):
+        return params
+    event = catalog.events[0]
+    if not len(event.focal_mechanisms):
+        return params
+    focal = catalog.events[0].focal_mechanisms[0]
+
+    # get the source and type information, if possible
+    mtype = 'unknown'
+    if focal.method_id is not None:
+        mtype = focal.method_id
+
+    msource = 'unknown'
+    if focal.creation_info is not None:
+        if focal.creation_info.agency_id is not None:
+            msource = focal.creation_info.agency_id
+        
+    if focal.nodal_planes is None:
+        return params
+    if focal.nodal_planes.nodal_plane_1 is None:
+        if focal.moment_tensor.tensor.m_rr is not None:
+            mrr = focal.moment_tensor.tensor.m_rr
+            mtt = focal.moment_tensor.tensor.m_tt
+            mpp = focal.moment_tensor.tensor.m_pp
+            mrt = focal.moment_tensor.tensor.m_rt
+            mrp = focal.moment_tensor.tensor.m_rp
+            mtp = focal.moment_tensor.tensor.m_tp
+            params = fill_tensor_from_components(mrr, mtt,
+                                                 mpp, mrt,
+                                                 mrp, mtp,
+                                                 source=msource,
+                                                 mtype=mtype)
+    else:
+        plane1 = focal.nodal_planes.nodal_plane_1
+        plane2 = focal.nodal_planes.nodal_plane_2
+        params['NP1'] = {'strike':plane1.strike,
+                        'dip':plane1.dip,
+                        'rake':plane1.rake}
+        params['NP2'] = {'strike':plane2.strike,
+                        'dip':plane2.dip,
+                        'rake':plane2.rake}
+    
+    
+    moment = {'moment':params}
+    return moment
 
 def read_source(sourcefile):
     """
