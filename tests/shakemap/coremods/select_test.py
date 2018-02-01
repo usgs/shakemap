@@ -66,6 +66,21 @@ def test_select():
         else:
             os.remove(conf_file)
 
+    # Subduction event (not over slab)
+    conf_file = os.path.join(datapath, 'usp0004bxs', 'current',
+                             'model_zc.conf')
+    if os.path.isfile(conf_file):
+        os.remove(conf_file)
+    try:
+        smod = SelectModule('usp0004bxs')
+        smod.execute()
+    finally:
+        if not os.path.isfile(conf_file):
+            print('select failed!')
+            assert False
+        else:
+            os.remove(conf_file)
+
 
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'
