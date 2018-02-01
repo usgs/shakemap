@@ -3,12 +3,10 @@ Parse STREC output and create/select a GMPE set for an event.
 """
 # stdlib imports
 import os.path
-import pprint
 import shutil
 from collections import OrderedDict
 
 # third party imports
-import numpy as np
 from configobj import ConfigObj
 from validate import ValidateError
 from strec.subtype import SubductionSelector
@@ -75,7 +73,7 @@ class SelectModule(CoreModule):
             tensor_params = org.moment.copy()
         else:
             selector = SubductionSelector()
-            mlat,mlon,mdepth,tensor_params = selector.getOnlineTensor(eid)
+            mlat,_,mdepth,tensor_params = selector.getOnlineTensor(eid)
             if mlat is None:
                 tensor_params = None
 

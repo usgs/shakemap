@@ -1,15 +1,8 @@
+# stdlib imports
 import re
-import glob
-import os.path
-from functools import partial
 
 # third party imports
-import pyproj
-from shapely.geometry import Point, Polygon, MultiPolygon
-from shapely.ops import transform
-import shapely.wkt
 import numpy as np
-from openquake.hazardlib.geo.geodetic import min_distance_to_segment
 from strec.subtype import SubductionSelector
 
 def get_weights(origin, config, tensor_params):

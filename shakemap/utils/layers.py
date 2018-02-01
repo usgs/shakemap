@@ -9,7 +9,6 @@ from shapely.ops import transform
 import shapely.wkt
 import numpy as np
 from openquake.hazardlib.geo.geodetic import min_distance_to_segment
-from strec.subtype import SubductionSelector
 
 def nearest_edge(elon, elat, poly):
     """
