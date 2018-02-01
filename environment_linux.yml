@@ -136,6 +136,8 @@ dependencies:
 - sip=4.18
 - six=1.11.0
 - snuggs=1.4.1
+- sphinx=1.6.6
+- sphinxcontrib-websupport=1.0.1
 - sqlalchemy=1.2.1
 - sqlite=3.20.1
 - terminado=0.8.1
@@ -170,4 +172,5 @@ dependencies:
   - ./libcomcat.zip
   - ./mapio.zip
   - ./strec.zip
+
 

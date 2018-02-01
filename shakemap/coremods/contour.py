@@ -202,7 +202,10 @@ def contour_to_files(container, config, output_dir, logger):
         imtype_spec = config['products']['contours']['IMTS'][imtype]
         filter_size = int(imtype_spec['filter_size'])
         for component in components:
-            fname = '%s_%s.%s' % (fileimt, component, extension)
+            if component == 'GREATER_OF_TWO_HORIZONTAL':
+                fname = 'cont_%s.%s' % (fileimt, extension)
+            else:
+                fname = 'cont_%s_%s.%s' % (fileimt, component, extension)
             filename = os.path.join(output_dir, fname)
             if os.path.isfile(filename):
                 fpath, fext = os.path.splitext(filename)

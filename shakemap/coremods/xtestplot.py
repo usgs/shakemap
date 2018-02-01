@@ -42,9 +42,10 @@ class TestPlot(CoreModule):
                                       'sets of points, not gridded data')
 
         datadict = {}
-        imtlist = container.getIMTs('Larger')
+        imtlist = container.getIMTs('GREATER_OF_TWO_HORIZONTAL')
         for myimt in imtlist:
-            datadict[myimt] = container.getIMTArrays(myimt, 'Larger')
+            datadict[myimt] = container.getIMTArrays(myimt,
+                    'GREATER_OF_TWO_HORIZONTAL')
 
         #
         # Make plots

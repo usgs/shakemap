@@ -46,11 +46,11 @@ class TestPlotSpectra(CoreModule):
         datalist = []
         stddevlist = []
         periodlist = []
-        imtlist = container.getIMTs('Larger')
+        imtlist = container.getIMTs('GREATER_OF_TWO_HORIZONTAL')
         for myimt in imtlist:
             if not myimt.startswith('SA('):
                 continue
-            ddict = container.getIMTArrays(myimt, 'Larger')
+            ddict = container.getIMTArrays(myimt, 'GREATER_OF_TWO_HORIZONTAL')
             datalist.append(ddict['mean'][0])
             stddevlist.append(ddict['std'][0])
             periodlist.append(float(myimt.replace('SA(', '').replace(')', '')))

@@ -15,6 +15,9 @@ from shakelib.rupture.base import Rupture
 from shakelib.rupture import utils
 from shakelib.rupture import constants
 
+from ps2ff.constants import DistType, MagScaling, Mechanism
+from ps2ff.interpolate import PS2FF
+
 
 class PointRupture(Rupture):
     """
@@ -148,128 +151,7 @@ class PointRupture(Rupture):
                 those predictions. If var is False then just the first element
                 of the tuple is returned.
         """
-        cdir, tmp = os.path.split(__file__)
-        origin = self._origin
-
-        # -------------------
-        # Sort out file names
-        # -------------------
-        mech = origin.mech
-        if not hasattr(origin, '_tectonic_region'):
-            rf = os.path.join(
-                cdir, "ps2ff",
-                "Rjb_WC94_mechA_ar1p0_seis0_20_Ratios.csv")
-            vf = os.path.join(
-                cdir, "ps2ff",
-                "Rjb_WC94_mechA_ar1p0_seis0_20_Var.csv")
-        elif origin._tectonic_region == 'Active Shallow Crust':
-            if mech == 'ALL':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_WC94_mechA_ar1p7_seis0_20_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_WC94_mechA_ar1p7_seis0_20_Var.csv")
-            elif mech == 'RS':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_WC94_mechR_ar1p7_seis0_20_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_WC94_mechR_ar1p7_seis0_20_Var.csv")
-            elif mech == 'NM':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_WC94_mechN_ar1p7_seis0_20_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_WC94_mechN_ar1p7_seis0_20_Var.csv")
-            elif mech == 'SS':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_WC94_mechSS_ar1p7_seis0_20_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_WC94_mechSS_ar1p7_seis0_20_Var.csv")
-        elif origin._tectonic_region == 'Stable Shallow Crust':
-            if mech == 'ALL':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_S14_mechA_ar1p0_seis0_15_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_S14_mechA_ar1p0_seis0_15_Var.csv")
-            elif mech == 'RS':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_S14_mechR_ar1p0_seis0_15_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_S14_mechR_ar1p0_seis0_15_Var.csv")
-            elif mech == 'NM':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_S14_mechN_ar1p0_seis0_15_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_S14_mechN_ar1p0_seis0_15_Var.csv")
-            elif mech == 'SS':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_S14_mechSS_ar1p0_seis0_15_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rjb_S14_mechSS_ar1p0_seis0_15_Var.csv")
-        else:
-            warnings.warn(
-                'Unsupported tectonic region; using coefficients for unknown'
-                'tectonic region.')
-            rf = os.path.join(
-                cdir, "ps2ff",
-                "Rjb_WC94_mechA_ar1p0_seis0_20_Ratios.csv")
-            vf = os.path.join(
-                cdir, "ps2ff",
-                "Rjb_WC94_mechA_ar1p0_seis0_20_Var.csv")
-
-        # -----------------
-        # Start with ratios
-        # -----------------
-        repi2rjb_ratios_tbl = pd.read_csv(rf, comment='#')
-        r2rrt_cols = repi2rjb_ratios_tbl.columns[1:]
-        mag_list = []
-        for column in (r2rrt_cols):
-            if re.search('R\d+\.*\d*', column):
-                magnitude = float(re.findall(
-                    'R(\d+\.*\d*)', column)[0])
-                mag_list.append(magnitude)
-        mag_list = np.array(mag_list)
-        dist_list = np.log(np.array(repi2rjb_ratios_tbl['Repi_km']))
-        repi2rjb_grid = repi2rjb_ratios_tbl.values[:, 1:]
-        repi2rjb_obj = spint.RectBivariateSpline(
-            dist_list, mag_list, repi2rjb_grid, kx=1, ky=1)
-
-        def repi2rjb_tbl(repi, M):
-            ratio = repi2rjb_obj.ev(np.log(repi), M)
-            rjb = repi * ratio
-            return rjb
-
-        repis = np.clip(self.computeRepi(lon, lat, depth), 0.0001, None)
-        mags = np.ones_like(repis) * origin.mag
-        rjb_hat = repi2rjb_tbl(repis, mags)
-
-        # -------------------
-        # Additional Variance
-        # -------------------
-        repi2rjbvar_ratios_tbl = pd.read_csv(vf, comment='#')
-        repi2rjbvar_grid = repi2rjbvar_ratios_tbl.values[:, 1:]
-        repi2rjbvar_obj = spint.RectBivariateSpline(
-            dist_list, mag_list, repi2rjbvar_grid, kx=1, ky=1)
-        rjbvar = repi2rjbvar_obj.ev(np.log(repis), mags)
-
-        if var is True:
-            return (rjb_hat, rjbvar)
-        else:
-            return rjb_hat
+        return self._computeRdist('Rjb', lon, lat, depth, var)
 
     def computeRrup(self, lon, lat, depth, var=False):
         """
@@ -283,133 +165,104 @@ class PointRupture(Rupture):
 
         Returns:
             If var is True then this returns a tuple of two arrays: first, the
-                predicted Rjb values, and second an array of the variance of
+                predicted Rrup, and second an array of the variance of
                 those predictions. If var is False then just the first element
                 of the tuple is returned.
         """
-        cdir, tmp = os.path.split(__file__)
-        origin = self._origin
+        return self._computeRdist('Rrup', lon, lat, depth, var)
 
-        # -------------------
-        # Sort out file names
-        # -------------------
-        rake = float(origin.rake)
-        mech = utils.rake_to_mech(rake)
+    def _computeRdist(self, rtype, lon, lat, depth, var):
+        """
+        Helper function to actually do the approximate fault distance
+        computations.
+
+        Args:
+            type (str): Either 'Rjb' or 'Rrup'.
+            lon (array): Numpy array of longitudes.
+            lat (array): Numpy array of latitudes.
+            depth (array): Numpy array of depths (km; positive down).
+            var (bool): Also return variance of prediction.
+
+        Returns:
+            If var is True then this returns a tuple of two arrays: first, the
+                predicted approximate fault distance values (either Rjb or 
+                Rrup, depending on the 'type' argument), and second an array of 
+                the variance of those predictions. If var is False then just the 
+                first element of the tuple is returned.
+        """
+        if rtype == 'Rjb':
+            dtype = DistType.Rjb
+        elif rtype == 'Rrup':
+            dtype = DistType.Rrup
+        else:
+            raise ValueError('Unknown distance type in _computeRdist')
+
+        # ----------------------------
+        # Sort out ps2ff parameters
+        # ----------------------------
+        origin = self._origin
+        mech = origin.mech
         if not hasattr(origin, '_tectonic_region'):
-            rf = os.path.join(
-                cdir, "ps2ff",
-                "Rrup_WC94_mechA_ar1p0_seis0-20_Ratios.csv")
-            vf = os.path.join(
-                cdir, "ps2ff",
-                "Rrup_WC94_mechA_ar1p0_seis0-20_Var.csv")
+            mscale = MagScaling.WC94
+            smech = Mechanism.A
+            aspect = 1.7
+            min_sdepth = 0
+            max_sdepth = 20
         elif origin._tectonic_region == 'Active Shallow Crust':
+            mscale = MagScaling.HB08
+            aspect = 1.7
+            min_sdepth = 0
+            max_sdepth = 20
             if mech == 'ALL':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_WC94_mechA_ar1p7_seis0-20_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_WC94_mechA_ar1p7_seis0-20_Var.csv")
+                # HB08 doesn't have an 'ALL' mechanism, so use WC94
+                mscale = MagScaling.WC94
+                smech = Mechanism.A
             elif mech == 'RS':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_WC94_mechR_ar1p7_seis0-20_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_WC94_mechR_ar1p7_seis0-20_Var.csv")
+                smech = Mechanism.R
             elif mech == 'NM':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_WC94_mechN_ar1p7_seis0-20_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_WC94_mechN_ar1p7_seis0-20_Var.csv")
+                smech = Mechanism.N
             elif mech == 'SS':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_WC94_mechSS_ar1p7_seis0-20_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_WC94_mechSS_ar1p7_seis0-20_Var.csv")
+                smech = Mechanism.SS
         elif origin._tectonic_region == 'Stable Shallow Crust':
+            mscale = MagScaling.S14
+            aspect = 1.0
+            min_sdepth = 0
+            max_sdepth = 15
             if mech == 'ALL':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_S14_mechA_ar1p0_seis0-15_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_S14_mechA_ar1p0_seis0-15_Var.csv")
+                smech = Mechanism.A
             elif mech == 'RS':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_S14_mechR_ar1p0_seis0-15_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_S14_mechR_ar1p0_seis0-15_Var.csv")
+                smech = Mechanism.R
             elif mech == 'NM':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_S14_mechN_ar1p0_seis0-15_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_S14_mechN_ar1p0_seis0-15_Var.csv")
+                smech = Mechanism.N
             elif mech == 'SS':
-                rf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_S14_mechSS_ar1p0_seis0-15_Ratios.csv")
-                vf = os.path.join(
-                    cdir, "ps2ff",
-                    "Rrup_S14_mechSS_ar1p0_seis0-15_Var.csv")
+                smech = Mechanism.SS
         else:
             warnings.warn(
                 'Unsupported tectonic region; using coefficients for unknown'
                 'tectonic region.')
-            rf = os.path.join(
-                cdir, "ps2ff",
-                "Rrup_WC94_mechA_ar1p0_seis0-20_Ratios.csv")
-            vf = os.path.join(
-                cdir, "ps2ff",
-                "Rrup_WC94_mechA_ar1p0_seis0-20_Var.csv")
+            mscale = MagScaling.WC94
+            smech = Mechanism.A
+            aspect = 1.7
+            min_sdepth = 0
+            max_sdepth = 20
 
-        # -----------------
-        # Start with ratios
-        # -----------------
-        repi2rrup_ratios_tbl = pd.read_csv(rf, comment='#')
-        r2rrt_cols = repi2rrup_ratios_tbl.columns[1:]
-        mag_list = []
-        for column in (r2rrt_cols):
-            if re.search('R\d+\.*\d*', column):
-                magnitude = float(re.findall(
-                    'R(\d+\.*\d*)', column)[0])
-                mag_list.append(magnitude)
-        mag_list = np.array(mag_list)
-        dist_list = np.log(np.array(repi2rrup_ratios_tbl['Repi_km']))
-        repi2rrup_grid = repi2rrup_ratios_tbl.values[:, 1:]
-        repi2rrup_obj = spint.RectBivariateSpline(
-            dist_list, mag_list, repi2rrup_grid, kx=1, ky=1)
-
-        def repi2rrup_tbl(repi, M):
-            ratio = repi2rrup_obj.ev(np.log(repi), M)
-            rrup = repi * ratio
-            return rrup
+        p2f = PS2FF.fromParams(dist_type=dtype,
+                               mag_scaling=mscale,
+                               mechanism=smech,
+                               AR=aspect,
+                               min_seis_depth=min_sdepth,
+                               max_seis_depth=max_sdepth)
 
         repis = np.clip(self.computeRepi(lon, lat, depth), 0.0001, None)
         mags = np.full_like(repis, origin.mag)
-        rrup_hat = repi2rrup_tbl(repis, mags)
 
-        # -------------------
-        # Additional Variance
-        # -------------------
-        repi2rrupvar_ratios_tbl = pd.read_csv(vf, comment='#')
-        repi2rrupvar_grid = repi2rrupvar_ratios_tbl.values[:, 1:]
-        repi2rrupvar_obj = spint.RectBivariateSpline(
-            dist_list, mag_list, repi2rrupvar_grid, kx=1, ky=1)
-        rrupvar = repi2rrupvar_obj.ev(np.log(repis), mags)
+        r_hat = p2f.r2r(repis, mags)
 
         if var is True:
-            return (rrup_hat, rrupvar)
+            r_var = p2f.var(repis, mags)
+            return (r_hat, r_var)
         else:
-            return rrup_hat
+            return r_hat
 
     def computeGC2(self, lon, lat, depth):
         """

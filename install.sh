@@ -90,6 +90,7 @@ rm mapio.zip
 rm strec.zip
 
 
+
 # This package
 echo "Installing shakemap..."
 pip install -e .
