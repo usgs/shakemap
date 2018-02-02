@@ -1,9 +1,10 @@
 # local imports
 import re
 
+
 def oq_to_file(oqimt):
     """Convert openquake IMT nomenclature to filename friendly form.
-    
+
     Examples:
     SA(1.0) (Spectral Acceleration at 1 second) -> PSA1p0
     SA(0.3) (Spectral Acceleration at 0.3 second) -> PSA0p3
@@ -37,9 +38,10 @@ def oq_to_file(oqimt):
     fileimt = 'PSA%sp%s' % (integer, fraction)
     return fileimt
 
+
 def file_to_oq(fileimt):
     """Convert filename friendly IMT form to openquake form.
-    
+
     Examples:
     PSA1p0 (Spectral Acceleration at 1 second) -> SA(1.0)
     PSA0p3 (Spectral Acceleration at 0.3 second) -> SA(0.3)

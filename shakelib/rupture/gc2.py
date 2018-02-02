@@ -207,7 +207,7 @@ def _computeGC2(rupture, lon, lat, depth):
         # Case 1:
         ix = t_i != 0
         w_i[ix] = (1.0 / t_i[ix]) * (np.arctan((l_i[i] -
-                  u_i[ix]) / t_i[ix]) - np.arctan(-u_i[ix] / t_i[ix]))
+                                                u_i[ix]) / t_i[ix]) - np.arctan(-u_i[ix] / t_i[ix]))
 
         # Case 2:
         ix = (t_i == 0) & ((u_i < 0) | (u_i > l_i[i]))

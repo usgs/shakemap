@@ -65,8 +65,8 @@ class NullGMPE(GMPE):
         stddevs = []
         for stddev_type in stddev_types:
             if stddev_type == const.StdDev.TOTAL:
-                stddevs.append(np.full_like(dists.rjb, 
-                    np.sqrt(self.phi**2 + self.tau**2)))
+                stddevs.append(np.full_like(dists.rjb,
+                                            np.sqrt(self.phi**2 + self.tau**2)))
             elif stddev_type == const.StdDev.INTRA_EVENT:
                 stddevs.append(np.full_like(dists.rjb, self.phi))
             elif stddev_type == const.StdDev.INTER_EVENT:
@@ -84,6 +84,3 @@ pgv    0.
 0.01   0.
 10     0.
 """)
-
-
-

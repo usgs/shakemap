@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class DummyCorrelation(object):
     """
     Simplified correlation module for testing purposes. Should not be used
@@ -71,4 +72,3 @@ class DummyCorrelation(object):
         ad = np.abs(h)
         rho = rho * np.exp(-ad / 10)
         return rho
-

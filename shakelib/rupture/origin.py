@@ -17,6 +17,7 @@ from shakelib.rupture import constants
 
 TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
+
 class Origin(object):
     """
     The purpose of this class is to read/store event origin information, which
@@ -92,9 +93,10 @@ class Origin(object):
 
         # make sure that time is an HistoricTime instance
         if 'time' in event:
-            if isinstance(event['time'],str):
+            if isinstance(event['time'], str):
                 try:
-                    event['time'] = HistoricTime.strptime(event['time'],TIMEFMT)
+                    event['time'] = HistoricTime.strptime(
+                        event['time'], TIMEFMT)
                 except ValueError:
                     fmt = 'Input time string %s cannot be converted to datetime.'
                     raise ValueError(fmt % event['time'])
@@ -112,7 +114,6 @@ class Origin(object):
                 raise Exception('mech must be SS, NM, RS, or ALL.')
         else:
             event['mech'] = constants.DEFAULT_MECH
-
 
         # ---------------------------------------------------------------------
         # Add keys as class attributes
@@ -297,15 +298,16 @@ def read_event_file(eventxml):
     if 'network' in xmldict:
         eqdict['eventsource'] = xmldict['network']
     else:
-        eqdict['eventsource'] = 'us' #??
+        eqdict['eventsource'] = 'us'  # ??
 
-    #look for the productcode attribute
+    # look for the productcode attribute
     if 'productcode' in xmldict:
         eqdict['productcode'] = xmldict['productcode']
 
     # fix eventsourcecode if not specified correctly
     if not eqdict['eventsourcecode'].startswith(eqdict['eventsource']):
-        eqdict['eventsourcecode'] = eqdict['eventsource'] + eqdict['eventsourcecode']
+        eqdict['eventsourcecode'] = eqdict['eventsource'] + \
+            eqdict['eventsourcecode']
 
     year = int(xmldict['year'])
     month = int(xmldict['month'])
@@ -313,8 +315,9 @@ def read_event_file(eventxml):
     hour = int(xmldict['hour'])
     minute = int(xmldict['minute'])
     second = int(xmldict['second'])
-    microseconds = int((second - int(xmldict['second']))*1e6)
-    eqdict['time'] = HistoricTime(year,month,day,hour,minute,second,microseconds)
+    microseconds = int((second - int(xmldict['second'])) * 1e6)
+    eqdict['time'] = HistoricTime(
+        year, month, day, hour, minute, second, microseconds)
     eqdict['lat'] = float(xmldict['lat'])
     eqdict['lon'] = float(xmldict['lon'])
     eqdict['depth'] = float(xmldict['depth'])
@@ -323,12 +326,13 @@ def read_event_file(eventxml):
     # make created field in event.xml optional - set to current UTC time if not
     # supplied.
     if 'created' in xmldict:
-        eqdict['created'] = HistoricTime.utcfromtimestamp(int(xmldict['created']))
+        eqdict['created'] = HistoricTime.utcfromtimestamp(
+            int(xmldict['created']))
     else:
         eqdict['created'] = HistoricTime.utcnow()
 
     eqdict['locstring'] = xmldict['locstring']
-    
+
     if 'mech' in xmldict:
         eqdict['mech'] = xmldict['mech']
     return eqdict
@@ -362,7 +366,7 @@ def read_moment_quakeml(momentfile):
     with warnings.catch_warnings():
         warnings.simplefilter('ignore')
         catalog = read_events(momentfile)
-        
+
     if not len(catalog.events):
         return params
     event = catalog.events[0]
@@ -379,7 +383,7 @@ def read_moment_quakeml(momentfile):
     if focal.creation_info is not None:
         if focal.creation_info.agency_id is not None:
             msource = focal.creation_info.agency_id
-        
+
     if focal.nodal_planes is None:
         return params
     if focal.nodal_planes.nodal_plane_1 is None:
@@ -398,16 +402,16 @@ def read_moment_quakeml(momentfile):
     else:
         plane1 = focal.nodal_planes.nodal_plane_1
         plane2 = focal.nodal_planes.nodal_plane_2
-        params['NP1'] = {'strike':plane1.strike,
-                        'dip':plane1.dip,
-                        'rake':plane1.rake}
-        params['NP2'] = {'strike':plane2.strike,
-                        'dip':plane2.dip,
-                        'rake':plane2.rake}
-    
-    
-    moment = {'moment':params}
+        params['NP1'] = {'strike': plane1.strike,
+                         'dip': plane1.dip,
+                         'rake': plane1.rake}
+        params['NP2'] = {'strike': plane2.strike,
+                         'dip': plane2.dip,
+                         'rake': plane2.rake}
+
+    moment = {'moment': params}
     return moment
+
 
 def read_source(sourcefile):
     """

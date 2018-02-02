@@ -335,24 +335,24 @@ class QuadRupture(Rupture):
         for i in range(n_groups):
             ind = np.where(u_groups[i] == group_index)[0]
             lons = np.concatenate(
-                    [xp0[ind[0]].reshape((1,)),
-                     xp1[ind], xp2[ind][::-1],
-                     xp3[ind][::-1][-1].reshape((1,)),
-                     xp0[ind[0]].reshape((1,))
-                     ])
+                [xp0[ind[0]].reshape((1,)),
+                 xp1[ind], xp2[ind][::-1],
+                 xp3[ind][::-1][-1].reshape((1,)),
+                 xp0[ind[0]].reshape((1,))
+                 ])
             lats = np.concatenate(
-                    [yp0[ind[0]].reshape((1,)),
-                     yp1[ind],
-                     yp2[ind][::-1],
-                     yp3[ind][::-1][-1].reshape((1,)),
-                     yp0[ind[0]].reshape((1,))
-                     ])
+                [yp0[ind[0]].reshape((1,)),
+                 yp1[ind],
+                 yp2[ind][::-1],
+                 yp3[ind][::-1][-1].reshape((1,)),
+                 yp0[ind[0]].reshape((1,))
+                 ])
             deps = np.concatenate(
-                    [zp[ind[0]].reshape((1,)),
-                     zp[ind],
-                     zpdown[ind][::-1],
-                     zpdown[ind][::-1][-1].reshape((1,)),
-                     zp[ind[0]].reshape((1,))])
+                [zp[ind[0]].reshape((1,)),
+                 zp[ind],
+                 zpdown[ind][::-1],
+                 zpdown[ind][::-1][-1].reshape((1,)),
+                 zp[ind[0]].reshape((1,))])
 
             poly = []
             for lon, lat, dep in zip(lons, lats, deps):
@@ -499,26 +499,26 @@ class QuadRupture(Rupture):
         for i in range(n_groups):
             ind = np.where(u_groups[i] == group_index)[0]
             lons = np.concatenate(
-                    [xp0[ind[0]].reshape((1,)),
-                     xp1[ind],
-                     xp2[ind][::-1],
-                     xp3[ind][::-1][-1].reshape((1,)),
-                     xp0[ind[0]].reshape((1,))
-                     ])
+                [xp0[ind[0]].reshape((1,)),
+                 xp1[ind],
+                 xp2[ind][::-1],
+                 xp3[ind][::-1][-1].reshape((1,)),
+                 xp0[ind[0]].reshape((1,))
+                 ])
             lats = np.concatenate(
-                    [yp0[ind[0]].reshape((1,)),
-                     yp1[ind],
-                     yp2[ind][::-1],
-                     yp3[ind][::-1][-1].reshape((1,)),
-                     yp0[ind[0]].reshape((1,))
-                     ])
+                [yp0[ind[0]].reshape((1,)),
+                 yp1[ind],
+                 yp2[ind][::-1],
+                 yp3[ind][::-1][-1].reshape((1,)),
+                 yp0[ind[0]].reshape((1,))
+                 ])
             deps = np.concatenate(
-                    [zp0[ind[0]].reshape((1,)),
-                     zp1[ind],
-                     zp2[ind][::-1],
-                     zp3[ind][::-1][-1].reshape((1,)),
-                     zp0[ind[0]].reshape((1,))
-                     ])
+                [zp0[ind[0]].reshape((1,)),
+                 zp1[ind],
+                 zp2[ind][::-1],
+                 zp3[ind][::-1][-1].reshape((1,)),
+                 zp0[ind[0]].reshape((1,))
+                 ])
 
             poly = []
             for lon, lat, dep in zip(lons, lats, deps):

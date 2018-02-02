@@ -38,7 +38,7 @@ class VirtualIPE(GMPE):
     DEFINED_FOR_STANDARD_DEVIATION_TYPES = None
     #: Distance measures required (will depend on the GMPE provided).
     REQUIRES_DISTANCES = None
-    #: OpenQuake IMC used (will depend on the GMPE, but "Larger" is 
+    #: OpenQuake IMC used (will depend on the GMPE, but "Larger" is
     #: typical).
     DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = None
     #: Determined by the GMPE selected.
@@ -85,13 +85,13 @@ class VirtualIPE(GMPE):
 
         self.REQUIRES_DISTANCES = gmpe.REQUIRES_DISTANCES.copy()
         self.REQUIRES_RUPTURE_PARAMETERS = \
-                gmpe.REQUIRES_RUPTURE_PARAMETERS.copy()
+            gmpe.REQUIRES_RUPTURE_PARAMETERS.copy()
         self.REQUIRES_SITES_PARAMETERS = \
-                gmpe.REQUIRES_SITES_PARAMETERS.copy()
+            gmpe.REQUIRES_SITES_PARAMETERS.copy()
         self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = \
-                copy.copy(gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT)
+            copy.copy(gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT)
         self.DEFINED_FOR_TECTONIC_REGION_TYPE = \
-                copy.copy(gmpe.DEFINED_FOR_TECTONIC_REGION_TYPE)
+            copy.copy(gmpe.DEFINED_FOR_TECTONIC_REGION_TYPE)
 
         return self
 
@@ -119,7 +119,7 @@ class VirtualIPE(GMPE):
             be any set that the MultiGMPE supports. See the ShakeMap manual
             for a detailed discussion of the way the uncertainty is computed.
 
-        """ # noqa
+        """  # noqa
 
         if imt != MMI():
             raise ValueError("imt must be MMI")

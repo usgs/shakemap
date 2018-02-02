@@ -220,7 +220,7 @@ def text_to_json(file):
     d = {
         "type": "FeatureCollection",
         "metadata": {
-            'reference':reference
+            'reference': reference
         },
         "features": [
             {

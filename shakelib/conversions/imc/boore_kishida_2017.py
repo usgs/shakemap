@@ -21,7 +21,7 @@ class BooreKishida2017(object):
 
     This class explicitly supports the following subset of the conversions
     provided by B&K (specified as OpenQuake IMCs):
-        
+
         - RotD50 <=> GMRotI50
         - RotD50 <=> AVERAGE_HORIZONTAL (i.e., Geometric Mean "as recorded")
         - RotD100 <=> RotD50
@@ -38,7 +38,7 @@ class BooreKishida2017(object):
     supported by B&K, we assume the IMC is equivalent to the geometric
     mean (which B&K call GM_AR), based on our reading of
     Beyer & Bommer (2006).
-        
+
     References
 
         Boore, D.M. and T. Kishida (2017). Relations between some
@@ -105,7 +105,7 @@ class BooreKishida2017(object):
         elif mag > 9:
             mag = 9.0
         ln_ratio = c0 + r1 * np.log(rrups_clipped / 50) + \
-                   m1 * (mag - 5.5) + m2 * (mag - 5.5)**2
+            m1 * (mag - 5.5) + m2 * (mag - 5.5)**2
         #
         # The B&K file naming convention has things like D100D50, which
         # means the parameters give the (log) ratio of RotD100/RotD50,
@@ -243,9 +243,9 @@ class BooreKishida2017(object):
         elif oq_imc == IMC.GMRotI50:
             return 'GM50'
         elif oq_imc == IMC.AVERAGE_HORIZONTAL or \
-             oq_imc == IMC.HORIZONTAL or \
-             oq_imc == IMC.RANDOM_HORIZONTAL or \
-             oq_imc == IMC.MEDIAN_HORIZONTAL:
+                oq_imc == IMC.HORIZONTAL or \
+                oq_imc == IMC.RANDOM_HORIZONTAL or \
+                oq_imc == IMC.MEDIAN_HORIZONTAL:
             return 'GMAR'
         elif oq_imc == IMC.GREATER_OF_TWO_HORIZONTAL:
             return 'Larger'
@@ -256,4 +256,3 @@ class BooreKishida2017(object):
             #
             logging.warn("Can't handle IMC %s, using GMAR" % oq_imc)
             return 'GMAR'
-
