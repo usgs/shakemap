@@ -1,0 +1,6 @@
+#Yagi, Y., T. Mikumo, J. Pacheco, and G. Reyes (2004). Source Rupture Process of the Tecomán, Colima, Mexico Earthquake of 22 January 2003, Determined by Joint Inversion of Teleseismic Body-Wave and Near-Source Data, Bull. Seism. Soc. Am. 94, 1795-1807.
+18.680	-104.559	12.000
+18.365	-103.984	12.000
+18.978	-103.610	43.842
+19.293	-104.184	43.842
+18.680	-104.559	12.000

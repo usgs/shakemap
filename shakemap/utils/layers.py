@@ -2,13 +2,13 @@ import glob
 import os.path
 from functools import partial
 
+# third party imports
 import pyproj
 from shapely.geometry import Point, Polygon, MultiPolygon
 from shapely.ops import transform
 import shapely.wkt
 import numpy as np
 from openquake.hazardlib.geo.geodetic import min_distance_to_segment
-
 
 def nearest_edge(elon, elat, poly):
     """
@@ -115,35 +115,35 @@ def get_layer_distances(elon, elat, layer_dir):
         dist_dict[layer_name] = dist_to_layer(elon, elat, geom)
     return dist_dict
 
-
-#
-# This is a dummy function. It needs to be replaced with the actual
-# function that gives the distance from the earthquake to the tectonic
-# regions # and, if the region is subduction, gives the probabilities
-# for the event types.
-#
-def get_tectonic_regions(elon, elat, edepth, eid):
-    strec_out = {
-        'focal_mech': 'ALL',
-        'tectonic_regions': {
-            'acr': {
-                'distance': 0.0,
-            },
-            'scr': {
-                'distance': 1500.0,
-            },
-            'subduction': {
-                'distance': 1400.0,
-                'probabilities': {
-                    'crustal': 0,
-                    'interface': 0,
-                    'intraslab': 0,
-                }
-            },
-            'volcanic': {
-                'distance': 2300.0,
-            },
-        }
-    }
-
-    return strec_out
+def update_config_regions(lat, lon, config):
+    min_dist_to_layer = 999999.9
+    inside_layer_name = None
+    if 'layers' in config and 'layer_dir' in config['layers']:
+        layer_dir = config['layers']['layer_dir']
+        if layer_dir and layer_dir != 'None':
+            geo_layers = get_layer_distances(lon, lat, layer_dir)
+        else:
+            geo_layers = {}
+        for layer in config['layers']:
+            if layer == 'layer_dir':
+                continue
+            if layer not in geo_layers:
+                self.logger.warning('Error: cannot find layer %s in %s' %
+                                    (layer, layer_dir))
+                continue
+            ldist = geo_layers[layer]
+            if ldist < min_dist_to_layer:
+                min_dist_to_layer = ldist
+                if min_dist_to_layer == 0:
+                    inside_layer_name = layer
+                    break
+    if inside_layer_name is None:
+        return config
+    else:
+        layer_config = config['layers'][inside_layer_name]
+        for region,rdict in layer_config.items():
+            if region == 'horizontal_buffer':
+                continue
+            config['tectonic_regions'][region] = rdict
+    return config
+        

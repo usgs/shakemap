@@ -20,7 +20,7 @@ from shapely.geometry import LineString
 from shapely.geometry import GeometryCollection
 from shapely.geometry import Polygon as sPolygon
 from shapely.geometry import shape as sShape
-from shapely.errors import TopologicalError
+from shapely.geos import TopologicalError
 
 import numpy as np
 from descartes import PolygonPatch

@@ -72,7 +72,7 @@ def get_configspec(config=None):
         return os.path.join(get_data_path(), 'configspec.conf')
     fname = os.path.join(get_data_path(), '%sspec.conf' % config)
     if not os.path.isfile(fname):
-        return FileNotFoundError('No file "%s" exists.' % fname)
+        raise FileNotFoundError('No file "%s" exists.' % fname)
     return fname
 
 

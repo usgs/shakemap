@@ -210,7 +210,7 @@ class ShakeMapInputContainer(ShakeMapContainer):
     """
     @classmethod
     def createFromInput(cls, filename, config, eventfile, version_history, rupturefile=None,
-                        datafiles=None):
+                        sourcefile = None, momentfile = None, datafiles=None):
         """
         Instantiate an InputContainer from ShakeMap input data.
 
@@ -221,6 +221,8 @@ class ShakeMapInputContainer(ShakeMapContainer):
                 necessary for ShakeMap ground motion and other calculations.
             eventfile (str): Path to ShakeMap event.xml file.
             rupturefile (str): Path to ShakeMap rupture text or JSON file.
+            sourcefile (str): Path to ShakeMap source.txt file.
+            momentfile (str): Path to ShakeMap moment.xml file.
             datafiles (list): List of ShakeMap data (DYFI, strong motion) files.
             version_history (dict): Dictionary containing version history.
 
@@ -231,7 +233,8 @@ class ShakeMapInputContainer(ShakeMapContainer):
         container.setConfig(config)
 
         # create an origin from the event file
-        origin = Origin.fromFile(eventfile)
+        origin = Origin.fromFile(eventfile, sourcefile = sourcefile,
+                                 momentfile = momentfile)
 
         # create a rupture object from the origin and the rupture file
         # (if present).

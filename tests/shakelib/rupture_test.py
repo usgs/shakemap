@@ -6,6 +6,8 @@ import os.path
 import sys
 import io
 import copy
+import tempfile
+import shutil
 
 # third party
 import numpy as np
@@ -13,8 +15,10 @@ import pytest
 from openquake.hazardlib.geo.geodetic import azimuth
 from mapio.geodict import GeoDict
 import matplotlib.pyplot as plt
+from obspy.core.event import Catalog,FocalMechanism,Event
+from obspy.core.event.source import NodalPlane,NodalPlanes
 
-from shakelib.rupture.origin import Origin
+from shakelib.rupture.origin import Origin,read_moment_quakeml
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.factory import get_rupture
@@ -562,6 +566,31 @@ def test_fromTrace():
         dips, origin,
         reference='From J Smith, (personal communication)')
 
+def test_with_quakeml():
+    np1 = NodalPlane(strike=259,dip=74,rake=10)
+    np2 = NodalPlane(strike=166,dip=80,rake=164)
+    nodal_planes = NodalPlanes(nodal_plane_1=np1,nodal_plane_2=np2)
+    focal = FocalMechanism(nodal_planes=nodal_planes)
+    event = Event(focal_mechanisms=[focal])
+    catalog = Catalog(events=[event])
+    event_text = '''<shakemap-data code_version="4.0" map_version="1">
+<earthquake id="us2000cmy3" lat="56.046" lon="-149.073" mag="7.9" year="2018" month="1" day="23" hour="9" minute="31" second="42" timezone="GMT" depth="25.00" locstring="280km SE of Kodiak, Alaska" />
+</shakemap-data>'''
+    try:
+        tempdir = tempfile.mkdtemp()
+        xmlfile = os.path.join(tempdir,'quakeml.xml')
+        catalog.write(xmlfile,format="QUAKEML")
+        eventfile = os.path.join(tempdir,'event.xml')
+        f = open(eventfile,'wt')
+        f.write(event_text)
+        f.close()
+        params = read_moment_quakeml(xmlfile)
+        origin = Origin.fromFile(eventfile,momentfile=xmlfile)
+        x = 1
+    except Exception as e:
+        assert 1==2
+    finally:
+        shutil.rmtree(tempdir)
 
 if __name__ == "__main__":
     test_rupture_from_dict()
@@ -573,3 +602,4 @@ if __name__ == "__main__":
     test_parse_complicated_rupture()
     test_incorrect()
     test_fromTrace()
+    test_with_quakeml()
