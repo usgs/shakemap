@@ -27,8 +27,8 @@ sys.path.insert(0, shakedir)
 
 
 def randomword(length):
-   letters = string.ascii_lowercase
-   return ''.join(random.choice(letters) for i in range(length))
+    letters = string.ascii_lowercase
+    return ''.join(random.choice(letters) for i in range(length))
 
 
 def dict_equal(d1, d2):
@@ -38,7 +38,7 @@ def dict_equal(d1, d2):
 
 
 def test_input_container():
-    f,datafile = tempfile.mkstemp()
+    f, datafile = tempfile.mkstemp()
     os.close(f)
     try:
         config = {'alliance': 'chaotic neutral',
@@ -101,7 +101,7 @@ def test_input_container():
                                                             eventfile,
                                                             {})
         try:
-            #this should fail, because we haven't set any station data yet
+            # this should fail, because we haven't set any station data yet
             station = container3.getStationList()
         except AttributeError:
             assert 1 == 1
@@ -130,76 +130,76 @@ def test_input_container():
         assert dict_equal(config, config2)
 
     except:
-        assert 1==2
+        assert 1 == 2
     finally:
         os.remove(datafile)
 
 
 def test_output_container():
-    geodict = GeoDict.createDictFromBox(-118.5,-114.5,32.1,36.7,0.01,0.02)
-    nrows,ncols = geodict.ny,geodict.nx
+    geodict = GeoDict.createDictFromBox(-118.5, -114.5, 32.1, 36.7, 0.01, 0.02)
+    nrows, ncols = geodict.ny, geodict.nx
 
-    #create MMI mean data for maximum component
-    mean_mmi_maximum_data = np.random.rand(nrows,ncols)
-    mean_mmi_maximum_metadata = {'name':'Gandalf',
-                                 'color':'white',
-                                 'powers':'magic'}
-    mean_mmi_maximum_grid = Grid2D(mean_mmi_maximum_data,geodict)
+    # create MMI mean data for maximum component
+    mean_mmi_maximum_data = np.random.rand(nrows, ncols)
+    mean_mmi_maximum_metadata = {'name': 'Gandalf',
+                                 'color': 'white',
+                                 'powers': 'magic'}
+    mean_mmi_maximum_grid = Grid2D(mean_mmi_maximum_data, geodict)
 
-    #create MMI std data for maximum component
-    std_mmi_maximum_data = mean_mmi_maximum_data/10
-    std_mmi_maximum_metadata = {'name':'Legolas',
-                                'color':'green',
-                                'powers':'good hair'}
-    std_mmi_maximum_grid = Grid2D(std_mmi_maximum_data,geodict)
+    # create MMI std data for maximum component
+    std_mmi_maximum_data = mean_mmi_maximum_data / 10
+    std_mmi_maximum_metadata = {'name': 'Legolas',
+                                'color': 'green',
+                                'powers': 'good hair'}
+    std_mmi_maximum_grid = Grid2D(std_mmi_maximum_data, geodict)
 
-    #create MMI mean data for rotd50 component
-    mean_mmi_rotd50_data = np.random.rand(nrows,ncols)
-    mean_mmi_rotd50_metadata = {'name':'Gimli',
-                                 'color':'brown',
-                                 'powers':'axing'}
-    mean_mmi_rotd50_grid = Grid2D(mean_mmi_rotd50_data,geodict)
+    # create MMI mean data for rotd50 component
+    mean_mmi_rotd50_data = np.random.rand(nrows, ncols)
+    mean_mmi_rotd50_metadata = {'name': 'Gimli',
+                                'color': 'brown',
+                                'powers': 'axing'}
+    mean_mmi_rotd50_grid = Grid2D(mean_mmi_rotd50_data, geodict)
 
-    #create MMI std data for rotd50 component
-    std_mmi_rotd50_data = mean_mmi_rotd50_data/10
-    std_mmi_rotd50_metadata = {'name':'Aragorn',
-                                'color':'white',
-                                'powers':'scruffiness'}
-    std_mmi_rotd50_grid = Grid2D(std_mmi_rotd50_data,geodict)
+    # create MMI std data for rotd50 component
+    std_mmi_rotd50_data = mean_mmi_rotd50_data / 10
+    std_mmi_rotd50_metadata = {'name': 'Aragorn',
+                               'color': 'white',
+                               'powers': 'scruffiness'}
+    std_mmi_rotd50_grid = Grid2D(std_mmi_rotd50_data, geodict)
 
-    #create PGA mean data for maximum component
-    mean_pga_maximum_data = np.random.rand(nrows,ncols)
-    mean_pga_maximum_metadata = {'name':'Pippin',
-                                 'color':'purple',
-                                 'powers':'rashness'}
-    mean_pga_maximum_grid = Grid2D(mean_pga_maximum_data,geodict)
+    # create PGA mean data for maximum component
+    mean_pga_maximum_data = np.random.rand(nrows, ncols)
+    mean_pga_maximum_metadata = {'name': 'Pippin',
+                                 'color': 'purple',
+                                 'powers': 'rashness'}
+    mean_pga_maximum_grid = Grid2D(mean_pga_maximum_data, geodict)
 
-    #create PGA std data for maximum component
-    std_pga_maximum_data = mean_pga_maximum_data/10
-    std_pga_maximum_metadata = {'name':'Merry',
-                                'color':'grey',
-                                'powers':'hunger'}
-    std_pga_maximum_grid = Grid2D(std_pga_maximum_data,geodict)
+    # create PGA std data for maximum component
+    std_pga_maximum_data = mean_pga_maximum_data / 10
+    std_pga_maximum_metadata = {'name': 'Merry',
+                                'color': 'grey',
+                                'powers': 'hunger'}
+    std_pga_maximum_grid = Grid2D(std_pga_maximum_data, geodict)
 
-    f,datafile = tempfile.mkstemp()
+    f, datafile = tempfile.mkstemp()
     os.close(f)
     try:
         container = ShakeMapOutputContainer.create(datafile)
         container.setIMTGrids('mmi',
-                         mean_mmi_maximum_grid,mean_mmi_maximum_metadata,
-                         std_mmi_maximum_grid,std_mmi_maximum_metadata,
-                         component='maximum')
+                              mean_mmi_maximum_grid, mean_mmi_maximum_metadata,
+                              std_mmi_maximum_grid, std_mmi_maximum_metadata,
+                              component='maximum')
         container.setIMTGrids('mmi',
-                         mean_mmi_rotd50_grid,mean_mmi_rotd50_metadata,
-                         std_mmi_rotd50_grid,std_mmi_rotd50_metadata,
-                         component='rotd50')
+                              mean_mmi_rotd50_grid, mean_mmi_rotd50_metadata,
+                              std_mmi_rotd50_grid, std_mmi_rotd50_metadata,
+                              component='rotd50')
         container.setIMTGrids('pga',
-                         mean_pga_maximum_grid,mean_pga_maximum_metadata,
-                         std_pga_maximum_grid,std_pga_maximum_metadata,
-                         component='maximum')
+                              mean_pga_maximum_grid, mean_pga_maximum_metadata,
+                              std_pga_maximum_grid, std_pga_maximum_metadata,
+                              component='maximum')
 
-        #get the maximum MMI imt data
-        mmi_max_dict = container.getIMTGrids('mmi',component='maximum')
+        # get the maximum MMI imt data
+        mmi_max_dict = container.getIMTGrids('mmi', component='maximum')
         np.testing.assert_array_equal(mmi_max_dict['mean'].getData(),
                                       mean_mmi_maximum_data)
         np.testing.assert_array_equal(mmi_max_dict['std'].getData(),
@@ -207,8 +207,8 @@ def test_output_container():
         assert mmi_max_dict['mean_metadata'] == mean_mmi_maximum_metadata
         assert mmi_max_dict['std_metadata'] == std_mmi_maximum_metadata
 
-        #get the rotd50 MMI imt data
-        mmi_rot_dict = container.getIMTGrids('mmi',component='rotd50')
+        # get the rotd50 MMI imt data
+        mmi_rot_dict = container.getIMTGrids('mmi', component='rotd50')
         np.testing.assert_array_equal(mmi_rot_dict['mean'].getData(),
                                       mean_mmi_rotd50_data)
         np.testing.assert_array_equal(mmi_rot_dict['std'].getData(),
@@ -216,17 +216,18 @@ def test_output_container():
         assert mmi_rot_dict['mean_metadata'] == mean_mmi_rotd50_metadata
         assert mmi_rot_dict['std_metadata'] == std_mmi_rotd50_metadata
 
-        #get list of maximum imts
+        # get list of maximum imts
         max_imts = container.getIMTs(component='maximum')
-        assert sorted(max_imts) == ['mmi','pga']
+        assert sorted(max_imts) == ['mmi', 'pga']
 
-        #get list of components for mmi
+        # get list of components for mmi
         mmi_comps = container.getComponents('mmi')
-        assert sorted(mmi_comps) == ['maximum','rotd50']
+        assert sorted(mmi_comps) == ['maximum', 'rotd50']
     except Exception as e:
         raise(e)
     finally:
         os.remove(datafile)
+
 
 def test_output_arrays():
 

@@ -180,11 +180,6 @@ def test_layers():
 #     np.testing.assert_almost_equal(interface,0.275,decimal=4)
 #     np.testing.assert_almost_equal(intraslab,0.3625,decimal=4)
 
-    
 
-    
-    
-    
-        
 if __name__ == '__main__':
     test_layers()

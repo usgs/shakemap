@@ -29,8 +29,8 @@ def test_wgrw12():
 
     mi, dmda = gmice.getMIfromGM(amps_in, PGA(), dists=None, mag=None)
     mi_target = np.array(
-	[ 3.18167182,  4.23133858,  5.62950857,  6.73127835,  7.37577236,
-          7.83304814,  8.18773878,  9.28950857])
+        [3.18167182,  4.23133858,  5.62950857,  6.73127835,  7.37577236,
+         7.83304814,  8.18773878,  9.28950857])
 
     if do_test is True:
         np.testing.assert_allclose(mi, mi_target)
@@ -41,8 +41,8 @@ def test_wgrw12():
     mi, dmda = gmice.getMIfromGM(
         amps_in + np.log(100), PGV(), dists=None, mag=None)
     mi_target = np.array(
-	[ 3.4       ,  4.40195463,  5.82      ,  6.86457408,  7.47561075,
-          7.90914817,  8.24542592,  9.29      ])
+        [3.4,  4.40195463,  5.82,  6.86457408,  7.47561075,
+         7.90914817,  8.24542592,  9.29])
 
     if do_test is True:
         np.testing.assert_allclose(mi, mi_target)
@@ -50,11 +50,10 @@ def test_wgrw12():
     else:
         print(repr(mi))
 
-
     amps, dadm = gmice.getGMfromMI(mmi_in, PGA(), dists=None, mag=None)
     amps_target = np.array(
-	[-5.84194287, -4.79531328, -3.7486837 , -2.69862254, -1.9436766 ,
-         -1.25164283, -0.74834554, -0.1821361 ])
+        [-5.84194287, -4.79531328, -3.7486837, -2.69862254, -1.9436766,
+         -1.25164283, -0.74834554, -0.1821361])
 
     if do_test is True:
         np.testing.assert_allclose(amps, amps_target)
@@ -64,15 +63,14 @@ def test_wgrw12():
 
     amps, dadm = gmice.getGMfromMI(mmi_in, PGV(), dists=None, mag=None)
     amps_target = np.array(
-	[-1.53505673, -0.43858764,  0.65788146,  1.75845836,  2.55474139,
-          3.2846675 ,  3.81552285,  4.41273512])
+        [-1.53505673, -0.43858764,  0.65788146,  1.75845836,  2.55474139,
+         3.2846675,  3.81552285,  4.41273512])
 
     if do_test is True:
         np.testing.assert_allclose(amps, amps_target)
         assert((set(dadm) - dadm_target[PGV()]) == set())
     else:
         print(repr(amps))
-
 
     if do_test is True:
         sdd = gmice.getGM2MIsd()

@@ -15,10 +15,10 @@ import pytest
 from openquake.hazardlib.geo.geodetic import azimuth
 from mapio.geodict import GeoDict
 import matplotlib.pyplot as plt
-from obspy.core.event import Catalog,FocalMechanism,Event
-from obspy.core.event.source import NodalPlane,NodalPlanes
+from obspy.core.event import Catalog, FocalMechanism, Event
+from obspy.core.event.source import NodalPlane, NodalPlanes
 
-from shakelib.rupture.origin import Origin,read_moment_quakeml
+from shakelib.rupture.origin import Origin, read_moment_quakeml
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.factory import get_rupture
@@ -151,12 +151,12 @@ def test_EdgeRupture():
     np.testing.assert_allclose(rjb1, rjb2, atol=2e-2)
     gc2 = erup.computeGC2(lons, lats, deps)
     targetRy0 = np.array(
-      [0., 0.,  0., 0.,  0.,
-       0., 0.,  0., 0.,  0.67335931])
+        [0., 0.,  0., 0.,  0.,
+         0., 0.,  0., 0.,  0.67335931])
     targetRx = np.array(
-      [-8.88024949, -17.73390996, -26.56167797, -35.3634266,
-       -44.13902929, -52.88835984, -61.61129242, -70.30770154,
-       -78.97746209, -87.6204493])
+        [-8.88024949, -17.73390996, -26.56167797, -35.3634266,
+         -44.13902929, -52.88835984, -61.61129242, -70.30770154,
+         -78.97746209, -87.6204493])
     np.testing.assert_allclose(gc2['ry0'], targetRy0)
     np.testing.assert_allclose(gc2['rx'], targetRx)
 
@@ -566,10 +566,11 @@ def test_fromTrace():
         dips, origin,
         reference='From J Smith, (personal communication)')
 
+
 def test_with_quakeml():
-    np1 = NodalPlane(strike=259,dip=74,rake=10)
-    np2 = NodalPlane(strike=166,dip=80,rake=164)
-    nodal_planes = NodalPlanes(nodal_plane_1=np1,nodal_plane_2=np2)
+    np1 = NodalPlane(strike=259, dip=74, rake=10)
+    np2 = NodalPlane(strike=166, dip=80, rake=164)
+    nodal_planes = NodalPlanes(nodal_plane_1=np1, nodal_plane_2=np2)
     focal = FocalMechanism(nodal_planes=nodal_planes)
     event = Event(focal_mechanisms=[focal])
     catalog = Catalog(events=[event])
@@ -578,19 +579,20 @@ def test_with_quakeml():
 </shakemap-data>'''
     try:
         tempdir = tempfile.mkdtemp()
-        xmlfile = os.path.join(tempdir,'quakeml.xml')
-        catalog.write(xmlfile,format="QUAKEML")
-        eventfile = os.path.join(tempdir,'event.xml')
-        f = open(eventfile,'wt')
+        xmlfile = os.path.join(tempdir, 'quakeml.xml')
+        catalog.write(xmlfile, format="QUAKEML")
+        eventfile = os.path.join(tempdir, 'event.xml')
+        f = open(eventfile, 'wt')
         f.write(event_text)
         f.close()
         params = read_moment_quakeml(xmlfile)
-        origin = Origin.fromFile(eventfile,momentfile=xmlfile)
+        origin = Origin.fromFile(eventfile, momentfile=xmlfile)
         x = 1
     except Exception as e:
-        assert 1==2
+        assert 1 == 2
     finally:
         shutil.rmtree(tempdir)
+
 
 if __name__ == "__main__":
     test_rupture_from_dict()

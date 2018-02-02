@@ -43,7 +43,8 @@ def test_multisegment_discordant():
 
     # Make an Origin object; most of the 'event' values don't matter for
     # this example
-    origin = Origin({'lat': 0,  'lon': 0, 'depth': 0, 'mag': 7.2, 'eventsourcecode': ''})
+    origin = Origin({'lat': 0,  'lon': 0, 'depth': 0,
+                     'mag': 7.2, 'eventsourcecode': ''})
     rup = QuadRupture.fromVertices(
         lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3,
         origin, group_index=[0, 0, 0, 1, 1, 1])
@@ -332,7 +333,8 @@ def test_EdgeRupture_vs_QuadRupture():
     widths = np.array([30, 20])
     dips = np.array([30, 40])
 
-    origin = Origin({'lat': 0,  'lon': 0, 'depth': 0, 'mag': 7.2, 'eventsourcecode': ''})
+    origin = Origin({'lat': 0,  'lon': 0, 'depth': 0,
+                     'mag': 7.2, 'eventsourcecode': ''})
     qrup = QuadRupture.fromTrace(xp0, yp0, xp1, yp1, zp, widths, dips, origin)
     rrup_q = qrup.computeRrup(lon, lat, dep)
     rjb_q = qrup.computeRjb(lon, lat, dep)

@@ -61,14 +61,14 @@ def test_get_extent_aspect():
     # Long horizontal rupture
     #
     rrep = io.StringIO(
-            """
+        """
             30.0 100.0 0.0
             30.0 110.0 0.0
             30.0 110.0 5.0
             30.0 100.0 5.0
             30.0 100.0 0.0
             """
-           )
+    )
     rupture = get_rupture(origin, rrep)
     W, E, S, N = get_extent(rupture)
     assert W == 97.18333333333334
@@ -79,14 +79,14 @@ def test_get_extent_aspect():
     # Long vertical rupture
     #
     rrep = io.StringIO(
-            """
+        """
             24.0 100.0 0.0
             36.0 100.0 0.0
             36.0 100.0 5.0
             24.0 100.0 5.0
             24.0 100.0 0.0
             """
-           )
+    )
     rupture = get_rupture(origin, rrep)
     W, E, S, N = get_extent(rupture)
     assert W == 92.53333333333333

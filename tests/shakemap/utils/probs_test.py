@@ -9,11 +9,11 @@ from configobj import ConfigObj
 
 
 def test_probs():
-    install_path,config_path = get_config_paths()
+    install_path, config_path = get_config_paths()
     config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
-    validate_config(config,install_path)
+    validate_config(config, install_path)
     eid = 'us2000cmy3'
-    
+
 
 if __name__ == '__main__':
     test_probs()
