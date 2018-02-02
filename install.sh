@@ -53,6 +53,8 @@ curl --max-time 60 --retry 3 -L \
      https://github.com/usgs/MapIO/archive/master.zip -o mapio.zip
 curl --max-time 60 --retry 3 -L \
      https://github.com/usgs/strec/archive/master.zip -o strec.zip
+curl --max-time 60 --retry 3 -L \
+    https://github.com/usgs/ps2ff/archive/master.zip -o ps2ff.zip
 
 
 # Create a conda virtual environment
@@ -88,6 +90,7 @@ rm impact-utils.zip
 rm libcomcat.zip
 rm mapio.zip
 rm strec.zip
+rm ps2ff.zip
 
 # This package
 echo "Installing shakemap..."
