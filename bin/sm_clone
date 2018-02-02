@@ -94,7 +94,7 @@ def main(args):
         info_file = os.path.join(tmpdir, 'info.json')
         shakemap.getContent('info.json', filename=info_file)
         infodict = json.load(open(info_file, 'r'))
-        _write_event_xml(detail['net'],detail.id,infodict, event_dir)
+        _write_event_xml(detail['net'], detail.id, infodict, event_dir)
         data_file = os.path.join(event_dir, '%s_dat.xml' % args.eventid)
         shakemap.getContent('stationlist.xml', filename=data_file)
         fault_files = shakemap.getContentsMatching('fault.txt')
