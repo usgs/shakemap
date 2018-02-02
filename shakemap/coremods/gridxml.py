@@ -15,7 +15,7 @@ from .base import CoreModule
 from shakemap.utils.config import get_config_paths
 import shakemap
 
-# historically, we only had the component we are now calling 
+# historically, we only had the component we are now calling
 # 'GREATER_OF_TWO_HORIZONTAL'.
 # As we do not intend grid.xml files to be forward compatible with
 # additional layers of information and different components (RotD50, etc.)

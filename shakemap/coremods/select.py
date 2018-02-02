@@ -55,25 +55,26 @@ class SelectModule(CoreModule):
         eventxml = os.path.join(datadir, 'event.xml')
         if not os.path.isfile(eventxml):
             raise FileNotFoundError('%s does not exist.' % eventxml)
-        momentfile = os.path.join(datadir,'moment.xml')
+        momentfile = os.path.join(datadir, 'moment.xml')
         if not os.path.isfile(momentfile):
             momentfile = None
-        sourcefile = os.path.join(datadir,'source.txt')
+        sourcefile = os.path.join(datadir, 'source.txt')
         if not os.path.isfile(sourcefile):
             sourcefile = None
-            
-        org = Origin.fromFile(eventxml,sourcefile=sourcefile,momentfile=momentfile)
+
+        org = Origin.fromFile(
+            eventxml, sourcefile=sourcefile, momentfile=momentfile)
 
         # ---------------------------------------------------------------------
         # Look for basic event and moment tensor information in the origin object.
         # If moment is not found, try to find tensor information in ComCat.
         # ---------------------------------------------------------------------
         eid = org.eventsourcecode
-        if hasattr(org,'moment'):
+        if hasattr(org, 'moment'):
             tensor_params = org.moment.copy()
         else:
             selector = SubductionSelector()
-            mlat,_,mdepth,tensor_params = selector.getOnlineTensor(eid)
+            mlat, _, mdepth, tensor_params = selector.getOnlineTensor(eid)
             if mlat is None:
                 tensor_params = None
 
@@ -97,7 +98,7 @@ class SelectModule(CoreModule):
         # default tectonic regions.
         # ---------------------------------------------------------------------
         config = update_config_regions(org.lat, org.lon, config)
-        
+
         # ---------------------------------------------------------------------
         # Get the default weighting for this event
         # ---------------------------------------------------------------------
@@ -135,7 +136,6 @@ class SelectModule(CoreModule):
         zc_conf.write()
 
 
-        
 # ##########################################################################
 # We can't use normal ConfigObj validation because there are
 # inconsistent sub-section structures (i.e., acr, scr, and volcanic
@@ -147,7 +147,7 @@ class SelectModule(CoreModule):
 
 def validate_config(mydict, install_path):
     """Recursively validate select.conf.
-    
+
     Args:
         mydict (dict): Full or partial config dictionary.
         install_path (str): 
@@ -165,7 +165,7 @@ def validate_config(mydict, install_path):
             mydict[key] = cfg.cfg_float_list(mydict[key])
         elif key == 'layer_dir':
             mydict[key] = mydict[key].replace('<INSTALL_DIR>', install_path)
-        elif key in  ('x1','x2','p1','p2','p_kagan_default','default_slab_depth'):
+        elif key in ('x1', 'x2', 'p1', 'p2', 'p_kagan_default', 'default_slab_depth'):
             mydict[key] = float(mydict[key])
         else:
             raise ValidateError('Invalid entry in config: "%s"' % (key))

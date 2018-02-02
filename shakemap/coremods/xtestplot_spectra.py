@@ -65,17 +65,17 @@ class TestPlotSpectra(CoreModule):
         #
         fig = plt.figure(figsize=(10, 8))
         plt.semilogx(periodlist[indxx],
-                 datalist[indxx], 
-                 color='k', label='mean')
+                     datalist[indxx],
+                     color='k', label='mean')
         plt.semilogx(periodlist[indxx],
-                 datalist[indxx] + stddevlist[indxx], 
-                 '--b', label='mean +/- stddev')
+                     datalist[indxx] + stddevlist[indxx],
+                     '--b', label='mean +/- stddev')
         plt.semilogx(periodlist[indxx],
-                 datalist[indxx] - stddevlist[indxx], 
-                 '--b')
+                     datalist[indxx] - stddevlist[indxx],
+                     '--b')
         plt.semilogx(periodlist[indxx],
-                 stddevlist[indxx], 
-                 '-.r', label='stddev')
+                     stddevlist[indxx],
+                     '-.r', label='stddev')
         plt.xlabel('Period (s)')
         plt.ylabel('ln(SA) (g)')
         plt.legend(loc='best')

@@ -45,13 +45,13 @@ from shakemap._version import get_versions
 #
 # default_mmi_stddev: the standard deviation of MMI values if it
 #                     is not specified in the input
-# min_mmi_convert: the minimum MMI to convert to PGM -- low 
+# min_mmi_convert: the minimum MMI to convert to PGM -- low
 #                  intensities don't convert very accurately
-# default_stddev_inter: This is a stand-in for tau when the gmpe set 
-#                       doesn't provide it. It is an educated guess 
+# default_stddev_inter: This is a stand-in for tau when the gmpe set
+#                       doesn't provide it. It is an educated guess
 #                       based on the NGA-east work and BC Hydro gmpe.
-#                       It's not perfect, but probably isn't too far off. 
-#                       It is only used when the GMPEs don't provide a 
+#                       It's not perfect, but probably isn't too far off.
+#                       It is only used when the GMPEs don't provide a
 #                       breakdown of the uncertainty terms.
 #
 SM_CONSTS = {'default_mmi_stddev': 0.3,
@@ -240,9 +240,9 @@ class ModelModule(CoreModule):
         imt_in_str_set = set()
         if stations is not None:
             df_dict['df1'], imt_in_str_dict['df1'] = \
-                    stations.getStationDictionary(instrumented=True)
+                stations.getStationDictionary(instrumented=True)
             df_dict['df2'], imt_in_str_dict['df2'] = \
-                    stations.getStationDictionary(instrumented=False)
+                stations.getStationDictionary(instrumented=False)
             imt_in_str_set = imt_in_str_dict['df1'] | imt_in_str_dict['df2']
             #
             # Make the sites and distance contexts for each dictionary then
@@ -287,7 +287,7 @@ class ModelModule(CoreModule):
                     df[imtstr + '_residual'] = \
                         df[imtstr] - df[imtstr + '_pred']
                     # ----------------------------------------------------------
-                    # Do the outlier flagging if we have a fault, or we don't 
+                    # Do the outlier flagging if we have a fault, or we don't
                     # have a fault but the event magnitude is under the limit
                     # ----------------------------------------------------------
                     if not isinstance(rupture_obj, PointRupture) or \
@@ -303,7 +303,7 @@ class ModelModule(CoreModule):
                         np.seterr(invalid='warn')
 
                         self.logger.debug('IMT: %s, flagged: %d' %
-                                         (imtstr, np.sum(flagged)))
+                                          (imtstr, np.sum(flagged)))
                         df[imtstr + '_outliers'] = flagged
                     else:
                         df[imtstr + '_outliers'] = np.full(df[imtstr].shape,
@@ -376,7 +376,7 @@ class ModelModule(CoreModule):
                         df2[imtstr + '_pred_phi'] = pstddev[2]
                     df2[imtstr + '_residual'] = df2[str(oqimt)] - pmean
                     df2[imtstr + '_outliers'] = np.full(
-                            pmean.shape, False, dtype=np.bool)
+                        pmean.shape, False, dtype=np.bool)
 
         #
         # Now make derived MMI from the best available PGM; This is ugly and
@@ -526,7 +526,7 @@ class ModelModule(CoreModule):
             sta_phi[imtstr] = np.array(phi).reshape((-1, 1))
             sta_sig_extra[imtstr] = np.array(sig_extra).reshape((-1, 1))
             sta_sig_total[imtstr] = np.sqrt(
-                    sta_phi[imtstr]**2 + sta_sig_extra[imtstr]**2)
+                sta_phi[imtstr]**2 + sta_sig_extra[imtstr]**2)
             if len(lons_rad) == 0:
                 bias_num[imtstr] = 0.0
                 bias_den[imtstr] = 0.0
@@ -561,7 +561,7 @@ class ModelModule(CoreModule):
             t2_22 = np.tile(sta_period_ix_dl.T, (d22_rows, 1))
             corr22[imtstr] = ccf.getCorrelation(t1_22, t2_22, dist22)
             sigma22 = corr22[imtstr] * corr_adj22 * \
-                    (sta_phi_dl * sta_phi_dl.T)
+                (sta_phi_dl * sta_phi_dl.T)
             sigma22inv = np.linalg.pinv(sigma22)
             #
             # Compute the bias numerator and denominator pieces
@@ -574,7 +574,7 @@ class ModelModule(CoreModule):
                 out_ix_arr = np.full_like(sta_period_ix_dl, outperiod_ix)
                 dist_arr = np.zeros_like(out_ix_arr, dtype=float)
                 Z = ccf.getCorrelation(sta_period_ix_dl, out_ix_arr,
-                                       dist_arr) 
+                                       dist_arr)
                 #
                 # Scale the correlation factor (Z) by the correlation
                 # adjustment due to observational uncertainty
@@ -598,9 +598,9 @@ class ModelModule(CoreModule):
             # Print the nominal values of the bias and its stddev
             #
             self.logger.debug(
-                    '%s: nom bias %f nom stddev %f; %d stations (time=%f sec)'
-                    % (imtstr, nominal_bias[imtstr], np.sqrt(nom_variance),
-                       np.size(sta_lons_rad[imtstr]), bias_time))
+                '%s: nom bias %f nom stddev %f; %d stations (time=%f sec)'
+                % (imtstr, nominal_bias[imtstr], np.sqrt(nom_variance),
+                   np.size(sta_lons_rad[imtstr]), bias_time))
         #
         # End bias
         #
@@ -653,7 +653,7 @@ class ModelModule(CoreModule):
             psd[imtstr] = np.sqrt(psd[imtstr]**2 + out_bias_var)
             pout_sd2 += out_bias_var
             #
-            # Unbias the station residuals and compute the 
+            # Unbias the station residuals and compute the
             # new phi that includes the variance of the bias
             #
             for i in range(np.size(sta_lons_rad[imtstr])):
@@ -669,7 +669,7 @@ class ModelModule(CoreModule):
             # new value of phi
             #
             corr_adj[imtstr] = sta_phi[imtstr] / \
-                    np.sqrt(sta_phi[imtstr]**2 + sta_sig_extra[imtstr]**2)
+                np.sqrt(sta_phi[imtstr]**2 + sta_sig_extra[imtstr]**2)
             corr_adj22 = corr_adj[imtstr] * corr_adj[imtstr].T
             np.fill_diagonal(corr_adj22, 1.0)
             #
@@ -685,11 +685,11 @@ class ModelModule(CoreModule):
             t2_22 = np.tile(sta_period_ix[imtstr].T, (d22_rows, 1))
             corr22[imtstr] = ccf.getCorrelation(t1_22, t2_22, dist22)
             #
-            # Rebuild sigma22_inv now that we have updated phi and 
+            # Rebuild sigma22_inv now that we have updated phi and
             # the correlation adjustment factors
             #
             sigma22 = corr22[imtstr] * corr_adj22 * \
-                    (sta_phi[imtstr] * sta_phi[imtstr].T)
+                (sta_phi[imtstr] * sta_phi[imtstr].T)
             sigma22inv = np.linalg.pinv(sigma22)
             #
             # Now do the MVN itself...
@@ -721,11 +721,11 @@ class ModelModule(CoreModule):
                 # sdsta is the standard deviation of the stations
                 sdsta = sta_phi[imtstr]
                 sigma12 = ne.evaluate(
-                        "corr12 * corr_adj12 * (sdsta * sdarr)").T
+                    "corr12 * corr_adj12 * (sdsta * sdarr)").T
                 stime += time.time() - time4
                 time4 = time.time()
                 #
-                # Sigma12 * Sigma22^-1 is known as the 'regression 
+                # Sigma12 * Sigma22^-1 is known as the 'regression
                 # coefficient' matrix (rcmatrix)
                 #
                 rcmatrix = sigma12.dot(sigma22inv)
@@ -741,7 +741,7 @@ class ModelModule(CoreModule):
                 time4 = time.time()
                 #
                 # We only want the diagonal elements of the conditional
-                # covariance matrix, so there is no point in doing the 
+                # covariance matrix, so there is no point in doing the
                 # full solution with the dot product, e.g.:
                 # sdgrid[ss:se] = pout_sd2[ss:se] - np.diag(rcmatrix.dot(sigma12))
                 #
@@ -760,7 +760,7 @@ class ModelModule(CoreModule):
             self.logger.debug('\ttime for %s amp calc=%f' % (imtstr, atime))
             self.logger.debug('\ttime for %s sd calc=%f' % (imtstr, mtime))
             self.logger.debug('total time for %s=%f' %
-                             (imtstr, time.time() - time1))
+                              (imtstr, time.time() - time1))
 
     # %%
         # ------------------------------------------------------------------
@@ -770,7 +770,7 @@ class ModelModule(CoreModule):
         if not os.path.isdir(product_path):
             os.mkdir(product_path)
         oc = ShakeMapOutputContainer.create(os.path.join(
-                product_path, 'shake_result.hdf'))
+            product_path, 'shake_result.hdf'))
         # ------------------------------------------------------------------
         # Might as well stick the whole config in the result
         # ------------------------------------------------------------------
@@ -949,7 +949,7 @@ class ModelModule(CoreModule):
                 continue
             for myimt in imt_in_str_dict[ndf]:
                 mybias = bias_num[myimt] / \
-                        ((1.0 / sdf[myimt + '_pred_tau']**2) + bias_den[myimt])
+                    ((1.0 / sdf[myimt + '_pred_tau']**2) + bias_den[myimt])
                 sdf[myimt + '_bias'] = mybias.flatten()
         # ------------------------------------------------------------------
         # Add the station data. The stationlist object has the original
@@ -1045,12 +1045,12 @@ class ModelModule(CoreModule):
                     imt_name = key.lower().replace('_pred', '')
                     mybias = sdf[imt_name.upper() + '_bias'][six]
                     station['properties']['predictions'][imt_name] = {
-                            'value': value,
-                            'units': units,
-                            'ln_tau': mytau,
-                            'ln_phi': myphi,
-                            'ln_sigma': mysigma,
-                            'ln_bias': mybias,
+                        'value': value,
+                        'units': units,
+                        'ln_tau': mytau,
+                        'ln_phi': myphi,
+                        'ln_sigma': mysigma,
+                        'ln_bias': mybias,
                     }
                 #
                 # Set the generic distance property (this is rrup)
@@ -1133,9 +1133,9 @@ class ModelModule(CoreModule):
                                 'digits': digits}
                 std_grid = Grid2D(outsd[key], gdict.copy())
                 oc.setIMTGrids(key,
-                          mean_grid, mean_metadata,
-                          std_grid, std_metadata,
-                          component)
+                               mean_grid, mean_metadata,
+                               std_grid, std_metadata,
+                               component)
 
         else:
             #
@@ -1471,6 +1471,7 @@ def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
         pe = gmpe
     return pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
 
+
 def get_input_container(evid):
     """
     Open the input container and return a handle to it, along with
@@ -1500,6 +1501,7 @@ def get_input_container(evid):
         raise FileNotFoundError('%s does not exist.' % datafile)
     ic = ShakeMapInputContainer.load(datafile)
     return ic, datadir
+
 
 def clear_products(datadir):
     """
