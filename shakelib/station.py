@@ -265,7 +265,7 @@ class StationList(object):
                             'units': units,
                             'flag': str(amp[3]),
                             'ln_stddev': '%.4f' % amp[4]
-                           }
+                            }
                 channels[amp[2]]['amplitudes'].append(this_amp)
             for channel in channels.values():
                 feature['properties']['channels'].append(channel)
@@ -642,8 +642,8 @@ class StationList(object):
                     units = 'intensity'
                 else:
                     units = '%g'
-            pgmdict[key] = {'value': value, 
-                            'flag': flag, 
+            pgmdict[key] = {'value': value,
+                            'flag': flag,
                             'stddev': stddev,
                             'units': units}
             imtset.add(key)
@@ -681,7 +681,7 @@ class StationList(object):
 
                 if 'code' not in attributes:
                     logging.warn(
-                            'Station does not have station code: skipping')
+                        'Station does not have station code: skipping')
                     continue
                 code = attributes['code']
                 if code.startswith(netid + '.'):
@@ -697,15 +697,15 @@ class StationList(object):
                 for comp in station:
                     if 'name' not in comp.attrib:
                         logging.warn(
-                                'Unnamed component for station %s; skipping'
-                                % (sta_id))
+                            'Unnamed component for station %s; skipping'
+                            % (sta_id))
                         continue
                     compname = comp.attrib['name']
                     if 'Intensity Questionnaire' in str(compname):
                         compdict['mmi'] = {}
                         continue
                     tpgmdict, ims, imt_translate = \
-                            self._getGroundMotions(comp, imt_translate)
+                        self._getGroundMotions(comp, imt_translate)
                     if compname in compdict:
                         pgmdict = compdict[compname]
                     else:

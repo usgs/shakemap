@@ -42,7 +42,7 @@ def test_virtualipe():
     #
     homedir = os.path.dirname(os.path.abspath(__file__))
     datadir = os.path.abspath(os.path.join(
-            homedir, 'virtualipe_data', 'Calexico', 'input'))
+        homedir, 'virtualipe_data', 'Calexico', 'input'))
 
     #
     # Read the event, origin, and rupture files and produce Rupture and Origin
@@ -166,21 +166,21 @@ def test_virtualipe():
     remake_save = False
     if remake_save:
         np.savez_compressed(
-                savefile,
-                mmi_const_vs30=mmi_const_vs30,
-                mmi_sd_const_vs30=mmi_sd_const_vs30[0],
-                mmi_variable_vs30=mmi_variable_vs30,
-                mmi_sd_variable_vs30=mmi_sd_variable_vs30[0],
-                mmi_variable_vs30_intra=mmi_variable_vs30_intra,
-                mmi_sd_variable_vs30_total=mmi_sd_variable_vs30_intra[0],
-                mmi_sd_variable_vs30_intra=mmi_sd_variable_vs30_intra[1],
-                mmi_sd_variable_vs30_inter=mmi_sd_variable_vs30_intra[2],
-                mmi_pga=mmi_pga,
-                mmi_sd_pga=mmi_sd_pga[0],
-                mmi_psa=mmi_psa,
-                mmi_sd_psa=mmi_sd_psa[0],
-                mmi_rjb=mmi_rjb,
-                mmi_sd_rjb=mmi_sd_rjb[0])
+            savefile,
+            mmi_const_vs30=mmi_const_vs30,
+            mmi_sd_const_vs30=mmi_sd_const_vs30[0],
+            mmi_variable_vs30=mmi_variable_vs30,
+            mmi_sd_variable_vs30=mmi_sd_variable_vs30[0],
+            mmi_variable_vs30_intra=mmi_variable_vs30_intra,
+            mmi_sd_variable_vs30_total=mmi_sd_variable_vs30_intra[0],
+            mmi_sd_variable_vs30_intra=mmi_sd_variable_vs30_intra[1],
+            mmi_sd_variable_vs30_inter=mmi_sd_variable_vs30_intra[2],
+            mmi_pga=mmi_pga,
+            mmi_sd_pga=mmi_sd_pga[0],
+            mmi_psa=mmi_psa,
+            mmi_sd_psa=mmi_sd_psa[0],
+            mmi_rjb=mmi_rjb,
+            mmi_sd_rjb=mmi_sd_rjb[0])
 
     td = np.load(savefile)
 

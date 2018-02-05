@@ -155,11 +155,11 @@ class MultiGMPE(GMPE):
             bk17 = BooreKishida2017(imc_in, imc_out)
             lmean = bk17.convertAmps(imt, lmean, dists.rrup, rup.mag)
             #
-            # The extra sigma from the component conversion appears to 
+            # The extra sigma from the component conversion appears to
             # apply to the total sigma, so the question arises as to
             # how to apportion it between the intra- and inter-event
             # sigma. Here we assume it all enters as intra-event sigma.
-            # 
+            #
             for j in range(len(lnsd2)):
                 if stddev_types[j] == const.StdDev.INTER_EVENT:
                     continue
@@ -270,7 +270,7 @@ class MultiGMPE(GMPE):
         return out
 
     def __multigmpe_from_gmpe_set(conf, set_name, filter_imt=None,
-                                 verbose=False):
+                                  verbose=False):
         """
         Private method for constructing a MultiGMPE from a set_name.
 
@@ -641,11 +641,11 @@ class MultiGMPE(GMPE):
             tmp = self
 
         lmean, lsd = tmp.get_mean_and_stddevs(
-                sites, rup, dists, imt,
-                list(tmp.DEFINED_FOR_STANDARD_DEVIATION_TYPES))
+            sites, rup, dists, imt,
+            list(tmp.DEFINED_FOR_STANDARD_DEVIATION_TYPES))
         lmean_ref, lsd = tmp.get_mean_and_stddevs(
-                ref_sites, rup, dists, imt,
-                list(tmp.DEFINED_FOR_STANDARD_DEVIATION_TYPES))
+            ref_sites, rup, dists, imt,
+            list(tmp.DEFINED_FOR_STANDARD_DEVIATION_TYPES))
 
         lamps = lmean - lmean_ref
 

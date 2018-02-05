@@ -104,7 +104,7 @@ def get_extent(rupture):
     # 15c, 7.5c)
     #
     return _round_coord(lonmin[0]), _round_coord(lonmax[0]), \
-           _round_coord(latmin[0]), _round_coord(latmax[0])
+        _round_coord(latmin[0]), _round_coord(latmax[0])
 
 
 def _round_coord(coord):
@@ -132,8 +132,8 @@ def is_stable(lon, lat):
 
     """
     p = Point((lon, lat))
-    pfile = pkg_resources.resource_filename('shakelib.utils', 
-            os.path.join('data', 'cratons.geojson'))
+    pfile = pkg_resources.resource_filename('shakelib.utils',
+                                            os.path.join('data', 'cratons.geojson'))
     with open(pfile) as f:
         cratons = json.load(f)
     coord_list = cratons['features'][0]['geometry']['coordinates']

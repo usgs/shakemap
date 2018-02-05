@@ -2,6 +2,7 @@ import numexpr as ne
 
 EARTH_RADIUS = 6371.0
 
+
 def geodetic_distance_fast(lons1, lats1, lons2, lats2):
     """
     Calculate the geodetic distance between two points or two collections
@@ -55,7 +56,6 @@ def geodetic_distance_haversine(lons1, lats1, lons2, lats2):
     """
     diameter = 2 * EARTH_RADIUS
     distance = ne.evaluate(
-            "diameter * arcsin(sqrt(sin((lats1 - lats2) / 2.0)**2.0 "
-            "+ cos(lats1) * cos(lats2) * sin((lons1 - lons2) / 2.0)**2.0))")
+        "diameter * arcsin(sqrt(sin((lats1 - lats2) / 2.0)**2.0 "
+        "+ cos(lats1) * cos(lats2) * sin((lons1 - lons2) / 2.0)**2.0))")
     return distance
-

@@ -17,10 +17,12 @@ from shakelib.rupture.factory import (rupture_from_dict,
 from shakelib.rupture.origin import Origin
 from shakelib.station import StationList
 
+
 class ShakeMapContainer(GridHDFContainer):
     """
     Parent class for InputShakeMapContainer and OutputShakeMapContainer.
     """
+
     def setConfig(self, config):
         """
         Add the config as a dictionary to the HDF file.
@@ -48,7 +50,7 @@ class ShakeMapContainer(GridHDFContainer):
         config = self.getDictionary('config')
         return config
 
-    def setRupture(self,rupture):
+    def setRupture(self, rupture):
         """
         Store Rupture object in container.
 
@@ -61,7 +63,7 @@ class ShakeMapContainer(GridHDFContainer):
         """
         if 'rupture' in self.getStrings():
             self.dropString('rupture')
-        if isinstance(rupture,dict):
+        if isinstance(rupture, dict):
             try:
                 _ = rupture_from_dict(rupture)
             except Exception:
@@ -70,7 +72,7 @@ class ShakeMapContainer(GridHDFContainer):
             json_str = json.dumps(rupture)
         else:
             json_str = json.dumps(rupture._geojson)
-        self.setString('rupture',json_str)
+        self.setString('rupture', json_str)
 
     def getRuptureObject(self):
         """
@@ -102,7 +104,7 @@ class ShakeMapContainer(GridHDFContainer):
         rupture_dict = json.loads(self.getString('rupture'))
         return rupture_dict
 
-    def setStationList(self,stationlist):
+    def setStationList(self, stationlist):
         """
         Store StationList object in container.
 
@@ -113,11 +115,11 @@ class ShakeMapContainer(GridHDFContainer):
         """
         if 'stations' in self.getStrings():
             self.dropString('stations')
-        if not isinstance(stationlist,StationList):
+        if not isinstance(stationlist, StationList):
             fmt = 'Input object is not a StationList.'
             raise TypeError(fmt)
         sql_string = stationlist.dumpToSQL()
-        self.setString('stations',sql_string)
+        self.setString('stations', sql_string)
 
     def getStationList(self):
         """
@@ -210,7 +212,7 @@ class ShakeMapInputContainer(ShakeMapContainer):
     """
     @classmethod
     def createFromInput(cls, filename, config, eventfile, version_history, rupturefile=None,
-                        sourcefile = None, momentfile = None, datafiles=None):
+                        sourcefile=None, momentfile=None, datafiles=None):
         """
         Instantiate an InputContainer from ShakeMap input data.
 
@@ -233,12 +235,12 @@ class ShakeMapInputContainer(ShakeMapContainer):
         container.setConfig(config)
 
         # create an origin from the event file
-        origin = Origin.fromFile(eventfile, sourcefile = sourcefile,
-                                 momentfile = momentfile)
+        origin = Origin.fromFile(eventfile, sourcefile=sourcefile,
+                                 momentfile=momentfile)
 
         # create a rupture object from the origin and the rupture file
         # (if present).
-        rupture = get_rupture(origin,file=rupturefile)
+        rupture = get_rupture(origin, file=rupturefile)
 
         # store the rupture object in the container
         container.setRupture(rupture)
@@ -274,7 +276,7 @@ class ShakeMapInputContainer(ShakeMapContainer):
         station.addData(datafiles)
         self.setStationList(station)
 
-    def updateRupture(self,eventxml = None, rupturefile = None):
+    def updateRupture(self, eventxml=None, rupturefile=None):
         """Update rupture/origin information in container.
 
         Args:
@@ -292,12 +294,12 @@ class ShakeMapInputContainer(ShakeMapContainer):
         if eventxml is not None:
             origin = Origin.fromFile(eventxml)
             if rupturefile is not None:
-                rupture = get_rupture(origin,file=rupturefile)
+                rupture = get_rupture(origin, file=rupturefile)
             else:
                 rupture_dict = rupture._geojson
-                rupture = rupture_from_dict_and_origin(rupture_dict,origin)
-        else: #no event.xml file, but we do have a rupture file
-            rupture = get_rupture(origin,file=rupturefile)
+                rupture = rupture_from_dict_and_origin(rupture_dict, origin)
+        else:  # no event.xml file, but we do have a rupture file
+            rupture = get_rupture(origin, file=rupturefile)
 
         self.setRupture(rupture)
 
@@ -352,8 +354,8 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             current_data_type = data_type_group.attrs['data_type']
             if current_data_type != datatype:
                 raise TypeError(
-                        'Trying to set data type to %s; file already type %s'
-                        % (datatype, current_data_type))
+                    'Trying to set data type to %s; file already type %s'
+                    % (datatype, current_data_type))
             #
             # Data type is already set; don't have to do anything
             #
@@ -392,7 +394,8 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         # set up the name of the group holding all the information for the IMT
         group_name = '__imt_%s_%s__' % (imt_name, component)
         if group_name in self._hdfobj:
-            raise Exception('An IMT group called %s already exists.' % imt_name)
+            raise Exception(
+                'An IMT group called %s already exists.' % imt_name)
         imt_group = self._hdfobj.create_group(group_name)
 
         # create the data set containing the mean IMT data and metadata
@@ -515,7 +518,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         group_name = '__imt_%s_%s__' % (imt_name, component)
         if group_name in self._hdfobj:
             raise ValueError('An IMT group called %s already exists.' %
-                            imt_name)
+                             imt_name)
         imt_group = self._hdfobj.create_group(group_name)
 
         # create data sets containing the longitudes, latitudes, and ids
@@ -619,7 +622,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         comp_groups = []
         for imt_group in imt_groups:
             if imt_group.find(component) > -1:
-                comp_groups.append(imt_group.replace('_'+component, ''))
+                comp_groups.append(imt_group.replace('_' + component, ''))
         return comp_groups
 
     def getComponents(self, imt_name):
@@ -632,7 +635,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         Returns:
           list: List of names of components for given IMT.
         """
-        components = _get_type_list(self._hdfobj, 'imt_'+imt_name)
+        components = _get_type_list(self._hdfobj, 'imt_' + imt_name)
         return components
 
     def dropIMT(self, imt_name):

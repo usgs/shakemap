@@ -10,6 +10,7 @@ import shapely.wkt
 import numpy as np
 from openquake.hazardlib.geo.geodetic import min_distance_to_segment
 
+
 def nearest_edge(elon, elat, poly):
     """
     Return the distance from a point to the nearest edge of a
@@ -115,6 +116,7 @@ def get_layer_distances(elon, elat, layer_dir):
         dist_dict[layer_name] = dist_to_layer(elon, elat, geom)
     return dist_dict
 
+
 def update_config_regions(lat, lon, config):
     min_dist_to_layer = 999999.9
     inside_layer_name = None
@@ -141,9 +143,8 @@ def update_config_regions(lat, lon, config):
         return config
     else:
         layer_config = config['layers'][inside_layer_name]
-        for region,rdict in layer_config.items():
+        for region, rdict in layer_config.items():
             if region == 'horizontal_buffer':
                 continue
             config['tectonic_regions'][region] = rdict
     return config
-        

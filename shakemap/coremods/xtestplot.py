@@ -45,7 +45,7 @@ class TestPlot(CoreModule):
         imtlist = container.getIMTs('GREATER_OF_TWO_HORIZONTAL')
         for myimt in imtlist:
             datadict[myimt] = container.getIMTArrays(myimt,
-                    'GREATER_OF_TWO_HORIZONTAL')
+                                                     'GREATER_OF_TWO_HORIZONTAL')
 
         #
         # Make plots
@@ -53,17 +53,17 @@ class TestPlot(CoreModule):
         for myimt in imtlist:
             data = datadict[myimt]
             fig = plt.figure(figsize=(10, 8))
-            plt.plot(data['lons'], 
-                     data['mean'], 
+            plt.plot(data['lons'],
+                     data['mean'],
                      color='k', label='mean')
-            plt.plot(data['lons'], 
-                     data['mean'] + data['std'], 
+            plt.plot(data['lons'],
+                     data['mean'] + data['std'],
                      '--b', label='mean +/- stddev')
-            plt.plot(data['lons'], 
-                     data['mean'] - data['std'], 
+            plt.plot(data['lons'],
+                     data['mean'] - data['std'],
                      '--b')
-            plt.plot(data['lons'], 
-                     data['std'], 
+            plt.plot(data['lons'],
+                     data['std'],
                      '-.r', label='stddev')
             plt.xlabel('Longitude')
             plt.ylabel('ln(%s) (g)' % myimt)

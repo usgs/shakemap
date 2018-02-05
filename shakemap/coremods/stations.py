@@ -53,7 +53,7 @@ class StationModule(CoreModule):
             if fformat == 'json':
                 self.logger.debug('Writing rupture.json file...')
                 station_dict = container.getStationDict()
-                station_file = os.path.join(datadir,'stationlist.json')
-                f = open(station_file,'w')
+                station_file = os.path.join(datadir, 'stationlist.json')
+                f = open(station_file, 'w')
                 json.dump(station_dict, f)
                 f.close()
