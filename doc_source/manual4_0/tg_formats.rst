@@ -183,3 +183,85 @@ Matlab developers can use the function *read_shake_data.m*, which is included in
 the repository for ShakeMap
 `here <https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m>`_.
 
+
+Generic Amplification Factors
+=============================
+
+The ShakeMap generic amplification factor facility supports the inclusion
+of linear amplifications that are not otherwise supported by Vs30-based
+site amplifications, such as basin or topographic amplifications. The
+ShakeMap operator may provide one or more files that contain factors
+that will be added to the (natural logarithm) of the results returned
+by the GMPE or IPE (the results from the IPE are not logged, but the
+amplification factors are still additive). Mapped area that extend
+beyond the boundaries of the amplification factor file are given an
+amplification factor of zero. If more than one amplification file is
+present in the *GenericAmpFactor* directory, then the system will apply
+all such files (i.e., the amplification factors will be cumulative to
+the extent that the grids overlap).
+
+The amplification factor file is a MapIO GridHDFContainer containing one
+or more Grid2D objects corresponding to the IMTs to which they apply. For
+instance, the following program creates a file **Test.hdf** which contains
+grids for PGA, SA(0.3), SA(1.0), and SA(3.0). The grids are derived from 
+GMT **.grd** files residing in the local directory::
+
+    #! /usr/bin/env python
+
+    from mapio.gmt import GMTGrid
+    from mapio.gridcontainer import GridHDFContainer
+
+    from shakelib.utils.imt_string import file_to_oq
+
+
+    gc = GridHDFContainer.create('Test.hdf')
+
+    files = ['PGA.grd', 'PSA0p3.grd', 'PSA1p0.grd', 'PSA3p0.grd']
+
+    for myfile in files:
+        g2d = GMTGrid.load(myfile)
+
+        fbase, ext = myfile.split('.')
+        name = file_to_oq(fbase)
+
+        gc.setGrid(name, g2d)
+
+    gc.close()
+
+All of the grids in a given GridHDFContainer file must have exactly the same
+boundaries and resolutions.
+
+The rules for extracting and applying the amplification grids are as follows:
+
+    - If an exact match to the output IMT is found, then that grid is used.
+    - If the output IMT is SA(X), where the period 'X' is between two of
+      the SA periods in the file, the grid that is applied will the the 
+      weighted average of the grids of the periods bracketing 'X'. The
+      weighting will be the (normalized) log difference in the periods.
+      I.e., if the bracketing periods are 'W' and 'Y", then the weight
+      applied to the grid corresponding to period W will be
+      *wW = (log(Y) - log(X)) / (log(Y) - log(W))* and the weight for grid
+      Y will be *wY = 1 - wW*.
+    - If the period of the output IMT is less than the shortest period in
+      the file, the grid corresponding to the shortest period will be used.
+    - If the period of the output IMT is greater than the longest period
+      in the file, the grid corresponding to the longest period will be used.
+    - If the output IMT is PGA and PGA is not found in the file, it will be
+      treated as SA(0.01) and the above rules will be applied.
+    - If the output IMT is PGV and PGV is not found in the file, it will be
+      treated as SA(1.0) and the above rules will be applied.
+    - Other output IMTs, if not found, will be given amplification factors
+      of zero.
+
+Thus, if the output IMT is PGV, and PGV is not in the file, the system will
+search for SA(1.0) using the rules above. If no SA grids are provided, the
+resulting amplification grid will be all zeros.
+
+If the operator wishes to alter these behaviors, then additional grids should
+be included in the HDF file. For instance, if the extrapolation of the grids
+for the longest and shortest periods to longer and shorter periods is 
+undesirable, the operator should include grids (e.g., of zeros) just below 
+and above the shortest and longest periods, respectively. If the interpolation
+between periods is undesirable, then grids matching the output IMTs should be 
+provided. Etc.
+

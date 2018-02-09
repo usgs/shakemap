@@ -13,6 +13,49 @@ def get_period_from_imt(imtstr):
     return float(imtstr.replace('SA(', '').replace(')', ''))
 
 def get_generic_amp_factors(sx, myimt):
+    """
+    Returns an array of generic amplification factors the same shape
+    as the lons and lats members of sx. The amplification factors are
+    pulled from the grids in the operator's configured directory:
+    '<install>/data/GenericAmpFactors'. Any HDF files in that directory
+    will be considerd amplification files and will be examined for 
+    factors that apply to the coordinates in sx. The factors are
+    assumed to be in natural log units and will be added to the output
+    of the GMPE (or IPE). For coordinates outside the available grids,
+    zero will be returned. If more than one file contains amplifications
+    for any of the coordinates (i.e., overlapping grids), then the 
+    factors will be summed together. It is the operator's responsibility 
+    to ensure the proper behavior is observed for the selected output
+    IMTs considering:
+
+        - If 'myimt' is 'PGA' and there is no PGA grid in the HDF
+          file, the 'myimt' will be set to 'SA(0.01)' for that file.
+        - If 'myimt' is 'PGV' and there is no PGV grid in the HDF
+          file, the 'myimt' will be set to 'SA(1.0)' for that file.
+        - If 'myimt' is spectral acceleration (i.e., 'SA(x)' where
+          'x' is the period), and SA of that period is not found in the
+          HDF file, the function will first attempt to interpolate the
+          grids of the next lower and next greater periods found in 
+          the file. The interpolation is done as a weighted average
+          of the grids with the weights being defined assigned by
+          the log difference in periods. If the period of 'myimt' is
+          less that the shortest period in the file, the grid for
+          the shortest period is used. If the period of 'myimt' is
+          greater that the longest period in the file, the grid for
+          the longest period is used.
+        - Interpolation in geographic space is nearest neighbor.
+        - Coordinates that fall outside the grid bounds of any
+          given file are assigned an amplification factor of zero.
+
+    Args:
+        sx (Sites Context): An OpenQuake sites context specifying the
+            coordinates of interest.
+        myimt (str): A string representing an OpenQuake IMT.
+
+    Returns:
+        array: An array of generic amplification factors corresponding
+        to the coordinates specified by sx.
+    """
 
     # Read the GenericAmpFactors directory in the install directory
     indir, datadir = get_config_paths()
