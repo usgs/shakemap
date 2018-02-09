@@ -188,15 +188,16 @@ Generic Amplification Factors
 =============================
 
 The ShakeMap generic amplification factor facility supports the inclusion
-of linear amplifications that are not otherwise supported by Vs30-based
-site amplifications, such as basin or topographic amplifications. The
+of linear amplifications that are not otherwise supported (by, for example,
+Vs30-based
+site amplifications), such as basin or topographic amplifications. The
 ShakeMap operator may provide one or more files that contain factors
 that will be added to the (natural logarithm) of the results returned
 by the GMPE or IPE (the results from the IPE are not logged, but the
-amplification factors are still additive). Mapped area that extend
+amplification factors are still additive). Mapped areas that extend
 beyond the boundaries of the amplification factor file are given an
 amplification factor of zero. If more than one amplification file is
-present in the *GenericAmpFactor* directory, then the system will apply
+present in the *GenericAmpFactors* directory, then the system will apply
 all such files (i.e., the amplification factors will be cumulative to
 the extent that the grids overlap).
 
@@ -229,19 +230,23 @@ GMT **.grd** files residing in the local directory::
     gc.close()
 
 All of the grids in a given GridHDFContainer file must have exactly the same
-boundaries and resolutions.
+boundaries and resolutions. The resulting HDF file should be placed in
+*<install_dir>/data/GenericAmpFactors* where *<install_dir>* is the current
+profile's install directory (as set/reported by **sm_profille**).
 
 The rules for extracting and applying the amplification grids are as follows:
 
     - If an exact match to the output IMT is found, then that grid is used.
-    - If the output IMT is SA(X), where the period 'X' is between two of
-      the SA periods in the file, the grid that is applied will the the 
+    - If the output IMT is 'SA(X)', where the period 'X' is between two of
+      the SA periods in the amplifaction file, the grid that is applied 
+      will the the 
       weighted average of the grids of the periods bracketing 'X'. The
       weighting will be the (normalized) log difference in the periods.
       I.e., if the bracketing periods are 'W' and 'Y", then the weight
-      applied to the grid corresponding to period W will be
-      *wW = (log(Y) - log(X)) / (log(Y) - log(W))* and the weight for grid
-      Y will be *wY = 1 - wW*.
+      applied to the grid corresponding to period W ('gW') will be
+      *wW = (log(Y) - log(X)) / (log(Y) - log(W))* and the weight for the
+      grid corresponding to period Y ('gY') will be *wY = 1 - wW*, so
+      the amplification factors used will be *wW * gW + wY * gY*.
     - If the period of the output IMT is less than the shortest period in
       the file, the grid corresponding to the shortest period will be used.
     - If the period of the output IMT is greater than the longest period
@@ -250,10 +255,10 @@ The rules for extracting and applying the amplification grids are as follows:
       treated as SA(0.01) and the above rules will be applied.
     - If the output IMT is PGV and PGV is not found in the file, it will be
       treated as SA(1.0) and the above rules will be applied.
-    - Other output IMTs, if not found, will be given amplification factors
-      of zero.
+    - After the application of the above rules, if and IMT is not found, it will 
+      be given amplification factors of zero.
 
-Thus, if the output IMT is PGV, and PGV is not in the file, the system will
+Thus, if the output IMT is PGV, and PGV is not in the file, ShakeMap will
 search for SA(1.0) using the rules above. If no SA grids are provided, the
 resulting amplification grid will be all zeros.
 

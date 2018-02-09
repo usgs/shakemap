@@ -1,0 +1,180 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakemap.utils.generic_amp &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakemap.utils.layers" href="shakemap.utils.layers.html" />
+    <link rel="prev" title="shakemap.utils.config" href="shakemap.utils.config.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakemap.utils.generic_amp">
+<span id="shakemap-utils-generic-amp"></span><h1>shakemap.utils.generic_amp<a class="headerlink" href="#module-shakemap.utils.generic_amp" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="shakemap.utils.generic_amp.get_period_from_imt">
+<code class="descclassname">shakemap.utils.generic_amp.</code><code class="descname">get_period_from_imt</code><span class="sig-paren">(</span><em>imtstr</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/generic_amp.html#get_period_from_imt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.generic_amp.get_period_from_imt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="shakemap.utils.generic_amp.get_generic_amp_factors">
+<code class="descclassname">shakemap.utils.generic_amp.</code><code class="descname">get_generic_amp_factors</code><span class="sig-paren">(</span><em>sx</em>, <em>myimt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/generic_amp.html#get_generic_amp_factors"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.generic_amp.get_generic_amp_factors" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of generic amplification factors the same shape
+as the lons and lats members of sx. The amplification factors are
+pulled from the grids in the operator’s configured directory:
+‘&lt;install&gt;/data/GenericAmpFactors’. Any HDF files in that directory
+will be considerd amplification files and will be examined for
+factors that apply to the coordinates in sx. The factors are
+assumed to be in natural log units and will be added to the output
+of the GMPE (or IPE). For coordinates outside the available grids,
+zero will be returned. If more than one file contains amplifications
+for any of the coordinates (i.e., overlapping grids), then the
+factors will be summed together. It is the operator’s responsibility
+to ensure the proper behavior is observed for the selected output
+IMTs considering:</p>
+<blockquote>
+<div><ul class="simple">
+<li>If ‘myimt’ is ‘PGA’ and there is no PGA grid in the HDF
+file, the ‘myimt’ will be set to ‘SA(0.01)’ for that file.</li>
+<li>If ‘myimt’ is ‘PGV’ and there is no PGV grid in the HDF
+file, the ‘myimt’ will be set to ‘SA(1.0)’ for that file.</li>
+<li>If ‘myimt’ is spectral acceleration (i.e., ‘SA(x)’ where
+‘x’ is the period), and SA of that period is not found in the
+HDF file, the function will first attempt to interpolate the
+grids of the next lower and next greater periods found in
+the file. The interpolation is done as a weighted average
+of the grids with the weights being defined assigned by
+the log difference in periods. If the period of ‘myimt’ is
+less that the shortest period in the file, the grid for
+the shortest period is used. If the period of ‘myimt’ is
+greater that the longest period in the file, the grid for
+the longest period is used.</li>
+<li>Interpolation in geographic space is nearest neighbor.</li>
+<li>Coordinates that fall outside the grid bounds of any
+given file are assigned an amplification factor of zero.</li>
+</ul>
+</div></blockquote>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>sx</strong> (<em>Sites Context</em>) – An OpenQuake sites context specifying the
+coordinates of interest.</li>
+<li><strong>myimt</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – A string representing an OpenQuake IMT.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">An array of generic amplification factors corresponding
+to the coordinates specified by sx.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0a API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.config.html">shakemap.utils.config</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.generic_amp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

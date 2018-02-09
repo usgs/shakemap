@@ -58,7 +58,7 @@ class TestPlot(CoreModule):
             plt.imshow(gridobj.getData(),
                        extent=(metadata['xmin'], metadata['xmax'],
                                metadata['ymin'], metadata['ymax']))
-            plt.colorbar()
+            plt.colorbar(shrink=0.6)
             plt.xlabel('Longitude')
             plt.ylabel('Latitude')
             plt.title(self._eventid)

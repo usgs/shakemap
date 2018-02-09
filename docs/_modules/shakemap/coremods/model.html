@@ -81,6 +81,7 @@
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">get_object_from_config</span>
 <span class="kn">from</span> <span class="nn">shakemap._version</span> <span class="k">import</span> <span class="n">get_versions</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.generic_amp</span> <span class="k">import</span> <span class="n">get_generic_amp_factors</span>
 
 <span class="c1">#</span>
 <span class="c1"># TODO: Some constants; these should maybe be in a configuration</span>
@@ -88,13 +89,13 @@
 <span class="c1">#</span>
 <span class="c1"># default_mmi_stddev: the standard deviation of MMI values if it</span>
 <span class="c1">#                     is not specified in the input</span>
-<span class="c1"># min_mmi_convert: the minimum MMI to convert to PGM -- low </span>
+<span class="c1"># min_mmi_convert: the minimum MMI to convert to PGM -- low</span>
 <span class="c1">#                  intensities don&#39;t convert very accurately</span>
-<span class="c1"># default_stddev_inter: This is a stand-in for tau when the gmpe set </span>
-<span class="c1">#                       doesn&#39;t provide it. It is an educated guess </span>
+<span class="c1"># default_stddev_inter: This is a stand-in for tau when the gmpe set</span>
+<span class="c1">#                       doesn&#39;t provide it. It is an educated guess</span>
 <span class="c1">#                       based on the NGA-east work and BC Hydro gmpe.</span>
-<span class="c1">#                       It&#39;s not perfect, but probably isn&#39;t too far off. </span>
-<span class="c1">#                       It is only used when the GMPEs don&#39;t provide a </span>
+<span class="c1">#                       It&#39;s not perfect, but probably isn&#39;t too far off.</span>
+<span class="c1">#                       It is only used when the GMPEs don&#39;t provide a</span>
 <span class="c1">#                       breakdown of the uncertainty terms.</span>
 <span class="c1">#</span>
 <span class="n">SM_CONSTS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;default_mmi_stddev&#39;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
@@ -117,30 +118,16 @@
 <span class="sd">            NotADirectoryError: When the event data directory does not exist.</span>
 <span class="sd">            FileNotFoundError: When the the shake_data HDF file does not exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1">#</span>
-        <span class="c1"># Find the shake_data file</span>
-        <span class="c1">#</span>
-        <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
-        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">datadir</span><span class="p">)</span>
-
-        <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
-
-        <span class="c1">#</span>
-        <span class="c1"># Clear away results from previous runs</span>
-        <span class="c1">#</span>
-        <span class="n">products_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">products_path</span><span class="p">):</span>
-            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">products_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Make the input container and extract the config</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="n">ic</span> <span class="o">=</span> <span class="n">ShakeMapInputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
+        <span class="n">ic</span><span class="p">,</span> <span class="n">datadir</span> <span class="o">=</span> <span class="n">get_input_container</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getConfig</span><span class="p">()</span>
+        <span class="c1"># ------------------------------------------------------------------</span>
+        <span class="c1"># Clear away results from previous runs</span>
+        <span class="c1"># ------------------------------------------------------------------</span>
+        <span class="n">clear_products</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Instantiate the gmpe, gmice, ipe, and ccf</span>
         <span class="c1"># Here we make a placeholder gmpe so that we can make the</span>
@@ -157,6 +144,10 @@
             <span class="n">ipe</span> <span class="o">=</span> <span class="n">VirtualIPE</span><span class="o">.</span><span class="n">fromFuncs</span><span class="p">(</span><span class="n">ipe_gmpe</span><span class="p">,</span> <span class="n">gmice</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ipe</span> <span class="o">=</span> <span class="n">get_object_from_config</span><span class="p">(</span><span class="s1">&#39;ipe&#39;</span><span class="p">,</span> <span class="s1">&#39;modeling&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+        <span class="c1"># ------------------------------------------------------------------</span>
+        <span class="c1"># Do we apply the generic amplification factors?</span>
+        <span class="c1"># ------------------------------------------------------------------</span>
+        <span class="n">apply_gafs</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;apply_generic_amp_factors&#39;</span><span class="p">]</span>
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Bias parameters</span>
         <span class="c1"># ------------------------------------------------------------------</span>
@@ -238,8 +229,6 @@
             <span class="c1"># GRID: Figure out the grid parameters and get output points</span>
             <span class="c1">#</span>
             <span class="n">do_grid</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">smdx</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;xres&#39;</span><span class="p">]</span>
-            <span class="n">smdy</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;yres&#39;</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;extent&#39;</span><span class="p">]:</span>
                 <span class="n">W</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">E</span><span class="p">,</span> <span class="n">N</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;extent&#39;</span><span class="p">]</span>
@@ -252,6 +241,8 @@
             <span class="n">smnx</span><span class="p">,</span> <span class="n">smny</span> <span class="o">=</span> <span class="n">sites_obj_out</span><span class="o">.</span><span class="n">getNxNy</span><span class="p">()</span>
             <span class="n">sx_out_soil</span> <span class="o">=</span> <span class="n">sites_obj_out</span><span class="o">.</span><span class="n">getSitesContext</span><span class="p">()</span>
             <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">sx_out_soil</span><span class="o">.</span><span class="n">lons</span><span class="p">,</span> <span class="n">sx_out_soil</span><span class="o">.</span><span class="n">lats</span><span class="p">)</span>
+            <span class="n">sx_out_soil</span><span class="o">.</span><span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">lons</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+            <span class="n">sx_out_soil</span><span class="o">.</span><span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">lats</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
             <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">lons</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
             <span class="n">lats</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
             <span class="n">depths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span>
@@ -268,9 +259,10 @@
         <span class="n">lons_out_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lons</span><span class="p">)</span>
         <span class="n">lats_out_rad</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">lats</span><span class="p">)</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="c1"># Station data</span>
+        <span class="c1"># If the gmpe doesn&#39;t break down its stardard deviation into</span>
+        <span class="c1"># within- and between-event terms, we need to handle things</span>
+        <span class="c1"># somewhat differently.</span>
         <span class="c1"># ------------------------------------------------------------------</span>
-        <span class="n">stations</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getStationList</span><span class="p">()</span>
         <span class="n">gmpe_sd_types</span> <span class="o">=</span> <span class="n">default_gmpe</span><span class="o">.</span><span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">gmpe_sd_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">total_sd_only</span> <span class="o">=</span> <span class="kc">True</span>
@@ -279,37 +271,36 @@
             <span class="n">total_sd_only</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">stddev_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">oqconst</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">,</span> <span class="n">oqconst</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">,</span>
                             <span class="n">oqconst</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTRA_EVENT</span><span class="p">]</span>
+        <span class="c1"># ------------------------------------------------------------------</span>
+        <span class="c1"># Station data</span>
+        <span class="c1"># ------------------------------------------------------------------</span>
+        <span class="n">stations</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getStationList</span><span class="p">()</span>
         <span class="c1">#</span>
         <span class="c1"># df1 holds the instrumented data (PGA, PGV, SA)</span>
         <span class="c1"># df2 holds the non-instrumented data (MMI)</span>
         <span class="c1">#</span>
-        <span class="n">df_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;df1&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;df2&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
-        <span class="n">imt_in_str_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;df1&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;df2&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
-        <span class="n">imt_in_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;df1&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;df2&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="n">df_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;df1&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="s1">&#39;df2&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="n">imt_in_str_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;df1&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                           <span class="s1">&#39;df2&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="n">sx_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;df1&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="s1">&#39;df2&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
+        <span class="n">dx_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;df1&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                   <span class="s1">&#39;df2&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
         <span class="n">imt_in_str_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="n">sx_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;df1&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;df2&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
-        <span class="n">dx_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;df1&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">&#39;df2&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}</span>
         <span class="k">if</span> <span class="n">stations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">df_dict</span><span class="p">[</span><span class="s1">&#39;df1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stations</span><span class="o">.</span><span class="n">getStationDictionary</span><span class="p">(</span><span class="n">instrumented</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="n">df_dict</span><span class="p">[</span><span class="s1">&#39;df2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">stations</span><span class="o">.</span><span class="n">getStationDictionary</span><span class="p">(</span><span class="n">instrumented</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">df_dict</span><span class="p">[</span><span class="s1">&#39;df1&#39;</span><span class="p">],</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="s1">&#39;df1&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">stations</span><span class="o">.</span><span class="n">getStationDictionary</span><span class="p">(</span><span class="n">instrumented</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">df_dict</span><span class="p">[</span><span class="s1">&#39;df2&#39;</span><span class="p">],</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="s1">&#39;df2&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                <span class="n">stations</span><span class="o">.</span><span class="n">getStationDictionary</span><span class="p">(</span><span class="n">instrumented</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">imt_in_str_set</span> <span class="o">=</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="s1">&#39;df1&#39;</span><span class="p">]</span> <span class="o">|</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="s1">&#39;df2&#39;</span><span class="p">]</span>
             <span class="c1">#</span>
             <span class="c1"># Make the sites and distance contexts for each dictionary then</span>
             <span class="c1"># compute the predictions for the IMTs in that dictionary.</span>
             <span class="c1">#</span>
             <span class="k">for</span> <span class="n">ndf</span><span class="p">,</span> <span class="n">df</span> <span class="ow">in</span> <span class="n">df_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">df</span><span class="p">:</span>
-                    <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-                    <span class="n">imt_in_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
                     <span class="k">continue</span>
-                <span class="c1">#</span>
-                <span class="c1"># Make lists of the input IMTs</span>
-                <span class="c1">#</span>
-                <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;PGA&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">)</span> <span class="ow">or</span>
-                     <span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_sd&#39;</span><span class="p">))])</span>
-                <span class="n">imt_in_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]])</span>
-                <span class="n">imt_in_str_set</span> <span class="o">|=</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]</span>
                 <span class="c1">#</span>
                 <span class="c1"># Get the sites and distance contexts</span>
                 <span class="c1">#</span>
@@ -328,10 +319,11 @@
                     <span class="k">if</span> <span class="n">imtstr</span> <span class="o">!=</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
                         <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="n">oqimt</span><span class="p">)</span>
                     <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="n">gmas</span><span class="p">(</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">sx_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">],</span> <span class="n">rx</span><span class="p">,</span>
-                                          <span class="n">dx_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
+                                          <span class="n">dx_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">,</span>
+                                          <span class="n">apply_gafs</span><span class="p">)</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">total_sd_only</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">total_sd_only</span><span class="p">:</span>
                         <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span>
                         <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
                             <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
@@ -346,8 +338,8 @@
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">]</span> <span class="o">=</span> \
                         <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">-</span> <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span>
                     <span class="c1"># ----------------------------------------------------------</span>
-                    <span class="c1"># Do the outlier flagging if we don&#39;t have a fault and</span>
-                    <span class="c1"># the event magnitude is over the limit</span>
+                    <span class="c1"># Do the outlier flagging if we have a fault, or we don&#39;t</span>
+                    <span class="c1"># have a fault but the event magnitude is under the limit</span>
                     <span class="c1"># ----------------------------------------------------------</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture_obj</span><span class="p">,</span> <span class="n">PointRupture</span><span class="p">)</span> <span class="ow">or</span> \
                        <span class="n">rx</span><span class="o">.</span><span class="n">mag</span> <span class="o">&lt;=</span> <span class="n">outlier_max_mag</span><span class="p">:</span>
@@ -362,7 +354,7 @@
                         <span class="n">np</span><span class="o">.</span><span class="n">seterr</span><span class="p">(</span><span class="n">invalid</span><span class="o">=</span><span class="s1">&#39;warn&#39;</span><span class="p">)</span>
 
                         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;IMT: </span><span class="si">%s</span><span class="s1">, flagged: </span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span>
-                                         <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">flagged</span><span class="p">)))</span>
+                                          <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">flagged</span><span class="p">)))</span>
                         <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">flagged</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span>
@@ -421,10 +413,11 @@
                     <span class="c1">#</span>
                     <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="n">oqimt</span><span class="p">)</span>
                     <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="n">gmas</span><span class="p">(</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">sx_dict</span><span class="p">[</span><span class="s1">&#39;df2&#39;</span><span class="p">],</span> <span class="n">rx</span><span class="p">,</span>
-                                          <span class="n">dx_dict</span><span class="p">[</span><span class="s1">&#39;df2&#39;</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
+                                          <span class="n">dx_dict</span><span class="p">[</span><span class="s1">&#39;df2&#39;</span><span class="p">],</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">,</span>
+                                          <span class="n">apply_gafs</span><span class="p">)</span>
                     <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
                     <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="n">total_sd_only</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">total_sd_only</span><span class="p">:</span>
                         <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span>
                         <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
                             <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
@@ -435,7 +428,7 @@
                         <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
                     <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">df2</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">oqimt</span><span class="p">)]</span> <span class="o">-</span> <span class="n">pmean</span>
                     <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full</span><span class="p">(</span>
-                            <span class="n">pmean</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
+                        <span class="n">pmean</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">bool</span><span class="p">)</span>
 
         <span class="c1">#</span>
         <span class="c1"># Now make derived MMI from the best available PGM; This is ugly and</span>
@@ -478,10 +471,10 @@
                 <span class="n">gmpe</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="n">gmas</span><span class="p">(</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">sx_dict</span><span class="p">[</span><span class="s1">&#39;df1&#39;</span><span class="p">],</span> <span class="n">rx</span><span class="p">,</span>
                                       <span class="n">dx_dict</span><span class="p">[</span><span class="s1">&#39;df1&#39;</span><span class="p">],</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">),</span>
-                                      <span class="n">stddev_types</span><span class="p">)</span>
+                                      <span class="n">stddev_types</span><span class="p">,</span> <span class="n">apply_gafs</span><span class="p">)</span>
                 <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
                 <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">total_sd_only</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">total_sd_only</span><span class="p">:</span>
                     <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span>
                     <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
                         <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
@@ -510,7 +503,7 @@
         <span class="c1">#</span>
         <span class="n">nominal_bias</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">bias_num</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c1"># The numerator term of the bias</span>
-        <span class="n">bias_den</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c1"># The denominator term of the bias</span>
+        <span class="n">bias_den</span> <span class="o">=</span> <span class="p">{}</span>   <span class="c1"># The denominator term of the bias (w/o the tau term)</span>
         <span class="n">outgrid</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">outsd</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">psd</span> <span class="o">=</span> <span class="p">{}</span>        <span class="c1"># phi of the output points</span>
@@ -543,36 +536,40 @@
             <span class="c1">#</span>
             <span class="n">outperiod_ix</span> <span class="o">=</span> <span class="n">get_period_index_from_imt_str</span><span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">imt_per_ix</span><span class="p">)</span>
             <span class="c1">#</span>
-            <span class="c1"># Fill the station arrays</span>
+            <span class="c1"># Fill the station arrays; here we use lists and append to</span>
+            <span class="c1"># them because it is much faster than appending to a numpy</span>
+            <span class="c1"># array; after the loop, the lists are converted to numpy</span>
+            <span class="c1"># arrays:</span>
             <span class="c1">#</span>
-            <span class="n">period_ix</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">lons_rad</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">lats_rad</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">resids</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">phi</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">sig_extra</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">tau</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">imtlist</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="n">rrups</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">imtlist</span> <span class="o">=</span> <span class="p">[]</span>    <span class="c1"># The input IMT</span>
+            <span class="n">period_ix</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># The index of the (pseudo-)period of the input IMT</span>
+            <span class="n">lons_rad</span> <span class="o">=</span> <span class="p">[]</span>   <span class="c1"># longitude (in radians) of the input station</span>
+            <span class="n">lats_rad</span> <span class="o">=</span> <span class="p">[]</span>   <span class="c1"># latitude (in radians) of the input station</span>
+            <span class="n">resids</span> <span class="o">=</span> <span class="p">[]</span>     <span class="c1"># The residual of the input IMT</span>
+            <span class="n">tau</span> <span class="o">=</span> <span class="p">[]</span>        <span class="c1"># The between-event stddev of the input IMT</span>
+            <span class="n">phi</span> <span class="o">=</span> <span class="p">[]</span>        <span class="c1"># The within-event stddev of the input IMT</span>
+            <span class="n">sig_extra</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Additional stddev of the input IMT</span>
+            <span class="n">rrups</span> <span class="o">=</span> <span class="p">[]</span>      <span class="c1"># The rupture distance of the input station</span>
             <span class="k">for</span> <span class="n">ndf</span><span class="p">,</span> <span class="n">sdf</span> <span class="ow">in</span> <span class="n">df_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">sdf</span><span class="p">:</span>
                     <span class="k">continue</span>
                 <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">])):</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># Each station can provide 0, 1, or 2 IMTs:</span>
+                    <span class="c1">#</span>
                     <span class="k">for</span> <span class="n">imtin</span> <span class="ow">in</span> <span class="n">get_sta_imts</span><span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">sdf</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span>
                                               <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]):</span>
                         <span class="n">imtlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imtin</span><span class="p">)</span>
-                        <span class="n">inperiod_ix</span> <span class="o">=</span> <span class="n">get_period_index_from_imt_str</span><span class="p">(</span>
-                            <span class="n">imtin</span><span class="p">,</span> <span class="n">imt_per_ix</span><span class="p">)</span>
-                        <span class="n">period_ix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inperiod_ix</span><span class="p">)</span>
+                        <span class="n">period_ix</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_period_index_from_imt_str</span><span class="p">(</span>
+                            <span class="n">imtin</span><span class="p">,</span> <span class="n">imt_per_ix</span><span class="p">))</span>
                         <span class="n">lons_rad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;lon_rad&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
                         <span class="n">lats_rad</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;lat_rad&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
                         <span class="n">resids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="n">imtin</span> <span class="o">+</span> <span class="s1">&#39;_residual&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
                         <span class="n">tau</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="n">imtin</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
-                        <span class="n">_phi</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">imtin</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-                        <span class="n">phi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_phi</span><span class="p">)</span>
+                        <span class="n">phi</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="n">imtin</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
                         <span class="n">sig_extra</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="n">imtin</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
                         <span class="n">rrups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;rrup&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">])</span>
-            <span class="n">sta_imtstr</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">imtlist</span><span class="p">)</span>
+            <span class="n">sta_imtstr</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">imtlist</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">period_ix</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lons_rad</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">sta_lats_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lats_rad</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -581,13 +578,14 @@
             <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">phi</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">sta_sig_extra</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">sig_extra</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">sta_sig_total</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
-                    <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sta_sig_extra</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sta_sig_extra</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">lons_rad</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">bias_num</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="n">bias_den</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="k">continue</span>
             <span class="c1">#</span>
-            <span class="c1"># Get the distance-limited set of data</span>
+            <span class="c1"># Get the distance-limited set of data for use in computing</span>
+            <span class="c1"># the bias</span>
             <span class="c1">#</span>
             <span class="n">dindx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">rrups</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">bias_max_range</span>
             <span class="n">sta_phi_dl</span> <span class="o">=</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">dindx</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
@@ -615,7 +613,7 @@
             <span class="n">t2_22</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">sta_period_ix_dl</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">d22_rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">corr22</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">t1_22</span><span class="p">,</span> <span class="n">t2_22</span><span class="p">,</span> <span class="n">dist22</span><span class="p">)</span>
             <span class="n">sigma22</span> <span class="o">=</span> <span class="n">corr22</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">corr_adj22</span> <span class="o">*</span> \
-                    <span class="p">(</span><span class="n">sta_phi_dl</span> <span class="o">*</span> <span class="n">sta_phi_dl</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+                <span class="p">(</span><span class="n">sta_phi_dl</span> <span class="o">*</span> <span class="n">sta_phi_dl</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
             <span class="n">sigma22inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">sigma22</span><span class="p">)</span>
             <span class="c1">#</span>
             <span class="c1"># Compute the bias numerator and denominator pieces</span>
@@ -628,7 +626,7 @@
                 <span class="n">out_ix_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">sta_period_ix_dl</span><span class="p">,</span> <span class="n">outperiod_ix</span><span class="p">)</span>
                 <span class="n">dist_arr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">out_ix_arr</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
                 <span class="n">Z</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">sta_period_ix_dl</span><span class="p">,</span> <span class="n">out_ix_arr</span><span class="p">,</span>
-                                       <span class="n">dist_arr</span><span class="p">)</span> 
+                                       <span class="n">dist_arr</span><span class="p">)</span>
                 <span class="c1">#</span>
                 <span class="c1"># Scale the correlation factor (Z) by the correlation</span>
                 <span class="c1"># adjustment due to observational uncertainty</span>
@@ -652,9 +650,9 @@
             <span class="c1"># Print the nominal values of the bias and its stddev</span>
             <span class="c1">#</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
-                    <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: nom bias </span><span class="si">%f</span><span class="s1"> nom stddev </span><span class="si">%f</span><span class="s1">; </span><span class="si">%d</span><span class="s1"> stations (time=</span><span class="si">%f</span><span class="s1"> sec)&#39;</span>
-                    <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">nominal_bias</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">nom_variance</span><span class="p">),</span>
-                       <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]),</span> <span class="n">bias_time</span><span class="p">))</span>
+                <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">: nom bias </span><span class="si">%f</span><span class="s1"> nom stddev </span><span class="si">%f</span><span class="s1">; </span><span class="si">%d</span><span class="s1"> stations (time=</span><span class="si">%f</span><span class="s1"> sec)&#39;</span>
+                <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">nominal_bias</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">nom_variance</span><span class="p">),</span>
+                   <span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]),</span> <span class="n">bias_time</span><span class="p">))</span>
         <span class="c1">#</span>
         <span class="c1"># End bias</span>
         <span class="c1">#</span>
@@ -675,7 +673,7 @@
             <span class="k">if</span> <span class="n">imtstr</span> <span class="o">!=</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
                 <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="n">oqimt</span><span class="p">)</span>
             <span class="n">pout_mean</span><span class="p">,</span> <span class="n">pout_sd</span> <span class="o">=</span> <span class="n">gmas</span><span class="p">(</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">sx_out_soil</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dx_out</span><span class="p">,</span>
-                                      <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
+                                      <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">,</span> <span class="n">apply_gafs</span><span class="p">)</span>
             <span class="c1">#</span>
             <span class="c1"># If there are no data, just use the unbiased prediction</span>
             <span class="c1"># and the total stddev</span>
@@ -688,7 +686,7 @@
             <span class="c1"># Get an array of the within-event standard deviations for the</span>
             <span class="c1"># output IMT at the output points</span>
             <span class="c1">#</span>
-            <span class="k">if</span> <span class="n">total_sd_only</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">total_sd_only</span><span class="p">:</span>
                 <span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pout_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span>
                                       <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                 <span class="n">tsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">],</span>
@@ -707,7 +705,7 @@
             <span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">out_bias_var</span><span class="p">)</span>
             <span class="n">pout_sd2</span> <span class="o">+=</span> <span class="n">out_bias_var</span>
             <span class="c1">#</span>
-            <span class="c1"># Unbias the station residuals and compute the </span>
+            <span class="c1"># Unbias the station residuals and compute the</span>
             <span class="c1"># new phi that includes the variance of the bias</span>
             <span class="c1">#</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="n">sta_lons_rad</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])):</span>
@@ -723,7 +721,7 @@
             <span class="c1"># new value of phi</span>
             <span class="c1">#</span>
             <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">/</span> \
-                    <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sta_sig_extra</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sta_sig_extra</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
             <span class="n">corr_adj22</span> <span class="o">=</span> <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">corr_adj</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span>
             <span class="n">np</span><span class="o">.</span><span class="n">fill_diagonal</span><span class="p">(</span><span class="n">corr_adj22</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
             <span class="c1">#</span>
@@ -739,11 +737,11 @@
             <span class="n">t2_22</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">tile</span><span class="p">(</span><span class="n">sta_period_ix</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="p">(</span><span class="n">d22_rows</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
             <span class="n">corr22</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">ccf</span><span class="o">.</span><span class="n">getCorrelation</span><span class="p">(</span><span class="n">t1_22</span><span class="p">,</span> <span class="n">t2_22</span><span class="p">,</span> <span class="n">dist22</span><span class="p">)</span>
             <span class="c1">#</span>
-            <span class="c1"># Rebuild sigma22_inv now that we have updated phi and </span>
+            <span class="c1"># Rebuild sigma22_inv now that we have updated phi and</span>
             <span class="c1"># the correlation adjustment factors</span>
             <span class="c1">#</span>
             <span class="n">sigma22</span> <span class="o">=</span> <span class="n">corr22</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">corr_adj22</span> <span class="o">*</span> \
-                    <span class="p">(</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+                <span class="p">(</span><span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">*</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
             <span class="n">sigma22inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">pinv</span><span class="p">(</span><span class="n">sigma22</span><span class="p">)</span>
             <span class="c1">#</span>
             <span class="c1"># Now do the MVN itself...</span>
@@ -772,13 +770,14 @@
                 <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
                 <span class="c1"># sdarr is the standard deviation of the output sites</span>
                 <span class="n">sdarr</span> <span class="o">=</span> <span class="n">psd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">][</span><span class="n">iy</span><span class="p">,</span> <span class="p">:]</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
-                <span class="c1"># ss is the standard deviation of the stations</span>
-                <span class="n">ss</span> <span class="o">=</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
-                <span class="n">sigma12</span> <span class="o">=</span> <span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="s2">&quot;corr12 * corr_adj12 * (ss * sdarr)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
+                <span class="c1"># sdsta is the standard deviation of the stations</span>
+                <span class="n">sdsta</span> <span class="o">=</span> <span class="n">sta_phi</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span>
+                <span class="n">sigma12</span> <span class="o">=</span> <span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                    <span class="s2">&quot;corr12 * corr_adj12 * (sdsta * sdarr)&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">T</span>
                 <span class="n">stime</span> <span class="o">+=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time4</span>
                 <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
                 <span class="c1">#</span>
-                <span class="c1"># Sigma12 * Sigma22^-1 is known as the &#39;regression </span>
+                <span class="c1"># Sigma12 * Sigma22^-1 is known as the &#39;regression</span>
                 <span class="c1"># coefficient&#39; matrix (rcmatrix)</span>
                 <span class="c1">#</span>
                 <span class="n">rcmatrix</span> <span class="o">=</span> <span class="n">sigma12</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma22inv</span><span class="p">)</span>
@@ -794,7 +793,7 @@
                 <span class="n">time4</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
                 <span class="c1">#</span>
                 <span class="c1"># We only want the diagonal elements of the conditional</span>
-                <span class="c1"># covariance matrix, so there is no point in doing the </span>
+                <span class="c1"># covariance matrix, so there is no point in doing the</span>
                 <span class="c1"># full solution with the dot product, e.g.:</span>
                 <span class="c1"># sdgrid[ss:se] = pout_sd2[ss:se] - np.diag(rcmatrix.dot(sigma12))</span>
                 <span class="c1">#</span>
@@ -813,7 +812,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time for </span><span class="si">%s</span><span class="s1"> amp calc=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">atime</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">time for </span><span class="si">%s</span><span class="s1"> sd calc=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">mtime</span><span class="p">))</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;total time for </span><span class="si">%s</span><span class="s1">=</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="o">%</span>
-                             <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time1</span><span class="p">))</span>
+                              <span class="p">(</span><span class="n">imtstr</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time1</span><span class="p">))</span>
 
     <span class="c1"># %%</span>
         <span class="c1"># ------------------------------------------------------------------</span>
@@ -823,7 +822,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">product_path</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">product_path</span><span class="p">)</span>
         <span class="n">oc</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">product_path</span><span class="p">,</span> <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">))</span>
+            <span class="n">product_path</span><span class="p">,</span> <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">))</span>
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Might as well stick the whole config in the result</span>
         <span class="c1"># ------------------------------------------------------------------</span>
@@ -995,6 +994,16 @@
         <span class="n">oc</span><span class="o">.</span><span class="n">setRupture</span><span class="p">(</span><span class="n">rupture_obj</span><span class="p">)</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
+        <span class="c1"># Compute a bias for all the IMTs in the data frames</span>
+        <span class="c1"># ------------------------------------------------------------------</span>
+        <span class="k">for</span> <span class="n">ndf</span><span class="p">,</span> <span class="n">sdf</span> <span class="ow">in</span> <span class="n">df_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">sdf</span> <span class="o">==</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="n">imt_in_str_dict</span><span class="p">[</span><span class="n">ndf</span><span class="p">]:</span>
+                <span class="n">mybias</span> <span class="o">=</span> <span class="n">bias_num</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">/</span> \
+                    <span class="p">((</span><span class="mf">1.0</span> <span class="o">/</span> <span class="n">sdf</span><span class="p">[</span><span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">bias_den</span><span class="p">[</span><span class="n">myimt</span><span class="p">])</span>
+                <span class="n">sdf</span><span class="p">[</span><span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_bias&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mybias</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+        <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Add the station data. The stationlist object has the original</span>
         <span class="c1"># data and produces a GeoJSON object (a dictionary, really), but</span>
         <span class="c1"># we need to add peak values and flagging that has been done here.</span>
@@ -1086,12 +1095,14 @@
                     <span class="n">myphi</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">key</span> <span class="o">+</span> <span class="s1">&#39;_phi&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
                     <span class="n">mysigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mytau</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">myphi</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                     <span class="n">imt_name</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_pred&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">mybias</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">imt_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;_bias&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
                     <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;predictions&#39;</span><span class="p">][</span><span class="n">imt_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-                            <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
-                            <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
-                            <span class="s1">&#39;tau&#39;</span><span class="p">:</span> <span class="n">mytau</span><span class="p">,</span>
-                            <span class="s1">&#39;phi&#39;</span><span class="p">:</span> <span class="n">myphi</span><span class="p">,</span>
-                            <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="n">mysigma</span><span class="p">,</span>
+                        <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">value</span><span class="p">,</span>
+                        <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
+                        <span class="s1">&#39;ln_tau&#39;</span><span class="p">:</span> <span class="n">mytau</span><span class="p">,</span>
+                        <span class="s1">&#39;ln_phi&#39;</span><span class="p">:</span> <span class="n">myphi</span><span class="p">,</span>
+                        <span class="s1">&#39;ln_sigma&#39;</span><span class="p">:</span> <span class="n">mysigma</span><span class="p">,</span>
+                        <span class="s1">&#39;ln_bias&#39;</span><span class="p">:</span> <span class="n">mybias</span><span class="p">,</span>
                     <span class="p">}</span>
                 <span class="c1">#</span>
                 <span class="c1"># Set the generic distance property (this is rrup)</span>
@@ -1174,9 +1185,9 @@
                                 <span class="s1">&#39;digits&#39;</span><span class="p">:</span> <span class="n">digits</span><span class="p">}</span>
                 <span class="n">std_grid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">outsd</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">gdict</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
                 <span class="n">oc</span><span class="o">.</span><span class="n">setIMTGrids</span><span class="p">(</span><span class="n">key</span><span class="p">,</span>
-                          <span class="n">mean_grid</span><span class="p">,</span> <span class="n">mean_metadata</span><span class="p">,</span>
-                          <span class="n">std_grid</span><span class="p">,</span> <span class="n">std_metadata</span><span class="p">,</span>
-                          <span class="n">component</span><span class="p">)</span>
+                               <span class="n">mean_grid</span><span class="p">,</span> <span class="n">mean_metadata</span><span class="p">,</span>
+                               <span class="n">std_grid</span><span class="p">,</span> <span class="n">std_metadata</span><span class="p">,</span>
+                               <span class="n">component</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
             <span class="c1">#</span>
@@ -1484,7 +1495,7 @@
 <span class="c1"># Helper function to call get_mean_and_stddevs for the</span>
 <span class="c1"># appropriate object given the IMT</span>
 <span class="c1">#</span>
-<div class="viewcode-block" id="gmas"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.gmas">[docs]</a><span class="k">def</span> <span class="nf">gmas</span><span class="p">(</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">):</span>
+<div class="viewcode-block" id="gmas"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.gmas">[docs]</a><span class="k">def</span> <span class="nf">gmas</span><span class="p">(</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">,</span> <span class="n">apply_gafs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is a helper function to call get_mean_and_stddevs for the</span>
 <span class="sd">    appropriate object given the IMT.</span>
@@ -1497,6 +1508,8 @@
 <span class="sd">        dx: Distance context.</span>
 <span class="sd">        oqimt: List of OpenQuake IMTs.</span>
 <span class="sd">        stddev_types: list of OpenQuake standard deviation types.</span>
+<span class="sd">        apply_gafs (boolean): Whether or not to apply the generic</span>
+<span class="sd">            amplification factors to the GMPE output.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        tuple: Tuple of two items:</span>
@@ -1510,8 +1523,58 @@
         <span class="n">pe</span> <span class="o">=</span> <span class="n">ipe</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">pe</span> <span class="o">=</span> <span class="n">gmpe</span>
-    <span class="k">return</span> <span class="n">pe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span></div>
+    <span class="n">mean</span><span class="p">,</span> <span class="n">stddevs</span> <span class="o">=</span>  <span class="n">pe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">apply_gafs</span><span class="p">:</span>
+        <span class="n">gafs</span> <span class="o">=</span> <span class="n">get_generic_amp_factors</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">oqimt</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">gafs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mean</span> <span class="o">+=</span> <span class="n">gafs</span>
+    <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">stddevs</span></div>
 
+
+<div class="viewcode-block" id="get_input_container"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.get_input_container">[docs]</a><span class="k">def</span> <span class="nf">get_input_container</span><span class="p">(</span><span class="n">evid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Open the input container and return a handle to it, along with</span>
+<span class="sd">    the event&#39;s current data directory.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        evid (str): The event ID of the desired input.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (ShakeMapInputContainer, str): An input container object and the</span>
+<span class="sd">        path to the event&#39;s data directory.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        NotADirectoryError: When the event data directory does not exist.</span>
+<span class="sd">        FileNotFoundError: When the the shake_data HDF file does not exist.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1">#</span>
+    <span class="c1"># Find the shake_data.hdf file</span>
+    <span class="c1">#</span>
+    <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
+    <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">evid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">datadir</span><span class="p">)</span>
+
+    <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
+    <span class="n">ic</span> <span class="o">=</span> <span class="n">ShakeMapInputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ic</span><span class="p">,</span> <span class="n">datadir</span></div>
+
+
+<div class="viewcode-block" id="clear_products"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.clear_products">[docs]</a><span class="k">def</span> <span class="nf">clear_products</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Function to delete an event&#39;s products directory if it exists.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        datadir (str): The path to the event&#39;s current data directory</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        nothing</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">products_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">products_path</span><span class="p">):</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">products_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

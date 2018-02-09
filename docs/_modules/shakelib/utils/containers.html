@@ -60,10 +60,12 @@
 <span class="kn">from</span> <span class="nn">shakelib.rupture.origin</span> <span class="k">import</span> <span class="n">Origin</span>
 <span class="kn">from</span> <span class="nn">shakelib.station</span> <span class="k">import</span> <span class="n">StationList</span>
 
+
 <div class="viewcode-block" id="ShakeMapContainer"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer">[docs]</a><span class="k">class</span> <span class="nc">ShakeMapContainer</span><span class="p">(</span><span class="n">GridHDFContainer</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parent class for InputShakeMapContainer and OutputShakeMapContainer.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="ShakeMapContainer.setConfig"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setConfig">[docs]</a>    <span class="k">def</span> <span class="nf">setConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add the config as a dictionary to the HDF file.</span>
@@ -91,7 +93,7 @@
         <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">config</span></div>
 
-<div class="viewcode-block" id="ShakeMapContainer.setRupture"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setRupture">[docs]</a>    <span class="k">def</span> <span class="nf">setRupture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">rupture</span><span class="p">):</span>
+<div class="viewcode-block" id="ShakeMapContainer.setRupture"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setRupture">[docs]</a>    <span class="k">def</span> <span class="nf">setRupture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rupture</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Store Rupture object in container.</span>
 
@@ -104,7 +106,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;rupture&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dropString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span><span class="nb">dict</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">_</span> <span class="o">=</span> <span class="n">rupture_from_dict</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
@@ -113,7 +115,7 @@
             <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">_geojson</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">,</span><span class="n">json_str</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">,</span> <span class="n">json_str</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ShakeMapContainer.getRuptureObject"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getRuptureObject">[docs]</a>    <span class="k">def</span> <span class="nf">getRuptureObject</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -145,7 +147,7 @@
         <span class="n">rupture_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">rupture_dict</span></div>
 
-<div class="viewcode-block" id="ShakeMapContainer.setStationList"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setStationList">[docs]</a>    <span class="k">def</span> <span class="nf">setStationList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">stationlist</span><span class="p">):</span>
+<div class="viewcode-block" id="ShakeMapContainer.setStationList"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setStationList">[docs]</a>    <span class="k">def</span> <span class="nf">setStationList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stationlist</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Store StationList object in container.</span>
 
@@ -156,11 +158,11 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;stations&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dropString</span><span class="p">(</span><span class="s1">&#39;stations&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stationlist</span><span class="p">,</span><span class="n">StationList</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stationlist</span><span class="p">,</span> <span class="n">StationList</span><span class="p">):</span>
             <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input object is not a StationList.&#39;</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
         <span class="n">sql_string</span> <span class="o">=</span> <span class="n">stationlist</span><span class="o">.</span><span class="n">dumpToSQL</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;stations&#39;</span><span class="p">,</span><span class="n">sql_string</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;stations&#39;</span><span class="p">,</span> <span class="n">sql_string</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ShakeMapContainer.getStationList"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getStationList">[docs]</a>    <span class="k">def</span> <span class="nf">getStationList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -253,7 +255,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="ShakeMapInputContainer.createFromInput"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.createFromInput">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">createFromInput</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventfile</span><span class="p">,</span> <span class="n">version_history</span><span class="p">,</span> <span class="n">rupturefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                        <span class="n">datafiles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+                        <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">datafiles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiate an InputContainer from ShakeMap input data.</span>
 
@@ -264,6 +266,8 @@
 <span class="sd">                necessary for ShakeMap ground motion and other calculations.</span>
 <span class="sd">            eventfile (str): Path to ShakeMap event.xml file.</span>
 <span class="sd">            rupturefile (str): Path to ShakeMap rupture text or JSON file.</span>
+<span class="sd">            sourcefile (str): Path to ShakeMap source.txt file.</span>
+<span class="sd">            momentfile (str): Path to ShakeMap moment.xml file.</span>
 <span class="sd">            datafiles (list): List of ShakeMap data (DYFI, strong motion) files.</span>
 <span class="sd">            version_history (dict): Dictionary containing version history.</span>
 
@@ -274,11 +278,12 @@
         <span class="n">container</span><span class="o">.</span><span class="n">setConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
         <span class="c1"># create an origin from the event file</span>
-        <span class="n">origin</span> <span class="o">=</span> <span class="n">Origin</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="n">eventfile</span><span class="p">)</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="n">Origin</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="n">eventfile</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="n">sourcefile</span><span class="p">,</span>
+                                 <span class="n">momentfile</span><span class="o">=</span><span class="n">momentfile</span><span class="p">)</span>
 
         <span class="c1"># create a rupture object from the origin and the rupture file</span>
         <span class="c1"># (if present).</span>
-        <span class="n">rupture</span> <span class="o">=</span> <span class="n">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">)</span>
+        <span class="n">rupture</span> <span class="o">=</span> <span class="n">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">)</span>
 
         <span class="c1"># store the rupture object in the container</span>
         <span class="n">container</span><span class="o">.</span><span class="n">setRupture</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
@@ -314,7 +319,7 @@
         <span class="n">station</span><span class="o">.</span><span class="n">addData</span><span class="p">(</span><span class="n">datafiles</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setStationList</span><span class="p">(</span><span class="n">station</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="ShakeMapInputContainer.updateRupture"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.updateRupture">[docs]</a>    <span class="k">def</span> <span class="nf">updateRupture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">eventxml</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">rupturefile</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="ShakeMapInputContainer.updateRupture"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.updateRupture">[docs]</a>    <span class="k">def</span> <span class="nf">updateRupture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventxml</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rupturefile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update rupture/origin information in container.</span>
 
 <span class="sd">        Args:</span>
@@ -332,12 +337,12 @@
         <span class="k">if</span> <span class="n">eventxml</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">origin</span> <span class="o">=</span> <span class="n">Origin</span><span class="o">.</span><span class="n">fromFile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">rupturefile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">rupture</span> <span class="o">=</span> <span class="n">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">)</span>
+                <span class="n">rupture</span> <span class="o">=</span> <span class="n">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">rupture_dict</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">_geojson</span>
-                <span class="n">rupture</span> <span class="o">=</span> <span class="n">rupture_from_dict_and_origin</span><span class="p">(</span><span class="n">rupture_dict</span><span class="p">,</span><span class="n">origin</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span> <span class="c1">#no event.xml file, but we do have a rupture file</span>
-            <span class="n">rupture</span> <span class="o">=</span> <span class="n">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span><span class="n">file</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">)</span>
+                <span class="n">rupture</span> <span class="o">=</span> <span class="n">rupture_from_dict_and_origin</span><span class="p">(</span><span class="n">rupture_dict</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># no event.xml file, but we do have a rupture file</span>
+            <span class="n">rupture</span> <span class="o">=</span> <span class="n">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">setRupture</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span></div></div>
 
@@ -392,8 +397,8 @@
             <span class="n">current_data_type</span> <span class="o">=</span> <span class="n">data_type_group</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">current_data_type</span> <span class="o">!=</span> <span class="n">datatype</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                        <span class="s1">&#39;Trying to set data type to </span><span class="si">%s</span><span class="s1">; file already type </span><span class="si">%s</span><span class="s1">&#39;</span>
-                        <span class="o">%</span> <span class="p">(</span><span class="n">datatype</span><span class="p">,</span> <span class="n">current_data_type</span><span class="p">))</span>
+                    <span class="s1">&#39;Trying to set data type to </span><span class="si">%s</span><span class="s1">; file already type </span><span class="si">%s</span><span class="s1">&#39;</span>
+                    <span class="o">%</span> <span class="p">(</span><span class="n">datatype</span><span class="p">,</span> <span class="n">current_data_type</span><span class="p">))</span>
             <span class="c1">#</span>
             <span class="c1"># Data type is already set; don&#39;t have to do anything</span>
             <span class="c1">#</span>
@@ -432,7 +437,8 @@
         <span class="c1"># set up the name of the group holding all the information for the IMT</span>
         <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;An IMT group called </span><span class="si">%s</span><span class="s1"> already exists.&#39;</span> <span class="o">%</span> <span class="n">imt_name</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s1">&#39;An IMT group called </span><span class="si">%s</span><span class="s1"> already exists.&#39;</span> <span class="o">%</span> <span class="n">imt_name</span><span class="p">)</span>
         <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
 
         <span class="c1"># create the data set containing the mean IMT data and metadata</span>
@@ -555,7 +561,7 @@
         <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;An IMT group called </span><span class="si">%s</span><span class="s1"> already exists.&#39;</span> <span class="o">%</span>
-                            <span class="n">imt_name</span><span class="p">)</span>
+                             <span class="n">imt_name</span><span class="p">)</span>
         <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
 
         <span class="c1"># create data sets containing the longitudes, latitudes, and ids</span>
@@ -659,7 +665,7 @@
         <span class="n">comp_groups</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">imt_group</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">component</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                <span class="n">comp_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imt_group</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="o">+</span><span class="n">component</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+                <span class="n">comp_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imt_group</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">component</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">comp_groups</span></div>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.getComponents"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getComponents">[docs]</a>    <span class="k">def</span> <span class="nf">getComponents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">):</span>
@@ -672,7 +678,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">          list: List of names of components for given IMT.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">components</span> <span class="o">=</span> <span class="n">_get_type_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">,</span> <span class="s1">&#39;imt_&#39;</span><span class="o">+</span><span class="n">imt_name</span><span class="p">)</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">_get_type_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">,</span> <span class="s1">&#39;imt_&#39;</span> <span class="o">+</span> <span class="n">imt_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">components</span></div>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.dropIMT"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.dropIMT">[docs]</a>    <span class="k">def</span> <span class="nf">dropIMT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">):</span>

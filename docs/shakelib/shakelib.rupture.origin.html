@@ -99,9 +99,9 @@ HistoricTime object.</p>
 </table>
 <dl class="classmethod">
 <dt id="shakelib.rupture.origin.Origin.fromFile">
-<em class="property">classmethod </em><code class="descname">fromFile</code><span class="sig-paren">(</span><em>eventxmlfile</em>, <em>sourcefile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin.fromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin.fromFile" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">fromFile</code><span class="sig-paren">(</span><em>eventxmlfile</em>, <em>sourcefile=None</em>, <em>momentfile=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#Origin.fromFile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.Origin.fromFile" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class method to create a Origin object by specifying an event.xml file,
-a rupture file, and a source.txt file.</p>
+a rupture file, a source.txt file, and a moment.xml file.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -109,6 +109,7 @@ a rupture file, and a source.txt file.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>eventxmlfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Event xml file (see read_event_file()).</li>
 <li><strong>sourcefile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – source.txt file (see read_source()).</li>
+<li><strong>momentfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – moment.xml file (see read_moment_quakeml()).</li>
 </ul>
 </td>
 </tr>
@@ -238,6 +239,47 @@ Input XML format looks like this:</p>
 - ‘SS’ (Strike-Slip)
 - ‘NM’ (Normal)
 - ‘ALL’ (Undetermined)</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="shakelib.rupture.origin.read_moment_quakeml">
+<code class="descclassname">shakelib.rupture.origin.</code><code class="descname">read_moment_quakeml</code><span class="sig-paren">(</span><em>momentfile</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/origin.html#read_moment_quakeml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.origin.read_moment_quakeml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read moment parameters from a QuakeML file.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>momentfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to a QuakeML file.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Empty if momentfile is somehow not valid, or:</dt>
+<dd><ul class="first last">
+<li><dl class="first docutils">
+<dt>moment:</dt>
+<dd><ul class="first last simple">
+<li>NP1:
+- strike: float
+- dip: float
+- rake: float</li>
+<li>NP2:
+- strike: float
+- dip: float
+- rake: float</li>
+<li>type: string</li>
+<li>source: string</li>
+</ul>
+</dd>
+</dl>
+</li>
 </ul>
 </dd>
 </dl>

@@ -413,11 +413,11 @@ grid and the generic amplification factors. The origin and magnitude
 are those of the January 17, 1994, Northridge, California earthquake.
 :num:`Figure #validation-test-thirteen` is an image of 3.0 s PSA. It
 shows that the coastline and 
-other major features of the Vs30 map are in the proper orientation.
-This test also used two generic amplification files that covered the 
-same geographic area: one file had values of 1.0 
+other geographic features of the Vs30 map are in the proper orientation.
+This test also uses two generic amplification files that cover the 
+same geographic area: one file has values of 1.0 
 for the northern half of the grid, and 0.0 for the southern half, while
-the second file had values of 1.0 for the western half and 0.0 for 
+the second file has values of 1.0 for the western half and 0.0 for 
 the eastern half. Thus, the northwest quadrant has a combined 
 amplification of 2.0, the northeast and southwest quadrants have
 amplification factors of 1.0, and the southeast quadrant has an
@@ -432,9 +432,9 @@ orientation.
    :width: 700
    :align: left
 
-   Validation Test 0013. 3 s PSA  map using The epicenter and magnitude
+   Validation Test 0013. 3 s PSA  map using the epicenter and magnitude
    of the January 17, 1994, Northridge, California earthquake. The
-   coastline and other background features are the result of the
+   coastline and other background features are the result of
    site amplification from the Vs30 file. The major north-south and
-   east-west divisions are the result of the generic amplification 
+   east-west divisions are the result of generic amplification 
    factors.
