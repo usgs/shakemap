@@ -198,11 +198,11 @@
             <span class="n">bk17</span> <span class="o">=</span> <span class="n">BooreKishida2017</span><span class="p">(</span><span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">)</span>
             <span class="n">lmean</span> <span class="o">=</span> <span class="n">bk17</span><span class="o">.</span><span class="n">convertAmps</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">lmean</span><span class="p">,</span> <span class="n">dists</span><span class="o">.</span><span class="n">rrup</span><span class="p">,</span> <span class="n">rup</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
             <span class="c1">#</span>
-            <span class="c1"># The extra sigma from the component conversion appears to </span>
+            <span class="c1"># The extra sigma from the component conversion appears to</span>
             <span class="c1"># apply to the total sigma, so the question arises as to</span>
             <span class="c1"># how to apportion it between the intra- and inter-event</span>
             <span class="c1"># sigma. Here we assume it all enters as intra-event sigma.</span>
-            <span class="c1"># </span>
+            <span class="c1">#</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lnsd2</span><span class="p">)):</span>
                 <span class="k">if</span> <span class="n">stddev_types</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">:</span>
                     <span class="k">continue</span>
@@ -313,7 +313,7 @@
         <span class="k">return</span> <span class="n">out</span></div>
 
     <span class="k">def</span> <span class="nf">__multigmpe_from_gmpe_set</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">set_name</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                 <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                                  <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Private method for constructing a MultiGMPE from a set_name.</span>
 
@@ -684,11 +684,11 @@
             <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span>
 
         <span class="n">lmean</span><span class="p">,</span> <span class="n">lsd</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
-                <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
-                <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span><span class="p">))</span>
+            <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span><span class="p">))</span>
         <span class="n">lmean_ref</span><span class="p">,</span> <span class="n">lsd</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
-                <span class="n">ref_sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
-                <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span><span class="p">))</span>
+            <span class="n">ref_sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
+            <span class="nb">list</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span><span class="p">))</span>
 
         <span class="n">lamps</span> <span class="o">=</span> <span class="n">lmean</span> <span class="o">-</span> <span class="n">lmean_ref</span>
 

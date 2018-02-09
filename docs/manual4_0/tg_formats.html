@@ -264,6 +264,90 @@ for some basic access patterns.</p>
 the repository for ShakeMap
 <a class="reference external" href="https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m">here</a>.</p>
 </div>
+<div class="section" id="generic-amplification-factors">
+<h2>2.2.4. Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h2>
+<p>The ShakeMap generic amplification factor facility supports the inclusion
+of linear amplifications that are not otherwise supported (by, for example,
+Vs30-based
+site amplifications), such as basin or topographic amplifications. The
+ShakeMap operator may provide one or more files that contain factors
+that will be added to the (natural logarithm) of the results returned
+by the GMPE or IPE (the results from the IPE are not logged, but the
+amplification factors are still additive). Mapped areas that extend
+beyond the boundaries of the amplification factor file are given an
+amplification factor of zero. If more than one amplification file is
+present in the <em>GenericAmpFactors</em> directory, then the system will apply
+all such files (i.e., the amplification factors will be cumulative to
+the extent that the grids overlap).</p>
+<p>The amplification factor file is a MapIO GridHDFContainer containing one
+or more Grid2D objects corresponding to the IMTs to which they apply. For
+instance, the following program creates a file <strong>Test.hdf</strong> which contains
+grids for PGA, SA(0.3), SA(1.0), and SA(3.0). The grids are derived from
+GMT <strong>.grd</strong> files residing in the local directory:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/env python</span>
+
+<span class="kn">from</span> <span class="nn">mapio.gmt</span> <span class="k">import</span> <span class="n">GMTGrid</span>
+<span class="kn">from</span> <span class="nn">mapio.gridcontainer</span> <span class="k">import</span> <span class="n">GridHDFContainer</span>
+
+<span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">file_to_oq</span>
+
+
+<span class="n">gc</span> <span class="o">=</span> <span class="n">GridHDFContainer</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s1">&#39;Test.hdf&#39;</span><span class="p">)</span>
+
+<span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;PGA.grd&#39;</span><span class="p">,</span> <span class="s1">&#39;PSA0p3.grd&#39;</span><span class="p">,</span> <span class="s1">&#39;PSA1p0.grd&#39;</span><span class="p">,</span> <span class="s1">&#39;PSA3p0.grd&#39;</span><span class="p">]</span>
+
+<span class="k">for</span> <span class="n">myfile</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
+    <span class="n">g2d</span> <span class="o">=</span> <span class="n">GMTGrid</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">myfile</span><span class="p">)</span>
+
+    <span class="n">fbase</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">myfile</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">file_to_oq</span><span class="p">(</span><span class="n">fbase</span><span class="p">)</span>
+
+    <span class="n">gc</span><span class="o">.</span><span class="n">setGrid</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">g2d</span><span class="p">)</span>
+
+<span class="n">gc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>All of the grids in a given GridHDFContainer file must have exactly the same
+boundaries and resolutions. The resulting HDF file should be placed in
+<em>&lt;install_dir&gt;/data/GenericAmpFactors</em> where <em>&lt;install_dir&gt;</em> is the current
+profile’s install directory (as set/reported by <strong>sm_profille</strong>).</p>
+<p>The rules for extracting and applying the amplification grids are as follows:</p>
+<blockquote>
+<div><ul class="simple">
+<li>If an exact match to the output IMT is found, then that grid is used.</li>
+<li>If the output IMT is ‘SA(X)’, where the period ‘X’ is between two of
+the SA periods in the amplifaction file, the grid that is applied
+will the the
+weighted average of the grids of the periods bracketing ‘X’. The
+weighting will be the (normalized) log difference in the periods.
+I.e., if the bracketing periods are ‘W’ and ‘Y”, then the weight
+applied to the grid corresponding to period W (‘gW’) will be
+<em>wW = (log(Y) - log(X)) / (log(Y) - log(W))</em> and the weight for the
+grid corresponding to period Y (‘gY’) will be <em>wY = 1 - wW</em>, so
+the amplification factors used will be <em>wW * gW + wY * gY</em>.</li>
+<li>If the period of the output IMT is less than the shortest period in
+the file, the grid corresponding to the shortest period will be used.</li>
+<li>If the period of the output IMT is greater than the longest period
+in the file, the grid corresponding to the longest period will be used.</li>
+<li>If the output IMT is PGA and PGA is not found in the file, it will be
+treated as SA(0.01) and the above rules will be applied.</li>
+<li>If the output IMT is PGV and PGV is not found in the file, it will be
+treated as SA(1.0) and the above rules will be applied.</li>
+<li>After the application of the above rules, if and IMT is not found, it will
+be given amplification factors of zero.</li>
+</ul>
+</div></blockquote>
+<p>Thus, if the output IMT is PGV, and PGV is not in the file, ShakeMap will
+search for SA(1.0) using the rules above. If no SA grids are provided, the
+resulting amplification grid will be all zeros.</p>
+<p>If the operator wishes to alter these behaviors, then additional grids should
+be included in the HDF file. For instance, if the extrapolation of the grids
+for the longest and shortest periods to longer and shorter periods is
+undesirable, the operator should include grids (e.g., of zeros) just below
+and above the shortest and longest periods, respectively. If the interpolation
+between periods is undesirable, then grids matching the output IMTs should be
+provided. Etc.</p>
+</div>
 </div>
 
 
@@ -300,6 +384,7 @@ the repository for ShakeMap
 <li class="toctree-l5"><a class="reference internal" href="#about-the-hdf5-file-format">2.2.1. About the HDF5 File Format</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#shake-data-hdf">2.2.2. shake_data.hdf</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#shake-result-hdf">2.2.3. shake_result.hdf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#generic-amplification-factors">2.2.4. Generic Amplification Factors</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="tg_validation.html">2.3. Validation</a></li>

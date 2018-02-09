@@ -38,6 +38,7 @@ from mapio.grid2d import Grid2D
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.utils import get_object_from_config
 from shakemap._version import get_versions
+from shakemap.utils.generic_amp import get_generic_amp_factors
 
 #
 # TODO: Some constants; these should maybe be in a configuration
@@ -100,6 +101,10 @@ class ModelModule(CoreModule):
             ipe = VirtualIPE.fromFuncs(ipe_gmpe, gmice)
         else:
             ipe = get_object_from_config('ipe', 'modeling', config)
+        # ------------------------------------------------------------------
+        # Do we apply the generic amplification factors?
+        # ------------------------------------------------------------------
+        apply_gafs = config['modeling']['apply_generic_amp_factors']
         # ------------------------------------------------------------------
         # Bias parameters
         # ------------------------------------------------------------------
@@ -193,6 +198,8 @@ class ModelModule(CoreModule):
             smnx, smny = sites_obj_out.getNxNy()
             sx_out_soil = sites_obj_out.getSitesContext()
             lons, lats = np.meshgrid(sx_out_soil.lons, sx_out_soil.lats)
+            sx_out_soil.lons = np.flipud(lons.copy())
+            sx_out_soil.lats = np.flipud(lats.copy())
             lons = np.flipud(lons).flatten()
             lats = np.flipud(lats).flatten()
             depths = np.zeros_like(lats)
@@ -269,10 +276,11 @@ class ModelModule(CoreModule):
                     if imtstr != 'MMI':
                         gmpe = MultiGMPE.from_config(config, filter_imt=oqimt)
                     pmean, pstddev = gmas(ipe, gmpe, sx_dict[ndf], rx,
-                                          dx_dict[ndf], oqimt, stddev_types)
+                                          dx_dict[ndf], oqimt, stddev_types,
+                                          apply_gafs)
                     df[imtstr + '_pred'] = pmean
                     df[imtstr + '_pred_sigma'] = pstddev[0]
-                    if total_sd_only is True:
+                    if total_sd_only:
                         tau_guess = SM_CONSTS['default_stddev_inter']
                         df[imtstr + '_pred_tau'] = np.full_like(
                             df[imtstr + '_pred'], tau_guess)
@@ -362,10 +370,11 @@ class ModelModule(CoreModule):
                     #
                     gmpe = MultiGMPE.from_config(config, filter_imt=oqimt)
                     pmean, pstddev = gmas(ipe, gmpe, sx_dict['df2'], rx,
-                                          dx_dict['df2'], oqimt, stddev_types)
+                                          dx_dict['df2'], oqimt, stddev_types,
+                                          apply_gafs)
                     df2[imtstr + '_pred'] = pmean
                     df2[imtstr + '_pred_sigma'] = pstddev[0]
-                    if total_sd_only is True:
+                    if total_sd_only:
                         tau_guess = SM_CONSTS['default_stddev_inter']
                         df2[imtstr + '_pred_tau'] = np.full_like(
                             df2[imtstr + '_pred'], tau_guess)
@@ -419,10 +428,10 @@ class ModelModule(CoreModule):
                 gmpe = None
                 pmean, pstddev = gmas(ipe, gmpe, sx_dict['df1'], rx,
                                       dx_dict['df1'], imt.from_string('MMI'),
-                                      stddev_types)
+                                      stddev_types, apply_gafs)
                 df1['MMI' + '_pred'] = pmean
                 df1['MMI' + '_pred_sigma'] = pstddev[0]
-                if total_sd_only is True:
+                if total_sd_only:
                     tau_guess = SM_CONSTS['default_stddev_inter']
                     df1['MMI' + '_pred_tau'] = np.full_like(
                         df1['MMI' + '_pred'], tau_guess)
@@ -621,7 +630,7 @@ class ModelModule(CoreModule):
             if imtstr != 'MMI':
                 gmpe = MultiGMPE.from_config(config, filter_imt=oqimt)
             pout_mean, pout_sd = gmas(ipe, gmpe, sx_out_soil, rx, dx_out,
-                                      oqimt, stddev_types)
+                                      oqimt, stddev_types, apply_gafs)
             #
             # If there are no data, just use the unbiased prediction
             # and the total stddev
@@ -634,7 +643,7 @@ class ModelModule(CoreModule):
             # Get an array of the within-event standard deviations for the
             # output IMT at the output points
             #
-            if total_sd_only is True:
+            if total_sd_only:
                 psd[imtstr] = np.sqrt(pout_sd[0]**2 -
                                       SM_CONSTS['default_stddev_inter']**2)
                 tsd[imtstr] = np.full_like(psd[imtstr],
@@ -1443,7 +1452,7 @@ def get_layer_info(layer):
 # Helper function to call get_mean_and_stddevs for the
 # appropriate object given the IMT
 #
-def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
+def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types, apply_gafs):
     """
     This is a helper function to call get_mean_and_stddevs for the
     appropriate object given the IMT.
@@ -1456,6 +1465,8 @@ def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
         dx: Distance context.
         oqimt: List of OpenQuake IMTs.
         stddev_types: list of OpenQuake standard deviation types.
+        apply_gafs (boolean): Whether or not to apply the generic
+            amplification factors to the GMPE output.
 
     Returns:
         tuple: Tuple of two items:
@@ -1469,7 +1480,12 @@ def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types):
         pe = ipe
     else:
         pe = gmpe
-    return pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
+    mean, stddevs =  pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
+    if apply_gafs:
+        gafs = get_generic_amp_factors(sx, str(oqimt))
+        if gafs is not None:
+            mean += gafs
+    return mean, stddevs
 
 
 def get_input_container(evid):

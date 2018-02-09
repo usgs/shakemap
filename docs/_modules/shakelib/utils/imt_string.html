@@ -44,9 +44,10 @@
 <span></span><span class="c1"># local imports</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
+
 <div class="viewcode-block" id="oq_to_file"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.imt_string.html#shakelib.utils.imt_string.oq_to_file">[docs]</a><span class="k">def</span> <span class="nf">oq_to_file</span><span class="p">(</span><span class="n">oqimt</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert openquake IMT nomenclature to filename friendly form.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">    SA(1.0) (Spectral Acceleration at 1 second) -&gt; PSA1p0</span>
 <span class="sd">    SA(0.3) (Spectral Acceleration at 0.3 second) -&gt; PSA0p3</span>
@@ -80,9 +81,10 @@
     <span class="n">fileimt</span> <span class="o">=</span> <span class="s1">&#39;PSA</span><span class="si">%s</span><span class="s1">p</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">integer</span><span class="p">,</span> <span class="n">fraction</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fileimt</span></div>
 
+
 <div class="viewcode-block" id="file_to_oq"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.imt_string.html#shakelib.utils.imt_string.file_to_oq">[docs]</a><span class="k">def</span> <span class="nf">file_to_oq</span><span class="p">(</span><span class="n">fileimt</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Convert filename friendly IMT form to openquake form.</span>
-<span class="sd">    </span>
+
 <span class="sd">    Examples:</span>
 <span class="sd">    PSA1p0 (Spectral Acceleration at 1 second) -&gt; SA(1.0)</span>
 <span class="sd">    PSA0p3 (Spectral Acceleration at 0.3 second) -&gt; SA(0.3)</span>

@@ -81,7 +81,7 @@
     <span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1">#: Distance measures required (will depend on the GMPE provided).</span>
     <span class="n">REQUIRES_DISTANCES</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="c1">#: OpenQuake IMC used (will depend on the GMPE, but &quot;Larger&quot; is </span>
+    <span class="c1">#: OpenQuake IMC used (will depend on the GMPE, but &quot;Larger&quot; is</span>
     <span class="c1">#: typical).</span>
     <span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="c1">#: Determined by the GMPE selected.</span>
@@ -128,13 +128,13 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_DISTANCES</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">REQUIRES_DISTANCES</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_RUPTURE_PARAMETERS</span> <span class="o">=</span> \
-                <span class="n">gmpe</span><span class="o">.</span><span class="n">REQUIRES_RUPTURE_PARAMETERS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">gmpe</span><span class="o">.</span><span class="n">REQUIRES_RUPTURE_PARAMETERS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_SITES_PARAMETERS</span> <span class="o">=</span> \
-                <span class="n">gmpe</span><span class="o">.</span><span class="n">REQUIRES_SITES_PARAMETERS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">gmpe</span><span class="o">.</span><span class="n">REQUIRES_SITES_PARAMETERS</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span> <span class="o">=</span> \
-                <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">gmpe</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span><span class="p">)</span>
+            <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">gmpe</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_TECTONIC_REGION_TYPE</span> <span class="o">=</span> \
-                <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">gmpe</span><span class="o">.</span><span class="n">DEFINED_FOR_TECTONIC_REGION_TYPE</span><span class="p">)</span>
+            <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">gmpe</span><span class="o">.</span><span class="n">DEFINED_FOR_TECTONIC_REGION_TYPE</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -162,7 +162,7 @@
 <span class="sd">            be any set that the MultiGMPE supports. See the ShakeMap manual</span>
 <span class="sd">            for a detailed discussion of the way the uncertainty is computed.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span> <span class="c1"># noqa</span>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
 
         <span class="k">if</span> <span class="n">imt</span> <span class="o">!=</span> <span class="n">MMI</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;imt must be MMI&quot;</span><span class="p">)</span>
