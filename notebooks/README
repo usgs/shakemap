@@ -1,0 +1,9 @@
+These notebooks were developed when we were testing out the code.
+They make use of the ShakeMap code from within python and would
+only be useful for developers. Please see the ShakeMap manual and
+the wiki on github associated with this repository for guidance on
+intsallilng and running ShakeMap.
+
+We hope to expand these notebooks to include more interesting
+examples of to make use of the shakemap code as a python library
+in the future.

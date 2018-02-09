@@ -25,6 +25,8 @@ Documentation
 -------------
 
 The API docs can be found `here <https://usgs.github.io/shakemap/>`_.
+Also, see the wiki associated with this repository for an install/setup
+tutorial.
 
 
 Introduction
@@ -74,14 +76,6 @@ Installation and Dependencies
   MapIO, matplotlib, pytables, lxml
 - The ``install.sh`` script installs this package and all dependencies. It is
   regularly tested on OSX and Ubuntu.
-- To install
-
-.. code-block::
-
-    git clone https://github.com/usgs/shakemap.git
-    cd shakemap
-    pip install .
-
 - Note that for development, we have found that the ``-e`` for the pip install
   is useful.
 
