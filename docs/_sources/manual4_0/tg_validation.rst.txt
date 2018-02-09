@@ -404,3 +404,37 @@ observational value (0.75), or go below it.
    show the conditional mean +/-- the conditional standard
    deviation, and the red line shows the conditional standard
    deviation. Compare with :num:`Figure #validation-test-eleven`.
+
+Test 0013
+====================
+
+The purpose of this test is to verify the orientation of the Vs30
+grid and the generic amplification factors. The origin and magnitude
+are those of the January 17, 1994, Northridge, California earthquake.
+:num:`Figure #validation-test-thirteen` is an image of 3.0 s PSA. It
+shows that the coastline and 
+other geographic features of the Vs30 map are in the proper orientation.
+This test also uses two generic amplification files that cover the 
+same geographic area: one file has values of 1.0 
+for the northern half of the grid, and 0.0 for the southern half, while
+the second file has values of 1.0 for the western half and 0.0 for 
+the eastern half. Thus, the northwest quadrant has a combined 
+amplification of 2.0, the northeast and southwest quadrants have
+amplification factors of 1.0, and the southeast quadrant has an
+amplification of 0.0. The figure demonstrates that the combined
+amplifications are working correctly and are in the proper 
+orientation.
+
+
+.. _validation-test-thirteen:
+
+.. figure:: _static/validation_test_0013_psa3p0.*
+   :width: 700
+   :align: left
+
+   Validation Test 0013. 3 s PSA  map using the epicenter and magnitude
+   of the January 17, 1994, Northridge, California earthquake. The
+   coastline and other background features are the result of
+   site amplification from the Vs30 file. The major north-south and
+   east-west divisions are the result of generic amplification 
+   factors.

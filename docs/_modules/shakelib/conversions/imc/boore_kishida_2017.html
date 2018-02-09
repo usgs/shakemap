@@ -64,7 +64,7 @@
 
 <span class="sd">    This class explicitly supports the following subset of the conversions</span>
 <span class="sd">    provided by B&amp;K (specified as OpenQuake IMCs):</span>
-<span class="sd">        </span>
+
 <span class="sd">        - RotD50 &lt;=&gt; GMRotI50</span>
 <span class="sd">        - RotD50 &lt;=&gt; AVERAGE_HORIZONTAL (i.e., Geometric Mean &quot;as recorded&quot;)</span>
 <span class="sd">        - RotD100 &lt;=&gt; RotD50</span>
@@ -81,7 +81,7 @@
 <span class="sd">    supported by B&amp;K, we assume the IMC is equivalent to the geometric</span>
 <span class="sd">    mean (which B&amp;K call GM_AR), based on our reading of</span>
 <span class="sd">    Beyer &amp; Bommer (2006).</span>
-<span class="sd">        </span>
+
 <span class="sd">    References</span>
 
 <span class="sd">        Boore, D.M. and T. Kishida (2017). Relations between some</span>
@@ -148,7 +148,7 @@
         <span class="k">elif</span> <span class="n">mag</span> <span class="o">&gt;</span> <span class="mi">9</span><span class="p">:</span>
             <span class="n">mag</span> <span class="o">=</span> <span class="mf">9.0</span>
         <span class="n">ln_ratio</span> <span class="o">=</span> <span class="n">c0</span> <span class="o">+</span> <span class="n">r1</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">rrups_clipped</span> <span class="o">/</span> <span class="mi">50</span><span class="p">)</span> <span class="o">+</span> \
-                   <span class="n">m1</span> <span class="o">*</span> <span class="p">(</span><span class="n">mag</span> <span class="o">-</span> <span class="mf">5.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">m2</span> <span class="o">*</span> <span class="p">(</span><span class="n">mag</span> <span class="o">-</span> <span class="mf">5.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">m1</span> <span class="o">*</span> <span class="p">(</span><span class="n">mag</span> <span class="o">-</span> <span class="mf">5.5</span><span class="p">)</span> <span class="o">+</span> <span class="n">m2</span> <span class="o">*</span> <span class="p">(</span><span class="n">mag</span> <span class="o">-</span> <span class="mf">5.5</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span>
         <span class="c1">#</span>
         <span class="c1"># The B&amp;K file naming convention has things like D100D50, which</span>
         <span class="c1"># means the parameters give the (log) ratio of RotD100/RotD50,</span>
@@ -286,9 +286,9 @@
         <span class="k">elif</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">GMRotI50</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;GM50&#39;</span>
         <span class="k">elif</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">AVERAGE_HORIZONTAL</span> <span class="ow">or</span> \
-             <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">HORIZONTAL</span> <span class="ow">or</span> \
-             <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">RANDOM_HORIZONTAL</span> <span class="ow">or</span> \
-             <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">MEDIAN_HORIZONTAL</span><span class="p">:</span>
+                <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">HORIZONTAL</span> <span class="ow">or</span> \
+                <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">RANDOM_HORIZONTAL</span> <span class="ow">or</span> \
+                <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">MEDIAN_HORIZONTAL</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;GMAR&#39;</span>
         <span class="k">elif</span> <span class="n">oq_imc</span> <span class="o">==</span> <span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span><span class="p">:</span>
             <span class="k">return</span> <span class="s1">&#39;Larger&#39;</span>
@@ -299,7 +299,6 @@
             <span class="c1">#</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Can&#39;t handle IMC </span><span class="si">%s</span><span class="s2">, using GMAR&quot;</span> <span class="o">%</span> <span class="n">oq_imc</span><span class="p">)</span>
             <span class="k">return</span> <span class="s1">&#39;GMAR&#39;</span></div>
-
 </pre></div>
 
           </div>

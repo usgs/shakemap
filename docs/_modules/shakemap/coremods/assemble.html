@@ -94,6 +94,14 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">eventxml</span><span class="p">)</span>
 
+        <span class="c1"># find any source.txt or moment.xml files</span>
+        <span class="n">momentfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;moment.xml&#39;</span><span class="p">)</span>
+        <span class="n">sourcefile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;source.txt&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">):</span>
+            <span class="n">sourcefile</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">momentfile</span><span class="p">):</span>
+            <span class="n">momentfile</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="c1">#</span>
         <span class="c1"># Clear away results from previous runs</span>
         <span class="c1">#</span>
@@ -232,14 +240,16 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating input container...&#39;</span><span class="p">)</span>
         <span class="n">shake_data</span> <span class="o">=</span> <span class="n">ShakeMapInputContainer</span><span class="o">.</span><span class="n">createFromInput</span><span class="p">(</span>
-                <span class="n">hdf_file</span><span class="p">,</span>
-                <span class="n">config</span><span class="p">,</span>
-                <span class="n">eventxml</span><span class="p">,</span>
-                <span class="n">history</span><span class="p">,</span>
-                <span class="n">rupturefile</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">,</span>
-                <span class="n">datafiles</span><span class="o">=</span><span class="n">datafiles</span><span class="p">)</span>
+            <span class="n">hdf_file</span><span class="p">,</span>
+            <span class="n">config</span><span class="p">,</span>
+            <span class="n">eventxml</span><span class="p">,</span>
+            <span class="n">history</span><span class="p">,</span>
+            <span class="n">rupturefile</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">,</span>
+            <span class="n">sourcefile</span><span class="o">=</span><span class="n">sourcefile</span><span class="p">,</span>
+            <span class="n">momentfile</span><span class="o">=</span><span class="n">momentfile</span><span class="p">,</span>
+            <span class="n">datafiles</span><span class="o">=</span><span class="n">datafiles</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created HDF5 input container in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
-                         <span class="n">shake_data</span><span class="o">.</span><span class="n">getFileName</span><span class="p">())</span>
+                          <span class="n">shake_data</span><span class="o">.</span><span class="n">getFileName</span><span class="p">())</span>
         <span class="n">shake_data</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>
 

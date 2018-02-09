@@ -284,7 +284,7 @@ the container.</td>
 </table>
 <dl class="classmethod">
 <dt id="shakelib.utils.containers.ShakeMapInputContainer.createFromInput">
-<em class="property">classmethod </em><code class="descname">createFromInput</code><span class="sig-paren">(</span><em>filename</em>, <em>config</em>, <em>eventfile</em>, <em>version_history</em>, <em>rupturefile=None</em>, <em>datafiles=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapInputContainer.createFromInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapInputContainer.createFromInput" title="Permalink to this definition">¶</a></dt>
+<em class="property">classmethod </em><code class="descname">createFromInput</code><span class="sig-paren">(</span><em>filename</em>, <em>config</em>, <em>eventfile</em>, <em>version_history</em>, <em>rupturefile=None</em>, <em>sourcefile=None</em>, <em>momentfile=None</em>, <em>datafiles=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/containers.html#ShakeMapInputContainer.createFromInput"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.containers.ShakeMapInputContainer.createFromInput" title="Permalink to this definition">¶</a></dt>
 <dd><p>Instantiate an InputContainer from ShakeMap input data.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -297,6 +297,8 @@ input data.</li>
 necessary for ShakeMap ground motion and other calculations.</li>
 <li><strong>eventfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to ShakeMap event.xml file.</li>
 <li><strong>rupturefile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to ShakeMap rupture text or JSON file.</li>
+<li><strong>sourcefile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to ShakeMap source.txt file.</li>
+<li><strong>momentfile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Path to ShakeMap moment.xml file.</li>
 <li><strong>datafiles</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of ShakeMap data (DYFI, strong motion) files.</li>
 <li><strong>version_history</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary containing version history.</li>
 </ul>

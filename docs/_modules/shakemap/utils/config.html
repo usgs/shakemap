@@ -115,7 +115,7 @@
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;configspec.conf&#39;</span><span class="p">)</span>
     <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">spec.conf&#39;</span> <span class="o">%</span> <span class="n">config</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-        <span class="k">return</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;No file &quot;</span><span class="si">%s</span><span class="s1">&quot; exists.&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;No file &quot;</span><span class="si">%s</span><span class="s1">&quot; exists.&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">fname</span></div>
 
 

@@ -46,15 +46,20 @@
 <span class="c1"># stdlib imports</span>
 <span class="kn">from</span> <span class="nn">xml.dom</span> <span class="k">import</span> <span class="n">minidom</span>
 <span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="c1"># third party</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo</span> <span class="k">import</span> <span class="n">point</span>
+<span class="kn">from</span> <span class="nn">obspy.io.quakeml.core</span> <span class="k">import</span> <span class="n">_is_quakeml</span>
+<span class="kn">from</span> <span class="nn">obspy.core.event</span> <span class="k">import</span> <span class="n">read_events</span>
+<span class="kn">from</span> <span class="nn">strec.tensor</span> <span class="k">import</span> <span class="n">fill_tensor_from_components</span>
 
 <span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="k">import</span> <span class="n">HistoricTime</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.exception</span> <span class="k">import</span> <span class="n">ShakeLibException</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
 
 <span class="n">TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span>
+
 
 <div class="viewcode-block" id="Origin"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin">[docs]</a><span class="k">class</span> <span class="nc">Origin</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -131,9 +136,10 @@
 
         <span class="c1"># make sure that time is an HistoricTime instance</span>
         <span class="k">if</span> <span class="s1">&#39;time&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span><span class="nb">str</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
                 <span class="k">try</span><span class="p">:</span>
-                    <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span><span class="n">TIMEFMT</span><span class="p">)</span>
+                    <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
+                        <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">TIMEFMT</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                     <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input time string </span><span class="si">%s</span><span class="s1"> cannot be converted to datetime.&#39;</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
@@ -151,7 +157,6 @@
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;mech must be SS, NM, RS, or ALL.&#39;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">event</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">DEFAULT_MECH</span>
-
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Add keys as class attributes</span>
@@ -174,14 +179,15 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="mf">0.0</span>
 
 <div class="viewcode-block" id="Origin.fromFile"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin.fromFile">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromFile</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">eventxmlfile</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fromFile</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">eventxmlfile</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Class method to create a Origin object by specifying an event.xml file,</span>
-<span class="sd">        a rupture file, and a source.txt file.</span>
+<span class="sd">        a rupture file, a source.txt file, and a moment.xml file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            eventxmlfile (str): Event xml file (see read_event_file()).</span>
 <span class="sd">            sourcefile (str): source.txt file (see read_source()).</span>
+<span class="sd">            momentfile (str): moment.xml file (see read_moment_quakeml()).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Origin object.</span>
@@ -191,6 +197,9 @@
         <span class="n">params</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">sourcefile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">read_source</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">)</span>
+            <span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">momentfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">read_moment_quakeml</span><span class="p">(</span><span class="n">momentfile</span><span class="p">)</span>
             <span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
 
@@ -332,15 +341,16 @@
     <span class="k">if</span> <span class="s1">&#39;network&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
         <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;network&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;us&#39;</span> <span class="c1">#??</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;us&#39;</span>  <span class="c1"># ??</span>
 
-    <span class="c1">#look for the productcode attribute</span>
+    <span class="c1"># look for the productcode attribute</span>
     <span class="k">if</span> <span class="s1">&#39;productcode&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
         <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
 
     <span class="c1"># fix eventsourcecode if not specified correctly</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]):</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">+</span> \
+            <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span>
 
     <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">])</span>
     <span class="n">month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">])</span>
@@ -348,8 +358,9 @@
     <span class="n">hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">])</span>
     <span class="n">minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;minute&#39;</span><span class="p">])</span>
     <span class="n">second</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">])</span>
-    <span class="n">microseconds</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">second</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]))</span><span class="o">*</span><span class="mi">1</span><span class="n">e6</span><span class="p">)</span>
-    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="p">(</span><span class="n">year</span><span class="p">,</span><span class="n">month</span><span class="p">,</span><span class="n">day</span><span class="p">,</span><span class="n">hour</span><span class="p">,</span><span class="n">minute</span><span class="p">,</span><span class="n">second</span><span class="p">,</span><span class="n">microseconds</span><span class="p">)</span>
+    <span class="n">microseconds</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">second</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]))</span> <span class="o">*</span> <span class="mi">1</span><span class="n">e6</span><span class="p">)</span>
+    <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="p">(</span>
+        <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">microseconds</span><span class="p">)</span>
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">])</span>
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">])</span>
@@ -358,15 +369,91 @@
     <span class="c1"># make created field in event.xml optional - set to current UTC time if not</span>
     <span class="c1"># supplied.</span>
     <span class="k">if</span> <span class="s1">&#39;created&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">utcfromtimestamp</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]))</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">utcfromtimestamp</span><span class="p">(</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]))</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;created&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span>
 
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span>
-    
+
     <span class="k">if</span> <span class="s1">&#39;mech&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
         <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">eqdict</span></div>
+
+
+<div class="viewcode-block" id="read_moment_quakeml"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.read_moment_quakeml">[docs]</a><span class="k">def</span> <span class="nf">read_moment_quakeml</span><span class="p">(</span><span class="n">momentfile</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Read moment parameters from a QuakeML file.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        momentfile (str): Path to a QuakeML file.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        dict: Empty if momentfile is somehow not valid, or:</span>
+<span class="sd">              - moment: </span>
+<span class="sd">                  - NP1:</span>
+<span class="sd">                    - strike: float</span>
+<span class="sd">                    - dip: float</span>
+<span class="sd">                    - rake: float</span>
+<span class="sd">                  - NP2:</span>
+<span class="sd">                    - strike: float</span>
+<span class="sd">                    - dip: float</span>
+<span class="sd">                    - rake: float  </span>
+<span class="sd">                  - type: string</span>
+<span class="sd">                  - source: string</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_is_quakeml</span><span class="p">(</span><span class="n">momentfile</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">params</span>
+
+    <span class="c1"># obspy spits out a bunch of warnings we don&#39;t care about</span>
+    <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s1">&#39;ignore&#39;</span><span class="p">)</span>
+        <span class="n">catalog</span> <span class="o">=</span> <span class="n">read_events</span><span class="p">(</span><span class="n">momentfile</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">catalog</span><span class="o">.</span><span class="n">events</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">params</span>
+    <span class="n">event</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">focal_mechanisms</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">params</span>
+    <span class="n">focal</span> <span class="o">=</span> <span class="n">catalog</span><span class="o">.</span><span class="n">events</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">focal_mechanisms</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># get the source and type information, if possible</span>
+    <span class="n">mtype</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
+    <span class="k">if</span> <span class="n">focal</span><span class="o">.</span><span class="n">method_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">mtype</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">method_id</span>
+
+    <span class="n">msource</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
+    <span class="k">if</span> <span class="n">focal</span><span class="o">.</span><span class="n">creation_info</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">focal</span><span class="o">.</span><span class="n">creation_info</span><span class="o">.</span><span class="n">agency_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">msource</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">creation_info</span><span class="o">.</span><span class="n">agency_id</span>
+
+    <span class="k">if</span> <span class="n">focal</span><span class="o">.</span><span class="n">nodal_planes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">params</span>
+    <span class="k">if</span> <span class="n">focal</span><span class="o">.</span><span class="n">nodal_planes</span><span class="o">.</span><span class="n">nodal_plane_1</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_rr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">mrr</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_rr</span>
+            <span class="n">mtt</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_tt</span>
+            <span class="n">mpp</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_pp</span>
+            <span class="n">mrt</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_rt</span>
+            <span class="n">mrp</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_rp</span>
+            <span class="n">mtp</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">moment_tensor</span><span class="o">.</span><span class="n">tensor</span><span class="o">.</span><span class="n">m_tp</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">fill_tensor_from_components</span><span class="p">(</span><span class="n">mrr</span><span class="p">,</span> <span class="n">mtt</span><span class="p">,</span>
+                                                 <span class="n">mpp</span><span class="p">,</span> <span class="n">mrt</span><span class="p">,</span>
+                                                 <span class="n">mrp</span><span class="p">,</span> <span class="n">mtp</span><span class="p">,</span>
+                                                 <span class="n">source</span><span class="o">=</span><span class="n">msource</span><span class="p">,</span>
+                                                 <span class="n">mtype</span><span class="o">=</span><span class="n">mtype</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">plane1</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">nodal_planes</span><span class="o">.</span><span class="n">nodal_plane_1</span>
+        <span class="n">plane2</span> <span class="o">=</span> <span class="n">focal</span><span class="o">.</span><span class="n">nodal_planes</span><span class="o">.</span><span class="n">nodal_plane_2</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP1&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
+                         <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
+                         <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane1</span><span class="o">.</span><span class="n">rake</span><span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
+                         <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
+                         <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">rake</span><span class="p">}</span>
+
+    <span class="n">moment</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;moment&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
+    <span class="k">return</span> <span class="n">moment</span></div>
 
 
 <div class="viewcode-block" id="read_source"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.read_source">[docs]</a><span class="k">def</span> <span class="nf">read_source</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">):</span>

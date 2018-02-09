@@ -45,6 +45,7 @@
 
 <span class="n">EARTH_RADIUS</span> <span class="o">=</span> <span class="mf">6371.0</span>
 
+
 <div class="viewcode-block" id="geodetic_distance_fast"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.distance.html#shakelib.utils.distance.geodetic_distance_fast">[docs]</a><span class="k">def</span> <span class="nf">geodetic_distance_fast</span><span class="p">(</span><span class="n">lons1</span><span class="p">,</span> <span class="n">lats1</span><span class="p">,</span> <span class="n">lons2</span><span class="p">,</span> <span class="n">lats2</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the geodetic distance between two points or two collections</span>
@@ -98,10 +99,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">diameter</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">EARTH_RADIUS</span>
     <span class="n">distance</span> <span class="o">=</span> <span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
-            <span class="s2">&quot;diameter * arcsin(sqrt(sin((lats1 - lats2) / 2.0)**2.0 &quot;</span>
-            <span class="s2">&quot;+ cos(lats1) * cos(lats2) * sin((lons1 - lons2) / 2.0)**2.0))&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;diameter * arcsin(sqrt(sin((lats1 - lats2) / 2.0)**2.0 &quot;</span>
+        <span class="s2">&quot;+ cos(lats1) * cos(lats2) * sin((lons1 - lons2) / 2.0)**2.0))&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">distance</span></div>
-
 </pre></div>
 
           </div>

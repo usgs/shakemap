@@ -45,6 +45,7 @@
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
 
+<span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">pyproj</span>
 <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">Point</span><span class="p">,</span> <span class="n">Polygon</span><span class="p">,</span> <span class="n">MultiPolygon</span>
 <span class="kn">from</span> <span class="nn">shapely.ops</span> <span class="k">import</span> <span class="n">transform</span>
@@ -159,37 +160,37 @@
     <span class="k">return</span> <span class="n">dist_dict</span></div>
 
 
-<span class="c1">#</span>
-<span class="c1"># This is a dummy function. It needs to be replaced with the actual</span>
-<span class="c1"># function that gives the distance from the earthquake to the tectonic</span>
-<span class="c1"># regions # and, if the region is subduction, gives the probabilities</span>
-<span class="c1"># for the event types.</span>
-<span class="c1">#</span>
-<div class="viewcode-block" id="get_tectonic_regions"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.get_tectonic_regions">[docs]</a><span class="k">def</span> <span class="nf">get_tectonic_regions</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">edepth</span><span class="p">,</span> <span class="n">eid</span><span class="p">):</span>
-    <span class="n">strec_out</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;focal_mech&#39;</span><span class="p">:</span> <span class="s1">&#39;ALL&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;tectonic_regions&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;acr&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;scr&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="mf">1500.0</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;subduction&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="mf">1400.0</span><span class="p">,</span>
-                <span class="s1">&#39;probabilities&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;crustal&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                    <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                    <span class="s1">&#39;intraslab&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                <span class="p">}</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;volcanic&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="mf">2300.0</span><span class="p">,</span>
-            <span class="p">},</span>
-        <span class="p">}</span>
-    <span class="p">}</span>
-
-    <span class="k">return</span> <span class="n">strec_out</span></div>
+<div class="viewcode-block" id="update_config_regions"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.update_config_regions">[docs]</a><span class="k">def</span> <span class="nf">update_config_regions</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
+    <span class="n">min_dist_to_layer</span> <span class="o">=</span> <span class="mf">999999.9</span>
+    <span class="n">inside_layer_name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s1">&#39;layers&#39;</span> <span class="ow">in</span> <span class="n">config</span> <span class="ow">and</span> <span class="s1">&#39;layer_dir&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">]:</span>
+        <span class="n">layer_dir</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="s1">&#39;layer_dir&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">layer_dir</span> <span class="ow">and</span> <span class="n">layer_dir</span> <span class="o">!=</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+            <span class="n">geo_layers</span> <span class="o">=</span> <span class="n">get_layer_distances</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">layer_dir</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">geo_layers</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">layer</span> <span class="o">==</span> <span class="s1">&#39;layer_dir&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">layer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">geo_layers</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Error: cannot find layer </span><span class="si">%s</span><span class="s1"> in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                                    <span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">layer_dir</span><span class="p">))</span>
+                <span class="k">continue</span>
+            <span class="n">ldist</span> <span class="o">=</span> <span class="n">geo_layers</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ldist</span> <span class="o">&lt;</span> <span class="n">min_dist_to_layer</span><span class="p">:</span>
+                <span class="n">min_dist_to_layer</span> <span class="o">=</span> <span class="n">ldist</span>
+                <span class="k">if</span> <span class="n">min_dist_to_layer</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">inside_layer_name</span> <span class="o">=</span> <span class="n">layer</span>
+                    <span class="k">break</span>
+    <span class="k">if</span> <span class="n">inside_layer_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">config</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">layer_config</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="n">inside_layer_name</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">rdict</span> <span class="ow">in</span> <span class="n">layer_config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;horizontal_buffer&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="n">region</span><span class="p">]</span> <span class="o">=</span> <span class="n">rdict</span>
+    <span class="k">return</span> <span class="n">config</span></div>
 </pre></div>
 
           </div>
