@@ -1,18 +1,13 @@
 #!/usr/bin/env python
 
 # stdlib modules
-import os
 import warnings
-import re
 
 # third party imports
 import numpy as np
-import pandas as pd
-import scipy.interpolate as spint
 
 from impactutils.time.ancient_time import HistoricTime
 from shakelib.rupture.base import Rupture
-from shakelib.rupture import utils
 from shakelib.rupture import constants
 
 from ps2ff.constants import DistType, MagScaling, Mechanism
@@ -279,11 +274,13 @@ class PointRupture(Rupture):
                 which include 'rx', 'ry', 'ry0', 'U', 'T'.
         """
         # This just returns defaults of zero, which will hopefully behave
-        # gracefully as used in GMPEs.
-        dict = {"rx": np.zeros_like(lon),
-                "ry": np.zeros_like(lon),
-                "ry0": np.zeros_like(lon),
-                "U": np.zeros_like(lon),
-                "T": np.zeros_like(lon)
-                }
-        return dict
+        # gracefully as used in GMPEs but should eventually be updated
+        # so that things like the hangingwall terms are unbiased.
+        gc2 = {
+            "rx": np.zeros_like(lon),
+            "ry": np.zeros_like(lon),
+            "ry0": np.zeros_like(lon),
+            "U": np.zeros_like(lon),
+            "T": np.zeros_like(lon)
+        }
+        return gc2
