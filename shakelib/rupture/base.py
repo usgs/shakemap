@@ -217,7 +217,7 @@ class Rupture(ABC):
         return repi
 
     @abstractmethod
-    def computeRjb(self, lon, lat, depth):
+    def computeRjb(self, lon, lat, depth, var=False):
         """
         Method for computing Joyner-Boore distance.
 
@@ -225,6 +225,8 @@ class Rupture(ABC):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
+            var (bool): Also return variance of prediction. Only meaningful
+                for the PointRupture subclass.
 
         Returns:
            array: Joyner-Boore distance (km).
@@ -233,7 +235,7 @@ class Rupture(ABC):
         pass
 
     @abstractmethod
-    def computeRrup(self, lon, lat, depth):
+    def computeRrup(self, lon, lat, depth, var=False):
         """
         Method for computing rupture distance.
 
@@ -241,6 +243,8 @@ class Rupture(ABC):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
+            var (bool): Also return variance of prediction. Only meaningful
+                for the PointRupture subclass.
 
         Returns:
            array: Rupture distance (km).

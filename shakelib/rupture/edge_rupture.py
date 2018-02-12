@@ -518,7 +518,7 @@ class EdgeRupture(Rupture):
 
         return qlist
 
-    def computeRrup(self, lon, lat, depth):
+    def computeRrup(self, lon, lat, depth, var=False):
         """
         Method for computing rupture distance.
 
@@ -526,11 +526,16 @@ class EdgeRupture(Rupture):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
+            var (bool): Also return variance of prediction. Unused, and
+                will raise an exception if not False.
 
         Returns:
            array: Rupture distance (km).
 
         """
+
+        if var is True:
+            raise ValueError('var must be False for EdgeRupture')
 
         mesh_dx = self._mesh_dx
 
@@ -595,7 +600,7 @@ class EdgeRupture(Rupture):
 
         return dist
 
-    def computeRjb(self, lon, lat, depth):
+    def computeRjb(self, lon, lat, depth, var=False):
         """
         Method for computing Joyner-Boore distance.
 
@@ -603,11 +608,16 @@ class EdgeRupture(Rupture):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
+            var (bool): Also return variance of prediction. Unused, and
+                will raise an exception if not False.
 
         Returns:
            array: Joyner-Boore distance (km).
 
         """
+
+        if var is True:
+            raise ValueError('var must be False for EdgeRupture')
 
         mesh_dx = self._mesh_dx
 
