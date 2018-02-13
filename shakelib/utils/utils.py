@@ -132,8 +132,10 @@ def is_stable(lon, lat):
 
     """
     p = Point((lon, lat))
-    pfile = pkg_resources.resource_filename('shakelib.utils',
-                                            os.path.join('data', 'cratons.geojson'))
+    pfile = pkg_resources.resource_filename(
+        'shakelib.utils',
+        os.path.join('data', 'cratons.geojson')
+    )
     with open(pfile) as f:
         cratons = json.load(f)
     coord_list = cratons['features'][0]['geometry']['coordinates']

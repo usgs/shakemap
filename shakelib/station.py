@@ -478,7 +478,7 @@ class StationList(object):
         psa30), the keys in the dictionary would be:
 
         'id', 'network', 'code', 'name', 'lat', 'lon', 'elev', 'vs30',
-        'stddev', 'instrumented', 'PGA', 'PGA_sd', 'PGV', 'PGA_sd', 
+        'stddev', 'instrumented', 'PGA', 'PGA_sd', 'PGV', 'PGA_sd',
         'SA(0.3)', 'SA(0.3)_sd, 'SA(1.0)', 'SA(1.0)_sd, 'SA(3.0)',
         'SA(3.0)_sd'
 

@@ -180,10 +180,10 @@ class PointRupture(Rupture):
 
         Returns:
             If var is True then this returns a tuple of two arrays: first, the
-                predicted approximate fault distance values (either Rjb or 
-                Rrup, depending on the 'type' argument), and second an array of 
-                the variance of those predictions. If var is False then just the 
-                first element of the tuple is returned.
+                predicted approximate fault distance values (either Rjb or
+                Rrup, depending on the 'type' argument), and second an array of
+                the variance of those predictions. If var is False then just
+                the first element of the tuple is returned.
         """
         if rtype == 'Rjb':
             dtype = DistType.Rjb

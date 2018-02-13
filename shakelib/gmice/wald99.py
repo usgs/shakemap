@@ -11,7 +11,7 @@ class Wald99(object):
     for higher intensities, PGA for lower) as is recommended in the reference.
 
     References:
-        Wald, D.J., V. Quitoriano, T.H. Heaton, and H. Kanamori (1999). 
+        Wald, D.J., V. Quitoriano, T.H. Heaton, and H. Kanamori (1999).
         Relationships between peak gorund acceleration, peak ground
         velocity, and Modified Mercalli Intensity in California,
         Earthquake Spectra, Volume15, No. 3, August 1999.
@@ -59,7 +59,7 @@ class Wald99(object):
                 Numpy array of distances from rupture (km). This parameter
                 is ignored by this GMICE.
             mag (float):
-                Earthquake magnitude. This parameter is ignored by this 
+                Earthquake magnitude. This parameter is ignored by this
                 GMICE.
 
         Returns:
@@ -119,7 +119,7 @@ class Wald99(object):
                 Rupture distances (km) to the corresponding MMIs. This
                 parameter is ignored by this GMICE.
             mag (float):
-                Earthquake magnitude. This parameter is ignored by this 
+                Earthquake magnitude. This parameter is ignored by this
                 GMICE.
 
         Returns:

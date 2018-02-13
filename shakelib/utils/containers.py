@@ -2,7 +2,6 @@
 
 # stdlib imports
 import json
-import logging
 
 # third party imports
 from mapio.grid2d import Grid2D
@@ -65,7 +64,7 @@ class ShakeMapContainer(GridHDFContainer):
             self.dropString('rupture')
         if isinstance(rupture, dict):
             try:
-                _ = rupture_from_dict(rupture)
+                rupture_from_dict(rupture)
             except Exception:
                 fmt = 'Input dict does not represent a rupture object.'
                 raise TypeError(fmt)
@@ -111,7 +110,8 @@ class ShakeMapContainer(GridHDFContainer):
         Args:
             stationlist (StationList): StationList object.
         Raises:
-            TypeError: If input object or dictionary is not a StationList object.
+            TypeError: If input object or dictionary is not a StationList
+                object.
         """
         if 'stations' in self.getStrings():
             self.dropString('stations')
@@ -211,21 +211,23 @@ class ShakeMapInputContainer(ShakeMapContainer):
 
     """
     @classmethod
-    def createFromInput(cls, filename, config, eventfile, version_history, rupturefile=None,
-                        sourcefile=None, momentfile=None, datafiles=None):
+    def createFromInput(cls, filename, config, eventfile, version_history,
+                        rupturefile=None, sourcefile=None, momentfile=None,
+                        datafiles=None):
         """
         Instantiate an InputContainer from ShakeMap input data.
 
         Args:
-            filename (str): Path to HDF5 file that will be created to encapsulate all
-                input data.
+            filename (str): Path to HDF5 file that will be created to
+                encapsulate all input data.
             config (dict): Dictionary containing all configuration information
                 necessary for ShakeMap ground motion and other calculations.
             eventfile (str): Path to ShakeMap event.xml file.
             rupturefile (str): Path to ShakeMap rupture text or JSON file.
             sourcefile (str): Path to ShakeMap source.txt file.
             momentfile (str): Path to ShakeMap moment.xml file.
-            datafiles (list): List of ShakeMap data (DYFI, strong motion) files.
+            datafiles (list): List of ShakeMap data (DYFI, strong motion)
+                files.
             version_history (dict): Dictionary containing version history.
 
         Returns:
@@ -422,7 +424,8 @@ class ShakeMapOutputContainer(ShakeMapContainer):
 
     def getIMTGrids(self, imt_name, component):
         """
-        Retrieve a Grid2D object and any associated metadata from the container.
+        Retrieve a Grid2D object and any associated metadata from the
+        container.
 
         Args:
             imt_name (str):

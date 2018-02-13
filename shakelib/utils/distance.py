@@ -54,7 +54,7 @@ def geodetic_distance_haversine(lons1, lats1, lons2, lats2):
     Returns:
         (numpy array): Distances in km.
     """
-    diameter = 2 * EARTH_RADIUS
+    diameter = 2 * EARTH_RADIUS  # noqa
     distance = ne.evaluate(
         "diameter * arcsin(sqrt(sin((lats1 - lats2) / 2.0)**2.0 "
         "+ cos(lats1) * cos(lats2) * sin((lons1 - lons2) / 2.0)**2.0))")

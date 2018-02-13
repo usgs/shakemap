@@ -21,7 +21,8 @@ from shakemap.utils.config import get_config_paths, get_custom_validator,\
 
 class AssembleModule(CoreModule):
     """
-    assemble -- Assemble ShakeMap input data into the shake_data.hdf input file.
+    assemble -- Assemble ShakeMap input data into the shake_data.hdf input
+                      file.
     """
 
     command_name = 'assemble'
@@ -135,7 +136,8 @@ class AssembleModule(CoreModule):
                 if not os.path.isfile(loc_file):
                     raise FileNotFoundError("prediction file '%s' is not "
                                             "a valid file" % loc_file)
-                global_config['interp']['prediction_location']['file'] = loc_file
+                global_config['interp']['prediction_location']['file'] = \
+                    loc_file
 
         config = global_config.dict()
 

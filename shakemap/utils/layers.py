@@ -1,6 +1,7 @@
 import glob
 import os.path
 from functools import partial
+import logging
 
 # third party imports
 import pyproj
@@ -130,8 +131,8 @@ def update_config_regions(lat, lon, config):
             if layer == 'layer_dir':
                 continue
             if layer not in geo_layers:
-                self.logger.warning('Error: cannot find layer %s in %s' %
-                                    (layer, layer_dir))
+                logging.warn('Error: cannot find layer %s in %s' %
+                             (layer, layer_dir))
                 continue
             ldist = geo_layers[layer]
             if ldist < min_dist_to_layer:

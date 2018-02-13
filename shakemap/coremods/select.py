@@ -66,8 +66,9 @@ class SelectModule(CoreModule):
             eventxml, sourcefile=sourcefile, momentfile=momentfile)
 
         # ---------------------------------------------------------------------
-        # Look for basic event and moment tensor information in the origin object.
-        # If moment is not found, try to find tensor information in ComCat.
+        # Look for basic event and moment tensor information in the origin
+        # object. If moment is not found, try to find tensor information in
+        # ComCat.
         # ---------------------------------------------------------------------
         eid = org.eventsourcecode
         if hasattr(org, 'moment'):
@@ -150,7 +151,7 @@ def validate_config(mydict, install_path):
 
     Args:
         mydict (dict): Full or partial config dictionary.
-        install_path (str): 
+        install_path (str):
 
     """
     for key in mydict:
@@ -165,7 +166,8 @@ def validate_config(mydict, install_path):
             mydict[key] = cfg.cfg_float_list(mydict[key])
         elif key == 'layer_dir':
             mydict[key] = mydict[key].replace('<INSTALL_DIR>', install_path)
-        elif key in ('x1', 'x2', 'p1', 'p2', 'p_kagan_default', 'default_slab_depth'):
+        elif key in ('x1', 'x2', 'p1', 'p2', 'p_kagan_default',
+                     'default_slab_depth'):
             mydict[key] = float(mydict[key])
         else:
             raise ValidateError('Invalid entry in config: "%s"' % (key))

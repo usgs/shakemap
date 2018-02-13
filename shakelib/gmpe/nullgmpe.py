@@ -11,7 +11,7 @@ from openquake.hazardlib.imt import PGA, PGV, SA
 
 class NullGMPE(GMPE):
     """
-    This is a GMPE for testing. It returns the mean and stddevs 
+    This is a GMPE for testing. It returns the mean and stddevs
     specified in the constructor.
     """
     DEFINED_FOR_TECTONIC_REGION_TYPE = const.TRT.ACTIVE_SHALLOW_CRUST
@@ -20,7 +20,8 @@ class NullGMPE(GMPE):
         PGV,
         SA
     ])
-    DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = const.IMC.GREATER_OF_TWO_HORIZONTAL
+    DEFINED_FOR_INTENSITY_MEASURE_COMPONENT = \
+        const.IMC.GREATER_OF_TWO_HORIZONTAL
     DEFINED_FOR_STANDARD_DEVIATION_TYPES = set([
         const.StdDev.TOTAL,
         const.StdDev.INTER_EVENT,
@@ -37,10 +38,11 @@ class NullGMPE(GMPE):
         Args:
             mean (float): the mean value returned by the GMPE (default=0).
                 This value is returned for all locations, regardles of
-                the IMT or the contents of sites, rupture and distance contexts.
-            phi (float): the within-event standard deviation returned by the 
+                the IMT or the contents of sites, rupture and distance
+                contexts.
+            phi (float): the within-event standard deviation returned by the
                  GMPE (default=0.8)
-            tau (float): the between-event standard deviation returned by the 
+            tau (float): the between-event standard deviation returned by the
                  GMPE (default=0.6)
 
         The total standard deviation returned will be ``sqrt(phi^2 + tau^2)``.
@@ -52,8 +54,8 @@ class NullGMPE(GMPE):
 
     def get_mean_and_stddevs(self, sites, rup, dists, imt, stddev_types):
         """
-        Implements the OpenQuake GroundShakingIntensityModel 
-        get_mean_and_stddevs interface. See superclass 
+        Implements the OpenQuake GroundShakingIntensityModel
+        get_mean_and_stddevs interface. See superclass
         `method <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs>`__.
 
         Returns a constant values for all locations specified in
@@ -65,8 +67,8 @@ class NullGMPE(GMPE):
         stddevs = []
         for stddev_type in stddev_types:
             if stddev_type == const.StdDev.TOTAL:
-                stddevs.append(np.full_like(dists.rjb,
-                                            np.sqrt(self.phi**2 + self.tau**2)))
+                stddevs.append(np.full_like(
+                    dists.rjb, np.sqrt(self.phi**2 + self.tau**2)))
             elif stddev_type == const.StdDev.INTRA_EVENT:
                 stddevs.append(np.full_like(dists.rjb, self.phi))
             elif stddev_type == const.StdDev.INTER_EVENT:
@@ -78,7 +80,7 @@ class NullGMPE(GMPE):
 # Dummy COEFFS table so MultiGMPE won't complain
 #
     COEFFS = CoeffsTable(sa_damping=5, table="""\
-IMT     c1  
+IMT     c1
 pga    0.
 pgv    0.
 0.01   0.

@@ -171,11 +171,6 @@ def contour_to_files(container, config, output_dir, logger):
     """
     jsonstr = container.getString('info.json')
     infojson = json.loads(jsonstr)
-    event_info = {
-        'event_id': infojson['input']['event_information']['event_id'],
-        'longitude': infojson['input']['event_information']['longitude'],
-        'latitude': infojson['input']['event_information']['latitude']
-    }
 
     imtlist = config['products']['contours']['IMTS'].keys()
 
@@ -232,7 +227,8 @@ def contour_to_files(container, config, output_dir, logger):
                 if 'intervals' in imtype_spec:
                     intervals = [float(i) for i in imtype_spec['intervals']]
 
-                line_strings = contour(container, imtype, component, intervals)
+                line_strings = contour(container, imtype, component, intervals,
+                                       filter_size)
                 for feature in line_strings:
                     vector_file.write(feature)
 

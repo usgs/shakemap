@@ -9,15 +9,14 @@ import os.path
 
 import numpy as np
 import pandas as pd
-from openquake.hazardlib import const
 from openquake.hazardlib.const import IMC
-from openquake.hazardlib.imt import PGA, PGV, SA
+from openquake.hazardlib.imt import PGA, PGV
 
 
 class BooreKishida2017(object):
     """
     This class implements the Boore and Kishida (2017) conversions for
-    horizontal intensity measure components. 
+    horizontal intensity measure components.
 
     This class explicitly supports the following subset of the conversions
     provided by B&K (specified as OpenQuake IMCs):
@@ -30,10 +29,10 @@ class BooreKishida2017(object):
         - GMRotI50 <=> GREATER_OF_TWO_HORIZONTAL
         - AVERAGE_HORIZONTAL <=> GREATER_OF_TWO_HORIZONTAL
 
-    Not supported are IMCs for which there is no OpenQuake equivalent; 
-    also not supported are chained conversions (that is, we do not 
-    support conversions from A to C when conversions from A to B and 
-    B to C are available; these must be done in two steps. For IMCs 
+    Not supported are IMCs for which there is no OpenQuake equivalent;
+    also not supported are chained conversions (that is, we do not
+    support conversions from A to C when conversions from A to B and
+    B to C are available; these must be done in two steps. For IMCs
     not explicitly
     supported by B&K, we assume the IMC is equivalent to the geometric
     mean (which B&K call GM_AR), based on our reading of
@@ -43,7 +42,7 @@ class BooreKishida2017(object):
 
         Boore, D.M. and T. Kishida (2017). Relations between some
         horizontal-component ground-motion intensity measures used
-        in practice. Bulletin of the Seismological Society of 
+        in practice. Bulletin of the Seismological Society of
         America, 107(1), 334-343, doi: 10.1785/0120160250.
 
         Beyer, K., & Bommer, J. J. (2006). Relationships between median values
@@ -81,8 +80,8 @@ class BooreKishida2017(object):
             imt (OpenQuake IMT): The intensity measure type of the input
                 ground motions. Valid IMTs are PGA, PGV, and SA.
             amps (array): A numpy array of the (logged) ground motions
-                to be converted. 
-            rrups (array): A numpy array of the same shape as amps, 
+                to be converted.
+            rrups (array): A numpy array of the same shape as amps,
                 containing the rupture distances of the ground motions.
             mag (float): The earthquake magnitude.
 
@@ -122,13 +121,13 @@ class BooreKishida2017(object):
 
     def convertStddevs(self, imt, stddevs, rrups, mag):
         """
-        Return an array of standard deviations converted from one IMC 
+        Return an array of standard deviations converted from one IMC
         to another.
 
         Note that the action of this method is to always increase the
         input standard deviations. Thus, while converting from one IMC
         to another and then back again will yield the original ground
-        motions via convertAmps(), the standard deviations will be 
+        motions via convertAmps(), the standard deviations will be
         inflated by both conversions via this method.
 
         Args:
