@@ -169,8 +169,6 @@ def contour_to_files(container, config, output_dir, logger):
             when configured IMT is not found in container.
 
     """
-    jsonstr = container.getString('info.json')
-    infojson = json.loads(jsonstr)
 
     imtlist = config['products']['contours']['IMTS'].keys()
 
