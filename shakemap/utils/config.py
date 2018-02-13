@@ -501,7 +501,7 @@ def get_shake_config():
     val = Validator()
     results = shake_conf.validate(val)
     if not isinstance(results, bool) or not results:
-        config_error(global_config, results)
+        config_error(shake_conf, results)
 
     return shake_conf
 
@@ -567,7 +567,6 @@ def get_logger(eventid, log_option=None):
         global_log_file = os.path.join(global_log_dir, 'shake.log')
         config['handlers']['global_file']['filename'] = global_log_file
         logging.config.dictConfig(config)
-        log_cfg = list(config['loggers'])
     # get the root logger, otherwise we can't log in sub-libraries
     logger = logging.getLogger()
 
@@ -595,9 +594,9 @@ def get_logging_config():
     # you need to have the logger have a name equal to the empty string ''.
     # Our logging dictionary is originally specified using ConfigObj, which
     # does not allow for empty section headers.  So, we need to get all of the
-    # information from the logger we specify, copy it into a logger dictionary with
-    # an empty key, and then delete the original logger from the config dictionary.
-    # Whew.
+    # information from the logger we specify, copy it into a logger dictionary
+    # with an empty key, and then delete the original logger from the config
+    # dictionary. Whew.
     log_name = log_config['loggers'].keys()[0]
     log_config['loggers'][''] = log_config['loggers'][log_name]
     del log_config['loggers'][log_name]
@@ -607,10 +606,10 @@ def get_logging_config():
 def _clean_log_dict(config):
     """Clean up dictionary returned by ConfigObj into form suitable for logging.
 
-    Basically, ConfigObj.validate wants all sections that are Handlers (for example)
-    to have the same fields, so it fills them in with default values.  However,
-    if you try to give a StreamHandler a filename parameter, it generates an error,
-    hence the code below.
+    Basically, ConfigObj.validate wants all sections that are Handlers (for
+    example) to have the same fields, so it fills them in with default values.
+    However, if you try to give a StreamHandler a filename parameter, it
+    generates an error, hence the code below.
 
     Returns:
         dict: Dictionary suitable for use with logging.config.dictConfig().

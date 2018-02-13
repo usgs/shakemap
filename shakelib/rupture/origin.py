@@ -2,7 +2,6 @@
 
 # stdlib imports
 from xml.dom import minidom
-import time as time
 import warnings
 
 # third party
@@ -98,7 +97,8 @@ class Origin(object):
                     event['time'] = HistoricTime.strptime(
                         event['time'], TIMEFMT)
                 except ValueError:
-                    fmt = 'Input time string %s cannot be converted to datetime.'
+                    fmt = 'Input time string %s cannot be '\
+                          'converted to datetime.'
                     raise ValueError(fmt % event['time'])
 
         if 'mech' in event.keys():
@@ -346,7 +346,7 @@ def read_moment_quakeml(momentfile):
 
     Returns:
         dict: Empty if momentfile is somehow not valid, or:
-              - moment: 
+              - moment:
                   - NP1:
                     - strike: float
                     - dip: float
@@ -354,7 +354,7 @@ def read_moment_quakeml(momentfile):
                   - NP2:
                     - strike: float
                     - dip: float
-                    - rake: float  
+                    - rake: float
                   - type: string
                   - source: string
     """

@@ -10,9 +10,12 @@ def get_weights(origin, config, tensor_params):
     """Get list of GMPEs and their weights for a given earthquake.
 
     Args:
-        origin (Origin object): ShakeMap Origin object, containing earthquake info.
-        config (dict-like): Configuration information regarding earthquake type.
-        tensor_params (dict): Containing fields NP1/NP2, each a dict with strike/dip/rake.
+        origin (Origin object): ShakeMap Origin object, containing earthquake
+            info.
+        config (dict-like): Configuration information regarding earthquake
+            type.
+        tensor_params (dict): Containing fields NP1/NP2, each a dict with
+            strike/dip/rake.
     Returns:
         list: String GMPEs selected for this earthquake.
         ndarray: Float weights for corresponding GMPEs.
@@ -58,29 +61,37 @@ def get_probs(origin, config, tensor_params):
 
     The results here contain probabilities that can be rolled up in many ways:
       - The probabilities of acr,scr,volcanic, and subduction should sum to 1.
-      - The probabilities of acr_X,scr_X,volcanic_X, crustal, interface and intraslab 
+      - The probabilities of acr_X,scr_X,volcanic_X, crustal, interface and
+        intraslab
         should sum to 1.
       - The probabilities of acr_X should sum to acr, and so on.
 
     Args:
-        origin (Origin object): ShakeMap Origin object, containing earthquake info.
-        config (dict-like): Configuration information regarding earthquake type.
-        tensor_params (dict): Containing fields NP1/NP2, each a dict with strike/dip/rake.
+        origin (Origin object): ShakeMap Origin object, containing earthquake
+            info.
+        config (dict-like): Configuration information regarding earthquake
+            type.
+        tensor_params (dict): Containing fields NP1/NP2, each a dict with
+            strike/dip/rake.
     Returns:
         dict: Probabilities for each earthquake type, with fields:
               - acr Probability that the earthquake is in an active region.
-              - acr_X Probability that the earthquake is in a depth layer of ACR, 
-                      starting from the top.
+              - acr_X Probability that the earthquake is in a depth layer of
+                ACR, starting from the top.
               - scr Probability that the earthquake is in a stable region.
-              - scr_X Probability that the earthquake is in a depth layer of SCR, 
-                      starting from the top.
-              - volcanic Probability that the earthquake is in a volcanic region.
-              - volcanic_X Probability that the earthquake is in a depth layer of 
-                           Volcanic, starting from the top.
-              - subduction Probability that the earthquake is in a subduction zone.
-              - crustal Probability that the earthquake is in the crust above an interface.
+              - scr_X Probability that the earthquake is in a depth layer of
+                SCR, starting from the top.
+              - volcanic Probability that the earthquake is in a volcanic
+                region.
+              - volcanic_X Probability that the earthquake is in a depth layer
+                of Volcanic, starting from the top.
+              - subduction Probability that the earthquake is in a subduction
+                zone.
+              - crustal Probability that the earthquake is in the crust above
+                an interface.
               - interface Probability that the earthquake is on the interface.
-              - intraslab Probability that the earthquake is in the slab below interface.
+              - intraslab Probability that the earthquake is in the slab below
+                interface.
 
     """
     selector = SubductionSelector()
@@ -92,46 +103,56 @@ def get_probs(origin, config, tensor_params):
     in_subduction = strec_results['TectonicRegion'] == 'Subduction'
     above_slab = not np.isnan(strec_results['SlabModelDepth'])
     if in_subduction:
-        subduction_probs = get_subduction_probs(strec_results, depth, mag, config,
-                                                above_slab)
+        subduction_probs = get_subduction_probs(
+            strec_results, depth, mag, config, above_slab
+        )
         for key, value in subduction_probs.items():
             subduction_probs[key] = value * region_probs['subduction']
     else:
-        subduction_probs = {'crustal': 0.0,
-                            'interface': 0.0,
-                            'intraslab': 0.0}
+        subduction_probs = {
+            'crustal': 0.0,
+            'interface': 0.0,
+            'intraslab': 0.0
+        }
 
     region_probs.update(subduction_probs)
     return (region_probs, strec_results)
 
 
 def get_region_probs(eid, depth, strec_results, config):
-    """Calculate the regional probabilities (not including subduction interface etc).
+    """
+    Calculate the regional probabilities (not including subduction interface
+    etc).
 
     Args:
         eid (str): Earthquake ID (i.e., us1000cdn0)
         depth (float): Depth of earthquake.
         strec_results (Series): Pandas series containing STREC output.
-        config (dict-like): Configuration information regarding earthquake type.
+        config (dict-like): Configuration information regarding earthquake
+            type.
     Returns:
         dict: Probabilities for each earthquake type, with fields:
               - acr Probability that the earthquake is in an active region.
-              - acr_X Probability that the earthquake is in a depth layer of ACR, 
-                      starting from the top.
+              - acr_X Probability that the earthquake is in a depth layer of
+                ACR, starting from the top.
               - scr Probability that the earthquake is in a stable region.
-              - scr_X Probability that the earthquake is in a depth layer of SCR, 
-                      starting from the top.
-              - volcanic Probability that the earthquake is in a volcanic region.
-              - volcanic_X Probability that the earthquake is in a depth layer of 
-                           Volcanic, starting from the top.
-              - subduction Probability that the earthquake is in a subduction zone.
+              - scr_X Probability that the earthquake is in a depth layer of
+                SCR, starting from the top.
+              - volcanic Probability that the earthquake is in a volcanic
+                region.
+              - volcanic_X Probability that the earthquake is in a depth layer
+                of Volcanic, starting from the top.
+              - subduction Probability that the earthquake is in a subduction
+                zone.
 
     """
     region_probs = {}
-    region_mapping = {'scr': 'DistanceToStable',
-                      'acr': 'DistanceToActive',
-                      'volcanic': 'DistanceToVolcanic',
-                      'subduction': 'DistanceToSubduction'}
+    region_mapping = {
+        'scr': 'DistanceToStable',
+        'acr': 'DistanceToActive',
+        'volcanic': 'DistanceToVolcanic',
+        'subduction': 'DistanceToSubduction'
+    }
     layer_probs = {}
     for region, rdict in config['tectonic_regions'].items():
         distance = strec_results[region_mapping[region]]
@@ -195,13 +216,16 @@ def get_subduction_probs(strec_results, depth, mag, config,
         strec_results (Series): Pandas series containing STREC output.
         depth (float): Depth of earthquake.
         mag (float): Earthquake magnitude.
-        config (dict-like): Configuration information regarding earthquake type.
+        config (dict-like): Configuration information regarding earthquake
+            type.
         above_slab (bool): Is earthquake above a defined slab?
     Returns:
         dict: Probabilities for each earthquake type, with fields:
-              - crustal Probability that the earthquake is in the crust above an interface.
+              - crustal Probability that the earthquake is in the crust above
+                an interface.
               - interface Probability that the earthquake is on the interface.
-              - intraslab Probability that the earthquake is in the slab below interface.
+              - intraslab Probability that the earthquake is in the slab below
+                interface.
 
     """
     subcfg = config['subduction']

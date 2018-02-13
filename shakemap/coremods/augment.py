@@ -132,7 +132,8 @@ class AugmentModule(CoreModule):
                 if not os.path.isfile(loc_file):
                     raise FileNotFoundError('prediction file "%s" is not a '
                                             'valid file' % loc_file)
-                shake_config['interp']['prediction_location']['file'] = loc_file
+                shake_config['interp']['prediction_location']['file'] = \
+                    loc_file
         #
         # Put the updated config back into shake_data.hdf`
         #

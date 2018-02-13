@@ -49,7 +49,7 @@ def main(args):
 
     sys.stderr.write('Building shakemap API documentation (REST)...\n')
     sphinx_cmd = 'sphinx-apidoc -o %s -f -e -d 12 -H "%s" -A "%s"'\
-                 ' -V %s -T %s' % (SHAKEMAP_API_DIR, SHAKEMAP_PACKAGE, 
+                 ' -V %s -T %s' % (SHAKEMAP_API_DIR, SHAKEMAP_PACKAGE,
                                    AUTHORS, verstr,
                                    SHAKEMAP_PACKAGE_DIR)
     res, stdout, stderr = get_command_output(sphinx_cmd)
@@ -64,7 +64,7 @@ def main(args):
     sphinx_cmd = 'sphinx-apidoc -o %s -f -e -d 12 -H "%s" -A "%s"'\
                  ' -V %s -T %s shakelib/rupture/gc2\.py' % \
                  (SHAKELIB_API_DIR, SHAKELIB_PACKAGE, AUTHORS, verstr,
-                 SHAKELIB_PACKAGE_DIR)
+                  SHAKELIB_PACKAGE_DIR)
     res, stdout, stderr = get_command_output(sphinx_cmd)
     if not res:
         raise Exception('Could not build ShakeLib API documentation'
@@ -88,7 +88,6 @@ def main(args):
     clean_cmd = "sed -e '/-.*-/d' -i '' `find %s/*.rst -type f "\
                 "-maxdepth 0 -print`" % SHAKEMAP_API_DIR
     res, stdout, stderr = get_command_output(clean_cmd)
-
 
     clean_cmd = "sed -e 's/ module//g' -i '' `find %s/*.rst -type f "\
                 "-maxdepth 0 -print`" % SHAKELIB_API_DIR

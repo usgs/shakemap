@@ -159,7 +159,8 @@ class GridXMLModule(CoreModule):
             shake_dict['shakemap_version'] = 1
             shake_dict['code_version'] = shakemap.__version__
             shake_dict['process_timestamp'] = datetime.utcnow()
-            shake_dict['shakemap_originator'] = config['system']['source_network']
+            shake_dict['shakemap_originator'] = \
+                config['system']['source_network']
             shake_dict['map_status'] = config['system']['map_status']
             # TODO - we need a source for this!!!
             shake_dict['shakemap_event_type'] = 'ACTUAL'

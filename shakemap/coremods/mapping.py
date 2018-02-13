@@ -20,7 +20,6 @@ from shapely.geometry import LineString
 from shapely.geometry import GeometryCollection
 from shapely.geometry import Polygon as sPolygon
 from shapely.geometry import shape as sShape
-from shapely.geos import TopologicalError
 
 import numpy as np
 from descartes import PolygonPatch
@@ -149,7 +148,7 @@ def getProjectedPolygon(polygon, m):
         try:
             intlon, intlat = zip(*interior.coords[:])
         except:
-            x = 1
+            pass
         intx, inty = m(intlon, intlat)
         ints.append(list(zip(intx, inty)))
     ppolygon = sPolygon(extpts, ints)
@@ -653,7 +652,7 @@ class MapMaker(object):
             latstr = 'N%.2f' % hlat
         dep = origin.depth
         eid = edict['event_id']
-        tpl = (timestr, mag, latstr, lonstr, dep, eid)
+#        tpl = (timestr, mag, latstr, lonstr, dep, eid)
         fmt = ('USGS ShakeMap (%s): %s\n %s UTC M%.1f %s %s '
                'Depth: %.1fkm ID:%s')
         tstr = fmt % (imt, eloc, timestr, mag, latstr, lonstr, dep, eid)

@@ -13,7 +13,7 @@ class DummyCorrelation(object):
 
         Args:
             periods (ndarray): An array of periods that will be requested
-                from the function. Values must be in the range [0.01, 10.0], 
+                from the function. Values must be in the range [0.01, 10.0],
                 and must me sorted from smallest to largest.
 
         Returns:
@@ -34,10 +34,10 @@ class DummyCorrelation(object):
 
           rho = T1/T2 * exp(-h/10)
 
-        where rho is the correlation, T1 is the smaller period, T2 is the 
+        where rho is the correlation, T1 is the smaller period, T2 is the
         larger period, and h is the distance between the points of interest.
 
-        The index arrays (ix1 and ix2) and h array must have the same 
+        The index arrays (ix1 and ix2) and h array must have the same
         dimensions. The
         indices may be equal, and there is no restriction on which one is
         larger. The indices refer to periods in the 'period' argument to the

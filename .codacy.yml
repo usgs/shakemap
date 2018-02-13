@@ -4,3 +4,4 @@ exclude_paths:
   - tests/**
   - versioneer.py
   - setup.cfg
+  - _version.py
