@@ -110,15 +110,17 @@ def create(config, profile, accept, ppath):
             os.path.expanduser('~'), 'ShakeMap', profile)
     default_install = os.path.join(profile_path, 'install')
     default_data = os.path.join(profile_path, 'data')
-    print('You will be prompted to supply two directories for this '
-          'ShakeMap profile:')
-    print(' - An *installation* path, under which will be created '
-          'directories for system')
-    print('   configuration, (cfg), logging (log), and support data '
-          '(lib).')
-    print(' - A *data* path, under which will be created directories '
-          'for each')
-    print('   event processed.\n')
+    if not accept:
+        print('You will be prompted to supply two directories for this '
+              'ShakeMap profile:')
+        print(' - An *installation* path, under which will be created '
+              'directories for system')
+        print('   configuration, (cfg), logging (log), and support data '
+              '(lib).')
+        print(' - A *data* path, under which will be created directories '
+              'for each')
+        print('   event processed.\n')
+
     install_path, install_ok = make_dir('install path', default_install,
                                         accept)
     if not install_ok:
