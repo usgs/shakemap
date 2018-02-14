@@ -4,10 +4,7 @@
 import os.path
 import sys
 import io
-import json
 import numpy as np
-import datetime as dt
-import time
 import datetime
 import tempfile
 import pytest
@@ -41,11 +38,13 @@ def test_input_container():
     f, datafile = tempfile.mkstemp()
     os.close(f)
     try:
-        config = {'alliance': 'chaotic neutral',
-                  'race': 'Elf',
-                  'armor': 5,
-                  'class': 'Warrior',
-                  'intelligence': 10}
+        config = {
+            'alliance': 'chaotic neutral',
+            'race': 'Elf',
+            'armor': 5,
+            'class': 'Warrior',
+            'intelligence': 10
+        }
         rupturefile = os.path.join(homedir, 'container_data',
                                    'Barkaetal02_fault.txt')
         event_text = """<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
@@ -62,12 +61,13 @@ def test_input_container():
         version = 1
         history = {'history': [[timestamp, originator, version]]}
 
-        container = ShakeMapInputContainer.createFromInput(datafile,
-                                                           config,
-                                                           eventfile,
-                                                           history,
-                                                           datafiles=datafiles,
-                                                           rupturefile=rupturefile)
+        container = ShakeMapInputContainer.createFromInput(
+            datafile,
+            config,
+            eventfile,
+            history,
+            datafiles=datafiles,
+            rupturefile=rupturefile)
         cfile = container.getFileName()
         assert datafile == cfile
         config = container.getConfig()
@@ -96,10 +96,11 @@ def test_input_container():
         container2.close()
 
         eventfile.seek(0)
-        container3 = ShakeMapInputContainer.createFromInput(datafile,
-                                                            config,
-                                                            eventfile,
-                                                            {})
+        container3 = ShakeMapInputContainer.createFromInput(
+            datafile,
+            config,
+            eventfile,
+            {})
         try:
             # this should fail, because we haven't set any station data yet
             station = container3.getStationList()
@@ -116,11 +117,13 @@ def test_input_container():
         # Test the getStationDict() and setStationDict() functions with
         # some dummy data
         #
-        config = {'alliance': 'chaotic neutral',
-                  'race': 'Elf',
-                  'armor': 5,
-                  'class': 'Warrior',
-                  'intelligence': 10}
+        config = {
+            'alliance': 'chaotic neutral',
+            'race': 'Elf',
+            'armor': 5,
+            'class': 'Warrior',
+            'intelligence': 10
+        }
         with pytest.raises(AttributeError):
             junk = container3.getStationDict()
         with pytest.raises(TypeError):
@@ -141,44 +144,56 @@ def test_output_container():
 
     # create MMI mean data for maximum component
     mean_mmi_maximum_data = np.random.rand(nrows, ncols)
-    mean_mmi_maximum_metadata = {'name': 'Gandalf',
-                                 'color': 'white',
-                                 'powers': 'magic'}
+    mean_mmi_maximum_metadata = {
+        'name': 'Gandalf',
+        'color': 'white',
+        'powers': 'magic'
+    }
     mean_mmi_maximum_grid = Grid2D(mean_mmi_maximum_data, geodict)
 
     # create MMI std data for maximum component
     std_mmi_maximum_data = mean_mmi_maximum_data / 10
-    std_mmi_maximum_metadata = {'name': 'Legolas',
-                                'color': 'green',
-                                'powers': 'good hair'}
+    std_mmi_maximum_metadata = {
+        'name': 'Legolas',
+        'color': 'green',
+        'powers': 'good hair'
+    }
     std_mmi_maximum_grid = Grid2D(std_mmi_maximum_data, geodict)
 
     # create MMI mean data for rotd50 component
     mean_mmi_rotd50_data = np.random.rand(nrows, ncols)
-    mean_mmi_rotd50_metadata = {'name': 'Gimli',
-                                'color': 'brown',
-                                'powers': 'axing'}
+    mean_mmi_rotd50_metadata = {
+        'name': 'Gimli',
+        'color': 'brown',
+        'powers': 'axing'
+    }
     mean_mmi_rotd50_grid = Grid2D(mean_mmi_rotd50_data, geodict)
 
     # create MMI std data for rotd50 component
     std_mmi_rotd50_data = mean_mmi_rotd50_data / 10
-    std_mmi_rotd50_metadata = {'name': 'Aragorn',
-                               'color': 'white',
-                               'powers': 'scruffiness'}
+    std_mmi_rotd50_metadata = {
+        'name': 'Aragorn',
+        'color': 'white',
+        'powers': 'scruffiness'
+    }
     std_mmi_rotd50_grid = Grid2D(std_mmi_rotd50_data, geodict)
 
     # create PGA mean data for maximum component
     mean_pga_maximum_data = np.random.rand(nrows, ncols)
-    mean_pga_maximum_metadata = {'name': 'Pippin',
-                                 'color': 'purple',
-                                 'powers': 'rashness'}
+    mean_pga_maximum_metadata = {
+        'name': 'Pippin',
+        'color': 'purple',
+        'powers': 'rashness'
+    }
     mean_pga_maximum_grid = Grid2D(mean_pga_maximum_data, geodict)
 
     # create PGA std data for maximum component
     std_pga_maximum_data = mean_pga_maximum_data / 10
-    std_pga_maximum_metadata = {'name': 'Merry',
-                                'color': 'grey',
-                                'powers': 'hunger'}
+    std_pga_maximum_metadata = {
+        'name': 'Merry',
+        'color': 'grey',
+        'powers': 'hunger'
+    }
     std_pga_maximum_grid = Grid2D(std_pga_maximum_data, geodict)
 
     f, datafile = tempfile.mkstemp()
@@ -223,6 +238,14 @@ def test_output_container():
         # get list of components for mmi
         mmi_comps = container.getComponents('mmi')
         assert sorted(mmi_comps) == ['maximum', 'rotd50']
+
+        # Test dropIMT
+        imts = container.getIMTs('maximum')
+        assert imts == ['mmi', 'pga']
+        container.dropIMT('mmi')
+        imts = container.getIMTs('maximum')
+        assert imts == ['pga']
+
     except Exception as e:
         raise(e)
     finally:
@@ -249,8 +272,10 @@ def test_output_arrays():
         lats = np.random.rand(100)
         lons = np.random.rand(100)
         ids = np.array([randomword(4).encode('ascii') for x in range(100)])
-        metadata = {'units': '%g',
-                    'digits': 4}
+        metadata = {
+            'units': '%g',
+            'digits': 4
+        }
         #
         # Put the data in the container
         #
