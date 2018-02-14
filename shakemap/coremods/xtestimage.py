@@ -27,7 +27,7 @@ class TestPlot(CoreModule):
             FileNotFoundError: When the the shake_result HDF file does not
                 exist.
         """
-        install_path, data_path = get_config_paths()
+        _, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
         if not os.path.isdir(datadir):
             raise NotADirectoryError('%s is not a valid directory.' % datadir)
@@ -54,7 +54,7 @@ class TestPlot(CoreModule):
             data = datadict[myimt]
             gridobj = data['mean']
             metadata = gridobj.getGeoDict().asDict()
-            fig = plt.figure(figsize=(10, 10))
+            plt.figure(figsize=(10, 10))
             plt.imshow(gridobj.getData(),
                        extent=(metadata['xmin'], metadata['xmax'],
                                metadata['ymin'], metadata['ymax']))

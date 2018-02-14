@@ -58,7 +58,7 @@ def get_generic_amp_factors(sx, myimt):
     """
 
     # Read the GenericAmpFactors directory in the install directory
-    indir, datadir = get_config_paths()
+    indir, _ = get_config_paths()
     gaf_dir = os.path.join(indir, "data", "GenericAmpFactors")
     if not os.path.isdir(gaf_dir):
         logging.warn("No GenericAmpFactors directory found.")
@@ -86,7 +86,7 @@ def get_generic_amp_factors(sx, myimt):
 
         if thisimt in contents:
             # If imt in IMT list, get the grid
-            mygrid, metadata = gc.getGrid(thisimt)
+            mygrid, _ = gc.getGrid(thisimt)
         elif not thisimt.startswith('SA('):
             logging.warn("Generic Amp Factors: IMT %s not found in file %s"
                     % (myimt, gfile))
