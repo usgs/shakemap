@@ -46,12 +46,15 @@ differently, if desired. By default the profiles reside in the file
     parser.add_argument('-p', '--preserve', action='store_true',
                         help='Preserve data when deleting a profile')
     parser.add_argument('-f', '--file', type=str,
-                        help='Specify an alternate file in which the '
+                        help='Specify an alternative file in which the '
                              'profiles (will) reside')
     return parser
 
 
-current_markers = {True: '**Current Profile**', False: ''}
+current_markers = {
+    True: '**Current Profile**',
+    False: ''
+}
 
 
 class ShakeProfile(object):
@@ -69,10 +72,34 @@ class ShakeProfile(object):
 
 
 def check_config(config):
+    """
+    Validation checks on the profile config. At least one profile must exist
+    (otherwise exit) and the paths for each profile should exist, otherwise the
+    profile entry is removed.
+
+    Args:
+        config (ConfigObj): The ConfigObj instance.
+    """
+    # Check that at least one profile exists
     if 'profiles' not in config:
-        print('There are currently no profiles. Use "shakeprofile '
+        print('There are currently no profiles. Use "sm_profile '
               '-c <profile>" to create one.')
         sys.exit(1)
+    # Check that the paths for each profile exist
+    for profile in config['profiles'].keys():
+        data_exists = os.path.isdir(config['profiles'][profile]['data_path'])
+        delete_profile = False
+        if not data_exists:
+            print('Data path for profile %s does not exist.' % profile)
+            delete_profile = True
+        install_exists = os.path.isdir(
+            config['profiles'][profile]['install_path'])
+        if not install_exists:
+            print('Install path for profile %s does not exist.' % profile)
+            delete_profile = True
+        if delete_profile:
+            print('    Deleting profile %s.' % profile)
+            del config['profiles'][profile]
 
 
 def make_dir(pathstr, default, accept):
@@ -101,6 +128,14 @@ def make_dir(pathstr, default, accept):
 
 
 def create(config, profile, accept, ppath):
+    """
+    Args:
+        config (ConfigObj): ConfigObj instance representing the
+            parsed config.
+        profile (str): Profile name.
+        accept (bool): Should defaults be accepted?
+        ppath (str): Path to an alternative profile location (optional).
+    """
     shakeconfig_data_path = get_data_path()
 
     if ppath:
@@ -110,15 +145,17 @@ def create(config, profile, accept, ppath):
             os.path.expanduser('~'), 'ShakeMap', profile)
     default_install = os.path.join(profile_path, 'install')
     default_data = os.path.join(profile_path, 'data')
-    print('You will be prompted to supply two directories for this '
-          'ShakeMap profile:')
-    print(' - An *installation* path, under which will be created '
-          'directories for system')
-    print('   configuration, (cfg), logging (log), and support data '
-          '(lib).')
-    print(' - A *data* path, under which will be created directories '
-          'for each')
-    print('   event processed.\n')
+    if not accept:
+        print('You will be prompted to supply two directories for this '
+              'ShakeMap profile:')
+        print(' - An *installation* path, under which will be created '
+              'directories for system')
+        print('   configuration, (cfg), logging (log), and support data '
+              '(lib).')
+        print(' - A *data* path, under which will be created directories '
+              'for each')
+        print('   event processed.\n')
+
     install_path, install_ok = make_dir('install path', default_install,
                                         accept)
     if not install_ok:
@@ -174,8 +211,10 @@ def create(config, profile, accept, ppath):
 
     if 'profiles' not in config:
         config['profiles'] = {}
-    config['profiles'][profile] = {'install_path': install_path,
-                                   'data_path': new_data_path}
+    config['profiles'][profile] = {
+        'install_path': install_path,
+        'data_path': new_data_path
+    }
 #    config.filename = configfile
     config['profile'] = profile
     config.write()
@@ -184,6 +223,11 @@ def create(config, profile, accept, ppath):
 
 
 def main(pparser, args):
+    """
+    Args:
+        pparser: ArgumentParser object.
+        args: ArgumentParser namespace with command line arguments.
+    """
     if args.file:
         configfile = args.file
         ppath = os.path.dirname(configfile)
