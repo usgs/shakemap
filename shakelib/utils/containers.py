@@ -312,7 +312,8 @@ class ShakeMapOutputContainer(ShakeMapContainer):
 
     This class provides methods for getting and setting IMT data.
     The philosophy here is that an IMT consists of both the mean results and
-    the standard deviations of those results, thus getIMT() returns a
+    the standard deviations of those results, thus getIMTArrays() (when data
+    type is 'points') and getIMTGrids() (when data type is 'grids') returns a
     dictionary with both, plus metadata for each data layer.
 
 
