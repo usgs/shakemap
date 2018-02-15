@@ -341,7 +341,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         will be set by the first call to setIMTGrids() or setIMTArray().
 
         Args:
-            (str): Either 'points' or 'grid'.
+            datatype (str): Either 'points' or 'grid'.
 
         Returns:
             Nothing.
@@ -550,19 +550,18 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         Retrieve the arrays and any associated metadata from the container.
 
         Args:
-            imt_name (str):
-                The name of the IMT stored in the container.
+            imt_name (str): The name of the IMT stored in the container.
 
         Returns:
             dict: Dictionary containing 7 items:
-                   - 'lons': array of longitude coordinates
-                   - 'lats': array of latitude coordinates
-                   - 'ids': array of IDs corresponding to the coordinates
-                   - 'mean': array of IMT mean values.
-                   - 'mean_metadata': Dictionary containing any metadata
+                   - lons -- array of longitude coordinates
+                   - lats -- array of latitude coordinates
+                   - ids -- array of IDs corresponding to the coordinates
+                   - mean -- array of IMT mean values.
+                   - mean_metadata -- Dictionary containing any metadata
                      describing mean layer.
-                   - 'std': array of IMT standard deviation values.
-                   - 'std_metadata': Dictionary containing any metadata
+                   - std -- array of IMT standard deviation values.
+                   - std_metadata -- Dictionary containing any metadata
                      describing standard deviation layer.
         """
 
@@ -616,7 +615,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         Return list of names of IMTs matching input component type.
 
         Args:
-            component (str): Name of component ('Larger','rotd50',etc.)
+            component (str): Name of component ('maximum', 'rotd50', etc.)
 
         Returns:
             list: List of names of IMTs matching component stored in container.
@@ -633,10 +632,10 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         Return list of components for given IMT.
 
         Args:
-          imt_name (str): Name of IMT ('MMI','PGA',etc.)
+            imt_name (str): Name of IMT ('mmi', 'pga', etc.)
 
         Returns:
-          list: List of names of components for given IMT.
+            list: List of names of components for given IMT.
         """
         components = _get_type_list(self._hdfobj, 'imt_' + imt_name)
         return components
@@ -646,12 +645,13 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         Delete IMT datasets from container.
 
         Args:
-          name (str):
-                The name of the IMT to be deleted.
+            name (str): The name of the IMT to be deleted.
 
         """
-        group_name = '__imt_%s_%s__' % (imt_name, component)
-        if group_name not in self._hdfobj:
-            raise LookupError('No group called %s in HDF file %s'
-                              % (imt_name, self.getFileName()))
-        del self._hdfobj[group_name]
+        components = self.getComponents(imt_name)
+        for component in components:
+            group_name = '__imt_%s_%s__' % (imt_name, component)
+            if group_name not in self._hdfobj:
+                raise LookupError('No group called %s in HDF file %s'
+                                  % (imt_name, self.getFileName()))
+            del self._hdfobj[group_name]
