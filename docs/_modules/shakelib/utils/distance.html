@@ -97,7 +97,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        (numpy array): Distances in km.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">diameter</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">EARTH_RADIUS</span>
+    <span class="n">diameter</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">EARTH_RADIUS</span>  <span class="c1"># noqa</span>
     <span class="n">distance</span> <span class="o">=</span> <span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
         <span class="s2">&quot;diameter * arcsin(sqrt(sin((lats1 - lats2) / 2.0)**2.0 &quot;</span>
         <span class="s2">&quot;+ cos(lats1) * cos(lats2) * sin((lons1 - lons2) / 2.0)**2.0))&quot;</span><span class="p">)</span>

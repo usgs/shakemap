@@ -175,7 +175,8 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">loc_file</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;prediction file &quot;</span><span class="si">%s</span><span class="s1">&quot; is not a &#39;</span>
                                             <span class="s1">&#39;valid file&#39;</span> <span class="o">%</span> <span class="n">loc_file</span><span class="p">)</span>
-                <span class="n">shake_config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loc_file</span>
+                <span class="n">shake_config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="n">loc_file</span>
         <span class="c1">#</span>
         <span class="c1"># Put the updated config back into shake_data.hdf`</span>
         <span class="c1">#</span>

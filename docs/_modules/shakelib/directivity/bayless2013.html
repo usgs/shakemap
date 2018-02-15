@@ -457,7 +457,7 @@
         <span class="n">mag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">e2s_mat</span> <span class="o">*</span> <span class="n">e2s_mat</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">))</span>
 
         <span class="c1"># Avoid division by zero</span>
-        <span class="n">mag</span><span class="p">[</span><span class="n">mag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">12</span>
+        <span class="n">mag</span><span class="p">[</span><span class="n">mag</span> <span class="o">==</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-12</span>
         <span class="n">e2s_norm</span> <span class="o">=</span> <span class="n">e2s_mat</span> <span class="o">/</span> <span class="n">mag</span>
 
         <span class="c1"># Dot epicenter-to-site with along-strike vector</span>

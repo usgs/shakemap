@@ -123,7 +123,7 @@
         <span class="n">reference</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span>
 
         <span class="c1"># Add origin information to metadata</span>
-        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="vm">__dict__</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">odict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">HistoricTime</span><span class="p">):</span>
                 <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
@@ -146,7 +146,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_computeStikeDip</span><span class="p">()</span>
 
 <div class="viewcode-block" id="EdgeRupture.fromArrays"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.edge_rupture.html#shakelib.rupture.edge_rupture.EdgeRupture.fromArrays">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromArrays</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">toplons</span><span class="p">,</span> <span class="n">toplats</span><span class="p">,</span> <span class="n">topdeps</span><span class="p">,</span> <span class="n">botlons</span><span class="p">,</span> <span class="n">botlats</span><span class="p">,</span> <span class="n">botdeps</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">fromArrays</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">toplons</span><span class="p">,</span> <span class="n">toplats</span><span class="p">,</span> <span class="n">topdeps</span><span class="p">,</span> <span class="n">botlons</span><span class="p">,</span> <span class="n">botlats</span><span class="p">,</span> <span class="n">botdeps</span><span class="p">,</span>
                    <span class="n">origin</span><span class="p">,</span> <span class="n">group_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Class method to initialize an EdgeRupture class from arrays of</span>
@@ -212,7 +212,7 @@
              <span class="p">}]}</span>
 
         <span class="c1"># Add origin information to metadata</span>
-        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="vm">__dict__</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">odict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">HistoricTime</span><span class="p">):</span>
                 <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
@@ -220,7 +220,7 @@
                 <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;mesh_dx&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mesh_dx</span>
 
-        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="EdgeRupture.getLength"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.edge_rupture.html#shakelib.rupture.edge_rupture.EdgeRupture.getLength">[docs]</a>    <span class="k">def</span> <span class="nf">getLength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -561,7 +561,7 @@
 
         <span class="k">return</span> <span class="n">qlist</span></div>
 
-<div class="viewcode-block" id="EdgeRupture.computeRrup"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.edge_rupture.html#shakelib.rupture.edge_rupture.EdgeRupture.computeRrup">[docs]</a>    <span class="k">def</span> <span class="nf">computeRrup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
+<div class="viewcode-block" id="EdgeRupture.computeRrup"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.edge_rupture.html#shakelib.rupture.edge_rupture.EdgeRupture.computeRrup">[docs]</a>    <span class="k">def</span> <span class="nf">computeRrup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for computing rupture distance.</span>
 
@@ -569,11 +569,16 @@
 <span class="sd">            lon (array): Numpy array of longitudes.</span>
 <span class="sd">            lat (array): Numpy array of latitudes.</span>
 <span class="sd">            depth (array): Numpy array of depths (km; positive down).</span>
+<span class="sd">            var (bool): Also return variance of prediction. Unused, and</span>
+<span class="sd">                will raise an exception if not False.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">           array: Rupture distance (km).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;var must be False for EdgeRupture&#39;</span><span class="p">)</span>
 
         <span class="n">mesh_dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh_dx</span>
 
@@ -638,7 +643,7 @@
 
         <span class="k">return</span> <span class="n">dist</span></div>
 
-<div class="viewcode-block" id="EdgeRupture.computeRjb"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.edge_rupture.html#shakelib.rupture.edge_rupture.EdgeRupture.computeRjb">[docs]</a>    <span class="k">def</span> <span class="nf">computeRjb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
+<div class="viewcode-block" id="EdgeRupture.computeRjb"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.edge_rupture.html#shakelib.rupture.edge_rupture.EdgeRupture.computeRjb">[docs]</a>    <span class="k">def</span> <span class="nf">computeRjb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for computing Joyner-Boore distance.</span>
 
@@ -646,11 +651,16 @@
 <span class="sd">            lon (array): Numpy array of longitudes.</span>
 <span class="sd">            lat (array): Numpy array of latitudes.</span>
 <span class="sd">            depth (array): Numpy array of depths (km; positive down).</span>
+<span class="sd">            var (bool): Also return variance of prediction. Unused, and</span>
+<span class="sd">                will raise an exception if not False.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">           array: Joyner-Boore distance (km).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;var must be False for EdgeRupture&#39;</span><span class="p">)</span>
 
         <span class="n">mesh_dx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mesh_dx</span>
 

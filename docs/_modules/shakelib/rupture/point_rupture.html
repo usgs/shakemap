@@ -44,18 +44,13 @@
 <span></span><span class="ch">#!/usr/bin/env python</span>
 
 <span class="c1"># stdlib modules</span>
-<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">import</span> <span class="nn">re</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">import</span> <span class="nn">scipy.interpolate</span> <span class="k">as</span> <span class="nn">spint</span>
 
 <span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="k">import</span> <span class="n">HistoricTime</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="k">import</span> <span class="n">Rupture</span>
-<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">utils</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
 
 <span class="kn">from</span> <span class="nn">ps2ff.constants</span> <span class="k">import</span> <span class="n">DistType</span><span class="p">,</span> <span class="n">MagScaling</span><span class="p">,</span> <span class="n">Mechanism</span>
@@ -103,7 +98,7 @@
              <span class="p">}]}</span>
 
         <span class="c1"># Add origin information to metadata</span>
-        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="vm">__dict__</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">odict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">HistoricTime</span><span class="p">):</span>
                 <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
@@ -228,10 +223,10 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            If var is True then this returns a tuple of two arrays: first, the</span>
-<span class="sd">                predicted approximate fault distance values (either Rjb or </span>
-<span class="sd">                Rrup, depending on the &#39;type&#39; argument), and second an array of </span>
-<span class="sd">                the variance of those predictions. If var is False then just the </span>
-<span class="sd">                first element of the tuple is returned.</span>
+<span class="sd">                predicted approximate fault distance values (either Rjb or</span>
+<span class="sd">                Rrup, depending on the &#39;type&#39; argument), and second an array of</span>
+<span class="sd">                the variance of those predictions. If var is False then just</span>
+<span class="sd">                the first element of the tuple is returned.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">rtype</span> <span class="o">==</span> <span class="s1">&#39;Rjb&#39;</span><span class="p">:</span>
             <span class="n">dtype</span> <span class="o">=</span> <span class="n">DistType</span><span class="o">.</span><span class="n">Rjb</span>
@@ -322,14 +317,16 @@
 <span class="sd">                which include &#39;rx&#39;, &#39;ry&#39;, &#39;ry0&#39;, &#39;U&#39;, &#39;T&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># This just returns defaults of zero, which will hopefully behave</span>
-        <span class="c1"># gracefully as used in GMPEs.</span>
-        <span class="nb">dict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rx&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span>
-                <span class="s2">&quot;ry&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span>
-                <span class="s2">&quot;ry0&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span>
-                <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span>
-                <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
-                <span class="p">}</span>
-        <span class="k">return</span> <span class="nb">dict</span></div></div>
+        <span class="c1"># gracefully as used in GMPEs but should eventually be updated</span>
+        <span class="c1"># so that things like the hangingwall terms are unbiased.</span>
+        <span class="n">gc2</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;rx&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span>
+            <span class="s2">&quot;ry&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span>
+            <span class="s2">&quot;ry0&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span>
+            <span class="s2">&quot;U&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">),</span>
+            <span class="s2">&quot;T&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">gc2</span></div></div>
 </pre></div>
 
           </div>

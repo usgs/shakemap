@@ -63,7 +63,6 @@
 <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">GeometryCollection</span>
 <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">Polygon</span> <span class="k">as</span> <span class="n">sPolygon</span>
 <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">shape</span> <span class="k">as</span> <span class="n">sShape</span>
-<span class="kn">from</span> <span class="nn">shapely.geos</span> <span class="k">import</span> <span class="n">TopologicalError</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">descartes</span> <span class="k">import</span> <span class="n">PolygonPatch</span>
@@ -192,7 +191,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">intlon</span><span class="p">,</span> <span class="n">intlat</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">interior</span><span class="o">.</span><span class="n">coords</span><span class="p">[:])</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="n">x</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="k">pass</span>
         <span class="n">intx</span><span class="p">,</span> <span class="n">inty</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">intlon</span><span class="p">,</span> <span class="n">intlat</span><span class="p">)</span>
         <span class="n">ints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">intx</span><span class="p">,</span> <span class="n">inty</span><span class="p">)))</span>
     <span class="n">ppolygon</span> <span class="o">=</span> <span class="n">sPolygon</span><span class="p">(</span><span class="n">extpts</span><span class="p">,</span> <span class="n">ints</span><span class="p">)</span>
@@ -696,7 +695,7 @@
             <span class="n">latstr</span> <span class="o">=</span> <span class="s1">&#39;N</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">hlat</span>
         <span class="n">dep</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">depth</span>
         <span class="n">eid</span> <span class="o">=</span> <span class="n">edict</span><span class="p">[</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
-        <span class="n">tpl</span> <span class="o">=</span> <span class="p">(</span><span class="n">timestr</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">latstr</span><span class="p">,</span> <span class="n">lonstr</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">eid</span><span class="p">)</span>
+<span class="c1">#        tpl = (timestr, mag, latstr, lonstr, dep, eid)</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;USGS ShakeMap (</span><span class="si">%s</span><span class="s1">): </span><span class="si">%s</span><span class="se">\n</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> UTC M</span><span class="si">%.1f</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> &#39;</span>
                <span class="s1">&#39;Depth: </span><span class="si">%.1f</span><span class="s1">km ID:</span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">tstr</span> <span class="o">=</span> <span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">eloc</span><span class="p">,</span> <span class="n">timestr</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">latstr</span><span class="p">,</span> <span class="n">lonstr</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">eid</span><span class="p">)</span>

@@ -54,7 +54,7 @@
 
 <div class="viewcode-block" id="NullGMPE"><a class="viewcode-back" href="../../../shakelib/shakelib.gmpe.nullgmpe.html#shakelib.gmpe.nullgmpe.NullGMPE">[docs]</a><span class="k">class</span> <span class="nc">NullGMPE</span><span class="p">(</span><span class="n">GMPE</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This is a GMPE for testing. It returns the mean and stddevs </span>
+<span class="sd">    This is a GMPE for testing. It returns the mean and stddevs</span>
 <span class="sd">    specified in the constructor.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">DEFINED_FOR_TECTONIC_REGION_TYPE</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">TRT</span><span class="o">.</span><span class="n">ACTIVE_SHALLOW_CRUST</span>
@@ -63,7 +63,8 @@
         <span class="n">PGV</span><span class="p">,</span>
         <span class="n">SA</span>
     <span class="p">])</span>
-    <span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span> <span class="o">=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span>
+    <span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span> <span class="o">=</span> \
+        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span>
     <span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
         <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">,</span>
         <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">,</span>
@@ -80,10 +81,11 @@
 <span class="sd">        Args:</span>
 <span class="sd">            mean (float): the mean value returned by the GMPE (default=0).</span>
 <span class="sd">                This value is returned for all locations, regardles of</span>
-<span class="sd">                the IMT or the contents of sites, rupture and distance contexts.</span>
-<span class="sd">            phi (float): the within-event standard deviation returned by the </span>
+<span class="sd">                the IMT or the contents of sites, rupture and distance</span>
+<span class="sd">                contexts.</span>
+<span class="sd">            phi (float): the within-event standard deviation returned by the</span>
 <span class="sd">                 GMPE (default=0.8)</span>
-<span class="sd">            tau (float): the between-event standard deviation returned by the </span>
+<span class="sd">            tau (float): the between-event standard deviation returned by the</span>
 <span class="sd">                 GMPE (default=0.6)</span>
 
 <span class="sd">        The total standard deviation returned will be ``sqrt(phi^2 + tau^2)``.</span>
@@ -95,8 +97,8 @@
 
 <div class="viewcode-block" id="NullGMPE.get_mean_and_stddevs"><a class="viewcode-back" href="../../../shakelib/shakelib.gmpe.nullgmpe.html#shakelib.gmpe.nullgmpe.NullGMPE.get_mean_and_stddevs">[docs]</a>    <span class="k">def</span> <span class="nf">get_mean_and_stddevs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Implements the OpenQuake GroundShakingIntensityModel </span>
-<span class="sd">        get_mean_and_stddevs interface. See superclass </span>
+<span class="sd">        Implements the OpenQuake GroundShakingIntensityModel</span>
+<span class="sd">        get_mean_and_stddevs interface. See superclass</span>
 <span class="sd">        `method &lt;http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs&gt;`__.</span>
 
 <span class="sd">        Returns a constant values for all locations specified in</span>
@@ -108,8 +110,8 @@
         <span class="n">stddevs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">stddev_type</span> <span class="ow">in</span> <span class="n">stddev_types</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">stddev_type</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">:</span>
-                <span class="n">stddevs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">rjb</span><span class="p">,</span>
-                                            <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
+                <span class="n">stddevs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
+                    <span class="n">dists</span><span class="o">.</span><span class="n">rjb</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phi</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">tau</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
             <span class="k">elif</span> <span class="n">stddev_type</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTRA_EVENT</span><span class="p">:</span>
                 <span class="n">stddevs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">rjb</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">phi</span><span class="p">))</span>
             <span class="k">elif</span> <span class="n">stddev_type</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">:</span>
@@ -121,7 +123,7 @@
 <span class="c1"># Dummy COEFFS table so MultiGMPE won&#39;t complain</span>
 <span class="c1">#</span>
     <span class="n">COEFFS</span> <span class="o">=</span> <span class="n">CoeffsTable</span><span class="p">(</span><span class="n">sa_damping</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">table</span><span class="o">=</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
-<span class="s2">IMT     c1  </span>
+<span class="s2">IMT     c1</span>
 <span class="s2">pga    0.</span>
 <span class="s2">pgv    0.</span>
 <span class="s2">0.01   0.</span>

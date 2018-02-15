@@ -71,15 +71,14 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">contextlib</span>
-
-<span class="kn">import</span> <span class="nn">scipy.stats</span>
 <span class="kn">from</span> <span class="nn">scipy.special</span> <span class="k">import</span> <span class="n">ndtr</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span> <span class="k">as</span> <span class="n">imt_module</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.calc.filters</span> <span class="k">import</span> <span class="n">IntegrationDistance</span><span class="p">,</span> <span class="n">get_distances</span>
-<span class="kn">from</span> <span class="nn">openquake.baselib.general</span> <span class="k">import</span> <span class="ne">DeprecationWarning</span>
+<span class="kn">from</span> <span class="nn">openquake.baselib.general</span> <span class="k">import</span> <span class="ne">DeprecationWarning</span><span class="p">,</span> <span class="n">AccumDict</span>
+<span class="kn">from</span> <span class="nn">openquake.baselib.performance</span> <span class="k">import</span> <span class="n">Monitor</span>
 <span class="kn">from</span> <span class="nn">openquake.baselib.python3compat</span> <span class="k">import</span> <span class="n">with_metaclass</span>
 
 
@@ -121,19 +120,19 @@
     <span class="n">deprecated</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">non_verified</span> <span class="o">=</span> <span class="kc">False</span>
 
-    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">cls</span><span class="o">.</span><span class="n">instantiable</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">instantiable</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">NonInstantiableError</span><span class="p">(</span>
-                <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> cannot be directly instantiated in this context&#39;</span> <span class="o">%</span> <span class="n">cls</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">deprecated</span><span class="p">:</span>
+                <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> cannot be directly instantiated in this context&#39;</span> <span class="o">%</span> <span class="bp">cls</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">deprecated</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is deprecated - use </span><span class="si">%s</span><span class="s1"> instead&#39;</span> <span class="o">%</span> <span class="p">(</span>
-                <span class="n">cls</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">cls</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="n">__name__</span><span class="p">)</span>
+                <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="ne">DeprecationWarning</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">cls</span><span class="o">.</span><span class="n">non_verified</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">non_verified</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not independently verified - the user is liable &#39;</span>
-                   <span class="s1">&#39;for their application&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="n">cls</span><span class="o">.</span><span class="n">__name__</span>
+                   <span class="s1">&#39;for their application&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">NotVerifiedWarning</span><span class="p">)</span>
-        <span class="bp">self</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MetaGSIM</span><span class="p">,</span> <span class="n">cls</span><span class="p">)</span><span class="o">.</span><span class="n">__call__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MetaGSIM</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
         <span class="k">return</span> <span class="bp">self</span>
 
@@ -142,15 +141,15 @@
     <span class="c1"># instantiated in the workers; however, they can still be</span>
     <span class="c1"># instantiated indirectly via __new__, so that unpickling works</span>
     <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
-    <span class="k">def</span> <span class="nf">forbid_instantiation</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">forbid_instantiation</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Make the class and all its subclassed not directly instantiable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">cls</span><span class="o">.</span><span class="n">instantiable</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">cls</span><span class="o">.</span><span class="n">instantiable</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">yield</span>
         <span class="k">finally</span><span class="p">:</span>
-            <span class="n">cls</span><span class="o">.</span><span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">cls</span><span class="o">.</span><span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
 
 
 <span class="k">class</span> <span class="nc">ContextMaker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -167,6 +166,13 @@
             <span class="k">for</span> <span class="n">gsim</span> <span class="ow">in</span> <span class="n">gsims</span><span class="p">:</span>
                 <span class="n">reqset</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">gsim</span><span class="p">,</span> <span class="s1">&#39;REQUIRES_&#39;</span> <span class="o">+</span> <span class="n">req</span><span class="p">))</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;REQUIRES_&#39;</span> <span class="o">+</span> <span class="n">req</span><span class="p">,</span> <span class="n">reqset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">gsims</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">):</span>  <span class="c1"># gsims is actually a dict rlzs_by_gsim</span>
+            <span class="c1"># since the ContextMaker must be used on ruptures with all the</span>
+            <span class="c1"># same TRT, given a realization there is a single gsim</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">gsim_by_rlzi</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">gsim</span><span class="p">,</span> <span class="n">rlzis</span> <span class="ow">in</span> <span class="n">gsims</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">rlzi</span> <span class="ow">in</span> <span class="n">rlzis</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">gsim_by_rlzi</span><span class="p">[</span><span class="n">rlzi</span><span class="p">]</span> <span class="o">=</span> <span class="n">gsim</span>
 
     <span class="k">def</span> <span class="nf">make_distances_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_collection</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="n">dist_dict</span><span class="o">=</span><span class="p">()):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -225,7 +231,7 @@
                 <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">site_collection</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> requires unknown site parameter </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span>
-                                 <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">param</span><span class="p">))</span>
+                                 <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">param</span><span class="p">))</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">sctx</span>
 
@@ -268,11 +274,11 @@
                 <span class="n">value</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> requires unknown rupture parameter </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span>
-                                 <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">param</span><span class="p">))</span>
+                                 <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">param</span><span class="p">))</span>
             <span class="nb">setattr</span><span class="p">(</span><span class="n">rctx</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">rctx</span>
 
-    <span class="k">def</span> <span class="nf">make_contexts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_collection</span><span class="p">,</span> <span class="n">rupture</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">make_contexts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_collection</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Filter the site collection with respect to the rupture and</span>
 <span class="sd">        create context objects.</span>
@@ -299,10 +305,57 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_rupture_context</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
         <span class="n">sites</span><span class="p">,</span> <span class="n">distances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum_distance</span><span class="o">.</span><span class="n">get_closest</span><span class="p">(</span>
-            <span class="n">site_collection</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">)</span>
+            <span class="n">site_collection</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">,</span> <span class="nb">filter</span><span class="p">)</span>
         <span class="n">sctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_sites_context</span><span class="p">(</span><span class="n">sites</span><span class="p">)</span>
         <span class="n">dctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_distances_context</span><span class="p">(</span><span class="n">sites</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;rjb&#39;</span><span class="p">:</span> <span class="n">distances</span><span class="p">})</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">disaggregate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sitecol</span><span class="p">,</span> <span class="n">ruptures</span><span class="p">,</span> <span class="n">iml4</span><span class="p">,</span> <span class="n">truncnorm</span><span class="p">,</span> <span class="n">epsilons</span><span class="p">,</span>
+                     <span class="n">monitor</span><span class="o">=</span><span class="n">Monitor</span><span class="p">()):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Disaggregate (separate) PoE of `imldict` in different contributions</span>
+<span class="sd">        each coming from `n_epsilons` distribution bins.</span>
+
+<span class="sd">        :param sitecol: a SiteCollection</span>
+<span class="sd">        :param ruptures: an iterator over ruptures with the same TRT</span>
+<span class="sd">        :param iml4: a 4d array of IMLs of shape (N, R, M, P)</span>
+<span class="sd">        :param truncnorm: an instance of scipy.stats.truncnorm</span>
+<span class="sd">        :param epsilons: the epsilon bins</span>
+<span class="sd">        :param monitor: a Monitor instance</span>
+<span class="sd">        :returns: an AccumDict</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sitemesh</span> <span class="o">=</span> <span class="n">sitecol</span><span class="o">.</span><span class="n">mesh</span>
+        <span class="n">acc</span> <span class="o">=</span> <span class="n">AccumDict</span><span class="p">(</span><span class="n">accum</span><span class="o">=</span><span class="p">[])</span>
+        <span class="n">ctx_mon</span> <span class="o">=</span> <span class="n">monitor</span><span class="p">(</span><span class="s1">&#39;disagg_contexts&#39;</span><span class="p">,</span> <span class="n">measuremem</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">pne_mon</span> <span class="o">=</span> <span class="n">monitor</span><span class="p">(</span><span class="s1">&#39;disaggregate_pne&#39;</span><span class="p">,</span> <span class="n">measuremem</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">rupture</span> <span class="ow">in</span> <span class="n">ruptures</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">ctx_mon</span><span class="p">:</span>
+                <span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_contexts</span><span class="p">(</span>
+                    <span class="n">sitecol</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">maximum_distance</span> <span class="ow">and</span>
+                <span class="n">dctx</span><span class="o">.</span><span class="n">rjb</span><span class="o">.</span><span class="n">min</span><span class="p">()</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum_distance</span><span class="p">(</span>
+                    <span class="n">rupture</span><span class="o">.</span><span class="n">tectonic_region_type</span><span class="p">,</span> <span class="n">rupture</span><span class="o">.</span><span class="n">mag</span><span class="p">)):</span>
+                <span class="k">continue</span>  <span class="c1"># rupture away from all sites</span>
+            <span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">r</span><span class="p">,</span> <span class="n">gsim</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">gsim_by_rlzi</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">imt</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iml4</span><span class="o">.</span><span class="n">imts</span><span class="p">):</span>
+                    <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">poe</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iml4</span><span class="o">.</span><span class="n">poes_disagg</span><span class="p">):</span>
+                        <span class="n">iml</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">iml4</span><span class="o">.</span><span class="n">array</span><span class="p">[:,</span> <span class="n">r</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">p</span><span class="p">])</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">pne</span> <span class="o">=</span> <span class="n">cache</span><span class="p">[</span><span class="n">gsim</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">iml</span><span class="p">]</span>
+                        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                            <span class="k">with</span> <span class="n">pne_mon</span><span class="p">:</span>
+                                <span class="n">pne</span> <span class="o">=</span> <span class="n">gsim</span><span class="o">.</span><span class="n">disaggregate_pne</span><span class="p">(</span>
+                                    <span class="n">rupture</span><span class="p">,</span> <span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">iml</span><span class="p">,</span>
+                                    <span class="n">truncnorm</span><span class="p">,</span> <span class="n">epsilons</span><span class="p">)</span>
+                                <span class="n">cache</span><span class="p">[</span><span class="n">gsim</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">iml</span><span class="p">]</span> <span class="o">=</span> <span class="n">pne</span>
+                        <span class="n">acc</span><span class="p">[</span><span class="n">poe</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">imt</span><span class="p">),</span> <span class="n">r</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pne</span><span class="p">)</span>
+            <span class="n">closest_points</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">get_closest_points</span><span class="p">(</span><span class="n">sitemesh</span><span class="p">)</span>
+            <span class="n">acc</span><span class="p">[</span><span class="s1">&#39;mags&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
+            <span class="n">acc</span><span class="p">[</span><span class="s1">&#39;dists&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dctx</span><span class="o">.</span><span class="n">rjb</span><span class="p">)</span>
+            <span class="n">acc</span><span class="p">[</span><span class="s1">&#39;lons&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">closest_points</span><span class="o">.</span><span class="n">lons</span><span class="p">)</span>
+            <span class="n">acc</span><span class="p">[</span><span class="s1">&#39;lats&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">closest_points</span><span class="o">.</span><span class="n">lats</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">acc</span>
 
 
 <span class="nd">@functools</span><span class="o">.</span><span class="n">total_ordering</span>
@@ -391,6 +444,8 @@
     <span class="c1">#:     Direct point parameter for directivity effect centered on the site- and earthquake-specific</span>
     <span class="c1">#      average DPP used. See:</span>
     <span class="c1">#:     See :meth:`~openquake.hazardlib.source.rupture.ParametricProbabilisticRupture.get_dppvalue`.</span>
+    <span class="c1">#: ``rvolc``</span>
+    <span class="c1">#:     Source to site distance passing through surface projection of volcanic zone</span>
     <span class="c1">#:</span>
     <span class="c1">#: All the distances are available from the :class:`DistancesContext`</span>
     <span class="c1">#: object attributes with same names. Values are in kilometers.</span>
@@ -530,78 +585,57 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">_truncnorm_sf</span><span class="p">(</span><span class="n">truncation_level</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">disaggregate_poe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">iml</span><span class="p">,</span>
-                         <span class="n">truncation_level</span><span class="p">,</span> <span class="n">n_epsilons</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">disaggregate_pne</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">iml</span><span class="p">,</span>
+                         <span class="n">truncnorm</span><span class="p">,</span> <span class="n">epsilons</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Disaggregate (separate) PoE of ``iml`` in different contributions</span>
-<span class="sd">        each coming from ``n_epsilons`` distribution bins.</span>
-
-<span class="sd">        If ``truncation_level = 3``, ``n_epsilons = 3``, bin edges are</span>
-<span class="sd">        ``-3 .. -1``, ``-1 .. +1`` and ``+1 .. +3``.</span>
-
-<span class="sd">        :param n_epsilons:</span>
-<span class="sd">            Integer number of bins to split truncated Gaussian distribution to.</span>
+<span class="sd">        each coming from ``epsilons`` distribution bins.</span>
 
 <span class="sd">        Other parameters are the same as for :meth:`get_poes`, with</span>
-<span class="sd">        differences that ``iml`` is only one single intensity level</span>
-<span class="sd">        and ``truncation_level`` is required to be positive.</span>
+<span class="sd">        differences that ``truncation_level`` is required to be positive.</span>
 
 <span class="sd">        :returns:</span>
 <span class="sd">            Contribution to probability of exceedance of ``iml`` coming</span>
-<span class="sd">            from different sigma bands in a form of 1d numpy array with</span>
-<span class="sd">            ``n_epsilons`` floats between 0 and 1.</span>
+<span class="sd">            from different sigma bands in the form of a 2d numpy array of</span>
+<span class="sd">            probabilities with shape (n_sites, n_epsilons)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">truncation_level</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;truncation level must be positive&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_imt</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
-
         <span class="c1"># compute mean and standard deviations</span>
         <span class="n">mean</span><span class="p">,</span> <span class="p">[</span><span class="n">stddev</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
                                                    <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">])</span>
 
         <span class="c1"># compute iml value with respect to standard (mean=0, std=1)</span>
         <span class="c1"># normal distributions</span>
-        <span class="n">iml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_distribution_values</span><span class="p">(</span><span class="n">iml</span><span class="p">)</span>
-        <span class="n">standard_imls</span> <span class="o">=</span> <span class="p">(</span><span class="n">iml</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">stddev</span>
+        <span class="n">standard_imls</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_distribution_values</span><span class="p">(</span><span class="n">iml</span><span class="p">)</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">stddev</span>
 
-        <span class="n">distribution</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">truncnorm</span><span class="p">(</span><span class="o">-</span> <span class="n">truncation_level</span><span class="p">,</span>
-                                             <span class="n">truncation_level</span><span class="p">)</span>
-        <span class="n">epsilons</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span> <span class="n">truncation_level</span><span class="p">,</span> <span class="n">truncation_level</span><span class="p">,</span>
-                                  <span class="n">n_epsilons</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="c1"># compute epsilon bins contributions</span>
-        <span class="n">contribution_by_bands</span> <span class="o">=</span> <span class="p">(</span><span class="n">distribution</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">epsilons</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span>
-                                 <span class="n">distribution</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">epsilons</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">contribution_by_bands</span> <span class="o">=</span> <span class="p">(</span><span class="n">truncnorm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">epsilons</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span>
+                                 <span class="n">truncnorm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">epsilons</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
 
         <span class="c1"># take the minimum epsilon larger than standard_iml</span>
-        <span class="n">iml_bin_indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">epsilons</span><span class="p">,</span> <span class="n">standard_imls</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-            <span class="c1"># take full disaggregated distribution for the case of</span>
-            <span class="c1"># ``iml &lt;= mean - truncation_level * stddev``</span>
-            <span class="n">contribution_by_bands</span>
-            <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span>
-
-            <span class="c1"># take zeros if ``iml &gt;= mean + truncation_level * stddev``</span>
-            <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_epsilons</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="n">n_epsilons</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">else</span>
-
-            <span class="c1"># for other cases (when ``iml`` falls somewhere in the</span>
-            <span class="c1"># histogram):</span>
-            <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span>
-                <span class="c1"># take zeros for bins that are on the left hand side</span>
-                <span class="c1"># from the bin ``iml`` falls into,</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
-                <span class="c1"># ... area of the portion of the bin containing ``iml``</span>
-                <span class="c1"># (the portion is limited on the left hand side by</span>
-                <span class="c1"># ``iml`` and on the right hand side by the bin edge),</span>
-                <span class="p">[</span><span class="n">distribution</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">standard_imls</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span>
-                 <span class="n">contribution_by_bands</span><span class="p">[</span><span class="n">idx</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()],</span>
-                <span class="c1"># ... and all bins on the right go unchanged.</span>
-                <span class="n">contribution_by_bands</span><span class="p">[</span><span class="n">idx</span><span class="p">:]</span>
-            <span class="p">))</span>
-
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iml_bin_indices</span><span class="p">)</span>
-        <span class="p">])</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">epsilons</span><span class="p">,</span> <span class="n">standard_imls</span><span class="p">)</span>
+        <span class="n">poe_by_site</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">n_epsilons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">epsilons</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">lvl</span><span class="p">,</span> <span class="nb">bin</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">standard_imls</span><span class="p">,</span> <span class="n">bins</span><span class="p">):</span>  <span class="c1"># one per site</span>
+            <span class="k">if</span> <span class="nb">bin</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">poe_by_site</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contribution_by_bands</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">bin</span> <span class="o">&gt;</span> <span class="n">n_epsilons</span><span class="p">:</span>
+                <span class="n">poe_by_site</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_epsilons</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># for other cases (when ``lvl`` falls somewhere in the</span>
+                <span class="c1"># histogram):</span>
+                <span class="n">poe</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
+                    <span class="c1"># take zeros for bins that are on the left hand side</span>
+                    <span class="c1"># from the bin ``lvl`` falls into,</span>
+                    <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">bin</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="c1"># ... area of the portion of the bin containing ``lvl``</span>
+                    <span class="c1"># (the portion is limited on the left hand side by</span>
+                    <span class="c1"># ``lvl`` and on the right hand side by the bin edge),</span>
+                    <span class="p">[</span><span class="n">truncnorm</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span> <span class="o">-</span> <span class="n">contribution_by_bands</span><span class="p">[</span><span class="nb">bin</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()],</span>
+                    <span class="c1"># ... and all bins on the right go unchanged.</span>
+                    <span class="n">contribution_by_bands</span><span class="p">[</span><span class="nb">bin</span><span class="p">:]])</span>
+                <span class="n">poe_by_site</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poe</span><span class="p">)</span>
+        <span class="n">poes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">poe_by_site</span><span class="p">)</span>  <span class="c1"># shape (n_sites, n_epsilons)</span>
+        <span class="k">return</span> <span class="n">rupture</span><span class="o">.</span><span class="n">get_probability_no_exceedance</span><span class="p">(</span><span class="n">poes</span><span class="p">)</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_distribution_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
@@ -634,7 +668,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;imt must be an instance of IMT subclass&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;imt </span><span class="si">%s</span><span class="s1"> is not supported by </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
-                             <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="p">))</span>
+                             <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">__lt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -657,7 +691,7 @@
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">kwargs</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">=</span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">kv</span> <span class="k">for</span> <span class="n">kv</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()))</span>
-        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">__name__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">(</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -750,7 +784,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns numpy array of natural logarithms of ``values``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+            <span class="c1"># avoid RuntimeWarning: divide by zero encountered in log</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_imt_unit_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -788,7 +825,7 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return True if ``other`` has same attributes with same values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slots_</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_slots_</span><span class="p">:</span>
                 <span class="n">self_other</span> <span class="o">=</span> <span class="p">[</span>
                     <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span>
@@ -830,7 +867,7 @@
 <span class="sd">    in a result context object.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">_slots_</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rx&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">,</span> <span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;repi&#39;</span><span class="p">,</span> <span class="s1">&#39;ry0&#39;</span><span class="p">,</span> <span class="s1">&#39;rcdpp&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;azimuth&#39;</span><span class="p">,</span> <span class="s1">&#39;hanging_wall&#39;</span><span class="p">)</span>
+               <span class="s1">&#39;azimuth&#39;</span><span class="p">,</span> <span class="s1">&#39;hanging_wall&#39;</span><span class="p">,</span> <span class="s1">&#39;rvolc&#39;</span><span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">RuptureContext</span><span class="p">(</span><span class="n">BaseContext</span><span class="p">):</span>
@@ -852,7 +889,7 @@
 
 
 <span class="k">class</span> <span class="nc">CoeffsTable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">r&quot;&quot;&quot;</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Instances of :class:`CoeffsTable` encapsulate tables of coefficients</span>
 <span class="sd">    corresponding to different IMTs.</span>
 
@@ -955,20 +992,46 @@
 <span class="sd">    Traceback (most recent call last):</span>
 <span class="sd">        ...</span>
 <span class="sd">    KeyError: SA(period=0.01, damping=5)</span>
+
+<span class="sd">    It is also possible to instantiate a table from a tuple of dictionaries,</span>
+<span class="sd">    corresponding to the SA coefficients and non-SA coefficients:</span>
+
+<span class="sd">    &gt;&gt;&gt; coeffs = {imt.SA(0.1): {&quot;a&quot;: 1.0, &quot;b&quot;: 2.0},</span>
+<span class="sd">    ...           imt.SA(1.0): {&quot;a&quot;: 3.0, &quot;b&quot;: 4.0},</span>
+<span class="sd">    ...           imt.PGA(): {&quot;a&quot;: 0.1, &quot;b&quot;: 1.0},</span>
+<span class="sd">    ...           imt.PGV(): {&quot;a&quot;: 0.5, &quot;b&quot;: 10.0}}</span>
+<span class="sd">    &gt;&gt;&gt; ct = CoeffsTable(sa_damping=5, table=coeffs)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;table&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;CoeffsTable requires &quot;table&quot; kwarg&#39;</span><span class="p">)</span>
-        <span class="n">table</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">sa_damping</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;sa_damping&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;CoeffsTable got unexpected kwargs: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_table_from_str</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">sa_damping</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">imt_module</span><span class="o">.</span><span class="n">SA</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;CoeffsTable cannot be constructed with inputs &quot;</span>
+                            <span class="s2">&quot;of the form &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">table</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setup_table_from_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">sa_damping</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds the input tables from a string definition</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
         <span class="n">header</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;IMT&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;first column in a table must be IMT&#39;</span><span class="p">)</span>
         <span class="n">coeff_names</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
             <span class="n">row</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
             <span class="n">imt_name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>

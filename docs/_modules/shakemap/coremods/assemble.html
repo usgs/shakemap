@@ -64,7 +64,8 @@
 
 <div class="viewcode-block" id="AssembleModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.assemble.html#shakemap.coremods.assemble.AssembleModule">[docs]</a><span class="k">class</span> <span class="nc">AssembleModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    assemble -- Assemble ShakeMap input data into the shake_data.hdf input file.</span>
+<span class="sd">    assemble -- Assemble ShakeMap input data into the shake_data.hdf input</span>
+<span class="sd">                      file.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;assemble&#39;</span>
@@ -178,7 +179,8 @@
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">loc_file</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;prediction file &#39;</span><span class="si">%s</span><span class="s2">&#39; is not &quot;</span>
                                             <span class="s2">&quot;a valid file&quot;</span> <span class="o">%</span> <span class="n">loc_file</span><span class="p">)</span>
-                <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">loc_file</span>
+                <span class="n">global_config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="n">loc_file</span>
 
         <span class="n">config</span> <span class="o">=</span> <span class="n">global_config</span><span class="o">.</span><span class="n">dict</span><span class="p">()</span>
 

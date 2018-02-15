@@ -53,9 +53,12 @@
     <span class="sd">&quot;&quot;&quot;Get list of GMPEs and their weights for a given earthquake.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        origin (Origin object): ShakeMap Origin object, containing earthquake info.</span>
-<span class="sd">        config (dict-like): Configuration information regarding earthquake type.</span>
-<span class="sd">        tensor_params (dict): Containing fields NP1/NP2, each a dict with strike/dip/rake.</span>
+<span class="sd">        origin (Origin object): ShakeMap Origin object, containing earthquake</span>
+<span class="sd">            info.</span>
+<span class="sd">        config (dict-like): Configuration information regarding earthquake</span>
+<span class="sd">            type.</span>
+<span class="sd">        tensor_params (dict): Containing fields NP1/NP2, each a dict with</span>
+<span class="sd">            strike/dip/rake.</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        list: String GMPEs selected for this earthquake.</span>
 <span class="sd">        ndarray: Float weights for corresponding GMPEs.</span>
@@ -101,29 +104,37 @@
 
 <span class="sd">    The results here contain probabilities that can be rolled up in many ways:</span>
 <span class="sd">      - The probabilities of acr,scr,volcanic, and subduction should sum to 1.</span>
-<span class="sd">      - The probabilities of acr_X,scr_X,volcanic_X, crustal, interface and intraslab </span>
+<span class="sd">      - The probabilities of acr_X,scr_X,volcanic_X, crustal, interface and</span>
+<span class="sd">        intraslab</span>
 <span class="sd">        should sum to 1.</span>
 <span class="sd">      - The probabilities of acr_X should sum to acr, and so on.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        origin (Origin object): ShakeMap Origin object, containing earthquake info.</span>
-<span class="sd">        config (dict-like): Configuration information regarding earthquake type.</span>
-<span class="sd">        tensor_params (dict): Containing fields NP1/NP2, each a dict with strike/dip/rake.</span>
+<span class="sd">        origin (Origin object): ShakeMap Origin object, containing earthquake</span>
+<span class="sd">            info.</span>
+<span class="sd">        config (dict-like): Configuration information regarding earthquake</span>
+<span class="sd">            type.</span>
+<span class="sd">        tensor_params (dict): Containing fields NP1/NP2, each a dict with</span>
+<span class="sd">            strike/dip/rake.</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Probabilities for each earthquake type, with fields:</span>
 <span class="sd">              - acr Probability that the earthquake is in an active region.</span>
-<span class="sd">              - acr_X Probability that the earthquake is in a depth layer of ACR, </span>
-<span class="sd">                      starting from the top.</span>
+<span class="sd">              - acr_X Probability that the earthquake is in a depth layer of</span>
+<span class="sd">                ACR, starting from the top.</span>
 <span class="sd">              - scr Probability that the earthquake is in a stable region.</span>
-<span class="sd">              - scr_X Probability that the earthquake is in a depth layer of SCR, </span>
-<span class="sd">                      starting from the top.</span>
-<span class="sd">              - volcanic Probability that the earthquake is in a volcanic region.</span>
-<span class="sd">              - volcanic_X Probability that the earthquake is in a depth layer of </span>
-<span class="sd">                           Volcanic, starting from the top.</span>
-<span class="sd">              - subduction Probability that the earthquake is in a subduction zone.</span>
-<span class="sd">              - crustal Probability that the earthquake is in the crust above an interface.</span>
+<span class="sd">              - scr_X Probability that the earthquake is in a depth layer of</span>
+<span class="sd">                SCR, starting from the top.</span>
+<span class="sd">              - volcanic Probability that the earthquake is in a volcanic</span>
+<span class="sd">                region.</span>
+<span class="sd">              - volcanic_X Probability that the earthquake is in a depth layer</span>
+<span class="sd">                of Volcanic, starting from the top.</span>
+<span class="sd">              - subduction Probability that the earthquake is in a subduction</span>
+<span class="sd">                zone.</span>
+<span class="sd">              - crustal Probability that the earthquake is in the crust above</span>
+<span class="sd">                an interface.</span>
 <span class="sd">              - interface Probability that the earthquake is on the interface.</span>
-<span class="sd">              - intraslab Probability that the earthquake is in the slab below interface.</span>
+<span class="sd">              - intraslab Probability that the earthquake is in the slab below</span>
+<span class="sd">                interface.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">selector</span> <span class="o">=</span> <span class="n">SubductionSelector</span><span class="p">()</span>
@@ -135,46 +146,56 @@
     <span class="n">in_subduction</span> <span class="o">=</span> <span class="n">strec_results</span><span class="p">[</span><span class="s1">&#39;TectonicRegion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Subduction&#39;</span>
     <span class="n">above_slab</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">strec_results</span><span class="p">[</span><span class="s1">&#39;SlabModelDepth&#39;</span><span class="p">])</span>
     <span class="k">if</span> <span class="n">in_subduction</span><span class="p">:</span>
-        <span class="n">subduction_probs</span> <span class="o">=</span> <span class="n">get_subduction_probs</span><span class="p">(</span><span class="n">strec_results</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span>
-                                                <span class="n">above_slab</span><span class="p">)</span>
+        <span class="n">subduction_probs</span> <span class="o">=</span> <span class="n">get_subduction_probs</span><span class="p">(</span>
+            <span class="n">strec_results</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">above_slab</span>
+        <span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">subduction_probs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">subduction_probs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">subduction_probs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;crustal&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-                            <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-                            <span class="s1">&#39;intraslab&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">}</span>
+        <span class="n">subduction_probs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;crustal&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s1">&#39;intraslab&#39;</span><span class="p">:</span> <span class="mf">0.0</span>
+        <span class="p">}</span>
 
     <span class="n">region_probs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">subduction_probs</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">region_probs</span><span class="p">,</span> <span class="n">strec_results</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_region_probs"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.probs.html#shakemap.utils.probs.get_region_probs">[docs]</a><span class="k">def</span> <span class="nf">get_region_probs</span><span class="p">(</span><span class="n">eid</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">strec_results</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Calculate the regional probabilities (not including subduction interface etc).</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate the regional probabilities (not including subduction interface</span>
+<span class="sd">    etc).</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        eid (str): Earthquake ID (i.e., us1000cdn0)</span>
 <span class="sd">        depth (float): Depth of earthquake.</span>
 <span class="sd">        strec_results (Series): Pandas series containing STREC output.</span>
-<span class="sd">        config (dict-like): Configuration information regarding earthquake type.</span>
+<span class="sd">        config (dict-like): Configuration information regarding earthquake</span>
+<span class="sd">            type.</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Probabilities for each earthquake type, with fields:</span>
 <span class="sd">              - acr Probability that the earthquake is in an active region.</span>
-<span class="sd">              - acr_X Probability that the earthquake is in a depth layer of ACR, </span>
-<span class="sd">                      starting from the top.</span>
+<span class="sd">              - acr_X Probability that the earthquake is in a depth layer of</span>
+<span class="sd">                ACR, starting from the top.</span>
 <span class="sd">              - scr Probability that the earthquake is in a stable region.</span>
-<span class="sd">              - scr_X Probability that the earthquake is in a depth layer of SCR, </span>
-<span class="sd">                      starting from the top.</span>
-<span class="sd">              - volcanic Probability that the earthquake is in a volcanic region.</span>
-<span class="sd">              - volcanic_X Probability that the earthquake is in a depth layer of </span>
-<span class="sd">                           Volcanic, starting from the top.</span>
-<span class="sd">              - subduction Probability that the earthquake is in a subduction zone.</span>
+<span class="sd">              - scr_X Probability that the earthquake is in a depth layer of</span>
+<span class="sd">                SCR, starting from the top.</span>
+<span class="sd">              - volcanic Probability that the earthquake is in a volcanic</span>
+<span class="sd">                region.</span>
+<span class="sd">              - volcanic_X Probability that the earthquake is in a depth layer</span>
+<span class="sd">                of Volcanic, starting from the top.</span>
+<span class="sd">              - subduction Probability that the earthquake is in a subduction</span>
+<span class="sd">                zone.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">region_probs</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">region_mapping</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;scr&#39;</span><span class="p">:</span> <span class="s1">&#39;DistanceToStable&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;acr&#39;</span><span class="p">:</span> <span class="s1">&#39;DistanceToActive&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;volcanic&#39;</span><span class="p">:</span> <span class="s1">&#39;DistanceToVolcanic&#39;</span><span class="p">,</span>
-                      <span class="s1">&#39;subduction&#39;</span><span class="p">:</span> <span class="s1">&#39;DistanceToSubduction&#39;</span><span class="p">}</span>
+    <span class="n">region_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;scr&#39;</span><span class="p">:</span> <span class="s1">&#39;DistanceToStable&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;acr&#39;</span><span class="p">:</span> <span class="s1">&#39;DistanceToActive&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;volcanic&#39;</span><span class="p">:</span> <span class="s1">&#39;DistanceToVolcanic&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;subduction&#39;</span><span class="p">:</span> <span class="s1">&#39;DistanceToSubduction&#39;</span>
+    <span class="p">}</span>
     <span class="n">layer_probs</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">rdict</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">distance</span> <span class="o">=</span> <span class="n">strec_results</span><span class="p">[</span><span class="n">region_mapping</span><span class="p">[</span><span class="n">region</span><span class="p">]]</span>
@@ -238,13 +259,16 @@
 <span class="sd">        strec_results (Series): Pandas series containing STREC output.</span>
 <span class="sd">        depth (float): Depth of earthquake.</span>
 <span class="sd">        mag (float): Earthquake magnitude.</span>
-<span class="sd">        config (dict-like): Configuration information regarding earthquake type.</span>
+<span class="sd">        config (dict-like): Configuration information regarding earthquake</span>
+<span class="sd">            type.</span>
 <span class="sd">        above_slab (bool): Is earthquake above a defined slab?</span>
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Probabilities for each earthquake type, with fields:</span>
-<span class="sd">              - crustal Probability that the earthquake is in the crust above an interface.</span>
+<span class="sd">              - crustal Probability that the earthquake is in the crust above</span>
+<span class="sd">                an interface.</span>
 <span class="sd">              - interface Probability that the earthquake is on the interface.</span>
-<span class="sd">              - intraslab Probability that the earthquake is in the slab below interface.</span>
+<span class="sd">              - intraslab Probability that the earthquake is in the slab below</span>
+<span class="sd">                interface.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">subcfg</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;subduction&#39;</span><span class="p">]</span>
