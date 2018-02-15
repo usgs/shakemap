@@ -312,7 +312,8 @@ class ShakeMapOutputContainer(ShakeMapContainer):
 
     This class provides methods for getting and setting IMT data.
     The philosophy here is that an IMT consists of both the mean results and
-    the standard deviations of those results, thus getIMT() returns a
+    the standard deviations of those results, thus getIMTArrays() (when data
+    type is 'points') and getIMTGrids() (when data type is 'grids') returns a
     dictionary with both, plus metadata for each data layer.
 
 
@@ -333,6 +334,63 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             data_type_group = self._hdfobj[group_name]
             return data_type_group.attrs['data_type']
         return None
+
+    def __repr__(self):
+        """Return a string representation of the container.
+        """
+        out = 'Data type: %s\n' % self.getDataType()
+        if self.getDataType() == 'grid':
+            out = out + '    use "getIMTGrids" method to access '\
+                        'interpolated IMTs\n'
+        else:
+            out = out + '    use "getIMTArrays" method to access '\
+                        'interpolated IMTs\n'
+        try:
+            rupt = self.getRuptureDict()
+            rupt_obj = rupture_from_dict(rupt)
+            out = out + "Rupture: %s\n" % type(rupt_obj)
+            out = out + "    locstring: %s\n" % rupt_obj._origin.locstring
+            out = out + "    magnitude: %.1f\n" % rupt_obj._origin.mag
+            out = out + "    time: %s\n" % rupt_obj._origin.time
+        except AttributeError:
+            out = out + "Rupture: None\n"
+        try:
+            self.getConfig()
+            out = out + "Config: use 'getConfig' method\n"
+        except AttributeError:
+            out = out + "Config: None\n"
+        try:
+            stations = self.getStationDict()['features']
+            nsta = len(stations)
+            sname = [s['properties']['channels'][0]['name'] for s in stations]
+            n_mi = len([s for s in sname if s == 'mmi'])
+            out = out + "Stations: use 'getStationDict' method\n"
+            out = out + "    # instrumental stations: %i\n" % (nsta - n_mi)
+            out = out + "    # macroseismic stations: %i\n" % n_mi
+        except AttributeError:
+            out = out + "Stations: None\n"
+        try:
+            self.getMetadata()
+            out = out + "Metadata: use 'getMetadata' method\n"
+        except LookupError:
+            out = out + "Metadata: None\n"
+        out = out + "Available IMTs (components):\n"
+        imt_list = sorted(self.getIMTs())
+        for i in range(len(imt_list)):
+            components = self.getComponents(imt_list[i])
+            comp_str = ", ".join(components)
+            out = out + '    %s (%s)\n' % (imt_list[i], comp_str)
+
+        return out
+
+    def getMetadata(self):
+        """Get metadata dictionary, i.e., 'info.json'.
+
+        Returns:
+            dict: Metadata dictionary.
+        """
+        info_str = self.getString('info.json')
+        return json.loads(info_str)
 
     def setDataType(self, datatype):
         """
@@ -610,22 +668,26 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         }
         return imt_dict
 
-    def getIMTs(self, component):
-        """
-        Return list of names of IMTs matching input component type.
+    def getIMTs(self, component=None):
+        """Return list of names of available IMTs.
 
         Args:
-            component (str): Name of component ('maximum', 'rotd50', etc.)
+            component (str): Optional string to filter result to only include
+                IMTs available for this component. Default of None returns
+                all IMTs regardless of component.
 
         Returns:
-            list: List of names of IMTs matching component stored in container.
+            list: List of names of IMTs.
         """
         imt_groups = _get_type_list(self._hdfobj, 'imt')
-        comp_groups = []
-        for imt_group in imt_groups:
-            if imt_group.find(component) > -1:
-                comp_groups.append(imt_group.replace('_' + component, ''))
-        return comp_groups
+        if component is not None:
+            imts = []
+            for imt_group in imt_groups:
+                if imt_group.find(component) > -1:
+                    imts.append(imt_group.replace('_' + component, ''))
+        else:
+            imts = list(set([i.split('_')[0] for i in imt_groups]))
+        return imts
 
     def getComponents(self, imt_name):
         """

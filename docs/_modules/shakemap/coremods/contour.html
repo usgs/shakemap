@@ -212,13 +212,6 @@
 <span class="sd">            when configured IMT is not found in container.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">jsonstr</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
-    <span class="n">infojson</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">jsonstr</span><span class="p">)</span>
-    <span class="n">event_info</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;event_id&#39;</span><span class="p">:</span> <span class="n">infojson</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="n">infojson</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="n">infojson</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
-    <span class="p">}</span>
 
     <span class="n">imtlist</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;contours&#39;</span><span class="p">][</span><span class="s1">&#39;IMTS&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 
@@ -275,7 +268,8 @@
                 <span class="k">if</span> <span class="s1">&#39;intervals&#39;</span> <span class="ow">in</span> <span class="n">imtype_spec</span><span class="p">:</span>
                     <span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">imtype_spec</span><span class="p">[</span><span class="s1">&#39;intervals&#39;</span><span class="p">]]</span>
 
-                <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">intervals</span><span class="p">)</span>
+                <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">intervals</span><span class="p">,</span>
+                                       <span class="n">filter_size</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">line_strings</span><span class="p">:</span>
                     <span class="n">vector_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
 

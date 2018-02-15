@@ -180,7 +180,7 @@
 <span class="c1">#        pass</span>
 
 <div class="viewcode-block" id="StationList.loadFromSQL"><a class="viewcode-back" href="../../shakelib/shakelib.station.html#shakelib.station.StationList.loadFromSQL">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">loadFromSQL</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">dbfile</span><span class="o">=</span><span class="s1">&#39;:memory:&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">loadFromSQL</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">dbfile</span><span class="o">=</span><span class="s1">&#39;:memory:&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a new object from saved SQL code (see :meth:`dumpToSQL`).</span>
 
@@ -196,7 +196,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbfile</span><span class="p">)</span>
-        <span class="bp">self</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">executescript</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
@@ -215,7 +215,7 @@
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">iterdump</span><span class="p">()))</span></div>
 
 <div class="viewcode-block" id="StationList.loadFromXML"><a class="viewcode-back" href="../../shakelib/shakelib.station.html#shakelib.station.StationList.loadFromXML">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">loadFromXML</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xmlfiles</span><span class="p">,</span> <span class="n">dbfile</span><span class="o">=</span><span class="s1">&#39;:memory:&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">loadFromXML</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">xmlfiles</span><span class="p">,</span> <span class="n">dbfile</span><span class="o">=</span><span class="s1">&#39;:memory:&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a StationList object by reading one or more ShakeMap XML input</span>
 <span class="sd">        files.</span>
@@ -233,7 +233,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Create the database and tables</span>
         <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbfile</span><span class="p">)</span>
-        <span class="bp">self</span> <span class="o">=</span> <span class="n">cls</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_createTables</span><span class="p">()</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">addData</span><span class="p">(</span><span class="n">xmlfiles</span><span class="p">)</span></div>
 
@@ -521,7 +521,7 @@
 <span class="sd">        psa30), the keys in the dictionary would be:</span>
 
 <span class="sd">        &#39;id&#39;, &#39;network&#39;, &#39;code&#39;, &#39;name&#39;, &#39;lat&#39;, &#39;lon&#39;, &#39;elev&#39;, &#39;vs30&#39;,</span>
-<span class="sd">        &#39;stddev&#39;, &#39;instrumented&#39;, &#39;PGA&#39;, &#39;PGA_sd&#39;, &#39;PGV&#39;, &#39;PGA_sd&#39;, </span>
+<span class="sd">        &#39;stddev&#39;, &#39;instrumented&#39;, &#39;PGA&#39;, &#39;PGA_sd&#39;, &#39;PGV&#39;, &#39;PGA_sd&#39;,</span>
 <span class="sd">        &#39;SA(0.3)&#39;, &#39;SA(0.3)_sd, &#39;SA(1.0)&#39;, &#39;SA(1.0)_sd, &#39;SA(3.0)&#39;,</span>
 <span class="sd">        &#39;SA(3.0)_sd&#39;</span>
 

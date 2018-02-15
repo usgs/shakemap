@@ -25,8 +25,6 @@
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="shakelib.plotting" href="shakelib.plotting.html" />
-    <link rel="prev" title="shakelib.gmpe" href="shakelib.gmpe.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -60,7 +58,8 @@ specified in the constructor.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>mean</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – the mean value returned by the GMPE (default=0).
 This value is returned for all locations, regardles of
-the IMT or the contents of sites, rupture and distance contexts.</li>
+the IMT or the contents of sites, rupture and distance
+contexts.</li>
 <li><strong>phi</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – the within-event standard deviation returned by the
 GMPE (default=0.8)</li>
 <li><strong>tau</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – the between-event standard deviation returned by the
@@ -78,7 +77,7 @@ GMPE (default=0.6)</li>
 
 <dl class="attribute">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES">
-<code class="descname">DEFINED_FOR_INTENSITY_MEASURE_TYPES</code><em class="property"> = {&lt;class 'openquake.hazardlib.imt.PGA'&gt;, &lt;class 'openquake.hazardlib.imt.SA'&gt;, &lt;class 'openquake.hazardlib.imt.PGV'&gt;}</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DEFINED_FOR_INTENSITY_MEASURE_TYPES</code><em class="property"> = {&lt;class 'openquake.hazardlib.imt.PGA'&gt;, &lt;class 'openquake.hazardlib.imt.PGV'&gt;, &lt;class 'openquake.hazardlib.imt.SA'&gt;}</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_INTENSITY_MEASURE_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -88,7 +87,7 @@ GMPE (default=0.6)</li>
 
 <dl class="attribute">
 <dt id="shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES">
-<code class="descname">DEFINED_FOR_STANDARD_DEVIATION_TYPES</code><em class="property"> = {'Inter event', 'Intra event', 'Total'}</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
+<code class="descname">DEFINED_FOR_STANDARD_DEVIATION_TYPES</code><em class="property"> = {'Intra event', 'Inter event', 'Total'}</em><a class="headerlink" href="#shakelib.gmpe.nullgmpe.NullGMPE.DEFINED_FOR_STANDARD_DEVIATION_TYPES" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -149,30 +148,12 @@ any of the other contexts. The imt is also ignored.</p>
 
 
 <h3>Navigation</h3>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a><ul class="current">
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakelib.gmpe.nullgmpe</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="shakelib.html">ShakeLib API</a></li>
 </ul>
 
 

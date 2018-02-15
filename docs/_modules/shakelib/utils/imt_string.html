@@ -65,7 +65,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">oqimt</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">]:</span>
         <span class="k">return</span> <span class="n">oqimt</span>
-    <span class="n">float_pattern</span> <span class="o">=</span> <span class="s2">r&quot;[-+]?\d*\.\d+|\d+&quot;</span>
+    <span class="n">float_pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;[-+]?\d*\.\d+|\d+&quot;</span>
     <span class="n">periods</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="n">float_pattern</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">periods</span><span class="p">):</span>
         <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;IMT string &quot;</span><span class="si">%s</span><span class="s1">&quot; has no file-name friendly representation.&#39;</span>

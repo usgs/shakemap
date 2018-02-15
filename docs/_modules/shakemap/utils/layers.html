@@ -44,6 +44,7 @@
 <span></span><span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">pyproj</span>
@@ -173,8 +174,8 @@
             <span class="k">if</span> <span class="n">layer</span> <span class="o">==</span> <span class="s1">&#39;layer_dir&#39;</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="k">if</span> <span class="n">layer</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">geo_layers</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Error: cannot find layer </span><span class="si">%s</span><span class="s1"> in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
-                                    <span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">layer_dir</span><span class="p">))</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Error: cannot find layer </span><span class="si">%s</span><span class="s1"> in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
+                             <span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="n">layer_dir</span><span class="p">))</span>
                 <span class="k">continue</span>
             <span class="n">ldist</span> <span class="o">=</span> <span class="n">geo_layers</span><span class="p">[</span><span class="n">layer</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">ldist</span> <span class="o">&lt;</span> <span class="n">min_dist_to_layer</span><span class="p">:</span>

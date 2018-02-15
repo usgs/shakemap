@@ -52,15 +52,14 @@
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.const</span> <span class="k">import</span> <span class="n">IMC</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.imt</span> <span class="k">import</span> <span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span><span class="p">,</span> <span class="n">SA</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.imt</span> <span class="k">import</span> <span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span>
 
 
 <div class="viewcode-block" id="BooreKishida2017"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017">[docs]</a><span class="k">class</span> <span class="nc">BooreKishida2017</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class implements the Boore and Kishida (2017) conversions for</span>
-<span class="sd">    horizontal intensity measure components. </span>
+<span class="sd">    horizontal intensity measure components.</span>
 
 <span class="sd">    This class explicitly supports the following subset of the conversions</span>
 <span class="sd">    provided by B&amp;K (specified as OpenQuake IMCs):</span>
@@ -73,10 +72,10 @@
 <span class="sd">        - GMRotI50 &lt;=&gt; GREATER_OF_TWO_HORIZONTAL</span>
 <span class="sd">        - AVERAGE_HORIZONTAL &lt;=&gt; GREATER_OF_TWO_HORIZONTAL</span>
 
-<span class="sd">    Not supported are IMCs for which there is no OpenQuake equivalent; </span>
-<span class="sd">    also not supported are chained conversions (that is, we do not </span>
-<span class="sd">    support conversions from A to C when conversions from A to B and </span>
-<span class="sd">    B to C are available; these must be done in two steps. For IMCs </span>
+<span class="sd">    Not supported are IMCs for which there is no OpenQuake equivalent;</span>
+<span class="sd">    also not supported are chained conversions (that is, we do not</span>
+<span class="sd">    support conversions from A to C when conversions from A to B and</span>
+<span class="sd">    B to C are available; these must be done in two steps. For IMCs</span>
 <span class="sd">    not explicitly</span>
 <span class="sd">    supported by B&amp;K, we assume the IMC is equivalent to the geometric</span>
 <span class="sd">    mean (which B&amp;K call GM_AR), based on our reading of</span>
@@ -86,7 +85,7 @@
 
 <span class="sd">        Boore, D.M. and T. Kishida (2017). Relations between some</span>
 <span class="sd">        horizontal-component ground-motion intensity measures used</span>
-<span class="sd">        in practice. Bulletin of the Seismological Society of </span>
+<span class="sd">        in practice. Bulletin of the Seismological Society of</span>
 <span class="sd">        America, 107(1), 334-343, doi: 10.1785/0120160250.</span>
 
 <span class="sd">        Beyer, K., &amp; Bommer, J. J. (2006). Relationships between median values</span>
@@ -124,8 +123,8 @@
 <span class="sd">            imt (OpenQuake IMT): The intensity measure type of the input</span>
 <span class="sd">                ground motions. Valid IMTs are PGA, PGV, and SA.</span>
 <span class="sd">            amps (array): A numpy array of the (logged) ground motions</span>
-<span class="sd">                to be converted. </span>
-<span class="sd">            rrups (array): A numpy array of the same shape as amps, </span>
+<span class="sd">                to be converted.</span>
+<span class="sd">            rrups (array): A numpy array of the same shape as amps,</span>
 <span class="sd">                containing the rupture distances of the ground motions.</span>
 <span class="sd">            mag (float): The earthquake magnitude.</span>
 
@@ -142,7 +141,7 @@
 
         <span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getParamsFromIMT</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
 
-        <span class="n">rrups_clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rrups</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+        <span class="n">rrups_clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rrups</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">mag</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">mag</span> <span class="o">=</span> <span class="mf">2.0</span>
         <span class="k">elif</span> <span class="n">mag</span> <span class="o">&gt;</span> <span class="mi">9</span><span class="p">:</span>
@@ -165,13 +164,13 @@
 
 <div class="viewcode-block" id="BooreKishida2017.convertStddevs"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertStddevs">[docs]</a>    <span class="k">def</span> <span class="nf">convertStddevs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddevs</span><span class="p">,</span> <span class="n">rrups</span><span class="p">,</span> <span class="n">mag</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return an array of standard deviations converted from one IMC </span>
+<span class="sd">        Return an array of standard deviations converted from one IMC</span>
 <span class="sd">        to another.</span>
 
 <span class="sd">        Note that the action of this method is to always increase the</span>
 <span class="sd">        input standard deviations. Thus, while converting from one IMC</span>
 <span class="sd">        to another and then back again will yield the original ground</span>
-<span class="sd">        motions via convertAmps(), the standard deviations will be </span>
+<span class="sd">        motions via convertAmps(), the standard deviations will be</span>
 <span class="sd">        inflated by both conversions via this method.</span>
 
 <span class="sd">        Args:</span>

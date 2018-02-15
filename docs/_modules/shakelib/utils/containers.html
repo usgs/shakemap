@@ -45,7 +45,6 @@
 
 <span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
@@ -108,7 +107,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">dropString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">_</span> <span class="o">=</span> <span class="n">rupture_from_dict</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
+                <span class="n">rupture_from_dict</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input dict does not represent a rupture object.&#39;</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
@@ -154,7 +153,8 @@
 <span class="sd">        Args:</span>
 <span class="sd">            stationlist (StationList): StationList object.</span>
 <span class="sd">        Raises:</span>
-<span class="sd">            TypeError: If input object or dictionary is not a StationList object.</span>
+<span class="sd">            TypeError: If input object or dictionary is not a StationList</span>
+<span class="sd">                object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;stations&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dropString</span><span class="p">(</span><span class="s1">&#39;stations&#39;</span><span class="p">)</span>
@@ -254,27 +254,29 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="ShakeMapInputContainer.createFromInput"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.createFromInput">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">createFromInput</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventfile</span><span class="p">,</span> <span class="n">version_history</span><span class="p">,</span> <span class="n">rupturefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                        <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">datafiles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">createFromInput</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventfile</span><span class="p">,</span> <span class="n">version_history</span><span class="p">,</span>
+                        <span class="n">rupturefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">datafiles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiate an InputContainer from ShakeMap input data.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            filename (str): Path to HDF5 file that will be created to encapsulate all</span>
-<span class="sd">                input data.</span>
+<span class="sd">            filename (str): Path to HDF5 file that will be created to</span>
+<span class="sd">                encapsulate all input data.</span>
 <span class="sd">            config (dict): Dictionary containing all configuration information</span>
 <span class="sd">                necessary for ShakeMap ground motion and other calculations.</span>
 <span class="sd">            eventfile (str): Path to ShakeMap event.xml file.</span>
 <span class="sd">            rupturefile (str): Path to ShakeMap rupture text or JSON file.</span>
 <span class="sd">            sourcefile (str): Path to ShakeMap source.txt file.</span>
 <span class="sd">            momentfile (str): Path to ShakeMap moment.xml file.</span>
-<span class="sd">            datafiles (list): List of ShakeMap data (DYFI, strong motion) files.</span>
+<span class="sd">            datafiles (list): List of ShakeMap data (DYFI, strong motion)</span>
+<span class="sd">                files.</span>
 <span class="sd">            version_history (dict): Dictionary containing version history.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            InputContainer: Instance of InputContainer.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">container</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="n">container</span><span class="o">.</span><span class="n">setConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
         <span class="c1"># create an origin from the event file</span>
@@ -353,7 +355,8 @@
 
 <span class="sd">    This class provides methods for getting and setting IMT data.</span>
 <span class="sd">    The philosophy here is that an IMT consists of both the mean results and</span>
-<span class="sd">    the standard deviations of those results, thus getIMT() returns a</span>
+<span class="sd">    the standard deviations of those results, thus getIMTArrays() (when data</span>
+<span class="sd">    type is &#39;points&#39;) and getIMTGrids() (when data type is &#39;grids&#39;) returns a</span>
 <span class="sd">    dictionary with both, plus metadata for each data layer.</span>
 
 
@@ -375,6 +378,63 @@
             <span class="k">return</span> <span class="n">data_type_group</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span>
         <span class="k">return</span> <span class="kc">None</span></div>
 
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return a string representation of the container.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Data type: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;    use &quot;getIMTGrids&quot; method to access &#39;</span>\
+                        <span class="s1">&#39;interpolated IMTs</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;    use &quot;getIMTArrays&quot; method to access &#39;</span>\
+                        <span class="s1">&#39;interpolated IMTs</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">rupt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRuptureDict</span><span class="p">()</span>
+            <span class="n">rupt_obj</span> <span class="o">=</span> <span class="n">rupture_from_dict</span><span class="p">(</span><span class="n">rupt</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;Rupture: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">rupt_obj</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;    locstring: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rupt_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">locstring</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;    magnitude: </span><span class="si">%.1f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rupt_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">mag</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;    time: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rupt_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">time</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;Rupture: None</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getConfig</span><span class="p">()</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;Config: use &#39;getConfig&#39; method</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;Config: None</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">stations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStationDict</span><span class="p">()[</span><span class="s1">&#39;features&#39;</span><span class="p">]</span>
+            <span class="n">nsta</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stations</span><span class="p">)</span>
+            <span class="n">sname</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stations</span><span class="p">]</span>
+            <span class="n">n_mi</span> <span class="o">=</span> <span class="nb">len</span><span class="p">([</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sname</span> <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;mmi&#39;</span><span class="p">])</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;Stations: use &#39;getStationDict&#39; method</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;    # instrumental stations: </span><span class="si">%i</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">nsta</span> <span class="o">-</span> <span class="n">n_mi</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;    # macroseismic stations: </span><span class="si">%i</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">n_mi</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;Stations: None</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;Metadata: use &#39;getMetadata&#39; method</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="k">except</span> <span class="ne">LookupError</span><span class="p">:</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;Metadata: None</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;Available IMTs (components):</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">imt_list</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getIMTs</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">imt_list</span><span class="p">)):</span>
+            <span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="n">imt_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="n">comp_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">components</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;    </span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">)</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_list</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">comp_str</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">out</span>
+
+<div class="viewcode-block" id="ShakeMapOutputContainer.getMetadata"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getMetadata">[docs]</a>    <span class="k">def</span> <span class="nf">getMetadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get metadata dictionary, i.e., &#39;info.json&#39;.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            dict: Metadata dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">info_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">info_str</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="ShakeMapOutputContainer.setDataType"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.setDataType">[docs]</a>    <span class="k">def</span> <span class="nf">setDataType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datatype</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Sets the type of the IMT, Vs30, and distance data stored in this</span>
@@ -382,7 +442,7 @@
 <span class="sd">        will be set by the first call to setIMTGrids() or setIMTArray().</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            (str): Either &#39;points&#39; or &#39;grid&#39;.</span>
+<span class="sd">            datatype (str): Either &#39;points&#39; or &#39;grid&#39;.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Nothing.</span>
@@ -465,7 +525,8 @@
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.getIMTGrids"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTGrids">[docs]</a>    <span class="k">def</span> <span class="nf">getIMTGrids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Retrieve a Grid2D object and any associated metadata from the container.</span>
+<span class="sd">        Retrieve a Grid2D object and any associated metadata from the</span>
+<span class="sd">        container.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            imt_name (str):</span>
@@ -590,19 +651,18 @@
 <span class="sd">        Retrieve the arrays and any associated metadata from the container.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            imt_name (str):</span>
-<span class="sd">                The name of the IMT stored in the container.</span>
+<span class="sd">            imt_name (str): The name of the IMT stored in the container.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Dictionary containing 7 items:</span>
-<span class="sd">                   - &#39;lons&#39;: array of longitude coordinates</span>
-<span class="sd">                   - &#39;lats&#39;: array of latitude coordinates</span>
-<span class="sd">                   - &#39;ids&#39;: array of IDs corresponding to the coordinates</span>
-<span class="sd">                   - &#39;mean&#39;: array of IMT mean values.</span>
-<span class="sd">                   - &#39;mean_metadata&#39;: Dictionary containing any metadata</span>
+<span class="sd">                   - lons -- array of longitude coordinates</span>
+<span class="sd">                   - lats -- array of latitude coordinates</span>
+<span class="sd">                   - ids -- array of IDs corresponding to the coordinates</span>
+<span class="sd">                   - mean -- array of IMT mean values.</span>
+<span class="sd">                   - mean_metadata -- Dictionary containing any metadata</span>
 <span class="sd">                     describing mean layer.</span>
-<span class="sd">                   - &#39;std&#39;: array of IMT standard deviation values.</span>
-<span class="sd">                   - &#39;std_metadata&#39;: Dictionary containing any metadata</span>
+<span class="sd">                   - std -- array of IMT standard deviation values.</span>
+<span class="sd">                   - std_metadata -- Dictionary containing any metadata</span>
 <span class="sd">                     describing standard deviation layer.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
@@ -651,32 +711,36 @@
         <span class="p">}</span>
         <span class="k">return</span> <span class="n">imt_dict</span></div>
 
-<div class="viewcode-block" id="ShakeMapOutputContainer.getIMTs"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTs">[docs]</a>    <span class="k">def</span> <span class="nf">getIMTs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return list of names of IMTs matching input component type.</span>
+<div class="viewcode-block" id="ShakeMapOutputContainer.getIMTs"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTs">[docs]</a>    <span class="k">def</span> <span class="nf">getIMTs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return list of names of available IMTs.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            component (str): Name of component (&#39;Larger&#39;,&#39;rotd50&#39;,etc.)</span>
+<span class="sd">            component (str): Optional string to filter result to only include</span>
+<span class="sd">                IMTs available for this component. Default of None returns</span>
+<span class="sd">                all IMTs regardless of component.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            list: List of names of IMTs matching component stored in container.</span>
+<span class="sd">            list: List of names of IMTs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">imt_groups</span> <span class="o">=</span> <span class="n">_get_type_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">,</span> <span class="s1">&#39;imt&#39;</span><span class="p">)</span>
-        <span class="n">comp_groups</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">imt_group</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">component</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                <span class="n">comp_groups</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imt_group</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">component</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">comp_groups</span></div>
+        <span class="k">if</span> <span class="n">component</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">imts</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">imt_group</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">component</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                    <span class="n">imts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imt_group</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">component</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">imts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">imts</span></div>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.getComponents"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getComponents">[docs]</a>    <span class="k">def</span> <span class="nf">getComponents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return list of components for given IMT.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">          imt_name (str): Name of IMT (&#39;MMI&#39;,&#39;PGA&#39;,etc.)</span>
+<span class="sd">            imt_name (str): Name of IMT (&#39;mmi&#39;, &#39;pga&#39;, etc.)</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">          list: List of names of components for given IMT.</span>
+<span class="sd">            list: List of names of components for given IMT.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">components</span> <span class="o">=</span> <span class="n">_get_type_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">,</span> <span class="s1">&#39;imt_&#39;</span> <span class="o">+</span> <span class="n">imt_name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">components</span></div>
@@ -686,15 +750,16 @@
 <span class="sd">        Delete IMT datasets from container.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">          name (str):</span>
-<span class="sd">                The name of the IMT to be deleted.</span>
+<span class="sd">            name (str): The name of the IMT to be deleted.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No group called </span><span class="si">%s</span><span class="s1"> in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
-                              <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
-        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span></div></div>
+        <span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="n">imt_name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+            <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No group called </span><span class="si">%s</span><span class="s1"> in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
+                                  <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span></div></div>
 </pre></div>
 
           </div>

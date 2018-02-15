@@ -109,8 +109,9 @@
             <span class="n">eventxml</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="n">sourcefile</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="n">momentfile</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="c1"># Look for basic event and moment tensor information in the origin object.</span>
-        <span class="c1"># If moment is not found, try to find tensor information in ComCat.</span>
+        <span class="c1"># Look for basic event and moment tensor information in the origin</span>
+        <span class="c1"># object. If moment is not found, try to find tensor information in</span>
+        <span class="c1"># ComCat.</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="n">eid</span> <span class="o">=</span> <span class="n">org</span><span class="o">.</span><span class="n">eventsourcecode</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">org</span><span class="p">,</span> <span class="s1">&#39;moment&#39;</span><span class="p">):</span>
@@ -193,7 +194,7 @@
 
 <span class="sd">    Args:</span>
 <span class="sd">        mydict (dict): Full or partial config dictionary.</span>
-<span class="sd">        install_path (str): </span>
+<span class="sd">        install_path (str):</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">mydict</span><span class="p">:</span>
@@ -208,7 +209,8 @@
             <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cfg</span><span class="o">.</span><span class="n">cfg_float_list</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
         <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;layer_dir&#39;</span><span class="p">:</span>
             <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;INSTALL_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">install_path</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span><span class="p">,</span> <span class="s1">&#39;p1&#39;</span><span class="p">,</span> <span class="s1">&#39;p2&#39;</span><span class="p">,</span> <span class="s1">&#39;p_kagan_default&#39;</span><span class="p">,</span> <span class="s1">&#39;default_slab_depth&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span><span class="p">,</span> <span class="s1">&#39;p1&#39;</span><span class="p">,</span> <span class="s1">&#39;p2&#39;</span><span class="p">,</span> <span class="s1">&#39;p_kagan_default&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;default_slab_depth&#39;</span><span class="p">):</span>
             <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="s1">&#39;Invalid entry in config: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">))</span>

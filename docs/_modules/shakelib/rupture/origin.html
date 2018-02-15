@@ -45,7 +45,6 @@
 
 <span class="c1"># stdlib imports</span>
 <span class="kn">from</span> <span class="nn">xml.dom</span> <span class="k">import</span> <span class="n">minidom</span>
-<span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 <span class="c1"># third party</span>
@@ -141,7 +140,8 @@
                     <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
                         <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">TIMEFMT</span><span class="p">)</span>
                 <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-                    <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input time string </span><span class="si">%s</span><span class="s1"> cannot be converted to datetime.&#39;</span>
+                    <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input time string </span><span class="si">%s</span><span class="s1"> cannot be &#39;</span>\
+                          <span class="s1">&#39;converted to datetime.&#39;</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="s1">&#39;mech&#39;</span> <span class="ow">in</span> <span class="n">event</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -179,7 +179,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="mf">0.0</span>
 
 <div class="viewcode-block" id="Origin.fromFile"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin.fromFile">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromFile</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">eventxmlfile</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fromFile</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">eventxmlfile</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Class method to create a Origin object by specifying an event.xml file,</span>
 <span class="sd">        a rupture file, a source.txt file, and a moment.xml file.</span>
@@ -201,7 +201,7 @@
         <span class="k">if</span> <span class="n">momentfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">read_moment_quakeml</span><span class="p">(</span><span class="n">momentfile</span><span class="p">)</span>
             <span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Origin.getHypo"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin.getHypo">[docs]</a>    <span class="k">def</span> <span class="nf">getHypo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -358,7 +358,7 @@
     <span class="n">hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">])</span>
     <span class="n">minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;minute&#39;</span><span class="p">])</span>
     <span class="n">second</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">])</span>
-    <span class="n">microseconds</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">second</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]))</span> <span class="o">*</span> <span class="mi">1</span><span class="n">e6</span><span class="p">)</span>
+    <span class="n">microseconds</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">second</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]))</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">)</span>
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="p">(</span>
         <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">microseconds</span><span class="p">)</span>
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
@@ -389,7 +389,7 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Empty if momentfile is somehow not valid, or:</span>
-<span class="sd">              - moment: </span>
+<span class="sd">              - moment:</span>
 <span class="sd">                  - NP1:</span>
 <span class="sd">                    - strike: float</span>
 <span class="sd">                    - dip: float</span>
@@ -397,7 +397,7 @@
 <span class="sd">                  - NP2:</span>
 <span class="sd">                    - strike: float</span>
 <span class="sd">                    - dip: float</span>
-<span class="sd">                    - rake: float  </span>
+<span class="sd">                    - rake: float</span>
 <span class="sd">                  - type: string</span>
 <span class="sd">                  - source: string</span>
 <span class="sd">    &quot;&quot;&quot;</span>
