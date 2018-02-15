@@ -334,6 +334,54 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             return data_type_group.attrs['data_type']
         return None
 
+    def __repr__(self):
+        """Return a string representation of the container.
+        """
+        out = 'Data type: %s\n' % self.getDataType()
+        if self.getDataType() == 'grid':
+            out = out + '    use "getIMTGrids" method to access '\
+                        'interpolated IMTs\n'
+        else:
+            out = out + '    use "getIMTArrays" method to access '\
+                        'interpolated IMTs\n'
+        try:
+            rupt = self.getRuptureDict()
+            rupt_obj = rupture_from_dict(rupt)
+            out = out + "Rupture: %s\n" % type(rupt_obj)
+            out = out + "    locstring: %s\n" % rupt_obj._origin.locstring
+            out = out + "    magnitude: %.1f\n" % rupt_obj._origin.mag
+            out = out + "    time: %s\n" % rupt_obj._origin.time
+        except AttributeError:
+            out = out + "Rupture: None\n"
+        try:
+            self.getConfig()
+            out = out + "Config: use 'getConfig' method\n"
+        except AttributeError:
+            out = out + "Config: None\n"
+        try:
+            stations = self.getStationDict()['features']
+            nsta = len(stations)
+            sname = [s['properties']['channels'][0]['name'] for s in stations]
+            n_mi = len([s for s in sname if s == 'mmi'])
+            out = out + "Stations: use 'getStationDict' method\n"
+            out = out + "    # instrumental stations: %i\n" % (nsta - n_mi)
+            out = out + "    # macroseismic stations: %i\n" % n_mi
+        except AttributeError:
+            out = out + "Stations: None\n"
+        try:
+            self.getMetadata()
+            out = out + "Metadata: use 'getMetadata' method\n"
+        except LookupError:
+            out = out + "Metadata: None\n"
+        out = out + "Available IMTs (components):\n"
+        imt_list = sorted(self.getIMTs())
+        for i in range(len(imt_list)):
+            components = self.getComponents(imt_list[i])
+            comp_str = ", ".join(components)
+            out = out + '    %s (%s)\n' % (imt_list[i], comp_str)
+
+        return out
+
     def getMetadata(self):
         """Get metadata dictionary, i.e., 'info.json'.
 

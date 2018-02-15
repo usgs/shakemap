@@ -10,7 +10,6 @@ import tempfile
 import pytest
 import random
 import string
-import json
 
 from shakelib.utils.containers import ShakeMapInputContainer
 from shakelib.utils.containers import ShakeMapOutputContainer
@@ -232,6 +231,18 @@ def test_output_container():
         assert mmi_rot_dict['mean_metadata'] == mean_mmi_rotd50_metadata
         assert mmi_rot_dict['std_metadata'] == std_mmi_rotd50_metadata
 
+        # Check repr method
+        assert repr(container) == '''Data type: grid
+    use "getIMTGrids" method to access interpolated IMTs
+Rupture: None
+Config: None
+Stations: None
+Metadata: None
+Available IMTs (components):
+    mmi (maximum, rotd50)
+    pga (maximum)
+'''
+
         # get list of all imts
         imts = container.getIMTs()
 
@@ -335,20 +346,27 @@ def test_output_repr():
         shakedir, 'tests', 'data', 'containers', 'northridge',
         'shake_result.hdf')
     shake_result = ShakeMapOutputContainer.load(out_file)
-
-    assert shake_result.getDataType() == 'grid'
-
-    rupt = shake_result.getRuptureDict()
-    assert rupt['metadata']['mag'] == 6.7
-
-    conf = shake_result.getConfig()
-    assert conf['modeling']['ccf'] == 'LB13'
-
-    stations = shake_result.getStationDict()
-    assert stations['features'][0]['id'] == 'CIIM.90260'
-
-    info = shake_result.getMetadata()
-    assert info['processing']['shakemap_versions']['map_version'] == '1'
+    container_str = repr(shake_result)
+    assert container_str == '''Data type: grid
+    use "getIMTGrids" method to access interpolated IMTs
+Rupture: <class \'shakelib.rupture.quad_rupture.QuadRupture\'>
+    locstring: Northridge
+    magnitude: 6.7
+    time: 1994-01-17 12:30:55
+Config: use \'getConfig\' method
+Stations: use \'getStationDict\' method
+    # instrumental stations: 185
+    # macroseismic stations: 547
+Metadata: use \'getMetadata\' method
+Available IMTs (components):
+    MMI (GREATER_OF_TWO_HORIZONTAL)
+    PGA (GREATER_OF_TWO_HORIZONTAL)
+    PGV (GREATER_OF_TWO_HORIZONTAL)
+    SA(0.3) (GREATER_OF_TWO_HORIZONTAL)
+    SA(1.0) (GREATER_OF_TWO_HORIZONTAL)
+    SA(3.0) (GREATER_OF_TWO_HORIZONTAL)
+'''
+    test = shake_result.getIMTGrids("SA(1.0)", "GREATER_OF_TWO_HORIZONTAL")
 
 
 if __name__ == '__main__':
