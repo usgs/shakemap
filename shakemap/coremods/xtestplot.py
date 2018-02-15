@@ -13,7 +13,7 @@ from shakemap.utils.config import get_config_paths
 from .base import CoreModule
 
 
-class TestPlot(CoreModule):
+class XTestPlot(CoreModule):
     """
     xtestplot -- Plot 1D sections of test events.
     """

@@ -87,16 +87,16 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         # Make the input container and extract the config
         # ------------------------------------------------------------------
-        self.setInputContainer()
+        self._setInputContainer()
         self.config = self.ic.getConfig()
         # ------------------------------------------------------------------
         # Clear away results from previous runs
         # ------------------------------------------------------------------
-        self.clearProducts()
+        self._clearProducts()
         # ------------------------------------------------------------------
         # Retrieve a bunch of config options and set them as attributes
         # ------------------------------------------------------------------
-        self.setConfigOptions()
+        self._setConfigOptions()
         # ------------------------------------------------------------------
         # Instantiate the gmpe, gmice, and ipe
         # Here we make a placeholder gmpe so that we can make the
@@ -128,7 +128,7 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         # The output locations: either a grid or a list of points
         # ------------------------------------------------------------------
-        self.setOutputParams()
+        self._setOutputParams()
         # ------------------------------------------------------------------
         # If the gmpe doesn't break down its stardard deviation into
         # within- and between-event terms, we need to handle things
@@ -148,18 +148,18 @@ class ModelModule(CoreModule):
         # df1 for instrumented data
         # df2 for non-instrumented data
         # ------------------------------------------------------------------
-        self.setDataframes()
+        self._setDataFrames()
         # ------------------------------------------------------------------
         # Add the predictions, etc. to the data frames
         # ------------------------------------------------------------------
-        self.populateDataFrames()
+        self._populateDataFrames()
         # ------------------------------------------------------------------
         # Try to make all the derived IMTs possible from MMI (if we have MMI)
         # ------------------------------------------------------------------
-        self.deriveIMTsFromMMI()
+        self._deriveIMTsFromMMI()
         # ------------------------------------------------------------------
         # ------------------------------------------------------------------
-        self.deriveMMIFromIMTs()
+        self._deriveMMIFromIMTs()
 
         # ------------------------------------------------------------------
         # Get the combined set of input and output IMTs, their periods,
@@ -169,7 +169,7 @@ class ModelModule(CoreModule):
         for ndf in self.dataframes:
             self.combined_imt_set |= getattr(self, ndf).imts
 
-        self.imt_per, self.imt_per_ix = get_period_arrays(
+        self.imt_per, self.imt_per_ix = _get_period_arrays(
                 self.combined_imt_set)
         self.ccf = get_object_from_config('ccf', 'modeling',
                                           self.config, self.imt_per)
@@ -186,7 +186,7 @@ class ModelModule(CoreModule):
         #
         # These are arrays (keyed by IMT) of the station data that will be
         # used to compute the bias and do the interpolation, they are filled
-        # in the computeBias method
+        # in the _fillDataArrays method
         #
         self.sta_period_ix = {}
         self.sta_lons_rad = {}
@@ -197,15 +197,17 @@ class ModelModule(CoreModule):
         self.sta_sig_total = {}
         self.sta_tau = {}
         self.sta_imtstr = {}
+        self.sta_rrups = {}
 
-        self.computeBias()
+        self._fillDataArrays()
+        self._computeBias()
 
         # ------------------------------------------------------------------
         # Now do the MVN with the intra-event residuals
         # ------------------------------------------------------------------
         self.outgrid = {}   # Holds the interpolated output arrays keyed by IMT
         self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
-        self.computeMVN()
+        self._computeMVN()
 
         # ------------------------------------------------------------------
         # Output the data and metadata
@@ -224,13 +226,13 @@ class ModelModule(CoreModule):
         # We're going to need masked arrays of the output grids later, so
         # make them now.
         #
-        moutgrid = self.getMaskedGrids()
+        moutgrid = self._getMaskedGrids()
 
         #
         # Get the info dictionary that will become info.json, and
         # store it in the output container
         #
-        info = self.getInfo(moutgrid)
+        info = self._getInfo(moutgrid)
         oc.setString('info.json', json.dumps(info))
 
         # ------------------------------------------------------------------
@@ -242,7 +244,7 @@ class ModelModule(CoreModule):
         # Fill the station dictionary for stationlist.json and add it to
         # the output container
         # ------------------------------------------------------------------
-        sjdict = self.fillStationJSON()
+        sjdict = self._fillStationJSON()
         oc.setStationDict(sjdict)
 
         # ------------------------------------------------------------------
@@ -250,16 +252,16 @@ class ModelModule(CoreModule):
         # metadata.
         # ------------------------------------------------------------------
         if self.do_grid:
-            self.storeGriddedData(oc)
+            self._storeGriddedData(oc)
         else:
-            self.storePointData(oc)
+            self._storePointData(oc)
 
         oc.close()
     # ------------------------------------------------------------------
     # End execute()
     # ------------------------------------------------------------------
 
-    def setInputContainer(self):
+    def _setInputContainer(self):
         """
         Open the input container and set
         the event's current data directory.
@@ -282,7 +284,7 @@ class ModelModule(CoreModule):
         self.datadir = datadir
         self.ic = ShakeMapInputContainer.load(datafile)
 
-    def clearProducts(self):
+    def _clearProducts(self):
         """
         Function to delete an event's products directory if it exists.
 
@@ -293,7 +295,14 @@ class ModelModule(CoreModule):
         if os.path.isdir(products_path):
             shutil.rmtree(products_path, ignore_errors=True)
 
-    def setConfigOptions(self):
+    def _setConfigOptions(self):
+        """
+        Pull various useful configuration options out of the config
+        dictionary.
+
+        Returns:
+            nothing
+        """
         # ------------------------------------------------------------------
         # Do we apply the generic amplification factors?
         # ------------------------------------------------------------------
@@ -329,7 +338,13 @@ class ModelModule(CoreModule):
         if not self.vs30_file:
             self.vs30_file = None
 
-    def setOutputParams(self):
+    def _setOutputParams(self):
+        """
+        Set variables dealing with the output grid or points
+
+        Returns:
+            nothing
+        """
         if self.config['interp']['prediction_location']['file'] and \
            self.config['interp']['prediction_location']['file'] != 'None':
             #
@@ -409,33 +424,35 @@ class ModelModule(CoreModule):
         #
         self.dx_out = dist_obj_out.getDistanceContext()
 
-        self.lons_out_rad = np.radians(lons).flatten()
-        self.lats_out_rad = np.radians(lats).flatten()
+        self.lons_out_rad = np.radians(self.lons)
+        self.lats_out_rad = np.radians(self.lats)
 
-    def setDataframes(self):
-        self.stations = self.ic.getStationList()
-        #
-        # Fill the DataFrame class and keep a list of dataframes
-        # df1 holds the instrumented data (PGA, PGV, SA)
-        # df2 holds the non-instrumented data (MMI)
-        #
+    def _setDataFrames(self):
+        """
+        Extract the StationList object from the input container and
+        fill the DataFrame class and keep a list of dataframes.
+
+            - df1 holds the instrumented data (PGA, PGV, SA)
+            - df2 holds the non-instrumented data (MMI)
+        """
         self.dataframes = []
-        if self.stations is not None:
-            for dfid, val in (('df1', True), ('df2', False)):
-                sdf, imts = self.stations.getStationDictionary(
-                        instrumented=val)
-                if sdf is not None:
-                    df = DataFrame()
-                    df.df = sdf
-                    df.imts = imts
-                    setattr(self, dfid, df)
-                    self.dataframes.append(dfid)
+        self.stations = self.ic.getStationList()
+        if self.stations is None:
+            return
+        for dfid, val in (('df1', True), ('df2', False)):
+            sdf, imts = self.stations.getStationDictionary(instrumented=val)
+            if sdf is not None:
+                df = DataFrame()
+                df.df = sdf
+                df.imts = imts
+                setattr(self, dfid, df)
+                self.dataframes.append(dfid)
 
-    def populateDataFrames(self):
-        #
-        # Make the sites and distance contexts for each dataframe then
-        # compute the predictions for the IMTs in that dataframe.
-        #
+    def _populateDataFrames(self):
+        """
+        Make the sites and distance contexts for each dataframe then
+        compute the predictions for the IMTs in that dataframe.
+        """
         for dfid in self.dataframes:
             dfn = getattr(self, dfid)
             df = dfn.df
@@ -456,9 +473,9 @@ class ModelModule(CoreModule):
                 gmpe = None
                 if imtstr != 'MMI':
                     gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-                pmean, pstddev = gmas(self.ipe, gmpe, dfn.sx, self.rx,
-                                      dfn.dx, oqimt, self.stddev_types,
-                                      self.apply_gafs)
+                pmean, pstddev = _gmas(self.ipe, gmpe, dfn.sx, self.rx,
+                                       dfn.dx, oqimt, self.stddev_types,
+                                       self.apply_gafs)
                 df[imtstr + '_pred'] = pmean
                 df[imtstr + '_pred_sigma'] = pstddev[0]
                 if self.total_sd_only:
@@ -517,13 +534,13 @@ class ModelModule(CoreModule):
                               df['depth'], self.rupture_obj)
             df['rrup'] = dd['rrup']
 
-    def deriveIMTsFromMMI(self):
-        # ------------------------------------------------------------------
-        # Compute all the IMTs possible from MMI
-        # TODO: This logic needs to be revisited. We should probably make what
-        # we have to to do the CMS to make the needed output IMTs, but
-        # for now, we're just going to use what we have and the ccf.
-        # ------------------------------------------------------------------
+    def _deriveIMTsFromMMI(self):
+        """
+        Compute all the IMTs possible from MMI
+        TODO: This logic needs to be revisited. We should probably make what
+        we have to to do the CMS to make the needed output IMTs, but
+        for now, we're just going to use what we have and the ccf.
+        """
         if 'df2' not in self.dataframes:
             return
 
@@ -551,9 +568,9 @@ class ModelModule(CoreModule):
                 # Get the predictions and stddevs
                 #
                 gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-                pmean, pstddev = gmas(self.ipe, gmpe, self.df2.sx, self.rx,
-                                      self.df2.dx, oqimt, self.stddev_types,
-                                      self.apply_gafs)
+                pmean, pstddev = _gmas(self.ipe, gmpe, self.df2.sx, self.rx,
+                                       self.df2.dx, oqimt, self.stddev_types,
+                                       self.apply_gafs)
                 df2[imtstr + '_pred'] = pmean
                 df2[imtstr + '_pred_sigma'] = pstddev[0]
                 if self.total_sd_only:
@@ -569,11 +586,11 @@ class ModelModule(CoreModule):
                 df2[imtstr + '_outliers'] = np.full(
                     pmean.shape, False, dtype=np.bool)
 
-    def deriveMMIFromIMTs(self):
-        #
-        # Make derived MMI from the best available PGM; This is ugly and
-        # it would be nice to have a more deterministic way of doing it
-        #
+    def _deriveMMIFromIMTs(self):
+        """
+        Make derived MMI from the best available PGM; This is ugly and
+        it would be nice to have a more deterministic way of doing it
+        """
         if 'df1' not in self.dataframes:
             return
         imtstr = None
@@ -611,9 +628,9 @@ class ModelModule(CoreModule):
             # Get the prediction and stddevs
             #
             gmpe = None
-            pmean, pstddev = gmas(self.ipe, gmpe, self.df1.sx, self.rx,
-                                  self.df1.dx, imt.from_string('MMI'),
-                                  self.stddev_types, self.apply_gafs)
+            pmean, pstddev = _gmas(self.ipe, gmpe, self.df1.sx, self.rx,
+                                   self.df1.dx, imt.from_string('MMI'),
+                                   self.stddev_types, self.apply_gafs)
             df1['MMI' + '_pred'] = pmean
             df1['MMI' + '_pred_sigma'] = pstddev[0]
             if self.total_sd_only:
@@ -629,16 +646,23 @@ class ModelModule(CoreModule):
             df1['MMI' + '_outliers'] = np.full(pmean.shape, False,
                                                dtype=np.bool)
 
-    def computeBias(self):
+    def _fillDataArrays(self):
+        """
+        For each IMT get lists of the amplitudes that can contribute
+        to the bias and the interpolation. Keep lists of, IMT, period
+        index, lons, lats, residuals, tau, phi, additional uncertainty,
+        and rupture distance.
+        """
         #
-        # Compute a bias for all of the IMTs in the inputs and outputs
+        # Get the valid imts for each station
         #
+        imtsets = {}
+        sasets = {}
+        for ndf in self.dataframes:
+            imtsets[ndf], sasets[ndf] = _get_imt_lists(getattr(self, ndf))
+
         for imtstr in self.combined_imt_set:
             time1 = time.time()
-            #
-            # Get the index of the (pseudo-) period of the output IMT
-            #
-            outperiod_ix = self.imt_per_ix[imtstr]
             #
             # Fill the station arrays; here we use lists and append to
             # them because it is much faster than appending to a numpy
@@ -661,7 +685,8 @@ class ModelModule(CoreModule):
                     #
                     # Each station can provide 0, 1, or 2 IMTs:
                     #
-                    for imtin in get_sta_imts(imtstr, sdf, i, imts):
+                    for imtin in _get_nearest_imts(imtstr, imtsets[ndf][i],
+                                                   sasets[ndf][i]):
                         imtlist.append(imtin)
                         period_ix.append(self.imt_per_ix[imtin])
                         lons_rad.append(sdf['lon_rad'][i])
@@ -681,15 +706,27 @@ class ModelModule(CoreModule):
             self.sta_sig_extra[imtstr] = np.array(sig_extra).reshape((-1, 1))
             self.sta_sig_total[imtstr] = np.sqrt(
                 self.sta_phi[imtstr]**2 + self.sta_sig_extra[imtstr]**2)
+            self.sta_rrups[imtstr] = np.array(rrups)
+
+    def _computeBias(self):
+        """
+        Compute a bias for all of the IMTs in the inputs and outputs
+        """
+        for imtstr in self.combined_imt_set:
+            time1 = time.time()
             if np.size(self.sta_lons_rad) == 0:
                 self.bias_num[imtstr] = 0.0
                 self.bias_den[imtstr] = 0.0
                 continue
             #
+            # Get the index of the (pseudo-) period of the output IMT
+            #
+            outperiod_ix = self.imt_per_ix[imtstr]
+            #
             # Get the distance-limited set of data for use in computing
             # the bias
             #
-            dix = np.array(rrups) <= self.bias_max_range
+            dix = self.sta_rrups[imtstr] <= self.bias_max_range
             sta_phi_dl = self.sta_phi[imtstr][dix].reshape((-1, 1))
             sta_tau_dl = self.sta_tau[imtstr][dix].reshape((-1, 1))
             sta_sig_total_dl = self.sta_sig_total[imtstr][dix].reshape((-1, 1))
@@ -759,7 +796,10 @@ class ModelModule(CoreModule):
                 % (imtstr, self.nominal_bias[imtstr], np.sqrt(nom_variance),
                    np.size(sta_lons_rad_dl), bias_time))
 
-    def computeMVN(self):
+    def _computeMVN(self):
+        """
+        Do the MVN computations
+        """
         for imtstr in self.imt_out_set:
             time1 = time.time()
             #
@@ -773,9 +813,9 @@ class ModelModule(CoreModule):
             gmpe = None
             if imtstr != 'MMI':
                 gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-            pout_mean, pout_sd = gmas(self.ipe, gmpe, self.sx_out_soil,
-                                      self.rx, self.dx_out, oqimt,
-                                      self.stddev_types, self.apply_gafs)
+            pout_mean, pout_sd = _gmas(self.ipe, gmpe, self.sx_out_soil,
+                                       self.rx, self.dx_out, oqimt,
+                                       self.stddev_types, self.apply_gafs)
             #
             # If there are no data, just use the unbiased prediction
             # and the total stddev
@@ -918,8 +958,11 @@ class ModelModule(CoreModule):
             self.logger.debug('total time for %s=%f' %
                               (imtstr, time.time() - time1))
 
-    def getMaskedGrids(self):
-
+    def _getMaskedGrids(self):
+        """
+        For each grid in the output, generate a grid with the water areas
+        masked out.
+        """
         moutgrid = {}
         # We only need to make the mask for one IMT, then we can
         # apply it to all of the other grids.
@@ -942,12 +985,15 @@ class ModelModule(CoreModule):
                                 mask=copy.copy(moutgrid[refimt].mask))
         return moutgrid
 
-    def getInfo(self, moutgrid):
+    def _getInfo(self, moutgrid):
+        """
+        Create an info dictionary that can be made into the info.json file.
+        """
         #
         # Get the map grade
         #
-        mean_rat, mygrade = get_map_grade(self.do_grid, self.outsd, self.psd,
-                                          moutgrid)
+        mean_rat, mygrade = _get_map_grade(self.do_grid, self.outsd, self.psd,
+                                           moutgrid)
         # ------------------------------------------------------------------
         # This is the metadata for creating info.json
         # ------------------------------------------------------------------
@@ -1095,8 +1141,10 @@ class ModelModule(CoreModule):
         info[pp][sr]['site_correction'] = 'GMPE native'
         return info
 
-    def fillStationJSON(self):
-
+    def _fillStationJSON(self):
+        """
+        Get the station JSON dictionary and then add a bunch of stuff to it.
+        """
         sjdict = {}
         if self.stations is None:
             return sjdict
@@ -1231,7 +1279,10 @@ class ModelModule(CoreModule):
                         amp['flag'] = '0'
         return sjdict
 
-    def storeGriddedData(self, oc):
+    def _storeGriddedData(self, oc):
+        """
+        Store gridded data in the output container.
+        """
         metadata = {}
         metadata['xmin'] = self.W
         metadata['xmax'] = self.E
@@ -1245,7 +1296,7 @@ class ModelModule(CoreModule):
         #
         # Put the Vs30 grid in the output container
         #
-        _, units, digits = get_layer_info('vs30')
+        _, units, digits = _get_layer_info('vs30')
         vs30 = Grid2D(self.sx_out_soil.vs30, gdict)
         vs30_metadata = {}
         vs30_metadata['units'] = units
@@ -1270,12 +1321,12 @@ class ModelModule(CoreModule):
         for key, value in self.outgrid.items():
             # set the data grid
             mean_grid = Grid2D(value, gdict)
-            mean_layername, units, digits = get_layer_info(key)
+            mean_layername, units, digits = _get_layer_info(key)
             mean_metadata = {'units': units,
                              'digits': digits}
 
             # set the uncertainty grid
-            std_layername, units, digits = get_layer_info(key + '_sd')
+            std_layername, units, digits = _get_layer_info(key + '_sd')
             std_metadata = {'units': units,
                             'digits': digits}
             std_grid = Grid2D(self.outsd[key], gdict.copy())
@@ -1284,7 +1335,10 @@ class ModelModule(CoreModule):
                            std_grid, std_metadata,
                            component)
 
-    def storePointData(self, oc):
+    def _storePointData(self, oc):
+        """
+        Store point data in the output container.
+        """
         #
         # Store the Vs30
         #
@@ -1311,11 +1365,11 @@ class ModelModule(CoreModule):
         component = self.config['interp']['component']
         for key, value in self.outgrid.items():
             # set the data grid
-            mean_layername, units, digits = get_layer_info(key)
+            mean_layername, units, digits = _get_layer_info(key)
             mean_metadata = {'units': units,
                              'digits': digits}
             # set the uncertainty grid
-            std_layername, units, digits = get_layer_info(key + '_sd')
+            std_layername, units, digits = _get_layer_info(key + '_sd')
             std_metadata = {'units': units,
                             'digits': digits}
             oc.setIMTArrays(key, self.sx_out_soil.lons.flatten(),
@@ -1324,7 +1378,7 @@ class ModelModule(CoreModule):
                             self.outsd[key].flatten(), std_metadata, component)
 
 
-def get_period_arrays(*args):
+def _get_period_arrays(*args):
     """
     Return 1) a sorted array of the periods represented by the IMT list(s)
     in the input, and 2) a dictionary of the IMTs and their indices.
@@ -1357,26 +1411,36 @@ def get_period_arrays(*args):
     return np.array(imt_per), imt_per_ix
 
 
-def get_nearest_imts(imtstr, imtset):
+def _get_period_from_imt(imtstr):
     """
-    Return the input imt's closest surrogarte (or bracket) found
+    Return a float representing the period of the SA IMT in the input.
+
+    Args:
+        imtstr (str): A string representing an SA IMT.
+
+    Returns:
+        float: The period of the SA IMT as a float.
+    """
+    return float(imtstr.replace('SA(', '').replace(')', ''))
+
+
+def _get_nearest_imts(imtstr, imtset, saset):
+    """
+    Return the input IMT, or it's closest surrogarte (or bracket) found
     in imtset.
 
     Args:
         imtstr (str): An (OQ-style) IMT string.
-        imtsset (set): A set of IMTs to search for imtstr or its closest
+        imtset (list): A list of IMTs to search for imtstr or its closest
             surrogate (or bracket).
+        saset (list): The SA IMTs found in imtset.
 
     Returns:
-        tuple: The IMT, it's closest surrogate, or a bracket of periods on
-        either side of the IMT's period, from the IMTs in intset.
+        tuple: The IMT, it's closest surrogate, or a bracket of SAs with
+        periods on either side of the IMT's period, from the IMTs in intset.
     """
-
-    salist = [x for x in imtset if x.startswith('SA(')]
-    periodlist = [float(x.replace('SA(', '').replace(')', '')) for x in salist]
-    periodlist = sorted(periodlist)
-    periodlist_str = [str(x) for x in periodlist]
-
+    if imtstr in imtset:
+        return (imtstr, )
     #
     # If we're here, then we know that IMT isn't in the inputs. Try
     # some alternatives.
@@ -1385,8 +1449,8 @@ def get_nearest_imts(imtstr, imtset):
         #
         # Use the highest frequency in the inputs, otherwise use PGV
         #
-        if len(salist):
-            return ('SA(' + periodlist_str[0] + ')', )
+        if len(saset):
+            return (sorted(saset, key=_get_period_from_imt)[0], )
         elif 'PGV' in imtset:
             return ('PGV', )
         else:
@@ -1396,7 +1460,9 @@ def get_nearest_imts(imtstr, imtset):
         # Use 1.0 sec SA (or its bracket) if it's there, otherwise
         # use PGA
         #
-        sa_tuple = get_sa_bracket(1.0, periodlist, periodlist_str)
+        if 'SA(1.0)' in saset:
+            return ('SA(1.0)', )
+        sa_tuple = _get_sa_bracket('SA(1.0)', saset)
         if sa_tuple != ():
             return sa_tuple
         if 'PGA' in imtset:
@@ -1410,81 +1476,94 @@ def get_nearest_imts(imtstr, imtset):
         #
         if 'PGV' in imtset:
             return ('PGV', )
-        return get_sa_bracket(1.0, periodlist, periodlist_str)
+        if 'SA(1.0)' in saset:
+            return ('SA(1.0)', )
+        return _get_sa_bracket('SA(1.0)', saset)
     elif imtstr.startswith('SA('):
-        myper = float(imtstr.replace('SA(', '').replace(')', ''))
-        return get_sa_bracket(myper, periodlist, periodlist_str)
+        #
+        # We know the actual IMT isn't here, so get the bracket
+        #
+        return _get_sa_bracket(imtstr, saset)
     else:
         raise ValueError('Unknown IMT %s in get_imt_bracket' % imtstr)
 
 
-def get_sa_bracket(myper, plist, plist_str):
+def _get_sa_bracket(myimt, saset):
     """
-    For a given period, look through the input periods and return a tuple of
-    a) the single IMT string representing the period itself if it is found
-    in the input; b) a pair of IMT strings representing the periods
-    bracketing the given period; or c) the single IMT representing the first
-    or last period in the input list if the given period is off the end of
-    the list.
+    For a given SA IMT, look through the input SAs and return a tuple of
+    a) a pair of IMT strings representing the periods bracketing the given
+    period; or c) the single IMT representing the first or last period in
+    the input list if the given period is off the end of the list.
 
     Args:
         myper (float): The period to search for in the input lists.
-        plist (array): A sorted list of periods as floats.
-        plist_str (array): The periods in 'plist' (above) as strings.
+        saset (list): A list of SA IMTs.
 
     Returns:
         tuple: One or two strings representing the IMTs closest to or
-        bracketing the input period.
+        bracketing the input IMT.
 
     """
-    if not len(plist):
+    if not len(saset):
         return ()
-    try:
-        return ('SA(' + plist_str[plist.index(myper)] + ')', )
-    except ValueError:
-        pass
-    for i, v in enumerate(plist):
-        if v > myper:
-            break
-    if i == 0 or v < myper:
-        return ('SA(' + plist_str[i] + ')', )
+    #
+    # Stick the target IMT into a copy of the list of SAs, then sort
+    # the list by period.
+    #
+    ss = saset.copy()
+    ss.append(myimt)
+    tmplist = sorted(ss, key=_get_period_from_imt)
+    nimt = len(tmplist)
+    #
+    # Get the index of the target IMT in the sorted list
+    #
+    myix = tmplist.index(myimt)
+    #
+    # If the target IMT is off the end of the list, return the
+    # appropriate endpoint; else return the pair of IMTs that
+    # bracket the target.
+    #
+    if myix == 0:
+        return (tmplist[1], )
+    elif myix == nimt - 1:
+        return (tmplist[-2], )
     else:
-        return ('SA(' + plist_str[i - 1] + ')', 'SA(' + plist_str[i] + ')')
+        return (tmplist[myix - 1], tmplist[myix + 1])
 
 
-def get_sta_imts(imtstr, sdf, ix, imtset):
+def _get_imt_lists(df):
     """
-    Get the IMT, its closest surrogate, or its bracket for a stataion
-    in a particular station dataframe, accounting for missing or
-    flagged data.
+    Given a data frame, return a list of lists of valid IMTS for
+    each station in the dataframe; also return a list of the valid
+    SA IMTs for each station.
 
     Args:
-        imtstr (str): The desired IMT as an OQ-style string.
-
-        sdf (dict): The dataframe containing the station.
-
-        ix (int): The index of the station in the dataframe.
-
-        imtset (set): The list of IMTs (as OQ-style strings) in the
-            dataframe.
+        df (DataFrame): A DataFrame.
 
     Returns:
-        tuple: The IMT, its closest surrogate, or the pair of IMTs
-        bracketing it in period, gathered from the valid data for the
-        station.
+        list, list: Two lists of lists: each list contains lists
+        corresponding to the stations in the data frame: the first
+        list contains all of the valid IMTs for that station, the
+        second list contains just the valid SA IMTs for the station.
     """
-    myimts = set()
-    for this_imt in imtset:
-        if not np.isnan(sdf[this_imt][ix]) and \
-           not sdf[this_imt + '_outliers'][ix]:
-            myimts.add(this_imt)
-    if imtstr in myimts:
-        return (imtstr, )
-    else:
-        return get_nearest_imts(imtstr, myimts)
+    imtlist = []
+    salist = []
+    nlist = np.size(df.df['lon'])
+    for ix in range(nlist):
+        valid_imts = []
+        sa_imts = []
+        for this_imt in df.imts:
+            if not np.isnan(df.df[this_imt][ix]) and \
+               not df.df[this_imt + '_outliers'][ix]:
+                valid_imts.append(this_imt)
+                if this_imt.startswith('SA('):
+                    sa_imts.append(this_imt)
+        imtlist.append(valid_imts)
+        salist.append(sa_imts)
+    return imtlist, salist
 
 
-def get_map_grade(do_grid, outsd, psd, moutgrid):
+def _get_map_grade(do_grid, outsd, psd, moutgrid):
     """
     Computes a 'grade' for the map. Essentially looks at the ratio of
     the computed PGA uncertainty to the predicted PGA uncertainty for
@@ -1528,7 +1607,7 @@ def get_map_grade(do_grid, outsd, psd, moutgrid):
 # we need a way to get units information about intensity measure types
 # and translate between openquake naming convention and ShakeMap grid naming
 # convention.
-def get_layer_info(layer):
+def _get_layer_info(layer):
     """
     We need a way to get units information about intensity measure types
     and translate between OpenQuake naming convention and ShakeMap grid naming
@@ -1575,7 +1654,7 @@ def get_layer_info(layer):
 # Helper function to call get_mean_and_stddevs for the
 # appropriate object given the IMT
 #
-def gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types, apply_gafs):
+def _gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types, apply_gafs):
     """
     This is a helper function to call get_mean_and_stddevs for the
     appropriate object given the IMT.

@@ -61,7 +61,18 @@ class TestPlot(CoreModule):
             plt.colorbar(shrink=0.6)
             plt.xlabel('Longitude')
             plt.ylabel('Latitude')
-            plt.title(self._eventid)
-#            plt.grid()
+            plt.title(self._eventid + ': ' + myimt + ' mean')
             pfile = os.path.join(datadir, self._eventid + '_' + myimt + '.pdf')
+            plt.savefig(pfile)
+
+            gridobj = data['std']
+            plt.figure(figsize=(10, 10))
+            plt.imshow(gridobj.getData(),
+                       extent=(metadata['xmin'], metadata['xmax'],
+                               metadata['ymin'], metadata['ymax']))
+            plt.colorbar(shrink=0.6)
+            plt.xlabel('Longitude')
+            plt.ylabel('Latitude')
+            plt.title(self._eventid + ': ' + myimt + ' stddev')
+            pfile = os.path.join(datadir, self._eventid + '_' + myimt + '_sd.pdf')
             plt.savefig(pfile)
