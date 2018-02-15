@@ -10,6 +10,7 @@ import tempfile
 import pytest
 import random
 import string
+import json
 
 from shakelib.utils.containers import ShakeMapInputContainer
 from shakelib.utils.containers import ShakeMapOutputContainer
@@ -19,7 +20,7 @@ from mapio.geodict import GeoDict
 from mapio.grid2d import Grid2D
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..', '..'))
 sys.path.insert(0, shakedir)
 
 
@@ -231,6 +232,9 @@ def test_output_container():
         assert mmi_rot_dict['mean_metadata'] == mean_mmi_rotd50_metadata
         assert mmi_rot_dict['std_metadata'] == std_mmi_rotd50_metadata
 
+        # get list of all imts
+        imts = container.getIMTs()
+
         # get list of maximum imts
         max_imts = container.getIMTs(component='maximum')
         assert sorted(max_imts) == ['mmi', 'pga']
@@ -326,7 +330,29 @@ def test_output_arrays():
         os.remove(datafile)
 
 
+def test_output_repr():
+    out_file = os.path.join(
+        shakedir, 'tests', 'data', 'containers', 'northridge',
+        'shake_result.hdf')
+    shake_result = ShakeMapOutputContainer.load(out_file)
+
+    assert shake_result.getDataType() == 'grid'
+
+    rupt = shake_result.getRuptureDict()
+    assert rupt['metadata']['mag'] == 6.7
+
+    conf = shake_result.getConfig()
+    assert conf['modeling']['ccf'] == 'LB13'
+
+    stations = shake_result.getStationDict()
+    assert stations['features'][0]['id'] == 'CIIM.90260'
+
+    info = shake_result.getMetadata()
+    assert info['processing']['shakemap_versions']['map_version'] == '1'
+
+
 if __name__ == '__main__':
     test_input_container()
     test_output_container()
     test_output_arrays()
+    test_output_repr()

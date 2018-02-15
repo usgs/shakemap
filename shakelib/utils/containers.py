@@ -334,6 +334,15 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             return data_type_group.attrs['data_type']
         return None
 
+    def getMetadata(self):
+        """Get metadata dictionary, i.e., 'info.json'.
+
+        Returns:
+            dict: Metadata dictionary.
+        """
+        info_str = self.getString('info.json')
+        return json.loads(info_str)
+
     def setDataType(self, datatype):
         """
         Sets the type of the IMT, Vs30, and distance data stored in this
@@ -610,22 +619,26 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         }
         return imt_dict
 
-    def getIMTs(self, component):
-        """
-        Return list of names of IMTs matching input component type.
+    def getIMTs(self, component=None):
+        """Return list of names of available IMTs.
 
         Args:
-            component (str): Name of component ('maximum', 'rotd50', etc.)
+            component (str): Optional string to filter result to only include
+                IMTs available for this component. Default of None returns
+                all IMTs regardless of component.
 
         Returns:
-            list: List of names of IMTs matching component stored in container.
+            list: List of names of IMTs.
         """
         imt_groups = _get_type_list(self._hdfobj, 'imt')
-        comp_groups = []
-        for imt_group in imt_groups:
-            if imt_group.find(component) > -1:
-                comp_groups.append(imt_group.replace('_' + component, ''))
-        return comp_groups
+        if component is not None:
+            imts = []
+            for imt_group in imt_groups:
+                if imt_group.find(component) > -1:
+                    imts.append(imt_group.replace('_' + component, ''))
+        else:
+            imts = list(set([i.split('_')[0] for i in imt_groups]))
+        return imts
 
     def getComponents(self, imt_name):
         """
