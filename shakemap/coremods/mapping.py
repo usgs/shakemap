@@ -978,8 +978,8 @@ class MapMaker(object):
         levels = getContourLevels(dmin, dmax)
 
         # Show dashed contours everywhere
-        csd = m.contour(x, y, np.flipud(pimt), colors='w', linestyles='dashed',
-                        cmap=None, levels=levels, zorder=DASHED_CONTOUR_ZORDER)
+        m.contour(x, y, np.flipud(pimt), colors='w', linestyles='dashed',
+                  cmap=None, levels=levels, zorder=DASHED_CONTOUR_ZORDER)
 
         # Solid contours on land
         cs = m.contour(x, y, np.flipud(pimt), colors='w',
