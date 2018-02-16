@@ -3,6 +3,7 @@ import re
 
 # third party imports
 import numpy as np
+import logging
 from strec.subtype import SubductionSelector
 
 
@@ -21,8 +22,7 @@ def get_weights(origin, config, tensor_params):
         ndarray: Float weights for corresponding GMPEs.
         Series: Pandas series containing STREC output.
     """
-    tprobs, strec_results = get_probs(origin, config,
-                                      tensor_params)
+    tprobs, strec_results = get_probs(origin, config, tensor_params)
     gmpelist = []
     weightlist = []
 
@@ -48,11 +48,14 @@ def get_weights(origin, config, tensor_params):
             pat = re.compile(region + '_')
             keylist = sorted(list(filter(pat.search, all_keylist)))
             if len(keylist):
-                gmpelist += rdict['gmpe']
                 for key in keylist:
                     weightlist.append(probs[key])
+                    idx = int(key.split('_')[1])
+                    gmpelist.append(rdict['gmpe'][idx])
 
     weightlist = np.array(weightlist)
+    logging.debug('gmpelist: %s' % gmpelist)
+    logging.debug('weightlist: %s' % weightlist)
     return gmpelist, weightlist, strec_results
 
 
@@ -60,7 +63,8 @@ def get_probs(origin, config, tensor_params):
     """Calculate probabilities for each earthquake type.
 
     The results here contain probabilities that can be rolled up in many ways:
-      - The probabilities of acr,scr,volcanic, and subduction should sum to 1.
+      - The probabilities of acr, scr, volcanic, and subduction should sum to
+        one.
       - The probabilities of acr_X,scr_X,volcanic_X, crustal, interface and
         intraslab
         should sum to 1.
@@ -178,12 +182,20 @@ def get_region_probs(eid, depth, strec_results, config):
         region_layer_probs = {}
         # now do the weights for each depth zone
         for i in range(0, len(rdict['min_depth'])):
-            x1 = rdict['min_depth'][i]
-            p1 = 1.0
-            x2 = rdict['max_depth'][i] + rdict['vertical_buffer']
+            # First, taper from -1 to 0 for the lower end
+            x1 = rdict['min_depth'][i] - rdict['vertical_buffer'] / 2
+            p1 = -1.0
+            x2 = rdict['min_depth'][i]
             p2 = 0.0
-            p_layer = get_probability(depth, x1, p1, x2, p2)
-            region_layer_probs['%s_%i' % (region, i)] = p_layer
+            p_layer1 = get_probability(depth, x1, p1, x2, p2)
+            # Then, taper from 0 to -1 for the higher end
+            x1 = rdict['max_depth'][i]
+            p1 = 0.0
+            x2 = rdict['max_depth'][i] + rdict['vertical_buffer'] / 2
+            p2 = -1.0
+            p_layer2 = get_probability(depth, x1, p1, x2, p2)
+            # Lastly, combine to get probability curve for layer i
+            region_layer_probs['%s_%i' % (region, i)] = 1 + p_layer1 + p_layer2
         probsum = sum([lp for lp in list(region_layer_probs.values())])
         if probsum > 0:
             for key, value in region_layer_probs.items():
