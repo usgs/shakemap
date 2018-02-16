@@ -1,7 +1,6 @@
 # stdlib
 import os.path
 import time
-from collections import OrderedDict
 import json
 from datetime import datetime
 
@@ -26,7 +25,7 @@ from descartes import PolygonPatch
 from scipy.ndimage import gaussian_filter
 import pandas as pd
 
-# neic imports
+# local imports
 from mapio.gmt import GMTGrid
 from impactutils.colors.cpalette import ColorPalette
 from mapio.basemapcity import BasemapCities
@@ -35,8 +34,7 @@ from shakelib.rupture.origin import Origin
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.rupture.factory import rupture_from_dict_and_origin
 from shakelib.utils.imt_string import oq_to_file
-
-# local imports
+from shakemap.coremods.contour import getContourLevels
 from shakemap.utils.config import get_config_paths
 from .base import CoreModule
 from shakemap.utils.utils import path_macro_sub
@@ -57,6 +55,7 @@ VERT_EXAG = 0.1
 IMG_ZORDER = 1
 ROAD_ZORDER = 5
 CONTOUR_ZORDER = 800
+DASHED_CONTOUR_ZORDER = 1002
 OCEAN_ZORDER = 1000
 BORDER_ZORDER = 1001
 FAULT_ZORDER = 1100
@@ -894,7 +893,7 @@ class MapMaker(object):
     def round_to(self, n, precision):
         """Round number to nearest level desired precision.
 
-        Example: round_to(22.1,10) => 20.
+        Example: round_to(22.1, 10) => 20.
 
         Args:
             n (float): Input number to round.
@@ -906,53 +905,6 @@ class MapMaker(object):
         """
         correction = 0.5 if n >= 0 else -0.5
         return int(n / precision + correction) * precision
-
-    def getContourLevels(self, dmin, dmax, imt):
-        """Get contour levels given min/max values and desired IMT.
-
-        Args:
-            dmin (float): Minimum value of data to contour.
-            dmax (float): Maximum value of data to contour.
-            imt (str): String IMT (one of PGV,PGA, etc.)
-
-        Returns:
-            ndarray: Numpy array of contour levels.
-
-        """
-        # groupings taken from table on
-        # https://en.wikipedia.org/wiki/Peak_ground_acceleration
-        if imt == 'PGV':
-            # table of minimum dmax and dinc levels
-            dmax_dinc = OrderedDict([(1.1, 0.1),
-                                     (3.4, 0.25),
-                                     (8.1, 0.5),
-                                     (16.0, 2.0),
-                                     (31.0, 5.0),
-                                     (60.0, 10.0),
-                                     (116.0, 10.0),
-                                     (200.0, 25.0)])
-            keys = np.array(list(dmax_dinc.keys()))
-            didx = np.where(keys < dmax)[0].max()
-            dinc = dmax_dinc[keys[didx]]
-            newdmin = self.round_to(dmin, dinc)
-            newdmax = self.round_to(dmax, dinc)
-        else:
-            dmax_dinc = OrderedDict([(0.0017 * 100, 0.1),
-                                     (0.014 * 100, 0.1),
-                                     (0.039 * 100, 0.5),
-                                     (0.092 * 100, 1.0),
-                                     (0.18 * 100, 2.5),
-                                     (0.34 * 100, 5.0),
-                                     (0.65 * 100, 10.0),
-                                     (1.24 * 100, 15.0),
-                                     (3.0 * 100, 37.5)])
-            keys = np.array(list(dmax_dinc.keys()))
-            didx = np.where(keys < dmax)[0].max()
-            dinc = dmax_dinc[keys[didx]]
-            newdmin = self.round_to(dmin, dinc)
-            newdmax = self.round_to(dmax, dinc)
-        levels = np.arange(newdmin, newdmax + dinc, dinc)
-        return levels
 
     def drawContourMap(self, imt, outfolder, cmin=None, cmax=None):
         """
@@ -1023,15 +975,23 @@ class MapMaker(object):
         pimt = gaussian_filter(pimt, 5.0)
         dmin = pimt.min()
         dmax = pimt.max()
-        levels = self.getContourLevels(dmin, dmax, imt)
+        levels = getContourLevels(dmin, dmax)
+
+        # Show dashed contours everywhere
+        csd = m.contour(x, y, np.flipud(pimt), colors='w', linestyles='dashed',
+                        cmap=None, levels=levels, zorder=DASHED_CONTOUR_ZORDER)
+
+        # Solid contours on land
         cs = m.contour(x, y, np.flipud(pimt), colors='w',
                        cmap=None, levels=levels, zorder=CONTOUR_ZORDER)
-        clabels = plt.clabel(cs, colors='k', fmt='%.1f',
+        clabels = plt.clabel(cs, colors='k', fmt='%.3g',
                              fontsize=8.0, zorder=CONTOUR_ZORDER)
+
+        # Put labels at the dashed zorder so that they are not maksed by oceans
         for cl in clabels:
             bbox = dict(boxstyle="round", facecolor='white', edgecolor='w')
             cl.set_bbox(bbox)
-            cl.set_zorder(CONTOUR_ZORDER)
+            cl.set_zorder(DASHED_CONTOUR_ZORDER)
 
         # draw country/state boundaries
         self._drawBoundaries(m)
