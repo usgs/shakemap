@@ -113,7 +113,8 @@ def contour(container, imtype, component, intervals=None,
         interval_type = 'log'
         if imtype == 'MMI':
             interval_type = 'linear'
-        intervals = _get_default_intervals(fgrid, interval_type=interval_type)
+        intervals = getContourLevels(
+            np.min(fgrid), np.max(fgrid), itype=interval_type)
 
     lonstart = metadata['xmin']
     latstart = metadata['ymin']
@@ -234,42 +235,36 @@ def contour_to_files(container, config, output_dir, logger):
                 vector_file.close()
 
 
-def _get_default_intervals(fgrid, interval_type='log'):
-    """
-    Get default intervals for any IMT.
+def getContourLevels(dmin, dmax, itype='log'):
+    """Get contour levels given min/max values and desired IMT.
+
+    Use itype='log' for any IMT that is logarithmically distributed, such as
+    PGA, PGV, and Sa. Linear for MMI.
 
     Args:
-        fgrid (ndarray): Numpy array containing IMT (MMI,PGA, etc.) data.
-        interval_type (str): Either 'log' or 'linear'.
+        dmin (float): Minimum value of data to contour.
+        dmax (float): Maximum value of data to contour.
+        itype (str): Interval type; default is 'log', anythign else
+            indicates linear intervals.
 
     Returns:
-        ndarray: Numpy array with contour intervals for input IMT.
+        ndarray: Numpy array of contour levels.
+
     """
-    if interval_type == 'log':
-        # get the range of the input data
-        dmin = fgrid.min()
-        dmax = fgrid.max()
-        # create an array of intervals at 1's and 3's
-        intervals = []
-        for i in range(-5, 5):
-            intervals += [10**i, (10**i) * 3]
-        intervals = np.array(intervals)
+    if itype == 'log':
+        # Within-decade label values
+        dec_inc = np.array([1, 2, 5], dtype=float)
 
-        # subtract the intervals from the lowest value in the data
-        diffs = dmin - intervals
+        # Upper and lower decades
+        lower_dec = np.floor(np.log10(dmin))
+        upper_dec = np.ceil(np.log10(dmax))
 
-        # find the index of the largest negative value in diffs
-        ibottom = np.where(diffs == diffs[diffs < 0].max())[0][0]
+        # Array of decades
+        decades = np.arange(lower_dec, upper_dec + 1)
 
-        # find the index
-        diffs = dmax - intervals
-        diffmin = diffs[diffs > 0].min()
-        itop = np.where(diffs == diffmin)[0][0]
-        return intervals[ibottom:itop + 1]
+        # Construct levels
+        levels = np.concatenate([np.power(10, d) * dec_inc for d in decades])
+        levels = levels[(levels < dmax) & (levels > dmin)]
     else:
-        # Because you dont contour below the smallest value
-        gmin = np.ceil(np.min(fgrid))
-        # Because you don't contour above the largest value
-        gmax = np.floor(np.max(fgrid))
-        intervals = np.arange(gmin, gmax + 1, 1)
-        return intervals
+        levels = np.arange(np.ceil(dmin), np.floor(dmax) + 1, 1)
+    return levels
