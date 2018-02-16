@@ -173,6 +173,8 @@ class MultiGMPE(GMPE):
 
             # Note: the lnsd2 calculation isn't complete until we drop out of
             # this loop and substract lnmu**2
+            # For an explanation of this method, see:
+            # https://stats.stackexchange.com/questions/16608/what-is-the-variance-of-the-weighted-mixture-of-two-gaussians  # noqa
             for j in range(len(lnsd2)):
                 lnsd2[j] = lnsd2[j] + wts[i] * (lmean**2 + lsd[j]**2)
 

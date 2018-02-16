@@ -4,6 +4,8 @@ import os.path
 # third party
 
 import matplotlib.pyplot as plt
+from matplotlib import gridspec
+import numpy as np
 
 # neic imports
 from shakelib.utils.containers import ShakeMapOutputContainer
@@ -13,7 +15,7 @@ from shakemap.utils.config import get_config_paths
 from .base import CoreModule
 
 
-class TestPlot(CoreModule):
+class XTestImage(CoreModule):
     """
     xtestimage -- Plot 2D images of ShakeMap arrays
     """
@@ -27,7 +29,7 @@ class TestPlot(CoreModule):
             FileNotFoundError: When the the shake_result HDF file does not
                 exist.
         """
-        install_path, data_path = get_config_paths()
+        _, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
         if not os.path.isdir(datadir):
             raise NotADirectoryError('%s is not a valid directory.' % datadir)
@@ -53,15 +55,54 @@ class TestPlot(CoreModule):
         for myimt in imtlist:
             data = datadict[myimt]
             gridobj = data['mean']
+            grddata = gridobj.getData()
             metadata = gridobj.getGeoDict().asDict()
+
             fig = plt.figure(figsize=(10, 10))
-            plt.imshow(gridobj.getData(),
+            gs = plt.GridSpec(4, 4, hspace=0.1, wspace=0.1)
+            ax0 = fig.add_subplot(gs[:-1, 1:])
+            plt.title(self._eventid + ': ' + myimt + ' mean')
+            ax0.imshow(grddata,
                        extent=(metadata['xmin'], metadata['xmax'],
                                metadata['ymin'], metadata['ymax']))
-            plt.colorbar(shrink=0.6)
-            plt.xlabel('Longitude')
-            plt.ylabel('Latitude')
-            plt.title(self._eventid)
-#            plt.grid()
+            ycut = fig.add_subplot(gs[:-1, 0], sharey=ax0)
+            xcut = fig.add_subplot(gs[-1, 1:], sharex=ax0)
+            rows, cols = grddata.shape
+            midrow = int(rows / 2)
+            midcol = int(cols / 2)
+            xvals = np.linspace(metadata['xmin'], metadata['xmax'], cols)
+            yvals = np.linspace(metadata['ymin'], metadata['ymax'], rows)
+            ycut.plot(grddata[:, midcol], yvals)
+            xcut.plot(xvals, grddata[midrow, :])
+            ycut.set(ylabel='Latitude')
+            xcut.set(xlabel='Longitude')
+            ax0.label_outer()
+
             pfile = os.path.join(datadir, self._eventid + '_' + myimt + '.pdf')
+            plt.savefig(pfile)
+
+            gridobj = data['std']
+            grddata = gridobj.getData()
+
+            fig = plt.figure(figsize=(10, 10))
+            gs = plt.GridSpec(4, 4, hspace=0.1, wspace=0.1)
+            ax0 = fig.add_subplot(gs[:-1, 1:])
+            plt.title(self._eventid + ': ' + myimt + ' stddev')
+            ax0.imshow(grddata,
+                       extent=(metadata['xmin'], metadata['xmax'],
+                               metadata['ymin'], metadata['ymax']))
+            ycut = fig.add_subplot(gs[:-1, 0], sharey=ax0)
+            xcut = fig.add_subplot(gs[-1, 1:], sharex=ax0)
+            rows, cols = grddata.shape
+            midrow = int(rows / 2)
+            midcol = int(cols / 2)
+            xvals = np.linspace(metadata['xmin'], metadata['xmax'], cols)
+            yvals = np.linspace(metadata['ymin'], metadata['ymax'], rows)
+            ycut.plot(grddata[:, midcol], yvals)
+            xcut.plot(xvals, grddata[midrow, :])
+            ycut.set(ylabel='Latitude')
+            xcut.set(xlabel='Longitude')
+            ax0.label_outer()
+
+            pfile = os.path.join(datadir, self._eventid + '_' + myimt + '_sd.pdf')
             plt.savefig(pfile)

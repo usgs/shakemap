@@ -10,8 +10,9 @@ import pytest
 from shakemap.utils.config import get_config_paths
 from shakemap.coremods.model import ModelModule
 from shakemap.coremods.assemble import AssembleModule
-from shakemap.coremods.xtestplot import TestPlot
-from shakemap.coremods.xtestplot_spectra import TestPlotSpectra
+from shakemap.coremods.xtestplot import XTestPlot
+from shakemap.coremods.xtestplot_spectra import XTestPlotSpectra
+from shakemap.coremods.xtestimage import XTestImage
 
 ########################################################################
 # Test the nullgmpe and the dummy correlation function as well as
@@ -30,7 +31,7 @@ def test_validation():
         assemble.execute()
         model = ModelModule('validation_test_0006')
         model.execute()
-        plot = TestPlot('validation_test_0006')
+        plot = XTestPlot('validation_test_0006')
         plot.execute()
 
         #
@@ -40,7 +41,17 @@ def test_validation():
         assemble.execute()
         model = ModelModule('validation_test_0007')
         model.execute()
-        plot = TestPlotSpectra('validation_test_0007')
+        plot = XTestPlotSpectra('validation_test_0007')
+        plot.execute()
+
+        #
+        # Test xtestimage on validation event 0013
+        #
+        assemble = AssembleModule('validation_test_0013')
+        assemble.execute()
+        model = ModelModule('validation_test_0013')
+        model.execute()
+        plot = XTestImage('validation_test_0013')
         plot.execute()
     finally:
         data_file = os.path.join(datapath, 'validation_test_0006', 'current',
@@ -56,6 +67,14 @@ def test_validation():
         if os.path.isfile(data_file):
             os.remove(data_file)
         res_file = os.path.join(datapath, 'validation_test_0007', 'current',
+                                'products', 'shake_results.hdf')
+        if os.path.isfile(res_file):
+            os.remove(res_file)
+        data_file = os.path.join(datapath, 'validation_test_0013', 'current',
+                                 'shake_data.hdf')
+        if os.path.isfile(data_file):
+            os.remove(data_file)
+        res_file = os.path.join(datapath, 'validation_test_0013', 'current',
                                 'products', 'shake_results.hdf')
         if os.path.isfile(res_file):
             os.remove(res_file)

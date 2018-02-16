@@ -343,8 +343,8 @@ class StationList(object):
             station_attributes, comp_dict = station_tpl
             lat = station_attributes['lat']
             lon = station_attributes['lon']
-            network = station_attributes['netid']
             code = station_attributes['code']
+            network = station_attributes['netid']
             if 'name' in station_attributes:
                 name = station_attributes['name']
             else:
@@ -661,10 +661,20 @@ class StationList(object):
         Returns:
             stationdict data structure
         """
+        #
+        # Strip off any namespace garbage that is prepended
+        # to the tags
+        #
+        it = ET.iterparse(xmlfile)
+        for _, el in it:
+            if '}' in el.tag:
+                el.tag = el.tag.split('}', 1)[1]
+        #
+        # Parse the cleaned up xml tree
+        #
         imt_translate = {}
         imtset = set()
-        tree = ET.parse(xmlfile)
-        root = tree.getroot()
+        root = it.root
         for sl in root.iter('stationlist'):
             for station in sl:
                 if station.tag != 'station':
@@ -676,7 +686,8 @@ class StationList(object):
                 if 'netid' in attributes:
                     netid = attributes['netid']
                 else:
-                    netid = ''
+                    netid = 'unknown'
+                    attributes['netid'] = netid
                 instrumented = int(netid.lower() not in CIIM_TUPLE)
 
                 if 'code' not in attributes:

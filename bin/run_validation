@@ -56,7 +56,7 @@ if [[ "$osname" == 'Darwin' ]]; then
           $basepath/$ev0009/$filepath/${ev0009}_PGA.pdf \
           $basepath/$ev0010/$filepath/${ev0010}_PGA.pdf \
           $basepath/$ev0011/$filepath/${ev0011}_PGA.pdf \
-          $basepath/$ev0012/$filepath/${ev0012}_PGA.pdf`\
+          $basepath/$ev0012/$filepath/${ev0012}_PGA.pdf \
           $basepath/$ev0013/$filepath/${ev0013}_PGA.pdf`
 else
     `xdg-open $basepath/$ev0001/$filepath/${ev0001}_PGA.pdf \

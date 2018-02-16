@@ -15,7 +15,7 @@ from shakemap.utils.config import get_config_paths
 from .base import CoreModule
 
 
-class TestPlotSpectra(CoreModule):
+class XTestPlotSpectra(CoreModule):
     """
     xtestplot_spectra -- Plot spectra of test events.
     """
