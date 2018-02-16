@@ -192,7 +192,7 @@ class ShakeMapContainer(GridHDFContainer):
         """
 
         if 'version_history' not in self.getDictionaries():
-            raise AttributeError('Version history not set in container.')
+            return {}
 
         version_dict = self.getDictionary('version_history')
         return version_dict

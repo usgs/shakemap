@@ -180,13 +180,19 @@ class AssembleModule(CoreModule):
             # No backups are available, but there is an existing shake_data
             # file. Extract its history and update the timestamp and
             # source network (but leave the version alone).
+            # If there is no history, just start a new one with version 1
             #
             bu_file = os.path.join(datadir, 'shake_data.hdf')
             bu_ic = ShakeMapInputContainer.load(bu_file)
             history = bu_ic.getVersionHistory()
             bu_ic.close()
-            new_line = [timestamp, originator, history['history'][-1][2]]
-            history['history'][-1] = new_line
+            if 'history' in history:
+                new_line = [timestamp, originator, history['history'][-1][2]]
+                history['history'][-1] = new_line
+            else:
+                history = {'history': []}
+                new_line = [timestamp, originator, 1]
+                history['history'].append(new_line)
         else:
             #
             # No backup and no existing file. Make this version 1
