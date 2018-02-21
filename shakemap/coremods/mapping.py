@@ -171,15 +171,17 @@ def getProjectedPatches(polygon, m, edgecolor=WATERCOLOR):
     if isinstance(polygon, MultiPolygon):
         for p in polygon:
             ppolygon = getProjectedPolygon(p, m)
-            patch = PolygonPatch(ppolygon, facecolor=WATERCOLOR,
-                                 edgecolor=edgecolor, zorder=OCEAN_ZORDER,
-                                 linewidth=1, fill=True, visible=True)
+            patch = PolygonPatch(
+                ppolygon, facecolor=WATERCOLOR,
+                edgecolor=edgecolor, zorder=OCEAN_ZORDER,
+                linewidth=1, fill=True, visible=True)
             patches.append(patch)
     else:
         ppolygon = getProjectedPolygon(polygon, m)
-        patch = PolygonPatch(ppolygon, facecolor=WATERCOLOR,
-                             edgecolor=edgecolor, zorder=OCEAN_ZORDER,
-                             linewidth=1, fill=True, visible=True)
+        patch = PolygonPatch(
+            ppolygon, facecolor=WATERCOLOR,
+            edgecolor=edgecolor, zorder=OCEAN_ZORDER,
+            linewidth=1, fill=True, visible=True)
         patches.append(patch)
 
     return patches
