@@ -1,6 +1,7 @@
 # stdlib imports
 import os.path
 import glob
+import json
 
 # third party imports
 from shapely.geometry import MultiLineString
@@ -150,7 +151,6 @@ def contour(container, imtype, component,
                 'units': units
             }
             if imtype == 'MMI':
-                print(cval)
                 color_array = np.array(intensity_colormap.getDataColor(cval))
                 color_rgb = np.array(
                     color_array[0:3] * 255, dtype=int).tolist()
@@ -269,10 +269,29 @@ def contour_to_files(container, config, output_dir, logger):
                 for feature in line_strings:
                     vector_file.write(feature)
 
-                # Add metadata
+                # Grab some metadata
+                meta = container.getMetadata()
+                event_info = meta['input']['event_information']
+                mdict = {
+                    'eventid': event_info['event_id'],
+                    'longitude': float(event_info['longitude']),
+                    'latitude': float(event_info['latitude'])
+                }
 
                 logger.debug('Writing contour file %s' % filename)
                 vector_file.close()
+
+                # Get bounds
+                tmp = fiona.open(filename)
+                bounds = tmp.bounds
+                tmp.close()
+
+                # Read back in to add metadata/bounds
+                data = json.load(open(filename))
+                data['metadata'] = mdict
+                data['bbox'] = bounds
+                with open(filename, 'w') as outfile:
+                    json.dump(data, outfile)
 
 
 def getContourLevels(dmin, dmax, itype='log'):
