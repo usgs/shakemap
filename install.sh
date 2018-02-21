@@ -25,6 +25,11 @@ if [ ! "$conda" ] ; then
     export PATH="$HOME/miniconda/bin:$PATH"
 fi
 
+################
+# In newer versions of conda, the no-deps option is broken.
+conda install conda=4.3.31
+################
+
 # Choose an environment file based on platform
 unamestr=`uname`
 if [ "$unamestr" == 'Linux' ]; then
