@@ -76,7 +76,7 @@ class AugmentModule(CoreModule):
         if 'max_workers' in shake_config['system']:
             shake_config['system']['max_workers'] = \
                     str(shake_config['system']['max_workers'])
-        
+
         modules_file = os.path.join(install_path, 'config', 'modules.conf')
         if os.path.isfile(modules_file):
             self.logger.info('Found a modules file.')

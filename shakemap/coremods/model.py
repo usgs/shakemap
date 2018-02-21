@@ -212,7 +212,7 @@ class ModelModule(CoreModule):
         self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
 
         with cf.ThreadPoolExecutor(max_workers=self.max_workers) as ex:
-            future = ex.map(self._computeMVN, self.imt_out_set)
+            ex.map(self._computeMVN, self.imt_out_set)
 #        self._computeMVN()
 
         # ------------------------------------------------------------------
@@ -793,7 +793,7 @@ class ModelModule(CoreModule):
             else:
                 self.bias_num[imtstr] = 0.0
                 self.bias_den[imtstr] = 0.0
-    
+
             nom_tau = np.mean(sta_tau_dl.flatten())
             nom_variance = 1.0 / ((1.0 / nom_tau**2) + self.bias_den[imtstr])
             self.nominal_bias[imtstr] = self.bias_num[imtstr] * nom_variance
