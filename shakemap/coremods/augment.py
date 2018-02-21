@@ -68,6 +68,14 @@ class AugmentModule(CoreModule):
         validator = get_custom_validator()
         shake_config = shake_data.getConfig()
         shake_config = ConfigObj(shake_config, configspec=spec_file)
+        #
+        # This is a weird hack to get around a bug/feature of ConfigObj
+        # that results in the validation failing if max_workers is already
+        # an integer.
+        #
+        if 'max_workers' in shake_config['system']:
+            shake_config['system']['max_workers'] = \
+                    str(shake_config['system']['max_workers'])
 
         modules_file = os.path.join(install_path, 'config', 'modules.conf')
         if os.path.isfile(modules_file):

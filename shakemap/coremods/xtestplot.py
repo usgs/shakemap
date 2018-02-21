@@ -72,3 +72,4 @@ class XTestPlot(CoreModule):
             plt.grid()
             pfile = os.path.join(datadir, self._eventid + '_' + myimt + '.pdf')
             plt.savefig(pfile)
+            plt.close()

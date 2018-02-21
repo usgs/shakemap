@@ -83,3 +83,4 @@ class XTestPlotSpectra(CoreModule):
         plt.grid()
         pfile = os.path.join(datadir, self._eventid + '_spectra_plot.pdf')
         plt.savefig(pfile)
+        plt.close()
