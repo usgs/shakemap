@@ -1,6 +1,5 @@
 # stdlib imports
 import os.path
-import json
 import glob
 
 # third party imports
@@ -179,11 +178,19 @@ def contour_to_files(container, config, output_dir, logger):
         raise LookupError(
             'File format %s not supported for contours.' % file_format)
     driver, extension = FORMATS[file_format]
-    schema = {'geometry': 'MultiLineString',
-              'properties': {'value': 'float',
-                             'units': 'str'}}
-    crs = {'no_defs': True, 'ellps': 'WGS84',
-           'datum': 'WGS84', 'proj': 'longlat'}
+    schema = {
+        'geometry': 'MultiLineString',
+        'properties': {
+            'value': 'float',
+            'units': 'str'
+        }
+    }
+    crs = {
+        'no_defs': True,
+        'ellps': 'WGS84',
+        'datum': 'WGS84',
+        'proj': 'longlat'
+    }
 
     for imtype in imtlist:
         fileimt = oq_to_file(imtype)
@@ -266,5 +273,10 @@ def getContourLevels(dmin, dmax, itype='log'):
         levels = np.concatenate([np.power(10, d) * dec_inc for d in decades])
         levels = levels[(levels < dmax) & (levels > dmin)]
     else:
-        levels = np.arange(np.ceil(dmin), np.floor(dmax) + 1, 1)
+        # MMI contours are every 0.5 units
+        levels = np.arange(
+            np.ceil(dmin * 2) / 2,
+            np.floor(dmax * 2) / 2 + 0.5,
+            0.5
+        )
     return levels
