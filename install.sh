@@ -27,7 +27,7 @@ fi
 
 ################
 # In newer versions of conda, the no-deps option is broken.
-conda install conda=4.3.31
+conda install -y conda=4.3.31
 ################
 
 # Choose an environment file based on platform
