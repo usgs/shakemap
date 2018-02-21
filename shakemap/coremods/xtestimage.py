@@ -80,6 +80,7 @@ class XTestImage(CoreModule):
 
             pfile = os.path.join(datadir, self._eventid + '_' + myimt + '.pdf')
             plt.savefig(pfile)
+            plt.close()
 
             gridobj = data['std']
             grddata = gridobj.getData()
@@ -106,3 +107,4 @@ class XTestImage(CoreModule):
 
             pfile = os.path.join(datadir, self._eventid + '_' + myimt + '_sd.pdf')
             plt.savefig(pfile)
+            plt.close()

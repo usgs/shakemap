@@ -17,6 +17,8 @@ from mpl_toolkits.basemap import maskoceans
 from openquake.hazardlib import imt
 import openquake.hazardlib.const as oqconst
 
+import concurrent.futures as cf
+
 # local imports
 from .base import CoreModule
 from shakelib.rupture.point_rupture import PointRupture
@@ -200,6 +202,7 @@ class ModelModule(CoreModule):
         self.sta_rrups = {}
 
         self._fillDataArrays()
+
         self._computeBias()
 
         # ------------------------------------------------------------------
@@ -207,7 +210,10 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         self.outgrid = {}   # Holds the interpolated output arrays keyed by IMT
         self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
-        self._computeMVN()
+
+        with cf.ThreadPoolExecutor(max_workers=self.max_workers) as ex:
+            future = ex.map(self._computeMVN, self.imt_out_set)
+#        self._computeMVN()
 
         # ------------------------------------------------------------------
         # Output the data and metadata
@@ -303,6 +309,10 @@ class ModelModule(CoreModule):
         Returns:
             nothing
         """
+        # ------------------------------------------------------------------
+        # Processing parameters
+        # ------------------------------------------------------------------
+        self.max_workers = self.config['system']['max_workers']
         # ------------------------------------------------------------------
         # Do we apply the generic amplification factors?
         # ------------------------------------------------------------------
@@ -783,7 +793,7 @@ class ModelModule(CoreModule):
             else:
                 self.bias_num[imtstr] = 0.0
                 self.bias_den[imtstr] = 0.0
-
+    
             nom_tau = np.mean(sta_tau_dl.flatten())
             nom_variance = 1.0 / ((1.0 / nom_tau**2) + self.bias_den[imtstr])
             self.nominal_bias[imtstr] = self.bias_num[imtstr] * nom_variance
@@ -796,167 +806,166 @@ class ModelModule(CoreModule):
                 % (imtstr, self.nominal_bias[imtstr], np.sqrt(nom_variance),
                    np.size(sta_lons_rad_dl), bias_time))
 
-    def _computeMVN(self):
+    def _computeMVN(self, imtstr):
         """
         Do the MVN computations
         """
-        for imtstr in self.imt_out_set:
-            time1 = time.time()
-            #
-            # Get the index of the (pesudo-) period of the output IMT
-            #
-            outperiod_ix = self.imt_per_ix[imtstr]
-            #
-            # Get the predictions at the output points
-            #
-            oqimt = imt.from_string(imtstr)
-            gmpe = None
-            if imtstr != 'MMI':
-                gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-            pout_mean, pout_sd = _gmas(self.ipe, gmpe, self.sx_out_soil,
-                                       self.rx, self.dx_out, oqimt,
-                                       self.stddev_types, self.apply_gafs)
-            #
-            # If there are no data, just use the unbiased prediction
-            # and the total stddev
-            #
-            if np.size(self.sta_lons_rad[imtstr]) == 0:
-                self.outgrid[imtstr] = pout_mean
-                self.outsd[imtstr] = pout_sd[0]
-                continue
-            #
-            # Get an array of the within-event standard deviations for the
-            # output IMT at the output points
-            #
-            if self.total_sd_only:
-                self.psd[imtstr] = np.sqrt(
-                        pout_sd[0]**2 - SM_CONSTS['default_stddev_inter']**2)
-                self.tsd[imtstr] = np.full_like(
-                        self.psd[imtstr], SM_CONSTS['default_stddev_inter'])
-            else:
-                self.psd[imtstr] = pout_sd[2]
-                self.tsd[imtstr] = pout_sd[1]
-            pout_sd2 = np.power(self.psd[imtstr], 2.0)
-            #
-            # Bias the predictions, and add the residual variance to
-            # phi
-            #
-            out_bias_var = 1.0 / ((1.0 / self.tsd[imtstr]**2) +
-                                  self.bias_den[imtstr])
-            out_bias = self.bias_num[imtstr] * out_bias_var
-            pout_mean += out_bias
-            self.psd[imtstr] = np.sqrt(self.psd[imtstr]**2 + out_bias_var)
-            pout_sd2 += out_bias_var
-            #
-            # Unbias the station residuals and compute the
-            # new phi that includes the variance of the bias
-            #
-            for i in range(np.size(self.sta_lons_rad[imtstr])):
-                imtin = self.sta_imtstr[imtstr][i]
-                in_bias_var = 1.0 / ((1.0 / self.sta_tau[imtstr][i, 0]**2) +
-                                     self.bias_den[imtin])
-                in_bias = self.bias_num[imtin] * in_bias_var
-                self.sta_resids[imtstr][i, 0] -= in_bias
-                self.sta_phi[imtstr][i, 0] = np.sqrt(
-                        self.sta_phi[imtstr][i, 0]**2 + in_bias_var)
-            #
-            # Update the omega factors to account for the bias and the
-            # new value of phi
-            #
-            corr_adj = self.sta_phi[imtstr] / np.sqrt(
-                    self.sta_phi[imtstr]**2 + self.sta_sig_extra[imtstr]**2)
-            corr_adj22 = corr_adj * corr_adj.T
-            np.fill_diagonal(corr_adj22, 1.0)
-            #
-            # Re-build the covariance matrix of the residuals with
-            # the full set of data
-            #
-            dist22 = geodetic_distance_fast(self.sta_lons_rad[imtstr],
-                                            self.sta_lats_rad[imtstr],
-                                            self.sta_lons_rad[imtstr].T,
-                                            self.sta_lats_rad[imtstr].T)
-            d22_rows, d22_cols = np.shape(dist22)  # should be square
-            t1_22 = np.tile(self.sta_period_ix[imtstr], (1, d22_cols))
-            t2_22 = np.tile(self.sta_period_ix[imtstr].T, (d22_rows, 1))
-            corr22 = self.ccf.getCorrelation(t1_22, t2_22, dist22)
-            #
-            # Rebuild sigma22_inv now that we have updated phi and
-            # the correlation adjustment factors
-            #
-            sigma22 = corr22 * corr_adj22 * \
-                (self.sta_phi[imtstr] * self.sta_phi[imtstr].T)
-            sigma22inv = np.linalg.pinv(sigma22)
-            #
-            # Now do the MVN itself...
-            #
-            dtime = mtime = ddtime = ctime = stime = atime = 0
+        time1 = time.time()
+        #
+        # Get the index of the (pesudo-) period of the output IMT
+        #
+        outperiod_ix = self.imt_per_ix[imtstr]
+        #
+        # Get the predictions at the output points
+        #
+        oqimt = imt.from_string(imtstr)
+        gmpe = None
+        if imtstr != 'MMI':
+            gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
+        pout_mean, pout_sd = _gmas(self.ipe, gmpe, self.sx_out_soil,
+                                   self.rx, self.dx_out, oqimt,
+                                   self.stddev_types, self.apply_gafs)
+        #
+        # If there are no data, just use the unbiased prediction
+        # and the total stddev
+        #
+        if np.size(self.sta_lons_rad[imtstr]) == 0:
+            self.outgrid[imtstr] = pout_mean
+            self.outsd[imtstr] = pout_sd[0]
+            return
+        #
+        # Get an array of the within-event standard deviations for the
+        # output IMT at the output points
+        #
+        if self.total_sd_only:
+            self.psd[imtstr] = np.sqrt(
+                    pout_sd[0]**2 - SM_CONSTS['default_stddev_inter']**2)
+            self.tsd[imtstr] = np.full_like(
+                    self.psd[imtstr], SM_CONSTS['default_stddev_inter'])
+        else:
+            self.psd[imtstr] = pout_sd[2]
+            self.tsd[imtstr] = pout_sd[1]
+        pout_sd2 = np.power(self.psd[imtstr], 2.0)
+        #
+        # Bias the predictions, and add the residual variance to
+        # phi
+        #
+        out_bias_var = 1.0 / ((1.0 / self.tsd[imtstr]**2) +
+                              self.bias_den[imtstr])
+        out_bias = self.bias_num[imtstr] * out_bias_var
+        pout_mean += out_bias.reshape(pout_mean.shape)
+        self.psd[imtstr] = np.sqrt(self.psd[imtstr]**2 + out_bias_var)
+        pout_sd2 += out_bias_var.reshape(pout_sd2.shape)
+        #
+        # Unbias the station residuals and compute the
+        # new phi that includes the variance of the bias
+        #
+        for i in range(np.size(self.sta_lons_rad[imtstr])):
+            imtin = self.sta_imtstr[imtstr][i]
+            in_bias_var = 1.0 / ((1.0 / self.sta_tau[imtstr][i, 0]**2) +
+                                 self.bias_den[imtin])
+            in_bias = self.bias_num[imtin] * in_bias_var
+            self.sta_resids[imtstr][i, 0] -= in_bias
+            self.sta_phi[imtstr][i, 0] = np.sqrt(
+                    self.sta_phi[imtstr][i, 0]**2 + in_bias_var)
+        #
+        # Update the omega factors to account for the bias and the
+        # new value of phi
+        #
+        corr_adj = self.sta_phi[imtstr] / np.sqrt(
+                self.sta_phi[imtstr]**2 + self.sta_sig_extra[imtstr]**2)
+        corr_adj22 = corr_adj * corr_adj.T
+        np.fill_diagonal(corr_adj22, 1.0)
+        #
+        # Re-build the covariance matrix of the residuals with
+        # the full set of data
+        #
+        dist22 = geodetic_distance_fast(self.sta_lons_rad[imtstr],
+                                        self.sta_lats_rad[imtstr],
+                                        self.sta_lons_rad[imtstr].T,
+                                        self.sta_lats_rad[imtstr].T)
+        d22_rows, d22_cols = np.shape(dist22)  # should be square
+        t1_22 = np.tile(self.sta_period_ix[imtstr], (1, d22_cols))
+        t2_22 = np.tile(self.sta_period_ix[imtstr].T, (d22_rows, 1))
+        corr22 = self.ccf.getCorrelation(t1_22, t2_22, dist22)
+        #
+        # Rebuild sigma22_inv now that we have updated phi and
+        # the correlation adjustment factors
+        #
+        sigma22 = corr22 * corr_adj22 * \
+            (self.sta_phi[imtstr] * self.sta_phi[imtstr].T)
+        sigma22inv = np.linalg.pinv(sigma22)
+        #
+        # Now do the MVN itself...
+        #
+        dtime = mtime = ddtime = ctime = stime = atime = 0
 
-            ampgrid = np.zeros_like(pout_mean)
-            sdgrid = np.zeros_like(pout_mean)
-            corr_adj12 = corr_adj * np.ones((1, self.smnx))  # noqa
-            for iy in range(self.smny):
-                ss = iy * self.smnx
-                se = (iy + 1) * self.smnx
-                time4 = time.time()
-                dist12 = geodetic_distance_fast(
-                    self.lons_out_rad[ss:se].reshape(1, -1),
-                    self.lats_out_rad[ss:se].reshape(1, -1),
-                    self.sta_lons_rad[imtstr],
-                    self.sta_lats_rad[imtstr])
-                t2_12 = np.full(dist12.shape, outperiod_ix, dtype=np.int)
-                _, d12_cols = np.shape(dist12)
-                t1_12 = np.tile(self.sta_period_ix[imtstr], (1, d12_cols))
-                ddtime += time.time() - time4
-                time4 = time.time()
-                corr12 = self.ccf.getCorrelation(t1_12, t2_12, dist12)  # noqa
-                ctime += time.time() - time4
-                time4 = time.time()
-                # sdarr is the standard deviation of the output sites
-                sdarr = self.psd[imtstr][iy, :].reshape((1, -1))  # noqa
-                # sdsta is the standard deviation of the stations
-                sdsta = self.sta_phi[imtstr]  # noqa
-                sigma12 = ne.evaluate(
-                    "corr12 * corr_adj12 * (sdsta * sdarr)").T
-                stime += time.time() - time4
-                time4 = time.time()
-                #
-                # Sigma12 * Sigma22^-1 is known as the 'regression
-                # coefficient' matrix (rcmatrix)
-                #
-                rcmatrix = sigma12.dot(sigma22inv)
-                dtime += time.time() - time4
-                time4 = time.time()
-                #
-                # This is the MVN solution for the conditional mean
-                #
-                adj_resid = corr_adj * self.sta_resids[imtstr]
-                ampgrid[iy, :] = \
-                    pout_mean[iy, :] + rcmatrix.dot(adj_resid).reshape((-1,))
-                atime += time.time() - time4
-                time4 = time.time()
-                #
-                # We only want the diagonal elements of the conditional
-                # covariance matrix, so there is no point in doing the
-                # full solution with the dot product, e.g.:
-                # sdgrid[ss:se] = pout_sd2[ss:se] -
-                #       np.diag(rcmatrix.dot(sigma12))
-                #
-                sdgrid[iy, :] = \
-                    pout_sd2[iy, :] - np.sum(rcmatrix * sigma12, axis=1)
-                mtime += time.time() - time4
+        ampgrid = np.zeros_like(pout_mean)
+        sdgrid = np.zeros_like(pout_mean)
+        corr_adj12 = corr_adj * np.ones((1, self.smnx))  # noqa
+        for iy in range(self.smny):
+            ss = iy * self.smnx
+            se = (iy + 1) * self.smnx
+            time4 = time.time()
+            dist12 = geodetic_distance_fast(
+                self.lons_out_rad[ss:se].reshape(1, -1),
+                self.lats_out_rad[ss:se].reshape(1, -1),
+                self.sta_lons_rad[imtstr],
+                self.sta_lats_rad[imtstr])
+            t2_12 = np.full(dist12.shape, outperiod_ix, dtype=np.int)
+            _, d12_cols = np.shape(dist12)
+            t1_12 = np.tile(self.sta_period_ix[imtstr], (1, d12_cols))
+            ddtime += time.time() - time4
+            time4 = time.time()
+            corr12 = self.ccf.getCorrelation(t1_12, t2_12, dist12)  # noqa
+            ctime += time.time() - time4
+            time4 = time.time()
+            # sdarr is the standard deviation of the output sites
+            sdarr = self.psd[imtstr][iy, :].reshape((1, -1))  # noqa
+            # sdsta is the standard deviation of the stations
+            sdsta = self.sta_phi[imtstr]  # noqa
+            sigma12 = ne.evaluate(
+                "corr12 * corr_adj12 * (sdsta * sdarr)").T
+            stime += time.time() - time4
+            time4 = time.time()
+            #
+            # Sigma12 * Sigma22^-1 is known as the 'regression
+            # coefficient' matrix (rcmatrix)
+            #
+            rcmatrix = sigma12.dot(sigma22inv)
+            dtime += time.time() - time4
+            time4 = time.time()
+            #
+            # This is the MVN solution for the conditional mean
+            #
+            adj_resid = corr_adj * self.sta_resids[imtstr]
+            ampgrid[iy, :] = \
+                pout_mean[iy, :] + rcmatrix.dot(adj_resid).reshape((-1,))
+            atime += time.time() - time4
+            time4 = time.time()
+            #
+            # We only want the diagonal elements of the conditional
+            # covariance matrix, so there is no point in doing the
+            # full solution with the dot product, e.g.:
+            # sdgrid[ss:se] = pout_sd2[ss:se] -
+            #       np.diag(rcmatrix.dot(sigma12))
+            #
+            sdgrid[iy, :] = \
+                pout_sd2[iy, :] - np.sum(rcmatrix * sigma12, axis=1)
+            mtime += time.time() - time4
 
-            self.outgrid[imtstr] = ampgrid
-            sdgrid[sdgrid < 0] = 0
-            self.outsd[imtstr] = np.sqrt(sdgrid)
+        self.outgrid[imtstr] = ampgrid
+        sdgrid[sdgrid < 0] = 0
+        self.outsd[imtstr] = np.sqrt(sdgrid)
 
-            self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
-            self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))
-            self.logger.debug('\ttime for %s sigma=%f' % (imtstr, stime))
-            self.logger.debug('\ttime for %s rcmatrix=%f' % (imtstr, dtime))
-            self.logger.debug('\ttime for %s amp calc=%f' % (imtstr, atime))
-            self.logger.debug('\ttime for %s sd calc=%f' % (imtstr, mtime))
-            self.logger.debug('total time for %s=%f' %
-                              (imtstr, time.time() - time1))
+        self.logger.debug('\ttime for %s distance=%f' % (imtstr, ddtime))
+        self.logger.debug('\ttime for %s correlation=%f' % (imtstr, ctime))
+        self.logger.debug('\ttime for %s sigma=%f' % (imtstr, stime))
+        self.logger.debug('\ttime for %s rcmatrix=%f' % (imtstr, dtime))
+        self.logger.debug('\ttime for %s amp calc=%f' % (imtstr, atime))
+        self.logger.debug('\ttime for %s sd calc=%f' % (imtstr, mtime))
+        self.logger.debug('total time for %s=%f' %
+                          (imtstr, time.time() - time1))
 
     def _getMaskedGrids(self):
         """
@@ -1312,7 +1321,7 @@ class ModelModule(CoreModule):
             dm_arr = getattr(self.dx_out, dm, None)
             if dm_arr is None:
                 continue
-            dm_arr_2d = Grid2D(dm_arr, gdict)
+            dm_arr_2d = Grid2D(dm_arr.copy(), gdict)
             oc.setGrid('distance_' + dm, dm_arr_2d, metadata=dist_metadata)
         #
         # Output the data and uncertainty grids
@@ -1355,7 +1364,7 @@ class ModelModule(CoreModule):
             dm_arr = getattr(self.dx_out, dm, None)
             if dm_arr is None:
                 continue
-            oc.setArray('distance_' + dm, dm_arr.flatten(),
+            oc.setArray('distance_' + dm, dm_arr.copy().flatten(),
                         metadata=distance_metadata)
         #
         # Store the IMTs
@@ -1682,7 +1691,7 @@ def _gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types, apply_gafs):
         pe = ipe
     else:
         pe = gmpe
-    mean, stddevs = pe.get_mean_and_stddevs(sx, rx, dx, oqimt, stddev_types)
+    mean, stddevs = pe.get_mean_and_stddevs(copy.deepcopy(sx), rx, copy.deepcopy(dx), oqimt, stddev_types)
     if apply_gafs:
         gafs = get_generic_amp_factors(sx, str(oqimt))
         if gafs is not None:
