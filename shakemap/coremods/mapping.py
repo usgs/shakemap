@@ -66,16 +66,18 @@ CITIES_ZORDER = 1200
 GRATICULE_ZORDER = 1200
 SCALE_ZORDER = 1500
 
-MMI_LABELS = {'1': 'I',
-              '2': 'II',
-              '3': 'III',
-              '4': 'IV',
-              '5': 'V',
-              '6': 'VI',
-              '7': 'VII',
-              '8': 'VIII',
-              '9': 'IX',
-              '10': 'X'}
+MMI_LABELS = {
+    '1': 'I',
+    '2': 'II',
+    '3': 'III',
+    '4': 'IV',
+    '5': 'V',
+    '6': 'VI',
+    '7': 'VII',
+    '8': 'VIII',
+    '9': 'IX',
+    '10': 'X'
+}
 
 
 class MappingModule(CoreModule):
@@ -686,19 +688,33 @@ class MapMaker(object):
         Args:
             m (Basemap): Basemap instance.
             fill (bool): Whether or not to fill symbols.
-            imt (str): One of ('MMI', 'PGA', 'PGV', or 'SA(x.y')
+            imt (str): One of ('MMI', 'PGA', 'PGV', or 'SA(x.x)')
         """
         dimt = imt.lower()
 
         # get the locations and values of the MMI observations
-        mmi_dict = {'lat': [], 'lon': [], 'mmi': []}
-        inst_dict = {'lat': [], 'lon': [], dimt: []}
-        # get the locations and values of the observed/instrumented
-        # observations
+        mmi_dict = {
+            'lat': [],
+            'lon': [],
+            'mmi': []
+        }
+        inst_dict = {
+            'lat': [],
+            'lon': [],
+            'mmi': [],
+            dimt: []
+        }
+        # Get the locations and values of the observed/instrumented
+        # observations.
+
         for feature in self.stations['features']:
             lon, lat = feature['geometry']['coordinates']
             net = feature['properties']['network'].lower()
+
+            # If the network matches one of these then it is an MMI
+            # observation
             if net in ['dyfi', 'mmi', 'intensity', 'ciim']:
+                # Append data from MMI features
                 channel = feature['properties']['channels'][0]
                 for amplitude in channel['amplitudes']:
                     if amplitude['name'] != 'mmi':
@@ -707,51 +723,64 @@ class MapMaker(object):
                     mmi_dict['lat'].append(lat)
                     mmi_dict['lon'].append(lon)
             else:
-                channel = feature['properties']['channels'][0]
-                for amplitude in channel['amplitudes']:
-                    if amplitude['name'] != dimt:
-                        continue
-                    inst_dict[dimt].append(float(amplitude['value']))
+                # Otherwise, the feature is an instrument
+
+                # If dimt is MMI then we have to use the converted value
+                # from an instrumental value
+                mmi_conv = float(feature['properties']['intensity'])
+                if dimt == 'mmi':
+                    inst_dict[dimt].append(mmi_conv)
                     inst_dict['lat'].append(lat)
                     inst_dict['lon'].append(lon)
+                else:
+                    # Other IMTs are given in the channel for instruments
+                    channel = feature['properties']['channels'][0]
+                    for amplitude in channel['amplitudes']:
+                        if amplitude['name'] != dimt:
+                            continue
+                        inst_dict[dimt].append(float(amplitude['value']))
+                        inst_dict['lat'].append(lat)
+                        inst_dict['lon'].append(lon)
+                        # Add mmi also for the fill color of symbols
+                        inst_dict['mmi'].append(mmi_conv)
 
-        mmidf = pd.DataFrame(mmi_dict)
-        instdf = pd.DataFrame(inst_dict)
-
-        if not fill:
-            # plot MMI as small circles
-            mmilat = mmidf['lat'].as_matrix()
-            mmilon = mmidf['lon'].as_matrix()
-            m.plot(mmilon, mmilat, 'ko', latlon=True, fillstyle='none',
-                   markersize=4, zorder=STATIONS_ZORDER)
-
-            # plot MMI as slightly larger triangles
-            instlat = instdf['lat'].as_matrix()
-            instlon = instdf['lon'].as_matrix()
-            m.plot(instlon, instlat, 'k^', latlon=True, fillstyle='none',
-                   markersize=6, zorder=STATIONS_ZORDER)
-        else:
-            for idx, value in enumerate(mmidf['lat']):
-                mlat = mmidf['lat'][idx]
-                mlon = mmidf['lon'][idx]
-                mmi = mmidf['mmi'][idx]
+        if fill:
+            # Fill the symbols with the color for the intensity
+            for i in range(len(mmi_dict['lat'])):
+                mlat = mmi_dict['lat'][i]
+                mlon = mmi_dict['lon'][i]
+                mmi = mmi_dict['mmi'][i]
                 mcolor = self.intensity_colormap.getDataColor(mmi)
                 m.plot(mlon, mlat, 'o', latlon=True,
                        markerfacecolor=mcolor, markeredgecolor='k',
                        markersize=4, zorder=STATIONS_ZORDER)
 
-            for idx, value in enumerate(instdf['lat']):
-                mlat = instdf['lat'][idx]
-                mlon = instdf['lon'][idx]
+            for i in range(len(inst_dict['lat'])):
+                mlat = inst_dict['lat'][i]
+                mlon = inst_dict['lon'][i]
                 #
                 # TODO: Make the fill color correspond to the mmi
                 # obtained from the IMT.
                 #
-#                dmmi = instdf[dimt][idx]
-#                mcolor = self.intensity_colormap.getDataColor(dmmi)
+                mmi = inst_dict['mmi'][i]
+                mcolor = self.intensity_colormap.getDataColor(mmi)
                 m.plot(mlon, mlat, '^', latlon=True,
-                       markerfacecolor='w', markeredgecolor='k',
+                       markerfacecolor=mcolor, markeredgecolor='k',
                        markersize=6, zorder=STATIONS_ZORDER)
+        else:
+            # Do not fill symbols
+
+            # plot MMI as small circles
+            mmilat = mmi_dict['lat']
+            mmilon = mmi_dict['lon']
+            m.plot(mmilon, mmilat, 'ko', latlon=True, fillstyle='none',
+                   markersize=4, zorder=STATIONS_ZORDER)
+
+            # plot MMI as slightly larger triangles
+            instlat = inst_dict['lat']
+            instlon = inst_dict['lon']
+            m.plot(instlon, instlat, 'k^', latlon=True, fillstyle='none',
+                   markersize=6, zorder=STATIONS_ZORDER)
 
     def _drawFault(self, m):
         """Draw fault rupture on the map.
