@@ -11,6 +11,7 @@ from shakelib.utils.containers import ShakeMapOutputContainer
 # local imports
 from shakemap.utils.config import get_config_paths
 from .base import CoreModule
+from shakelib.utils.imt_string import oq_to_file
 
 
 class XTestPlot(CoreModule):
@@ -70,6 +71,7 @@ class XTestPlot(CoreModule):
             plt.legend(loc='best')
             plt.title(self._eventid)
             plt.grid()
-            pfile = os.path.join(datadir, self._eventid + '_' + myimt + '.pdf')
+            filleimt = oq_to_file(myimt)
+            pfile = os.path.join(datadir, self._eventid + '_' + fileimt + '.pdf')
             plt.savefig(pfile)
             plt.close()
