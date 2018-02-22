@@ -211,6 +211,14 @@ class ModelModule(CoreModule):
         self.outgrid = {}   # Holds the interpolated output arrays keyed by IMT
         self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
 
+        #
+        # Places to put the results for the regression plots
+        #
+        self.rockgrid = {}
+        self.soilgrid = {}
+        self.rocksd = {}
+        self.soilsd = {}
+
         with cf.ThreadPoolExecutor(max_workers=self.max_workers) as ex:
             ex.map(self._computeMVN, self.imt_out_set)
 #        self._computeMVN()
@@ -261,6 +269,9 @@ class ModelModule(CoreModule):
             self._storeGriddedData(oc)
         else:
             self._storePointData(oc)
+
+        if self.do_grid:
+            self._storeRegressionData(oc)
 
         oc.close()
     # ------------------------------------------------------------------
@@ -391,13 +402,13 @@ class ModelModule(CoreModule):
                                                   defaultVs30=self.vs30default,
                                                   vs30File=self.vs30_file)
 
-            self.sx_out_soil = self.sites_obj_out.getSitesContext(
+            self.sx_out = self.sites_obj_out.getSitesContext(
                     {'lats': self.lats,
                      'lons': self.lons})
             # Replace the Vs30 from the grid (or default) with the Vs30
             # provided with the site list.
             if np.any(self.vs30 > 0):
-                self.sx_out_soil.vs30 = self.vs30
+                self.sx_out.vs30 = self.vs30
         else:
             #
             # GRID: Figure out the grid parameters and get output points
@@ -415,11 +426,16 @@ class ModelModule(CoreModule):
                                                   defaultVs30=self.vs30default,
                                                   vs30File=self.vs30_file)
             self.smnx, self.smny = self.sites_obj_out.getNxNy()
-            self.sx_out_soil = self.sites_obj_out.getSitesContext()
-            lons, lats = np.meshgrid(self.sx_out_soil.lons,
-                                     self.sx_out_soil.lats)
-            self.sx_out_soil.lons = np.flipud(lons.copy())
-            self.sx_out_soil.lats = np.flipud(lats.copy())
+            self.sx_out = self.sites_obj_out.getSitesContext()
+            #
+            # Grids on rock and soil for the regression plots
+            #
+            self.sx_rock = self.sites_obj_out.getSitesContext(rock_vs30=760)
+            self.sx_soil = self.sites_obj_out.getSitesContext(rock_vs30=180)
+            lons, lats = np.meshgrid(self.sx_out.lons,
+                                     self.sx_out.lats)
+            self.sx_out.lons = np.flipud(lons.copy())
+            self.sx_out.lats = np.flipud(lats.copy())
             self.lons = np.flipud(lons).flatten()
             self.lats = np.flipud(lats).flatten()
             self.depths = np.zeros_like(lats)
@@ -822,9 +838,24 @@ class ModelModule(CoreModule):
         gmpe = None
         if imtstr != 'MMI':
             gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-        pout_mean, pout_sd = _gmas(self.ipe, gmpe, self.sx_out_soil,
+        pout_mean, pout_sd = _gmas(self.ipe, gmpe, self.sx_out,
                                    self.rx, self.dx_out, oqimt,
                                    self.stddev_types, self.apply_gafs)
+        if self.do_grid:
+            #
+            # Fill the grids for the regression plots
+            #
+            x_mean, x_sd = _gmas(self.ipe, gmpe, self.sx_rock,
+                                 self.rx, self.dx_out, oqimt,
+                                 [oqconst.StdDev.TOTAL], False)
+            self.rockgrid[imtstr] = x_mean
+            self.rocksd[imtstr] = x_sd[0]
+            x_mean, x_sd = _gmas(self.ipe, gmpe, self.sx_soil,
+                                 self.rx, self.dx_out, oqimt,
+                                 [oqconst.StdDev.TOTAL], False)
+            self.soilgrid[imtstr] = x_mean
+            self.soilsd[imtstr] = x_sd[0]
+
         #
         # If there are no data, just use the unbiased prediction
         # and the total stddev
@@ -984,7 +1015,7 @@ class ModelModule(CoreModule):
             warnings.filterwarnings("ignore",
                                     category=np.VisibleDeprecationWarning)
             moutgrid[refimt] = \
-                maskoceans(self.sx_out_soil.lons, self.sx_out_soil.lats,
+                maskoceans(self.sx_out.lons, self.sx_out.lats,
                            self.outgrid[refimt], inlands=False, grid=1.25)
         for imtout in self.imt_out_set:
             if imtout == refimt:
@@ -1306,7 +1337,7 @@ class ModelModule(CoreModule):
         # Put the Vs30 grid in the output container
         #
         _, units, digits = _get_layer_info('vs30')
-        vs30 = Grid2D(self.sx_out_soil.vs30, gdict)
+        vs30 = Grid2D(self.sx_out.vs30, gdict)
         vs30_metadata = {}
         vs30_metadata['units'] = units
         vs30_metadata['digits'] = digits
@@ -1353,7 +1384,7 @@ class ModelModule(CoreModule):
         #
         vs30_metadata = {'units': 'm/s',
                          'digits': 4}
-        oc.setArray('vs30', self.sx_out_soil.vs30.flatten(),
+        oc.setArray('vs30', self.sx_out.vs30.flatten(),
                     metadata=vs30_metadata)
         #
         # Store the distances
@@ -1381,10 +1412,59 @@ class ModelModule(CoreModule):
             std_layername, units, digits = _get_layer_info(key + '_sd')
             std_metadata = {'units': units,
                             'digits': digits}
-            oc.setIMTArrays(key, self.sx_out_soil.lons.flatten(),
-                            self.sx_out_soil.lats.flatten(),
+            oc.setIMTArrays(key, self.sx_out.lons.flatten(),
+                            self.sx_out.lats.flatten(),
                             ascii_ids, value.flatten(), mean_metadata,
                             self.outsd[key].flatten(), std_metadata, component)
+
+    def _storeRegressionData(self, oc):
+        """
+        Average the regression grids in distance bins and output the arrays
+        """
+        rrup = self.dx_out.rrup
+        dx = self.smdx * 111.0
+        dmax = np.max(rrup)
+        dists = np.arange(0, dmax + dx, dx)
+        ndists = np.size(dists)
+        rockmean = {}
+        soilmean = {}
+        rocksd = {}
+        soilsd = {}
+        mean_dists = np.zeros(ndists - 1)
+        for imtstr in self.rockgrid.keys():
+            rockmean[imtstr] = np.zeros(ndists - 1)
+            soilmean[imtstr] = np.zeros(ndists - 1)
+            rocksd[imtstr] = np.zeros(ndists - 1)
+            soilsd[imtstr] = np.zeros(ndists - 1)
+
+        bad_ix = []
+        for ix in range(ndists - 1):
+            ixx = (rrup >= dists[ix]) & (rrup < dists[ix+1])
+            mean_dists[ix] = (dists[ix] + dists[ix+1]) / 2.0
+            if not np.any(ixx):
+                bad_ix.append(ix)
+                continue
+            for imtstr in self.rockgrid.keys():
+                rockmean[imtstr][ix] = np.mean(self.rockgrid[imtstr][ixx])
+                soilmean[imtstr][ix] = np.mean(self.soilgrid[imtstr][ixx])
+                rocksd[imtstr][ix] = np.mean(self.rocksd[imtstr][ixx])
+                soilsd[imtstr][ix] = np.mean(self.soilsd[imtstr][ixx])
+
+        mean_dists = np.delete(mean_dists, bad_ix)
+        oc.setArray('regression_distances', mean_dists)
+        for imtstr in self.rockgrid.keys():
+            rockmean[imtstr] = np.delete(rockmean[imtstr], bad_ix)
+            soilmean[imtstr] = np.delete(soilmean[imtstr], bad_ix)
+            rocksd[imtstr] = np.delete(rocksd[imtstr], bad_ix)
+            soilsd[imtstr] = np.delete(soilsd[imtstr], bad_ix)
+            oc.setArray('regression_' + imtstr + '_rock_mean', 
+                        rockmean[imtstr])
+            oc.setArray('regression_' + imtstr + '_soil_mean', 
+                        soilmean[imtstr])
+            oc.setArray('regression_' + imtstr + '_rock_sd', 
+                        rocksd[imtstr])
+            oc.setArray('regression_' + imtstr + '_soil_sd', 
+                        soilsd[imtstr])
 
 
 def _get_period_arrays(*args):
