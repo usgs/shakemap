@@ -11,4 +11,4 @@ shakemap.egg-info/
 **/.gmtcommands4
 htmlcov
 tests/data/eventdata/*/current/products
-.pytest/*
+*.pytest*

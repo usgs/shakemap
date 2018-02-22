@@ -12,6 +12,7 @@ from configobj import ConfigObj
 from matplotlib.colors import LightSource
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
+import matplotlib.patheffects as path_effects
 
 from shapely.geometry import MultiPolygon
 from shapely.geometry import MultiLineString
@@ -64,6 +65,17 @@ STATIONS_ZORDER = 1150
 CITIES_ZORDER = 1200
 GRATICULE_ZORDER = 1200
 SCALE_ZORDER = 1500
+
+MMI_LABELS = {'1': 'I',
+              '2': 'II',
+              '3': 'III',
+              '4': 'IV',
+              '5': 'V',
+              '6': 'VI',
+              '7': 'VII',
+              '8': 'VIII',
+              '9': 'IX',
+              '10': 'X'}
 
 
 class MappingModule(CoreModule):
@@ -171,15 +183,17 @@ def getProjectedPatches(polygon, m, edgecolor=WATERCOLOR):
     if isinstance(polygon, MultiPolygon):
         for p in polygon:
             ppolygon = getProjectedPolygon(p, m)
-            patch = PolygonPatch(ppolygon, facecolor=WATERCOLOR,
-                                 edgecolor=edgecolor, zorder=OCEAN_ZORDER,
-                                 linewidth=1, fill=True, visible=True)
+            patch = PolygonPatch(
+                ppolygon, facecolor=WATERCOLOR,
+                edgecolor=edgecolor, zorder=OCEAN_ZORDER,
+                linewidth=1, fill=True, visible=True)
             patches.append(patch)
     else:
         ppolygon = getProjectedPolygon(polygon, m)
-        patch = PolygonPatch(ppolygon, facecolor=WATERCOLOR,
-                             edgecolor=edgecolor, zorder=OCEAN_ZORDER,
-                             linewidth=1, fill=True, visible=True)
+        patch = PolygonPatch(
+            ppolygon, facecolor=WATERCOLOR,
+            edgecolor=edgecolor, zorder=OCEAN_ZORDER,
+            linewidth=1, fill=True, visible=True)
         patches.append(patch)
 
     return patches
@@ -975,23 +989,82 @@ class MapMaker(object):
         pimt = gaussian_filter(pimt, 5.0)
         dmin = pimt.min()
         dmax = pimt.max()
-        levels = getContourLevels(dmin, dmax)
+        if imt == 'MMI':
+            levels = getContourLevels(dmin, dmax, itype='linear')
+            mmimap = ColorPalette.fromPreset('mmi')
 
-        # Show dashed contours everywhere
-        m.contour(x, y, np.flipud(pimt), colors='w', linestyles='dashed',
-                  cmap=None, levels=levels, zorder=DASHED_CONTOUR_ZORDER)
+            for level in levels:
+                # First, draw contours at half unit locations
+                if (level * 2) % 2 == 1:
+                    # Show dashed contours everywhere
+                    m.contour(x, y, np.flipud(pimt),
+                              linestyles='dashed',
+                              cmap=mmimap.cmap,
+                              vmin=mmimap.vmin,
+                              vmax=mmimap.vmax,
+                              levels=level,
+                              zorder=DASHED_CONTOUR_ZORDER)
 
-        # Solid contours on land
-        cs = m.contour(x, y, np.flipud(pimt), colors='w',
-                       cmap=None, levels=levels, zorder=CONTOUR_ZORDER)
-        clabels = plt.clabel(cs, colors='k', fmt='%.3g',
-                             fontsize=8.0, zorder=CONTOUR_ZORDER)
+                    # Solid contours on land
+                    m.contour(x, y, np.flipud(pimt),
+                              cmap=mmimap.cmap,
+                              vmin=mmimap.vmin,
+                              vmax=mmimap.vmax,
+                              levels=level,
+                              zorder=CONTOUR_ZORDER)
 
-        # Put labels at the dashed zorder so that they are not maksed by oceans
-        for cl in clabels:
-            bbox = dict(boxstyle="round", facecolor='white', edgecolor='w')
-            cl.set_bbox(bbox)
-            cl.set_zorder(DASHED_CONTOUR_ZORDER)
+                # Put contour labels at the whole unit locations
+                else:
+                    cs = m.contour(x, y, np.flipud(pimt),
+                                   linestyles='dashed',
+                                   cmap=mmimap.cmap,
+                                   vmin=mmimap.vmin,
+                                   vmax=mmimap.vmax,
+                                   levels=level,
+                                   linewidths=0.0,
+                                   zorder=DASHED_CONTOUR_ZORDER)
+                    labs = cs.clabel(fontsize=0, fmt='%.0f')
+                    for clabel in labs:
+                        cx, cy = clabel.get_position()
+                        label_str = clabel.get_text()
+                        roman_label = MMI_LABELS[label_str]
+                        th = plt.text(cx, cy, roman_label,
+                                      zorder=DASHED_CONTOUR_ZORDER,
+                                      ha='center',
+                                      va='center',
+                                      color='black',
+                                      weight='normal',
+                                      size=16)
+                        th.set_path_effects(
+                            [path_effects.Stroke(linewidth=2.0,
+                                                 foreground='white'),
+                             path_effects.Normal()])
+
+        else:
+            levels = getContourLevels(dmin, dmax)
+
+            # Show dashed contours everywhere
+            m.contour(x, y, np.flipud(pimt), colors='w',
+                      linestyles='dashed',
+                      cmap=None,
+                      levels=levels,
+                      zorder=DASHED_CONTOUR_ZORDER)
+
+            # Solid contours on land
+            cs = m.contour(x, y, np.flipud(pimt), colors='w',
+                           cmap=None,
+                           levels=levels,
+                           zorder=CONTOUR_ZORDER)
+            clabels = plt.clabel(cs, colors='k', fmt='%.3g',
+                                 fontsize=8.0,
+                                 zorder=CONTOUR_ZORDER)
+
+            # Put labels at the dashed zorder so that they are not maksed by
+            # oceans
+            for cl in clabels:
+                bbox = dict(boxstyle="round", facecolor='white', edgecolor='w')
+                cl.set_bbox(bbox)
+                cl.set_zorder(DASHED_CONTOUR_ZORDER)
 
         # draw country/state boundaries
         self._drawBoundaries(m)

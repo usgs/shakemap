@@ -1,7 +1,7 @@
 # stdlib imports
 import os.path
-import json
 import glob
+import json
 
 # third party imports
 from shapely.geometry import MultiLineString
@@ -17,6 +17,7 @@ from configobj import ConfigObj
 # local imports
 from .base import CoreModule
 from shakemap.utils.config import get_config_paths
+from impactutils.colors.cpalette import ColorPalette
 
 FORMATS = {
     'shapefile': ('ESRI Shapefile', 'shp'),
@@ -62,7 +63,7 @@ class ContourModule(CoreModule):
         contour_to_files(container, config, datadir, self.logger)
 
 
-def contour(container, imtype, component, intervals=None,
+def contour(container, imtype, component,
             filter_size=DEFAULT_FILTER_SIZE):
     """
     Generate contours of a specific IMT and return as a Shapely
@@ -74,7 +75,6 @@ def contour(container, imtype, component, intervals=None,
         imtype (str): String containing the name of an Intensity
             Measure Type found in container.
         component (str): Intensity Measure component found in container.
-        intervals (np.ndarray or None): Array of intervals for IMT, or None.
         filter_size (int): Integer filter (see
             https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)
     Returns:
@@ -89,6 +89,7 @@ def contour(container, imtype, component, intervals=None,
         NotImplementedError -- if the user attempts to contour a data file
             with sets of points rather than grids.
     """
+    intensity_colormap = ColorPalette.fromPreset('mmi')
     if container.getDataType() != 'grid':
         raise NotImplementedError('contour module can only contour '
                                   'gridded data, not sets of points')
@@ -109,12 +110,11 @@ def contour(container, imtype, component, intervals=None,
         fgrid = median_filter(sgrid, size=filter_size)
         units = 'pctg'
 
-    if intervals is None:
-        interval_type = 'log'
-        if imtype == 'MMI':
-            interval_type = 'linear'
-        intervals = getContourLevels(
-            np.min(fgrid), np.max(fgrid), itype=interval_type)
+    interval_type = 'log'
+    if imtype == 'MMI':
+        interval_type = 'linear'
+    intervals = getContourLevels(
+        np.min(fgrid), np.max(fgrid), itype=interval_type)
 
     lonstart = metadata['xmin']
     latstart = metadata['ymin']
@@ -146,11 +146,25 @@ def contour(container, imtype, component, intervals=None,
 
         if len(new_contours):
             mls = MultiLineString(new_contours)
-            props = {'value': cval, 'units': units}
-            line_strings.append({
-                'geometry': mapping(mls),
-                'properties': props
-            })
+            props = {
+                'value': cval,
+                'units': units
+            }
+            if imtype == 'MMI':
+                color_array = np.array(intensity_colormap.getDataColor(cval))
+                color_rgb = np.array(
+                    color_array[0:3] * 255, dtype=int).tolist()
+                props['color'] = '#%02x%02x%02x' % tuple(color_rgb)
+                if (cval * 2) % 2 == 1:
+                    props['weight'] = 4
+                else:
+                    props['weight'] = 2
+            line_strings.append(
+                {
+                    'geometry': mapping(mls),
+                    'properties': props
+                }
+            )
     return line_strings
 
 
@@ -179,11 +193,28 @@ def contour_to_files(container, config, output_dir, logger):
         raise LookupError(
             'File format %s not supported for contours.' % file_format)
     driver, extension = FORMATS[file_format]
-    schema = {'geometry': 'MultiLineString',
-              'properties': {'value': 'float',
-                             'units': 'str'}}
-    crs = {'no_defs': True, 'ellps': 'WGS84',
-           'datum': 'WGS84', 'proj': 'longlat'}
+    sa_schema = {
+        'geometry': 'MultiLineString',
+        'properties': {
+            'value': 'float',
+            'units': 'str'
+        }
+    }
+    mmi_schema = {
+        'geometry': 'MultiLineString',
+        'properties': {
+            'value': 'float',
+            'units': 'str',
+            'color': 'str',
+            'weight': 'int'
+        }
+    }
+    crs = {
+        'no_defs': True,
+        'ellps': 'WGS84',
+        'datum': 'WGS84',
+        'proj': 'longlat'
+    }
 
     for imtype in imtlist:
         fileimt = oq_to_file(imtype)
@@ -217,22 +248,50 @@ def contour_to_files(container, config, output_dir, logger):
             # not sure where the warning is coming from,
             # but there appears to be no way to stop it...
             with fiona.drivers():
-                vector_file = fiona.open(filename, 'w',
-                                         driver=driver,
-                                         schema=schema,
-                                         crs=crs)
+                if imtype == 'MMI':
+                    selected_schema = mmi_schema
+                else:
+                    selected_schema = sa_schema
+                vector_file = fiona.open(
+                    filename, 'w',
+                    driver=driver,
+                    schema=selected_schema,
+                    crs=crs
+                )
 
-                intervals = None
-                if 'intervals' in imtype_spec:
-                    intervals = [float(i) for i in imtype_spec['intervals']]
+                line_strings = contour(
+                    container,
+                    imtype,
+                    component,
+                    filter_size
+                )
 
-                line_strings = contour(container, imtype, component, intervals,
-                                       filter_size)
                 for feature in line_strings:
                     vector_file.write(feature)
 
+                # Grab some metadata
+                meta = container.getMetadata()
+                event_info = meta['input']['event_information']
+                mdict = {
+                    'eventid': event_info['event_id'],
+                    'longitude': float(event_info['longitude']),
+                    'latitude': float(event_info['latitude'])
+                }
+
                 logger.debug('Writing contour file %s' % filename)
                 vector_file.close()
+
+                # Get bounds
+                tmp = fiona.open(filename)
+                bounds = tmp.bounds
+                tmp.close()
+
+                # Read back in to add metadata/bounds
+                data = json.load(open(filename))
+                data['metadata'] = mdict
+                data['bbox'] = bounds
+                with open(filename, 'w') as outfile:
+                    json.dump(data, outfile)
 
 
 def getContourLevels(dmin, dmax, itype='log'):
@@ -266,5 +325,10 @@ def getContourLevels(dmin, dmax, itype='log'):
         levels = np.concatenate([np.power(10, d) * dec_inc for d in decades])
         levels = levels[(levels < dmax) & (levels > dmin)]
     else:
-        levels = np.arange(np.ceil(dmin), np.floor(dmax) + 1, 1)
+        # MMI contours are every 0.5 units
+        levels = np.arange(
+            np.ceil(dmin * 2) / 2,
+            np.floor(dmax * 2) / 2 + 0.5,
+            0.5
+        )
     return levels

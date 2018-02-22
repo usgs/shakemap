@@ -17,7 +17,7 @@ def test_intervals():
 
     fgrid = np.array([3.5, 5.6, 8.2])
     intervals = getContourLevels(np.min(fgrid), np.max(fgrid), itype='linear')
-    np.testing.assert_almost_equal(intervals[0], 4.0)
+    np.testing.assert_almost_equal(intervals[0], 3.5)
     np.testing.assert_almost_equal(intervals[-1], 8.0)
 
 
