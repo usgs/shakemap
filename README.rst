@@ -8,13 +8,13 @@
     :alt: Code Coverage Status
 .. image:: https://api.codacy.com/project/badge/Grade/1f771008e85041b89b97b6d12d85298a
     :target: https://www.codacy.com/app/emthompson_2/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
-.. image:: https://badge.waffle.io/usgs/shakemap.svg?columns=all 
-    :target: https://waffle.io/usgs/shakemap 
+.. image:: https://badge.waffle.io/usgs/shakemap.svg?columns=all
+    :target: https://waffle.io/usgs/shakemap
     :alt: 'Waffle.io - Columns and their card count'
 
 shakemap
 ========
-Note, this repository consists of experimental code that is still under 
+Note, this repository consists of experimental code that is still under
 development for the next major update to Shakemap. The current version
 of ShakeMap can be found here
 
@@ -41,7 +41,7 @@ The manual for ShakeMap V3.5 can be found here
 - http://usgs.github.io/shakemap/
 
 The manual includes an both a Technical Guide and and User's Guide. Installation
-instructions can be found in the chapter titled Software & Implementation Guide. 
+instructions can be found in the chapter titled Software & Implementation Guide.
 
 This repository hosts the ShakeMap V3.5 manual and is
 also where we refactoring the code base into Python. The core ShakeMap code,
@@ -62,7 +62,7 @@ ShakeMap, such as for scenario earthquakes and the ShakeMap Atlas, have also
 required ongoing modification of the code.
 
 To receive updates on ShakeMap and discuss the software, please join the
-`shake-dev <https://geohazards.usgs.gov/mailman/listinfo/shake-dev.>`_
+`shake-dev <https://geohazards.usgs.gov/mailman/listinfo/shake-dev>`_
 mailing list. We also encourage requests, questions, and discussions through
 the Github issues tab associated with this repository.
 
