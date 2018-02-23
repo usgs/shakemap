@@ -619,58 +619,61 @@ class ModelModule(CoreModule):
         """
         if 'df1' not in self.dataframes:
             return
-        imtstr = None
         df1 = self.df1.df
-        if 'PGV' in df1 \
-                and imt.PGV in self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
-            imtstr = 'PGV'
-        elif 'PGA' in df1 \
-                and imt.PGA in self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES:
-            imtstr = 'PGA'
-        elif 'SA(1.0)' in df1 \
-                and imt.SA in self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES \
-                and 1.0 in self.gmice.DEFINED_FOR_SA_PERIODS:
-            imtstr = 'SA(1.0)'
-        elif 'SA(0.3)' in df1 \
-                and imt.SA in self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES \
-                and 0.3 in self.gmice.DEFINED_FOR_SA_PERIODS:
-            imtstr = 'SA(0.3)'
-        elif 'SA(3.0)' in df1 \
-                and imt.SA in self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES \
-                and 3.0 in self.gmice.DEFINED_FOR_SA_PERIODS:
-            imtstr = 'SA(3.0)'
-
-        if imtstr is not None:
+        gmice_imts = self.gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+        gmice_pers = self.gmice.DEFINED_FOR_SA_PERIODS
+        for imtstr in self.df1.imts:
             oqimt = imt.from_string(imtstr)
+            if type(oqimt) not in gmice_imts:
+                continue
+            if type(oqimt) == imt.SA and \
+               oqimt.period not in gmice_pers:
+                continue
+
             np.seterr(invalid='ignore')
-            df1['MMI'], _ = self.gmice.getMIfromGM(df1[imtstr], oqimt,
-                                                   dists=df1['rrup'],
-                                                   mag=self.rx.mag)
+            df1['derived_MMI_from_' + imtstr], _ = \
+                    self.gmice.getMIfromGM(df1[imtstr], oqimt,
+                                           dists=df1['rrup'],
+                                           mag=self.rx.mag)
             np.seterr(invalid='warn')
-            df1['MMI_sd'] = np.full_like(df1[imtstr],
-                                         self.gmice.getGM2MIsd()[oqimt])
+            df1['derived_MMI_from_' + imtstr + '_sd'] = \
+                    np.full_like(df1[imtstr], self.gmice.getGM2MIsd()[oqimt])
+
+        preferred_imts = ['PGV', 'PGA', 'SA(1.0)', 'SA(0.3)', 'SA(3.0']
+        df1['MMI'] = np.full_like(df1['lon'], np.nan)
+        df1['MMI_sd'] = np.full_like(df1['lon'], np.nan)
+        for imtstr in preferred_imts:
+            if 'derived_MMI_from_' + imtstr in df1:
+                ixx = np.isnan(df1['MMI'])
+                df1['MMI'][ixx] = df1['derived_MMI_from_' + imtstr][ixx]
+                df1['MMI_sd'][ixx] = \
+                        df1['derived_MMI_from_' + imtstr + '_sd'][ixx]
+        if np.all(np.isnan(df1['MMI'])):
+            del df1['MMI']
+            del df1['MMI_sd']
+        else:
             self.df1.imts.add('MMI')
-            #
-            # Get the prediction and stddevs
-            #
-            gmpe = None
-            pmean, pstddev = _gmas(self.ipe, gmpe, self.df1.sx, self.rx,
-                                   self.df1.dx, imt.from_string('MMI'),
-                                   self.stddev_types, self.apply_gafs)
-            df1['MMI' + '_pred'] = pmean
-            df1['MMI' + '_pred_sigma'] = pstddev[0]
-            if self.total_sd_only:
-                tau_guess = SM_CONSTS['default_stddev_inter']
-                df1['MMI' + '_pred_tau'] = np.full_like(
-                    df1['MMI' + '_pred'], tau_guess)
-                df1['MMI' + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
-                                                   tau_guess**2)
-            else:
-                df1['MMI' + '_pred_tau'] = pstddev[1]
-                df1['MMI' + '_pred_phi'] = pstddev[2]
-            df1['MMI' + '_residual'] = df1['MMI'] - pmean
-            df1['MMI' + '_outliers'] = np.full(pmean.shape, False,
-                                               dtype=np.bool)
+        #
+        # Get the prediction and stddevs
+        #
+        gmpe = None
+        pmean, pstddev = _gmas(self.ipe, gmpe, self.df1.sx, self.rx,
+                               self.df1.dx, imt.from_string('MMI'),
+                               self.stddev_types, self.apply_gafs)
+        df1['MMI' + '_pred'] = pmean
+        df1['MMI' + '_pred_sigma'] = pstddev[0]
+        if self.total_sd_only:
+            tau_guess = SM_CONSTS['default_stddev_inter']
+            df1['MMI' + '_pred_tau'] = np.full_like(
+                df1['MMI' + '_pred'], tau_guess)
+            df1['MMI' + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
+                                               tau_guess**2)
+        else:
+            df1['MMI' + '_pred_tau'] = pstddev[1]
+            df1['MMI' + '_pred_phi'] = pstddev[2]
+        df1['MMI' + '_residual'] = df1['MMI'] - pmean
+        df1['MMI' + '_outliers'] = np.full(pmean.shape, False,
+                                           dtype=np.bool)
 
     def _fillDataArrays(self):
         """
@@ -1231,8 +1234,10 @@ class ModelModule(CoreModule):
         for station in sjdict['features']:
             if station['id'] in sta_ix['df1']:
                 ndf = 'df1'
+                station['properties']['station_type'] = 'seismic'
             elif station['id'] in sta_ix['df2']:
                 ndf = 'df2'
+                station['properties']['station_type'] = 'macroseismic'
             else:
                 raise ValueError('Unknown station %s in stationlist' %
                                  (station['id']))
@@ -1241,24 +1246,27 @@ class ModelModule(CoreModule):
             #
             # Set the 'intensity', 'pga', and 'pga' peak properties
             #
-            if 'MMI' in sdf and not sdf['MMI_outliers'][six]:
+            if 'MMI' in sdf and not sdf['MMI_outliers'][six] \
+                    and not np.isnan(sdf['MMI'][six]):
                 station['properties']['intensity'] = \
-                    '%.1f' % sdf['MMI'][six]
+                    float("%.1f" % sdf['MMI'][six])
                 station['properties']['intensity_stddev'] = \
-                    '%.1f' % sdf['MMI_sd'][six]
+                    sdf['MMI_sd'][six]
             else:
                 station['properties']['intensity'] = 'null'
                 station['properties']['intensity_stddev'] = 'null'
 
-            if 'PGA' in sdf and not sdf['PGA_outliers'][six]:
+            if 'PGA' in sdf and not sdf['PGA_outliers'][six] \
+                    and not np.isnan(sdf['PGA'][six]):
                 station['properties']['pga'] = \
-                    '%.4f' % (np.exp(sdf['PGA'][six]) * 100)
+                    _round_float(np.exp(sdf['PGA'][six]) * 100, 4)
             else:
                 station['properties']['pga'] = 'null'
 
-            if 'PGV' in sdf and not sdf['PGV_outliers'][six]:
-                station['properties']['pgv'] = '%.4f' % \
-                    (np.exp(sdf['PGV'][six]))
+            if 'PGV' in sdf and not sdf['PGV_outliers'][six] \
+                    and not np.isnan(sdf['PGV'][six]):
+                station['properties']['pgv'] = \
+                    _round_float(np.exp(sdf['PGV'][six]), 4)
             else:
                 station['properties']['pgv'] = 'null'
             #
@@ -1287,23 +1295,72 @@ class ModelModule(CoreModule):
                 imt_name = key.lower().replace('_pred', '')
                 mybias = sdf[imt_name.upper() + '_bias'][six]
                 station['properties']['predictions'][imt_name] = {
-                    'value': value,
+                    'value': _round_float(value, 4),
                     'units': units,
-                    'ln_tau': mytau,
-                    'ln_phi': myphi,
-                    'ln_sigma': mysigma,
-                    'ln_bias': mybias,
+                    'ln_tau': _round_float(mytau, 4),
+                    'ln_phi': _round_float(myphi, 4),
+                    'ln_sigma': _round_float(mysigma, 4),
+                    'ln_bias': _round_float(mybias, 4),
                 }
+            #
+            # For df1 stations, add the MMIs comverted from PGM
+            #
+            if ndf == 'df1':
+                station['properties']['mmi_from_pgm'] = {}
+                for myimt in getattr(self, ndf).imts:
+                    if myimt == 'MMI':
+                        continue
+                    dimtstr = 'derived_MMI_from_' + myimt
+                    if dimtstr not in sdf:
+                        continue
+                    imt_name = myimt.lower()
+                    myamp = sdf[dimtstr][six]
+                    mysd = sdf[dimtstr + '_sd'][six]
+                    if np.isnan(myamp):
+                        myamp = 'null'
+                        mysd = 'null'
+                    station['properties']['mmi_from_pgm'][imt_name] = {
+                        'value': _round_float(myamp, 2),
+                        'sigma': _round_float(mysd, 2),
+                    }
+
+            #
+            # For df2 stations, add the PGMs converted from MMI
+            #
+            if ndf == 'df2':
+                station['properties']['pgm_from_mmi'] = {}
+                for myimt in getattr(self, ndf).imts:
+                    if myimt == 'MMI':
+                        continue
+                    imt_name = myimt.lower()
+                    myamp = sdf[myimt][six]
+                    mysd = sdf[myimt + '_sd'][six]
+                    if myimt == 'PGV':
+                        value = np.exp(myamp)
+                        units = 'cm/s'
+                    else:
+                        value = np.exp(myamp) * 100
+                        units = '%g'
+                    if np.isnan(value):
+                        value = 'null'
+                        mysd = 'null'
+                    station['properties']['pgm_from_mmi'][imt_name] = {
+                        'value': value,
+                        'units': units,
+                        'ln_sigma': mysd,
+                    }
             #
             # Set the generic distance property (this is rrup)
             #
-            station['properties']['distance'] = '%.2f' % sdf['rrup'][six]
+            station['properties']['distance'] = \
+                    _round_float(sdf['rrup'][six], 3)
             #
             # Set the specific distances properties
             #
             station['properties']['distances'] = {}
             for dm, dm_arr in dist_dict[ndf].items():
-                station['properties']['distances'][dm] = dm_arr[six]
+                station['properties']['distances'][dm] = \
+                        _round_float(dm_arr[six], 3)
             #
             # Set the outlier flags
             #
@@ -1777,3 +1834,7 @@ def _gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types, apply_gafs):
         if gafs is not None:
             mean += gafs
     return mean, stddevs
+
+def _round_float(val, digits):
+    return float(('%.' + str(digits) + 'f') % val)
+
