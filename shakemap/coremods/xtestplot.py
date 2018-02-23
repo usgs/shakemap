@@ -71,7 +71,7 @@ class XTestPlot(CoreModule):
             plt.legend(loc='best')
             plt.title(self._eventid)
             plt.grid()
-            filleimt = oq_to_file(myimt)
+            fileimt = oq_to_file(myimt)
             pfile = os.path.join(datadir, self._eventid + '_' + fileimt + '.pdf')
             plt.savefig(pfile)
             plt.close()
