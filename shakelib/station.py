@@ -261,10 +261,10 @@ class StationList(object):
                     value = np.exp(myamp) * 100
                     units = '%g'
                 this_amp = {'name': amp[1].lower(),
-                            'value': '%.4f' % value,
+                            'value': float('%.4f' % value),
                             'units': units,
                             'flag': str(amp[3]),
-                            'ln_stddev': '%.4f' % amp[4]
+                            'ln_stddev': float('%.4f' % amp[4])
                             }
                 channels[amp[2]]['amplitudes'].append(this_amp)
             for channel in channels.values():

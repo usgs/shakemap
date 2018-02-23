@@ -60,7 +60,7 @@ class XPlotRegr(CoreModule):
             soilsd[myimt], _ = ic.getArray('regression_' + myimt + '_soil_sd')
         distances, _ = ic.getArray('regression_distances')
 
-#        stations = ic.getStationDict()
+        stations = ic.getStationDict()
 
         #
         # Make plots
@@ -77,6 +77,66 @@ class XPlotRegr(CoreModule):
                          label='soil +/- stddev')
             plt.semilogx(distances, soilgrid[myimt] - soilsd[myimt], 'g--')
 
+            for station in stations['features']:
+                dist = station['properties']['distance']
+                if dist > distances[-1]:
+                    continue
+                if station['properties']['station_type'] == 'seismic':
+                    symbol = '^'
+                    if myimt == 'MMI':
+                        value = station['properties']['intensity']
+                        if value != 'null':
+                            plt.semilogx(dist, value, symbol + 'k', mfc='none')
+                    else:
+                        imtstr = myimt.lower()
+                        value = np.nan
+                        for chan in station['properties']['channels']:
+                            if chan['name'].endswith('Z') or \
+                               chan['name'].endswith('U'):
+                                continue
+                            for amp in chan['amplitudes']:
+                                if amp['name'] != imtstr:
+                                    continue
+                                if amp['flag'] != '' and amp['flag'] != '0':
+                                    break
+                                if amp['value'] == 'null':
+                                    break
+                                if isinstance(amp['value'], str):
+                                    thisamp = float(amp['value'])
+                                else:
+                                    thisamp = amp['value']
+                                if thisamp <= 0:
+                                    break
+                                if myimt == 'PGV':
+                                    tmpval = np.log(thisamp)
+                                else:
+                                    tmpval = np.log(thisamp / 100.)
+                                if np.isnan(value) or tmpval > value:
+                                    value = tmpval
+                                break
+                        if not np.isnan(value):
+                            plt.semilogx(dist, value, symbol + 'k', mfc='none')
+                else:
+                    symbol = 'o'
+                    if myimt == 'MMI':
+                        amp = station['properties']['channels'][0]['amplitudes'][0]
+                        if amp['flag'] == '' or amp['flag'] == '0':
+                            if amp['value'] != 'null':
+                                if isinstance(amp['value'], str):
+                                    value = float(amp['value'])
+                                else:
+                                    value = amp['value']
+                                plt.semilogx(dist, value, symbol + 'k', mfc='none')
+                    else:
+                        imtstr = myimt.lower()
+                        if imtstr in station['properties']['pgm_from_mmi']:
+                            amp = station['properties']['pgm_from_mmi'][imtstr]['value']
+                            if amp != 'null' and amp != 0:
+                                if myimt == 'PGV':
+                                    amp = np.log(amp)
+                                else:
+                                    amp = np.log(amp / 100.)
+                                plt.semilogx(dist, amp, symbol + 'k', mfc='none')
 
             plt.title(self._eventid + ': ' + myimt + ' mean')
             plt.xlabel('Rrup (km)')
