@@ -624,7 +624,7 @@ class ModelModule(CoreModule):
         gmice_pers = self.gmice.DEFINED_FOR_SA_PERIODS
         for imtstr in self.df1.imts:
             oqimt = imt.from_string(imtstr)
-            if not isinstance(oqimt, tuple(gmice_imts):
+            if not isinstance(oqimt, tuple(gmice_imts)):
                 continue
             if isinstance(oqimt, imt.SA) and \
                oqimt.period not in gmice_pers:
