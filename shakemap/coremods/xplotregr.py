@@ -4,7 +4,6 @@ import os.path
 # third party
 
 import matplotlib.pyplot as plt
-from matplotlib import gridspec
 import numpy as np
 
 # neic imports
@@ -66,7 +65,7 @@ class XPlotRegr(CoreModule):
         # Make plots
         #
         for myimt in imtlist:
-            fig = plt.figure(figsize=(10, 10))
+            plt.figure(figsize=(10, 10))
 
             plt.semilogx(distances, rockgrid[myimt], 'r', label='rock')
             plt.semilogx(distances, soilgrid[myimt], 'g', label='soil')
@@ -149,7 +148,7 @@ class XPlotRegr(CoreModule):
             plt.legend()
 
             fileimt = oq_to_file(myimt)
-            pfile = os.path.join(datadir, 
+            pfile = os.path.join(datadir,
                     self._eventid + '_regression_' + fileimt + '.pdf')
             plt.savefig(pfile)
             plt.close()

@@ -624,9 +624,9 @@ class ModelModule(CoreModule):
         gmice_pers = self.gmice.DEFINED_FOR_SA_PERIODS
         for imtstr in self.df1.imts:
             oqimt = imt.from_string(imtstr)
-            if type(oqimt) not in gmice_imts:
+            if not isinstance(oqimt, tuple(gmice_imts):
                 continue
-            if type(oqimt) == imt.SA and \
+            if isinstance(oqimt, imt.SA) and \
                oqimt.period not in gmice_pers:
                 continue
 
@@ -1514,13 +1514,13 @@ class ModelModule(CoreModule):
             soilmean[imtstr] = np.delete(soilmean[imtstr], bad_ix)
             rocksd[imtstr] = np.delete(rocksd[imtstr], bad_ix)
             soilsd[imtstr] = np.delete(soilsd[imtstr], bad_ix)
-            oc.setArray('regression_' + imtstr + '_rock_mean', 
+            oc.setArray('regression_' + imtstr + '_rock_mean',
                         rockmean[imtstr])
-            oc.setArray('regression_' + imtstr + '_soil_mean', 
+            oc.setArray('regression_' + imtstr + '_soil_mean',
                         soilmean[imtstr])
-            oc.setArray('regression_' + imtstr + '_rock_sd', 
+            oc.setArray('regression_' + imtstr + '_rock_sd',
                         rocksd[imtstr])
-            oc.setArray('regression_' + imtstr + '_soil_sd', 
+            oc.setArray('regression_' + imtstr + '_soil_sd',
                         soilsd[imtstr])
 
 
