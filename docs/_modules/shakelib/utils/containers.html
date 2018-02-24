@@ -235,7 +235,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="s1">&#39;version_history&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Version history not set in container.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">{}</span>
 
         <span class="n">version_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;version_history&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">version_dict</span></div></div>
@@ -254,7 +254,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="ShakeMapInputContainer.createFromInput"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.createFromInput">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">createFromInput</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventfile</span><span class="p">,</span> <span class="n">version_history</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">createFromInput</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventfile</span><span class="p">,</span> <span class="n">version_history</span><span class="p">,</span>
                         <span class="n">rupturefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">datafiles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -276,7 +276,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            InputContainer: Instance of InputContainer.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">container</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="n">container</span><span class="o">.</span><span class="n">setConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
         <span class="c1"># create an origin from the event file</span>

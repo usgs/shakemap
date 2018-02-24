@@ -1277,12 +1277,20 @@ class ModelModule(CoreModule):
                 if not key.endswith('_pred'):
                     continue
                 myamp = sdf[key][six]
+                tau_str = 'ln_tau'
+                phi_str = 'ln_phi'
+                sigma_str = 'ln_sigma'
+                bias_str = 'ln_bias'
                 if key.startswith('PGV'):
                     value = np.exp(myamp)
                     units = 'cm/s'
                 elif key.startswith('MMI'):
                     value = myamp
                     units = 'intensity'
+                    tau_str = 'tau'
+                    phi_str = 'phi'
+                    sigma_str = 'sigma'
+                    bias_str = 'bias'
                 else:
                     value = np.exp(myamp) * 100
                     units = '%g'
@@ -1297,10 +1305,10 @@ class ModelModule(CoreModule):
                 station['properties']['predictions'][imt_name] = {
                     'value': _round_float(value, 4),
                     'units': units,
-                    'ln_tau': _round_float(mytau, 4),
-                    'ln_phi': _round_float(myphi, 4),
-                    'ln_sigma': _round_float(mysigma, 4),
-                    'ln_bias': _round_float(mybias, 4),
+                    tau_str: _round_float(mytau, 4),
+                    phi_str: _round_float(myphi, 4),
+                    sigma_str: _round_float(mysigma, 4),
+                    bias_str: _round_float(mybias, 4),
                 }
             #
             # For df1 stations, add the MMIs comverted from PGM
@@ -1345,9 +1353,9 @@ class ModelModule(CoreModule):
                         value = 'null'
                         mysd = 'null'
                     station['properties']['pgm_from_mmi'][imt_name] = {
-                        'value': value,
+                        'value': _round_float(value, 4),
                         'units': units,
-                        'ln_sigma': mysd,
+                        'ln_sigma': _round_float(mysd, 4),
                     }
             #
             # Set the generic distance property (this is rrup)
@@ -1836,5 +1844,7 @@ def _gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types, apply_gafs):
     return mean, stddevs
 
 def _round_float(val, digits):
+    if val == 'null':
+        return val
     return float(('%.' + str(digits) + 'f') % val)
 

@@ -43,8 +43,8 @@
   <h1>Source code for shakemap.coremods.contour</h1><div class="highlight"><pre>
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">json</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">MultiLineString</span>
@@ -60,6 +60,7 @@
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
+<span class="kn">from</span> <span class="nn">impactutils.colors.cpalette</span> <span class="k">import</span> <span class="n">ColorPalette</span>
 
 <span class="n">FORMATS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;shapefile&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;ESRI Shapefile&#39;</span><span class="p">,</span> <span class="s1">&#39;shp&#39;</span><span class="p">),</span>
@@ -105,7 +106,7 @@
         <span class="n">contour_to_files</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="contour"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.contour">[docs]</a><span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">intervals</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+<div class="viewcode-block" id="contour"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.contour">[docs]</a><span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span>
             <span class="n">filter_size</span><span class="o">=</span><span class="n">DEFAULT_FILTER_SIZE</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate contours of a specific IMT and return as a Shapely</span>
@@ -117,7 +118,6 @@
 <span class="sd">        imtype (str): String containing the name of an Intensity</span>
 <span class="sd">            Measure Type found in container.</span>
 <span class="sd">        component (str): Intensity Measure component found in container.</span>
-<span class="sd">        intervals (np.ndarray or None): Array of intervals for IMT, or None.</span>
 <span class="sd">        filter_size (int): Integer filter (see</span>
 <span class="sd">            https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)</span>
 <span class="sd">    Returns:</span>
@@ -132,6 +132,7 @@
 <span class="sd">        NotImplementedError -- if the user attempts to contour a data file</span>
 <span class="sd">            with sets of points rather than grids.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">intensity_colormap</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">container</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;contour module can only contour &#39;</span>
                                   <span class="s1">&#39;gridded data, not sets of points&#39;</span><span class="p">)</span>
@@ -152,11 +153,11 @@
         <span class="n">fgrid</span> <span class="o">=</span> <span class="n">median_filter</span><span class="p">(</span><span class="n">sgrid</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">filter_size</span><span class="p">)</span>
         <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;pctg&#39;</span>
 
-    <span class="k">if</span> <span class="n">intervals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;log&#39;</span>
-        <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-            <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span>
-        <span class="n">intervals</span> <span class="o">=</span> <span class="n">_get_default_intervals</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span> <span class="n">interval_type</span><span class="o">=</span><span class="n">interval_type</span><span class="p">)</span>
+    <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;log&#39;</span>
+    <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+        <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span>
+    <span class="n">intervals</span> <span class="o">=</span> <span class="n">getContourLevels</span><span class="p">(</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">fgrid</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fgrid</span><span class="p">),</span> <span class="n">itype</span><span class="o">=</span><span class="n">interval_type</span><span class="p">)</span>
 
     <span class="n">lonstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmin&#39;</span><span class="p">]</span>
     <span class="n">latstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ymin&#39;</span><span class="p">]</span>
@@ -188,11 +189,25 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_contours</span><span class="p">):</span>
             <span class="n">mls</span> <span class="o">=</span> <span class="n">MultiLineString</span><span class="p">(</span><span class="n">new_contours</span><span class="p">)</span>
-            <span class="n">props</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">cval</span><span class="p">,</span> <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">}</span>
-            <span class="n">line_strings</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
-                <span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">mapping</span><span class="p">(</span><span class="n">mls</span><span class="p">),</span>
-                <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">props</span>
-            <span class="p">})</span>
+            <span class="n">props</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">cval</span><span class="p">,</span>
+                <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+                <span class="n">color_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">intensity_colormap</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">cval</span><span class="p">))</span>
+                <span class="n">color_rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                    <span class="n">color_array</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">props</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;#</span><span class="si">%02x%02x%02x</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">color_rgb</span><span class="p">)</span>
+                <span class="k">if</span> <span class="p">(</span><span class="n">cval</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">props</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">props</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="n">line_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">mapping</span><span class="p">(</span><span class="n">mls</span><span class="p">),</span>
+                    <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">props</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
     <span class="k">return</span> <span class="n">line_strings</span></div>
 
 
@@ -221,11 +236,28 @@
         <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span>
             <span class="s1">&#39;File format </span><span class="si">%s</span><span class="s1"> not supported for contours.&#39;</span> <span class="o">%</span> <span class="n">file_format</span><span class="p">)</span>
     <span class="n">driver</span><span class="p">,</span> <span class="n">extension</span> <span class="o">=</span> <span class="n">FORMATS</span><span class="p">[</span><span class="n">file_format</span><span class="p">]</span>
-    <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="s1">&#39;MultiLineString&#39;</span><span class="p">,</span>
-              <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">}}</span>
-    <span class="n">crs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;no_defs&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span> <span class="s1">&#39;ellps&#39;</span><span class="p">:</span> <span class="s1">&#39;WGS84&#39;</span><span class="p">,</span>
-           <span class="s1">&#39;datum&#39;</span><span class="p">:</span> <span class="s1">&#39;WGS84&#39;</span><span class="p">,</span> <span class="s1">&#39;proj&#39;</span><span class="p">:</span> <span class="s1">&#39;longlat&#39;</span><span class="p">}</span>
+    <span class="n">sa_schema</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="s1">&#39;MultiLineString&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">mmi_schema</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="s1">&#39;MultiLineString&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">crs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;no_defs&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s1">&#39;ellps&#39;</span><span class="p">:</span> <span class="s1">&#39;WGS84&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;datum&#39;</span><span class="p">:</span> <span class="s1">&#39;WGS84&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;proj&#39;</span><span class="p">:</span> <span class="s1">&#39;longlat&#39;</span>
+    <span class="p">}</span>
 
     <span class="k">for</span> <span class="n">imtype</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
         <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
@@ -259,63 +291,90 @@
             <span class="c1"># not sure where the warning is coming from,</span>
             <span class="c1"># but there appears to be no way to stop it...</span>
             <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">drivers</span><span class="p">():</span>
-                <span class="n">vector_file</span> <span class="o">=</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span>
-                                         <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span>
-                                         <span class="n">schema</span><span class="o">=</span><span class="n">schema</span><span class="p">,</span>
-                                         <span class="n">crs</span><span class="o">=</span><span class="n">crs</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+                    <span class="n">selected_schema</span> <span class="o">=</span> <span class="n">mmi_schema</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">selected_schema</span> <span class="o">=</span> <span class="n">sa_schema</span>
+                <span class="n">vector_file</span> <span class="o">=</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span>
+                    <span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">,</span>
+                    <span class="n">driver</span><span class="o">=</span><span class="n">driver</span><span class="p">,</span>
+                    <span class="n">schema</span><span class="o">=</span><span class="n">selected_schema</span><span class="p">,</span>
+                    <span class="n">crs</span><span class="o">=</span><span class="n">crs</span>
+                <span class="p">)</span>
 
-                <span class="n">intervals</span> <span class="o">=</span> <span class="kc">None</span>
-                <span class="k">if</span> <span class="s1">&#39;intervals&#39;</span> <span class="ow">in</span> <span class="n">imtype_spec</span><span class="p">:</span>
-                    <span class="n">intervals</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">imtype_spec</span><span class="p">[</span><span class="s1">&#39;intervals&#39;</span><span class="p">]]</span>
+                <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span>
+                    <span class="n">container</span><span class="p">,</span>
+                    <span class="n">imtype</span><span class="p">,</span>
+                    <span class="n">component</span><span class="p">,</span>
+                    <span class="n">filter_size</span>
+                <span class="p">)</span>
 
-                <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">intervals</span><span class="p">,</span>
-                                       <span class="n">filter_size</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">line_strings</span><span class="p">:</span>
                     <span class="n">vector_file</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
 
+                <span class="c1"># Grab some metadata</span>
+                <span class="n">meta</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
+                <span class="n">event_info</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]</span>
+                <span class="n">mdict</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;eventid&#39;</span><span class="p">:</span> <span class="n">event_info</span><span class="p">[</span><span class="s1">&#39;event_id&#39;</span><span class="p">],</span>
+                    <span class="s1">&#39;longitude&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">event_info</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]),</span>
+                    <span class="s1">&#39;latitude&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">event_info</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">])</span>
+                <span class="p">}</span>
+
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Writing contour file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
-                <span class="n">vector_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+                <span class="n">vector_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+                <span class="c1"># Get bounds</span>
+                <span class="n">tmp</span> <span class="o">=</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+                <span class="n">bounds</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">bounds</span>
+                <span class="n">tmp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+                <span class="c1"># Read back in to add metadata/bounds</span>
+                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mdict</span>
+                <span class="n">data</span><span class="p">[</span><span class="s1">&#39;bbox&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bounds</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+                    <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">outfile</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_get_default_intervals</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span> <span class="n">interval_type</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get default intervals for any IMT.</span>
+<div class="viewcode-block" id="getContourLevels"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.getContourLevels">[docs]</a><span class="k">def</span> <span class="nf">getContourLevels</span><span class="p">(</span><span class="n">dmin</span><span class="p">,</span> <span class="n">dmax</span><span class="p">,</span> <span class="n">itype</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get contour levels given min/max values and desired IMT.</span>
+
+<span class="sd">    Use itype=&#39;log&#39; for any IMT that is logarithmically distributed, such as</span>
+<span class="sd">    PGA, PGV, and Sa. Linear for MMI.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        fgrid (ndarray): Numpy array containing IMT (MMI,PGA, etc.) data.</span>
-<span class="sd">        interval_type (str): Either &#39;log&#39; or &#39;linear&#39;.</span>
+<span class="sd">        dmin (float): Minimum value of data to contour.</span>
+<span class="sd">        dmax (float): Maximum value of data to contour.</span>
+<span class="sd">        itype (str): Interval type; default is &#39;log&#39;, anythign else</span>
+<span class="sd">            indicates linear intervals.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        ndarray: Numpy array with contour intervals for input IMT.</span>
+<span class="sd">        ndarray: Numpy array of contour levels.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">interval_type</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
-        <span class="c1"># get the range of the input data</span>
-        <span class="n">dmin</span> <span class="o">=</span> <span class="n">fgrid</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-        <span class="n">dmax</span> <span class="o">=</span> <span class="n">fgrid</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-        <span class="c1"># create an array of intervals at 1&#39;s and 3&#39;s</span>
-        <span class="n">intervals</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">):</span>
-            <span class="n">intervals</span> <span class="o">+=</span> <span class="p">[</span><span class="mi">10</span><span class="o">**</span><span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">i</span><span class="p">)</span> <span class="o">*</span> <span class="mi">3</span><span class="p">]</span>
-        <span class="n">intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">intervals</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">itype</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
+        <span class="c1"># Within-decade label values</span>
+        <span class="n">dec_inc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
 
-        <span class="c1"># subtract the intervals from the lowest value in the data</span>
-        <span class="n">diffs</span> <span class="o">=</span> <span class="n">dmin</span> <span class="o">-</span> <span class="n">intervals</span>
+        <span class="c1"># Upper and lower decades</span>
+        <span class="n">lower_dec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dmin</span><span class="p">))</span>
+        <span class="n">upper_dec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dmax</span><span class="p">))</span>
 
-        <span class="c1"># find the index of the largest negative value in diffs</span>
-        <span class="n">ibottom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diffs</span> <span class="o">==</span> <span class="n">diffs</span><span class="p">[</span><span class="n">diffs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">())[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Array of decades</span>
+        <span class="n">decades</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lower_dec</span><span class="p">,</span> <span class="n">upper_dec</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
 
-        <span class="c1"># find the index</span>
-        <span class="n">diffs</span> <span class="o">=</span> <span class="n">dmax</span> <span class="o">-</span> <span class="n">intervals</span>
-        <span class="n">diffmin</span> <span class="o">=</span> <span class="n">diffs</span><span class="p">[</span><span class="n">diffs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
-        <span class="n">itop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">diffs</span> <span class="o">==</span> <span class="n">diffmin</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">intervals</span><span class="p">[</span><span class="n">ibottom</span><span class="p">:</span><span class="n">itop</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+        <span class="c1"># Construct levels</span>
+        <span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">*</span> <span class="n">dec_inc</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">decades</span><span class="p">])</span>
+        <span class="n">levels</span> <span class="o">=</span> <span class="n">levels</span><span class="p">[(</span><span class="n">levels</span> <span class="o">&lt;</span> <span class="n">dmax</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">levels</span> <span class="o">&gt;</span> <span class="n">dmin</span><span class="p">)]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># Because you dont contour below the smallest value</span>
-        <span class="n">gmin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">fgrid</span><span class="p">))</span>
-        <span class="c1"># Because you don&#39;t contour above the largest value</span>
-        <span class="n">gmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fgrid</span><span class="p">))</span>
-        <span class="n">intervals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">gmin</span><span class="p">,</span> <span class="n">gmax</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">intervals</span>
+        <span class="c1"># MMI contours are every 0.5 units</span>
+        <span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">dmin</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">dmax</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
+            <span class="mf">0.5</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">levels</span></div>
 </pre></div>
 
           </div>

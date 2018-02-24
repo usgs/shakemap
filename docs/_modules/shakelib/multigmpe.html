@@ -114,10 +114,10 @@
         <span class="c1"># ---------------------------------------------------------------------</span>
 
         <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
                 <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
                 <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 
@@ -130,12 +130,12 @@
 
         <span class="c1"># Need to turn all 2D arrays into 1D arrays because of</span>
         <span class="c1"># inconsistencies in how arrays are handled in OpenQuake.</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
-                <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">dists</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
-                <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
+                <span class="n">sites</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># These are arrays to hold the weighted combination of the GMPEs</span>
@@ -160,7 +160,7 @@
             <span class="c1"># Evaluate GMPEs</span>
             <span class="c1"># -----------------------------------------------------------------</span>
 
-            <span class="n">gmpe_imts</span> <span class="o">=</span> <span class="p">[</span><span class="n">imt</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span>
+            <span class="n">gmpe_imts</span> <span class="o">=</span> <span class="p">[</span><span class="n">imt</span><span class="o">.</span><span class="n">__name__</span> <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span>
                          <span class="n">gmpe</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">]</span>
             <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">PGV</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;PGV&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gmpe_imts</span><span class="p">):</span>
                 <span class="c1"># -------------------------------------------------------------</span>
@@ -216,6 +216,8 @@
 
             <span class="c1"># Note: the lnsd2 calculation isn&#39;t complete until we drop out of</span>
             <span class="c1"># this loop and substract lnmu**2</span>
+            <span class="c1"># For an explanation of this method, see:</span>
+            <span class="c1"># https://stats.stackexchange.com/questions/16608/what-is-the-variance-of-the-weighted-mixture-of-two-gaussians  # noqa</span>
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lnsd2</span><span class="p">)):</span>
                 <span class="n">lnsd2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">lnsd2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">wts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">lmean</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
@@ -225,12 +227,12 @@
         <span class="n">lnsd</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">lnsd2</span><span class="p">]</span>
 
         <span class="c1"># Undo reshapes of inputs</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
-                <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">dists</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="n">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
-                <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
+                <span class="n">sites</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
 
         <span class="c1"># Reshape output</span>
         <span class="n">lnmu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">lnmu</span><span class="p">,</span> <span class="n">orig_shape</span><span class="p">)</span>
@@ -240,7 +242,7 @@
         <span class="k">return</span> <span class="n">lnmu</span><span class="p">,</span> <span class="n">lnsd</span>
 
 <div class="viewcode-block" id="MultiGMPE.from_config"><a class="viewcode-back" href="../../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE.from_config">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a MultiGMPE from a config file.</span>
 
@@ -287,11 +289,11 @@
             <span class="k">if</span> <span class="n">set_of_sets</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">mgmpes</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">selected_gmpe_sets</span><span class="p">:</span>
-                    <span class="n">mgmpes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__multigmpe_from_gmpe_set</span><span class="p">(</span>
+                    <span class="n">mgmpes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cls</span><span class="o">.</span><span class="n">__multigmpe_from_gmpe_set</span><span class="p">(</span>
                         <span class="n">conf</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="n">filter_imt</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">))</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="n">mgmpes</span><span class="p">,</span> <span class="n">gmpe_set_weights</span><span class="p">,</span> <span class="n">imc</span><span class="o">=</span><span class="n">IMC</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">set_of_gmpes</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__multigmpe_from_gmpe_set</span><span class="p">(</span>
+                <span class="n">out</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">__multigmpe_from_gmpe_set</span><span class="p">(</span>
                     <span class="n">conf</span><span class="p">,</span>
                     <span class="n">selected_gmpe</span><span class="p">,</span>
                     <span class="n">filter_imt</span><span class="o">=</span><span class="n">filter_imt</span><span class="p">,</span>
@@ -446,7 +448,7 @@
         <span class="k">return</span> <span class="n">mgmpe</span>
 
 <div class="viewcode-block" id="MultiGMPE.from_list"><a class="viewcode-back" href="../../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE.from_list">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_list</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">gmpes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">from_list</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">gmpes</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span>
                   <span class="n">imc</span><span class="o">=</span><span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span><span class="p">,</span>
                   <span class="n">default_gmpes_for_site</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                   <span class="n">default_gmpes_for_site_weights</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
@@ -496,7 +498,7 @@
         <span class="c1"># Check that GMPE weights sum to 1.0:</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
 
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">1e-7</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">7</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Weights must sum to one.&#39;</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
@@ -515,7 +517,7 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">GMPE</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">%s</span><span class="se">\&quot;</span><span class="s2"> is not a GMPE instance.&quot;</span> <span class="o">%</span> <span class="n">g</span><span class="p">)</span>
 
-        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">()</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="n">cls</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span> <span class="o">=</span> <span class="n">gmpes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">WEIGHTS</span> <span class="o">=</span> <span class="n">weights</span>
 
@@ -819,11 +821,11 @@
 <span class="sd">        The associated coefficient table.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">stuff</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">()</span>
+    <span class="n">stuff</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">__dir__</span><span class="p">()</span>
     <span class="n">coef_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">stuff</span> <span class="k">if</span> <span class="s1">&#39;COEFFS&#39;</span> <span class="ow">in</span> <span class="n">s</span><span class="p">]</span>
     <span class="k">for</span> <span class="n">coef_sel</span> <span class="ow">in</span> <span class="n">coef_list</span><span class="p">:</span>
         <span class="n">cobj</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">coef_sel</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s2">&quot;sa_coeffs&quot;</span> <span class="ow">in</span> <span class="n">cobj</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s2">&quot;sa_coeffs&quot;</span> <span class="ow">in</span> <span class="n">cobj</span><span class="o">.</span><span class="n">__dir__</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">cobj</span>
     <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;GMPE </span><span class="si">%s</span><span class="s2"> does not contain sa_coeffs attribute.&quot;</span> <span class="o">%</span> <span class="n">gmpe</span><span class="p">)</span></div>
 </pre></div>

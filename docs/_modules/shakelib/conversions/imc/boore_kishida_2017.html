@@ -141,7 +141,7 @@
 
         <span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getParamsFromIMT</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
 
-        <span class="n">rrups_clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rrups</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+        <span class="n">rrups_clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rrups</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">mag</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">mag</span> <span class="o">=</span> <span class="mf">2.0</span>
         <span class="k">elif</span> <span class="n">mag</span> <span class="o">&gt;</span> <span class="mi">9</span><span class="p">:</span>

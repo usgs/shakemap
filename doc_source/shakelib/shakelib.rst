@@ -5,6 +5,13 @@ shakelib
 .. toctree::
 
     shakelib.conversions
+    shakelib.correlation
+    shakelib.directivity
+    shakelib.gmice
+    shakelib.gmpe
+    shakelib.plotting
+    shakelib.rupture
+    shakelib.utils
 
 Submodules
 

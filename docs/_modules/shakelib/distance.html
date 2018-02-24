@@ -94,7 +94,7 @@
             <span class="n">gmpe</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Distance.fromSites"><a class="viewcode-back" href="../../shakelib/shakelib.distance.html#shakelib.distance.Distance.fromSites">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromSites</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fromSites</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convenience class method to construct a Distance object from a sites</span>
 <span class="sd">        object.</span>
@@ -120,7 +120,7 @@
         <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
         <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">)</span>
         <span class="n">dep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">rup</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">rup</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Distance.getDistanceContext"><a class="viewcode-back" href="../../shakelib/shakelib.distance.html#shakelib.distance.Distance.getDistanceContext">[docs]</a>    <span class="k">def</span> <span class="nf">getDistanceContext</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -170,7 +170,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ddict</span> <span class="o">=</span> <span class="n">get_distance</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">requires</span><span class="p">),</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rupture</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">requires</span><span class="p">:</span>
-            <span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)[</span><span class="n">method</span><span class="p">]</span> <span class="o">=</span> <span class="n">ddict</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
+            <span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">__dict__</span><span class="p">)[</span><span class="n">method</span><span class="p">]</span> <span class="o">=</span> <span class="n">ddict</span><span class="p">[</span><span class="n">method</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">context</span></div>
 
