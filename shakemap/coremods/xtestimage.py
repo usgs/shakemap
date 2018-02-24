@@ -13,6 +13,7 @@ from shakelib.utils.containers import ShakeMapOutputContainer
 # local imports
 from shakemap.utils.config import get_config_paths
 from .base import CoreModule
+from shakelib.utils.imt_string import oq_to_file
 
 
 class XTestImage(CoreModule):
@@ -53,6 +54,8 @@ class XTestImage(CoreModule):
         # Make plots
         #
         for myimt in imtlist:
+            fileimt = oq_to_file(myimt)
+
             data = datadict[myimt]
             gridobj = data['mean']
             grddata = gridobj.getData()
@@ -78,7 +81,7 @@ class XTestImage(CoreModule):
             xcut.set(xlabel='Longitude')
             ax0.label_outer()
 
-            pfile = os.path.join(datadir, self._eventid + '_' + myimt + '.pdf')
+            pfile = os.path.join(datadir, self._eventid + '_' + fileimt + '.pdf')
             plt.savefig(pfile)
             plt.close()
 
@@ -105,6 +108,6 @@ class XTestImage(CoreModule):
             xcut.set(xlabel='Longitude')
             ax0.label_outer()
 
-            pfile = os.path.join(datadir, self._eventid + '_' + myimt + '_sd.pdf')
+            pfile = os.path.join(datadir, self._eventid + '_' + fileimt + '_sd.pdf')
             plt.savefig(pfile)
             plt.close()

@@ -13,6 +13,7 @@ from shakemap.coremods.assemble import AssembleModule
 from shakemap.coremods.xtestplot import XTestPlot
 from shakemap.coremods.xtestplot_spectra import XTestPlotSpectra
 from shakemap.coremods.xtestimage import XTestImage
+from shakemap.coremods.xplotregr import XPlotRegr
 
 ########################################################################
 # Test the nullgmpe and the dummy correlation function as well as
@@ -53,6 +54,8 @@ def test_validation():
         model.execute()
         plot = XTestImage('validation_test_0013')
         plot.execute()
+        regr = XPlotRegr('validation_test_0013')
+        regr.execute()
     finally:
         data_file = os.path.join(datapath, 'validation_test_0006', 'current',
                                  'shake_data.hdf')
