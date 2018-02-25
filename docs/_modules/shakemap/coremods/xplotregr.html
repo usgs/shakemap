@@ -1,0 +1,255 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakemap.coremods.xplotregr &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakemap.coremods.xplotregr</h1><div class="highlight"><pre>
+<span></span><span class="c1"># stdlib</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+
+<span class="c1"># third party</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="c1"># neic imports</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
+
+<span class="c1"># local imports</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span>
+
+
+<div class="viewcode-block" id="XPlotRegr"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.xplotregr.html#shakemap.coremods.xplotregr.XPlotRegr">[docs]</a><span class="k">class</span> <span class="nc">XPlotRegr</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    xplotregr -- Plot the regression curves from a data file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;xplotregr&#39;</span>
+
+<div class="viewcode-block" id="XPlotRegr.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.xplotregr.html#shakemap.coremods.xplotregr.XPlotRegr.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Raises:</span>
+<span class="sd">            NotADirectoryError: When the event data directory does not exist.</span>
+<span class="sd">            FileNotFoundError: When the the shake_result HDF file does not</span>
+<span class="sd">                exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">datadir</span><span class="p">)</span>
+        <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
+
+        <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
+        <span class="n">ic</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ic</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;xplotregr module can only operate on &#39;</span>
+                                      <span class="s1">&#39;gridded data not sets of points&#39;</span><span class="p">)</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># Cheating here a bit by assuming that the IMTs are the same</span>
+        <span class="c1"># as the regression IMTs</span>
+        <span class="c1">#</span>
+        <span class="n">rockgrid</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">soilgrid</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">rocksd</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">soilsd</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">imtlist</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getIMTs</span><span class="p">(</span><span class="s1">&#39;GREATER_OF_TWO_HORIZONTAL&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
+            <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_rock_mean&#39;</span><span class="p">)</span>
+            <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_soil_mean&#39;</span><span class="p">)</span>
+            <span class="n">rocksd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_rock_sd&#39;</span><span class="p">)</span>
+            <span class="n">soilsd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39;_soil_sd&#39;</span><span class="p">)</span>
+        <span class="n">distances</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getArray</span><span class="p">(</span><span class="s1">&#39;regression_distances&#39;</span><span class="p">)</span>
+
+        <span class="n">stations</span> <span class="o">=</span> <span class="n">ic</span><span class="o">.</span><span class="n">getStationDict</span><span class="p">()</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># Make plots</span>
+        <span class="c1">#</span>
+        <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">))</span>
+
+            <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;r&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;rock&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;g&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;soil&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">+</span> <span class="n">rocksd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;r--&#39;</span><span class="p">,</span>
+                         <span class="n">label</span><span class="o">=</span><span class="s1">&#39;rock +/- stddev&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">rockgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">-</span> <span class="n">rocksd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;r--&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">+</span> <span class="n">soilsd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;g--&#39;</span><span class="p">,</span>
+                         <span class="n">label</span><span class="o">=</span><span class="s1">&#39;soil +/- stddev&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">distances</span><span class="p">,</span> <span class="n">soilgrid</span><span class="p">[</span><span class="n">myimt</span><span class="p">]</span> <span class="o">-</span> <span class="n">soilsd</span><span class="p">[</span><span class="n">myimt</span><span class="p">],</span> <span class="s1">&#39;g--&#39;</span><span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">stations</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
+                <span class="n">dist</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">dist</span> <span class="o">&gt;</span> <span class="n">distances</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;station_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;seismic&#39;</span><span class="p">:</span>
+                    <span class="n">symbol</span> <span class="o">=</span> <span class="s1">&#39;^&#39;</span>
+                    <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">value</span> <span class="o">!=</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">imtstr</span> <span class="o">=</span> <span class="n">myimt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
+                        <span class="k">for</span> <span class="n">chan</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]:</span>
+                            <span class="k">if</span> <span class="n">chan</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">)</span> <span class="ow">or</span> \
+                               <span class="n">chan</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;U&#39;</span><span class="p">):</span>
+                                <span class="k">continue</span>
+                            <span class="k">for</span> <span class="n">amp</span> <span class="ow">in</span> <span class="n">chan</span><span class="p">[</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">]:</span>
+                                <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">imtstr</span><span class="p">:</span>
+                                    <span class="k">continue</span>
+                                <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span> <span class="ow">and</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+                                    <span class="k">break</span>
+                                <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
+                                    <span class="k">break</span>
+                                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                                    <span class="n">thisamp</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">thisamp</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                                <span class="k">if</span> <span class="n">thisamp</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                                    <span class="k">break</span>
+                                <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+                                    <span class="n">tmpval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">thisamp</span><span class="p">)</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">tmpval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">thisamp</span> <span class="o">/</span> <span class="mf">100.</span><span class="p">)</span>
+                                <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">or</span> <span class="n">tmpval</span> <span class="o">&gt;</span> <span class="n">value</span><span class="p">:</span>
+                                    <span class="n">value</span> <span class="o">=</span> <span class="n">tmpval</span>
+                                <span class="k">break</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+                            <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">symbol</span> <span class="o">=</span> <span class="s1">&#39;o&#39;</span>
+                    <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+                        <span class="n">amp</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
+                                    <span class="n">value</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">])</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">value</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                                <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">imtstr</span> <span class="o">=</span> <span class="n">myimt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+                        <span class="k">if</span> <span class="n">imtstr</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;pgm_from_mmi&#39;</span><span class="p">]:</span>
+                            <span class="n">amp</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;pgm_from_mmi&#39;</span><span class="p">][</span><span class="n">imtstr</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="n">amp</span> <span class="o">!=</span> <span class="s1">&#39;null&#39;</span> <span class="ow">and</span> <span class="n">amp</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+                                    <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amp</span><span class="p">)</span>
+                                <span class="k">else</span><span class="p">:</span>
+                                    <span class="n">amp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amp</span> <span class="o">/</span> <span class="mf">100.</span><span class="p">)</span>
+                                <span class="n">plt</span><span class="o">.</span><span class="n">semilogx</span><span class="p">(</span><span class="n">dist</span><span class="p">,</span> <span class="n">amp</span><span class="p">,</span> <span class="n">symbol</span> <span class="o">+</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">mfc</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">)</span>
+
+            <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span> <span class="o">+</span> <span class="s1">&#39;: &#39;</span> <span class="o">+</span> <span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39; mean&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">&#39;Rrup (km)&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">&#39;PGV ln(cm/s)&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">myimt</span> <span class="o">+</span> <span class="s1">&#39; ln(g)&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+
+            <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">myimt</span><span class="p">)</span>
+            <span class="n">pfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span> <span class="o">+</span> <span class="s1">&#39;_regression_&#39;</span> <span class="o">+</span> <span class="n">fileimt</span> <span class="o">+</span> <span class="s1">&#39;.pdf&#39;</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">pfile</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

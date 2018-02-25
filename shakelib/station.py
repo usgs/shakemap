@@ -245,26 +245,33 @@ class StationList(object):
             channels = {}
             for amp in amp_rows:
                 # print('doing channel %s imt %s' % (amp[2], amp[1]))
+                sd_string = 'ln_sigma'
                 if amp[2] not in channels:
                     channels[amp[2]] = {'name': amp[2], 'amplitudes': []}
                 if amp[0] == 'NULL':
-                    myamp = np.nan
+                    value = 'null'
+                    sigma = 'null'
                 else:
-                    myamp = amp[0]
+                    value = amp[0]
+                    sigma = float('%.4f' % amp[4])
                 if amp[1] == 'PGV':
-                    value = np.exp(myamp)
+                    if value != 'null':
+                        value = float('%.4f' % (np.exp(value)))
                     units = 'cm/s'
                 elif amp[1] == 'MMI':
-                    value = myamp
+                    if value != 'null':
+                        value = float('%.1f' % (value))
                     units = 'intensity'
+                    sd_string = 'sigma'
                 else:
-                    value = np.exp(myamp) * 100
+                    if value != 'null':
+                        value = float('%.4f' % (np.exp(value) * 100))
                     units = '%g'
                 this_amp = {'name': amp[1].lower(),
-                            'value': float('%.4f' % value),
+                            'value': value,
                             'units': units,
                             'flag': str(amp[3]),
-                            'ln_stddev': float('%.4f' % amp[4])
+                            sd_string: sigma
                             }
                 channels[amp[2]]['amplitudes'].append(this_amp)
             for channel in channels.values():

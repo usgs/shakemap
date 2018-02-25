@@ -223,13 +223,19 @@
             <span class="c1"># No backups are available, but there is an existing shake_data</span>
             <span class="c1"># file. Extract its history and update the timestamp and</span>
             <span class="c1"># source network (but leave the version alone).</span>
+            <span class="c1"># If there is no history, just start a new one with version 1</span>
             <span class="c1">#</span>
             <span class="n">bu_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)</span>
             <span class="n">bu_ic</span> <span class="o">=</span> <span class="n">ShakeMapInputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">bu_file</span><span class="p">)</span>
             <span class="n">history</span> <span class="o">=</span> <span class="n">bu_ic</span><span class="o">.</span><span class="n">getVersionHistory</span><span class="p">()</span>
             <span class="n">bu_ic</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]]</span>
-            <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_line</span>
+            <span class="k">if</span> <span class="s1">&#39;history&#39;</span> <span class="ow">in</span> <span class="n">history</span><span class="p">:</span>
+                <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]]</span>
+                <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_line</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">history</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;history&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+                <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_line</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1">#</span>
             <span class="c1"># No backup and no existing file. Make this version 1</span>

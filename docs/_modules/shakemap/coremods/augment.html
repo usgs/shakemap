@@ -111,6 +111,14 @@
         <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
         <span class="n">shake_config</span> <span class="o">=</span> <span class="n">shake_data</span><span class="o">.</span><span class="n">getConfig</span><span class="p">()</span>
         <span class="n">shake_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">shake_config</span><span class="p">,</span> <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># This is a weird hack to get around a bug/feature of ConfigObj</span>
+        <span class="c1"># that results in the validation failing if max_workers is already</span>
+        <span class="c1"># an integer.</span>
+        <span class="c1">#</span>
+        <span class="k">if</span> <span class="s1">&#39;max_workers&#39;</span> <span class="ow">in</span> <span class="n">shake_config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">]:</span>
+            <span class="n">shake_config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;max_workers&#39;</span><span class="p">]</span> <span class="o">=</span> \
+                    <span class="nb">str</span><span class="p">(</span><span class="n">shake_config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;max_workers&#39;</span><span class="p">])</span>
 
         <span class="n">modules_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;modules.conf&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">modules_file</span><span class="p">):</span>

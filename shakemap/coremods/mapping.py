@@ -738,6 +738,8 @@ class MapMaker(object):
                     for amplitude in channel['amplitudes']:
                         if amplitude['name'] != dimt:
                             continue
+                        if amplitude['value'] == 'null':
+                            continue
                         inst_dict[dimt].append(float(amplitude['value']))
                         inst_dict['lat'].append(lat)
                         inst_dict['lon'].append(lon)

@@ -101,7 +101,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="c1"># Read the GenericAmpFactors directory in the install directory</span>
-    <span class="n">indir</span><span class="p">,</span> <span class="n">datadir</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
+    <span class="n">indir</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
     <span class="n">gaf_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">indir</span><span class="p">,</span> <span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;GenericAmpFactors&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">gaf_dir</span><span class="p">):</span>
         <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No GenericAmpFactors directory found.&quot;</span><span class="p">)</span>
@@ -129,7 +129,7 @@
 
         <span class="k">if</span> <span class="n">thisimt</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
             <span class="c1"># If imt in IMT list, get the grid</span>
-            <span class="n">mygrid</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">gc</span><span class="o">.</span><span class="n">getGrid</span><span class="p">(</span><span class="n">thisimt</span><span class="p">)</span>
+            <span class="n">mygrid</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">gc</span><span class="o">.</span><span class="n">getGrid</span><span class="p">(</span><span class="n">thisimt</span><span class="p">)</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">thisimt</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">):</span>
             <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Generic Amp Factors: IMT </span><span class="si">%s</span><span class="s2"> not found in file </span><span class="si">%s</span><span class="s2">&quot;</span>
                     <span class="o">%</span> <span class="p">(</span><span class="n">myimt</span><span class="p">,</span> <span class="n">gfile</span><span class="p">))</span>

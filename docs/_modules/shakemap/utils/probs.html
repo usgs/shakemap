@@ -46,6 +46,7 @@
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">strec.subtype</span> <span class="k">import</span> <span class="n">SubductionSelector</span>
 
 
@@ -64,8 +65,7 @@
 <span class="sd">        ndarray: Float weights for corresponding GMPEs.</span>
 <span class="sd">        Series: Pandas series containing STREC output.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">tprobs</span><span class="p">,</span> <span class="n">strec_results</span> <span class="o">=</span> <span class="n">get_probs</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span>
-                                      <span class="n">tensor_params</span><span class="p">)</span>
+    <span class="n">tprobs</span><span class="p">,</span> <span class="n">strec_results</span> <span class="o">=</span> <span class="n">get_probs</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">tensor_params</span><span class="p">)</span>
     <span class="n">gmpelist</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">weightlist</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -91,11 +91,14 @@
             <span class="n">pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">region</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
             <span class="n">keylist</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">pat</span><span class="o">.</span><span class="n">search</span><span class="p">,</span> <span class="n">all_keylist</span><span class="p">)))</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keylist</span><span class="p">):</span>
-                <span class="n">gmpelist</span> <span class="o">+=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]</span>
                 <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keylist</span><span class="p">:</span>
                     <span class="n">weightlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+                    <span class="n">idx</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span>
+                    <span class="n">gmpelist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;gmpe&#39;</span><span class="p">][</span><span class="n">idx</span><span class="p">])</span>
 
     <span class="n">weightlist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">weightlist</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;gmpelist: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">gmpelist</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;weightlist: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">weightlist</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">gmpelist</span><span class="p">,</span> <span class="n">weightlist</span><span class="p">,</span> <span class="n">strec_results</span></div>
 
 
@@ -103,7 +106,8 @@
     <span class="sd">&quot;&quot;&quot;Calculate probabilities for each earthquake type.</span>
 
 <span class="sd">    The results here contain probabilities that can be rolled up in many ways:</span>
-<span class="sd">      - The probabilities of acr,scr,volcanic, and subduction should sum to 1.</span>
+<span class="sd">      - The probabilities of acr, scr, volcanic, and subduction should sum to</span>
+<span class="sd">        one.</span>
 <span class="sd">      - The probabilities of acr_X,scr_X,volcanic_X, crustal, interface and</span>
 <span class="sd">        intraslab</span>
 <span class="sd">        should sum to 1.</span>
@@ -221,12 +225,20 @@
         <span class="n">region_layer_probs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># now do the weights for each depth zone</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;min_depth&#39;</span><span class="p">])):</span>
-            <span class="n">x1</span> <span class="o">=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;min_depth&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">p1</span> <span class="o">=</span> <span class="mf">1.0</span>
-            <span class="n">x2</span> <span class="o">=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;max_depth&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;vertical_buffer&#39;</span><span class="p">]</span>
+            <span class="c1"># First, taper from -1 to 0 for the lower end</span>
+            <span class="n">x1</span> <span class="o">=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;min_depth&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;vertical_buffer&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+            <span class="n">x2</span> <span class="o">=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;min_depth&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
             <span class="n">p2</span> <span class="o">=</span> <span class="mf">0.0</span>
-            <span class="n">p_layer</span> <span class="o">=</span> <span class="n">get_probability</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
-            <span class="n">region_layer_probs</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="n">p_layer</span>
+            <span class="n">p_layer1</span> <span class="o">=</span> <span class="n">get_probability</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+            <span class="c1"># Then, taper from 0 to -1 for the higher end</span>
+            <span class="n">x1</span> <span class="o">=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;max_depth&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">p1</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">x2</span> <span class="o">=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;max_depth&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;vertical_buffer&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="mi">2</span>
+            <span class="n">p2</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span>
+            <span class="n">p_layer2</span> <span class="o">=</span> <span class="n">get_probability</span><span class="p">(</span><span class="n">depth</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
+            <span class="c1"># Lastly, combine to get probability curve for layer i</span>
+            <span class="n">region_layer_probs</span><span class="p">[</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">region</span><span class="p">,</span> <span class="n">i</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">p_layer1</span> <span class="o">+</span> <span class="n">p_layer2</span>
         <span class="n">probsum</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="n">lp</span> <span class="k">for</span> <span class="n">lp</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">region_layer_probs</span><span class="o">.</span><span class="n">values</span><span class="p">())])</span>
         <span class="k">if</span> <span class="n">probsum</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">region_layer_probs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
