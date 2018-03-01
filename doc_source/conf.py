@@ -231,7 +231,9 @@ latex_elements = {
     #'pointsize': '10pt',
 
     # Additional stuff for the LaTeX preamble.
-    #'preamble': '',
+    'preamble': r'''
+\usepackage{arydshln}
+'''
 }
 
 # Grouping the document tree into LaTeX files. List of tuples
@@ -381,6 +383,8 @@ autodoc_member_order = 'bysource'
 
 napoleon_include_special_with_doc = False
 todo_include_todos = True
+
+imgmath_latex_preamble = r'\usepackage{arydshln}'
 
 
 def setup(app):

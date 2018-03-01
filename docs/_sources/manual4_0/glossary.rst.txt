@@ -67,6 +67,10 @@ PGM
 PGV
   Peak Ground Velocity
 
+SA
+  Spectral acceleration; SA(1.0) represents spectral acceleration at a 
+  period of 1.0 s.
+
 USGS
   the United States Geological Survey, a bureau of the U.S. Department of the Interior.
       

@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>2.3. Validation &#8212; ShakeMap Documentation  documentation</title>
+    <title>2.4. Validation &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
@@ -25,8 +25,8 @@
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="2.4. Guidelines for Contributors" href="tg_contributing.html" />
-    <link rel="prev" title="2.2. Data Formats" href="tg_formats.html" />
+    <link rel="next" title="2.5. Guidelines for Contributors" href="tg_contributing.html" />
+    <link rel="prev" title="2.3. Data Formats" href="tg_formats.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -43,7 +43,7 @@
           <div class="body" role="main">
             
   <div class="section" id="validation">
-<span id="sec-validation-4"></span><h1>2.3. Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h1>
+<span id="sec-validation-4"></span><h1>2.4. Validation<a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h1>
 <p>The results produced by the ShakeMap <strong>model</strong> module are the product of
 an interpolation scheme based on the statistics of multivariate
 normal distributions (MVN). See <a class="reference internal" href="references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a>
@@ -87,7 +87,7 @@ not work on all systems. The plots can be found in
 <em>tests/data/eventdata/validation_test_XXXX/current/products</em> (where
 “<em>XXXX</em>” is the number of the test).</p>
 <div class="section" id="test-0001">
-<h2>2.3.1. Test 0001<a class="headerlink" href="#test-0001" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.1. Test 0001<a class="headerlink" href="#test-0001" title="Permalink to this headline">¶</a></h2>
 <p><a class="pageref" href="#validation-test-one">Figure  1</a> shows the results of Test 0001. This
 test places two observation points along a line.
 As discussed above, the GMPE evaluates to 0 (in log units) everywhere.
@@ -110,7 +110,7 @@ deviation.</span></p>
 </div>
 </div>
 <div class="section" id="test-0002">
-<h2>2.3.2. Test 0002<a class="headerlink" href="#test-0002" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.2. Test 0002<a class="headerlink" href="#test-0002" title="Permalink to this headline">¶</a></h2>
 <p>Test 0002 is shown in <a class="pageref" href="#validation-test-two">Figure  2</a>. In this test,
 one observation has an amplitude of +1.0, the other is –1.0. Because of
 the offsetting observations, the bias is again 0. The figure shows that
@@ -130,7 +130,7 @@ deviation.</span></p>
 </div>
 </div>
 <div class="section" id="test-0003">
-<h2>2.3.3. Test 0003<a class="headerlink" href="#test-0003" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.3. Test 0003<a class="headerlink" href="#test-0003" title="Permalink to this headline">¶</a></h2>
 <p>Validation Test 0003 has a single observation with an amplitude of +1.0
 along a line (see <a class="pageref" href="#validation-test-three">Figure  3</a>). Given the GMPE
 within-event standard deviation of 0.8 and
@@ -154,7 +154,7 @@ deviation.</span></p>
 </div>
 </div>
 <div class="section" id="test-0004">
-<h2>2.3.4. Test 0004<a class="headerlink" href="#test-0004" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.4. Test 0004<a class="headerlink" href="#test-0004" title="Permalink to this headline">¶</a></h2>
 <p>Test 0004 uses an identical set up to Test 0003, except there
 are two observations (of amplitude +1.0) at the same location.
 Because the observations are co-located and of the same period,
@@ -176,7 +176,7 @@ deviation. Compare with <a class="pageref" href="#validation-test-three">Figure 
 </div>
 </div>
 <div class="section" id="test-0005">
-<h2>2.3.5. Test 0005<a class="headerlink" href="#test-0005" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.5. Test 0005<a class="headerlink" href="#test-0005" title="Permalink to this headline">¶</a></h2>
 <p>Test 0005 also has two co-located observations (see Validation
 Test 0004, above), but here they have
 opposite amplitudes of +1.0 and –1.0. The result, shown in
@@ -195,7 +195,7 @@ deviation.</span></p>
 </div>
 </div>
 <div class="section" id="test-0006">
-<h2>2.3.6. Test 0006<a class="headerlink" href="#test-0006" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.6. Test 0006<a class="headerlink" href="#test-0006" title="Permalink to this headline">¶</a></h2>
 <p><a class="pageref" href="#validation-test-six">Figure  6</a> illustrates Validation Test 0006.
 Forty evenly-spaced observations, all with amplitudes of +1.0 are used.
 Most of the observations are to the left of center of the plot (and
@@ -217,7 +217,7 @@ deviation.</span></p>
 </div>
 </div>
 <div class="section" id="test-0007">
-<h2>2.3.7. Test 0007<a class="headerlink" href="#test-0007" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.7. Test 0007<a class="headerlink" href="#test-0007" title="Permalink to this headline">¶</a></h2>
 <p>Validation Test 0007 uses a single observation with an amplitude
 of +1.0. The observation is of spectral acceleration (SA) at a
 period of 1.0 s. The conditional mean SA was
@@ -245,7 +245,7 @@ deviation.</span></p>
 </div>
 </div>
 <div class="section" id="test-0008">
-<h2>2.3.8. Test 0008<a class="headerlink" href="#test-0008" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.8. Test 0008<a class="headerlink" href="#test-0008" title="Permalink to this headline">¶</a></h2>
 <p>Validation Test 0008 has a single observation with an amplitude of 1.0,
 as in Test 0003, however the point is given a non-zero uncertainty.
 In this case the stanard deviation is 0.5 (in natural log units). Thus,
@@ -273,7 +273,7 @@ deviation. Compare with <a class="pageref" href="#validation-test-three">Figure 
 </div>
 </div>
 <div class="section" id="test-0009">
-<h2>2.3.9. Test 0009<a class="headerlink" href="#test-0009" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.9. Test 0009<a class="headerlink" href="#test-0009" title="Permalink to this headline">¶</a></h2>
 <p>Test 0009 (see <a class="pageref" href="#validation-test-nine">Figure  9</a>) has a single
 observation with an amplitude of 1.0, as with Test 0008, but here
 the standard deviation of the observation is 10.0. This large
@@ -295,7 +295,7 @@ and <a class="pageref" href="#validation-test-eight">Figure  8</a>.</span></p>
 </div>
 </div>
 <div class="section" id="test-0010">
-<h2>2.3.10. Test 0010<a class="headerlink" href="#test-0010" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.10. Test 0010<a class="headerlink" href="#test-0010" title="Permalink to this headline">¶</a></h2>
 <p>As with Tests 0008 and  0009, Test 0010 (see
 <a class="pageref" href="#validation-test-ten">Figure  10</a>) has a single observation
 with an amplitude of 1.0, but here the standard deviation of the
@@ -317,7 +317,7 @@ deviation. Compare with <a class="pageref" href="#validation-test-three">Figure 
 </div>
 </div>
 <div class="section" id="test-0011">
-<h2>2.3.11. Test 0011<a class="headerlink" href="#test-0011" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.11. Test 0011<a class="headerlink" href="#test-0011" title="Permalink to this headline">¶</a></h2>
 <p>Test 0011 (see
 <a class="pageref" href="#validation-test-eleven">Figure  11</a>) has five observations:
 the central observation has an amplitude of 0.75, while the
@@ -342,7 +342,7 @@ deviation.</span></p>
 </div>
 </div>
 <div class="section" id="test-0012">
-<h2>2.3.12. Test 0012<a class="headerlink" href="#test-0012" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.12. Test 0012<a class="headerlink" href="#test-0012" title="Permalink to this headline">¶</a></h2>
 <p>Like Test 0011, Test 0012 (see
 <a class="pageref" href="#validation-test-twelve">Figure  12</a>) has five observations:
 the central observation has an amplitude of 0.75, while the
@@ -367,7 +367,7 @@ deviation. Compare with <a class="pageref" href="#validation-test-eleven">Figure
 </div>
 </div>
 <div class="section" id="test-0013">
-<h2>2.3.13. Test 0013<a class="headerlink" href="#test-0013" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.13. Test 0013<a class="headerlink" href="#test-0013" title="Permalink to this headline">¶</a></h2>
 <p>The purpose of this test is to verify the orientation of the Vs30
 grid and the generic amplification factors. The origin and magnitude
 are those of the January 17, 1994, Northridge, California earthquake.
@@ -426,24 +426,25 @@ factors.</span></p>
 <li class="toctree-l3"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="tg_architecture.html">2.1. Software Architecture</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_formats.html">2.2. Data Formats</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">2.3. Validation</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#test-0001">2.3.1. Test 0001</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0002">2.3.2. Test 0002</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0003">2.3.3. Test 0003</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0004">2.3.4. Test 0004</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0005">2.3.5. Test 0005</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0006">2.3.6. Test 0006</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0007">2.3.7. Test 0007</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0008">2.3.8. Test 0008</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0009">2.3.9. Test 0009</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0010">2.3.10. Test 0010</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0011">2.3.11. Test 0011</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0012">2.3.12. Test 0012</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#test-0013">2.3.13. Test 0013</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html">2.2. Data Processing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_formats.html">2.3. Data Formats</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">2.4. Validation</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#test-0001">2.4.1. Test 0001</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0002">2.4.2. Test 0002</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0003">2.4.3. Test 0003</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0004">2.4.4. Test 0004</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0005">2.4.5. Test 0005</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0006">2.4.6. Test 0006</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0007">2.4.7. Test 0007</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0008">2.4.8. Test 0008</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0009">2.4.9. Test 0009</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0010">2.4.10. Test 0010</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0011">2.4.11. Test 0011</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0012">2.4.12. Test 0012</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#test-0013">2.4.13. Test 0013</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.4. Guidelines for Contributors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.5. Guidelines for Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>
