@@ -1272,7 +1272,7 @@ class ModelModule(CoreModule):
             #
             # Add the predictions so we can plot residuals
             #
-            station['properties']['predictions'] = {}
+            station['properties']['predictions'] = []
             for key in sdf.keys():
                 if not key.endswith('_pred'):
                     continue
@@ -1302,19 +1302,20 @@ class ModelModule(CoreModule):
                 mysigma = np.sqrt(mytau**2 + myphi**2)
                 imt_name = key.lower().replace('_pred', '')
                 mybias = sdf[imt_name.upper() + '_bias'][six]
-                station['properties']['predictions'][imt_name] = {
+                station['properties']['predictions'].append({
+                    'name': imt_name,
                     'value': _round_float(value, 4),
                     'units': units,
                     tau_str: _round_float(mytau, 4),
                     phi_str: _round_float(myphi, 4),
                     sigma_str: _round_float(mysigma, 4),
                     bias_str: _round_float(mybias, 4),
-                }
+                })
             #
             # For df1 stations, add the MMIs comverted from PGM
             #
             if ndf == 'df1':
-                station['properties']['mmi_from_pgm'] = {}
+                station['properties']['mmi_from_pgm'] = []
                 for myimt in getattr(self, ndf).imts:
                     if myimt == 'MMI':
                         continue
@@ -1327,16 +1328,17 @@ class ModelModule(CoreModule):
                     if np.isnan(myamp):
                         myamp = 'null'
                         mysd = 'null'
-                    station['properties']['mmi_from_pgm'][imt_name] = {
+                    station['properties']['mmi_from_pgm'].append({
+                        'name': imt_name,
                         'value': _round_float(myamp, 2),
                         'sigma': _round_float(mysd, 2),
-                    }
+                    })
 
             #
             # For df2 stations, add the PGMs converted from MMI
             #
             if ndf == 'df2':
-                station['properties']['pgm_from_mmi'] = {}
+                station['properties']['pgm_from_mmi'] = []
                 for myimt in getattr(self, ndf).imts:
                     if myimt == 'MMI':
                         continue
@@ -1352,11 +1354,12 @@ class ModelModule(CoreModule):
                     if np.isnan(value):
                         value = 'null'
                         mysd = 'null'
-                    station['properties']['pgm_from_mmi'][imt_name] = {
+                    station['properties']['pgm_from_mmi'].append({
+                        'name': imt_name,
                         'value': _round_float(value, 4),
                         'units': units,
                         'ln_sigma': _round_float(mysd, 4),
-                    }
+                    })
             #
             # Set the generic distance property (this is rrup)
             #
