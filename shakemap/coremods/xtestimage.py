@@ -54,15 +54,25 @@ class XTestImage(CoreModule):
         # Make plots
         #
         for myimt in imtlist:
+            if myimt == 'MMI':
+                yunits = '(MMI)'
+            elif myimt == 'PGV':
+                yunits = '[ln(cm/s)]'
+            else:
+                yunits = '[ln(g)]'
+
             fileimt = oq_to_file(myimt)
 
+            #
+            # Do the ground motion plots
+            #
             data = datadict[myimt]
             gridobj = data['mean']
             grddata = gridobj.getData()
             metadata = gridobj.getGeoDict().asDict()
 
             fig = plt.figure(figsize=(10, 10))
-            gs = plt.GridSpec(4, 4, hspace=0.1, wspace=0.1)
+            gs = plt.GridSpec(4, 4, hspace=0.2, wspace=0.1)
             ax0 = fig.add_subplot(gs[:-1, 1:])
             plt.title(self._eventid + ': ' + myimt + ' mean')
             ax0.imshow(grddata,
@@ -77,19 +87,22 @@ class XTestImage(CoreModule):
             yvals = np.linspace(metadata['ymin'], metadata['ymax'], rows)
             ycut.plot(grddata[:, midcol], yvals)
             xcut.plot(xvals, grddata[midrow, :])
-            ycut.set(ylabel='Latitude')
-            xcut.set(xlabel='Longitude')
+            ycut.set(xlabel=myimt + ' ' + yunits, ylabel='Latitude')
+            xcut.set(xlabel='Longitude', ylabel=myimt + ' ' + yunits)
             ax0.label_outer()
 
             pfile = os.path.join(datadir, self._eventid + '_' + fileimt + '.pdf')
             plt.savefig(pfile)
             plt.close()
 
+            #
+            # Do the stddev plots
+            #
             gridobj = data['std']
             grddata = gridobj.getData()
 
             fig = plt.figure(figsize=(10, 10))
-            gs = plt.GridSpec(4, 4, hspace=0.1, wspace=0.1)
+            gs = plt.GridSpec(4, 4, hspace=0.2, wspace=0.1)
             ax0 = fig.add_subplot(gs[:-1, 1:])
             plt.title(self._eventid + ': ' + myimt + ' stddev')
             ax0.imshow(grddata,
@@ -104,8 +117,10 @@ class XTestImage(CoreModule):
             yvals = np.linspace(metadata['ymin'], metadata['ymax'], rows)
             ycut.plot(grddata[:, midcol], yvals)
             xcut.plot(xvals, grddata[midrow, :])
-            ycut.set(ylabel='Latitude')
-            xcut.set(xlabel='Longitude')
+            ycut.set(xlabel='stddev ' + yunits, ylabel='Latitude')
+            xcut.set(xlabel='Longitude', ylabel='stddev ' + yunits)
+            xcut.set_ylim(bottom=0, top=np.max(grddata[midrow, :]) * 1.1)
+            ycut.set_xlim(left=0, right=np.max(grddata[:, midcol] * 1.1))
             ax0.label_outer()
 
             pfile = os.path.join(datadir, self._eventid + '_' + fileimt + '_sd.pdf')

@@ -90,7 +90,8 @@ the <a class="reference internal" href="references.html#abrahamson2014"><span cl
 <a class="reference internal" href="references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs. The
 field smoothly decays with distance, as expected. In contrast, the
 standard deviation field (<a class="pageref" href="#gmpe-test-sd">Figure  2</a> displays an
-unexpected oscillatory behavior. Upon closer inspection, however,
+unexpected oscillatory behavior. Upon inspection of the cross-section
+plots, however,
 we find that the oscillations are very small in magnitude.</p>
 <div class="figure align-left" id="id1">
 <span id="gmpe-test-mean"></span><a class="reference internal image-reference" href="../_images/gmpe_test_PSA3p0.png"><img alt="../_images/gmpe_test_PSA3p0.png" src="../_images/gmpe_test_PSA3p0.png" style="width: 700px;" /></a>
@@ -191,9 +192,10 @@ is the derivative of the GMICE at the value of the PGM from the GMPE, and
 <img class="math" src="../_images/math/b36834b7682867043ef9dff450e08d15db9abb85.png" alt="\sigma_{\text{MMI}|\text{PGM}}"/>
 is the standard deviation of the PGM to MMI conversion as given by the
 GMICE.</p>
-<p>Because many GMICEs are bilinear, the predicted intensities
+<p>Because many GMICEs are bilinear (see, for example,
+<a class="pageref" href="#wgrw12-pgv-mmi">Figure  3</a>), the predicted intensities
 and their standard deviations can contain some features that are
-less than ideal. For instance, <a class="pageref" href="#gmice-test-mean">Figure  3</a> shows
+less than ideal. For instance, <a class="pageref" href="#gmice-test-mean">Figure  4</a> shows
 the mean intensity from a VirtualIPE of the
 <a class="reference internal" href="references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al (2014)</span></a> and the
 <a class="reference internal" href="references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs combined with the
@@ -201,22 +203,28 @@ GMICE of <a class="reference internal" href="references.html#worden2012"><span c
 display a distinct change in slope as the relation reaches the
 lower intensities. This is due to the different slopes of the two
 lines of the bilinear relationship. More significantly,
-<a class="pageref" href="#gmice-test-sd">Figure  4</a>
+<a class="pageref" href="#gmice-test-sd">Figure  5</a>
 displays a dramatic drop in the standard deviation at the
 point where the two lines of the bi-linear relationship meet.
 Neither of these features is likely physical, but are a
 consequence of the bilinear form of the GMICE.</p>
-<div class="figure align-left" id="id3">
+<div class="figure align-center" id="id3">
+<span id="wgrw12-pgv-mmi"></span><a class="reference internal image-reference" href="../_images/wgrw12_figure_6.png"><img alt="../_images/wgrw12_figure_6.png" src="../_images/wgrw12_figure_6.png" style="width: 550px;" /></a>
+<p class="caption"><span class="caption-text">Figure 3: MMI vs. PGV for the <a class="reference internal" href="references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>
+GMICE. Note the bi-linear relationship of the three GMICE
+plotted. (Figure from <a class="reference internal" href="references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a>.)</span></p>
+</div>
+<div class="figure align-left" id="id4">
 <span id="gmice-test-mean"></span><a class="reference internal image-reference" href="../_images/gmpe_test_MMI.png"><img alt="../_images/gmpe_test_MMI.png" src="../_images/gmpe_test_MMI.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 3: The mean MMI field for a VirtualIPE comprised of a 50-50
+<p class="caption"><span class="caption-text">Figure 4: The mean MMI field for a VirtualIPE comprised of a 50-50
 combination of the
 <a class="reference internal" href="references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al (2014)</span></a> and the
 <a class="reference internal" href="references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs, and
 the <a class="reference internal" href="references.html#worden2012"><span class="std std-ref">Worden et al. (2012)</span></a> GMICE.</span></p>
 </div>
-<div class="figure align-left" id="id4">
+<div class="figure align-left" id="id5">
 <span id="gmice-test-sd"></span><a class="reference internal image-reference" href="../_images/gmpe_test_MMI_sd.png"><img alt="../_images/gmpe_test_MMI_sd.png" src="../_images/gmpe_test_MMI_sd.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 4: The standard deviation of the MMI field for a VirtualIPE
+<p class="caption"><span class="caption-text">Figure 5: The standard deviation of the MMI field for a VirtualIPE
 comprised of a 50-50 combination of the
 <a class="reference internal" href="references.html#abrahamson2014"><span class="std std-ref">Abrahamson et al (2014)</span></a> and the
 <a class="reference internal" href="references.html#chiou2014"><span class="std std-ref">Chiou and Youngs (2014)</span></a> GMPEs, and
@@ -361,7 +369,7 @@ using the 1.0 and 3.0 second residuals is sufficient. (In situations
 where the output SA is higher (or lower) than the highest (or lowest)
 SA in the input, we choose the single IMT at the highest (or lowest)
 SA.)</p>
-<p><a class="pageref" href="#cond-spectra-mean">Figure  5</a> illustrates this point. Conditional
+<p><a class="pageref" href="#cond-spectra-mean">Figure  6</a> illustrates this point. Conditional
 mean spectra were computed for two sets of points. One set had SA
 observations at three periods (0.3, 1.0, and 3.0 seconds), and the other
 set had observations at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0,
@@ -370,7 +378,7 @@ and 9.0 seconds). The observations the two sets had in common (0.3,
 shows that in the shared regions (between 0.3 and 1.0 seconds, and
 between 1.0 and 3.0 seconds), there is very little difference between
 the conditional spectra. This point is reinforced by
-<a class="pageref" href="#cond-spectra-sd">Figure  6</a>, which shows the standard deviations of
+<a class="pageref" href="#cond-spectra-sd">Figure  7</a>, which shows the standard deviations of
 the two sets of conditional spectra. While the 7-point spectra is
 better constrained overall, in the area of overlap (again, between 0.3
 and 1.0 seconds, and between 1.0 and 3.0 seconds) there is virtually
@@ -379,15 +387,15 @@ no difference between the spectra. These figures were generated using the
 <a class="reference internal" href="references.html#baker2008"><span class="std std-ref">Baker and Jayaram (2008)</span></a> spectral correlation function.
 The odd kink in the mean plots at around 0.2 seconds is a result of the
 specifics of the correlation function.</p>
-<div class="figure align-left" id="id5">
-<span id="cond-spectra-mean"></span><a class="reference internal image-reference" href="../_images/Figure_mu_compare.png"><img alt="../_images/Figure_mu_compare.png" src="../_images/Figure_mu_compare.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 5: Conditional spectra for two sets of conditioning observations:
+<div class="figure align-center" id="id6">
+<span id="cond-spectra-mean"></span><a class="reference internal image-reference" href="../_images/Figure_mu_compare.png"><img alt="../_images/Figure_mu_compare.png" src="../_images/Figure_mu_compare.png" style="width: 450px;" /></a>
+<p class="caption"><span class="caption-text">Figure 6: Conditional spectra for two sets of conditioning observations:
 One set at three periods (0.3, 1.0, and 3.0 seconds), and the other
 set at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0, and 9.0 seconds).</span></p>
 </div>
-<div class="figure align-left" id="id6">
-<span id="cond-spectra-sd"></span><a class="reference internal image-reference" href="../_images/Figure_sigma_compare.png"><img alt="../_images/Figure_sigma_compare.png" src="../_images/Figure_sigma_compare.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 6: The standard deviations of conditional spectra for two sets of
+<div class="figure align-center" id="id7">
+<span id="cond-spectra-sd"></span><a class="reference internal image-reference" href="../_images/Figure_sigma_compare.png"><img alt="../_images/Figure_sigma_compare.png" src="../_images/Figure_sigma_compare.png" style="width: 450px;" /></a>
+<p class="caption"><span class="caption-text">Figure 7: The standard deviations of conditional spectra for two sets of
 conditioning observations:
 One set at three periods (0.3, 1.0, and 3.0 seconds), and the other
 set at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0, and 9.0 seconds).</span></p>

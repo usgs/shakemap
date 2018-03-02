@@ -61,7 +61,8 @@ the :ref:`Abrahamson et al (2014) <abrahamson2014>` and the
 :ref:`Chiou and Youngs (2014) <chiou2014>` GMPEs. The
 field smoothly decays with distance, as expected. In contrast, the
 standard deviation field (:num:`Figure #gmpe-test-sd` displays an
-unexpected oscillatory behavior. Upon closer inspection, however,
+unexpected oscillatory behavior. Upon inspection of the cross-section
+plots, however,
 we find that the oscillations are very small in magnitude.
 
 .. _gmpe-test-mean:
@@ -186,7 +187,8 @@ is the derivative of the GMICE at the value of the PGM from the GMPE, and
 is the standard deviation of the PGM to MMI conversion as given by the 
 GMICE.
 
-Because many GMICEs are bilinear, the predicted intensities
+Because many GMICEs are bilinear (see, for example, 
+:num:`Figure #wgrw12-pgv-mmi`), the predicted intensities
 and their standard deviations can contain some features that are 
 less than ideal. For instance, :num:`Figure #gmice-test-mean` shows
 the mean intensity from a VirtualIPE of the 
@@ -201,6 +203,16 @@ displays a dramatic drop in the standard deviation at the
 point where the two lines of the bi-linear relationship meet.
 Neither of these features is likely physical, but are a 
 consequence of the bilinear form of the GMICE.
+
+.. _wgrw12-pgv-mmi:
+
+.. figure:: _static/wgrw12_figure_6.*
+   :width: 550
+   :align: center
+
+   MMI vs. PGV for the :ref:`Worden et al. (2012) <worden2012>` 
+   GMICE. Note the bi-linear relationship of the three GMICE
+   plotted. (Figure from :ref:`Worden et al. (2012) <worden2012>`.)
 
 .. _gmice-test-mean:
 
@@ -419,8 +431,8 @@ specifics of the correlation function.
 .. _cond-spectra-mean:
 
 .. figure:: _static/Figure_mu_compare.*
-   :width: 700
-   :align: left
+   :width: 450
+   :align: center
 
    Conditional spectra for two sets of conditioning observations:
    One set at three periods (0.3, 1.0, and 3.0 seconds), and the other
@@ -430,8 +442,8 @@ specifics of the correlation function.
 .. _cond-spectra-sd:
 
 .. figure:: _static/Figure_sigma_compare.*
-   :width: 700
-   :align: left
+   :width: 450
+   :align: center
 
    The standard deviations of conditional spectra for two sets of 
    conditioning observations:
