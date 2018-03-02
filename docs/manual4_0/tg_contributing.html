@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>2.4. Guidelines for Contributors &#8212; ShakeMap Documentation  documentation</title>
+    <title>2.5. Guidelines for Contributors &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
@@ -26,7 +26,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="3. References &amp; Bibliography" href="references.html" />
-    <link rel="prev" title="2.3. Validation" href="tg_validation.html" />
+    <link rel="prev" title="2.4. Validation" href="tg_validation.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -43,7 +43,7 @@
           <div class="body" role="main">
             
   <div class="section" id="guidelines-for-contributors">
-<span id="sec-contributing-4"></span><h1>2.4. Guidelines for Contributors<a class="headerlink" href="#guidelines-for-contributors" title="Permalink to this headline">¶</a></h1>
+<span id="sec-contributing-4"></span><h1>2.5. Guidelines for Contributors<a class="headerlink" href="#guidelines-for-contributors" title="Permalink to this headline">¶</a></h1>
 <p>We encourage contributions to the ShakeMap project. Before
 you begin, however, we recommend you contact us (either
 directly or, preferrably, through the <em>issues</em> feature on
@@ -77,7 +77,7 @@ request.</p>
 <li>Coremods</li>
 </ul>
 <div class="section" id="coding-style">
-<h2>2.4.1. Coding Style<a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h2>
+<h2>2.5.1. Coding Style<a class="headerlink" href="#coding-style" title="Permalink to this headline">¶</a></h2>
 <p>In general, follow the <a class="reference external" href="https://www.python.org/dev/peps/pep-0008/">PEP-8 style guide</a>.
 Modifications/details/re-emphasis:</p>
 <p><strong>General</strong></p>
@@ -294,7 +294,7 @@ directory on Github.</p>
 </div>
 </div>
 <div class="section" id="workflow">
-<h2>2.4.2. Workflow<a class="headerlink" href="#workflow" title="Permalink to this headline">¶</a></h2>
+<h2>2.5.2. Workflow<a class="headerlink" href="#workflow" title="Permalink to this headline">¶</a></h2>
 <p>Below is a description of our Git workflow. This workflow
 is an adaption of a fairly common set of procedures for working with
 GitHub. <a class="pageref" href="#workflow-figure">Figure  1</a> illustrates the process described
@@ -384,7 +384,7 @@ local master branch is updated only by pulling from the upstream
 repository.</p>
 </div>
 <div class="section" id="core-modules">
-<h2>2.4.3. Core Modules<a class="headerlink" href="#core-modules" title="Permalink to this headline">¶</a></h2>
+<h2>2.5.3. Core Modules<a class="headerlink" href="#core-modules" title="Permalink to this headline">¶</a></h2>
 <p>Most developers will be primarily interested in developing modules
 for the <code class="docutils literal"><span class="pre">shake</span></code> program.
 The source for these modules may be found in the directory
@@ -404,7 +404,7 @@ or <em>info.py</em> for examples of the way core modules are implemented.</p>
 it automatically and include it in the list of available modules.</p>
 </div>
 <div class="section" id="logging">
-<h2>2.4.4. Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
+<h2>2.5.4. Logging<a class="headerlink" href="#logging" title="Permalink to this headline">¶</a></h2>
 <p>Modules should log to <code class="docutils literal"><span class="pre">self.logger</span></code>. We encourage logging generally
 useful information as <code class="docutils literal"><span class="pre">self.logger.info</span></code>, particularly anything that
 might normally be put in as a <code class="docutils literal"><span class="pre">print</span></code> statement. We also encourage
@@ -452,13 +452,14 @@ include:</p>
 <li class="toctree-l3"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="tg_architecture.html">2.1. Software Architecture</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_formats.html">2.2. Data Formats</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_validation.html">2.3. Validation</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">2.4. Guidelines for Contributors</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#coding-style">2.4.1. Coding Style</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#workflow">2.4.2. Workflow</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#core-modules">2.4.3. Core Modules</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#logging">2.4.4. Logging</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html">2.2. Data Processing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_formats.html">2.3. Data Formats</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_validation.html">2.4. Validation</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">2.5. Guidelines for Contributors</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#coding-style">2.5.1. Coding Style</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#workflow">2.5.2. Workflow</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#core-modules">2.5.3. Core Modules</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#logging">2.5.4. Logging</a></li>
 </ul>
 </li>
 </ul>

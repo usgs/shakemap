@@ -114,6 +114,12 @@ Atkinson, G.M. and D.M. Boore (1995). Ground motion relations for eastern North 
 
 Applied Technology Council (2002). ATC-54: Guidelines for using strong-motion data and ShakeMaps in 
 Post-Earthquake Response, Redwood City, California, 224pp. 
+\
+
+.. _baker2008:
+
+Baker, J.W. and Jayaram, N. (2008). Correlation of spectral acceleration
+values from NGA ground motion models, Earthquake Spectra, 24(1), pp 299-317.
 
 Boatwright, J., H. Bundock, J. Luetgert, L. Seekins, L. Gee, and P. Lombard (2003). The dependence of 
 sPGA and PGV on distance and magnitude inferred from Northern California ShakeMap data, *Bull. 
@@ -212,6 +218,13 @@ Conversion Equations (GMICEs): A Global Relationship and Evaluation of Regional 
 .. _celsi2005:
 
 Celsi, R., M. Wolfinbarger, and D.J. Wald (2005). The Effects of Magnitude Anchoring, Earthquake Attenuation Estimation, Measure Complexity, Hubris, and Experience Inflation on Individuals’ Perceptions of Felt Earthquake Experience and Perceptions of Earthquake Risk, *Earthquake Spectra* 21(4), 987-1008. 
+\
+
+.. _chiou2014:
+
+Chiou, B.S.J. and R.R. Youngs (2014). Update of the Chiou and Youngs NGA model for
+the average horizontal component of peak ground motion and response spectra, 
+*Earthquake Spectra* 30(3), 1117-1153.
 
 Chiou, B.S.J. and R.R. Youngs (2008a). An NGA model for the average horizontal component of peak 
 ground motion and response spectra, *Earthquake Spectra* 24(1), 173-215.
@@ -435,6 +448,12 @@ strong ground motion in Japan based on recorded data, *Bull. Seism. Soc. Am* 96(
 
 Knudsen, K.L., and J.D.J. Bott (2011). Geologic and geomorphic evaluation of liquefaction 
 case histories- toward rapid hazard mapping, *Seis. Res. Lett.* 82(2), 334-335.
+\
+
+.. _ku1966:
+
+Ku, H. H. (1966). Notes on the use of propagation of error formulas, 
+J. Res. Natl. Bur. Stand. 70, doi: 10.6028/jres.070C.025.
 
 Lin, K.W. and D.J. Wald (2008). ShakeCast Manual, *U.S. Geological Survey Open File Report*  
 2008-1158, 90 pp.
@@ -446,6 +465,13 @@ Lin, K.W., D.J. Wald,  C.B. Worden, and A.F. Shakal (2005). Quantifying CISN Sha
 Lin, K.W. and D.J. Wald (2012). Developing Statistical Fragility Analysis Framework for the USGS 
 ShakeCast System for Rapid Post-Earthquake Assessment, *Proc. 15th World Conf. on Eq. Eng.*, 
 Lisbon, 10pp.
+\
+
+.. _loth2013:
+
+Loth, C., and Baker, J. W. (2013). “A spatial cross-correlation model of
+ground motion spectral accelerations at multiple periods.”
+Earthquake Engineering & Structural Dynamics, 42, 397-417.
 
 Marano, K.D., D.J. Wald, and T.I. Allen (2009). Global earthquake casualties due to 
 secondary effects: a quantitative analysis for improving rapid loss analyses. *Natural 
@@ -570,10 +596,18 @@ revised ground-motion prediction relation for use in extensional tectonic regime
 89, 1156-1170.
 \
 
-.. _thompson2012:
+.. _thompson2018:
 
-Thompson, E.M. and D.J. Wald (2012). Developing Vs30 Site-Condition Maps By Combining Observations 
-With Geologic And Topographic Constraints, *Proc. 15th World Conf. on Eq. Eng.*, Lisbon, 9 pp.
+Eric M. Thompson, C. Bruce Worden; Estimating Rupture Distances without a Rupture. 
+Bulletin of the Seismological Society of America ; 108 (1): 371–379. 
+doi: https://doi.org/10.1785/0120170174
+\
+
+.. _thompson2016:
+
+Thompson, E.M., D.J. Wald, C.B. Worden, N. Field, N. Luco, M. D. Peterson, P. M. Powers, 
+and B. Rowshandel (2016).  ShakeMap Scenario Strategy, *U.S. Geological Survey Open File Report*, 
+in progress. 
 \
 
 .. _thompson2014:
@@ -582,11 +616,10 @@ Thompson, E.M., D.J. Wald, and C.B. Worden (2014).  A VS30 map for California wi
 topographic constraints, *Bull. Seism. Soc. Am.* 104(5), 2313-2321.
 \
 
-.. _thompson2016:
+.. _thompson2012:
 
-Thompson, E.M., D.J. Wald, C.B. Worden, N. Field, N. Luco, M. D. Peterson, P. M. Powers, 
-and B. Rowshandel (2016).  ShakeMap Scenario Strategy, *U.S. Geological Survey Open File Report*, 
-in progress. 
+Thompson, E.M. and D.J. Wald (2012). Developing Vs30 Site-Condition Maps By Combining Observations 
+With Geologic And Topographic Constraints, *Proc. 15th World Conf. on Eq. Eng.*, Lisbon, 9 pp.
 \
 
 .. _turner2014:
@@ -805,7 +838,7 @@ U. S. Geological Survey. usgs.github.io/shakemap. DOI: XXX
 
 Worden, C.B., E.M. Thompson, J.W. Baker, B.A. Bradley, N. Luco, and D.J. Wald (2018). 
 Spatial and Spectral Interpolation of Ground Motion Intensity Measure Observations,
-*Bull. Seism. Soc. Am.* In press.
+*Bull. Seism. Soc. Am.* doi: https://doi.org/10.1785/0120170201
 \
 
 .. _yamakawa1998:
