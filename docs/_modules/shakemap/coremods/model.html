@@ -1315,7 +1315,7 @@
             <span class="c1">#</span>
             <span class="c1"># Add the predictions so we can plot residuals</span>
             <span class="c1">#</span>
-            <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;predictions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;predictions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sdf</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_pred&#39;</span><span class="p">):</span>
                     <span class="k">continue</span>
@@ -1345,19 +1345,20 @@
                 <span class="n">mysigma</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mytau</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">myphi</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                 <span class="n">imt_name</span> <span class="o">=</span> <span class="n">key</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_pred&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
                 <span class="n">mybias</span> <span class="o">=</span> <span class="n">sdf</span><span class="p">[</span><span class="n">imt_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;_bias&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]</span>
-                <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;predictions&#39;</span><span class="p">][</span><span class="n">imt_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;predictions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">imt_name</span><span class="p">,</span>
                     <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                     <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
                     <span class="n">tau_str</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mytau</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                     <span class="n">phi_str</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">myphi</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                     <span class="n">sigma_str</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mysigma</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                     <span class="n">bias_str</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mybias</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-                <span class="p">}</span>
+                <span class="p">})</span>
             <span class="c1">#</span>
             <span class="c1"># For df1 stations, add the MMIs comverted from PGM</span>
             <span class="c1">#</span>
             <span class="k">if</span> <span class="n">ndf</span> <span class="o">==</span> <span class="s1">&#39;df1&#39;</span><span class="p">:</span>
-                <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;mmi_from_pgm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;mmi_from_pgm&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndf</span><span class="p">)</span><span class="o">.</span><span class="n">imts</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
                         <span class="k">continue</span>
@@ -1370,16 +1371,17 @@
                     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">myamp</span><span class="p">):</span>
                         <span class="n">myamp</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
                         <span class="n">mysd</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
-                    <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;mmi_from_pgm&#39;</span><span class="p">][</span><span class="n">imt_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;mmi_from_pgm&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">imt_name</span><span class="p">,</span>
                         <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">myamp</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
                         <span class="s1">&#39;sigma&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mysd</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span>
-                    <span class="p">}</span>
+                    <span class="p">})</span>
 
             <span class="c1">#</span>
             <span class="c1"># For df2 stations, add the PGMs converted from MMI</span>
             <span class="c1">#</span>
             <span class="k">if</span> <span class="n">ndf</span> <span class="o">==</span> <span class="s1">&#39;df2&#39;</span><span class="p">:</span>
-                <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;pgm_from_mmi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;pgm_from_mmi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndf</span><span class="p">)</span><span class="o">.</span><span class="n">imts</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">myimt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
                         <span class="k">continue</span>
@@ -1395,11 +1397,12 @@
                     <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
                         <span class="n">value</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
                         <span class="n">mysd</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
-                    <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;pgm_from_mmi&#39;</span><span class="p">][</span><span class="n">imt_name</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;pgm_from_mmi&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">imt_name</span><span class="p">,</span>
                         <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
                         <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span><span class="p">,</span>
                         <span class="s1">&#39;ln_sigma&#39;</span><span class="p">:</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">mysd</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span>
-                    <span class="p">}</span>
+                    <span class="p">})</span>
             <span class="c1">#</span>
             <span class="c1"># Set the generic distance property (this is rrup)</span>
             <span class="c1">#</span>
