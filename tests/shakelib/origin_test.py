@@ -31,7 +31,7 @@ def test_origin():
     event_text = """<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
 <earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9" year="2008"
 month="05" day="12" hour="06" minute="28" second="01" timezone="GMT"
-depth="19.0"
+depth="19.0" network="us" 
 locstring="EASTERN SICHUAN, CHINA" created="1211173621" otime="1210573681"
 type="" />"""
     source_text = "mech=RS"
@@ -104,7 +104,7 @@ created="1211173621" otime="1210573681" type="" />"""
 <earthquake id="2008" lat="30.9858" lon="103.3639" mag="7.9" year="2008"
 month="05" day="12" hour="06" minute="28" second="01" timezone="GMT"
 depth="19.0" locstring="EASTERN SICHUAN, CHINA" created="1211173621"
-otime="1210573681" type="" mech="SS"/>"""
+otime="1210573681" type="" mech="SS" network="us"/>"""
     efile = io.StringIO(event_text)
     origin = Origin.fromFile(efile)
     assert origin.mech == 'SS'
@@ -113,7 +113,7 @@ otime="1210573681" type="" mech="SS"/>"""
 <earthquake id="2008" lat="30.9858" lon="103.3639" mag="7.9" year="2008"
 month="05" day="12" hour="06" minute="28" second="01" timezone="GMT"
 depth="19.0" locstring="EASTERN SICHUAN, CHINA" created="1211173621"
-otime="1210573681" type="" mech=""/>"""
+otime="1210573681" type="" mech="" network="us"/>"""
     efile = io.StringIO(event_text)
     origin = Origin.fromFile(efile)
     assert origin.mech == 'ALL'
@@ -123,7 +123,7 @@ otime="1210573681" type="" mech=""/>"""
 standalone="yes"?> <earthquake id="2008" lat="31.9858" lon="103.3639"
 mag="7.9" year="2008" month="05" day="12" hour="06" minute="28" second="01"
 timezone="GMT" depth="19.0" locstring="EASTERN SICHUAN, CHINA"
-created="1211173621" otime="1210573681" type="" mech="Strike slip"/>"""
+created="1211173621" otime="1210573681" type="" mech="Strike slip" network="us"/>"""
         efile = io.StringIO(event_text)
         origin = Origin.fromFile(efile)
 

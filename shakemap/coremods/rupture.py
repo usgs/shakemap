@@ -1,6 +1,7 @@
 # stdlib imports
 import os.path
 import json
+from collections import OrderedDict
 
 # third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
@@ -19,6 +20,16 @@ class RuptureModule(CoreModule):
     """
 
     command_name = 'rupture'
+
+    # supply here a data structure with information about files that
+    # can be created by this module.
+    contents = OrderedDict.fromkeys(['ruptureJSON'])
+    contents['ruptureJSON'] = {'title':'Fault Rupture',
+                                'caption':'JSON Representation of Fault Rupture.',
+                                'formats':[{'filename':'rupture.json',
+                                         'type':'application/json'}
+                                          ]
+                                }
 
     def execute(self):
         """

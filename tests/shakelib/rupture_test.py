@@ -36,7 +36,7 @@ sys.path.insert(0, shakedir)
 def test_rupture_from_dict():
     # Grab an EdgeRupture
     origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0})
+                     'depth': 5.0, 'mag': 7.0, 'eventsource':'us'})
 
     file = os.path.join(homedir, 'rupture_data/cascadia.json')
     rup_original = get_rupture(origin, file)
@@ -63,7 +63,7 @@ def test_rupture_from_dict():
     # Point rupture
     origin = Origin({'eventsourcecode': 'test',
                      'lon': -122.5, 'lat': 37.3,
-                     'depth': 5.0, 'mag': 7.0})
+                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
     rup_original = get_rupture(origin)
     d = rup_original._geojson
     rup_from_dict = rupture_from_dict(d)
@@ -74,7 +74,7 @@ def test_rupture_from_dict():
 def test_EdgeRupture():
     # Rupture requires an origin even when not used:
     origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0})
+                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
 
     file = os.path.join(homedir, 'rupture_data/cascadia.json')
     rup = get_rupture(origin, file)
@@ -164,7 +164,7 @@ def test_EdgeRupture():
 def test_QuadRupture():
     # Rupture requires an origin even when not used:
     origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0})
+                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
 
     # First with json file
     file = os.path.join(homedir, 'rupture_data/izmit.json')
@@ -285,7 +285,7 @@ def test_rupture_depth(interactive=False):
         dips = np.ones(xp0.shape) * DIP
         strike = [strike]
         origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                         'depth': 5.0, 'mag': 7.0})
+                         'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
         rupture = QuadRupture.fromTrace(
             xp0, yp0, xp1, yp1, zp, widths, dips, origin, strike=strike)
 
@@ -333,7 +333,7 @@ def test_rupture_depth(interactive=False):
 def test_slip():
     # Rupture requires an origin even when not used:
     origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0})
+                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
     # Make a rupture
     lat0 = np.array([34.1])
     lon0 = np.array([-118.2])
@@ -364,7 +364,7 @@ def test_northridge():
 
     # Rupture requires an origin even when not used:
     origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0})
+                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
     cbuf = io.StringIO(rupture_text)
     rupture = get_rupture(origin, cbuf)
     strike = rupture.getStrike()
@@ -446,7 +446,7 @@ def test_parse_complicated_rupture():
 
     # Rupture requires an origin even when not used:
     origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0})
+                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
     cbuf = io.StringIO(rupture_text)
     rupture = get_rupture(origin, cbuf)
     strike = rupture.getStrike()
@@ -529,7 +529,7 @@ def test_incorrect():
 
     # Rupture requires an origin even when not used:
     origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0})
+                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
     cbuf = io.StringIO(rupture_text)
     with pytest.raises(Exception):
         get_rupture(origin, cbuf)
@@ -546,7 +546,7 @@ def test_fromTrace():
 
     # Rupture requires an origin even when not used:
     origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0})
+                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
     rupture = QuadRupture.fromTrace(
         xp0, yp0, xp1, yp1, zp, widths,
         dips, origin,
@@ -575,7 +575,7 @@ def test_with_quakeml():
     event = Event(focal_mechanisms=[focal])
     catalog = Catalog(events=[event])
     event_text = '''<shakemap-data code_version="4.0" map_version="1">
-<earthquake id="us2000cmy3" lat="56.046" lon="-149.073" mag="7.9" year="2018" month="1" day="23" hour="9" minute="31" second="42" timezone="GMT" depth="25.00" locstring="280km SE of Kodiak, Alaska" />
+<earthquake id="us2000cmy3" lat="56.046" lon="-149.073" mag="7.9" year="2018" month="1" day="23" hour="9" minute="31" second="42" timezone="GMT" depth="25.00" locstring="280km SE of Kodiak, Alaska" network="us"/>
 </shakemap-data>'''
     try:
         tempdir = tempfile.mkdtemp()

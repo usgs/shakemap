@@ -76,6 +76,14 @@ class GridXMLModule(CoreModule):
 
     command_name = 'gridxml'
 
+    contents = {'xmlGrids':{'title':'XML Grid',
+                            'caption':'XML grid of ground motions',
+                            'formats':[{'filename':'grid.xml',
+                                        'type':'text/xml'}
+                                      ]
+                           }
+               }
+
     def execute(self):
         """Create grid.xml and uncertainty.xml files.
 

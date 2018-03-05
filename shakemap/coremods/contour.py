@@ -2,6 +2,8 @@
 import os.path
 import glob
 import json
+from collections import OrderedDict
+import shutil
 
 # third party imports
 from shapely.geometry import MultiLineString
@@ -34,6 +36,42 @@ class ContourModule(CoreModule):
     """
 
     command_name = 'contour'
+
+    # supply here a data structure with information about files that
+    # can be created by this module.
+    contour_page = {'title':'Ground Motion Contours','slug':'contours'}
+    contents = OrderedDict.fromkeys(['miContour','pgaContour','pgvContour','psa[PERIOD]Contour'])
+    contents['miContour'] = {'title':'Intensity Contours',
+                             'caption':'Contours of macroseismic intensity.',
+                             'page':contour_page,
+                             'formats':[{'filename':'cont_*MMI.json',
+                                         'type':'application/json'}
+                                       ]
+                            }
+    
+    contents['pgaContour'] = {'title':'PGA Contours',
+                              'caption':'Contours of [COMPONENT] peak ground acceleration (%g).',
+                              'page':contour_page,
+                              'formats':[{'filename':'cont_*PGA.json',
+                                          'type':'application/json'}
+                                          ]
+                             }
+    contents['pgvContour'] = {'title':'PGV Contours',
+                              'caption':'Contours of [COMPONENT] peak ground velocity (cm/s).',
+                              'page':contour_page,
+                              'formats':[{'filename':'cont_*PGV.json',
+                                          'type':'application/json'}
+                                          ]
+                             }
+    psacap = 'Contours of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'
+    contents['psa[PERIOD]Contour'] = {'title':'PSA[PERIOD] Contour',
+                                      'page':contour_page,
+                                      'caption':psacap,
+                                      'formats':[{'filename':'cont_*PSA[0-9]p[0-9].json',
+                                                  'type':'application/json'}
+                                                ]
+                                     }
+               
 
     def execute(self):
         """Create contour files for all configured IMT values.
@@ -293,7 +331,17 @@ def contour_to_files(container, config, output_dir, logger):
                 with open(filename, 'w') as outfile:
                     json.dump(data, outfile)
 
+            #####################################
+            # Make an extra version of the MMI contour file
+            # so that the current web rendering code can find it.
+            # Delete this file once everyone has moved to new version
+            # of ComCat code.
 
+            if imtype == 'MMI':
+                old_file = os.path.join(output_dir, 'cont_mi.json')
+                shutil.copy(filename,old_file)
+            #####################################
+            
 def getContourLevels(dmin, dmax, itype='log'):
     """Get contour levels given min/max values and desired IMT.
 

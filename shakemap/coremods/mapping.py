@@ -3,6 +3,7 @@ import os.path
 import time
 import json
 from datetime import datetime
+from collections import OrderedDict
 
 # third party
 import fiona
@@ -13,6 +14,7 @@ from matplotlib.colors import LightSource
 import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import matplotlib.patheffects as path_effects
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 from shapely.geometry import MultiPolygon
 from shapely.geometry import MultiLineString
@@ -66,6 +68,8 @@ CITIES_ZORDER = 1200
 GRATICULE_ZORDER = 1200
 SCALE_ZORDER = 1500
 
+THUMBNAIL_WIDTH_PIXELS = 100
+
 MMI_LABELS = {
     '1': 'I',
     '2': 'II',
@@ -87,6 +91,49 @@ class MappingModule(CoreModule):
 
     command_name = 'mapping'
 
+    # supply here a data structure with information about files that
+    # can be created by this module.
+    mapping_page = {'title':'Ground Motion Maps','slug':'maps'}
+    contents = OrderedDict.fromkeys(['intensityMap','pgaMap','pgvMap','psa[PERIOD]Map'])
+    contents['intensityMap'] = {'title':'Intensity Map',
+                                'caption':'Map of macroseismic intensity.',
+                                'page':mapping_page,
+                                'formats':[{'filename':'intensity.jpg',
+                                            'type':'image/jpeg'},
+                                           {'filename':'intensity.pdf',
+                                            'type':'application/pdf'}
+                                          ]
+                                }
+    
+    contents['pgaMap'] = {'title':'PGA Map',
+                              'caption':'Map of peak ground acceleration (%g).',
+                              'page':mapping_page,
+                              'formats':[{'filename':'pga.jpg',
+                                          'type':'image/jpeg'},
+                                          {'filename':'PGA_contour.pdf',
+                                          'type':'image/jpeg'}
+                                          ]
+                             }
+    contents['pgvMap'] = {'title':'PGV Map',
+                              'caption':'Map of peak ground velocity (cm/s).',
+                              'page':mapping_page,
+                              'formats':[{'filename':'pgv.jpg',
+                                          'type':'image/jpeg'},
+                                          {'filename':'PGV_contour.pdf',
+                                          'type':'application/pdf'},
+                                          ]
+                             }
+    psacap = 'Map of [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'
+    contents['psa[PERIOD]Map'] = {'title':'PSA[PERIOD] Map',
+                                      'page':mapping_page,
+                                      'caption':psacap,
+                                      'formats':[{'filename':'psa[0-9][0-9].jpg',
+                                                  'type':'image/jpeg'},
+                                                 {'filename':'PSA[0-9]p[0-9]_contour.pdf',
+                                                  'type':'application/pdf'},
+                                                ]
+                                     }
+    
     def execute(self):
         """
         Raises:
@@ -141,6 +188,29 @@ class MappingModule(CoreModule):
             contour_file = mapmaker.drawContourMap(imt, datadir)
             self.logger.info('Created contour map %s' % contour_file)
 
+        ###########################
+        # Make a placeholder plot of standard deviation
+        # fill this in later if necessary
+        figure = plt.figure(figsize=(FIG_WIDTH,FIG_HEIGHT))
+        components = container.getComponents('PGA')
+        if not len(components):
+            return
+        component = components[0]
+        imt_dict = container.getIMTGrids('PGA',component)
+        im = plt.imshow(imt_dict['std'].getData(),interpolation='none',
+                        cmap='jet',vmin=0,vmax=1.25)
+        plt.title('PGA Standard Deviation')
+        ax = plt.gca() #get the current axes object
+
+        #do some magic stuff to make a new axes
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes("right", size="5%", pad=0.05)
+        #draw colorbar in new divider axes
+        plt.colorbar(im, cax=cax)
+        sd_file = os.path.join(datadir,'sd.jpg')
+        plt.savefig(sd_file)
+        ###########################
+            
 
 def getProjectedPolygon(polygon, m):
     """
@@ -250,6 +320,7 @@ class MapMaker(object):
             container.getString('info.json'))['input']['event_information']
         event_dict = {
             'eventsourcecode': info_dict['event_id'],
+            'eventsource': info_dict['eventsource'],
             'lat': float(info_dict['latitude']),
             'lon': float(info_dict['longitude']),
             'depth': float(info_dict['depth']),
@@ -906,8 +977,16 @@ class MapMaker(object):
         plt.draw()
         outfile = os.path.join(outfolder, 'intensity.pdf')
         plt.savefig(outfile)
+        outfile2 = os.path.join(outfolder, 'intensity.jpg')
+        plt.savefig(outfile2)
         tn = time.time()
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
+
+        # make the thumbnail image
+        dpi = THUMBNAIL_WIDTH_PIXELS / self.fig_width 
+        thumbfile = os.path.join(outfolder, 'pin-thumbnail.png')
+        plt.savefig(thumbfile,dpi=dpi)
+        
         return outfile
 
     def _getShaded(self, ptopo):
@@ -1153,9 +1232,25 @@ class MapMaker(object):
         # save plot to file
         fileimt = oq_to_file(imt)
         plt.draw()
-        outfile = os.path.join(outfolder, 'contour_%s.pdf' %
+        outfile = os.path.join(outfolder, '%s_contour.pdf' %
                                (fileimt))
         plt.savefig(outfile)
+
+        ###################
+        # to be compatible with the current NEIC web rendering,
+        # we're going to make another copy of the file with the
+        # old style naming convention.  Stop making this when
+        # all contributing networks are using this code.
+        if 'PSA' in fileimt:
+            oldimt = fileimt.replace('p','').lower()
+        else:
+            oldimt = fileimt.lower()
+        outfile_old = os.path.join(outfolder, '%s.jpg' % oldimt)
+        plt.savefig(outfile_old)
+        ######################
+
+        
+        
         tn = time.time()
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
         return outfile

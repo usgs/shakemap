@@ -1,6 +1,7 @@
 # stdlib imports
 import os.path
 import json
+from collections import OrderedDict
 
 # third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
@@ -19,6 +20,16 @@ class StationModule(CoreModule):
     """
 
     command_name = 'stations'
+
+    # supply here a data structure with information about files that
+    # can be created by this module.
+    contents = OrderedDict.fromkeys(['stationJSON'])
+    contents['stationJSON'] = {'title':'Station Lists',
+                                'caption':'Lists of ShakeMap input data.',
+                                'formats':[{'filename':'stationlist.json',
+                                         'type':'application/json'}
+                                          ]
+                                }
 
     def execute(self):
         """Write stationlist.json file.

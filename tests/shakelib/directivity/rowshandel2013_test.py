@@ -43,6 +43,7 @@ def test_exceptions():
                      'depth': 10,
                      'mag': magnitude,
                      'eventsourcecode': 'ss3',
+                     'eventsource':'us',
                      'rake': rake})
 
     # Rupture
@@ -92,6 +93,7 @@ def test_fromSites():
                      'depth': 10,
                      'mag': magnitude,
                      'eventsourcecode': '',
+                     'eventsource':'',
                      'rake': rake})
 
     # Rupture
@@ -154,6 +156,7 @@ def test_ss3():
                      'depth': 10,
                      'mag': magnitude,
                      'eventsourcecode': 'ss3',
+                     'eventsource':'',
                      'rake': rake})
 
     # Rupture
@@ -1877,6 +1880,7 @@ def test_rv4():
                      'depth': 0,
                      'mag': 0,
                      'eventsourcecode': '',
+                     'eventsource':'',
                      'rake': rake})
 
     # Rupture
@@ -1909,6 +1913,7 @@ def test_rv4():
                      'depth': epidepth,
                      'mag': magnitude,
                      'eventsourcecode': 'rv4',
+                     'eventsource':'',
                      'rake': rake})
 
     # Sites
@@ -1981,6 +1986,7 @@ def test_so6():
                      'depth': 0,
                      'mag': 0,
                      'eventsourcecode': 'so6',
+                     'eventsource':'',
                      'rake': rake})
 
     # Rupture
@@ -2020,6 +2026,7 @@ def test_so6():
                      'depth': epidepth,
                      'mag': magnitude,
                      'eventsourcecode': 'so6',
+                     'eventsource':'',
                      'rake': rake})
 
     ruplat = [a.latitude for a in rup.getQuadrilaterals()[0]]

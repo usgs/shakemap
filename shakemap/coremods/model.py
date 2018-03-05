@@ -9,6 +9,7 @@ import copy
 from time import gmtime, strftime
 import json
 import shutil
+from collections import OrderedDict
 
 import numpy as np
 import numpy.ma as ma
@@ -76,6 +77,16 @@ class ModelModule(CoreModule):
     """
 
     command_name = 'model'
+
+    # supply here a data structure with information about files that
+    # can be created by this module.
+    contents = OrderedDict.fromkeys(['shakemapHDF'])
+    contents['shakemapHDF'] = {'title':'Comprehensive ShakeMap HDF Data File',
+                                'caption':'HDF file containing all ShakeMap results.',
+                                'formats':[{'filename':'shake_result.hdf',
+                                         'type':'application/x-bag'}
+                                          ]
+                                }
 
     def execute(self):
         """
@@ -1056,6 +1067,15 @@ class ModelModule(CoreModule):
         info[ip][ei] = {}
         info[ip][ei]['depth'] = str(self.rx.hypo_depth)
         info[ip][ei]['event_id'] = self._eventid
+
+        # the following items are primarily useful for PDL
+        info[ip][ei]['eventsource'] = self.rupture_obj._origin.eventsource
+        info[ip][ei]['eventsourcecode'] = self.rupture_obj._origin.eventsourcecode
+        info[ip][ei]['productcode'] = self.rupture_obj._origin.productcode
+        info[ip][ei]['productsource'] = self.config['system']['source_network']
+        info[ip][ei]['producttype'] = self.config['system']['product_type']
+
+        
         info[ip][ei]['fault_ref'] = self.rupture_obj.getReference()
         if 'df2' in self.dataframes:
             info[ip][ei]['intensity_observations'] = \

@@ -51,7 +51,7 @@ def test_input_container():
     <earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9" year="2008"
     month="05" day="12" hour="06" minute="28" second="01" timezone="GMT"
     depth="19.0" locstring="EASTERN SICHUAN, CHINA" created="1211173621" productcode="us2008ryan"
-    otime="1210573681" type="" />"""
+    otime="1210573681" type="" network="" />"""
         eventfile = io.StringIO(event_text)
         datafiles = [os.path.join(
             homedir, 'container_data/northridge_stations_dat.xml')]
@@ -350,13 +350,13 @@ def test_output_repr():
     assert container_str == '''Data type: grid
     use "getIMTGrids" method to access interpolated IMTs
 Rupture: <class \'shakelib.rupture.quad_rupture.QuadRupture\'>
-    locstring: Northridge
-    magnitude: 6.7
+    locstring: Northridge, California
+    magnitude: 6.6
     time: 1994-01-17 12:30:55
 Config: use \'getConfig\' method
 Stations: use \'getStationDict\' method
     # instrumental stations: 185
-    # macroseismic stations: 547
+    # macroseismic stations: 977
 Metadata: use \'getMetadata\' method
 Available IMTs (components):
     MMI (GREATER_OF_TWO_HORIZONTAL)

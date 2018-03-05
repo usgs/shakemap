@@ -1,5 +1,6 @@
 # stdlib imports
 import os.path
+from collections import OrderedDict
 
 # third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
@@ -18,6 +19,17 @@ class InfoModule(CoreModule):
     """
 
     command_name = 'info'
+
+    # supply here a data structure with information about files that
+    # can be created by this module.
+    contents = OrderedDict.fromkeys(['supplementalInformation'])
+    cap = 'ShakeMap processing parameters and map summary information.'
+    contents['supplementalInformation'] = {'title':'Supplemental Information',
+                             'caption':cap,
+                             'formats':[{'filename':'info.json',
+                                         'type':'application/json'}
+                                       ]
+                            }
 
     def execute(self):
         """
