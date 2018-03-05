@@ -45,11 +45,10 @@ class CoreModule(ABC):
             return
 
         # read all of the files in the products folder
-        install_path, data_path = get_config_paths()
+        _, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
         if not os.path.isdir(datadir):
             raise NotADirectoryError('%s is not a valid directory.' % datadir)
-        datafiles = os.listdir(datadir)
 
         period_regex = '([0-9]p[0-9])|[0-9][0-9]'
         
@@ -58,10 +57,10 @@ class CoreModule(ABC):
         nuke_keys = []
         new_contents = {}
         for key,cdict in contents.items():
-            for format in cdict['formats']:
-                filenames = glob.glob(os.path.join(datadir,format['filename']))
+            for tformat in cdict['formats']:
+                filenames = glob.glob(os.path.join(datadir,tformat['filename']))
                 if len(filenames) == 1:
-                    fpath,fname = os.path.split(filenames[0])
+                    _,fname = os.path.split(filenames[0])
                     parts = fname.split('_')
                     # is this file a "greater of two horizontal" component
                     # or something like rotd50?
@@ -69,7 +68,7 @@ class CoreModule(ABC):
                         component = parts[1]
                     else:
                         component = 'greater of two horizontal'
-                    format['filename'] = fname
+                    tformat['filename'] = fname
                     cdict['caption'] = cdict['caption'].replace('[COMPONENT]',component)
                 elif len(filenames) == 0:
                     fmt = 'No filenames defined for contents.xml format (file element %s of module %s)'
@@ -79,7 +78,6 @@ class CoreModule(ABC):
                     if '[PERIOD]' in key:
                         nuke_keys.append(key)
                         # make new keys
-                        periods = {}
                         for fname in filenames:
                             fpath,filename = os.path.split(fname)
                             parts = filename.split('_')
@@ -101,7 +99,7 @@ class CoreModule(ABC):
                                 component = 'greater of two horizontal'
                             newcap = newcap.replace('[COMPONENT]',component)
                             new_cdict['caption'] = newcap
-                            format['filename'] = filename
+                            tformat['filename'] = filename
                             new_contents[newkey] = new_cdict
         # remove the keys we replaced with period specific ones
         for key in nuke_keys:
@@ -198,7 +196,6 @@ def _write_contents(contents,contents_file):
     f = open(contents_file,'wt')
     f.write(xmlstr.decode('utf-8'))
     f.close()
-    x = 1
                             
 def _period_to_fp(period):
     # take a string like PSA0p3 and turn it into 0.3

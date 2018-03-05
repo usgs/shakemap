@@ -191,7 +191,7 @@ class MappingModule(CoreModule):
         ###########################
         # Make a placeholder plot of standard deviation
         # fill this in later if necessary
-        figure = plt.figure(figsize=(FIG_WIDTH,FIG_HEIGHT))
+        plt.figure(figsize=(FIG_WIDTH,FIG_HEIGHT))
         components = container.getComponents('PGA')
         if not len(components):
             return
