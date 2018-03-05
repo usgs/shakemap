@@ -38,6 +38,7 @@ dependencies:
 - shapely
 - sphinx
 - versioneer
+- paramiko
 - pip:
   - et-xmlfile==1.0.1
   - ipython-genutils==0.2.0
@@ -50,4 +51,5 @@ dependencies:
   - ./mapio.zip
   - ./impact-utils.zip
   - ./strec.zip
+  - ./ps2ff.zip
 

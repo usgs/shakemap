@@ -3,6 +3,7 @@
 # stdlib imports
 from xml.dom import minidom
 import warnings
+import os.path
 
 # third party
 from openquake.hazardlib.geo import point
@@ -294,21 +295,30 @@ def read_event_file(eventxml):
     root.unlink()
 
     eqdict = {}
+
+    # read in the id fields
     eqdict['eventsourcecode'] = xmldict['id']
     if 'network' in xmldict:
         eqdict['eventsource'] = xmldict['network']
     else:
-        eqdict['eventsource'] = 'us'  # ??
-
-    # look for the productcode attribute
-    if 'productcode' in xmldict:
-        eqdict['productcode'] = xmldict['productcode']
+        raise Exception('Input event dictionary is missing the "network" field! ')
 
     # fix eventsourcecode if not specified correctly
     if not eqdict['eventsourcecode'].startswith(eqdict['eventsource']):
         eqdict['eventsourcecode'] = eqdict['eventsource'] + \
             eqdict['eventsourcecode']
 
+    # look for the productcode attribute in the xml,
+    # otherwise use the event directory name.
+    if 'productcode' in xmldict:
+        eqdict['productcode'] = xmldict['productcode']
+    else:
+        if isinstance(eventxml, str):
+            path_parts = eventxml.split(os.sep)
+            eqdict['productcode'] = path_parts[-3]
+        else:
+            eqdict['productcode'] = eqdict['eventsourcecode']
+            
     year = int(xmldict['year'])
     month = int(xmldict['month'])
     day = int(xmldict['day'])

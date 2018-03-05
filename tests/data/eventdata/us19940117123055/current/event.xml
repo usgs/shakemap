@@ -76,5 +76,5 @@
 >
 ]>
 <shakemap-data code_version="4.0" map_version="1">
-<earthquake id="Northridge" lat="34.213" lon="-118.537" mag="6.7" year="1994" month="1" day="17" hour="12" minute="30" second="55" timezone="GMT" depth="18.2" locstring="Northridge, CA"/>
+<earthquake id="Northridge" lat="34.213" lon="-118.537" mag="6.7" year="1994" month="1" day="17" hour="12" minute="30" second="55" timezone="GMT" depth="18.2" locstring="Northridge, CA" network="us"/>
 </shakemap-data>

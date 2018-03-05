@@ -155,6 +155,8 @@ def main(args):
             elapsed = t2 - t1
             logger.info('Finished running command %s: Elapsed %.2f secs'
                         % (cmd, elapsed))
+            # create/update the contents.xml file
+            cmd_obj.writeContents()
 
     except Exception as e:
         error_msg = _format_error_info(e, args.eventid)

@@ -1218,7 +1218,7 @@ def test_multigmpe_get_mean_stddevs():
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
              'eventsourcecode': '', 'locstring': '', 'rake': 30.3,
              'time': HistoricTime.utcfromtimestamp(int(time.time())),
-             'timezone': 'UTC'}
+             'timezone': 'UTC','eventsource':''}
     origin = Origin(event)
     rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip, origin)
 

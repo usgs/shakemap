@@ -30,6 +30,7 @@ def test_plot_rupture(interactive=False):
                      'lon': 0.0,
                      'depth': 0.0,
                      'mag': 5.5,
+                     'eventsource':'',
                      'eventsourcecode': 'abcd'})
     interface_width = MAX_DEPTH / np.sin(np.radians(DIP))
     widths = np.ones(xp0.shape) * interface_width
@@ -56,6 +57,7 @@ def test_map_rupture(interactive=False):
                      'lon': 0.0,
                      'depth': 0.0,
                      'mag': 5.5,
+                     'eventsource':'',
                      'eventsourcecode': 'abcd'})
     interface_width = MAX_DEPTH / np.sin(np.radians(DIP))
     widths = np.ones(xp0.shape) * interface_width
