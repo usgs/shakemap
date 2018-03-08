@@ -93,14 +93,18 @@ class TransferModule(CoreModule):
                     else:
                         sender = sender_class(properties=params,
                                               local_directory = products_dir)
-                    sender.send()
+
+                    nfiles, msg = sender.send()
+                    fmt = '%i files sent.  Message from sender: \n"%s"'
+                    tpl = (nfiles,msg)
+                    self.logger.info(fmt % tpl)
                 except Exception as e:
                     # for the standard config, this should generate an email to the developer
                     # list.
                     msg = str(e)
                     fmt = 'Transfer for %s method, %s destination failed with error "%s".'
                     tpl = (transfer_method,destination,msg)
-                    self.logger.exception(fmt % tpl)
+                    self.logger.warning(fmt % tpl)
                     continue
                 
 def _get_properties(info):
