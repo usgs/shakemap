@@ -75,9 +75,11 @@ class XTestImage(CoreModule):
             gs = plt.GridSpec(4, 4, hspace=0.2, wspace=0.1)
             ax0 = fig.add_subplot(gs[:-1, 1:])
             plt.title(self._eventid + ': ' + myimt + ' mean')
-            ax0.imshow(grddata,
+            im1 = ax0.imshow(grddata,
                        extent=(metadata['xmin'], metadata['xmax'],
                                metadata['ymin'], metadata['ymax']))
+            cbax = fig.add_axes([0.915, .34, .02, .5])
+            cb1 = plt.colorbar(im1, ax=ax0, cax=cbax)
             ycut = fig.add_subplot(gs[:-1, 0], sharey=ax0)
             xcut = fig.add_subplot(gs[-1, 1:], sharex=ax0)
             rows, cols = grddata.shape
@@ -89,10 +91,12 @@ class XTestImage(CoreModule):
             xcut.plot(xvals, grddata[midrow, :])
             ycut.set(xlabel=myimt + ' ' + yunits, ylabel='Latitude')
             xcut.set(xlabel='Longitude', ylabel=myimt + ' ' + yunits)
+            ycut.set_ylim((metadata['ymin'], metadata['ymax']))
+            xcut.set_xlim((metadata['xmin'], metadata['xmax']))
             ax0.label_outer()
 
             pfile = os.path.join(datadir, self._eventid + '_' + fileimt + '.pdf')
-            plt.savefig(pfile)
+            plt.savefig(pfile, bbox_inches='tight')
             plt.close()
 
             #
@@ -105,9 +109,11 @@ class XTestImage(CoreModule):
             gs = plt.GridSpec(4, 4, hspace=0.2, wspace=0.1)
             ax0 = fig.add_subplot(gs[:-1, 1:])
             plt.title(self._eventid + ': ' + myimt + ' stddev')
-            ax0.imshow(grddata,
+            im1 = ax0.imshow(grddata,
                        extent=(metadata['xmin'], metadata['xmax'],
                                metadata['ymin'], metadata['ymax']))
+            cbax = fig.add_axes([0.915, .34, .02, .5])
+            cb1 = plt.colorbar(im1, ax=ax0, cax=cbax)
             ycut = fig.add_subplot(gs[:-1, 0], sharey=ax0)
             xcut = fig.add_subplot(gs[-1, 1:], sharex=ax0)
             rows, cols = grddata.shape
@@ -119,10 +125,12 @@ class XTestImage(CoreModule):
             xcut.plot(xvals, grddata[midrow, :])
             ycut.set(xlabel='stddev ' + yunits, ylabel='Latitude')
             xcut.set(xlabel='Longitude', ylabel='stddev ' + yunits)
+            xcut.set_xlim((metadata['xmin'], metadata['xmax']))
             xcut.set_ylim(bottom=0, top=np.max(grddata[midrow, :]) * 1.1)
             ycut.set_xlim(left=0, right=np.max(grddata[:, midcol] * 1.1))
+            ycut.set_ylim((metadata['ymin'], metadata['ymax']))
             ax0.label_outer()
 
             pfile = os.path.join(datadir, self._eventid + '_' + fileimt + '_sd.pdf')
-            plt.savefig(pfile)
+            plt.savefig(pfile, bbox_inches='tight')
             plt.close()

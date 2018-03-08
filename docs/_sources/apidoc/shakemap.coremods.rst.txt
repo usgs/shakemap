@@ -17,6 +17,7 @@ Submodules
    shakemap.coremods.rupture
    shakemap.coremods.select
    shakemap.coremods.stations
+   shakemap.coremods.transfer
    shakemap.coremods.xplotregr
    shakemap.coremods.xtestimage
    shakemap.coremods.xtestplot

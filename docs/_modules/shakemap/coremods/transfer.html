@@ -1,0 +1,263 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakemap.coremods.transfer &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakemap.coremods.transfer</h1><div class="highlight"><pre>
+<span></span><span class="c1"># stdlib imports</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+
+<span class="c1"># third party imports</span>
+<span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
+<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
+<span class="kn">from</span> <span class="nn">impactutils.transfer.factory</span> <span class="k">import</span> <span class="n">get_sender_class</span>
+
+<span class="c1"># local imports</span>
+<span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span><span class="n">get_data_path</span>
+
+<span class="n">TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span>
+
+<div class="viewcode-block" id="TransferModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.transfer.html#shakemap.coremods.transfer.TransferModule">[docs]</a><span class="k">class</span> <span class="nc">TransferModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    info -- Extract info.json from shake_result.hdf and write it as a file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;transfer&#39;</span>
+
+<div class="viewcode-block" id="TransferModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.transfer.html#shakemap.coremods.transfer.TransferModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Tranfer ShakeMap products using methods configured in transfer.conf.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            NotADirectoryError: When the event data directory does not exist.</span>
+<span class="sd">            FileNotFoundError: When the the shake_result HDF file does not</span>
+<span class="sd">                exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
+        <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">datadir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">datadir</span><span class="p">)</span>
+        <span class="n">products_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">products_dir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">products_dir</span><span class="p">)</span>
+
+        <span class="c1"># get the path to the transfer.conf spec file</span>
+        <span class="n">configspec</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span><span class="s1">&#39;transferspec.conf&#39;</span><span class="p">)</span>
+        
+        <span class="c1"># look for an event specific transfer.conf file</span>
+        <span class="n">transfer_conf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="s1">&#39;transfer.conf&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">transfer_conf</span><span class="p">):</span>
+            <span class="c1"># if not there, use the system one</span>
+            <span class="n">transfer_conf</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span><span class="s1">&#39;config&#39;</span><span class="p">,</span><span class="s1">&#39;transfer.conf&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">transfer_conf</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">transfer_conf</span><span class="p">)</span>
+
+        <span class="c1"># get the config information for transfer</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">transfer_conf</span><span class="p">,</span><span class="n">configspec</span><span class="o">=</span><span class="n">configspec</span><span class="p">)</span>
+
+        <span class="c1"># get the output container with all the things in it</span>
+        <span class="n">datafile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">products_dir</span><span class="p">,</span> <span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
+
+        <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
+
+        <span class="c1"># call the transfer method</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_transfer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">container</span><span class="p">,</span><span class="n">products_dir</span><span class="p">):</span>
+        <span class="c1"># extract the info.json object from the container</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">))</span>
+        <span class="n">properties</span><span class="p">,</span><span class="n">product_properties</span> <span class="o">=</span> <span class="n">_get_properties</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
+
+        <span class="c1"># get the config information:</span>
+        <span class="k">for</span> <span class="n">transfer_method</span><span class="p">,</span><span class="n">transfer_dict</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Doing </span><span class="si">%s</span><span class="s1"> transfers...&#39;</span> <span class="o">%</span> <span class="n">transfer_method</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">destination</span><span class="p">,</span><span class="n">params</span> <span class="ow">in</span> <span class="n">transfer_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">properties</span><span class="p">)</span>
+                <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Doing </span><span class="si">%s</span><span class="s1"> transfer to </span><span class="si">%s</span><span class="s1">...&#39;</span>
+                <span class="n">tpl</span> <span class="o">=</span> <span class="p">(</span><span class="n">transfer_method</span><span class="p">,</span><span class="n">destination</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">tpl</span><span class="p">)</span>
+                <span class="c1"># append eventid to remote_directory, if present</span>
+                <span class="k">if</span> <span class="s1">&#39;remote_directory&#39;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+                    <span class="n">rem_dir</span> <span class="o">=</span> <span class="n">params</span><span class="p">[</span><span class="s1">&#39;remote_directory&#39;</span><span class="p">]</span>
+                    <span class="n">params</span><span class="p">[</span><span class="s1">&#39;remote_directory&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rem_dir</span><span class="p">,</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">])</span>
+
+                <span class="c1"># get the sender class from the type</span>
+                <span class="n">sender_class</span> <span class="o">=</span> <span class="n">get_sender_class</span><span class="p">(</span><span class="n">transfer_method</span><span class="p">)</span>
+
+                <span class="c1"># try to send the data</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">transfer_method</span> <span class="o">==</span> <span class="s1">&#39;pdl&#39;</span><span class="p">:</span>
+                        <span class="n">sender</span> <span class="o">=</span> <span class="n">sender_class</span><span class="p">(</span><span class="n">properties</span> <span class="o">=</span> <span class="n">params</span><span class="p">,</span>
+                                              <span class="n">local_directory</span> <span class="o">=</span> <span class="n">products_dir</span><span class="p">,</span>
+                                              <span class="n">product_properties</span> <span class="o">=</span> <span class="n">product_properties</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">sender</span> <span class="o">=</span> <span class="n">sender_class</span><span class="p">(</span><span class="n">properties</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
+                                              <span class="n">local_directory</span> <span class="o">=</span> <span class="n">products_dir</span><span class="p">)</span>
+                    <span class="n">sender</span><span class="o">.</span><span class="n">send</span><span class="p">()</span>
+                <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                    <span class="c1"># for the standard config, this should generate an email to the developer</span>
+                    <span class="c1"># list.</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                    <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Transfer for </span><span class="si">%s</span><span class="s1"> method, </span><span class="si">%s</span><span class="s1"> destination failed with error &quot;</span><span class="si">%s</span><span class="s1">&quot;.&#39;</span>
+                    <span class="n">tpl</span> <span class="o">=</span> <span class="p">(</span><span class="n">transfer_method</span><span class="p">,</span><span class="n">destination</span><span class="p">,</span><span class="n">msg</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">tpl</span><span class="p">)</span>
+                    <span class="k">continue</span></div>
+                
+<span class="k">def</span> <span class="nf">_get_properties</span><span class="p">(</span><span class="n">info</span><span class="p">):</span>
+    <span class="n">properties</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">product_properties</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># origin info</span>
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]</span>
+    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span>
+    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span>
+    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
+    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;productsource&#39;</span><span class="p">]</span>
+    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;producttype&#39;</span><span class="p">]</span>
+    
+    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;magnitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;magnitude&#39;</span><span class="p">])</span>
+    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">])</span>
+    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">])</span>
+    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">])</span>
+    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;eventtime&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span><span class="n">TIMEFMT</span><span class="p">)</span>
+
+    
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;event-type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;event-description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span>
+
+    <span class="c1"># other metadata</span>
+    <span class="n">mmi_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;MMI&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxmmi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmi_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxmmi-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmi_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+
+    <span class="n">pgv_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;PGV&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpgv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pgv_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpgv-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pgv_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+
+    <span class="n">pga_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;PGA&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpga&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pga_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpga-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pga_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+
+    <span class="n">psa03_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;SA(0.3)&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa03&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa03_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa03-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa03_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+
+    <span class="n">psa10_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;SA(1.0)&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa10&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa10_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa10-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa10_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+
+    <span class="n">psa30_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;SA(3.0)&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa30&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa30_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa30-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa30_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;minimum-longitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;map_information&#39;</span><span class="p">][</span><span class="s1">&#39;min&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;minimum-latitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;map_information&#39;</span><span class="p">][</span><span class="s1">&#39;min&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maximum-longitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;map_information&#39;</span><span class="p">][</span><span class="s1">&#39;max&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maximum-latitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;map_information&#39;</span><span class="p">][</span><span class="s1">&#39;max&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
+
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;process-timestamp&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="s1">&#39;shakemap_versions&#39;</span><span class="p">][</span><span class="s1">&#39;process_time&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;version&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="s1">&#39;shakemap_versions&#39;</span><span class="p">][</span><span class="s1">&#39;map_version&#39;</span><span class="p">]</span>
+    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;map-status&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;processing&#39;</span><span class="p">][</span><span class="s1">&#39;shakemap_versions&#39;</span><span class="p">][</span><span class="s1">&#39;map_status&#39;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">properties</span><span class="p">,</span><span class="n">product_properties</span><span class="p">)</span>
+                
+        
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

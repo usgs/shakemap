@@ -52,6 +52,7 @@
 <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">gmtime</span><span class="p">,</span> <span class="n">strftime</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">numpy.ma</span> <span class="k">as</span> <span class="nn">ma</span>
@@ -119,6 +120,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;model&#39;</span>
+
+    <span class="c1"># supply here a data structure with information about files that</span>
+    <span class="c1"># can be created by this module.</span>
+    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;shakemapHDF&#39;</span><span class="p">])</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;shakemapHDF&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;Comprehensive ShakeMap HDF Data File&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="s1">&#39;HDF file containing all ShakeMap results.&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;shake_result.hdf&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/x-bag&#39;</span><span class="p">}</span>
+                                          <span class="p">]</span>
+                                <span class="p">}</span>
 
 <div class="viewcode-block" id="ModelModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.ModelModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1099,6 +1110,15 @@
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">hypo_depth</span><span class="p">)</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span>
+
+        <span class="c1"># the following items are primarily useful for PDL</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">eventsource</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">eventsourcecode</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">productcode</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;productsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;source_network&#39;</span><span class="p">]</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;producttype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;product_type&#39;</span><span class="p">]</span>
+
+        
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;fault_ref&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">getReference</span><span class="p">()</span>
         <span class="k">if</span> <span class="s1">&#39;df2&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframes</span><span class="p">:</span>
             <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;intensity_observations&#39;</span><span class="p">]</span> <span class="o">=</span> \

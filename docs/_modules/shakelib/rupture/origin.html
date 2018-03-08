@@ -46,6 +46,7 @@
 <span class="c1"># stdlib imports</span>
 <span class="kn">from</span> <span class="nn">xml.dom</span> <span class="k">import</span> <span class="n">minidom</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
 
 <span class="c1"># third party</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo</span> <span class="k">import</span> <span class="n">point</span>
@@ -337,21 +338,30 @@
     <span class="n">root</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
 
     <span class="n">eqdict</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># read in the id fields</span>
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="s1">&#39;network&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
         <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;network&#39;</span><span class="p">]</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;us&#39;</span>  <span class="c1"># ??</span>
-
-    <span class="c1"># look for the productcode attribute</span>
-    <span class="k">if</span> <span class="s1">&#39;productcode&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Input event dictionary is missing the &quot;network&quot; field! &#39;</span><span class="p">)</span>
 
     <span class="c1"># fix eventsourcecode if not specified correctly</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]):</span>
         <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">+</span> \
             <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span>
 
+    <span class="c1"># look for the productcode attribute in the xml,</span>
+    <span class="c1"># otherwise use the event directory name.</span>
+    <span class="k">if</span> <span class="s1">&#39;productcode&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eventxml</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">path_parts</span> <span class="o">=</span> <span class="n">eventxml</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+            <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_parts</span><span class="p">[</span><span class="o">-</span><span class="mi">3</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span>
+            
     <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;year&#39;</span><span class="p">])</span>
     <span class="n">month</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;month&#39;</span><span class="p">])</span>
     <span class="n">day</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;day&#39;</span><span class="p">])</span>

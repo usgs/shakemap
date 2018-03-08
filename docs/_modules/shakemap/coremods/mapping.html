@@ -46,6 +46,7 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
 <span class="c1"># third party</span>
 <span class="kn">import</span> <span class="nn">fiona</span>
@@ -56,6 +57,7 @@
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">mpl_toolkits.basemap</span> <span class="k">import</span> <span class="n">Basemap</span>
 <span class="kn">import</span> <span class="nn">matplotlib.patheffects</span> <span class="k">as</span> <span class="nn">path_effects</span>
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="k">import</span> <span class="n">make_axes_locatable</span>
 
 <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">MultiPolygon</span>
 <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">MultiLineString</span>
@@ -109,6 +111,8 @@
 <span class="n">GRATICULE_ZORDER</span> <span class="o">=</span> <span class="mi">1200</span>
 <span class="n">SCALE_ZORDER</span> <span class="o">=</span> <span class="mi">1500</span>
 
+<span class="n">THUMBNAIL_WIDTH_PIXELS</span> <span class="o">=</span> <span class="mi">100</span>
+
 <span class="n">MMI_LABELS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="s1">&#39;I&#39;</span><span class="p">,</span>
     <span class="s1">&#39;2&#39;</span><span class="p">:</span> <span class="s1">&#39;II&#39;</span><span class="p">,</span>
@@ -130,6 +134,49 @@
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;mapping&#39;</span>
 
+    <span class="c1"># supply here a data structure with information about files that</span>
+    <span class="c1"># can be created by this module.</span>
+    <span class="n">mapping_page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;Ground Motion Maps&#39;</span><span class="p">,</span><span class="s1">&#39;slug&#39;</span><span class="p">:</span><span class="s1">&#39;maps&#39;</span><span class="p">}</span>
+    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;intensityMap&#39;</span><span class="p">,</span><span class="s1">&#39;pgaMap&#39;</span><span class="p">,</span><span class="s1">&#39;pgvMap&#39;</span><span class="p">,</span><span class="s1">&#39;psa[PERIOD]Map&#39;</span><span class="p">])</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;intensityMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;Intensity Map&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="s1">&#39;Map of macroseismic intensity.&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;page&#39;</span><span class="p">:</span><span class="n">mapping_page</span><span class="p">,</span>
+                                <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;intensity.jpg&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
+                                           <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;intensity.pdf&#39;</span><span class="p">,</span>
+                                            <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">}</span>
+                                          <span class="p">]</span>
+                                <span class="p">}</span>
+    
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgaMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;PGA Map&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="s1">&#39;Map of peak ground acceleration (</span><span class="si">%g</span><span class="s1">).&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;page&#39;</span><span class="p">:</span><span class="n">mapping_page</span><span class="p">,</span>
+                              <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;pga.jpg&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
+                                          <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;PGA_contour.pdf&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">}</span>
+                                          <span class="p">]</span>
+                             <span class="p">}</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgvMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;PGV Map&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="s1">&#39;Map of peak ground velocity (cm/s).&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;page&#39;</span><span class="p">:</span><span class="n">mapping_page</span><span class="p">,</span>
+                              <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;pgv.jpg&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
+                                          <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;PGV_contour.pdf&#39;</span><span class="p">,</span>
+                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">},</span>
+                                          <span class="p">]</span>
+                             <span class="p">}</span>
+    <span class="n">psacap</span> <span class="o">=</span> <span class="s1">&#39;Map of [FPERIOD] sec 5</span><span class="si">% d</span><span class="s1">amped pseudo-spectral acceleration(</span><span class="si">%g</span><span class="s1">).&#39;</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;psa[PERIOD]Map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;PSA[PERIOD] Map&#39;</span><span class="p">,</span>
+                                      <span class="s1">&#39;page&#39;</span><span class="p">:</span><span class="n">mapping_page</span><span class="p">,</span>
+                                      <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="n">psacap</span><span class="p">,</span>
+                                      <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;psa[0-9][0-9].jpg&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
+                                                 <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;PSA[0-9]p[0-9]_contour.pdf&#39;</span><span class="p">,</span>
+                                                  <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">},</span>
+                                                <span class="p">]</span>
+                                     <span class="p">}</span>
+    
 <div class="viewcode-block" id="MappingModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MappingModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Raises:</span>
@@ -182,8 +229,31 @@
         <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;imts&#39;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Drawing </span><span class="si">%s</span><span class="s1"> contour map...&#39;</span> <span class="o">%</span> <span class="n">imt</span><span class="p">)</span>
             <span class="n">contour_file</span> <span class="o">=</span> <span class="n">mapmaker</span><span class="o">.</span><span class="n">drawContourMap</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">datadir</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created contour map </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">contour_file</span><span class="p">)</span></div></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Created contour map </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">contour_file</span><span class="p">)</span>
 
+        <span class="c1">###########################</span>
+        <span class="c1"># Make a placeholder plot of standard deviation</span>
+        <span class="c1"># fill this in later if necessary</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">FIG_WIDTH</span><span class="p">,</span><span class="n">FIG_HEIGHT</span><span class="p">))</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="s1">&#39;PGA&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="n">component</span> <span class="o">=</span> <span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">imt_dict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="s1">&#39;PGA&#39;</span><span class="p">,</span><span class="n">component</span><span class="p">)</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getData</span><span class="p">(),</span><span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+                        <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">,</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">vmax</span><span class="o">=</span><span class="mf">1.25</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;PGA Standard Deviation&#39;</span><span class="p">)</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span> <span class="c1">#get the current axes object</span>
+
+        <span class="c1">#do some magic stuff to make a new axes</span>
+        <span class="n">divider</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
+        <span class="n">cax</span> <span class="o">=</span> <span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
+        <span class="c1">#draw colorbar in new divider axes</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax</span><span class="p">)</span>
+        <span class="n">sd_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="s1">&#39;sd.jpg&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">sd_file</span><span class="p">)</span></div></div>
+        <span class="c1">###########################</span>
+            
 
 <div class="viewcode-block" id="getProjectedPolygon"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.getProjectedPolygon">[docs]</a><span class="k">def</span> <span class="nf">getProjectedPolygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">m</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -293,6 +363,7 @@
             <span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">))[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]</span>
         <span class="n">event_dict</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;eventsourcecode&#39;</span><span class="p">:</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;event_id&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;eventsource&#39;</span><span class="p">:</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">],</span>
             <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]),</span>
             <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]),</span>
             <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]),</span>
@@ -949,8 +1020,16 @@
         <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
         <span class="n">outfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;intensity.pdf&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
+        <span class="n">outfile2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;intensity.jpg&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">outfile2</span><span class="p">)</span>
         <span class="n">tn</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
+
+        <span class="c1"># make the thumbnail image</span>
+        <span class="n">dpi</span> <span class="o">=</span> <span class="n">THUMBNAIL_WIDTH_PIXELS</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig_width</span> 
+        <span class="n">thumbfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;pin-thumbnail.png&#39;</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">thumbfile</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+        
         <span class="k">return</span> <span class="n">outfile</span></div>
 
     <span class="k">def</span> <span class="nf">_getShaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ptopo</span><span class="p">):</span>
@@ -1196,9 +1275,25 @@
         <span class="c1"># save plot to file</span>
         <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
-        <span class="n">outfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;contour_</span><span class="si">%s</span><span class="s1">.pdf&#39;</span> <span class="o">%</span>
+        <span class="n">outfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_contour.pdf&#39;</span> <span class="o">%</span>
                                <span class="p">(</span><span class="n">fileimt</span><span class="p">))</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
+
+        <span class="c1">###################</span>
+        <span class="c1"># to be compatible with the current NEIC web rendering,</span>
+        <span class="c1"># we&#39;re going to make another copy of the file with the</span>
+        <span class="c1"># old style naming convention.  Stop making this when</span>
+        <span class="c1"># all contributing networks are using this code.</span>
+        <span class="k">if</span> <span class="s1">&#39;PSA&#39;</span> <span class="ow">in</span> <span class="n">fileimt</span><span class="p">:</span>
+            <span class="n">oldimt</span> <span class="o">=</span> <span class="n">fileimt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">oldimt</span> <span class="o">=</span> <span class="n">fileimt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="n">outfile_old</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.jpg&#39;</span> <span class="o">%</span> <span class="n">oldimt</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">outfile_old</span><span class="p">)</span>
+        <span class="c1">######################</span>
+
+        
+        
         <span class="n">tn</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">outfile</span></div></div>
