@@ -41,7 +41,7 @@ type="" />"""
     origin = Origin.fromFile(efile, sourcefile=sfile)
 
     testdict = {'mag': 7.9,
-                'eventsourcecode': 'us2008ryan',
+                'eventsourcecode': '2008ryan',
                 'locstring': 'EASTERN SICHUAN, CHINA',
                 'mech': 'RS',
                 'lon': 103.3639,

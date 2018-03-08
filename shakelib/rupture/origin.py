@@ -296,6 +296,24 @@ def read_event_file(eventxml):
 
     eqdict = {}
 
+    #########################################################
+    # A Short Primer on PDL-style Identifiers
+    # Because Everybody (Including The Author) Forgets It.
+    #
+    # In PDL, there are 4 identifiers that fully specify a product:
+    # - source The network that generated the *product* (us, ci, etc.).
+    # - code   The unique ID string that identifies this product,
+    #          usually prepended by *source* (us2008abcd).
+    # - eventsource The network that created the *origin* (us, ci, etc.)
+    # - eventsourcecode The code within that network that uniquely
+    #                   identifies the event (2008abcd).
+    #
+    # For our purposes, we're storing *source* and *code* as
+    # *productsource* and *productcode* respectively in the
+    # container, in an effort to reduce confusion about their
+    # meaning. Time will tell.
+    #########################################################
+    
     # read in the id fields
     eqdict['eventsourcecode'] = xmldict['id']
     if 'network' in xmldict:
@@ -304,9 +322,9 @@ def read_event_file(eventxml):
         raise Exception('Input event dictionary is missing the "network" field! ')
 
     # fix eventsourcecode if not specified correctly
-    if not eqdict['eventsourcecode'].startswith(eqdict['eventsource']):
-        eqdict['eventsourcecode'] = eqdict['eventsource'] + \
-            eqdict['eventsourcecode']
+    if eqdict['eventsourcecode'].startswith(eqdict['eventsource']):
+        newcode = eqdict['eventsourcecode'].replace(eqdict['eventsource'],'')
+        eqdict['eventsourcecode'] = newcode
 
     # look for the productcode attribute in the xml,
     # otherwise use the event directory name.
