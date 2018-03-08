@@ -43,6 +43,8 @@
   <h1>Source code for shakemap.coremods.raster</h1><div class="highlight"><pre>
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
@@ -70,6 +72,14 @@
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;raster&#39;</span>
 
+    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;rasterData&#39;</span><span class="p">])</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;rasterData&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;ESRI Raster Files&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="s1">&#39;Data and uncertainty grids in ESRI raster format&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;raster.zip&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/zip&#39;</span><span class="p">}</span>
+                                          <span class="p">]</span>
+                                <span class="p">}</span>
+
 <div class="viewcode-block" id="RasterModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.raster.html#shakemap.coremods.raster.RasterModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
         <span class="n">datadir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
@@ -93,6 +103,13 @@
         <span class="c1"># create GIS-readable .flt files of imt and uncertainty</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Creating GIS grids...&#39;</span><span class="p">)</span>
         <span class="n">layers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;raster&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">]</span>
+
+        <span class="c1"># Package up all of these files into one zip file.</span>
+        <span class="n">zfilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="s1">&#39;rasters.zip&#39;</span><span class="p">)</span>
+        <span class="n">zfile</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zfilename</span><span class="p">,</span><span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span>
+                                <span class="n">compression</span><span class="o">=</span><span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span>
+
+        <span class="n">files_written</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">layers</span><span class="p">:</span>
             <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
             <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="s1">&#39;GREATER_OF_TWO_HORIZONTAL&#39;</span><span class="p">)</span>
@@ -101,11 +118,29 @@
             <span class="n">mean_gdal</span> <span class="o">=</span> <span class="n">GDALGrid</span><span class="o">.</span><span class="n">copyFromGrid</span><span class="p">(</span><span class="n">mean_grid</span><span class="p">)</span>
             <span class="n">std_gdal</span> <span class="o">=</span> <span class="n">GDALGrid</span><span class="o">.</span><span class="n">copyFromGrid</span><span class="p">(</span><span class="n">std_grid</span><span class="p">)</span>
             <span class="n">mean_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_mean.flt&#39;</span> <span class="o">%</span> <span class="n">fileimt</span><span class="p">)</span>
+            <span class="n">mean_hdr</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_mean.hdr&#39;</span> <span class="o">%</span> <span class="n">fileimt</span><span class="p">)</span>
             <span class="n">std_fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_std.flt&#39;</span> <span class="o">%</span> <span class="n">fileimt</span><span class="p">)</span>
+            <span class="n">std_hdr</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_std.hdr&#39;</span> <span class="o">%</span> <span class="n">fileimt</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Saving </span><span class="si">%s</span><span class="s1">...&#39;</span> <span class="o">%</span> <span class="n">mean_fname</span><span class="p">)</span>
             <span class="n">mean_gdal</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">mean_fname</span><span class="p">)</span>
+            <span class="n">files_written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mean_fname</span><span class="p">)</span>
+            <span class="n">files_written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mean_hdr</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Saving </span><span class="si">%s</span><span class="s1">...&#39;</span> <span class="o">%</span> <span class="n">std_fname</span><span class="p">)</span>
-            <span class="n">std_gdal</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">std_fname</span><span class="p">)</span></div></div>
+            <span class="n">std_gdal</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">std_fname</span><span class="p">)</span>
+            <span class="n">files_written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">std_fname</span><span class="p">)</span>
+            <span class="n">files_written</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">std_hdr</span><span class="p">)</span>
+            <span class="n">zfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mean_fname</span><span class="p">,</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_mean.flt&#39;</span> <span class="o">%</span> <span class="n">fileimt</span><span class="p">)</span>
+            <span class="n">zfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">mean_fname</span><span class="p">,</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_mean.hdr&#39;</span> <span class="o">%</span> <span class="n">fileimt</span><span class="p">)</span>
+            <span class="n">zfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">std_fname</span><span class="p">,</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_std.flt&#39;</span> <span class="o">%</span> <span class="n">fileimt</span><span class="p">)</span>
+            <span class="n">zfile</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">std_fname</span><span class="p">,</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_std.hdr&#39;</span> <span class="o">%</span> <span class="n">fileimt</span><span class="p">)</span>
+            
+        <span class="n">zfile</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+        <span class="c1"># nuke all of the copies of the files we just put in the zipfile</span>
+        <span class="k">for</span> <span class="n">file_written</span> <span class="ow">in</span> <span class="n">files_written</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file_written</span><span class="p">)</span></div></div>
+        
+        
 </pre></div>
 
           </div>

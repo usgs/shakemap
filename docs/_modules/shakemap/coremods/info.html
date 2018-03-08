@@ -43,6 +43,7 @@
   <h1>Source code for shakemap.coremods.info</h1><div class="highlight"><pre>
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
@@ -61,6 +62,17 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;info&#39;</span>
+
+    <span class="c1"># supply here a data structure with information about files that</span>
+    <span class="c1"># can be created by this module.</span>
+    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;supplementalInformation&#39;</span><span class="p">])</span>
+    <span class="n">cap</span> <span class="o">=</span> <span class="s1">&#39;ShakeMap processing parameters and map summary information.&#39;</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;supplementalInformation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;Supplemental Information&#39;</span><span class="p">,</span>
+                             <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="n">cap</span><span class="p">,</span>
+                             <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;info.json&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+                                       <span class="p">]</span>
+                            <span class="p">}</span>
 
 <div class="viewcode-block" id="InfoModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.info.html#shakemap.coremods.info.InfoModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

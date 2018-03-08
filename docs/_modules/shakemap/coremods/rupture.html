@@ -44,6 +44,7 @@
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
@@ -62,6 +63,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;rupture&#39;</span>
+
+    <span class="c1"># supply here a data structure with information about files that</span>
+    <span class="c1"># can be created by this module.</span>
+    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;ruptureJSON&#39;</span><span class="p">])</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;ruptureJSON&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;Fault Rupture&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="s1">&#39;JSON Representation of Fault Rupture.&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;rupture.json&#39;</span><span class="p">,</span>
+                                         <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+                                          <span class="p">]</span>
+                                <span class="p">}</span>
 
 <div class="viewcode-block" id="RuptureModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.rupture.html#shakemap.coremods.rupture.RuptureModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

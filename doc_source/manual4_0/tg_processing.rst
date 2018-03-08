@@ -12,7 +12,7 @@ The interpolation is performed by treating the ground motions as a
 conditional
 multivariate normal distribution (MVN). The MVN approach employed by 
 ShakeMap is described in :ref:`Worden et al., 2018 <worden2018>`. The 
-specifics of ShakeMap's implementation of this method are described herein.
+specifics of ShakeMap's implementation of this method are described below.
 
 Ground-Motion Prediction
 ==========================
@@ -27,7 +27,7 @@ combination of two or more GMPEs. GMPEs are configured in ShakeMap
 as GMPE "sets" (see *gmpe_sets.conf* and *modules.conf* for 
 information on the specification of GMPE sets; the GMPE set to use
 is specified with the ``gmpe`` parameter of the ``model`` section of
-*model.conf*)) and are executed through its 
+*model.conf*) and are executed through its 
 :class:`MultiGMPE <shakelib.multigmpe.MultiGMPE>` class.
 The MultiGMPE class allows for smooth transitions between tectonic
 environments, as well as consistency with the methodology of other
@@ -47,7 +47,7 @@ the variances are given by:
 
 .. math::
 
-    \sigma^2 = \sum_{i=1}^{n} \left( {\left( \mu_i - \mu \right)}^2 + 
+    \sigma^2 = \sum_{i=1}^{n} w_i \left( {\left( \mu_i - \mu \right)}^2 + 
                                      \sigma^2_i \right),
 
 where :math:`\sigma_i` are the standard deviations of the corresponding
@@ -174,18 +174,20 @@ given by the rules of error propagation (see :ref:`Ku (1966) <ku1966>` is:
 
 .. math::
 
-    \sigma_{\text{MMI}} = \sqrt{\left(\sigma_{\text{PGM}} 
-        \frac{\delta \text{MMI}}{\delta \text{PGM}}\right)^2 + 
-        \sigma^2_{\text{MMI}|\text{PGM}}},
+    \sigma_{\text{MMI}} = \sqrt{\left(\sigma_{\ln(Y)} 
+        \frac{\delta \text{MMI}}{\delta \ln(Y)}\right)^2 + 
+        \sigma^2_{\text{MMI}|\ln(Y)}},
 
 where 
-:math:`\sigma_{\text{PGM}}` 
-is the standard deviation given by the GMPE,
-:math:`\frac{\delta \text{MMI}}{\delta \text{PGM}}`
-is the derivative of the GMICE at the value of the PGM from the GMPE, and
-:math:`\sigma_{\text{MMI}|\text{PGM}}` 
-is the standard deviation of the PGM to MMI conversion as given by the 
-GMICE.
+:math:`\sigma_{\ln(Y)}` 
+is the standard deviation of the natural log of the ground motion as 
+given by the GMPE,
+:math:`\frac{\delta \text{MMI}}{\delta \ln(Y)}`
+is the derivative of the GMICE at the value of 
+:math:`\ln(Y)` from the GMPE, and
+:math:`\sigma_{\text{MMI}|\ln(Y)}` 
+is the standard deviation of the ground motion to MMI conversion as given 
+by the GMICE.
 
 Because many GMICEs are bilinear (see, for example, 
 :num:`Figure #wgrw12-pgv-mmi`), the predicted intensities
@@ -346,12 +348,12 @@ of :math:`\mathbf{\Sigma_{Y_2Y_2}}` multiplied by the "omega factors"
 of the residuals [for a discussion, see 
 :ref:`Worden et al. (2018) <worden2018>`].
 
-The standard deviation of the bias terms is given by:
+The variance of the bias terms is given by:
 
 .. math::
    :label: bias-sigma
 
-    \sigma_{\delta B_{i,m}} = 
+    \sigma^2_{\delta B_{i,m}} = 
     \frac{1}
     {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}_{Y_2 Y_2}}    
     \bm{Z}_i}.
@@ -377,152 +379,6 @@ Interpolation
 :ref:`Worden et al. (2018) <worden2018>` discusses the application of
 the MVN to the interpolation of ground motions. Here, we
 discuss some specific details of its implementation within ShakeMap.
-
-.. _subsubsec-imt-selection:
-
-IMT Selection
--------------
-
-In a typical ShakeMap operational environment, it is common for each
-seismic station to produce a number of IMT observations, some of 
-which may be flagged as outliers. In addition, in ShakeMap V4, the
-output IMTs may or may not correspond to any of the input IMTs. The
-MVN approach described in :ref:`Worden et al. (2018) <worden2018>`
-would allow all of the input IMTs to be used in the production of 
-each output IMT. Such an approach, however, is unnecessary and inefficient.
-
-If the output IMT is represented in the set of input IMT residuals, 
-then any additional IMT residuals at that same site are mathematically
-irrelevant. Since the computational effort of the MVN process increases
-largely in proportion to the square of the number of residuals, adding
-unnecessary residuals only slows the process, without adding additional
-accuracy.
-
-Similarly, we have found that in cases where the output IMT is not
-represented in the set of IMT residuals at a station, then using the 
-two IMTs that "bracket" the output IMT is sufficient to define the
-observation point. For instance, if the output IMT is 2.0 second SA,
-and 0.3, 1.0, and 3.0 second SA are available in the input, then
-using the 1.0 and 3.0 second residuals is sufficient. (In situations
-where the output SA is higher (or lower) than the highest (or lowest)
-SA in the input, we choose the single IMT at the highest (or lowest)
-SA.)
-
-:num:`Figure #cond-spectra-mean` illustrates this point. Conditional
-mean spectra were computed for two sets of points. One set had SA
-observations at three periods (0.3, 1.0, and 3.0 seconds), and the other
-set had observations at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0, 
-and 9.0 seconds). The observations the two sets had in common (0.3, 
-1.0, and 3.0 seconds) were constrained to be the same. The figure 
-shows that in the shared regions (between 0.3 and 1.0 seconds, and
-between 1.0 and 3.0 seconds), there is very little difference between
-the conditional spectra. This point is reinforced by 
-:num:`Figure #cond-spectra-sd`, which shows the standard deviations of
-the two sets of conditional spectra. While the 7-point spectra is
-better constrained overall, in the area of overlap (again, between 0.3
-and 1.0 seconds, and between 1.0 and 3.0 seconds) there is virtually
-no difference between the spectra. These figures were generated using the 
-:ref:`Chiou and Youngs (2014) <chiou2014>` GMPE and the 
-:ref:`Baker and Jayaram (2008) <baker2008>` spectral correlation function.
-The odd kink in the mean plots at around 0.2 seconds is a result of the
-specifics of the correlation function.
-
-
-.. _cond-spectra-mean:
-
-.. figure:: _static/Figure_mu_compare.*
-   :width: 450
-   :align: center
-
-   Conditional spectra for two sets of conditioning observations:
-   One set at three periods (0.3, 1.0, and 3.0 seconds), and the other
-   set at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0, and 9.0 seconds).
-
-
-.. _cond-spectra-sd:
-
-.. figure:: _static/Figure_sigma_compare.*
-   :width: 450
-   :align: center
-
-   The standard deviations of conditional spectra for two sets of 
-   conditioning observations:
-   One set at three periods (0.3, 1.0, and 3.0 seconds), and the other
-   set at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0, and 9.0 seconds).
-
-
-Updating the Within-Event Standard Deviation
---------------------------------------------
-
-Once the bias calculation has been performed, the residuals may be 
-computed from the biased estimates of the ground motions. Similarly,
-the adjusted within-event standard deviation of the residuals may be 
-calculated:
-
-.. math::
-
-    \hat{\phi}_{i,m} = \sqrt{\phi^2_{i,m} + \sigma^2_{\delta B_{i,m}}}
-
-where
-:math:`\hat{\phi}_{i,m}` is the adjusted within-event standard deviation
-of IMT *i* at site *m*,
-:math:`\phi_{i,m}` is the within-event standard deviation of IMT *i*
-at site *m*, and
-:math:`\sigma_{\delta B_{i,m}}` is the standard deviation of the bias
-as calculated by Equation :eq:`bias-sigma`.
-
-With the adjusted within-event residual, the elements of the covariance 
-matrix of the residuals become:
-
-.. math::
-
-    \Sigma_{i,j} = \rho_{i,j}\hat{\phi}_i\hat{\phi}_j
-
-where
-:math:`\rho_{i,j}` is the correlation between residuals *i* (at site *m*)
-and *j* (at site *n*), and
-:math:`\hat{\phi}_i` and :math:`\hat{\phi}_j` are the adjusted within-event
-standard deviations of residuals *i* and *j* at their sites *m* and *n*.
-
-.. _subsubsec-weighting-residuals:
-
-Weighting of Residuals
-----------------------
-
-As discussed in :ref:`Worden et al. (2018) <worden2018>` uncertain data
-can be accommodated in the MVN structure through the use of the "omega
-factors". In our implementation, these factors are based on the adjusted
-within-event standard deviation computed for each residual:
-
-.. math::
-
-    \omega_{i,m} = \sqrt{\frac{\hat{\phi}^2_{i,m}}
-                              {\hat{\phi}^2_{i,m} + \sigma^2_{\epsilon,i,m}}}
-
-where 
-:math:`\sigma_{\epsilon,i,m}` is the additional standard deviation of the
-observation of IMT *i* at site *m*. These factors are then applied to the 
-covariance matrix and the residuals, as discussed in Worden et al.
-Analogous factors, using the unadjusted within-event standard deviation 
-(:math:`\phi_{i,m}`) rather than the adjusted standard deviation
-(:math:`\hat{\phi}_{i,m}`) are used to modify the :math:`\bm{Z}_i`
-vectors and residuals when computing the bias.
-
-The additional standard deviation of a residual (i.e., 
-:math:`\sigma_{\epsilon,i,m}`) can come from a number of 
-sources. Observations converted from one IMT to another (via, for example,
-the GMICE) will carry the additional uncertainty of the conversion process.
-Intensity observations themselves -- such as those obtained through the
-"Did You Feel It?" system -- have an inherent uncertainty due to the 
-averaging process in their derivation. 
-
-This standard deviation may be specified by the 
-operator in the input file. If it is not specified, ShakeMap assigns a
-default standard deviation to intensity measurements of 0.3 intensity
-units. Other observations may have non-zero uncertainty for reasons of
-instrument or site characteristics. This uncertainty may be specified
-in the input file using the *ln_stddev* attribute of the amplitude tag..
-
 
 Computation
 -----------
@@ -603,6 +459,18 @@ and covariance
             \mathbf{\Sigma^{-1}_{Y_2Y_2}}
             \mathbf{\Sigma_{Y_2Y_1}}.
 
+The constituents of :math:`\bm{Y_1}` may be a particular IMT at multiple 
+locations, multiple IMTs at a given location, or both: multiple IMTs at
+multiple locations. In a ShakeMap, we may have an output grid of Q 
+locations and wish to compute this output grid for P different IMTs. 
+Thus, :math:`M = P \times Q`. Similarly, the N constituents of
+:math:`\bm{Y_2}` consist of a number of IMTs at each of a number of
+observation locations. Thus, as long as the elements of the covariance
+matrix :math:`\bm{\Sigma_Y}` can be computed, Equations :eq:`cond-mean` 
+and :eq:`cond-covariance` could be computed just once to provide the 
+complete grids for all of the output IMTs. In most cases, however,
+this approach is impractical and inefficient.
+
 We note that in Equation :eq:`cond-mean` there is no interdependence
 on the computed elements of :math:`\bm{\mu}_{\mathbf{Y_1}|\mathbf{y_2}}`.
 That is, the vector of output ordinates :math:`\bm{Y_1}` may be 
@@ -616,7 +484,9 @@ matrices must be used in order to compute the full covariance matrix
 
 For even a small Shake map of 200 by 300 grid points, the
 matrix :math:`\mathbf{\Sigma_{Y_1Y_1}}` becomes 60,000 by 60,000
-elements, making the computation of 
+elements. In a typical ShakeMap run, at least 6 output IMTs are
+computed, making this matrix 36 times larger. This large size makes
+the computation of 
 :math:`\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}}` impractical for
 most situations. For ShakeMap uses, however, we are only interested 
 in the diagonal
@@ -634,8 +504,8 @@ diagonal elements of :math:`\mathbf{\Sigma_{Y_1Y_1}}`) and
 
 .. math::
 
-    \mathbf{\Phi} = \mathbf{\Sigma_{Y_1Y_2}} \odot 
-        \left(\mathbf{\Sigma^{-1}_{Y_2Y_2}} \mathbf{\Sigma_{Y_2Y_1}}\right)^T,
+    \mathbf{\Phi} = \mathbf{\Sigma_{Y_1Y_2}} \mathbf{\Sigma^{-1}_{Y_2Y_2}}
+        \odot \mathbf{\Sigma^T_{Y_2Y_1}},
 
 where :math:`\odot` represents the element-by-element product.
 
@@ -651,7 +521,162 @@ where :math:`\bm{J}` is a column vector of ones.
 As with the conditional mean, this formulation is insensitive to any 
 particular partitioning of the :math:`\bm{Y_1}` vector. For ShakeMap
 purposes, it is both convenient and computationally efficient to process 
-each row of the output grid separately.
+each row of the output grid for each IMT separately.
+
+
+.. _subsubsec-imt-selection:
+
+IMT Selection
+-------------
+
+In a typical ShakeMap operational environment, it is common for each
+seismic station to produce a number of IMT observations, some of 
+which may be flagged as outliers. In addition, in ShakeMap V4, the
+output IMTs may or may not correspond to any of the input IMTs. The
+MVN approach described in :ref:`Worden et al. (2018) <worden2018>`
+would allow all of the input IMTs to be used in the production of 
+each output IMT. Such an approach, however, is inefficient.
+
+If the output IMT is represented in the set of input IMT residuals, 
+then any additional IMT residuals at that same site are mathematically
+irrelevant. Since the computational effort of the MVN process increases
+largely in proportion to the square of the number of residuals, adding
+unnecessary residuals only slows the process, without adding additional
+accuracy.
+
+Similarly, we have found that in cases where the output IMT is not
+represented in the set of IMT residuals at a station, then using the 
+two IMTs that "bracket" the output IMT is sufficient to define the
+observation point. For instance, if the output IMT is 2.0 second SA,
+and 0.3, 1.0, and 3.0 second SA are available in the input, then
+using the 1.0 and 3.0 second residuals is sufficient. (In situations
+where the output SA is higher (or lower) than the highest (or lowest)
+SA in the input, we choose the single IMT at the highest (or lowest)
+SA.)
+
+:num:`Figure #cond-spectra-mean` illustrates this point. Conditional
+mean spectra were computed for two sets of points. One set had SA
+observations at three periods (0.3, 1.0, and 3.0 seconds), and the other
+set had observations at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0, 
+and 9.0 seconds). The observations the two sets had in common (0.3, 
+1.0, and 3.0 seconds) were constrained to be the same. The figure 
+shows that in the shared regions (between 0.3 and 1.0 seconds, and
+between 1.0 and 3.0 seconds), there is very little difference between
+the conditional spectra. This point is reinforced by 
+:num:`Figure #cond-spectra-sd`, which shows the standard deviations of
+the two sets of conditional spectra. While the 7-point spectra is
+better constrained overall, in the area of overlap (again, between 0.3
+and 1.0 seconds, and between 1.0 and 3.0 seconds) there is virtually
+no difference between the spectra. These figures were generated using the 
+:ref:`Chiou and Youngs (2014) <chiou2014>` GMPE and the 
+:ref:`Baker and Jayaram (2008) <baker2008>` spectral correlation function.
+The odd kink in the mean plots at around 0.2 seconds is a result of the
+specifics of the correlation function.
+
+
+.. _cond-spectra-mean:
+
+.. figure:: _static/Figure_mu_compare.*
+   :width: 450
+   :align: center
+
+   Conditional spectra for two sets of conditioning observations:
+   One set at three periods (0.3, 1.0, and 3.0 seconds), and the other
+   set at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0, and 9.0 seconds).
+   The gray line is the spectrum of the GMM. The solid black line is
+   the spectrum conditioned on 3 periods; the dashed line is the
+   spectrum conditioned on 7 periods. The circles represent the periods
+   and amplitudes of the conditioning observations.
+
+
+.. _cond-spectra-sd:
+
+.. figure:: _static/Figure_sigma_compare.*
+   :width: 450
+   :align: center
+
+   The standard deviations of conditional spectra for two sets of 
+   conditioning observations:
+   One set at three periods (0.3, 1.0, and 3.0 seconds), and the other
+   set at seven periods (0.02, 0.06, 0.3, 1.0, 3.0, 5.0, and 9.0 seconds).
+   The gray line is the standard deviation of spectrum from the GMM. The 
+   solid black line is the standard deviation of the spectrum conditioned 
+   on 3 periods; the dashed line is the standard deviation of the 
+   spectrum conditioned on 7 periods. The circles represent the periods
+   and amplitudes of the conditioning observations.
+
+
+Updating the Within-Event Standard Deviation
+--------------------------------------------
+
+Once the bias calculation has been performed, the residuals may be 
+computed from the biased estimates of the ground motions. Similarly,
+the adjusted within-event standard deviation of the residuals may be 
+calculated:
+
+.. math::
+
+    \hat{\phi}_{i,m} = \sqrt{\phi^2_{i,m} + \sigma^2_{\delta B_{i,m}}}
+
+where
+:math:`\hat{\phi}_{i,m}` is the adjusted within-event standard deviation
+of IMT *i* at site *m*,
+:math:`\phi_{i,m}` is the within-event standard deviation of IMT *i*
+at site *m*, and
+:math:`\sigma_{\delta B_{i,m}}` is the standard deviation of the bias
+as calculated by Equation :eq:`bias-sigma`.
+
+With the adjusted within-event residual, the elements of the covariance 
+matrix of the residuals become:
+
+.. math::
+
+    \Sigma_{i,j} = \rho_{i,j}\hat{\phi}_i\hat{\phi}_j
+
+where
+:math:`\rho_{i,j}` is the correlation between residuals *i* (at site *m*)
+and *j* (at site *n*), and
+:math:`\hat{\phi}_i` and :math:`\hat{\phi}_j` are the adjusted within-event
+standard deviations of residuals *i* and *j* at their sites *m* and *n*.
+
+.. _subsubsec-weighting-residuals:
+
+Weighting of Residuals
+----------------------
+
+As discussed in :ref:`Worden et al. (2018) <worden2018>` uncertain data
+can be accommodated in the MVN structure through the use of the "omega
+factors". In our implementation, these factors are based on the adjusted
+within-event standard deviation computed for each residual:
+
+.. math::
+
+    \omega_{i,m} = \sqrt{\frac{\hat{\phi}^2_{i,m}}
+                              {\hat{\phi}^2_{i,m} + \sigma^2_{\epsilon,i,m}}}
+
+where 
+:math:`\sigma_{\epsilon,i,m}` is the additional standard deviation of the
+observation of IMT *i* at site *m*. These factors are then applied to the 
+covariance matrix and the residuals, as discussed in Worden et al.
+Analogous factors, using the unadjusted within-event standard deviation 
+(:math:`\phi_{i,m}`) rather than the adjusted standard deviation
+(:math:`\hat{\phi}_{i,m}`) are used to modify the :math:`\bm{Z}_i`
+vectors and residuals when computing the bias.
+
+The additional standard deviation of a residual (i.e., 
+:math:`\sigma_{\epsilon,i,m}`) can come from a number of 
+sources. Observations converted from one IMT to another (via, for example,
+the GMICE) will carry the additional uncertainty of the conversion process.
+Intensity observations themselves -- such as those obtained through the
+"Did You Feel It?" system -- have an inherent uncertainty due to the 
+averaging process in their derivation. 
+
+This standard deviation may be specified by the 
+operator in the input file. If it is not specified, ShakeMap assigns a
+default standard deviation to intensity measurements of 0.3 intensity
+units. Other observations may have non-zero uncertainty for reasons of
+instrument or site characteristics. This uncertainty may be specified
+in the input file using the *ln_stddev* attribute of the amplitude tag..
 
 
 .. _sec-point-source:
