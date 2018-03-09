@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.rupture.base &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -89,32 +80,32 @@
 <span class="sd">        Args:</span>
 <span class="sd">            file (str): Name of file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geojson</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span></div>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span></div>
+            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_geojson</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Rupture.getLength"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getLength">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">getLength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            float: Rupture length in km.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">pass</span>
 
 <div class="viewcode-block" id="Rupture.getWidth"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getWidth">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">getWidth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            float: Rupture width in km.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">pass</span>
 
 <div class="viewcode-block" id="Rupture.getArea"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getArea">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">getArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            float: Rupture area in square km.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">pass</span>
 
 <div class="viewcode-block" id="Rupture.getStrike"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getStrike">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">getStrike</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -128,12 +119,12 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            float: Strike angle in degrees.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">pass</span>
 
 <div class="viewcode-block" id="Rupture.getDip"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getDip">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">getDip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+    <span class="k">def</span> <span class="nf">getDip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
+        <span class="k">pass</span>
 
 <div class="viewcode-block" id="Rupture.getDepthToTop"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getDepthToTop">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">getDepthToTop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -141,32 +132,32 @@
 <span class="sd">        Returns:</span>
 <span class="sd">           float: Average dip in degrees.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">pass</span>
 
 <div class="viewcode-block" id="Rupture.getQuadrilaterals"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getQuadrilaterals">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">getQuadrilaterals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method to return rupture quadrilaterals. Returns None for</span>
 <span class="sd">        PointRupture.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">pass</span>
 
 <div class="viewcode-block" id="Rupture.getReference"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getReference">[docs]</a>    <span class="k">def</span> <span class="nf">getReference</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">           string: Reference info from file.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reference</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reference</span>
 
 <div class="viewcode-block" id="Rupture.getOrigin"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getOrigin">[docs]</a>    <span class="k">def</span> <span class="nf">getOrigin</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">           Origin object</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_origin</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_origin</span>
 
     <span class="nd">@abstractproperty</span>
     <span class="k">def</span> <span class="nf">lats</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -216,8 +207,8 @@
         <span class="n">rx</span><span class="o">.</span><span class="n">hypo_lat</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lat</span>
         <span class="n">rx</span><span class="o">.</span><span class="n">hypo_lon</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lon</span>
         <span class="n">rx</span><span class="o">.</span><span class="n">hypo_depth</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">depth</span>
-
-        <span class="k">return</span> <span class="n">rx</span></div>
+</div>
+        <span class="k">return</span> <span class="n">rx</span>
 
 <div class="viewcode-block" id="Rupture.computeRhyp"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.computeRhyp">[docs]</a>    <span class="k">def</span> <span class="nf">computeRhyp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -236,8 +227,8 @@
 
         <span class="n">rhyp</span> <span class="o">=</span> <span class="n">geodetic</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">origin</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span>
                                  <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
-        <span class="n">rhyp</span> <span class="o">=</span> <span class="n">rhyp</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">oldshape</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">rhyp</span></div>
+        <span class="n">rhyp</span> <span class="o">=</span> <span class="n">rhyp</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">oldshape</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">rhyp</span>
 
 <div class="viewcode-block" id="Rupture.computeRepi"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.computeRepi">[docs]</a>    <span class="k">def</span> <span class="nf">computeRepi</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -256,8 +247,8 @@
 
         <span class="n">repi</span> <span class="o">=</span> <span class="n">geodetic</span><span class="o">.</span><span class="n">distance</span><span class="p">(</span><span class="n">origin</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span>
                                  <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
-        <span class="n">repi</span> <span class="o">=</span> <span class="n">repi</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">oldshape</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">repi</span></div>
+        <span class="n">repi</span> <span class="o">=</span> <span class="n">repi</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">oldshape</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">repi</span>
 
 <div class="viewcode-block" id="Rupture.computeRjb"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.computeRjb">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">computeRjb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -274,8 +265,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">           array: Joyner-Boore distance (km).</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">pass</span>
 
 <div class="viewcode-block" id="Rupture.computeRrup"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.computeRrup">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">computeRrup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -292,8 +283,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">           array: Rupture distance (km).</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">pass</span>
 
 <div class="viewcode-block" id="Rupture.computeGC2"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.computeGC2">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">computeGC2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
@@ -309,20 +300,20 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Dictionary with keys for each of the GC2-related distances,</span>
 <span class="sd">                which include &#39;rx&#39;, &#39;ry&#39;, &#39;ry0&#39;, &#39;U&#39;, &#39;T&#39;.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">pass</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">pass</span>
 
 <div class="viewcode-block" id="Rupture.plot3d"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.plot3d">[docs]</a>    <span class="k">def</span> <span class="nf">plot3d</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for making a quick 3D wireframe plot of rupture.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">plot_rupture_wire3d</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="n">plot_rupture_wire3d</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Rupture.map"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.map">[docs]</a>    <span class="k">def</span> <span class="nf">map</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for making a quick map of the fault.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">map_rupture</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+<span class="sd">        &quot;&quot;&quot;</span></div></div>
+        <span class="n">map_rupture</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 </pre></div>
 
           </div>
@@ -358,12 +349,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

@@ -4,37 +4,26 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.correlation.boore_2003 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="shakelib.correlation.dummy" href="shakelib.correlation.dummy.html" />
-    <link rel="prev" title="shakelib.correlation.baker_jayaram_2008" href="shakelib.correlation.baker_jayaram_2008.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -47,7 +36,7 @@
 <dl class="class">
 <dt id="shakelib.correlation.boore_2003.Boore2003">
 <em class="property">class </em><code class="descclassname">shakelib.correlation.boore_2003.</code><code class="descname">Boore2003</code><a class="reference internal" href="../_modules/shakelib/correlation/boore_2003.html#Boore2003"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.boore_2003.Boore2003" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Implements the correlation model proposed in the appendix of Boore et al.
 (2003).</p>
 <dl class="docutils">
@@ -66,7 +55,7 @@ the Seismological Society of America, 93(6), 2737-2751.
 <a class="reference external" href="http://www.bssaonline.org/content/93/6/2737.short">[link]</a></p>
 <dl class="staticmethod">
 <dt id="shakelib.correlation.boore_2003.Boore2003.getSpatialCorrelation">
-<em class="property">static </em><code class="descname">getSpatialCorrelation</code><span class="sig-paren">(</span><em>dists</em>, <em>imt='PGA'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/boore_2003.html#Boore2003.getSpatialCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.boore_2003.Boore2003.getSpatialCorrelation" title="Permalink to this definition">¶</a></dt>
+<em class="property">static </em><code class="descname">getSpatialCorrelation</code><span class="sig-paren">(</span><em>imt='PGA'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/boore_2003.html#Boore2003.getSpatialCorrelation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.boore_2003.Boore2003.getSpatialCorrelation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for evalulating spatial correlation model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -74,7 +63,7 @@ the Seismological Society of America, 93(6), 2737-2751.
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>dists</strong> (<em>ndarray</em>) – Numpy array of distances (km).</li>
-<li><strong>imt</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/string.html#module-string" title="(in Python v3.6)"><em>string</em></a>) – Openquake intensity measure type instance string.
+<li><strong>imt</strong> (<em>string</em>) – Openquake intensity measure type instance string.
 <a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/imt.html">[link]</a>
 This model was developed specifically for PGA, and so this is
 the default value.</li>
@@ -115,45 +104,25 @@ the default value.</li>
 
 
 <h3>Navigation</h3>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.baker_jayaram_2008.html">shakelib.correlation.baker_jayaram_2008</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakelib.correlation.boore_2003</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.dummy.html">shakelib.correlation.dummy</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.goda_atkinson_2010.html">shakelib.correlation.goda_atkinson_2010</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.loth_baker_2013.html">shakelib.correlation.loth_baker_2013</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="shakelib.html">ShakeLib API</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

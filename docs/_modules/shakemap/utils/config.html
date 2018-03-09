@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.utils.config &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -96,8 +87,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        str: The full path to the data directory.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;shakemap&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span></div>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+    <span class="k">return</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span><span class="s1">&#39;shakemap&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_configspec"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_configspec">[docs]</a><span class="k">def</span> <span class="nf">get_configspec</span><span class="p">(</span><span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -115,8 +106,8 @@
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;configspec.conf&#39;</span><span class="p">)</span>
     <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">spec.conf&#39;</span> <span class="o">%</span> <span class="n">config</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;No file &quot;</span><span class="si">%s</span><span class="s1">&quot; exists.&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">fname</span></div>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;No file &quot;</span><span class="si">%s</span><span class="s1">&quot; exists.&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">fname</span>
 
 
 <div class="viewcode-block" id="get_config_paths"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_config_paths">[docs]</a><span class="k">def</span> <span class="nf">get_config_paths</span><span class="p">():</span>
@@ -155,8 +146,8 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Profile </span><span class="si">%s</span><span class="s2"> not found in list of profiles&quot;</span><span class="p">)</span>
         <span class="n">profile</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profiles&#39;</span><span class="p">][</span><span class="n">profile_name</span><span class="p">]</span>
         <span class="n">install</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;install_path&#39;</span><span class="p">]</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;data_path&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">install</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span></div>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">profile</span><span class="p">[</span><span class="s1">&#39;data_path&#39;</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="p">(</span><span class="n">install</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="get_custom_validator"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_custom_validator">[docs]</a><span class="k">def</span> <span class="nf">get_custom_validator</span><span class="p">():</span>
@@ -177,8 +168,8 @@
         <span class="s1">&#39;extent_list&#39;</span><span class="p">:</span> <span class="n">extent_list</span><span class="p">,</span>
         <span class="s1">&#39;status_string&#39;</span><span class="p">:</span> <span class="n">status_string</span><span class="p">,</span>
     <span class="p">}</span>
-    <span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">fdict</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">validator</span></div>
+    <span class="n">validator</span> <span class="o">=</span> <span class="n">Validator</span><span class="p">(</span><span class="n">fdict</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">validator</span>
 
 
 <div class="viewcode-block" id="config_error"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.config_error">[docs]</a><span class="k">def</span> <span class="nf">config_error</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">):</span>
@@ -211,8 +202,8 @@
             <span class="n">errs</span> <span class="o">+=</span> <span class="mi">1</span>
     <span class="k">if</span> <span class="n">errs</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;There </span><span class="si">%s</span><span class="s1"> </span><span class="si">%d</span><span class="s1"> </span><span class="si">%s</span><span class="s1"> in configuration.&#39;</span>
-                           <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;was&#39;</span> <span class="k">if</span> <span class="n">errs</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;were&#39;</span><span class="p">,</span> <span class="n">errs</span><span class="p">,</span>
-                              <span class="s1">&#39;error&#39;</span> <span class="k">if</span> <span class="n">errs</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;errors&#39;</span><span class="p">))</span></div>
+                           <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;was&#39;</span> <span class="k">if</span> <span class="n">errs</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;were&#39;</span><span class="p">,</span> <span class="n">errs</span><span class="p">,</span></div>
+                              <span class="s1">&#39;error&#39;</span> <span class="k">if</span> <span class="n">errs</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;errors&#39;</span><span class="p">))</span>
 
 
 <div class="viewcode-block" id="check_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.check_config">[docs]</a><span class="k">def</span> <span class="nf">check_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
@@ -243,8 +234,8 @@
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ccf&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;ccf_modules&#39;</span><span class="p">]:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Configuration error: ccf </span><span class="si">%s</span><span class="s1"> not in ccf_modules&#39;</span> <span class="o">%</span>
-                     <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ccf&#39;</span><span class="p">]))</span>
-        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span></div>
+                     <span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;ccf&#39;</span><span class="p">]))</span></div>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
 
 
 <div class="viewcode-block" id="annotatedfloat_type"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.annotatedfloat_type">[docs]</a><span class="k">def</span> <span class="nf">annotatedfloat_type</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -276,8 +267,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">out</span></div>
+            <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">out</span>
 
 
 <div class="viewcode-block" id="weight_list"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.weight_list">[docs]</a><span class="k">def</span> <span class="nf">weight_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">):</span>
@@ -330,8 +321,8 @@
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">out</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np_out</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mf">0.01</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;weights must sum to 1.0: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">out</span></div>
+</div>
+    <span class="k">return</span> <span class="n">out</span>
 
 
 <div class="viewcode-block" id="gmpe_list"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.gmpe_list">[docs]</a><span class="k">def</span> <span class="nf">gmpe_list</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">):</span>
@@ -359,8 +350,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list of strings&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
             <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">value</span></div>
+</div>
+    <span class="k">return</span> <span class="n">value</span>
 
 
 <div class="viewcode-block" id="extent_list"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.extent_list">[docs]</a><span class="k">def</span> <span class="nf">extent_list</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -401,8 +392,8 @@
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid extent: &quot;</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span>
               <span class="s2">&quot; : -360 &lt;= longitude &lt;= 360, -90 &lt;= latitude &lt;= 90&quot;</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">out</span></div>
+</div>
+    <span class="k">return</span> <span class="n">out</span>
 
 
 <div class="viewcode-block" id="file_type"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.file_type">[docs]</a><span class="k">def</span> <span class="nf">file_type</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -421,8 +412,8 @@
         <span class="k">return</span> <span class="s1">&#39;&#39;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;file &#39;</span><span class="si">%s</span><span class="s2">&#39; is not a valid file&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
-        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">value</span></div>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">value</span>
 
 
 <div class="viewcode-block" id="directory_type"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.directory_type">[docs]</a><span class="k">def</span> <span class="nf">directory_type</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -440,8 +431,8 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span> <span class="ow">or</span> <span class="n">value</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;&#39;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">value</span></div>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">value</span>
 
 
 <div class="viewcode-block" id="status_string"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.status_string">[docs]</a><span class="k">def</span> <span class="nf">status_string</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">min</span><span class="p">):</span>
@@ -460,8 +451,8 @@
     <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="p">:</span>
         <span class="k">return</span> <span class="s1">&#39;automatic&#39;</span>
     <span class="k">if</span> <span class="n">value</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;automatic&#39;</span><span class="p">,</span> <span class="s1">&#39;released&#39;</span><span class="p">,</span> <span class="s1">&#39;reviewed&#39;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">value</span></div>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">value</span>
 
 
 <div class="viewcode-block" id="cfg_float_list"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.cfg_float_list">[docs]</a><span class="k">def</span> <span class="nf">cfg_float_list</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -495,8 +486,8 @@
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a list of floats&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
             <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
-        <span class="n">fvalue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fval</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">fvalue</span></div>
+        <span class="n">fvalue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fval</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">fvalue</span>
 
 
 <div class="viewcode-block" id="cfg_float"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.cfg_float">[docs]</a><span class="k">def</span> <span class="nf">cfg_float</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
@@ -520,8 +511,8 @@
         <span class="n">fval</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&#39;</span><span class="si">%s</span><span class="s2">&#39; is not a float&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">value</span><span class="p">))</span>
-        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">fval</span></div>
+        <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">fval</span>
 
 
 <div class="viewcode-block" id="get_shake_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_shake_config">[docs]</a><span class="k">def</span> <span class="nf">get_shake_config</span><span class="p">():</span>
@@ -545,8 +536,8 @@
     <span class="n">results</span> <span class="o">=</span> <span class="n">shake_conf</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
         <span class="n">config_error</span><span class="p">(</span><span class="n">shake_conf</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">shake_conf</span></div>
+</div>
+    <span class="k">return</span> <span class="n">shake_conf</span>
 
 
 <div class="viewcode-block" id="get_logger"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_logger">[docs]</a><span class="k">def</span> <span class="nf">get_logger</span><span class="p">(</span><span class="n">eventid</span><span class="p">,</span> <span class="n">log_option</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -612,8 +603,8 @@
         <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
     <span class="c1"># get the root logger, otherwise we can&#39;t log in sub-libraries</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
-
-    <span class="k">return</span> <span class="n">logger</span></div>
+</div>
+    <span class="k">return</span> <span class="n">logger</span>
 
 
 <div class="viewcode-block" id="get_logging_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_logging_config">[docs]</a><span class="k">def</span> <span class="nf">get_logging_config</span><span class="p">():</span>
@@ -642,8 +633,8 @@
     <span class="c1"># dictionary. Whew.</span>
     <span class="n">log_name</span> <span class="o">=</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="n">log_name</span><span class="p">]</span>
-    <span class="k">del</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="n">log_name</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">log_config</span></div>
+    <span class="k">del</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="n">log_name</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">log_config</span>
 
 
 <span class="k">def</span> <span class="nf">_clean_log_dict</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
@@ -699,12 +690,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

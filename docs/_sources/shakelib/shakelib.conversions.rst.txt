@@ -1,11 +1,5 @@
-shakelib\.conversions
-=============================
-
-
-.. toctree::
-
-    shakelib.conversions.imc
-    shakelib.conversions.imt
+shakelib.conversions
+============================
 
 Module contents
 

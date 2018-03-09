@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.rupture.quad_rupture &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -99,7 +90,7 @@
             <span class="n">dep</span> <span class="o">=</span> <span class="n">dep</span> <span class="o">+</span> <span class="n">p_depths</span> <span class="o">+</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">]</span>
 
         <span class="c1"># Add origin information to metadata</span>
-        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="vm">__dict__</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">odict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">HistoricTime</span><span class="p">):</span>
                 <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
@@ -115,7 +106,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_setQuadrilaterals</span><span class="p">()</span>
 
 <div class="viewcode-block" id="QuadRupture.getDepthAtPoint"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getDepthAtPoint">[docs]</a>    <span class="k">def</span> <span class="nf">getDepthAtPoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">):</span>
-        <span class="n">SMALL_DISTANCE</span> <span class="o">=</span> <span class="mi">2</span><span class="n">e</span><span class="o">-</span><span class="mi">03</span>  <span class="c1"># 2 meters</span>
+        <span class="n">SMALL_DISTANCE</span> <span class="o">=</span> <span class="mf">2e-03</span>  <span class="c1"># 2 meters</span>
         <span class="n">depth</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
 
         <span class="n">tmp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">computeRjb</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lon</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lat</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">0</span><span class="p">]))</span>
@@ -185,8 +176,8 @@
 
         <span class="c1"># Compute the depth of of the plane at Px:</span>
         <span class="n">depth</span> <span class="o">=</span> <span class="n">wtt</span> <span class="o">*</span> <span class="n">P0</span><span class="o">.</span><span class="n">z</span> <span class="o">+</span> <span class="n">wtb</span> <span class="o">*</span> <span class="n">P3</span><span class="o">.</span><span class="n">z</span> <span class="o">*</span> <span class="mi">1000</span>
-
-        <span class="k">return</span> <span class="n">depth</span></div>
+</div>
+        <span class="k">return</span> <span class="n">depth</span>
 
 <div class="viewcode-block" id="QuadRupture.getLength"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getLength">[docs]</a>    <span class="k">def</span> <span class="nf">getLength</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -198,8 +189,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">flength</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">quad</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">:</span>
-            <span class="n">flength</span> <span class="o">=</span> <span class="n">flength</span> <span class="o">+</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_quad_length</span><span class="p">(</span><span class="n">quad</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">flength</span></div>
+            <span class="n">flength</span> <span class="o">=</span> <span class="n">flength</span> <span class="o">+</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_quad_length</span><span class="p">(</span><span class="n">quad</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">flength</span>
 
 <div class="viewcode-block" id="QuadRupture.getWidth"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getWidth">[docs]</a>    <span class="k">def</span> <span class="nf">getWidth</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -212,8 +203,8 @@
         <span class="n">wsum</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="k">for</span> <span class="n">quad</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">:</span>
             <span class="n">wsum</span> <span class="o">=</span> <span class="n">wsum</span> <span class="o">+</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_quad_width</span><span class="p">(</span><span class="n">quad</span><span class="p">)</span>
-        <span class="n">mwidth</span> <span class="o">=</span> <span class="p">(</span><span class="n">wsum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">))</span> <span class="o">/</span> <span class="mf">1000.0</span>
-        <span class="k">return</span> <span class="n">mwidth</span></div>
+        <span class="n">mwidth</span> <span class="o">=</span> <span class="p">(</span><span class="n">wsum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">))</span> <span class="o">/</span> <span class="mf">1000.0</span></div>
+        <span class="k">return</span> <span class="n">mwidth</span>
 
 <div class="viewcode-block" id="QuadRupture.getArea"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getArea">[docs]</a>    <span class="k">def</span> <span class="nf">getArea</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -227,11 +218,11 @@
         <span class="k">for</span> <span class="n">quad</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">:</span>
             <span class="n">width</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_quad_width</span><span class="p">(</span><span class="n">quad</span><span class="p">)</span>
             <span class="n">length</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_quad_length</span><span class="p">(</span><span class="n">quad</span><span class="p">)</span>
-            <span class="n">asum</span> <span class="o">=</span> <span class="n">asum</span> <span class="o">+</span> <span class="n">width</span> <span class="o">*</span> <span class="n">length</span>
-        <span class="k">return</span> <span class="n">asum</span></div>
+            <span class="n">asum</span> <span class="o">=</span> <span class="n">asum</span> <span class="o">+</span> <span class="n">width</span> <span class="o">*</span> <span class="n">length</span></div>
+        <span class="k">return</span> <span class="n">asum</span>
 
 <div class="viewcode-block" id="QuadRupture.fromTrace"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.fromTrace">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromTrace</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xp0</span><span class="p">,</span> <span class="n">yp0</span><span class="p">,</span> <span class="n">xp1</span><span class="p">,</span> <span class="n">yp1</span><span class="p">,</span> <span class="n">zp</span><span class="p">,</span> <span class="n">widths</span><span class="p">,</span> <span class="n">dips</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">fromTrace</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">xp0</span><span class="p">,</span> <span class="n">yp0</span><span class="p">,</span> <span class="n">xp1</span><span class="p">,</span> <span class="n">yp1</span><span class="p">,</span> <span class="n">zp</span><span class="p">,</span> <span class="n">widths</span><span class="p">,</span> <span class="n">dips</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span>
                   <span class="n">strike</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">group_index</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a QuadRupture instance from a set of vertices that define the</span>
@@ -418,14 +409,14 @@
              <span class="p">}]}</span>
 
         <span class="c1"># Add origin information to metadata</span>
-        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="vm">__dict__</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">odict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">HistoricTime</span><span class="p">):</span>
                 <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-
-        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span></div>
+</div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span>
 
 <div class="viewcode-block" id="QuadRupture.writeTextFile"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.writeTextFile">[docs]</a>    <span class="k">def</span> <span class="nf">writeTextFile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rupturefile</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -452,12 +443,12 @@
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1"> </span><span class="si">%.4f</span><span class="s1"> </span><span class="si">%.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">P2</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">P2</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">P2</span><span class="o">.</span><span class="n">depth</span><span class="p">))</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1"> </span><span class="si">%.4f</span><span class="s1"> </span><span class="si">%.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">P3</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">P3</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">P3</span><span class="o">.</span><span class="n">depth</span><span class="p">))</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1"> </span><span class="si">%.4f</span><span class="s1"> </span><span class="si">%.4f</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">P0</span><span class="o">.</span><span class="n">latitude</span><span class="p">,</span> <span class="n">P0</span><span class="o">.</span><span class="n">longitude</span><span class="p">,</span> <span class="n">P0</span><span class="o">.</span><span class="n">depth</span><span class="p">))</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">u&#39;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rupturefile</span><span class="p">,</span> <span class="s1">&#39;read&#39;</span><span class="p">):</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rupturefile</span><span class="p">,</span> <span class="s1">&#39;read&#39;</span><span class="p">):</span></div>
+            <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 <div class="viewcode-block" id="QuadRupture.fromVertices"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.fromVertices">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromVertices</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">fromVertices</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>
                      <span class="n">xp0</span><span class="p">,</span> <span class="n">yp0</span><span class="p">,</span> <span class="n">zp0</span><span class="p">,</span> <span class="n">xp1</span><span class="p">,</span> <span class="n">yp1</span><span class="p">,</span> <span class="n">zp1</span><span class="p">,</span>
                      <span class="n">xp2</span><span class="p">,</span> <span class="n">yp2</span><span class="p">,</span> <span class="n">zp2</span><span class="p">,</span> <span class="n">xp3</span><span class="p">,</span> <span class="n">yp3</span><span class="p">,</span> <span class="n">zp3</span><span class="p">,</span>
                      <span class="n">origin</span><span class="p">,</span>
@@ -584,7 +575,7 @@
              <span class="p">}]}</span>
 
         <span class="c1"># Add origin information to metadata</span>
-        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">__dict__</span>
+        <span class="n">odict</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="vm">__dict__</span>
         <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">odict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">HistoricTime</span><span class="p">):</span>
                 <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
@@ -592,8 +583,8 @@
                 <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s1">&#39;id&#39;</span><span class="p">):</span>
             <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;eventid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">id</span>
-
-        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span></div>
+</div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span>
 
 <div class="viewcode-block" id="QuadRupture.getQuadrilaterals"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getQuadrilaterals">[docs]</a>    <span class="k">def</span> <span class="nf">getQuadrilaterals</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -603,8 +594,8 @@
 <span class="sd">            list: List of quadrilaterals where each quad is a tuple of four</span>
 <span class="sd">                `Point &lt;https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/point.py&gt;`__</span>
 <span class="sd">                objects.</span>
-<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
-        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">)</span></div>
+<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span></div>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">)</span>
 
 <div class="viewcode-block" id="QuadRupture.getStrike"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getStrike">[docs]</a>    <span class="k">def</span> <span class="nf">getStrike</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -629,8 +620,8 @@
         <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">strikes</span><span class="p">))</span>
         <span class="n">y</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">strikes</span><span class="p">))</span>
         <span class="n">xbar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">lengths</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
-        <span class="n">ybar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">lengths</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">xbar</span><span class="p">,</span> <span class="n">ybar</span><span class="p">))</span></div>
+        <span class="n">ybar</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">lengths</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">lengths</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">xbar</span><span class="p">,</span> <span class="n">ybar</span><span class="p">))</span>
 
 <div class="viewcode-block" id="QuadRupture.getDepthToTop"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getDepthToTop">[docs]</a>    <span class="k">def</span> <span class="nf">getDepthToTop</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -644,8 +635,8 @@
             <span class="n">P0</span><span class="p">,</span> <span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">,</span> <span class="n">P3</span> <span class="o">=</span> <span class="n">quad</span>
             <span class="n">depths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">P0</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">P1</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">P2</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">P3</span><span class="o">.</span><span class="n">depth</span><span class="p">])</span>
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">depths</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">mindep</span><span class="p">:</span>
-                <span class="n">mindep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">depths</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">mindep</span></div>
+                <span class="n">mindep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">depths</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">mindep</span>
 
 <div class="viewcode-block" id="QuadRupture.getDip"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getDip">[docs]</a>    <span class="k">def</span> <span class="nf">getDip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -660,8 +651,8 @@
             <span class="n">N</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_quad_normal</span><span class="p">(</span><span class="n">quad</span><span class="p">)</span>
             <span class="n">V</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_vertical_vector</span><span class="p">(</span><span class="n">quad</span><span class="p">)</span>
             <span class="n">dipsum</span> <span class="o">=</span> <span class="n">dipsum</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">Vector</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">V</span><span class="p">)))</span>
-        <span class="n">dip</span> <span class="o">=</span> <span class="n">dipsum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">dip</span></div>
+        <span class="n">dip</span> <span class="o">=</span> <span class="n">dipsum</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">dip</span>
 
 <div class="viewcode-block" id="QuadRupture.getIndividualWidths"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getIndividualWidths">[docs]</a>    <span class="k">def</span> <span class="nf">getIndividualWidths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -675,8 +666,8 @@
         <span class="n">widths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">nquad</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nquad</span><span class="p">):</span>
             <span class="n">q</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_quad_width</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span>
-        <span class="k">return</span> <span class="n">widths</span></div>
+            <span class="n">widths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">get_quad_width</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span></div>
+        <span class="k">return</span> <span class="n">widths</span>
 
 <div class="viewcode-block" id="QuadRupture.getIndividualTopLengths"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getIndividualTopLengths">[docs]</a>    <span class="k">def</span> <span class="nf">getIndividualTopLengths</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -692,13 +683,13 @@
             <span class="n">P0</span><span class="p">,</span> <span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">,</span> <span class="n">P3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
             <span class="n">p0</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P0</span><span class="p">)</span>
             <span class="n">p1</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P1</span><span class="p">)</span>
-            <span class="n">lengths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p0</span><span class="p">)</span><span class="o">.</span><span class="n">mag</span><span class="p">()</span> <span class="o">/</span> <span class="mf">1000.0</span>
-        <span class="k">return</span> <span class="n">lengths</span></div>
+            <span class="n">lengths</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p0</span><span class="p">)</span><span class="o">.</span><span class="n">mag</span><span class="p">()</span> <span class="o">/</span> <span class="mf">1000.0</span></div>
+        <span class="k">return</span> <span class="n">lengths</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_fixStrikeDirection</span><span class="p">(</span><span class="n">quad</span><span class="p">):</span>
         <span class="n">P0</span><span class="p">,</span> <span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">,</span> <span class="n">P3</span> <span class="o">=</span> <span class="n">quad</span>
-        <span class="n">eps</span> <span class="o">=</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">6</span>
+        <span class="n">eps</span> <span class="o">=</span> <span class="mf">1e-6</span>
         <span class="n">p0</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P0</span><span class="p">)</span>  <span class="c1"># fromPoint converts to ECEF</span>
         <span class="n">p1</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P1</span><span class="p">)</span>
         <span class="n">p2</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P2</span><span class="p">)</span>
@@ -902,8 +893,8 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            array: Numpy array of latitude values.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
 <div class="viewcode-block" id="QuadRupture.getNumGroups"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getNumGroups">[docs]</a>    <span class="k">def</span> <span class="nf">getNumGroups</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -912,8 +903,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            int:Rnumber of rupture groups.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_group_index</span><span class="p">))</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_group_index</span><span class="p">))</span>
 
 <div class="viewcode-block" id="QuadRupture.getNumQuads"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getNumQuads">[docs]</a>    <span class="k">def</span> <span class="nf">getNumQuads</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -921,8 +912,8 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            int: Number of rupture quadrilaterals.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">)</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_quadrilaterals</span><span class="p">)</span>
 
 <div class="viewcode-block" id="QuadRupture.getRuptureAsArrays"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsArrays">[docs]</a>    <span class="k">def</span> <span class="nf">getRuptureAsArrays</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -934,8 +925,8 @@
 <span class="sd">                coordinates.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lon</span><span class="p">),</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lat</span><span class="p">),</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_depth</span><span class="p">))</span></div>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lat</span><span class="p">),</span></div>
+                <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_depth</span><span class="p">))</span>
 
 <div class="viewcode-block" id="QuadRupture.getRuptureAsMesh"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getRuptureAsMesh">[docs]</a>    <span class="k">def</span> <span class="nf">getRuptureAsMesh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -944,8 +935,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Mesh (https://github.com/gem/oq-hazardlib/blob/master/openquake/hazardlib/geo/mesh.py)</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
-        <span class="n">rupture</span> <span class="o">=</span> <span class="n">Mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lon</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">rupture</span></div>
+        <span class="n">rupture</span> <span class="o">=</span> <span class="n">Mesh</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lon</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_depth</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">rupture</span>
 
 <div class="viewcode-block" id="QuadRupture.computeRjb"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.computeRjb">[docs]</a>    <span class="k">def</span> <span class="nf">computeRjb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -982,7 +973,7 @@
         <span class="n">z</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">newshape</span>
         <span class="n">sites_ecef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
 
-        <span class="n">minrjb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">newshape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">lon</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span><span class="n">e16</span>
+        <span class="n">minrjb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">newshape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">lon</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e16</span>
         <span class="n">quads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQuadrilaterals</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">quads</span><span class="p">)):</span>
@@ -999,8 +990,8 @@
             <span class="n">rjbdist</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">_quad_distance</span><span class="p">(</span><span class="n">squad</span><span class="p">,</span> <span class="n">sites_ecef</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">minrjb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">minrjb</span><span class="p">,</span> <span class="n">rjbdist</span><span class="p">)</span>
 
-        <span class="n">minrjb</span> <span class="o">=</span> <span class="n">minrjb</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">oldshape</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">minrjb</span></div>
+        <span class="n">minrjb</span> <span class="o">=</span> <span class="n">minrjb</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">oldshape</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">minrjb</span>
 
 <div class="viewcode-block" id="QuadRupture.computeRrup"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.computeRrup">[docs]</a>    <span class="k">def</span> <span class="nf">computeRrup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1037,15 +1028,15 @@
         <span class="n">z</span><span class="o">.</span><span class="n">shape</span> <span class="o">=</span> <span class="n">newshape</span>
         <span class="n">sites_ecef</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">hstack</span><span class="p">((</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">))</span>
 
-        <span class="n">minrrup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">newshape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">lon</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1</span><span class="n">e16</span>
+        <span class="n">minrrup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">(</span><span class="n">newshape</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">lon</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">*</span> <span class="mf">1e16</span>
         <span class="n">quads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getQuadrilaterals</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">quads</span><span class="p">)):</span>
             <span class="n">rrupdist</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">_quad_distance</span><span class="p">(</span><span class="n">quads</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">sites_ecef</span><span class="p">)</span>
             <span class="n">minrrup</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">minimum</span><span class="p">(</span><span class="n">minrrup</span><span class="p">,</span> <span class="n">rrupdist</span><span class="p">)</span>
 
-        <span class="n">minrrup</span> <span class="o">=</span> <span class="n">minrrup</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">oldshape</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">minrrup</span></div>
+        <span class="n">minrrup</span> <span class="o">=</span> <span class="n">minrrup</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">oldshape</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">minrrup</span>
 
 <div class="viewcode-block" id="QuadRupture.computeGC2"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.computeGC2">[docs]</a>    <span class="k">def</span> <span class="nf">computeGC2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1062,8 +1053,8 @@
 <span class="sd">                which include &#39;rx&#39;, &#39;ry&#39;, &#39;ry0&#39;, &#39;U&#39;, &#39;T&#39;.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># This just hands off to the module-level method</span>
-        <span class="nb">dict</span> <span class="o">=</span> <span class="n">gc2</span><span class="o">.</span><span class="n">_computeGC2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">dict</span></div></div>
+        <span class="nb">dict</span> <span class="o">=</span> <span class="n">gc2</span><span class="o">.</span><span class="n">_computeGC2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="nb">dict</span>
 </pre></div>
 
           </div>
@@ -1099,12 +1090,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

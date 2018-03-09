@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.coremods.mapping &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -111,7 +102,7 @@
 <span class="n">GRATICULE_ZORDER</span> <span class="o">=</span> <span class="mi">1200</span>
 <span class="n">SCALE_ZORDER</span> <span class="o">=</span> <span class="mi">1500</span>
 
-<span class="n">THUMBNAIL_WIDTH_PIXELS</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="n">THUMBNAIL_WIDTH_PIXELS</span> <span class="o">=</span> <span class="mi">800</span>
 
 <span class="n">MMI_LABELS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;1&#39;</span><span class="p">:</span> <span class="s1">&#39;I&#39;</span><span class="p">,</span>
@@ -250,8 +241,8 @@
         <span class="n">cax</span> <span class="o">=</span> <span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
         <span class="c1">#draw colorbar in new divider axes</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax</span><span class="p">)</span>
-        <span class="n">sd_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="s1">&#39;sd.jpg&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">sd_file</span><span class="p">)</span></div></div>
+        <span class="n">sd_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="s1">&#39;sd.jpg&#39;</span><span class="p">)</span></div></div>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">sd_file</span><span class="p">)</span>
         <span class="c1">###########################</span>
             
 
@@ -277,8 +268,8 @@
             <span class="k">pass</span>
         <span class="n">intx</span><span class="p">,</span> <span class="n">inty</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">intlon</span><span class="p">,</span> <span class="n">intlat</span><span class="p">)</span>
         <span class="n">ints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">intx</span><span class="p">,</span> <span class="n">inty</span><span class="p">)))</span>
-    <span class="n">ppolygon</span> <span class="o">=</span> <span class="n">sPolygon</span><span class="p">(</span><span class="n">extpts</span><span class="p">,</span> <span class="n">ints</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">ppolygon</span></div>
+    <span class="n">ppolygon</span> <span class="o">=</span> <span class="n">sPolygon</span><span class="p">(</span><span class="n">extpts</span><span class="p">,</span> <span class="n">ints</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">ppolygon</span>
 
 
 <div class="viewcode-block" id="getProjectedPatches"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.getProjectedPatches">[docs]</a><span class="k">def</span> <span class="nf">getProjectedPatches</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span><span class="p">):</span>
@@ -310,8 +301,8 @@
             <span class="n">edgecolor</span><span class="o">=</span><span class="n">edgecolor</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">OCEAN_ZORDER</span><span class="p">,</span>
             <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">patches</span></div>
+</div>
+    <span class="k">return</span> <span class="n">patches</span>
 
 
 <div class="viewcode-block" id="MapMaker"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker">[docs]</a><span class="k">class</span> <span class="nc">MapMaker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -454,8 +445,8 @@
 <span class="sd">                grid cell.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="o">=</span> <span class="n">nx</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span> <span class="o">=</span> <span class="n">ny</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="n">cities_per_grid</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span> <span class="o">=</span> <span class="n">ny</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="n">cities_per_grid</span>
 
 <div class="viewcode-block" id="MapMaker.setFigureSize"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.setFigureSize">[docs]</a>    <span class="k">def</span> <span class="nf">setFigureSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figwidth</span><span class="p">,</span> <span class="n">figheight</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set the figure size in inches.</span>
@@ -464,8 +455,8 @@
 <span class="sd">            figwidth (float): Figure width in inches.</span>
 <span class="sd">            figheight (float): Figure height in inches.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fig_width</span> <span class="o">=</span> <span class="n">figwidth</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fig_height</span> <span class="o">=</span> <span class="n">figheight</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig_width</span> <span class="o">=</span> <span class="n">figwidth</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig_height</span> <span class="o">=</span> <span class="n">figheight</span>
 
 <div class="viewcode-block" id="MapMaker.setCityList"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.setCityList">[docs]</a>    <span class="k">def</span> <span class="nf">setCityList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set the city list to an input dataframe.</span>
@@ -490,8 +481,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="n">BasemapCities</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>  <span class="c1"># may raise exception</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">_setMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gd</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Define the map extents, figure size, etc.</span>
@@ -1029,8 +1020,8 @@
         <span class="n">dpi</span> <span class="o">=</span> <span class="n">THUMBNAIL_WIDTH_PIXELS</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig_width</span> 
         <span class="n">thumbfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;pin-thumbnail.png&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">thumbfile</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
-        
-        <span class="k">return</span> <span class="n">outfile</span></div>
+        </div>
+        <span class="k">return</span> <span class="n">outfile</span>
 
     <span class="k">def</span> <span class="nf">_getShaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ptopo</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get shaded topography.</span>
@@ -1070,8 +1061,8 @@
 <span class="sd">            int: Rounded value.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">correction</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mf">0.5</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">precision</span> <span class="o">+</span> <span class="n">correction</span><span class="p">)</span> <span class="o">*</span> <span class="n">precision</span></div>
+        <span class="n">correction</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mf">0.5</span></div>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">precision</span> <span class="o">+</span> <span class="n">correction</span><span class="p">)</span> <span class="o">*</span> <span class="n">precision</span>
 
 <div class="viewcode-block" id="MapMaker.drawContourMap"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.drawContourMap">[docs]</a>    <span class="k">def</span> <span class="nf">drawContourMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">outfolder</span><span class="p">,</span> <span class="n">cmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1295,8 +1286,8 @@
         
         
         <span class="n">tn</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">outfile</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span></div></div>
+        <span class="k">return</span> <span class="n">outfile</span>
 </pre></div>
 
           </div>
@@ -1332,12 +1323,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

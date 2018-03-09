@@ -1,5 +1,5 @@
-shakemap\.coremods
-==========================
+shakemap.coremods
+=========================
 
 Submodules
 
@@ -9,6 +9,7 @@ Submodules
    shakemap.coremods.augment
    shakemap.coremods.base
    shakemap.coremods.contour
+   shakemap.coremods.dyfi
    shakemap.coremods.gridxml
    shakemap.coremods.info
    shakemap.coremods.mapping

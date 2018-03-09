@@ -4,37 +4,26 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.rupture.edge_rupture &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="shakelib.rupture.factory" href="shakelib.rupture.factory.html" />
-    <link rel="prev" title="shakelib.rupture.constants" href="shakelib.rupture.constants.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -47,7 +36,7 @@
 <dl class="class">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture">
 <em class="property">class </em><code class="descclassname">shakelib.rupture.edge_rupture.</code><code class="descname">EdgeRupture</code><span class="sig-paren">(</span><em>d</em>, <em>origin</em>, <em>mesh_dx=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakelib.rupture.base.html#shakelib.rupture.base.Rupture" title="shakelib.rupture.base.Rupture"><code class="xref py py-class docutils literal"><span class="pre">shakelib.rupture.base.Rupture</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="shakelib.rupture.base.html#shakelib.rupture.base.Rupture" title="shakelib.rupture.base.Rupture"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.rupture.base.Rupture</span></code></a></p>
 <p>Rupture class that representst the rupture surface by specifying the top
 edge and the bottom edges. These edges do not need to be horizontal. The
 freedom to allow for non-horizontal edges (as compared to QuadRupture)
@@ -208,7 +197,7 @@ segments.</p>
 </dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
 </tr>
 </tbody>
 </table>
@@ -230,7 +219,7 @@ segments.</p>
 </dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
 </tr>
 </tbody>
 </table>
@@ -252,7 +241,7 @@ segments.</p>
 </dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
 </tr>
 </tbody>
 </table>
@@ -304,9 +293,9 @@ horizontal top/bottom edges.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of longitudes.</li>
-<li><strong>lat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of latitudes.</li>
-<li><strong>depth</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of depths (km; positive down).</li>
+<li><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</li>
+<li><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</li>
+<li><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</li>
 <li><strong>var</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also return variance of prediction. Unused, and
 will raise an exception if not False.</li>
 </ul>
@@ -315,7 +304,7 @@ will raise an exception if not False.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Rupture distance (km).</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array</p>
 </td>
 </tr>
 </tbody>
@@ -331,9 +320,9 @@ will raise an exception if not False.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of longitudes.</li>
-<li><strong>lat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of latitudes.</li>
-<li><strong>depth</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of depths (km; positive down).</li>
+<li><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</li>
+<li><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</li>
+<li><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</li>
 <li><strong>var</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also return variance of prediction. Unused, and
 will raise an exception if not False.</li>
 </ul>
@@ -342,7 +331,7 @@ will raise an exception if not False.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Joyner-Boore distance (km).</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array</p>
 </td>
 </tr>
 </tbody>
@@ -359,9 +348,9 @@ will raise an exception if not False.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of longitudes.</li>
-<li><strong>lat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of latitudes.</li>
-<li><strong>depth</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of depths (km; positive down).</li>
+<li><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</li>
+<li><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</li>
+<li><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</li>
 </ul>
 </td>
 </tr>
@@ -407,48 +396,25 @@ will raise an exception if not False.</li>
 
 
 <h3>Navigation</h3>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.directivity.html">shakelib.directivity</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.gmice.html">shakelib.gmice</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.gmpe.html">shakelib.gmpe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.plotting.html">shakelib.plotting</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="shakelib.rupture.html">shakelib.rupture</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.base.html">shakelib.rupture.base</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.constants.html">shakelib.rupture.constants</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakelib.rupture.edge_rupture</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.factory.html">shakelib.rupture.factory</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.origin.html">shakelib.rupture.origin</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.point_rupture.html">shakelib.rupture.point_rupture</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.quad_rupture.html">shakelib.rupture.quad_rupture</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.rupture.utils.html">shakelib.rupture.utils</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.utils.html">shakelib.utils</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.distance.html">shakelib.distance</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.multigmpe.html">shakelib.multigmpe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.sites.html">shakelib.sites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.station.html">shakelib.station</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shakelib.virtualipe.html">shakelib.virtualipe</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="shakelib.html">ShakeLib API</a></li>
 </ul>
 
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

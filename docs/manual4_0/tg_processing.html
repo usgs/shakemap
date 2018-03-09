@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>2.2. Data Processing &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -33,8 +25,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -63,9 +54,9 @@ In addition to these individual GMPEs, ShakeMap allows for a weighted
 combination of two or more GMPEs. GMPEs are configured in ShakeMap
 as GMPE “sets” (see <em>gmpe_sets.conf</em> and <em>modules.conf</em> for
 information on the specification of GMPE sets; the GMPE set to use
-is specified with the <code class="docutils literal"><span class="pre">gmpe</span></code> parameter of the <code class="docutils literal"><span class="pre">model</span></code> section of
+is specified with the <code class="docutils literal notranslate"><span class="pre">gmpe</span></code> parameter of the <code class="docutils literal notranslate"><span class="pre">model</span></code> section of
 <em>model.conf</em>) and are executed through its
-<a class="reference internal" href="../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE" title="shakelib.multigmpe.MultiGMPE"><code class="xref py py-class docutils literal"><span class="pre">MultiGMPE</span></code></a> class.
+<a class="reference internal" href="../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE" title="shakelib.multigmpe.MultiGMPE"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiGMPE</span></code></a> class.
 The MultiGMPE class allows for smooth transitions between tectonic
 environments, as well as consistency with the methodology of other
 projects, such as the <a class="reference external" href="https://earthquake.usgs.gov/hazards/hazmaps/">USGS National Seismic Hazard Mapping Project</a>.</p>
@@ -119,8 +110,8 @@ if all of the GMPEs in the primary set do not support Vs30-based site
 amplification. The GMPEs in this set will be used to compute the site
 terms, which will then be applied to the results of the primary set.</p>
 <p>In general, site amplifications are computed using a Vs30 grid supplied
-by the operator (see the Vs30 parameters <code class="docutils literal"><span class="pre">vs30file</span></code> and <code class="docutils literal"><span class="pre">vs30default</span></code>
-in the <code class="docutils literal"><span class="pre">data</span></code> section of <em>model.conf</em> for configuration information.)</p>
+by the operator (see the Vs30 parameters <code class="docutils literal notranslate"><span class="pre">vs30file</span></code> and <code class="docutils literal notranslate"><span class="pre">vs30default</span></code>
+in the <code class="docutils literal notranslate"><span class="pre">data</span></code> section of <em>model.conf</em> for configuration information.)</p>
 <p>Shakemap does not currently support operator-supplied basin
 depths. Some modern GMPEs use basin depths (typically “Z1.0” or “Z2.5”)
 as an additional site amplification term. These GMPEs typically also
@@ -135,7 +126,7 @@ factors are additive (in natural log space) factors that are intended
 to accommodate basin or topographic amplifications. The user-supplied
 grids should taper to zero at the edges, and are assumed to be zero
 everywhere outside of the supplied grid(s). See the module
-<a class="reference internal" href="../apidoc/shakemap.utils.generic_amp.html#module-shakemap.utils.generic_amp" title="shakemap.utils.generic_amp"><code class="xref py py-mod docutils literal"><span class="pre">shakemap.utils.generic_amp</span></code></a> for more on the generic amplification
+<a class="reference internal" href="../apidoc/shakemap.utils.generic_amp.html#module-shakemap.utils.generic_amp" title="shakemap.utils.generic_amp"><code class="xref py py-mod docutils literal notranslate"><span class="pre">shakemap.utils.generic_amp</span></code></a> for more on the generic amplification
 factors.</p>
 </div>
 <div class="section" id="ground-motion-to-intensity-conversions">
@@ -163,7 +154,7 @@ preference) for the MMI map. Similarly, we convert MMI to other IMTs,
 and use the best available of those for the IMT map in question (as
 discussed in <a class="reference internal" href="#subsubsec-imt-selection"><span class="std std-ref">IMT Selection</span></a>).</p>
 <p>The available GMICE are specified in the modules.conf configuration file,
-and configured with the <code class="docutils literal"><span class="pre">gmice</span></code> parameter in the <code class="docutils literal"><span class="pre">modeling</span></code> section
+and configured with the <code class="docutils literal notranslate"><span class="pre">gmice</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">modeling</span></code> section
 of <em>model.conf</em>.</p>
 </div>
 <div class="section" id="intensity-prediction-equations">
@@ -171,7 +162,7 @@ of <em>model.conf</em>.</p>
 <p>A small number of intensity prediction equations (IPEs) are currently
 available. The available IPEs are for active tectonic and stable
 tectonic regions. If a suitable IPE is not available, the operator may
-specify the <a class="reference internal" href="../shakelib/shakelib.virtualipe.html#shakelib.virtualipe.VirtualIPE" title="shakelib.virtualipe.VirtualIPE"><code class="xref py py-class docutils literal"><span class="pre">VirtualIPE</span></code></a> as the
+specify the <a class="reference internal" href="../shakelib/shakelib.virtualipe.html#shakelib.virtualipe.VirtualIPE" title="shakelib.virtualipe.VirtualIPE"><code class="xref py py-class docutils literal notranslate"><span class="pre">VirtualIPE</span></code></a> as the
 IPE of choice. The VirtualIPE uses the configured GMPE and GMICE to form
 a composite IPE. That is, ground motions (typically PGV) are predicted
 via the GMPE and then converted to intensity via the GMICE.</p>
@@ -274,17 +265,17 @@ errant amplitude will make it through. ShakeMap’s primary
 means of dealing with these amplitudes is through the flagging
 of outliers.</p>
 <p>Outlier flagging works through an operator-configurable
-parameter <code class="docutils literal"><span class="pre">max_deviation</span></code> in the <code class="docutils literal"><span class="pre">outlier</span></code> sub-section of
-the <code class="docutils literal"><span class="pre">data</span></code> section of <em>model.conf</em>). Essentially,
+parameter <code class="docutils literal notranslate"><span class="pre">max_deviation</span></code> in the <code class="docutils literal notranslate"><span class="pre">outlier</span></code> sub-section of
+the <code class="docutils literal notranslate"><span class="pre">data</span></code> section of <em>model.conf</em>). Essentially,
 for each ground
 motion in the input, a prediction is calculated with the
 configured GMPE. If the observed amplitude is greater than
-<code class="docutils literal"><span class="pre">max_deviation</span></code> standard deviations above or below the
+<code class="docutils literal notranslate"><span class="pre">max_deviation</span></code> standard deviations above or below the
 prediction, then that observation is flagged as an
 outlier and is not used in further processing.</p>
 <p>Outlier flagging is suspended in cases where the magnitude
 of the earthquake exceeds the operator-configurable value
-of <code class="docutils literal"><span class="pre">max_mag</span></code> (also in the <code class="docutils literal"><span class="pre">outlier</span></code> sub-section of the <code class="docutils literal"><span class="pre">data</span></code>
+of <code class="docutils literal notranslate"><span class="pre">max_mag</span></code> (also in the <code class="docutils literal notranslate"><span class="pre">outlier</span></code> sub-section of the <code class="docutils literal notranslate"><span class="pre">data</span></code>
 section of <em>model.conf</em>), and no finite rupture model
 is available. The thinking here is that for larger earthquakes,
 the large size of the rupture makes it difficult to know
@@ -293,7 +284,7 @@ reliable. While ShakeMap attempts to compensate for the
 absence of a rupture model (see <a class="reference internal" href="#sec-point-source"><span class="std std-ref">Finite-rupture Approximations</span></a>,
 it is still desirable to turn
 off the outlier flagging at larger magnitudes. If a
-rupture model is available, the <code class="docutils literal"><span class="pre">max_mag</span></code> parameter has no
+rupture model is available, the <code class="docutils literal notranslate"><span class="pre">max_mag</span></code> parameter has no
 effect.</p>
 <p>Outlier flagging is performed on a per-IMT basis. Thus, for
 example, if a station’s PGA value is flagged, the other IMTs
@@ -330,17 +321,17 @@ of the residuals [for a discussion, see
  {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}_{Y_2 Y_2}}
  \bm{Z}_i}."/></p>
 </div><p>In the ShakeMap implementation, the residuals used to compute the bias
-are limited to a subset within a distance of <code class="docutils literal"><span class="pre">max_range</span></code> km from the
-source (<code class="docutils literal"><span class="pre">max_range</span></code> is found in the <code class="docutils literal"><span class="pre">bias</span></code> sub-section of the
-<code class="docutils literal"><span class="pre">modeling</span></code> section of <em>model.conf</em>). As with the outlier flagging, the
+are limited to a subset within a distance of <code class="docutils literal notranslate"><span class="pre">max_range</span></code> km from the
+source (<code class="docutils literal notranslate"><span class="pre">max_range</span></code> is found in the <code class="docutils literal notranslate"><span class="pre">bias</span></code> sub-section of the
+<code class="docutils literal notranslate"><span class="pre">modeling</span></code> section of <em>model.conf</em>). As with the outlier flagging, the
 operator may
-also set a <code class="docutils literal"><span class="pre">max_mag</span></code> for the bias (also found in the <code class="docutils literal"><span class="pre">bias</span></code>
-sub-section of <em>model.conf</em>). If an earthquake exceeds <code class="docutils literal"><span class="pre">max_mag</span></code>,
+also set a <code class="docutils literal notranslate"><span class="pre">max_mag</span></code> for the bias (also found in the <code class="docutils literal notranslate"><span class="pre">bias</span></code>
+sub-section of <em>model.conf</em>). If an earthquake exceeds <code class="docutils literal notranslate"><span class="pre">max_mag</span></code>,
 and no rupture model is available, the bias computations will be
 skipped.</p>
 <p>The calculation and application of the bias may be turned off by
-setting the parameter <code class="docutils literal"><span class="pre">do_bias</span></code> (found in the <code class="docutils literal"><span class="pre">bias</span></code> sub-section
-of the <code class="docutils literal"><span class="pre">modeling</span></code> section of <em>model.conf</em>) to <code class="docutils literal"><span class="pre">False</span></code>.</p>
+setting the parameter <code class="docutils literal notranslate"><span class="pre">do_bias</span></code> (found in the <code class="docutils literal notranslate"><span class="pre">bias</span></code> sub-section
+of the <code class="docutils literal notranslate"><span class="pre">modeling</span></code> section of <em>model.conf</em>) to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
 </div>
 <div class="section" id="interpolation">
 <h2>2.2.7. Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this headline">¶</a></h2>
@@ -593,16 +584,16 @@ the earthquake, and its extent is set automatically. The default
 configuration tends to err on the side of larger maps, however
 the operator may control the parameters used to determine the
 map extent through the <em>extent.conf</em> configuration file. Alternately,
-the operator may set fixed bounds for maps through the <code class="docutils literal"><span class="pre">extent</span></code>
-parameter in the <code class="docutils literal"><span class="pre">prediction_location</span></code> sub-section of the
-<code class="docutils literal"><span class="pre">interp</span></code> section in <em>model.conf</em> (which, like all parameters in
+the operator may set fixed bounds for maps through the <code class="docutils literal notranslate"><span class="pre">extent</span></code>
+parameter in the <code class="docutils literal notranslate"><span class="pre">prediction_location</span></code> sub-section of the
+<code class="docutils literal notranslate"><span class="pre">interp</span></code> section in <em>model.conf</em> (which, like all parameters in
 <em>model.conf</em> may be set globally or on an event-by-event basis).</p>
 <p>ShakeMap can also be configured to compute ground motions for
 an arbitrary set of points. The operator may create a file
 containing rows of latitude, longitude, Vs30, and a location or facility
 identifier (with the columns being separated by whitespace).
-The file may then be specified with the <code class="docutils literal"><span class="pre">file</span></code> parameter in
-the <code class="docutils literal"><span class="pre">prediction_location</span></code> sub-section of the <code class="docutils literal"><span class="pre">interp</span></code> section
+The file may then be specified with the <code class="docutils literal notranslate"><span class="pre">file</span></code> parameter in
+the <code class="docutils literal notranslate"><span class="pre">prediction_location</span></code> sub-section of the <code class="docutils literal notranslate"><span class="pre">interp</span></code> section
 of <em>model.conf</em>.</p>
 </div>
 <div class="section" id="performance-considerations">
@@ -614,18 +605,18 @@ code that does the majority of the computations is highly optimized
 on most systems (including running on multiple cores), it may be
 possible to improve the performance of ShakeMap on some systems
 by setting the
-<code class="docutils literal"><span class="pre">max_workers</span></code> parameter in the <code class="docutils literal"><span class="pre">system</span></code> section of <em>model.conf</em>.
-Setting <code class="docutils literal"><span class="pre">max_workers</span></code> to a value greater than one will tell
+<code class="docutils literal notranslate"><span class="pre">max_workers</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">system</span></code> section of <em>model.conf</em>.
+Setting <code class="docutils literal notranslate"><span class="pre">max_workers</span></code> to a value greater than one will tell
 ShakeMap to spin off separate threads for the output IMTs (thus,
 there is no point in setting this value to anything larger than
 the number of output IMTs.) There is, however, an interaction with
 the BLAS libraries underlying Numpy. If ShakeMap produces an
 error of the type:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">BLAS</span> <span class="p">:</span> <span class="n">Program</span> <span class="ow">is</span> <span class="n">Terminated</span><span class="o">.</span> <span class="n">Because</span> <span class="n">you</span> <span class="n">tried</span> <span class="n">to</span> <span class="n">allocate</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BLAS</span> <span class="p">:</span> <span class="n">Program</span> <span class="ow">is</span> <span class="n">Terminated</span><span class="o">.</span> <span class="n">Because</span> <span class="n">you</span> <span class="n">tried</span> <span class="n">to</span> <span class="n">allocate</span>
 <span class="n">too</span> <span class="n">many</span> <span class="n">memory</span> <span class="n">regions</span><span class="o">.</span>
 </pre></div>
 </div>
-<p>then <code class="docutils literal"><span class="pre">max_workers</span></code> should be reduced (or, you can obtain or
+<p>then <code class="docutils literal notranslate"><span class="pre">max_workers</span></code> should be reduced (or, you can obtain or
 compile BLAS libraries that are reentrant safe – a topic which is
 far beyond the scope of this manual.)</p>
 </div>
@@ -699,12 +690,14 @@ far beyond the scope of this manual.)</p>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

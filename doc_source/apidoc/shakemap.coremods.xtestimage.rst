@@ -1,5 +1,5 @@
-shakemap\.coremods\.xtestimage
-=====================================
+shakemap.coremods.xtestimage
+===================================
 
 .. automodule:: shakemap.coremods.xtestimage
     :members:

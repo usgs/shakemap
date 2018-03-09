@@ -1,5 +1,5 @@
-shakelib\.directivity
-=============================
+shakelib.directivity
+============================
 
 Submodules
 

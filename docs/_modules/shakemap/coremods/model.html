@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.coremods.model &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -110,8 +101,8 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">df</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">imts</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">sx</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">dx</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="n">sx</span> <span class="o">=</span> <span class="kc">None</span></div>
+        <span class="n">dx</span> <span class="o">=</span> <span class="kc">None</span>
 
 
 <div class="viewcode-block" id="ModelModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.ModelModule">[docs]</a><span class="k">class</span> <span class="nc">ModelModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
@@ -326,8 +317,8 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_grid</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_storeRegressionData</span><span class="p">(</span><span class="n">oc</span><span class="p">)</span>
-
-        <span class="n">oc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+</div>
+        <span class="n">oc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     <span class="c1"># ------------------------------------------------------------------</span>
     <span class="c1"># End execute()</span>
     <span class="c1"># ------------------------------------------------------------------</span>
@@ -1594,8 +1585,8 @@
                         <span class="n">soilmean</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
             <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_rock_sd&#39;</span><span class="p">,</span>
                         <span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
-            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_soil_sd&#39;</span><span class="p">,</span>
-                        <span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span></div>
+            <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_soil_sd&#39;</span><span class="p">,</span></div>
+                        <span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
 
 
 <span class="k">def</span> <span class="nf">_get_period_arrays</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -1949,12 +1940,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

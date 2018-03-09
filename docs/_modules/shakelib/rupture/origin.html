@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.rupture.origin &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -180,7 +171,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="mf">0.0</span>
 
 <div class="viewcode-block" id="Origin.fromFile"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin.fromFile">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromFile</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">eventxmlfile</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">fromFile</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">eventxmlfile</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Class method to create a Origin object by specifying an event.xml file,</span>
 <span class="sd">        a rupture file, a source.txt file, and a moment.xml file.</span>
@@ -201,15 +192,15 @@
             <span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">momentfile</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">read_moment_quakeml</span><span class="p">(</span><span class="n">momentfile</span><span class="p">)</span>
-            <span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">event</span><span class="p">)</span></div>
+            <span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">params</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Origin.getHypo"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin.getHypo">[docs]</a>    <span class="k">def</span> <span class="nf">getHypo</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">           Hypocenter as OpenQuake Point instance.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">point</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span></div>
+<span class="sd">        &quot;&quot;&quot;</span></div>
+        <span class="k">return</span> <span class="n">point</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">depth</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Origin.setMechanism"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.Origin.setMechanism">[docs]</a>    <span class="k">def</span> <span class="nf">setMechanism</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mech</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rake</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dip</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -268,8 +259,8 @@
             <span class="n">rake</span> <span class="o">=</span> <span class="n">mechs</span><span class="p">[</span><span class="n">mech</span><span class="p">][</span><span class="s1">&#39;rake&#39;</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">dip</span> <span class="o">=</span> <span class="n">dip</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="n">rake</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">mech</span> <span class="o">=</span> <span class="n">mech</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="n">rake</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">mech</span> <span class="o">=</span> <span class="n">mech</span>
 
 
 <div class="viewcode-block" id="read_event_file"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.read_event_file">[docs]</a><span class="k">def</span> <span class="nf">read_event_file</span><span class="p">(</span><span class="n">eventxml</span><span class="p">):</span>
@@ -339,6 +330,24 @@
 
     <span class="n">eqdict</span> <span class="o">=</span> <span class="p">{}</span>
 
+    <span class="c1">#########################################################</span>
+    <span class="c1"># A Short Primer on PDL-style Identifiers</span>
+    <span class="c1"># Because Everybody (Including The Author) Forgets It.</span>
+    <span class="c1">#</span>
+    <span class="c1"># In PDL, there are 4 identifiers that fully specify a product:</span>
+    <span class="c1"># - source The network that generated the *product* (us, ci, etc.).</span>
+    <span class="c1"># - code   The unique ID string that identifies this product,</span>
+    <span class="c1">#          usually prepended by *source* (us2008abcd).</span>
+    <span class="c1"># - eventsource The network that created the *origin* (us, ci, etc.)</span>
+    <span class="c1"># - eventsourcecode The code within that network that uniquely</span>
+    <span class="c1">#                   identifies the event (2008abcd).</span>
+    <span class="c1">#</span>
+    <span class="c1"># For our purposes, we&#39;re storing *source* and *code* as</span>
+    <span class="c1"># *productsource* and *productcode* respectively in the</span>
+    <span class="c1"># container, in an effort to reduce confusion about their</span>
+    <span class="c1"># meaning. Time will tell.</span>
+    <span class="c1">#########################################################</span>
+    
     <span class="c1"># read in the id fields</span>
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="s1">&#39;network&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
@@ -347,9 +356,9 @@
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Input event dictionary is missing the &quot;network&quot; field! &#39;</span><span class="p">)</span>
 
     <span class="c1"># fix eventsourcecode if not specified correctly</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]):</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">+</span> \
-            <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]):</span>
+        <span class="n">newcode</span> <span class="o">=</span> <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">],</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newcode</span>
 
     <span class="c1"># look for the productcode attribute in the xml,</span>
     <span class="c1"># otherwise use the event directory name.</span>
@@ -368,7 +377,7 @@
     <span class="n">hour</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;hour&#39;</span><span class="p">])</span>
     <span class="n">minute</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;minute&#39;</span><span class="p">])</span>
     <span class="n">second</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">])</span>
-    <span class="n">microseconds</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">second</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]))</span> <span class="o">*</span> <span class="mi">1</span><span class="n">e6</span><span class="p">)</span>
+    <span class="n">microseconds</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">second</span> <span class="o">-</span> <span class="nb">int</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;second&#39;</span><span class="p">]))</span> <span class="o">*</span> <span class="mf">1e6</span><span class="p">)</span>
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="p">(</span>
         <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">day</span><span class="p">,</span> <span class="n">hour</span><span class="p">,</span> <span class="n">minute</span><span class="p">,</span> <span class="n">second</span><span class="p">,</span> <span class="n">microseconds</span><span class="p">)</span>
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">])</span>
@@ -387,8 +396,8 @@
     <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;locstring&#39;</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="s1">&#39;mech&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
-        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">eqdict</span></div>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span></div>
+    <span class="k">return</span> <span class="n">eqdict</span>
 
 
 <div class="viewcode-block" id="read_moment_quakeml"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.read_moment_quakeml">[docs]</a><span class="k">def</span> <span class="nf">read_moment_quakeml</span><span class="p">(</span><span class="n">momentfile</span><span class="p">):</span>
@@ -462,8 +471,8 @@
                          <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
                          <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">rake</span><span class="p">}</span>
 
-    <span class="n">moment</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;moment&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
-    <span class="k">return</span> <span class="n">moment</span></div>
+    <span class="n">moment</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;moment&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span></div>
+    <span class="k">return</span> <span class="n">moment</span>
 
 
 <div class="viewcode-block" id="read_source"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.origin.html#shakelib.rupture.origin.read_source">[docs]</a><span class="k">def</span> <span class="nf">read_source</span><span class="p">(</span><span class="n">sourcefile</span><span class="p">):</span>
@@ -499,8 +508,8 @@
                 <span class="k">pass</span>
         <span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">isFile</span><span class="p">:</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">params</span></div>
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">params</span>
 </pre></div>
 
           </div>
@@ -536,12 +545,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

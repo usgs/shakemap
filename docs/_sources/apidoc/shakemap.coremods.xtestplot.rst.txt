@@ -1,5 +1,5 @@
-shakemap\.coremods\.xtestplot
-====================================
+shakemap.coremods.xtestplot
+==================================
 
 .. automodule:: shakemap.coremods.xtestplot
     :members:

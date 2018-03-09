@@ -1,5 +1,5 @@
-shakelib\.utils\.utils
-=============================
+shakelib.utils.utils
+===========================
 
 .. automodule:: shakelib.utils.utils
     :members:
