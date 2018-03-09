@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+
+# stdlib imports
+import argparse
+from urllib.parse import urlparse
+import os.path
+import sys
+
+# local imports
+from shakemap.utils.config import get_config_paths
+from shakemap.coremods.dyfi import _get_dyfi_dataframe,_dataframe_to_xml
+
+DETAIL_TEMPLATE = 'https://earthquake.usgs.gov/fdsnws/event/1/query?eventid=[EID]&format=geojson'
+
+def get_parser():
+    description = '''
+    Download DYFI data from NEIC Comcat into a local data directory.
+
+    Where url is a ComCat event page URL.  For example, the url for the 2014 
+    South Napa event is:
+    https://earthquake.usgs.gov/earthquakes/eventpage/nc72282711
+    '''
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('url',
+                        help='ComCat URL of the event to process')
+    return parser
+
+def main(args):
+    install_path, data_path = get_config_paths()
+    if not os.path.isdir(data_path):
+        print('%s is not a valid directory.' % data_path)
+        sys.exit(1)
+
+    # get the eventid from the url
+    parts = urlparse(args.url)
+    eventid = parts.path.split('/')[-1]
+        
+    # check to see if the event directory exists
+    event_dir = os.path.join(data_path, eventid, 'current')
+    if not os.path.isdir(event_dir):
+        fmt = 'Event %s does not exist in this installation.  Run "sm_clone %s" first.'
+        print(fmt % (eventid,eventid))
+        sys.exit(1)
+
+    detail_url = DETAIL_TEMPLATE.replace('[EID]',eventid)
+    dataframe,msg = _get_dyfi_dataframe(detail_url)
+    reference = 'USGS Did You Feel It? System'
+    outfile = _dataframe_to_xml(dataframe,eventid,event_dir,reference)
+    print('Saved DYFI data to %s.' % outfile)
+    sys.exit(0)
+
+if __name__ == '__main__':
+    parser = get_parser()
+    pargs = parser.parse_args()
+    main(pargs)
+    
