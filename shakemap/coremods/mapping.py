@@ -1290,4 +1290,4 @@ def _select_font():
     
     if selected_font.startswith('TEST'):
         raise Exception('Could not find any font from system font list')
-    return font
+    return selected_font
