@@ -1264,7 +1264,7 @@ def _select_font():
     # is supposed to come with matplotlib, so just loop over font names found on the system
     # and pick the shortest one we can find that matches the input
     fontlist = [f.name for f in matplotlib.font_manager.fontManager.ttflist]
-    preferences = ['Arial','Helvetica','Bitstream','DejaVu','Times','Courier','Verdana']
+    preferences = ['Arial','Helvetica','Bitstream Vera Sans','DejaVu','Times','Courier','Verdana']
     selected_font = 'TEST'*128
     for preference in preferences:
         for font in fontlist:
