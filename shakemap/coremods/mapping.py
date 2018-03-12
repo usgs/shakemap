@@ -16,6 +16,8 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.patheffects as path_effects
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
+from matplotlib.font_manager import findfont, FontProperties
+
 from shapely.geometry import MultiPolygon
 from shapely.geometry import MultiLineString
 from shapely.geometry import LineString
@@ -963,6 +965,7 @@ class MapMaker(object):
             if 'Times New Roman' in self.cities._fontlist:
                 font = 'Times New Roman'
             else:
+                font = findfont(FontProperties(family=['sans-serif']))
                 font = 'DejaVu Sans'
             self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
