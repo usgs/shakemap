@@ -1260,7 +1260,8 @@ class MapMaker(object):
         else:
             oldimt = fileimt.lower()
         outfile_old = os.path.join(outfolder, '%s.jpg' % oldimt)
-        plt.savefig(outfile_old)
+        fig = plt.gcf()
+        _save_jpg(fig,outfile_old)
         ######################
 
         
