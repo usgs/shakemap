@@ -16,7 +16,7 @@ from mpl_toolkits.basemap import Basemap
 import matplotlib.patheffects as path_effects
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 
-from matplotlib.font_manager import findfont, FontProperties
+import matplotlib
 
 from shapely.geometry import MultiPolygon
 from shapely.geometry import MultiLineString
