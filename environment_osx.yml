@@ -197,7 +197,8 @@ dependencies:
   - jupyter-console==5.2.0
   - jupyter-core==4.4.0
   - prompt-toolkit==1.0.15
-  - ps2ff==1.1
   - sphinx-argparse==0.2.1
-prefix: /Users/mhearne/anaconda3/envs/shakemap
+  - ./mapio.zip
+  - ./strec.zip
+  - ./ps2ff.zip
 
