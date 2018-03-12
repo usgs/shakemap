@@ -966,7 +966,7 @@ class MapMaker(object):
                 font = 'Times New Roman'
             else:
                 font = findfont(FontProperties(family=['sans-serif']))
-                font = 'DejaVu Sans'
+                # font = 'DejaVu Sans'
             self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
