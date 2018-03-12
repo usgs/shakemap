@@ -215,7 +215,6 @@ class MappingModule(CoreModule):
         sd_file = os.path.join(datadir,'sd.jpg')
         fig = plt.gcf()
         _save_jpg(fig,sd_file)
-        plt.savefig(sd_file)
         ###########################
             
 
