@@ -16,12 +16,15 @@ dependencies:
 - fiona
 - gdal
 - h5py
+- impactutils
 - ipython
 - jupyter
+- libcomcat
 - matplotlib
 - numexpr
 - numpy
 - obspy
+- openquake.engine
 - pandas
 - psutil
 - pyproj
@@ -47,9 +50,7 @@ dependencies:
   - jupyter-core==4.4.0
   - prompt-toolkit==1.0.15
   - sphinx-argparse==0.2.1
-  - ./libcomcat.zip
   - ./mapio.zip
-  - ./impact-utils.zip
   - ./strec.zip
   - ./ps2ff.zip
 

@@ -33,6 +33,8 @@ def get_parser():
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument('url_or_id',
                         help='ComCat URL/ID of the event to process')
+    parser.add_argument('--file',
+                        help='Download to Excel file specified')
     return parser
 
 def main(args):
@@ -49,6 +51,15 @@ def main(args):
         eventid = parts.path.split('/')[-1]
     else:
         eventid = args.url_or_id
+
+
+    detail_url = DETAIL_TEMPLATE.replace('[EID]',eventid)
+    dataframe,msg = _get_dyfi_dataframe(detail_url)
+
+    if args.file:
+        dataframe.to_excel(args.file,index=False)
+        print('Saved %i records to %s. Exiting.' % (len(dataframe),args.file))
+        sys.exit(0)
         
     # check to see if the event directory exists
     event_dir = os.path.join(data_path, eventid, 'current')
@@ -57,8 +68,6 @@ def main(args):
         print(fmt % (eventid,eventid))
         sys.exit(1)
 
-    detail_url = DETAIL_TEMPLATE.replace('[EID]',eventid)
-    dataframe,msg = _get_dyfi_dataframe(detail_url)
     reference = 'USGS Did You Feel It? System'
     outfile = _dataframe_to_xml(dataframe,eventid,event_dir,reference)
     print('Saved DYFI data to %s.' % outfile)
