@@ -213,6 +213,8 @@ class MappingModule(CoreModule):
         #draw colorbar in new divider axes
         plt.colorbar(im, cax=cax)
         sd_file = os.path.join(datadir,'sd.jpg')
+        fig = plt.gcf()
+        _save_jpg(fig,sd_file)
         plt.savefig(sd_file)
         ###########################
             
@@ -990,13 +992,7 @@ class MapMaker(object):
         # so, let's grab the figure as an RGB image, and then write it to a file
         # manually
         fig = plt.gcf()
-        canvas = FigureCanvas(plt.gcf())
-        canvas.draw()       # draw the canvas, cache the renderer
-        image = np.fromstring(canvas.tostring_rgb(), dtype='uint8')
-        width, height = map(int, fig.get_size_inches() * fig.get_dpi())
-        image = image.reshape(height, width, 3)
-        img = Image.fromarray(image, 'RGB')
-        img.save(outfile2)
+        _save_jpg(fig,outfile2)
         tn = time.time()
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
 
@@ -1291,3 +1287,12 @@ def _select_font():
     if selected_font.startswith('TEST'):
         raise Exception('Could not find any font from system font list')
     return selected_font
+
+def _save_jpg(fig,filename):
+    canvas = FigureCanvas(fig)
+    canvas.draw()       # draw the canvas, cache the renderer
+    image = np.fromstring(canvas.tostring_rgb(), dtype='uint8')
+    width, height = map(int, fig.get_size_inches() * fig.get_dpi())
+    image = image.reshape(height, width, 3)
+    img = Image.fromarray(image, 'RGB')
+    img.save(filename)
