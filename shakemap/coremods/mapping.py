@@ -1270,6 +1270,8 @@ def _select_font():
         for font in fontlist:
             if font.startswith(preference) and len(font) < len(selected_font):
                 selected_font = font
+        if not selected_font.startswith('TEST'):
+            break
     
     if selected_font.startswith('TEST'):
         raise Exception('Could not find any font from system font list')
