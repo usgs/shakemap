@@ -962,11 +962,11 @@ class MapMaker(object):
                 nx=self.city_cols, ny=self.city_rows,
                 cities_per_grid=self.cities_per_grid)
             # self.logger.debug("Available fonts: ", self.cities._fontlist)
-            if 'Times New Roman' in self.cities._fontlist:
-                font = 'Times New Roman'
+            if 'Arial' in self.cities._fontlist:
+                font = 'Arial'
             else:
-                font = findfont(FontProperties(family=['sans-serif']))
-                # font = 'DejaVu Sans'
+                font = _select_font()
+
             self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
@@ -1257,3 +1257,20 @@ class MapMaker(object):
         tn = time.time()
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
         return outfile
+
+def _select_font(fontlist):
+    # I really don't care that much about fonts, just trying to find one that will
+    # work on any given platform.  Can't seem to reliably find whatever default font
+    # is supposed to come with matplotlib, so just loop over font names found on the system
+    # and pick the shortest one we can find that matches the input
+    fontlist = [f.name for f in matplotlib.font_manager.fontManager.ttflist]
+    preferences = ['Arial','Helvetica','Bitstream','DejaVu','Times','Courier','Verdana']
+    selected_font = 'TEST'*128
+    for preference in preferences:
+        for font in fontlist:
+            if font.startswith(preference) and len(font) < len(selected_font):
+                selected_font = font
+    
+    if selected_font.startswith('TEST'):
+        raise Exception('Could not find any font from system font list')
+    return font
