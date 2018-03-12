@@ -1258,7 +1258,7 @@ class MapMaker(object):
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
         return outfile
 
-def _select_font(fontlist):
+def _select_font():
     # I really don't care that much about fonts, just trying to find one that will
     # work on any given platform.  Can't seem to reliably find whatever default font
     # is supposed to come with matplotlib, so just loop over font names found on the system
