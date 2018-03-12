@@ -15,8 +15,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import matplotlib.patheffects as path_effects
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 
 import matplotlib
+
+from PIL import Image
 
 from shapely.geometry import MultiPolygon
 from shapely.geometry import MultiLineString
@@ -981,7 +984,19 @@ class MapMaker(object):
         outfile = os.path.join(outfolder, 'intensity.pdf')
         plt.savefig(outfile)
         outfile2 = os.path.join(outfolder, 'intensity.jpg')
-        plt.savefig(outfile2)
+
+        # newer versions of PIL don't support writing of RGBA images to JPEG,
+        # or at least they won't handle getting rid of the alpha channel for you.
+        # so, let's grab the figure as an RGB image, and then write it to a file
+        # manually
+        fig = plt.gcf()
+        canvas = FigureCanvas(plt.gcf())
+        canvas.draw()       # draw the canvas, cache the renderer
+        image = np.fromstring(canvas.tostring_rgb(), dtype='uint8')
+        width, height = map(int, fig.get_size_inches() * fig.get_dpi())
+        image = image.reshape(height, width, 3)
+        img = Image.fromarray(image, 'RGB')
+        img.save(outfile2)
         tn = time.time()
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
 
