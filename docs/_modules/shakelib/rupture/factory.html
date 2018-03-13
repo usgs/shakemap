@@ -4,13 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.rupture.factory &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -23,7 +31,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -101,8 +110,8 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Origin requred if no rupture file is provided.&quot;</span><span class="p">)</span>
-        <span class="n">rupt</span> <span class="o">=</span> <span class="n">PointRupture</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span></div>
-    <span class="k">return</span> <span class="n">rupt</span>
+        <span class="n">rupt</span> <span class="o">=</span> <span class="n">PointRupture</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rupt</span></div>
 
 
 <div class="viewcode-block" id="rupture_from_dict_and_origin"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.rupture_from_dict_and_origin">[docs]</a><span class="k">def</span> <span class="nf">rupture_from_dict_and_origin</span><span class="p">(</span><span class="n">rupdict</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
@@ -142,8 +151,8 @@
             <span class="n">rupt</span> <span class="o">=</span> <span class="n">PointRupture</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">rupt</span> <span class="o">=</span> <span class="n">EdgeRupture</span><span class="p">(</span><span class="n">rupdict</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="n">mesh_dx</span><span class="p">)</span>
-</div>
-    <span class="k">return</span> <span class="n">rupt</span>
+
+    <span class="k">return</span> <span class="n">rupt</span></div>
 
 
 <div class="viewcode-block" id="rupture_from_dict"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.rupture_from_dict">[docs]</a><span class="k">def</span> <span class="nf">rupture_from_dict</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
@@ -177,8 +186,8 @@
             <span class="n">rupt</span> <span class="o">=</span> <span class="n">QuadRupture</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">geo_type</span> <span class="o">==</span> <span class="s1">&#39;Point&#39;</span><span class="p">:</span>
         <span class="n">rupt</span> <span class="o">=</span> <span class="n">PointRupture</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span>
-</div>
-    <span class="k">return</span> <span class="n">rupt</span>
+
+    <span class="k">return</span> <span class="n">rupt</span></div>
 
 
 <div class="viewcode-block" id="text_to_json"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.text_to_json">[docs]</a><span class="k">def</span> <span class="nf">text_to_json</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
@@ -271,8 +280,8 @@
                 <span class="p">}</span>
             <span class="p">}</span>
         <span class="p">]</span>
-    <span class="p">}</span></div>
-    <span class="k">return</span> <span class="n">d</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">d</span></div>
 
 
 <div class="viewcode-block" id="validate_json"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.validate_json">[docs]</a><span class="k">def</span> <span class="nf">validate_json</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
@@ -338,8 +347,8 @@
                 <span class="n">top_depth</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
                 <span class="n">bot_depth</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)][</span><span class="mi">2</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">top_depth</span> <span class="o">&gt;=</span> <span class="n">bot_depth</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span></div>
-                        <span class="s1">&#39;Top points must be ordered before bottom points.&#39;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                        <span class="s1">&#39;Top points must be ordered before bottom points.&#39;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="is_quadrupture_class"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.is_quadrupture_class">[docs]</a><span class="k">def</span> <span class="nf">is_quadrupture_class</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
@@ -362,7 +371,7 @@
     <span class="n">polygons</span> <span class="o">=</span> <span class="n">geom</span><span class="p">[</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">polygons</span><span class="p">)</span>
-    <span class="k">except</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">False</span>
     <span class="n">n_polygons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">polygons</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_polygons</span><span class="p">):</span>
@@ -390,8 +399,8 @@
             <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">bots</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bots</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                               <span class="n">atol</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">DEPTH_TOL</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
                 <span class="n">isQuad</span> <span class="o">=</span> <span class="kc">False</span>
-</div>
-    <span class="k">return</span> <span class="n">isQuad</span>
+
+    <span class="k">return</span> <span class="n">isQuad</span></div>
 </pre></div>
 
           </div>
@@ -427,14 +436,12 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

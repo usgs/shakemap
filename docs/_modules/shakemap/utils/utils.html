@@ -4,13 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.utils.utils &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -23,7 +31,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -58,8 +67,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">cls_abbr</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">obj</span><span class="p">]</span>
     <span class="n">mods</span> <span class="o">=</span> <span class="n">obj</span> <span class="o">+</span> <span class="s1">&#39;_modules&#39;</span>
-    <span class="p">(</span><span class="n">cname</span><span class="p">,</span> <span class="n">mpath</span><span class="p">)</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">mods</span><span class="p">][</span><span class="n">cls_abbr</span><span class="p">]</span></div>
-    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">import_module</span><span class="p">(</span><span class="n">mpath</span><span class="p">),</span> <span class="n">cname</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">cname</span><span class="p">,</span> <span class="n">mpath</span><span class="p">)</span> <span class="o">=</span> <span class="n">cfg</span><span class="p">[</span><span class="n">mods</span><span class="p">][</span><span class="n">cls_abbr</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">import_module</span><span class="p">(</span><span class="n">mpath</span><span class="p">),</span> <span class="n">cname</span><span class="p">)(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span></div>
 
 
 <span class="c1">#</span>
@@ -98,8 +107,8 @@
         <span class="k">elif</span> <span class="n">choice</span> <span class="ow">in</span> <span class="n">valid</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">valid</span><span class="p">[</span><span class="n">choice</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Please respond with &#39;yes&#39; or &#39;no&#39; &quot;</span></div>
-                             <span class="s2">&quot;(or &#39;y&#39; or &#39;n&#39;).</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Please respond with &#39;yes&#39; or &#39;no&#39; &quot;</span>
+                             <span class="s2">&quot;(or &#39;y&#39; or &#39;n&#39;).</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="path_macro_sub"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.utils.html#shakemap.utils.utils.path_macro_sub">[docs]</a><span class="k">def</span> <span class="nf">path_macro_sub</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="n">dp</span><span class="p">):</span>
@@ -121,8 +130,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        str: A new string with the sub-string replacements.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-</div>
-    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;INSTALL_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;DATA_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">dp</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;INSTALL_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;DATA_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">dp</span><span class="p">)</span></div>
 </pre></div>
 
           </div>
@@ -158,14 +167,12 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

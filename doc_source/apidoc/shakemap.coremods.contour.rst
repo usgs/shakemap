@@ -1,5 +1,5 @@
-shakemap.coremods.contour
-================================
+shakemap\.coremods\.contour
+==================================
 
 .. automodule:: shakemap.coremods.contour
     :members:

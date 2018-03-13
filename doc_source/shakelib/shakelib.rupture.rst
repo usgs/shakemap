@@ -1,5 +1,5 @@
-shakelib.rupture
-========================
+shakelib\.rupture
+=========================
 
 Submodules
 

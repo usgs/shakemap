@@ -1,5 +1,5 @@
-shakelib.plotting.plotrupture
-====================================
+shakelib\.plotting\.plotrupture
+======================================
 
 .. automodule:: shakelib.plotting.plotrupture
     :members:

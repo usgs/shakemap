@@ -1,5 +1,5 @@
-shakelib.rupture.quad\_rupture
-=====================================
+shakelib\.rupture\.quad\_rupture
+=======================================
 
 .. automodule:: shakelib.rupture.quad_rupture
     :members:

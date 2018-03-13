@@ -1,5 +1,5 @@
-shakemap.coremods.assemble
-=================================
+shakemap\.coremods\.assemble
+===================================
 
 .. automodule:: shakemap.coremods.assemble
     :members:

@@ -1,5 +1,5 @@
-shakemap.coremods.select
-===============================
+shakemap\.coremods\.select
+=================================
 
 .. automodule:: shakemap.coremods.select
     :members:

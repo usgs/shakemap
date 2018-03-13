@@ -4,13 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.conversions.imc.boore_kishida_2017 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../../_static/doctools.js"></script>
@@ -23,7 +31,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -132,7 +141,7 @@
 
         <span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getParamsFromIMT</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
 
-        <span class="n">rrups_clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rrups</span><span class="p">,</span> <span class="mf">1e-2</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
+        <span class="n">rrups_clipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">rrups</span><span class="p">,</span> <span class="mi">1</span><span class="n">e</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">400</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">mag</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">mag</span> <span class="o">=</span> <span class="mf">2.0</span>
         <span class="k">elif</span> <span class="n">mag</span> <span class="o">&gt;</span> <span class="mi">9</span><span class="p">:</span>
@@ -150,8 +159,8 @@
             <span class="n">amps</span> <span class="o">=</span> <span class="n">amps</span> <span class="o">-</span> <span class="n">ln_ratio</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">amps</span> <span class="o">=</span> <span class="n">amps</span> <span class="o">+</span> <span class="n">ln_ratio</span>
-</div>
-        <span class="k">return</span> <span class="n">amps</span>
+
+        <span class="k">return</span> <span class="n">amps</span></div>
 
 <div class="viewcode-block" id="BooreKishida2017.convertStddevs"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertStddevs">[docs]</a>    <span class="k">def</span> <span class="nf">convertStddevs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddevs</span><span class="p">,</span> <span class="n">rrups</span><span class="p">,</span> <span class="n">mag</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -186,8 +195,8 @@
         <span class="p">(</span><span class="n">sigma</span><span class="p">,</span> <span class="n">c0</span><span class="p">,</span> <span class="n">r1</span><span class="p">,</span> <span class="n">m1</span><span class="p">,</span> <span class="n">m2</span><span class="p">)</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getParamsFromIMT</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
 
         <span class="n">stddevs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">stddevs</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
-</div>
-        <span class="k">return</span> <span class="n">stddevs</span>
+
+        <span class="k">return</span> <span class="n">stddevs</span></div>
 
     <span class="k">def</span> <span class="nf">_getParamsFromIMT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -287,8 +296,8 @@
             <span class="c1"># For less common IMCs, Beyer &amp; Bommer (2006) found most</span>
             <span class="c1"># of them to be more or less equivalent to geometric mean</span>
             <span class="c1">#</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Can&#39;t handle IMC </span><span class="si">%s</span><span class="s2">, using GMAR&quot;</span> <span class="o">%</span> <span class="n">oq_imc</span><span class="p">)</span></div>
-            <span class="k">return</span> <span class="s1">&#39;GMAR&#39;</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Can&#39;t handle IMC </span><span class="si">%s</span><span class="s2">, using GMAR&quot;</span> <span class="o">%</span> <span class="n">oq_imc</span><span class="p">)</span>
+            <span class="k">return</span> <span class="s1">&#39;GMAR&#39;</span></div>
 </pre></div>
 
           </div>
@@ -324,14 +333,12 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

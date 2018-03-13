@@ -4,13 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.gmice.wald99 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -23,7 +31,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -134,8 +143,8 @@
         <span class="n">mmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C4&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C3&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lamps</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
         <span class="n">dmmi_damp</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C3&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lfact</span>
 
-        <span class="n">mmi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">mmi</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span></div>
-        <span class="k">return</span> <span class="n">mmi</span><span class="p">,</span> <span class="n">dmmi_damp</span>
+        <span class="n">mmi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">mmi</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mmi</span><span class="p">,</span> <span class="n">dmmi_damp</span></div>
 
 <div class="viewcode-block" id="Wald99.getGMfromMI"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getGMfromMI">[docs]</a>    <span class="k">def</span> <span class="nf">getGMfromMI</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mmi</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">dists</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -191,8 +200,8 @@
         <span class="n">pgm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pgm</span><span class="p">)</span>
         <span class="n">pgm</span><span class="p">[</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
         <span class="n">dpgm_dmmi</span><span class="p">[</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span>
-</div>
-        <span class="k">return</span> <span class="n">pgm</span><span class="p">,</span> <span class="n">dpgm_dmmi</span>
+
+        <span class="k">return</span> <span class="n">pgm</span><span class="p">,</span> <span class="n">dpgm_dmmi</span></div>
 
 <div class="viewcode-block" id="Wald99.getGM2MIsd"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getGM2MIsd">[docs]</a>    <span class="k">def</span> <span class="nf">getGM2MIsd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -202,8 +211,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Dictionary of GM to MI sigmas (in MMI units).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">][</span><span class="s1">&#39;SMMI&#39;</span><span class="p">],</span></div>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">][</span><span class="s1">&#39;SMMI&#39;</span><span class="p">]}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">][</span><span class="s1">&#39;SMMI&#39;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">][</span><span class="s1">&#39;SMMI&#39;</span><span class="p">]}</span></div>
 
 <div class="viewcode-block" id="Wald99.getMI2GMsd"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getMI2GMsd">[docs]</a>    <span class="k">def</span> <span class="nf">getMI2GMsd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -218,8 +227,8 @@
         <span class="c1"># Need to convert log10 to ln units</span>
         <span class="c1">#</span>
         <span class="n">lfact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">][</span><span class="s1">&#39;SPGM&#39;</span><span class="p">],</span></div>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">][</span><span class="s1">&#39;SPGM&#39;</span><span class="p">]}</span>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">][</span><span class="s1">&#39;SPGM&#39;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">][</span><span class="s1">&#39;SPGM&#39;</span><span class="p">]}</span></div>
 
 <div class="viewcode-block" id="Wald99.getName"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getName">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">getName</span><span class="p">():</span>
@@ -228,8 +237,8 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            String containing name of this GMICE.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="s1">&#39;Wald et al. (1999)&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;Wald et al. (1999)&#39;</span></div>
 
 <div class="viewcode-block" id="Wald99.getScale"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getScale">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">getScale</span><span class="p">():</span>
@@ -239,8 +248,8 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Name of GMICE scale file.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="s1">&#39;scale_wald99.ps&#39;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="s1">&#39;scale_wald99.ps&#39;</span></div>
 
 <div class="viewcode-block" id="Wald99.getMinMax"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getMinMax">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">getMinMax</span><span class="p">():</span>
@@ -249,12 +258,12 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tuple of min and max values of GMICE.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Wald99.getDistanceType"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getDistanceType">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">getDistanceType</span><span class="p">():</span></div>
-        <span class="k">return</span> <span class="s1">&#39;rrup&#39;</span>
+    <span class="k">def</span> <span class="nf">getDistanceType</span><span class="p">():</span>
+        <span class="k">return</span> <span class="s1">&#39;rrup&#39;</span></div>
 
     <span class="k">def</span> <span class="nf">__getConsts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -262,8 +271,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">imt</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pga</span> <span class="ow">and</span> <span class="n">imt</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid IMT &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">imt</span><span class="p">))</span></div>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid IMT &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">imt</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span></div>
 </pre></div>
 
           </div>
@@ -299,14 +308,12 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

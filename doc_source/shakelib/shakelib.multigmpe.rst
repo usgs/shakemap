@@ -1,5 +1,5 @@
-shakelib.multigmpe
-=========================
+shakelib\.multigmpe
+==========================
 
 .. automodule:: shakelib.multigmpe
     :members:

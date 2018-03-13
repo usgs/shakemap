@@ -1,5 +1,5 @@
-shakemap.coremods.model
-==============================
+shakemap\.coremods\.model
+================================
 
 .. automodule:: shakemap.coremods.model
     :members:

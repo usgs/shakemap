@@ -1,5 +1,5 @@
-shakelib.correlation
-============================
+shakelib\.correlation
+=============================
 
 Submodules
 

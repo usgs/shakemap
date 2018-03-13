@@ -1,5 +1,5 @@
-shakemap.coremods.rupture
-================================
+shakemap\.coremods\.rupture
+==================================
 
 .. automodule:: shakemap.coremods.rupture
     :members:

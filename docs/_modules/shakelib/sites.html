@@ -4,13 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.sites &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
@@ -23,7 +31,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -87,9 +96,9 @@
                                  <span class="bp">self</span><span class="o">.</span><span class="n">_GeoDict</span><span class="o">.</span><span class="n">ny</span><span class="p">)</span>
 
     <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">_create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">geodict</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="p">,</span> <span class="n">vs30File</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">resample</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_create</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">geodict</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="p">,</span> <span class="n">vs30File</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">resample</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">vs30File</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">fgeodict</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_getFileGeoDict</span><span class="p">(</span><span class="n">vs30File</span><span class="p">)</span>
+            <span class="n">fgeodict</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_getFileGeoDict</span><span class="p">(</span><span class="n">vs30File</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">resample</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">padding</span><span class="p">:</span>
                     <span class="c1"># we want something that is within and aligned</span>
@@ -98,14 +107,14 @@
                     <span class="c1"># we want something that is just aligned, since we&#39;re</span>
                     <span class="c1"># padding edges</span>
                     <span class="n">geodict</span> <span class="o">=</span> <span class="n">fgeodict</span><span class="o">.</span><span class="n">getAligned</span><span class="p">(</span><span class="n">geodict</span><span class="p">)</span>
-            <span class="n">vs30grid</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">vs30File</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">geodict</span><span class="p">,</span>
+            <span class="n">vs30grid</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_load</span><span class="p">(</span><span class="n">vs30File</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">geodict</span><span class="p">,</span>
                                  <span class="n">resample</span><span class="o">=</span><span class="n">resample</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
                                  <span class="n">doPadding</span><span class="o">=</span><span class="n">padding</span><span class="p">,</span> <span class="n">padValue</span><span class="o">=</span><span class="n">defaultVs30</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">vs30grid</span>
 
 <div class="viewcode-block" id="Sites.fromBounds"><a class="viewcode-back" href="../../shakelib/shakelib.sites.html#shakelib.sites.Sites.fromBounds">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromBounds</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="o">=</span><span class="mf">686.0</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">fromBounds</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="o">=</span><span class="mf">686.0</span><span class="p">,</span>
                    <span class="n">vs30File</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vs30measured_grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">backarc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -134,17 +143,17 @@
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
         <span class="n">geodict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="o">.</span><span class="n">createDictFromBox</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">vs30File</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">vs30grid</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_create</span><span class="p">(</span><span class="n">geodict</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="p">,</span>
+            <span class="n">vs30grid</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_create</span><span class="p">(</span><span class="n">geodict</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="p">,</span>
                                    <span class="n">vs30File</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">resample</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">griddata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">geodict</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">geodict</span><span class="o">.</span><span class="n">nx</span><span class="p">),</span>
                                <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="n">defaultVs30</span>
             <span class="n">vs30grid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">griddata</span><span class="p">,</span> <span class="n">geodict</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">vs30grid</span><span class="p">,</span> <span class="n">vs30measured_grid</span><span class="o">=</span><span class="n">vs30measured_grid</span><span class="p">,</span></div>
-                   <span class="n">backarc</span><span class="o">=</span><span class="n">backarc</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="o">=</span><span class="n">defaultVs30</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">vs30grid</span><span class="p">,</span> <span class="n">vs30measured_grid</span><span class="o">=</span><span class="n">vs30measured_grid</span><span class="p">,</span>
+                   <span class="n">backarc</span><span class="o">=</span><span class="n">backarc</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="o">=</span><span class="n">defaultVs30</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Sites.fromCenter"><a class="viewcode-back" href="../../shakelib/shakelib.sites.html#shakelib.sites.Sites.fromCenter">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromCenter</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">xspan</span><span class="p">,</span> <span class="n">yspan</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="o">=</span><span class="mf">686.0</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">fromCenter</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">xspan</span><span class="p">,</span> <span class="n">yspan</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="o">=</span><span class="mf">686.0</span><span class="p">,</span>
                    <span class="n">vs30File</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">vs30measured_grid</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                    <span class="n">backarc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -173,14 +182,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
         <span class="n">geodict</span> <span class="o">=</span> <span class="n">GeoDict</span><span class="o">.</span><span class="n">createDictFromCenter</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">xspan</span><span class="p">,</span> <span class="n">yspan</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">vs30File</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">vs30grid</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">_create</span><span class="p">(</span><span class="n">geodict</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="p">,</span>
+            <span class="n">vs30grid</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">_create</span><span class="p">(</span><span class="n">geodict</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="p">,</span>
                                    <span class="n">vs30File</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">resample</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">griddata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="n">geodict</span><span class="o">.</span><span class="n">ny</span><span class="p">,</span> <span class="n">geodict</span><span class="o">.</span><span class="n">nx</span><span class="p">),</span>
                                <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span> <span class="o">*</span> <span class="n">defaultVs30</span>
             <span class="n">vs30grid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="p">(</span><span class="n">griddata</span><span class="p">,</span> <span class="n">geodict</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">vs30grid</span><span class="p">,</span> <span class="n">vs30measured_grid</span><span class="o">=</span><span class="n">vs30measured_grid</span><span class="p">,</span></div>
-                   <span class="n">backarc</span><span class="o">=</span><span class="n">backarc</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="o">=</span><span class="n">defaultVs30</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">vs30grid</span><span class="p">,</span> <span class="n">vs30measured_grid</span><span class="o">=</span><span class="n">vs30measured_grid</span><span class="p">,</span>
+                   <span class="n">backarc</span><span class="o">=</span><span class="n">backarc</span><span class="p">,</span> <span class="n">defaultVs30</span><span class="o">=</span><span class="n">defaultVs30</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Sites.getSitesContext"><a class="viewcode-back" href="../../shakelib/shakelib.sites.html#shakelib.sites.Sites.getSitesContext">[docs]</a>    <span class="k">def</span> <span class="nf">getSitesContext</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lldict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rock_vs30</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -252,21 +261,21 @@
             <span class="n">sctx</span><span class="o">.</span><span class="n">backarc</span> <span class="o">=</span> <span class="n">backarcgrid</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">lats</span><span class="p">,</span> <span class="n">lons</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">sctx</span><span class="o">.</span><span class="n">backarc</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_backarc</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-</div>
-        <span class="k">return</span> <span class="n">sctx</span>
+
+        <span class="k">return</span> <span class="n">sctx</span></div>
 
 <div class="viewcode-block" id="Sites.getVs30Grid"><a class="viewcode-back" href="../../shakelib/shakelib.sites.html#shakelib.sites.Sites.getVs30Grid">[docs]</a>    <span class="k">def</span> <span class="nf">getVs30Grid</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="sd">        Returns: Grid2D object containing Vs30 values for this Sites object.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Vs30</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Vs30</span></div>
 
 <div class="viewcode-block" id="Sites.getNxNy"><a class="viewcode-back" href="../../shakelib/shakelib.sites.html#shakelib.sites.Sites.getNxNy">[docs]</a>    <span class="k">def</span> <span class="nf">getNxNy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns: The number of grid points in x and y.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GeoDict</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GeoDict</span><span class="o">.</span><span class="n">ny</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GeoDict</span><span class="o">.</span><span class="n">nx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_GeoDict</span><span class="o">.</span><span class="n">ny</span></div>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_load</span><span class="p">(</span><span class="n">vs30File</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">,</span>
@@ -397,8 +406,8 @@
 
 <span class="sd">        Returns: Numpy array of z2.5 in m.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">z2pt5</span> <span class="o">=</span> <span class="mf">519.0</span> <span class="o">+</span> <span class="n">z1pt0</span> <span class="o">*</span> <span class="mf">3.595</span></div>
-        <span class="k">return</span> <span class="n">z2pt5</span>
+        <span class="n">z2pt5</span> <span class="o">=</span> <span class="mf">519.0</span> <span class="o">+</span> <span class="n">z1pt0</span> <span class="o">*</span> <span class="mf">3.595</span>
+        <span class="k">return</span> <span class="n">z2pt5</span></div>
 </pre></div>
 
           </div>
@@ -434,14 +443,12 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

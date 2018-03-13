@@ -1,5 +1,5 @@
-shakemap.coremods.transfer
-=================================
+shakemap\.coremods\.transfer
+===================================
 
 .. automodule:: shakemap.coremods.transfer
     :members:

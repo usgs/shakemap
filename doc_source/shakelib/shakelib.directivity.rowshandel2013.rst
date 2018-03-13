@@ -1,5 +1,5 @@
-shakelib.directivity.rowshandel2013
-==========================================
+shakelib\.directivity\.rowshandel2013
+============================================
 
 .. automodule:: shakelib.directivity.rowshandel2013
     :members:

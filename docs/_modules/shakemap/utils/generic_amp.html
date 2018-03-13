@@ -4,13 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.utils.generic_amp &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -23,7 +31,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -43,8 +52,8 @@
 <span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
 
 
-<div class="viewcode-block" id="get_period_from_imt"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.generic_amp.html#shakemap.utils.generic_amp.get_period_from_imt">[docs]</a><span class="k">def</span> <span class="nf">get_period_from_imt</span><span class="p">(</span><span class="n">imtstr</span><span class="p">):</span></div>
-    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">imtstr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+<div class="viewcode-block" id="get_period_from_imt"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.generic_amp.html#shakemap.utils.generic_amp.get_period_from_imt">[docs]</a><span class="k">def</span> <span class="nf">get_period_from_imt</span><span class="p">(</span><span class="n">imtstr</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">imtstr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;SA(&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="get_generic_amp_factors"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.generic_amp.html#shakemap.utils.generic_amp.get_generic_amp_factors">[docs]</a><span class="k">def</span> <span class="nf">get_generic_amp_factors</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">myimt</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -135,8 +144,8 @@
 
         <span class="n">amp_factors</span> <span class="o">=</span> <span class="n">mygrid</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">sx</span><span class="o">.</span><span class="n">lats</span><span class="p">,</span> <span class="n">sx</span><span class="o">.</span><span class="n">lons</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="c1"># Sum into output array</span>
-        <span class="n">gaf</span> <span class="o">+=</span> <span class="n">amp_factors</span></div>
-    <span class="k">return</span> <span class="n">gaf</span>
+        <span class="n">gaf</span> <span class="o">+=</span> <span class="n">amp_factors</span>
+    <span class="k">return</span> <span class="n">gaf</span></div>
 
 <span class="k">def</span> <span class="nf">_get_average_grid</span><span class="p">(</span><span class="n">gc</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">myimt</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
@@ -224,14 +233,12 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

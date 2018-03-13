@@ -4,13 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.rupture.utils &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -23,7 +31,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -93,8 +102,8 @@
              <span class="n">p1</span><span class="o">.</span><span class="n">toPoint</span><span class="p">(),</span>
              <span class="n">new_p2</span><span class="o">.</span><span class="n">toPoint</span><span class="p">(),</span>
              <span class="n">p3</span><span class="o">.</span><span class="n">toPoint</span><span class="p">()]</span>
-</div>
-    <span class="k">return</span> <span class="p">(</span><span class="n">on_plane</span><span class="p">,</span> <span class="n">fquad</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">on_plane</span><span class="p">,</span> <span class="n">fquad</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_quad_width"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_quad_width">[docs]</a><span class="k">def</span> <span class="nf">get_quad_width</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
@@ -116,8 +125,8 @@
     <span class="n">AC</span> <span class="o">=</span> <span class="n">p0</span> <span class="o">-</span> <span class="n">p3</span>
     <span class="n">t1</span> <span class="o">=</span> <span class="p">(</span><span class="n">AB</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">AC</span><span class="p">)</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">AB</span><span class="p">))</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
     <span class="n">width</span> <span class="o">=</span> <span class="n">t1</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">AC</span><span class="p">)</span>
-</div>
-    <span class="k">return</span> <span class="n">width</span>
+
+    <span class="k">return</span> <span class="n">width</span></div>
 
 
 <div class="viewcode-block" id="get_quad_mesh"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_quad_mesh">[docs]</a><span class="k">def</span> <span class="nf">get_quad_mesh</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">dx</span><span class="p">):</span>
@@ -207,8 +216,8 @@
             <span class="n">cp</span> <span class="o">=</span> <span class="n">mp0</span> <span class="o">+</span> <span class="p">(</span><span class="n">mp1</span> <span class="o">-</span> <span class="n">mp0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.5</span>
             <span class="n">mesh</span><span class="p">[</span><span class="s1">&#39;cpx&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">x</span>
             <span class="n">mesh</span><span class="p">[</span><span class="s1">&#39;cpy&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">y</span>
-            <span class="n">mesh</span><span class="p">[</span><span class="s1">&#39;cpz&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">z</span></div>
-    <span class="k">return</span> <span class="n">mesh</span>
+            <span class="n">mesh</span><span class="p">[</span><span class="s1">&#39;cpz&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">cp</span><span class="o">.</span><span class="n">z</span>
+    <span class="k">return</span> <span class="n">mesh</span></div>
 
 
 <div class="viewcode-block" id="get_local_unit_slip_vector"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_local_unit_slip_vector">[docs]</a><span class="k">def</span> <span class="nf">get_local_unit_slip_vector</span><span class="p">(</span><span class="n">strike</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">):</span>
@@ -234,8 +243,8 @@
         <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span>
     <span class="n">sy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span> <span class="o">+</span> \
         <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span>
-    <span class="n">sz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span></div>
-    <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sz</span><span class="p">)</span>
+    <span class="n">sz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sz</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_local_unit_slip_vector_DS"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_local_unit_slip_vector_DS">[docs]</a><span class="k">def</span> <span class="nf">get_local_unit_slip_vector_DS</span><span class="p">(</span><span class="n">strike</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">):</span>
@@ -259,8 +268,8 @@
     <span class="n">rake</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span>
     <span class="n">sx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span>
     <span class="n">sy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span>
-    <span class="n">sz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span></div>
-    <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sz</span><span class="p">)</span>
+    <span class="n">sz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">dip</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sz</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_local_unit_slip_vector_SS"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_local_unit_slip_vector_SS">[docs]</a><span class="k">def</span> <span class="nf">get_local_unit_slip_vector_SS</span><span class="p">(</span><span class="n">strike</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">rake</span><span class="p">):</span>
@@ -284,8 +293,8 @@
     <span class="n">rake</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">radians</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span>
     <span class="n">sx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span>
     <span class="n">sy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">rake</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span>
-    <span class="n">sz</span> <span class="o">=</span> <span class="mf">0.0</span></div>
-    <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sz</span><span class="p">)</span>
+    <span class="n">sz</span> <span class="o">=</span> <span class="mf">0.0</span>
+    <span class="k">return</span> <span class="n">Vector</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="n">sy</span><span class="p">,</span> <span class="n">sz</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="reverse_quad"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.reverse_quad">[docs]</a><span class="k">def</span> <span class="nf">reverse_quad</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
@@ -299,8 +308,8 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        list: Reversed quadrilateral.</span>
 
-<span class="sd">    &quot;&quot;&quot;</span></div>
-    <span class="k">return</span> <span class="p">[</span><span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">q</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">q</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span></div>
 
 
 <div class="viewcode-block" id="get_quad_slip"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_quad_slip">[docs]</a><span class="k">def</span> <span class="nf">get_quad_slip</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">rake</span><span class="p">):</span>
@@ -329,8 +338,8 @@
     <span class="n">s0_ll</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s0_local</span><span class="o">.</span><span class="n">x</span><span class="p">]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">s0_local</span><span class="o">.</span><span class="n">y</span><span class="p">]),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">s1_ecef</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromTuple</span><span class="p">(</span><span class="n">latlon2ecef</span><span class="p">(</span><span class="n">s1_ll</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s1_ll</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s1_local</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
     <span class="n">s0_ecef</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromTuple</span><span class="p">(</span><span class="n">latlon2ecef</span><span class="p">(</span><span class="n">s0_ll</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">s0_ll</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">s0_local</span><span class="o">.</span><span class="n">z</span><span class="p">))</span>
-    <span class="n">slp_ecef</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1_ecef</span> <span class="o">-</span> <span class="n">s0_ecef</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span></div>
-    <span class="k">return</span> <span class="n">slp_ecef</span>
+    <span class="n">slp_ecef</span> <span class="o">=</span> <span class="p">(</span><span class="n">s1_ecef</span> <span class="o">-</span> <span class="n">s0_ecef</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">slp_ecef</span></div>
 
 
 <div class="viewcode-block" id="get_quad_length"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_quad_length">[docs]</a><span class="k">def</span> <span class="nf">get_quad_length</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
@@ -347,8 +356,8 @@
     <span class="n">P0</span><span class="p">,</span> <span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">,</span> <span class="n">P3</span> <span class="o">=</span> <span class="n">q</span>
     <span class="n">p0</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P0</span><span class="p">)</span>  <span class="c1"># fromPoint converts to ECEF</span>
     <span class="n">p1</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P1</span><span class="p">)</span>
-    <span class="n">qlength</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p0</span><span class="p">)</span><span class="o">.</span><span class="n">mag</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1000</span></div>
-    <span class="k">return</span> <span class="n">qlength</span>
+    <span class="n">qlength</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p0</span><span class="p">)</span><span class="o">.</span><span class="n">mag</span><span class="p">()</span> <span class="o">/</span> <span class="mi">1000</span>
+    <span class="k">return</span> <span class="n">qlength</span></div>
 
 
 <div class="viewcode-block" id="get_quad_dip"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_quad_dip">[docs]</a><span class="k">def</span> <span class="nf">get_quad_dip</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
@@ -364,8 +373,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">N</span> <span class="o">=</span> <span class="n">get_quad_normal</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
     <span class="n">V</span> <span class="o">=</span> <span class="n">get_vertical_vector</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
-    <span class="n">dip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">Vector</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">V</span><span class="p">)))</span></div>
-    <span class="k">return</span> <span class="n">dip</span>
+    <span class="n">dip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">degrees</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arccos</span><span class="p">(</span><span class="n">Vector</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">N</span><span class="p">,</span> <span class="n">V</span><span class="p">)))</span>
+    <span class="k">return</span> <span class="n">dip</span></div>
 
 
 <div class="viewcode-block" id="get_quad_normal"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_quad_normal">[docs]</a><span class="k">def</span> <span class="nf">get_quad_normal</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
@@ -385,8 +394,8 @@
     <span class="n">p3</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P3</span><span class="p">)</span>
     <span class="n">v1</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">-</span> <span class="n">p0</span>
     <span class="n">v2</span> <span class="o">=</span> <span class="n">p3</span> <span class="o">-</span> <span class="n">p0</span>
-    <span class="n">vn</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">v1</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span></div>
-    <span class="k">return</span> <span class="n">vn</span>
+    <span class="n">vn</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">v2</span><span class="p">,</span> <span class="n">v1</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">vn</span></div>
 
 
 <div class="viewcode-block" id="get_quad_strike_vector"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_quad_strike_vector">[docs]</a><span class="k">def</span> <span class="nf">get_quad_strike_vector</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
@@ -403,8 +412,8 @@
     <span class="n">P0</span><span class="p">,</span> <span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">,</span> <span class="n">P3</span> <span class="o">=</span> <span class="n">q</span>
     <span class="n">p0</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P0</span><span class="p">)</span>  <span class="c1"># fromPoint converts to ECEF</span>
     <span class="n">p1</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P1</span><span class="p">)</span>
-    <span class="n">v1</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p0</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span></div>
-    <span class="k">return</span> <span class="n">v1</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p0</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">v1</span></div>
 
 
 <div class="viewcode-block" id="get_quad_down_dip_vector"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_quad_down_dip_vector">[docs]</a><span class="k">def</span> <span class="nf">get_quad_down_dip_vector</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
@@ -424,8 +433,8 @@
     <span class="n">p1</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P1</span><span class="p">)</span>
     <span class="n">p0p1</span> <span class="o">=</span> <span class="n">p1</span> <span class="o">-</span> <span class="n">p0</span>
     <span class="n">qnv</span> <span class="o">=</span> <span class="n">get_quad_normal</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
-    <span class="n">ddv</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">p0p1</span><span class="p">,</span> <span class="n">qnv</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span></div>
-    <span class="k">return</span> <span class="n">ddv</span>
+    <span class="n">ddv</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">p0p1</span><span class="p">,</span> <span class="n">qnv</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">ddv</span></div>
 
 
 <div class="viewcode-block" id="get_vertical_vector"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.utils.html#shakelib.rupture.utils.get_vertical_vector">[docs]</a><span class="k">def</span> <span class="nf">get_vertical_vector</span><span class="p">(</span><span class="n">q</span><span class="p">):</span>
@@ -445,8 +454,8 @@
     <span class="n">P0_up</span><span class="o">.</span><span class="n">depth</span> <span class="o">=</span> <span class="n">P0_up</span><span class="o">.</span><span class="n">depth</span> <span class="o">-</span> <span class="mf">1.0</span>
     <span class="n">p0</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P0</span><span class="p">)</span>   <span class="c1"># fromPoint converts to ECEF</span>
     <span class="n">p1</span> <span class="o">=</span> <span class="n">Vector</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">P0_up</span><span class="p">)</span>
-    <span class="n">v1</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p0</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span></div>
-    <span class="k">return</span> <span class="n">v1</span>
+    <span class="n">v1</span> <span class="o">=</span> <span class="p">(</span><span class="n">p1</span> <span class="o">-</span> <span class="n">p0</span><span class="p">)</span><span class="o">.</span><span class="n">norm</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">v1</span></div>
 
 
 <span class="k">def</span> <span class="nf">_quad_distance</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">points</span><span class="p">,</span> <span class="n">horizontal</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -562,8 +571,8 @@
         <span class="n">denom</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">b</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">c</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">dist</span> <span class="o">=</span> <span class="n">numer</span> <span class="o">/</span> <span class="n">denom</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">dist</span> <span class="o">=</span> <span class="mi">0</span></div>
-    <span class="k">return</span> <span class="n">dist</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">return</span> <span class="n">dist</span></div>
 
 
 <span class="k">def</span> <span class="nf">_distance_sq_to_segment</span><span class="p">(</span><span class="n">p0</span><span class="p">,</span> <span class="n">p1</span><span class="p">):</span>
@@ -641,8 +650,8 @@
         <span class="k">if</span> <span class="n">rake</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mi">120</span> <span class="ow">and</span> <span class="n">rake</span> <span class="o">&lt;=</span> <span class="o">-</span><span class="mi">60</span><span class="p">:</span>
             <span class="n">mech</span> <span class="o">=</span> <span class="s1">&#39;NM&#39;</span>
         <span class="k">if</span> <span class="n">rake</span> <span class="o">&gt;=</span> <span class="mi">60</span> <span class="ow">and</span> <span class="n">rake</span> <span class="o">&lt;=</span> <span class="mi">120</span><span class="p">:</span>
-            <span class="n">mech</span> <span class="o">=</span> <span class="s1">&#39;RS&#39;</span></div>
-    <span class="k">return</span> <span class="n">mech</span>
+            <span class="n">mech</span> <span class="o">=</span> <span class="s1">&#39;RS&#39;</span>
+    <span class="k">return</span> <span class="n">mech</span></div>
 </pre></div>
 
           </div>
@@ -678,14 +687,12 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
