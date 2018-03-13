@@ -1,13 +1,11 @@
 # stdlib imports
 import os.path
-from collections import OrderedDict
 from datetime import timedelta
-from io import StringIO 
+from io import StringIO
 import json
 
 # third party imports
 from shakelib.utils.containers import ShakeMapInputContainer
-from configobj import ConfigObj
 from libcomcat.search import get_event_by_id, search
 from libcomcat.classes import DetailEvent
 import pandas as pd
@@ -61,7 +59,7 @@ class DYFIModule(CoreModule):
             FileNotFoundError: When the the shake_result HDF file does not
                 exist.
         """
-        install_path, data_path = get_config_paths()
+        _, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current')
         if not os.path.isdir(datadir):
             raise NotADirectoryError('%s is not a valid directory.' % datadir)
@@ -72,13 +70,12 @@ class DYFIModule(CoreModule):
         # try to find the event by our event id
         try:
             detail = get_event_by_id(self._eventid)
-        except:
+        except Exception as e:
             # load the container, get the basic event info
             container = ShakeMapInputContainer.load(datafile)
             origin = container.getRuptureObject()._origin
             lat = origin.lat
             lon = origin.lon
-            depth = origin.depth
             mag = origin.magnitude
             etime = origin.time
             tstart = etime-timedelta(seconds=TIMEWINDOW)
@@ -169,7 +166,7 @@ def _get_dyfi_dataframe(detail_or_url):
         df = df.drop(['No. of responses','Suspect?','City','State'],axis=1)
 
     df['network'] = 'DYFI'
-    df['source'] = source="USGS (Did You Feel It?)"
+    df['source'] = "USGS (Did You Feel It?)"
     return (df,'')
 
 def _parse_geocoded(bytes_data):
@@ -196,13 +193,13 @@ def _parse_geocoded(bytes_data):
                                       'name':'station'})
     return df
 
-def _dataframe_to_xml(df,eventid,dir,reference=None):
+def _dataframe_to_xml(df,eventid,outdir,reference=None):
     """Write a dataframe to ShakeMap XML format.
     
     Args:
         df (DataFrame): Pandas dataframe, as described in read_excel.
         eventid (str): Event ID string.
-        dir (str): Path to directory where XML file should be written.
+        outdir (str): Path to directory where XML file should be written.
     Returns:
         str: Path to output XML file.
     """
@@ -222,7 +219,7 @@ def _dataframe_to_xml(df,eventid,dir,reference=None):
     if reference is not None:
         stationlist.attrib['reference'] = reference
     
-    for idx,row in df.iterrows():
+    for _,row in df.iterrows():
         station = etree.SubElement(stationlist,'station')
 
         tmprow = row.copy()
@@ -268,7 +265,7 @@ def _dataframe_to_xml(df,eventid,dir,reference=None):
                     pgm_el.attrib['value'] = '%.4f' % row[channel][pgm]
 
     
-    outfile = os.path.join(dir,'%s_dat.xml' % eventid)
+    outfile = os.path.join(outdir,'%s_dat.xml' % eventid)
     tree = etree.ElementTree(root)
     tree.write(outfile,pretty_print=True)
 

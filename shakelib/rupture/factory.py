@@ -328,7 +328,7 @@ def is_quadrupture_class(d):
     polygons = geom['coordinates'][0]
     try:
         len(polygons)
-    except:
+    except Exception as e:
         return False
     n_polygons = len(polygons)
     for i in range(n_polygons):
