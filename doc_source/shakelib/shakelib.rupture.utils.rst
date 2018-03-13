@@ -1,5 +1,5 @@
-shakelib.rupture.utils
-=============================
+shakelib\.rupture\.utils
+===============================
 
 .. automodule:: shakelib.rupture.utils
     :members:

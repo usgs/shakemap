@@ -1,5 +1,5 @@
-shakelib.conversions.imt
-================================
+shakelib\.conversions\.imt
+==================================
 
 Submodules
 

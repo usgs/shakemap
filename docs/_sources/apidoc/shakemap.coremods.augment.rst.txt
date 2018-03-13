@@ -1,5 +1,5 @@
-shakemap.coremods.augment
-================================
+shakemap\.coremods\.augment
+==================================
 
 .. automodule:: shakemap.coremods.augment
     :members:

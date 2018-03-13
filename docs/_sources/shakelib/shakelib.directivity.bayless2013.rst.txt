@@ -1,5 +1,5 @@
-shakelib.directivity.bayless2013
-=======================================
+shakelib\.directivity\.bayless2013
+=========================================
 
 .. automodule:: shakelib.directivity.bayless2013
     :members:

@@ -4,13 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.coremods.base &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -23,7 +31,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -64,8 +73,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">log_name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CoreModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.base.html#shakemap.coremods.base.CoreModule.execute">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span></div>
-        <span class="k">pass</span>
+    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="CoreModule.writeContents"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.base.html#shakemap.coremods.base.CoreModule.writeContents">[docs]</a>    <span class="k">def</span> <span class="nf">writeContents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># if the module has not defined a contents dictionary</span>
@@ -150,8 +159,8 @@
             <span class="c1"># TODO: should we ensure that keys are globally unique?</span>
             <span class="n">old_contents</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
             <span class="n">_write_contents</span><span class="p">(</span><span class="n">old_contents</span><span class="p">,</span><span class="n">contents_file</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span></div></div>
-            <span class="n">_write_contents</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span><span class="n">contents_file</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_write_contents</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span><span class="n">contents_file</span><span class="p">)</span></div></div>
 
 <span class="k">def</span> <span class="nf">_read_contents</span><span class="p">(</span><span class="n">contents_file</span><span class="p">):</span>
     <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">contents_file</span><span class="p">)</span>
@@ -279,14 +288,12 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

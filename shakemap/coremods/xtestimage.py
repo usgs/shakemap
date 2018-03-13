@@ -79,7 +79,7 @@ class XTestImage(CoreModule):
                        extent=(metadata['xmin'], metadata['xmax'],
                                metadata['ymin'], metadata['ymax']))
             cbax = fig.add_axes([0.915, .34, .02, .5])
-            cb1 = plt.colorbar(im1, ax=ax0, cax=cbax)
+            plt.colorbar(im1, ax=ax0, cax=cbax)
             ycut = fig.add_subplot(gs[:-1, 0], sharey=ax0)
             xcut = fig.add_subplot(gs[-1, 1:], sharex=ax0)
             rows, cols = grddata.shape
@@ -113,7 +113,7 @@ class XTestImage(CoreModule):
                        extent=(metadata['xmin'], metadata['xmax'],
                                metadata['ymin'], metadata['ymax']))
             cbax = fig.add_axes([0.915, .34, .02, .5])
-            cb1 = plt.colorbar(im1, ax=ax0, cax=cbax)
+            plt.colorbar(im1, ax=ax0, cax=cbax)
             ycut = fig.add_subplot(gs[:-1, 0], sharey=ax0)
             xcut = fig.add_subplot(gs[-1, 1:], sharex=ax0)
             rows, cols = grddata.shape

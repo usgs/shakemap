@@ -1,5 +1,5 @@
-shakemap.utils.layers
-============================
+shakemap\.utils\.layers
+==============================
 
 .. automodule:: shakemap.utils.layers
     :members:

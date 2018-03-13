@@ -1,5 +1,5 @@
-shakemap.coremods
-=========================
+shakemap\.coremods
+==========================
 
 Submodules
 

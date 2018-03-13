@@ -1,5 +1,5 @@
-shakelib.utils
-======================
+shakelib\.utils
+=======================
 
 Submodules
 

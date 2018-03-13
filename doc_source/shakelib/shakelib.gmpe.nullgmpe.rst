@@ -1,5 +1,5 @@
-shakelib.gmpe.nullgmpe
-=============================
+shakelib\.gmpe\.nullgmpe
+===============================
 
 .. automodule:: shakelib.gmpe.nullgmpe
     :members:

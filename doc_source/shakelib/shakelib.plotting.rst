@@ -1,5 +1,5 @@
-shakelib.plotting
-=========================
+shakelib\.plotting
+==========================
 
 Submodules
 

@@ -320,65 +320,14 @@ from that station are unaffected (unless they, too, are
 flagged).
 
 
-Event Bias
-==========
-
-:ref:`Worden et al. (2018) <worden2018>` discusses the calculation
-of the event "bias". The bias at site *m* for IMT *i* is given by:
-
-.. math::
-
-    \mu_{\delta B_{i,m}} = 
-    \frac{\bm{Z}^T_i \mathbf{\Sigma^{-1}_{Y_2Y_2}} 
-    \bm{\zeta}_i }
-    {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}_{Y_2 Y_2}}    
-    \bm{Z}_i},
-
-where
-:math:`\bm{\zeta}_i`
-are the total residuals of IMT i,
-:math:`\mathbf{\Sigma_{Y_2Y_2}}`
-is the covariance matrix of the within-event standard deviations of the 
-residuals,
-:math:`\tau_{i, m}`
-is the between-event standard deviation of IMT *i* at site *m*, and
-:math:`\bm{Z}_i`
-is the correlation between IMT *i* and the IMTs comprising the rows
-of :math:`\mathbf{\Sigma_{Y_2Y_2}}` multiplied by the "omega factors"
-of the residuals [for a discussion, see 
-:ref:`Worden et al. (2018) <worden2018>`].
-
-The variance of the bias terms is given by:
-
-.. math::
-   :label: bias-sigma
-
-    \sigma^2_{\delta B_{i,m}} = 
-    \frac{1}
-    {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}_{Y_2 Y_2}}    
-    \bm{Z}_i}.
-
-In the ShakeMap implementation, the residuals used to compute the bias 
-are limited to a subset within a distance of ``max_range`` km from the 
-source (``max_range`` is found in the ``bias`` sub-section of the 
-``modeling`` section of *model.conf*). As with the outlier flagging, the 
-operator may
-also set a ``max_mag`` for the bias (also found in the ``bias``
-sub-section of *model.conf*). If an earthquake exceeds ``max_mag``,
-and no rupture model is available, the bias computations will be
-skipped.
-
-The calculation and application of the bias may be turned off by 
-setting the parameter ``do_bias`` (found in the ``bias`` sub-section
-of the ``modeling`` section of *model.conf*) to ``False``.
-
-
 Interpolation
 =============
 
 :ref:`Worden et al. (2018) <worden2018>` discusses the application of
 the MVN to the interpolation of ground motions. Here, we
 discuss some specific details of its implementation within ShakeMap.
+
+.. _subsubsec-mvn-computation:
 
 Computation
 -----------
@@ -427,7 +376,21 @@ and covariance:
         \right].
 
 where :math:`M \times M`, :math:`M \times N`, :math:`N \times M`, and 
-:math:`N \times N` give the dimensions of the partitioned arrays.
+:math:`N \times N` give the dimensions of the partitioned arrays. The
+mean values may be taken from a GMPE or other ground motion model. The
+elements of the covariance matrix are given by:
+
+.. math::
+
+    \Sigma_{{Y_i},{Y_j}} = \rho_{{Y_i},{Y_j}}\phi_{Y_i}\phi_{Y_j},
+
+where
+:math:`\Sigma_{{Y_i},{Y_j}}` is the element of the covariance matrix at
+position *(i, j)*,
+:math:`\rho_{{Y_i},{Y_j}}` is the correlation between the elements
+:math:`Y_i` and :math:`Y_j` of the vector :math:`\bm{Y}`, and
+:math:`\phi_{Y_i}` and :math:`\phi_{Y_j}` are the within-event standard
+deviations of the elements :math:`Y_i` and :math:`Y_j`.
 
 Given a set of observations :math:`\mathbf{Y_2} = \mathbf{y_2}`, we define 
 a vector of residuals
@@ -606,6 +569,66 @@ specifics of the correlation function.
    and amplitudes of the conditioning observations.
 
 
+Event Bias
+----------
+
+Prior to computing the MVN as described in the section
+:ref:`subsubsec-mvn-computation`
+above, ShakeMap computes the event term (the "bias").
+:ref:`Worden et al. (2018) <worden2018>` discusses the calculation
+of the event term in more detail. 
+
+The bias at site *m* for IMT *i* is given by:
+
+.. math::
+
+    \mu_{\delta B_{i,m}} = 
+    \frac{\bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2Y_2},i} 
+    \bm{\zeta}_i }
+    {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2 Y_2},i}
+    \bm{Z}_i},
+
+where
+:math:`\bm{\zeta}_i`
+are the total residuals of IMT i (or its closest surrogates, as discussed
+in the section :ref:`subsubsec-imt-selection`, above),
+:math:`\mathbf{\Sigma}_{\mathbf{Y_2Y_2},i}`
+is the covariance matrix of the within-event standard deviations of
+that particualr set of residuals,
+:math:`\tau_{i, m}`
+is the between-event standard deviation of IMT *i* at site *m*, and
+:math:`\bm{Z}_i`
+is the correlation between IMT *i* and the IMTs comprising the rows
+of :math:`\bm{\zeta}_i` multiplied by the "omega factors",
+:math:`\bm{\omega}`,
+of the residuals [for a discussion, see 
+:ref:`Worden et al. (2018) <worden2018>`].
+
+The variance of the bias terms is given by:
+
+.. math::
+   :label: bias-sigma
+
+    \sigma^2_{\delta B_{i,m}} = 
+    \frac{1}
+    {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2 Y_2},i}
+    \bm{Z}_i}.
+
+In the ShakeMap implementation, the residuals used to compute the bias 
+are limited to a subset within a distance of ``max_range`` km from the 
+source (``max_range`` is found in the ``bias`` sub-section of the 
+``modeling`` section of *model.conf*). As with the outlier flagging, the 
+operator may
+also set a ``max_mag`` for the bias (also found in the ``bias``
+sub-section of *model.conf*). If an earthquake exceeds ``max_mag``,
+and no rupture model is available, the bias computations will be
+skipped.
+
+The calculation and application of the bias may be turned off by 
+setting the parameter ``do_bias`` (found in the ``bias`` sub-section
+of the ``modeling`` section of *model.conf*) to ``False``.
+
+
 Updating the Within-Event Standard Deviation
 --------------------------------------------
 
@@ -626,18 +649,16 @@ at site *m*, and
 :math:`\sigma_{\delta B_{i,m}}` is the standard deviation of the bias
 as calculated by Equation :eq:`bias-sigma`.
 
-With the adjusted within-event residual, the elements of the covariance 
-matrix of the residuals become:
+With the adjusted within-event residuals, the elements of the covariance 
+matrix are given by:
 
 .. math::
 
-    \Sigma_{i,j} = \rho_{i,j}\hat{\phi}_i\hat{\phi}_j
+    \Sigma_{{Y_i},{Y_j}} = \rho_{{Y_i},{Y_j}}\hat{\phi}_{Y_i}\hat{\phi}_{Y_j},
 
-where
-:math:`\rho_{i,j}` is the correlation between residuals *i* (at site *m*)
-and *j* (at site *n*), and
-:math:`\hat{\phi}_i` and :math:`\hat{\phi}_j` are the adjusted within-event
-standard deviations of residuals *i* and *j* at their sites *m* and *n*.
+where the variables are defined as they were in the section
+:ref:`subsubsec-mvn-computation`, but with 
+:math:`\hat{\phi}` replacing :math:`\phi`.
 
 .. _subsubsec-weighting-residuals:
 
@@ -676,7 +697,26 @@ operator in the input file. If it is not specified, ShakeMap assigns a
 default standard deviation to intensity measurements of 0.3 intensity
 units. Other observations may have non-zero uncertainty for reasons of
 instrument or site characteristics. This uncertainty may be specified
-in the input file using the *ln_stddev* attribute of the amplitude tag..
+in the input file using the *ln_stddev* attribute of the amplitude tag.
+
+
+Summary
+-------
+
+The interpolation process begins with the calculation of the bias, where
+the covariance matrix, :math:`\bm{\Sigma_{Y_2,Y_2}}`, and the 
+"omega factorrs", :math:`\bm{\omega}`, are assembled from
+the unadjusted within-event standard deviations, and the
+residuals, :math:`\bm{\zeta}`, are the total residuals computed from 
+the unbiased estimates.
+
+Once the bias values and the adjusted within-event standard deviations
+are known, the covariance matrix and the "omega factors" can be 
+re-computed (using the adjusted within-event standard deviations),
+and the residuals are recomputed from the bias-adjusted estimates.
+These updated factors (including the bias-adjusted estimates) are
+then used in the MVN procedure as described in section
+:ref:`subsubsec-mvn-computation`.
 
 
 .. _sec-point-source:

@@ -4,13 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>2.2. Data Processing &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -25,7 +33,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -54,9 +63,9 @@ In addition to these individual GMPEs, ShakeMap allows for a weighted
 combination of two or more GMPEs. GMPEs are configured in ShakeMap
 as GMPE “sets” (see <em>gmpe_sets.conf</em> and <em>modules.conf</em> for
 information on the specification of GMPE sets; the GMPE set to use
-is specified with the <code class="docutils literal notranslate"><span class="pre">gmpe</span></code> parameter of the <code class="docutils literal notranslate"><span class="pre">model</span></code> section of
+is specified with the <code class="docutils literal"><span class="pre">gmpe</span></code> parameter of the <code class="docutils literal"><span class="pre">model</span></code> section of
 <em>model.conf</em>) and are executed through its
-<a class="reference internal" href="../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE" title="shakelib.multigmpe.MultiGMPE"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultiGMPE</span></code></a> class.
+<a class="reference internal" href="../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE" title="shakelib.multigmpe.MultiGMPE"><code class="xref py py-class docutils literal"><span class="pre">MultiGMPE</span></code></a> class.
 The MultiGMPE class allows for smooth transitions between tectonic
 environments, as well as consistency with the methodology of other
 projects, such as the <a class="reference external" href="https://earthquake.usgs.gov/hazards/hazmaps/">USGS National Seismic Hazard Mapping Project</a>.</p>
@@ -110,8 +119,8 @@ if all of the GMPEs in the primary set do not support Vs30-based site
 amplification. The GMPEs in this set will be used to compute the site
 terms, which will then be applied to the results of the primary set.</p>
 <p>In general, site amplifications are computed using a Vs30 grid supplied
-by the operator (see the Vs30 parameters <code class="docutils literal notranslate"><span class="pre">vs30file</span></code> and <code class="docutils literal notranslate"><span class="pre">vs30default</span></code>
-in the <code class="docutils literal notranslate"><span class="pre">data</span></code> section of <em>model.conf</em> for configuration information.)</p>
+by the operator (see the Vs30 parameters <code class="docutils literal"><span class="pre">vs30file</span></code> and <code class="docutils literal"><span class="pre">vs30default</span></code>
+in the <code class="docutils literal"><span class="pre">data</span></code> section of <em>model.conf</em> for configuration information.)</p>
 <p>Shakemap does not currently support operator-supplied basin
 depths. Some modern GMPEs use basin depths (typically “Z1.0” or “Z2.5”)
 as an additional site amplification term. These GMPEs typically also
@@ -126,7 +135,7 @@ factors are additive (in natural log space) factors that are intended
 to accommodate basin or topographic amplifications. The user-supplied
 grids should taper to zero at the edges, and are assumed to be zero
 everywhere outside of the supplied grid(s). See the module
-<a class="reference internal" href="../apidoc/shakemap.utils.generic_amp.html#module-shakemap.utils.generic_amp" title="shakemap.utils.generic_amp"><code class="xref py py-mod docutils literal notranslate"><span class="pre">shakemap.utils.generic_amp</span></code></a> for more on the generic amplification
+<a class="reference internal" href="../apidoc/shakemap.utils.generic_amp.html#module-shakemap.utils.generic_amp" title="shakemap.utils.generic_amp"><code class="xref py py-mod docutils literal"><span class="pre">shakemap.utils.generic_amp</span></code></a> for more on the generic amplification
 factors.</p>
 </div>
 <div class="section" id="ground-motion-to-intensity-conversions">
@@ -154,7 +163,7 @@ preference) for the MMI map. Similarly, we convert MMI to other IMTs,
 and use the best available of those for the IMT map in question (as
 discussed in <a class="reference internal" href="#subsubsec-imt-selection"><span class="std std-ref">IMT Selection</span></a>).</p>
 <p>The available GMICE are specified in the modules.conf configuration file,
-and configured with the <code class="docutils literal notranslate"><span class="pre">gmice</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">modeling</span></code> section
+and configured with the <code class="docutils literal"><span class="pre">gmice</span></code> parameter in the <code class="docutils literal"><span class="pre">modeling</span></code> section
 of <em>model.conf</em>.</p>
 </div>
 <div class="section" id="intensity-prediction-equations">
@@ -162,7 +171,7 @@ of <em>model.conf</em>.</p>
 <p>A small number of intensity prediction equations (IPEs) are currently
 available. The available IPEs are for active tectonic and stable
 tectonic regions. If a suitable IPE is not available, the operator may
-specify the <a class="reference internal" href="../shakelib/shakelib.virtualipe.html#shakelib.virtualipe.VirtualIPE" title="shakelib.virtualipe.VirtualIPE"><code class="xref py py-class docutils literal notranslate"><span class="pre">VirtualIPE</span></code></a> as the
+specify the <a class="reference internal" href="../shakelib/shakelib.virtualipe.html#shakelib.virtualipe.VirtualIPE" title="shakelib.virtualipe.VirtualIPE"><code class="xref py py-class docutils literal"><span class="pre">VirtualIPE</span></code></a> as the
 IPE of choice. The VirtualIPE uses the configured GMPE and GMICE to form
 a composite IPE. That is, ground motions (typically PGV) are predicted
 via the GMPE and then converted to intensity via the GMICE.</p>
@@ -265,17 +274,17 @@ errant amplitude will make it through. ShakeMap’s primary
 means of dealing with these amplitudes is through the flagging
 of outliers.</p>
 <p>Outlier flagging works through an operator-configurable
-parameter <code class="docutils literal notranslate"><span class="pre">max_deviation</span></code> in the <code class="docutils literal notranslate"><span class="pre">outlier</span></code> sub-section of
-the <code class="docutils literal notranslate"><span class="pre">data</span></code> section of <em>model.conf</em>). Essentially,
+parameter <code class="docutils literal"><span class="pre">max_deviation</span></code> in the <code class="docutils literal"><span class="pre">outlier</span></code> sub-section of
+the <code class="docutils literal"><span class="pre">data</span></code> section of <em>model.conf</em>). Essentially,
 for each ground
 motion in the input, a prediction is calculated with the
 configured GMPE. If the observed amplitude is greater than
-<code class="docutils literal notranslate"><span class="pre">max_deviation</span></code> standard deviations above or below the
+<code class="docutils literal"><span class="pre">max_deviation</span></code> standard deviations above or below the
 prediction, then that observation is flagged as an
 outlier and is not used in further processing.</p>
 <p>Outlier flagging is suspended in cases where the magnitude
 of the earthquake exceeds the operator-configurable value
-of <code class="docutils literal notranslate"><span class="pre">max_mag</span></code> (also in the <code class="docutils literal notranslate"><span class="pre">outlier</span></code> sub-section of the <code class="docutils literal notranslate"><span class="pre">data</span></code>
+of <code class="docutils literal"><span class="pre">max_mag</span></code> (also in the <code class="docutils literal"><span class="pre">outlier</span></code> sub-section of the <code class="docutils literal"><span class="pre">data</span></code>
 section of <em>model.conf</em>), and no finite rupture model
 is available. The thinking here is that for larger earthquakes,
 the large size of the rupture makes it difficult to know
@@ -284,62 +293,20 @@ reliable. While ShakeMap attempts to compensate for the
 absence of a rupture model (see <a class="reference internal" href="#sec-point-source"><span class="std std-ref">Finite-rupture Approximations</span></a>,
 it is still desirable to turn
 off the outlier flagging at larger magnitudes. If a
-rupture model is available, the <code class="docutils literal notranslate"><span class="pre">max_mag</span></code> parameter has no
+rupture model is available, the <code class="docutils literal"><span class="pre">max_mag</span></code> parameter has no
 effect.</p>
 <p>Outlier flagging is performed on a per-IMT basis. Thus, for
 example, if a station’s PGA value is flagged, the other IMTs
 from that station are unaffected (unless they, too, are
 flagged).</p>
 </div>
-<div class="section" id="event-bias">
-<h2>2.2.6. Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a> discusses the calculation
-of the event “bias”. The bias at site <em>m</em> for IMT <em>i</em> is given by:</p>
-<div class="math">
-<p><img src="../_images/math/ba9f137481f9a0df60f63a3ee9269e8d33d74c34.png" alt="\mu_{\delta B_{i,m}} =
-\frac{\bm{Z}^T_i \mathbf{\Sigma^{-1}_{Y_2Y_2}}
-\bm{\zeta}_i }
-{\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}_{Y_2 Y_2}}
-\bm{Z}_i},"/></p>
-</div><p>where
-<img class="math" src="../_images/math/384876608d7d4c227281107fc3c8170501ce70ce.png" alt="\bm{\zeta}_i"/>
-are the total residuals of IMT i,
-<img class="math" src="../_images/math/756fd7b9050e3f51f46532fcafbf2429a782c08c.png" alt="\mathbf{\Sigma_{Y_2Y_2}}"/>
-is the covariance matrix of the within-event standard deviations of the
-residuals,
-<img class="math" src="../_images/math/c185ded128083b4536eac38428563b026e6046fb.png" alt="\tau_{i, m}"/>
-is the between-event standard deviation of IMT <em>i</em> at site <em>m</em>, and
-<img class="math" src="../_images/math/18005be2ced655e3df3ee837e716d68d1d7c7343.png" alt="\bm{Z}_i"/>
-is the correlation between IMT <em>i</em> and the IMTs comprising the rows
-of <img class="math" src="../_images/math/756fd7b9050e3f51f46532fcafbf2429a782c08c.png" alt="\mathbf{\Sigma_{Y_2Y_2}}"/> multiplied by the “omega factors”
-of the residuals [for a discussion, see
-<a class="reference internal" href="references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a>].</p>
-<p>The variance of the bias terms is given by:</p>
-<div class="math" id="equation-bias-sigma">
-<p><span class="eqno">(1)<a class="headerlink" href="#equation-bias-sigma" title="Permalink to this equation">¶</a></span><img src="../_images/math/5b3ff48079d675348b71b8d65d3095950383ec0e.png" alt="\sigma^2_{\delta B_{i,m}} =
- \frac{1}
- {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}_{Y_2 Y_2}}
- \bm{Z}_i}."/></p>
-</div><p>In the ShakeMap implementation, the residuals used to compute the bias
-are limited to a subset within a distance of <code class="docutils literal notranslate"><span class="pre">max_range</span></code> km from the
-source (<code class="docutils literal notranslate"><span class="pre">max_range</span></code> is found in the <code class="docutils literal notranslate"><span class="pre">bias</span></code> sub-section of the
-<code class="docutils literal notranslate"><span class="pre">modeling</span></code> section of <em>model.conf</em>). As with the outlier flagging, the
-operator may
-also set a <code class="docutils literal notranslate"><span class="pre">max_mag</span></code> for the bias (also found in the <code class="docutils literal notranslate"><span class="pre">bias</span></code>
-sub-section of <em>model.conf</em>). If an earthquake exceeds <code class="docutils literal notranslate"><span class="pre">max_mag</span></code>,
-and no rupture model is available, the bias computations will be
-skipped.</p>
-<p>The calculation and application of the bias may be turned off by
-setting the parameter <code class="docutils literal notranslate"><span class="pre">do_bias</span></code> (found in the <code class="docutils literal notranslate"><span class="pre">bias</span></code> sub-section
-of the <code class="docutils literal notranslate"><span class="pre">modeling</span></code> section of <em>model.conf</em>) to <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p>
-</div>
 <div class="section" id="interpolation">
-<h2>2.2.7. Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this headline">¶</a></h2>
+<h2>2.2.6. Interpolation<a class="headerlink" href="#interpolation" title="Permalink to this headline">¶</a></h2>
 <p><a class="reference internal" href="references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a> discusses the application of
 the MVN to the interpolation of ground motions. Here, we
 discuss some specific details of its implementation within ShakeMap.</p>
 <div class="section" id="computation">
-<h3>2.2.7.1. Computation<a class="headerlink" href="#computation" title="Permalink to this headline">¶</a></h3>
+<span id="subsubsec-mvn-computation"></span><h3>2.2.6.1. Computation<a class="headerlink" href="#computation" title="Permalink to this headline">¶</a></h3>
 <p>The conditional MVN can be summarized as a situation in which we have a
 variable of interest <img class="math" src="../_images/math/eb033c9481b1f0b7e66d45bbff46b87c96420dc3.png" alt="\bm{Y}"/> where we wish to compute predictions
 at a set of <em>M</em> ordinates (<img class="math" src="../_images/math/4cc152eabd200b686a2e35e505de0469cbfaba87.png" alt="\bm{Y}_1"/>) conditioned upon a set of
@@ -375,7 +342,18 @@ two components:</p>
         \end{array}
     \right]."/></p>
 </div><p>where <img class="math" src="../_images/math/924fc2b26f8e8d95e1537c87e882ac593ebcd7c2.png" alt="M \times M"/>, <img class="math" src="../_images/math/5fd54973ffc191d68282c6ed8725983c0a0a12cc.png" alt="M \times N"/>, <img class="math" src="../_images/math/2da42e970fd4524a49ff8e514e365ac65498f3e0.png" alt="N \times M"/>, and
-<img class="math" src="../_images/math/3825b0d17c2415b10cd65e6aae860bfa8067f712.png" alt="N \times N"/> give the dimensions of the partitioned arrays.</p>
+<img class="math" src="../_images/math/3825b0d17c2415b10cd65e6aae860bfa8067f712.png" alt="N \times N"/> give the dimensions of the partitioned arrays. The
+mean values may be taken from a GMPE or other ground motion model. The
+elements of the covariance matrix are given by:</p>
+<div class="math">
+<p><img src="../_images/math/6ca5a2ebb8fd8df0dc5dcb31d2c2daf038e48cec.png" alt="\Sigma_{{Y_i},{Y_j}} = \rho_{{Y_i},{Y_j}}\phi_{Y_i}\phi_{Y_j},"/></p>
+</div><p>where
+<img class="math" src="../_images/math/c3e57c467046bfe1df450b351ffa5863cbed1e06.png" alt="\Sigma_{{Y_i},{Y_j}}"/> is the element of the covariance matrix at
+position <em>(i, j)</em>,
+<img class="math" src="../_images/math/07258c7ae5050c2280248fe97363e3a3f3f3f56c.png" alt="\rho_{{Y_i},{Y_j}}"/> is the correlation between the elements
+<img class="math" src="../_images/math/c370bafe6175b964dcdae989c714c8e55a88cbce.png" alt="Y_i"/> and <img class="math" src="../_images/math/bb6e327d6694e8c3d46c0051b93a6ef0debf780e.png" alt="Y_j"/> of the vector <img class="math" src="../_images/math/eb033c9481b1f0b7e66d45bbff46b87c96420dc3.png" alt="\bm{Y}"/>, and
+<img class="math" src="../_images/math/8651a17f7c9c3626f8209a0a7ea719226e11dda4.png" alt="\phi_{Y_i}"/> and <img class="math" src="../_images/math/398db89eecf1119740f6419cc6ee6eb32a904a9d.png" alt="\phi_{Y_j}"/> are the within-event standard
+deviations of the elements <img class="math" src="../_images/math/c370bafe6175b964dcdae989c714c8e55a88cbce.png" alt="Y_i"/> and <img class="math" src="../_images/math/bb6e327d6694e8c3d46c0051b93a6ef0debf780e.png" alt="Y_j"/>.</p>
 <p>Given a set of observations <img class="math" src="../_images/math/345ea8dc937749e65d049602eddf10cd621cfb66.png" alt="\mathbf{Y_2} = \mathbf{y_2}"/>, we define
 a vector of residuals</p>
 <div class="math">
@@ -384,13 +362,13 @@ a vector of residuals</p>
 </div><p>The distribution of <img class="math" src="../_images/math/3db82ce046a89a8dc3e6af8b14b97adc68eb70ba.png" alt="\mathbf{Y_1}"/>, given that
 <img class="math" src="../_images/math/345ea8dc937749e65d049602eddf10cd621cfb66.png" alt="\mathbf{Y_2} = \mathbf{y_2}"/>, is multivariate normal with mean</p>
 <div class="math" id="equation-cond-mean">
-<p><span class="eqno">(2)<a class="headerlink" href="#equation-cond-mean" title="Permalink to this equation">¶</a></span><img src="../_images/math/32c621de7c308ab28fc1e12fc7ef932deada6780.png" alt="\bm{\mu}_{\mathbf{Y_1}|\mathbf{y_2}} =
+<p><span class="eqno">(1)<a class="headerlink" href="#equation-cond-mean" title="Permalink to this equation">¶</a></span><img src="../_images/math/32c621de7c308ab28fc1e12fc7ef932deada6780.png" alt="\bm{\mu}_{\mathbf{Y_1}|\mathbf{y_2}} =
      \bm{\mu}_{\mathbf{Y_1}} +
          \mathbf{\Sigma_{Y_1Y_2}}
          \mathbf{\Sigma^{-1}_{Y_2Y_2}}\bm{\zeta}\text{,}"/></p>
 </div><p>and covariance</p>
 <div class="math" id="equation-cond-covariance">
-<p><span class="eqno">(3)<a class="headerlink" href="#equation-cond-covariance" title="Permalink to this equation">¶</a></span><img src="../_images/math/849845e0ebf9214f3eb430967bbfb9890adcc722.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}} =
+<p><span class="eqno">(2)<a class="headerlink" href="#equation-cond-covariance" title="Permalink to this equation">¶</a></span><img src="../_images/math/849845e0ebf9214f3eb430967bbfb9890adcc722.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}} =
      \mathbf{\Sigma_{Y_1Y_1}} -
          \mathbf{\Sigma_{Y_1Y_2}}
          \mathbf{\Sigma^{-1}_{Y_2Y_2}}
@@ -402,18 +380,18 @@ locations and wish to compute this output grid for P different IMTs.
 Thus, <img class="math" src="../_images/math/35cff3b1ffe774131c1cd9bcece38a8e53cd7994.png" alt="M = P \times Q"/>. Similarly, the N constituents of
 <img class="math" src="../_images/math/b2c2125ffa93f4dae5990d91c11e7556ce20f792.png" alt="\bm{Y_2}"/> consist of a number of IMTs at each of a number of
 observation locations. Thus, as long as the elements of the covariance
-matrix <img class="math" src="../_images/math/088c1d38318b58e979cea6107c6afbe3a9510f21.png" alt="\bm{\Sigma_Y}"/> can be computed, Equations <a class="reference internal" href="#equation-cond-mean">(2)</a>
-and <a class="reference internal" href="#equation-cond-covariance">(3)</a> could be computed just once to provide the
+matrix <img class="math" src="../_images/math/088c1d38318b58e979cea6107c6afbe3a9510f21.png" alt="\bm{\Sigma_Y}"/> can be computed, Equations <a class="reference internal" href="#equation-cond-mean">(1)</a>
+and <a class="reference internal" href="#equation-cond-covariance">(2)</a> could be computed just once to provide the
 complete grids for all of the output IMTs. In most cases, however,
 this approach is impractical and inefficient.</p>
-<p>We note that in Equation <a class="reference internal" href="#equation-cond-mean">(2)</a> there is no interdependence
+<p>We note that in Equation <a class="reference internal" href="#equation-cond-mean">(1)</a> there is no interdependence
 on the computed elements of <img class="math" src="../_images/math/13431498cf0f2aba82966a2845ef7512f1f3ade0.png" alt="\bm{\mu}_{\mathbf{Y_1}|\mathbf{y_2}}"/>.
 That is, the vector of output ordinates <img class="math" src="../_images/math/b60dfe8dd2ef967626e5f67969f703fb2c1819d1.png" alt="\bm{Y_1}"/> may be
 divided in any
 convenient way, the elements of
 <img class="math" src="../_images/math/96cc1cc2648b06f7a33724678dbce497e40e092e.png" alt="\bm{\mu_Y}"/> and <img class="math" src="../_images/math/088c1d38318b58e979cea6107c6afbe3a9510f21.png" alt="\bm{\Sigma_Y}"/> adjusted accordingly,
 and the computations can proceed independently. The
-same cannot be said for Equation <a class="reference internal" href="#equation-cond-covariance">(3)</a>, where the full
+same cannot be said for Equation <a class="reference internal" href="#equation-cond-covariance">(2)</a>, where the full
 matrices must be used in order to compute the full covariance matrix
 <img class="math" src="../_images/math/2a33f2578c60cb77fd39d3532a94f2ba991b5f5a.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}}"/>.</p>
 <p>For even a small Shake map of 200 by 300 grid points, the
@@ -426,7 +404,7 @@ most situations. For ShakeMap uses, however, we are only interested
 in the diagonal
 elements of <img class="math" src="../_images/math/2a33f2578c60cb77fd39d3532a94f2ba991b5f5a.png" alt="\bm{\Sigma}_{\mathbf{Y_1Y_1}|\mathbf{y_2}}"/>,
 that is, the variances of the conditional means. In this case, we
-can modify Equation <a class="reference internal" href="#equation-cond-covariance">(3)</a> by making the following
+can modify Equation <a class="reference internal" href="#equation-cond-covariance">(2)</a> by making the following
 definitions:</p>
 <div class="math">
 <p><img src="../_images/math/6684e1f24a994010fc26a8f0e69490e3138ef080.png" alt="\bm{\sigma_{Y_1}}^2 = \text{diag}\left(\mathbf{\Sigma_{Y_1Y_1}}\right),"/></p>
@@ -447,7 +425,7 @@ purposes, it is both convenient and computationally efficient to process
 each row of the output grid for each IMT separately.</p>
 </div>
 <div class="section" id="imt-selection">
-<span id="subsubsec-imt-selection"></span><h3>2.2.7.2. IMT Selection<a class="headerlink" href="#imt-selection" title="Permalink to this headline">¶</a></h3>
+<span id="subsubsec-imt-selection"></span><h3>2.2.6.2. IMT Selection<a class="headerlink" href="#imt-selection" title="Permalink to this headline">¶</a></h3>
 <p>In a typical ShakeMap operational environment, it is common for each
 seismic station to produce a number of IMT observations, some of
 which may be flagged as outliers. In addition, in ShakeMap V4, the
@@ -511,8 +489,56 @@ spectrum conditioned on 7 periods. The circles represent the periods
 and amplitudes of the conditioning observations.</span></p>
 </div>
 </div>
+<div class="section" id="event-bias">
+<h3>2.2.6.3. Event Bias<a class="headerlink" href="#event-bias" title="Permalink to this headline">¶</a></h3>
+<p>Prior to computing the MVN as described in the section
+<a class="reference internal" href="#subsubsec-mvn-computation"><span class="std std-ref">Computation</span></a>
+above, ShakeMap computes the event term (the “bias”).
+<a class="reference internal" href="references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a> discusses the calculation
+of the event term in more detail.</p>
+<p>The bias at site <em>m</em> for IMT <em>i</em> is given by:</p>
+<div class="math">
+<p><img src="../_images/math/fbcb384be21582b3dfa632060de02e4a8f61f908.png" alt="\mu_{\delta B_{i,m}} =
+\frac{\bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2Y_2},i}
+\bm{\zeta}_i }
+{\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2 Y_2},i}
+\bm{Z}_i},"/></p>
+</div><p>where
+<img class="math" src="../_images/math/384876608d7d4c227281107fc3c8170501ce70ce.png" alt="\bm{\zeta}_i"/>
+are the total residuals of IMT i (or its closest surrogates, as discussed
+in the section <a class="reference internal" href="#subsubsec-imt-selection"><span class="std std-ref">IMT Selection</span></a>, above),
+<img class="math" src="../_images/math/5fab57a71e3c59ca826e8dbc1ed0de5ff85adb4b.png" alt="\mathbf{\Sigma}_{\mathbf{Y_2Y_2},i}"/>
+is the covariance matrix of the within-event standard deviations of
+that particualr set of residuals,
+<img class="math" src="../_images/math/c185ded128083b4536eac38428563b026e6046fb.png" alt="\tau_{i, m}"/>
+is the between-event standard deviation of IMT <em>i</em> at site <em>m</em>, and
+<img class="math" src="../_images/math/18005be2ced655e3df3ee837e716d68d1d7c7343.png" alt="\bm{Z}_i"/>
+is the correlation between IMT <em>i</em> and the IMTs comprising the rows
+of <img class="math" src="../_images/math/384876608d7d4c227281107fc3c8170501ce70ce.png" alt="\bm{\zeta}_i"/> multiplied by the “omega factors”,
+<img class="math" src="../_images/math/fc19b5c295f941f5d926621d613609a2faed0ff8.png" alt="\bm{\omega}"/>,
+of the residuals [for a discussion, see
+<a class="reference internal" href="references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a>].</p>
+<p>The variance of the bias terms is given by:</p>
+<div class="math" id="equation-bias-sigma">
+<p><span class="eqno">(3)<a class="headerlink" href="#equation-bias-sigma" title="Permalink to this equation">¶</a></span><img src="../_images/math/76781397f82dae47d66887b843beb4386e53956b.png" alt="\sigma^2_{\delta B_{i,m}} =
+ \frac{1}
+ {\tau_{i, m}^{-2} + \bm{Z}^T_i \mathbf{\Sigma^{-1}}_{\mathbf{Y_2 Y_2},i}
+ \bm{Z}_i}."/></p>
+</div><p>In the ShakeMap implementation, the residuals used to compute the bias
+are limited to a subset within a distance of <code class="docutils literal"><span class="pre">max_range</span></code> km from the
+source (<code class="docutils literal"><span class="pre">max_range</span></code> is found in the <code class="docutils literal"><span class="pre">bias</span></code> sub-section of the
+<code class="docutils literal"><span class="pre">modeling</span></code> section of <em>model.conf</em>). As with the outlier flagging, the
+operator may
+also set a <code class="docutils literal"><span class="pre">max_mag</span></code> for the bias (also found in the <code class="docutils literal"><span class="pre">bias</span></code>
+sub-section of <em>model.conf</em>). If an earthquake exceeds <code class="docutils literal"><span class="pre">max_mag</span></code>,
+and no rupture model is available, the bias computations will be
+skipped.</p>
+<p>The calculation and application of the bias may be turned off by
+setting the parameter <code class="docutils literal"><span class="pre">do_bias</span></code> (found in the <code class="docutils literal"><span class="pre">bias</span></code> sub-section
+of the <code class="docutils literal"><span class="pre">modeling</span></code> section of <em>model.conf</em>) to <code class="docutils literal"><span class="pre">False</span></code>.</p>
+</div>
 <div class="section" id="updating-the-within-event-standard-deviation">
-<h3>2.2.7.3. Updating the Within-Event Standard Deviation<a class="headerlink" href="#updating-the-within-event-standard-deviation" title="Permalink to this headline">¶</a></h3>
+<h3>2.2.6.4. Updating the Within-Event Standard Deviation<a class="headerlink" href="#updating-the-within-event-standard-deviation" title="Permalink to this headline">¶</a></h3>
 <p>Once the bias calculation has been performed, the residuals may be
 computed from the biased estimates of the ground motions. Similarly,
 the adjusted within-event standard deviation of the residuals may be
@@ -525,19 +551,17 @@ of IMT <em>i</em> at site <em>m</em>,
 <img class="math" src="../_images/math/a4c65301942b32af7b68c522857c33fd92e37bae.png" alt="\phi_{i,m}"/> is the within-event standard deviation of IMT <em>i</em>
 at site <em>m</em>, and
 <img class="math" src="../_images/math/ef33b8ad98730646427057519ff7dbc4cc735a5a.png" alt="\sigma_{\delta B_{i,m}}"/> is the standard deviation of the bias
-as calculated by Equation <a class="reference internal" href="#equation-bias-sigma">(1)</a>.</p>
-<p>With the adjusted within-event residual, the elements of the covariance
-matrix of the residuals become:</p>
+as calculated by Equation <a class="reference internal" href="#equation-bias-sigma">(3)</a>.</p>
+<p>With the adjusted within-event residuals, the elements of the covariance
+matrix are given by:</p>
 <div class="math">
-<p><img src="../_images/math/565afd875434464072d9e2cd52d235b2308bc3d6.png" alt="\Sigma_{i,j} = \rho_{i,j}\hat{\phi}_i\hat{\phi}_j"/></p>
-</div><p>where
-<img class="math" src="../_images/math/8c38773b8e6dbaac66ad6a9591d8ca6c4d36d01e.png" alt="\rho_{i,j}"/> is the correlation between residuals <em>i</em> (at site <em>m</em>)
-and <em>j</em> (at site <em>n</em>), and
-<img class="math" src="../_images/math/664a899f01a47e9f3cb8820d345debd152921530.png" alt="\hat{\phi}_i"/> and <img class="math" src="../_images/math/91cbe63e0882ad97fd32762ac102fc8e7c305da2.png" alt="\hat{\phi}_j"/> are the adjusted within-event
-standard deviations of residuals <em>i</em> and <em>j</em> at their sites <em>m</em> and <em>n</em>.</p>
+<p><img src="../_images/math/dcc7d8609c2ecebc0b36718c7812c777db2a3f0d.png" alt="\Sigma_{{Y_i},{Y_j}} = \rho_{{Y_i},{Y_j}}\hat{\phi}_{Y_i}\hat{\phi}_{Y_j},"/></p>
+</div><p>where the variables are defined as they were in the section
+<a class="reference internal" href="#subsubsec-mvn-computation"><span class="std std-ref">Computation</span></a>, but with
+<img class="math" src="../_images/math/64b01c14cb604f8f31b8c571def02200c30669ce.png" alt="\hat{\phi}"/> replacing <img class="math" src="../_images/math/c8f6ee4c832e7d910199a0031862e079359b2799.png" alt="\phi"/>.</p>
 </div>
 <div class="section" id="weighting-of-residuals">
-<span id="subsubsec-weighting-residuals"></span><h3>2.2.7.4. Weighting of Residuals<a class="headerlink" href="#weighting-of-residuals" title="Permalink to this headline">¶</a></h3>
+<span id="subsubsec-weighting-residuals"></span><h3>2.2.6.5. Weighting of Residuals<a class="headerlink" href="#weighting-of-residuals" title="Permalink to this headline">¶</a></h3>
 <p>As discussed in <a class="reference internal" href="references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a> uncertain data
 can be accommodated in the MVN structure through the use of the “omega
 factors”. In our implementation, these factors are based on the adjusted
@@ -565,11 +589,27 @@ operator in the input file. If it is not specified, ShakeMap assigns a
 default standard deviation to intensity measurements of 0.3 intensity
 units. Other observations may have non-zero uncertainty for reasons of
 instrument or site characteristics. This uncertainty may be specified
-in the input file using the <em>ln_stddev</em> attribute of the amplitude tag..</p>
+in the input file using the <em>ln_stddev</em> attribute of the amplitude tag.</p>
+</div>
+<div class="section" id="summary">
+<h3>2.2.6.6. Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
+<p>The interpolation process begins with the calculation of the bias, where
+the covariance matrix, <img class="math" src="../_images/math/e26dd638f54113cfa1666090dca7d7f873fb90d5.png" alt="\bm{\Sigma_{Y_2,Y_2}}"/>, and the
+“omega factorrs”, <img class="math" src="../_images/math/fc19b5c295f941f5d926621d613609a2faed0ff8.png" alt="\bm{\omega}"/>, are assembled from
+the unadjusted within-event standard deviations, and the
+residuals, <img class="math" src="../_images/math/192fbc9d6d11b2aa511e2a9f50976062ceb79a4c.png" alt="\bm{\zeta}"/>, are the total residuals computed from
+the unbiased estimates.</p>
+<p>Once the bias values and the adjusted within-event standard deviations
+are known, the covariance matrix and the “omega factors” can be
+re-computed (using the adjusted within-event standard deviations),
+and the residuals are recomputed from the bias-adjusted estimates.
+These updated factors (including the bias-adjusted estimates) are
+then used in the MVN procedure as described in section
+<a class="reference internal" href="#subsubsec-mvn-computation"><span class="std std-ref">Computation</span></a>.</p>
 </div>
 </div>
 <div class="section" id="finite-rupture-approximations">
-<span id="sec-point-source"></span><h2>2.2.8. Finite-rupture Approximations<a class="headerlink" href="#finite-rupture-approximations" title="Permalink to this headline">¶</a></h2>
+<span id="sec-point-source"></span><h2>2.2.7. Finite-rupture Approximations<a class="headerlink" href="#finite-rupture-approximations" title="Permalink to this headline">¶</a></h2>
 <p>In situations where no finite rupture model has been specified,
 ShakeMap will approximate distances (and adjust the uncertainties
 of predicted ground motions)
@@ -577,27 +617,27 @@ using the point-source to finite-rupture equations developed
 by <a class="reference internal" href="references.html#thompson2018"><span class="std std-ref">Thompson and Worden (2018)</span></a></p>
 </div>
 <div class="section" id="output-points-vs-grids">
-<h2>2.2.9. Output: Points vs. Grids<a class="headerlink" href="#output-points-vs-grids" title="Permalink to this headline">¶</a></h2>
+<h2>2.2.8. Output: Points vs. Grids<a class="headerlink" href="#output-points-vs-grids" title="Permalink to this headline">¶</a></h2>
 <p>The typical application of ShakeMap is to compute ground motions
 over a gridded region. The grid is centered on the epicenter of
 the earthquake, and its extent is set automatically. The default
 configuration tends to err on the side of larger maps, however
 the operator may control the parameters used to determine the
 map extent through the <em>extent.conf</em> configuration file. Alternately,
-the operator may set fixed bounds for maps through the <code class="docutils literal notranslate"><span class="pre">extent</span></code>
-parameter in the <code class="docutils literal notranslate"><span class="pre">prediction_location</span></code> sub-section of the
-<code class="docutils literal notranslate"><span class="pre">interp</span></code> section in <em>model.conf</em> (which, like all parameters in
+the operator may set fixed bounds for maps through the <code class="docutils literal"><span class="pre">extent</span></code>
+parameter in the <code class="docutils literal"><span class="pre">prediction_location</span></code> sub-section of the
+<code class="docutils literal"><span class="pre">interp</span></code> section in <em>model.conf</em> (which, like all parameters in
 <em>model.conf</em> may be set globally or on an event-by-event basis).</p>
 <p>ShakeMap can also be configured to compute ground motions for
 an arbitrary set of points. The operator may create a file
 containing rows of latitude, longitude, Vs30, and a location or facility
 identifier (with the columns being separated by whitespace).
-The file may then be specified with the <code class="docutils literal notranslate"><span class="pre">file</span></code> parameter in
-the <code class="docutils literal notranslate"><span class="pre">prediction_location</span></code> sub-section of the <code class="docutils literal notranslate"><span class="pre">interp</span></code> section
+The file may then be specified with the <code class="docutils literal"><span class="pre">file</span></code> parameter in
+the <code class="docutils literal"><span class="pre">prediction_location</span></code> sub-section of the <code class="docutils literal"><span class="pre">interp</span></code> section
 of <em>model.conf</em>.</p>
 </div>
 <div class="section" id="performance-considerations">
-<h2>2.2.10. Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permalink to this headline">¶</a></h2>
+<h2>2.2.9. Performance Considerations<a class="headerlink" href="#performance-considerations" title="Permalink to this headline">¶</a></h2>
 <p>The run time of ShakeMap is most strongly controlled by the number
 of input seismic stations (and macroseismic observations), the size
 of the output grid, and the number of output IMTs. While the Numpy
@@ -605,18 +645,18 @@ code that does the majority of the computations is highly optimized
 on most systems (including running on multiple cores), it may be
 possible to improve the performance of ShakeMap on some systems
 by setting the
-<code class="docutils literal notranslate"><span class="pre">max_workers</span></code> parameter in the <code class="docutils literal notranslate"><span class="pre">system</span></code> section of <em>model.conf</em>.
-Setting <code class="docutils literal notranslate"><span class="pre">max_workers</span></code> to a value greater than one will tell
+<code class="docutils literal"><span class="pre">max_workers</span></code> parameter in the <code class="docutils literal"><span class="pre">system</span></code> section of <em>model.conf</em>.
+Setting <code class="docutils literal"><span class="pre">max_workers</span></code> to a value greater than one will tell
 ShakeMap to spin off separate threads for the output IMTs (thus,
 there is no point in setting this value to anything larger than
 the number of output IMTs.) There is, however, an interaction with
 the BLAS libraries underlying Numpy. If ShakeMap produces an
 error of the type:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">BLAS</span> <span class="p">:</span> <span class="n">Program</span> <span class="ow">is</span> <span class="n">Terminated</span><span class="o">.</span> <span class="n">Because</span> <span class="n">you</span> <span class="n">tried</span> <span class="n">to</span> <span class="n">allocate</span>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">BLAS</span> <span class="p">:</span> <span class="n">Program</span> <span class="ow">is</span> <span class="n">Terminated</span><span class="o">.</span> <span class="n">Because</span> <span class="n">you</span> <span class="n">tried</span> <span class="n">to</span> <span class="n">allocate</span>
 <span class="n">too</span> <span class="n">many</span> <span class="n">memory</span> <span class="n">regions</span><span class="o">.</span>
 </pre></div>
 </div>
-<p>then <code class="docutils literal notranslate"><span class="pre">max_workers</span></code> should be reduced (or, you can obtain or
+<p>then <code class="docutils literal"><span class="pre">max_workers</span></code> should be reduced (or, you can obtain or
 compile BLAS libraries that are reentrant safe – a topic which is
 far beyond the scope of this manual.)</p>
 </div>
@@ -658,17 +698,18 @@ far beyond the scope of this manual.)</p>
 <li class="toctree-l5"><a class="reference internal" href="#intensity-prediction-equations">2.2.3. Intensity Prediction Equations</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#cross-correlation-functions">2.2.4. Cross-correlation Functions</a></li>
 <li class="toctree-l5"><a class="reference internal" href="#data-handling-and-outliers">2.2.5. Data Handling and Outliers</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#event-bias">2.2.6. Event Bias</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#interpolation">2.2.7. Interpolation</a><ul>
-<li class="toctree-l6"><a class="reference internal" href="#computation">2.2.7.1. Computation</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#imt-selection">2.2.7.2. IMT Selection</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#updating-the-within-event-standard-deviation">2.2.7.3. Updating the Within-Event Standard Deviation</a></li>
-<li class="toctree-l6"><a class="reference internal" href="#weighting-of-residuals">2.2.7.4. Weighting of Residuals</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#interpolation">2.2.6. Interpolation</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#computation">2.2.6.1. Computation</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#imt-selection">2.2.6.2. IMT Selection</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#event-bias">2.2.6.3. Event Bias</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#updating-the-within-event-standard-deviation">2.2.6.4. Updating the Within-Event Standard Deviation</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#weighting-of-residuals">2.2.6.5. Weighting of Residuals</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#summary">2.2.6.6. Summary</a></li>
 </ul>
 </li>
-<li class="toctree-l5"><a class="reference internal" href="#finite-rupture-approximations">2.2.8. Finite-rupture Approximations</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#output-points-vs-grids">2.2.9. Output: Points vs. Grids</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#performance-considerations">2.2.10. Performance Considerations</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#finite-rupture-approximations">2.2.7. Finite-rupture Approximations</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#output-points-vs-grids">2.2.8. Output: Points vs. Grids</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#performance-considerations">2.2.9. Performance Considerations</a></li>
 </ul>
 </li>
 <li class="toctree-l4"><a class="reference internal" href="tg_formats.html">2.3. Data Formats</a></li>
@@ -690,14 +731,12 @@ far beyond the scope of this manual.)</p>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

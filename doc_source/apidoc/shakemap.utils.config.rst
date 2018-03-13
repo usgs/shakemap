@@ -1,5 +1,5 @@
-shakemap.utils.config
-============================
+shakemap\.utils\.config
+==============================
 
 .. automodule:: shakemap.utils.config
     :members:

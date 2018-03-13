@@ -1,5 +1,5 @@
-shakelib.rupture.factory
-===============================
+shakelib\.rupture\.factory
+=================================
 
 .. automodule:: shakelib.rupture.factory
     :members:

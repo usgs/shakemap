@@ -4,13 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.directivity.rowshandel2013 &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -23,7 +31,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -156,7 +165,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">__computeFd</span><span class="p">()</span>
 
 <div class="viewcode-block" id="Rowshandel2013.fromSites"><a class="viewcode-back" href="../../../shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.fromSites">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">fromSites</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">a_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">fromSites</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span> <span class="n">a_weight</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
                   <span class="n">mtype</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">simpleDT</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">centered</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Construct a rowshandel2013 instance from a sites instance.</span>
 
@@ -198,47 +207,47 @@
         <span class="n">lons</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">nx</span><span class="p">)</span>
         <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">)</span>
         <span class="n">dep</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">lon</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span></div>
-                   <span class="n">a_weight</span><span class="p">,</span> <span class="n">mtype</span><span class="p">,</span> <span class="n">simpleDT</span><span class="p">,</span> <span class="n">centered</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cls</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">dep</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">T</span><span class="p">,</span>
+                   <span class="n">a_weight</span><span class="p">,</span> <span class="n">mtype</span><span class="p">,</span> <span class="n">simpleDT</span><span class="p">,</span> <span class="n">centered</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Rowshandel2013.getFd"><a class="viewcode-back" href="../../../shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.getFd">[docs]</a>    <span class="k">def</span> <span class="nf">getFd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        :returns:</span>
 <span class="sd">            Numpy array of Fd; this is the directivity amplification factor</span>
 <span class="sd">            (log units).</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fd</span><span class="p">)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_fd</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Rowshandel2013.getXiPrime"><a class="viewcode-back" href="../../../shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.getXiPrime">[docs]</a>    <span class="k">def</span> <span class="nf">getXiPrime</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            Numpy array of Xi&#39;; this is the variable that accounts for</span>
 <span class="sd">            geometric factors in Fd.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xi_prime</span><span class="p">)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_xi_prime</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Rowshandel2013.getDT"><a class="viewcode-back" href="../../../shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.getDT">[docs]</a>    <span class="k">def</span> <span class="nf">getDT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">           List of numpy arrays of the distance taper factor. Length is the</span>
 <span class="sd">           number of periods.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DTlist</span><span class="p">)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_DTlist</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Rowshandel2013.getWP"><a class="viewcode-back" href="../../../shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.getWP">[docs]</a>    <span class="k">def</span> <span class="nf">getWP</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            List of numpy array of the narrow-band multiplier. Length is the</span>
 <span class="sd">            number of periods.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_WPlist</span><span class="p">)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_WPlist</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Rowshandel2013.getLD"><a class="viewcode-back" href="../../../shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.getLD">[docs]</a>    <span class="k">def</span> <span class="nf">getLD</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            Numpy array of the rupture length de-normalization factor.</span>
-<span class="sd">        &quot;&quot;&quot;</span></div>
-        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_LD</span><span class="p">)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_LD</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">__computeFd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -598,8 +607,8 @@
         <span class="c1"># Update (Rowshandel, personal communication)</span>
         <span class="n">sig</span> <span class="o">=</span> <span class="mf">0.55</span>
         <span class="n">Tp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">1.04</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_M</span> <span class="o">-</span> <span class="mf">6.0</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_WP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="n">Tp</span><span class="p">)</span> <span class="o">*</span></div>
-                            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="n">Tp</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sig</span> <span class="o">*</span> <span class="n">sig</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_WP</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="n">Tp</span><span class="p">)</span> <span class="o">*</span>
+                            <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">period</span> <span class="o">/</span> <span class="n">Tp</span><span class="p">))</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sig</span> <span class="o">*</span> <span class="n">sig</span><span class="p">))</span></div>
 
 
 <span class="k">def</span> <span class="nf">_get_quad_slip_ds_ss</span><span class="p">(</span><span class="n">q</span><span class="p">,</span> <span class="n">rake</span><span class="p">,</span> <span class="n">cp</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
@@ -744,14 +753,12 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

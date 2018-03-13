@@ -1,5 +1,5 @@
-shakemap.coremods.gridxml
-================================
+shakemap\.coremods\.gridxml
+==================================
 
 .. automodule:: shakemap.coremods.gridxml
     :members:

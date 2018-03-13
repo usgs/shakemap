@@ -1,6 +1,12 @@
 shakemap
 ================
 
+
+.. toctree::
+
+    shakemap.coremods
+    shakemap.utils
+
 Module contents
 
 .. automodule:: shakemap

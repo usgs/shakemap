@@ -625,8 +625,10 @@ class ModelModule(CoreModule):
 
     def _deriveMMIFromIMTs(self):
         """
-        Make derived MMI from the best available PGM; This is ugly and
-        it would be nice to have a more deterministic way of doing it
+        Make derived MMI from each of the IMTs in the input (for
+        which the GMICE is defined; then select the best MMI for
+        each station based on a list of "preferred" IMTs; also
+        calculate the predicted MMI and the residual.
         """
         if 'df1' not in self.dataframes:
             return
@@ -993,7 +995,7 @@ class ModelModule(CoreModule):
             # covariance matrix, so there is no point in doing the
             # full solution with the dot product, e.g.:
             # sdgrid[ss:se] = pout_sd2[ss:se] -
-            #       np.diag(rcmatrix.dot(sigma12))
+            #       np.diag(rcmatrix.dot(sigma21))
             #
             sdgrid[iy, :] = \
                 pout_sd2[iy, :] - np.sum(rcmatrix * sigma12, axis=1)
@@ -1075,7 +1077,7 @@ class ModelModule(CoreModule):
         info[ip][ei]['productsource'] = self.config['system']['source_network']
         info[ip][ei]['producttype'] = self.config['system']['product_type']
 
-        
+
         info[ip][ei]['fault_ref'] = self.rupture_obj.getReference()
         if 'df2' in self.dataframes:
             info[ip][ei]['intensity_observations'] = \

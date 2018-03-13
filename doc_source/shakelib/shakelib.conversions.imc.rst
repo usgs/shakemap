@@ -1,5 +1,5 @@
-shakelib.conversions.imc
-================================
+shakelib\.conversions\.imc
+==================================
 
 Submodules
 

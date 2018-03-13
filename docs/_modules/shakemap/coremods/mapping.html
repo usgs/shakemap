@@ -4,13 +4,21 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
-        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.coremods.mapping &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -23,7 +31,8 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head><body>
+  </head>
+  <body>
   
 
     <div class="document">
@@ -49,6 +58,11 @@
 <span class="kn">from</span> <span class="nn">mpl_toolkits.basemap</span> <span class="k">import</span> <span class="n">Basemap</span>
 <span class="kn">import</span> <span class="nn">matplotlib.patheffects</span> <span class="k">as</span> <span class="nn">path_effects</span>
 <span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="k">import</span> <span class="n">make_axes_locatable</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_agg</span> <span class="k">import</span> <span class="n">FigureCanvasAgg</span> <span class="k">as</span> <span class="n">FigureCanvas</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib</span>
+
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
 
 <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">MultiPolygon</span>
 <span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">MultiLineString</span>
@@ -241,8 +255,9 @@
         <span class="n">cax</span> <span class="o">=</span> <span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
         <span class="c1">#draw colorbar in new divider axes</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax</span><span class="p">)</span>
-        <span class="n">sd_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="s1">&#39;sd.jpg&#39;</span><span class="p">)</span></div></div>
-        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">sd_file</span><span class="p">)</span>
+        <span class="n">sd_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span><span class="s1">&#39;sd.jpg&#39;</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+        <span class="n">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span><span class="n">sd_file</span><span class="p">)</span></div></div>
         <span class="c1">###########################</span>
             
 
@@ -268,8 +283,8 @@
             <span class="k">pass</span>
         <span class="n">intx</span><span class="p">,</span> <span class="n">inty</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">intlon</span><span class="p">,</span> <span class="n">intlat</span><span class="p">)</span>
         <span class="n">ints</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">intx</span><span class="p">,</span> <span class="n">inty</span><span class="p">)))</span>
-    <span class="n">ppolygon</span> <span class="o">=</span> <span class="n">sPolygon</span><span class="p">(</span><span class="n">extpts</span><span class="p">,</span> <span class="n">ints</span><span class="p">)</span></div>
-    <span class="k">return</span> <span class="n">ppolygon</span>
+    <span class="n">ppolygon</span> <span class="o">=</span> <span class="n">sPolygon</span><span class="p">(</span><span class="n">extpts</span><span class="p">,</span> <span class="n">ints</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ppolygon</span></div>
 
 
 <div class="viewcode-block" id="getProjectedPatches"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.getProjectedPatches">[docs]</a><span class="k">def</span> <span class="nf">getProjectedPatches</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">edgecolor</span><span class="o">=</span><span class="n">WATERCOLOR</span><span class="p">):</span>
@@ -301,8 +316,8 @@
             <span class="n">edgecolor</span><span class="o">=</span><span class="n">edgecolor</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">OCEAN_ZORDER</span><span class="p">,</span>
             <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">visible</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">patches</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">patch</span><span class="p">)</span>
-</div>
-    <span class="k">return</span> <span class="n">patches</span>
+
+    <span class="k">return</span> <span class="n">patches</span></div>
 
 
 <div class="viewcode-block" id="MapMaker"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker">[docs]</a><span class="k">class</span> <span class="nc">MapMaker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -445,8 +460,8 @@
 <span class="sd">                grid cell.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="o">=</span> <span class="n">nx</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span> <span class="o">=</span> <span class="n">ny</span></div>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="n">cities_per_grid</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span> <span class="o">=</span> <span class="n">ny</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="n">cities_per_grid</span></div>
 
 <div class="viewcode-block" id="MapMaker.setFigureSize"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.setFigureSize">[docs]</a>    <span class="k">def</span> <span class="nf">setFigureSize</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">figwidth</span><span class="p">,</span> <span class="n">figheight</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set the figure size in inches.</span>
@@ -455,8 +470,8 @@
 <span class="sd">            figwidth (float): Figure width in inches.</span>
 <span class="sd">            figheight (float): Figure height in inches.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fig_width</span> <span class="o">=</span> <span class="n">figwidth</span></div>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fig_height</span> <span class="o">=</span> <span class="n">figheight</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig_width</span> <span class="o">=</span> <span class="n">figwidth</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fig_height</span> <span class="o">=</span> <span class="n">figheight</span></div>
 
 <div class="viewcode-block" id="MapMaker.setCityList"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.setCityList">[docs]</a>    <span class="k">def</span> <span class="nf">setCityList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Set the city list to an input dataframe.</span>
@@ -481,8 +496,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="n">BasemapCities</span><span class="p">(</span><span class="n">dataframe</span><span class="p">)</span>  <span class="c1"># may raise exception</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="o">=</span> <span class="kc">None</span></div>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span> <span class="o">=</span> <span class="kc">None</span></div>
 
     <span class="k">def</span> <span class="nf">_setMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gd</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Define the map extents, figure size, etc.</span>
@@ -994,10 +1009,11 @@
                 <span class="n">nx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span><span class="p">,</span>
                 <span class="n">cities_per_grid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span><span class="p">)</span>
             <span class="c1"># self.logger.debug(&quot;Available fonts: &quot;, self.cities._fontlist)</span>
-            <span class="k">if</span> <span class="s1">&#39;Times New Roman&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">_fontlist</span><span class="p">:</span>
-                <span class="n">font</span> <span class="o">=</span> <span class="s1">&#39;Times New Roman&#39;</span>
+            <span class="k">if</span> <span class="s1">&#39;Arial&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">_fontlist</span><span class="p">:</span>
+                <span class="n">font</span> <span class="o">=</span> <span class="s1">&#39;Arial&#39;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">font</span> <span class="o">=</span> <span class="s1">&#39;DejaVu Sans&#39;</span>
+                <span class="n">font</span> <span class="o">=</span> <span class="n">_select_font</span><span class="p">()</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">limitByMapCollision</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">fontname</span><span class="o">=</span><span class="n">font</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">renderToMap</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">CITIES_ZORDER</span><span class="p">)</span>
 
@@ -1012,7 +1028,13 @@
         <span class="n">outfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;intensity.pdf&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">outfile</span><span class="p">)</span>
         <span class="n">outfile2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;intensity.jpg&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">outfile2</span><span class="p">)</span>
+
+        <span class="c1"># newer versions of PIL don&#39;t support writing of RGBA images to JPEG,</span>
+        <span class="c1"># or at least they won&#39;t handle getting rid of the alpha channel for you.</span>
+        <span class="c1"># so, let&#39;s grab the figure as an RGB image, and then write it to a file</span>
+        <span class="c1"># manually</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+        <span class="n">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span><span class="n">outfile2</span><span class="p">)</span>
         <span class="n">tn</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
 
@@ -1020,8 +1042,8 @@
         <span class="n">dpi</span> <span class="o">=</span> <span class="n">THUMBNAIL_WIDTH_PIXELS</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig_width</span> 
         <span class="n">thumbfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;pin-thumbnail.png&#39;</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">thumbfile</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
-        </div>
-        <span class="k">return</span> <span class="n">outfile</span>
+        
+        <span class="k">return</span> <span class="n">outfile</span></div>
 
     <span class="k">def</span> <span class="nf">_getShaded</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ptopo</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get shaded topography.</span>
@@ -1061,8 +1083,8 @@
 <span class="sd">            int: Rounded value.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">correction</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mf">0.5</span></div>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">precision</span> <span class="o">+</span> <span class="n">correction</span><span class="p">)</span> <span class="o">*</span> <span class="n">precision</span>
+        <span class="n">correction</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mf">0.5</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">precision</span> <span class="o">+</span> <span class="n">correction</span><span class="p">)</span> <span class="o">*</span> <span class="n">precision</span></div>
 
 <div class="viewcode-block" id="MapMaker.drawContourMap"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.drawContourMap">[docs]</a>    <span class="k">def</span> <span class="nf">drawContourMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">outfolder</span><span class="p">,</span> <span class="n">cmin</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">cmax</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -1253,10 +1275,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">limitByGrid</span><span class="p">(</span>
                 <span class="n">nx</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_cols</span><span class="p">,</span> <span class="n">ny</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">city_rows</span><span class="p">,</span>
                 <span class="n">cities_per_grid</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">cities_per_grid</span><span class="p">)</span>
-            <span class="k">if</span> <span class="s1">&#39;Times New Roman&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">_fontlist</span><span class="p">:</span>
-                <span class="n">font</span> <span class="o">=</span> <span class="s1">&#39;Times New Roman&#39;</span>
+            <span class="k">if</span> <span class="s1">&#39;Arial&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">_fontlist</span><span class="p">:</span>
+                <span class="n">font</span> <span class="o">=</span> <span class="s1">&#39;Arial&#39;</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">font</span> <span class="o">=</span> <span class="s1">&#39;DejaVu Sans&#39;</span>
+                <span class="n">font</span> <span class="o">=</span> <span class="n">_select_font</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">cities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">limitByMapCollision</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">fontname</span><span class="o">=</span><span class="n">font</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">renderToMap</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">CITIES_ZORDER</span><span class="p">)</span>
 
@@ -1280,14 +1302,43 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">oldimt</span> <span class="o">=</span> <span class="n">fileimt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">outfile_old</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.jpg&#39;</span> <span class="o">%</span> <span class="n">oldimt</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">outfile_old</span><span class="p">)</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+        <span class="n">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span><span class="n">outfile_old</span><span class="p">)</span>
         <span class="c1">######################</span>
 
         
         
         <span class="n">tn</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span></div></div>
-        <span class="k">return</span> <span class="n">outfile</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">outfile</span></div></div>
+
+<span class="k">def</span> <span class="nf">_select_font</span><span class="p">():</span>
+    <span class="c1"># I really don&#39;t care that much about fonts, just trying to find one that will</span>
+    <span class="c1"># work on any given platform.  Can&#39;t seem to reliably find whatever default font</span>
+    <span class="c1"># is supposed to come with matplotlib, so just loop over font names found on the system</span>
+    <span class="c1"># and pick the shortest one we can find that matches the input</span>
+    <span class="n">fontlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">matplotlib</span><span class="o">.</span><span class="n">font_manager</span><span class="o">.</span><span class="n">fontManager</span><span class="o">.</span><span class="n">ttflist</span><span class="p">]</span>
+    <span class="n">preferences</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Arial&#39;</span><span class="p">,</span><span class="s1">&#39;Helvetica&#39;</span><span class="p">,</span><span class="s1">&#39;Bitstream Vera Sans&#39;</span><span class="p">,</span><span class="s1">&#39;DejaVu&#39;</span><span class="p">,</span><span class="s1">&#39;Times&#39;</span><span class="p">,</span><span class="s1">&#39;Courier&#39;</span><span class="p">,</span><span class="s1">&#39;Verdana&#39;</span><span class="p">]</span>
+    <span class="n">selected_font</span> <span class="o">=</span> <span class="s1">&#39;TEST&#39;</span><span class="o">*</span><span class="mi">128</span>
+    <span class="k">for</span> <span class="n">preference</span> <span class="ow">in</span> <span class="n">preferences</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">font</span> <span class="ow">in</span> <span class="n">fontlist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">font</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">preference</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">font</span><span class="p">)</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected_font</span><span class="p">):</span>
+                <span class="n">selected_font</span> <span class="o">=</span> <span class="n">font</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">selected_font</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;TEST&#39;</span><span class="p">):</span>
+            <span class="k">break</span>
+    
+    <span class="k">if</span> <span class="n">selected_font</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;TEST&#39;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Could not find any font from system font list&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">selected_font</span>
+
+<span class="k">def</span> <span class="nf">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+    <span class="n">canvas</span> <span class="o">=</span> <span class="n">FigureCanvas</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
+    <span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>       <span class="c1"># draw the canvas, cache the renderer</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">canvas</span><span class="o">.</span><span class="n">tostring_rgb</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
+    <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">int</span><span class="p">,</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_size_inches</span><span class="p">()</span> <span class="o">*</span> <span class="n">fig</span><span class="o">.</span><span class="n">get_dpi</span><span class="p">())</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="s1">&#39;RGB&#39;</span><span class="p">)</span>
+    <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 </pre></div>
 
           </div>
@@ -1323,14 +1374,12 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
-    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <input type="text" name="q" />
-      <input type="submit" value="Go" />
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
-    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
