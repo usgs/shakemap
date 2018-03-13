@@ -1,5 +1,5 @@
-shakelib\.rupture\.constants
-===================================
+shakelib.rupture.constants
+=================================
 
 .. automodule:: shakelib.rupture.constants
     :members:

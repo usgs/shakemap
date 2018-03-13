@@ -1,5 +1,5 @@
-shakelib\.sites
-======================
+shakelib.sites
+=====================
 
 .. automodule:: shakelib.sites
     :members:

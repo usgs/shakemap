@@ -1,5 +1,5 @@
-shakelib\.virtualipe
-===========================
+shakelib.virtualipe
+==========================
 
 .. automodule:: shakelib.virtualipe
     :members:

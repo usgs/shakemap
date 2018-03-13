@@ -71,7 +71,7 @@ def get_rupture(origin, file=None, mesh_dx=0.5):
     return rupt
 
 
-def rupture_from_dict_and_origin(d, origin, mesh_dx=0.5):
+def rupture_from_dict_and_origin(rupdict, origin, mesh_dx=0.5):
     """
     Method returns either a QuadRupture or EdgeRupture object based on a
     GeoJSON dictionary and an origin. Note that this is very similar to
@@ -86,7 +86,7 @@ def rupture_from_dict_and_origin(d, origin, mesh_dx=0.5):
     .. seealso:: :func:`rupture_from_dict`
 
     Args:
-        d (dict): Rupture GeoJSON dictionary.
+        rupdictd (dict): Rupture GeoJSON dictionary.
         origin (Origin): A ShakeMap origin object.
         mesh_dx (float): Target spacing (in km) for rupture discretization;
             default is 0.5 km and it is only used if the rupture file is an
@@ -96,15 +96,18 @@ def rupture_from_dict_and_origin(d, origin, mesh_dx=0.5):
         a Rupture subclass.
 
     """
-    validate_json(d)
+    validate_json(rupdict)
 
     # Is this a QuadRupture or an EdgeRupture?
-    valid_quads = is_quadrupture_class(d)
+    valid_quads = is_quadrupture_class(rupdict)
 
     if valid_quads is True:
-        rupt = QuadRupture(d, origin)
+        rupt = QuadRupture(rupdict, origin)
     else:
-        rupt = EdgeRupture(d, origin, mesh_dx=mesh_dx)
+        if rupdict['features'][0]['geometry']['type'] == 'Point':
+            rupt = PointRupture(origin)
+        else:
+            rupt = EdgeRupture(rupdict, origin, mesh_dx=mesh_dx)
 
     return rupt
 
@@ -323,6 +326,10 @@ def is_quadrupture_class(d):
     f = d['features'][0]
     geom = f['geometry']
     polygons = geom['coordinates'][0]
+    try:
+        len(polygons)
+    except Exception as e:
+        return False
     n_polygons = len(polygons)
     for i in range(n_polygons):
         p = polygons[i]

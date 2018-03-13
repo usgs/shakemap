@@ -15,6 +15,11 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 import matplotlib.patheffects as path_effects
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+
+import matplotlib
+
+from PIL import Image
 
 from shapely.geometry import MultiPolygon
 from shapely.geometry import MultiLineString
@@ -208,7 +213,8 @@ class MappingModule(CoreModule):
         #draw colorbar in new divider axes
         plt.colorbar(im, cax=cax)
         sd_file = os.path.join(datadir,'sd.jpg')
-        plt.savefig(sd_file)
+        fig = plt.gcf()
+        _save_jpg(fig,sd_file)
         ###########################
             
 
@@ -960,10 +966,11 @@ class MapMaker(object):
                 nx=self.city_cols, ny=self.city_rows,
                 cities_per_grid=self.cities_per_grid)
             # self.logger.debug("Available fonts: ", self.cities._fontlist)
-            if 'Times New Roman' in self.cities._fontlist:
-                font = 'Times New Roman'
+            if 'Arial' in self.cities._fontlist:
+                font = 'Arial'
             else:
-                font = 'DejaVu Sans'
+                font = _select_font()
+
             self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
@@ -978,7 +985,13 @@ class MapMaker(object):
         outfile = os.path.join(outfolder, 'intensity.pdf')
         plt.savefig(outfile)
         outfile2 = os.path.join(outfolder, 'intensity.jpg')
-        plt.savefig(outfile2)
+
+        # newer versions of PIL don't support writing of RGBA images to JPEG,
+        # or at least they won't handle getting rid of the alpha channel for you.
+        # so, let's grab the figure as an RGB image, and then write it to a file
+        # manually
+        fig = plt.gcf()
+        _save_jpg(fig,outfile2)
         tn = time.time()
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
 
@@ -1219,10 +1232,10 @@ class MapMaker(object):
             self.cities = self.cities.limitByGrid(
                 nx=self.city_cols, ny=self.city_rows,
                 cities_per_grid=self.cities_per_grid)
-            if 'Times New Roman' in self.cities._fontlist:
-                font = 'Times New Roman'
+            if 'Arial' in self.cities._fontlist:
+                font = 'Arial'
             else:
-                font = 'DejaVu Sans'
+                font = _select_font()
             self.cities = self.cities.limitByMapCollision(m, fontname=font)
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
@@ -1246,7 +1259,8 @@ class MapMaker(object):
         else:
             oldimt = fileimt.lower()
         outfile_old = os.path.join(outfolder, '%s.jpg' % oldimt)
-        plt.savefig(outfile_old)
+        fig = plt.gcf()
+        _save_jpg(fig,outfile_old)
         ######################
 
         
@@ -1254,3 +1268,31 @@ class MapMaker(object):
         tn = time.time()
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
         return outfile
+
+def _select_font():
+    # I really don't care that much about fonts, just trying to find one that will
+    # work on any given platform.  Can't seem to reliably find whatever default font
+    # is supposed to come with matplotlib, so just loop over font names found on the system
+    # and pick the shortest one we can find that matches the input
+    fontlist = [f.name for f in matplotlib.font_manager.fontManager.ttflist]
+    preferences = ['Arial','Helvetica','Bitstream Vera Sans','DejaVu','Times','Courier','Verdana']
+    selected_font = 'TEST'*128
+    for preference in preferences:
+        for font in fontlist:
+            if font.startswith(preference) and len(font) < len(selected_font):
+                selected_font = font
+        if not selected_font.startswith('TEST'):
+            break
+    
+    if selected_font.startswith('TEST'):
+        raise Exception('Could not find any font from system font list')
+    return selected_font
+
+def _save_jpg(fig,filename):
+    canvas = FigureCanvas(fig)
+    canvas.draw()       # draw the canvas, cache the renderer
+    image = np.fromstring(canvas.tostring_rgb(), dtype='uint8')
+    width, height = map(int, fig.get_size_inches() * fig.get_dpi())
+    image = image.reshape(height, width, 3)
+    img = Image.fromarray(image, 'RGB')
+    img.save(filename)

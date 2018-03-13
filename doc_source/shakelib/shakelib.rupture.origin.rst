@@ -1,5 +1,5 @@
-shakelib\.rupture\.origin
-================================
+shakelib.rupture.origin
+==============================
 
 .. automodule:: shakelib.rupture.origin
     :members:

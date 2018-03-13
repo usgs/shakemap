@@ -1,5 +1,5 @@
-shakemap\.utils\.utils
-=============================
+shakemap.utils.utils
+===========================
 
 .. automodule:: shakemap.utils.utils
     :members:

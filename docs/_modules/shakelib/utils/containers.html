@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.utils.containers &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -74,8 +65,8 @@
 <span class="sd">                information.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;config&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dropDictionary</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setDictionary</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropDictionary</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDictionary</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ShakeMapContainer.getConfig"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getConfig">[docs]</a>    <span class="k">def</span> <span class="nf">getConfig</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -89,8 +80,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;config&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Configuration not set in container.&#39;</span><span class="p">)</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">config</span></div>
+        <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;config&#39;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">config</span>
 
 <div class="viewcode-block" id="ShakeMapContainer.setRupture"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setRupture">[docs]</a>    <span class="k">def</span> <span class="nf">setRupture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rupture</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -113,8 +104,8 @@
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
             <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">_geojson</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">,</span> <span class="n">json_str</span><span class="p">)</span></div>
+            <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">_geojson</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">,</span> <span class="n">json_str</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ShakeMapContainer.getRuptureObject"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getRuptureObject">[docs]</a>    <span class="k">def</span> <span class="nf">getRuptureObject</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -127,8 +118,8 @@
 <span class="sd">                the container.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">rupture_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRuptureDict</span><span class="p">()</span>
-        <span class="n">rupture</span> <span class="o">=</span> <span class="n">rupture_from_dict</span><span class="p">(</span><span class="n">rupture_dict</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">rupture</span></div>
+        <span class="n">rupture</span> <span class="o">=</span> <span class="n">rupture_from_dict</span><span class="p">(</span><span class="n">rupture_dict</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">rupture</span>
 
 <div class="viewcode-block" id="ShakeMapContainer.getRuptureDict"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getRuptureDict">[docs]</a>    <span class="k">def</span> <span class="nf">getRuptureDict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -143,8 +134,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;rupture&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Rupture object not set in container.&#39;</span><span class="p">)</span>
-        <span class="n">rupture_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">rupture_dict</span></div>
+        <span class="n">rupture_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">rupture_dict</span>
 
 <div class="viewcode-block" id="ShakeMapContainer.setStationList"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setStationList">[docs]</a>    <span class="k">def</span> <span class="nf">setStationList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stationlist</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -161,8 +152,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stationlist</span><span class="p">,</span> <span class="n">StationList</span><span class="p">):</span>
             <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input object is not a StationList.&#39;</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
-        <span class="n">sql_string</span> <span class="o">=</span> <span class="n">stationlist</span><span class="o">.</span><span class="n">dumpToSQL</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;stations&#39;</span><span class="p">,</span> <span class="n">sql_string</span><span class="p">)</span></div>
+        <span class="n">sql_string</span> <span class="o">=</span> <span class="n">stationlist</span><span class="o">.</span><span class="n">dumpToSQL</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;stations&#39;</span><span class="p">,</span> <span class="n">sql_string</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ShakeMapContainer.getStationList"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getStationList">[docs]</a>    <span class="k">def</span> <span class="nf">getStationList</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -177,8 +168,8 @@
         <span class="k">if</span> <span class="s1">&#39;stations&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;StationList object not set in container.&#39;</span><span class="p">)</span>
         <span class="n">sql_string</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;stations&#39;</span><span class="p">)</span>
-        <span class="n">stationlist</span> <span class="o">=</span> <span class="n">StationList</span><span class="o">.</span><span class="n">loadFromSQL</span><span class="p">(</span><span class="n">sql_string</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">stationlist</span></div>
+        <span class="n">stationlist</span> <span class="o">=</span> <span class="n">StationList</span><span class="o">.</span><span class="n">loadFromSQL</span><span class="p">(</span><span class="n">sql_string</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">stationlist</span>
 
 <div class="viewcode-block" id="ShakeMapContainer.setStationDict"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setStationDict">[docs]</a>    <span class="k">def</span> <span class="nf">setStationDict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stationdict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -194,8 +185,8 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;stations_dict&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">dropStrings</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">)</span>
-        <span class="n">stationstring</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">stationdict</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">,</span> <span class="n">stationstring</span><span class="p">)</span></div>
+        <span class="n">stationstring</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">stationdict</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">,</span> <span class="n">stationstring</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ShakeMapContainer.getStationDict"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getStationDict">[docs]</a>    <span class="k">def</span> <span class="nf">getStationDict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -209,8 +200,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;stations_dict&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Station dictionary not set in container.&#39;</span><span class="p">)</span>
-        <span class="n">stations</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">stations</span></div>
+        <span class="n">stations</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="n">stations</span>
 
 <div class="viewcode-block" id="ShakeMapContainer.setVersionHistory"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setVersionHistory">[docs]</a>    <span class="k">def</span> <span class="nf">setVersionHistory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">history_dict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -220,8 +211,8 @@
 <span class="sd">            history_dict (dict): Dictionary containing version history. ??</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="s1">&#39;version_history&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dropDictionary</span><span class="p">(</span><span class="s1">&#39;version_history&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setDictionary</span><span class="p">(</span><span class="s1">&#39;version_history&#39;</span><span class="p">,</span> <span class="n">history_dict</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropDictionary</span><span class="p">(</span><span class="s1">&#39;version_history&#39;</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDictionary</span><span class="p">(</span><span class="s1">&#39;version_history&#39;</span><span class="p">,</span> <span class="n">history_dict</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ShakeMapContainer.getVersionHistory"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getVersionHistory">[docs]</a>    <span class="k">def</span> <span class="nf">getVersionHistory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -237,8 +228,8 @@
         <span class="k">if</span> <span class="s1">&#39;version_history&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
             <span class="k">return</span> <span class="p">{}</span>
 
-        <span class="n">version_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;version_history&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">version_dict</span></div></div>
+        <span class="n">version_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;version_history&#39;</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="n">version_dict</span>
 
 
 <div class="viewcode-block" id="ShakeMapInputContainer"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer">[docs]</a><span class="k">class</span> <span class="nc">ShakeMapInputContainer</span><span class="p">(</span><span class="n">ShakeMapContainer</span><span class="p">):</span>
@@ -254,7 +245,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="ShakeMapInputContainer.createFromInput"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.createFromInput">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">createFromInput</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventfile</span><span class="p">,</span> <span class="n">version_history</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">createFromInput</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventfile</span><span class="p">,</span> <span class="n">version_history</span><span class="p">,</span>
                         <span class="n">rupturefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">datafiles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -276,7 +267,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            InputContainer: Instance of InputContainer.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">container</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="n">container</span><span class="o">.</span><span class="n">setConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
         <span class="c1"># create an origin from the event file</span>
@@ -293,8 +284,8 @@
         <span class="k">if</span> <span class="n">datafiles</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">container</span><span class="o">.</span><span class="n">setStationData</span><span class="p">(</span><span class="n">datafiles</span><span class="p">)</span>
 
-        <span class="n">container</span><span class="o">.</span><span class="n">setVersionHistory</span><span class="p">(</span><span class="n">version_history</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">container</span></div>
+        <span class="n">container</span><span class="o">.</span><span class="n">setVersionHistory</span><span class="p">(</span><span class="n">version_history</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">container</span>
 
 <div class="viewcode-block" id="ShakeMapInputContainer.setStationData"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.setStationData">[docs]</a>    <span class="k">def</span> <span class="nf">setStationData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datafiles</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -305,8 +296,8 @@
 <span class="sd">              motion observations, (macroseismic or instrumented).</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">station</span> <span class="o">=</span> <span class="n">StationList</span><span class="o">.</span><span class="n">loadFromXML</span><span class="p">(</span><span class="n">datafiles</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setStationList</span><span class="p">(</span><span class="n">station</span><span class="p">)</span></div>
+        <span class="n">station</span> <span class="o">=</span> <span class="n">StationList</span><span class="o">.</span><span class="n">loadFromXML</span><span class="p">(</span><span class="n">datafiles</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStationList</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ShakeMapInputContainer.addStationData"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.addStationData">[docs]</a>    <span class="k">def</span> <span class="nf">addStationData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datafiles</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -318,8 +309,8 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">station</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStationList</span><span class="p">()</span>
-        <span class="n">station</span><span class="o">.</span><span class="n">addData</span><span class="p">(</span><span class="n">datafiles</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setStationList</span><span class="p">(</span><span class="n">station</span><span class="p">)</span></div>
+        <span class="n">station</span><span class="o">.</span><span class="n">addData</span><span class="p">(</span><span class="n">datafiles</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setStationList</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ShakeMapInputContainer.updateRupture"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.updateRupture">[docs]</a>    <span class="k">def</span> <span class="nf">updateRupture</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventxml</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rupturefile</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Update rupture/origin information in container.</span>
@@ -345,8 +336,8 @@
                 <span class="n">rupture</span> <span class="o">=</span> <span class="n">rupture_from_dict_and_origin</span><span class="p">(</span><span class="n">rupture_dict</span><span class="p">,</span> <span class="n">origin</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>  <span class="c1"># no event.xml file, but we do have a rupture file</span>
             <span class="n">rupture</span> <span class="o">=</span> <span class="n">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">rupturefile</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">setRupture</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span></div></div>
+</div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setRupture</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ShakeMapOutputContainer"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer">[docs]</a><span class="k">class</span> <span class="nc">ShakeMapOutputContainer</span><span class="p">(</span><span class="n">ShakeMapContainer</span><span class="p">):</span>
@@ -375,8 +366,8 @@
         <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__file_data_type__&#39;</span>
         <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
             <span class="n">data_type_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">data_type_group</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="kc">None</span></div>
+            <span class="k">return</span> <span class="n">data_type_group</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span></div>
+        <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return a string representation of the container.</span>
@@ -432,8 +423,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Metadata dictionary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">info_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">info_str</span><span class="p">)</span></div>
+        <span class="n">info_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">info_str</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.setDataType"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.setDataType">[docs]</a>    <span class="k">def</span> <span class="nf">setDataType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datatype</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -464,8 +455,8 @@
             <span class="c1">#</span>
             <span class="k">return</span>
         <span class="n">data_type_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
-        <span class="n">data_type_group</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datatype</span>
-        <span class="k">return</span></div>
+        <span class="n">data_type_group</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">datatype</span></div>
+        <span class="k">return</span>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.setIMTGrids"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.setIMTGrids">[docs]</a>    <span class="k">def</span> <span class="nf">setIMTGrids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">,</span> <span class="n">imt_mean</span><span class="p">,</span> <span class="n">mean_metadata</span><span class="p">,</span>
                     <span class="n">imt_std</span><span class="p">,</span> <span class="n">std_metadata</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span>
@@ -520,8 +511,8 @@
                 <span class="n">std_set</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">imt_std</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">std_set</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-
-        <span class="k">return</span> <span class="n">imt_group</span></div>
+</div>
+        <span class="k">return</span> <span class="n">imt_group</span>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.getIMTGrids"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTGrids">[docs]</a>    <span class="k">def</span> <span class="nf">getIMTGrids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -573,8 +564,8 @@
             <span class="s1">&#39;mean_metadata&#39;</span><span class="p">:</span> <span class="n">mean_metadata</span><span class="p">,</span>
             <span class="s1">&#39;std&#39;</span><span class="p">:</span> <span class="n">std_grid</span><span class="p">,</span>
             <span class="s1">&#39;std_metadata&#39;</span><span class="p">:</span> <span class="n">std_metadata</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">imt_dict</span></div>
+        <span class="p">}</span></div>
+        <span class="k">return</span> <span class="n">imt_dict</span>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.setIMTArrays"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.setIMTArrays">[docs]</a>    <span class="k">def</span> <span class="nf">setIMTArrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">,</span> <span class="n">lons</span><span class="p">,</span> <span class="n">lats</span><span class="p">,</span> <span class="n">ids</span><span class="p">,</span>
                      <span class="n">imt_mean</span><span class="p">,</span> <span class="n">mean_metadata</span><span class="p">,</span>
@@ -643,8 +634,8 @@
         <span class="k">if</span> <span class="n">std_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">std_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
-
-        <span class="k">return</span> <span class="n">imt_group</span></div>
+</div>
+        <span class="k">return</span> <span class="n">imt_group</span>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.getIMTArrays"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTArrays">[docs]</a>    <span class="k">def</span> <span class="nf">getIMTArrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -708,8 +699,8 @@
             <span class="s1">&#39;mean_metadata&#39;</span><span class="p">:</span> <span class="n">mean_metadata</span><span class="p">,</span>
             <span class="s1">&#39;std&#39;</span><span class="p">:</span> <span class="n">std_data</span><span class="p">,</span>
             <span class="s1">&#39;std_metadata&#39;</span><span class="p">:</span> <span class="n">std_metadata</span>
-        <span class="p">}</span>
-        <span class="k">return</span> <span class="n">imt_dict</span></div>
+        <span class="p">}</span></div>
+        <span class="k">return</span> <span class="n">imt_dict</span>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.getIMTs"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTs">[docs]</a>    <span class="k">def</span> <span class="nf">getIMTs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">component</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Return list of names of available IMTs.</span>
@@ -729,8 +720,8 @@
                 <span class="k">if</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">component</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
                     <span class="n">imts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imt_group</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">component</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">imts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">]))</span>
-        <span class="k">return</span> <span class="n">imts</span></div>
+            <span class="n">imts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">]))</span></div>
+        <span class="k">return</span> <span class="n">imts</span>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.getComponents"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getComponents">[docs]</a>    <span class="k">def</span> <span class="nf">getComponents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -742,8 +733,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            list: List of names of components for given IMT.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">components</span> <span class="o">=</span> <span class="n">_get_type_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">,</span> <span class="s1">&#39;imt_&#39;</span> <span class="o">+</span> <span class="n">imt_name</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">components</span></div>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">_get_type_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">,</span> <span class="s1">&#39;imt_&#39;</span> <span class="o">+</span> <span class="n">imt_name</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">components</span>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.dropIMT"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.dropIMT">[docs]</a>    <span class="k">def</span> <span class="nf">dropIMT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -758,8 +749,8 @@
             <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No group called </span><span class="si">%s</span><span class="s1"> in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
-                                  <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
-            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span></div></div>
+                                  <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span></div></div>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
 </pre></div>
 
           </div>
@@ -795,12 +786,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

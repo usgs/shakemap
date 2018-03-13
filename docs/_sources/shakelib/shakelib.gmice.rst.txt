@@ -1,5 +1,5 @@
-shakelib\.gmice
-=======================
+shakelib.gmice
+======================
 
 Submodules
 

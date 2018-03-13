@@ -1,5 +1,5 @@
-shakemap\.utils
-=======================
+shakemap.utils
+======================
 
 Submodules
 

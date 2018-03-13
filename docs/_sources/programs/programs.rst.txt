@@ -7,4 +7,5 @@ ShakeMap Programs
    shake
    sm_clone
    sm_profile
+   getdyfi
 
