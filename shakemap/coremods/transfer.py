@@ -2,6 +2,9 @@
 import os.path
 import json
 from datetime import datetime
+import glob
+import re
+import shutil
 
 # third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
@@ -62,6 +65,31 @@ class TransferModule(CoreModule):
 
         # call the transfer method
         self._transfer(config, container, products_dir)
+
+        # copy the current folder to a new backup directory
+        self._make_backup(data_path)
+
+
+    def _make_backup(self,data_path):
+        data_dir = os.path.join(data_path,self._eventid)
+        current_dir = os.path.join(data_dir,'current')
+        backup_dirs = glob.glob(os.path.join(data_dir,'backup*'))
+        latest_version = 0
+
+        # and get the most recent version number
+        for backup_dir in backup_dirs:
+            if not os.path.isdir(backup_dir):
+                continue
+            match = re.search('[0-9]*$',backup_dir)
+            if match is not None:
+                version = int(match.group())
+                if version > latest_version:
+                    latest_version = version
+
+        new_version = latest_version + 1
+        backup = os.path.join(data_dir,'backup%04i' % new_version)
+        shutil.copytree(current_dir,backup)
+        self.logger.debug('Created backup directory %s' % backup)
 
     def _transfer(self,config,container,products_dir):
         # extract the info.json object from the container
