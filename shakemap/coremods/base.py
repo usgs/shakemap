@@ -49,10 +49,10 @@ class CoreModule(ABC):
         # one. It will collect up everything after the current
         # modules options in args.rem, which should be returned
         # by this function. Note: doing parser.parse_known_args()
-        # will not work as it will suck up any later modules' 
+        # will not work as it will suck up any later modules'
         # options that are the same as this one's.
         #
-        parser.add_argument('rem', nargs=argparse.REMAINDER, 
+        parser.add_argument('rem', nargs=argparse.REMAINDER,
                             help=argparse.SUPPRESS)
         args = parser.parse_args(arglist)
         return args.rem
