@@ -4,10 +4,14 @@ an InputContainer and write it out as shake_data.hdf.
 """
 
 # stdlib imports
+import argparse
+import inspect
 import os.path
 import glob
 import datetime
 import shutil
+import sys
+import logging
 
 # third party imports
 from configobj import ConfigObj
@@ -16,7 +20,7 @@ from configobj import ConfigObj
 from .base import CoreModule
 from shakelib.utils.containers import ShakeMapInputContainer
 from shakemap.utils.config import get_config_paths, get_custom_validator,\
-    config_error, check_config, get_configspec
+    config_error, check_config, get_configspec, get_logging_config
 
 
 class AssembleModule(CoreModule):
@@ -26,6 +30,18 @@ class AssembleModule(CoreModule):
     """
 
     command_name = 'assemble'
+
+    def __init__(self, eventid, comment=None):
+        """
+        Instantiate a CoreModule class with an event ID.
+        """
+        self._eventid = eventid
+        log_config = get_logging_config()
+        log_name = log_config['loggers'].keys()[0]
+        self.logger = logging.getLogger(log_name)
+        if comment is not None:
+            self.comment = comment
+
 
     def execute(self):
         """
@@ -51,6 +67,15 @@ class AssembleModule(CoreModule):
         self.logger.debug('Looking for event.xml file...')
         if not os.path.isfile(eventxml):
             raise FileNotFoundError('%s does not exist.' % eventxml)
+
+        # Prompt for a comment string if none is provided on the command line
+        if self.comment is None:
+            if sys.stdout.isatty():
+                self.comment = input(
+                        'Please enter a comment for this version.\n'
+                        'comment: ')
+            else:
+                self.comment = ''
 
         # find any source.txt or moment.xml files
         momentfile = os.path.join(datadir, 'moment.xml')
@@ -158,7 +183,7 @@ class AssembleModule(CoreModule):
         timestamp = datetime.datetime.utcnow().strftime('%FT%TZ')
         originator = config['system']['source_network']
         backup_dirs = sorted(
-            glob.glob(os.path.join(datadir, '..', '.backup*')),
+            glob.glob(os.path.join(datadir, '..', 'backup*')),
             reverse=True)
         if len(backup_dirs):
             #
@@ -171,9 +196,9 @@ class AssembleModule(CoreModule):
             bu_ic.close()
             version = int(
                 backup_dirs[0].replace(
-                    os.path.join(datadir, '..', '.backup'), ''))
+                    os.path.join(datadir, '..', 'backup'), ''))
             version += 1
-            new_line = [timestamp, originator, version]
+            new_line = [timestamp, originator, version, self.comment]
             history['history'].append(new_line)
         elif os.path.isfile(os.path.join(datadir, 'shake_data.hdf')):
             #
@@ -187,18 +212,19 @@ class AssembleModule(CoreModule):
             history = bu_ic.getVersionHistory()
             bu_ic.close()
             if 'history' in history:
-                new_line = [timestamp, originator, history['history'][-1][2]]
+                new_line = [timestamp, originator, history['history'][-1][2],
+                            self.comment]
                 history['history'][-1] = new_line
             else:
                 history = {'history': []}
-                new_line = [timestamp, originator, 1]
+                new_line = [timestamp, originator, 1, self.comment]
                 history['history'].append(new_line)
         else:
             #
             # No backup and no existing file. Make this version 1
             #
             history = {'history': []}
-            new_line = [timestamp, originator, 1]
+            new_line = [timestamp, originator, 1, self.comment]
             history['history'].append(new_line)
 
         hdf_file = os.path.join(datadir, 'shake_data.hdf')
@@ -216,3 +242,28 @@ class AssembleModule(CoreModule):
         self.logger.debug('Created HDF5 input container in %s' %
                           shake_data.getFileName())
         shake_data.close()
+
+    def parseArgs(self, arglist):
+        """
+        Set up the object to accept the --comment flag.
+        """
+        parser = argparse.ArgumentParser(prog=self.__class__.command_name,
+                    description=inspect.getdoc(self.__class__))
+        parser.add_argument('-c', '--comment', help='Provide a comment for '
+                            'this version of the ShakeMap. If the comment '
+                            'has spaces, the string should be quoted (e.g., '
+                            '--comment "This is a comment.")')
+        #
+        # This line should be in any modules that overrides this
+        # one. It will collect up everything after the current
+        # modules options in args.rem, which should be returned
+        # by this function. Note: doing parser.parse_known_args()
+        # will not work as it will suck up any later modules'
+        # options that are the same as this one's.
+        #
+        parser.add_argument('rem', nargs=argparse.REMAINDER,
+                            help=argparse.SUPPRESS)
+        args = parser.parse_args(arglist)
+        self.comment = args.comment
+        return args.rem
+

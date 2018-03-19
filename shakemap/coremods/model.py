@@ -1198,6 +1198,8 @@ class ModelModule(CoreModule):
             strftime("%Y-%m-%d %H:%M:%S%Z", gmtime())
         info[pp][sv]['map_version'] = \
             self.ic.getVersionHistory()['history'][-1][2]
+        info[pp][sv]['map_comment'] = \
+            self.ic.getVersionHistory()['history'][-1][3]
         info[pp][sv]['map_data_history'] = \
             self.ic.getVersionHistory()['history']
         info[pp][sv]['map_status'] = self.config['system']['map_status']

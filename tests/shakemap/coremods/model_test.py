@@ -23,7 +23,7 @@ def test_model_1():
     # Remove the products directory to hit the code that makes it
     # (should succeed)
     #
-    assemble = AssembleModule('northridge_points')
+    assemble = AssembleModule('northridge_points', comment='Test comment.')
     assemble.execute()
     products_dir = os.path.join(datapath, 'northridge_points', 'current',
                                 'products')
@@ -41,7 +41,7 @@ def test_model_2():
     # Removing this test because we effectively run it when
     # testing the other product modules.
     #
-    #    assemble = AssembleModule('nc72282711')
+    #    assemble = AssembleModule('nc72282711', comment='Test comment.')
     #    assemble.execute()
     #    model = ModelModule('nc72282711')
     #    model.execute()
@@ -53,7 +53,7 @@ def test_model_3():
     #
     # This is a small grid with DYFI data only (should succeed)
     #
-    assemble = AssembleModule('nc72282711_dyfi')
+    assemble = AssembleModule('nc72282711_dyfi', comment='Test comment.')
     assemble.execute()
     model = ModelModule('nc72282711_dyfi')
     model.execute()
@@ -64,7 +64,8 @@ def test_model_4():
     #
     # Run with no data and no fault, and use the default extent.
     #
-    assemble = AssembleModule('nc72282711_nodata_nofault')
+    assemble = AssembleModule('nc72282711_nodata_nofault',
+                              comment='Test comment.')
     assemble.execute()
     model = ModelModule('nc72282711_nodata_nofault')
     model.execute()
@@ -76,7 +77,7 @@ def test_model_5():
     # Set the bias and outlier magnitude limits low to test additional
     # code branches
     #
-    assemble = AssembleModule('nc72282711_nofault')
+    assemble = AssembleModule('nc72282711_nofault', comment='Test comment.')
     assemble.execute()
     model = ModelModule('nc72282711_nofault')
     model.execute()

@@ -4,10 +4,14 @@ configs, data, etc., then writes a new shake_data.hdf.
 """
 
 # stdlib imports
+import argparse
+import inspect
 import os.path
 import glob
 import datetime
 import shutil
+import sys
+import logging
 
 # third party imports
 from configobj import ConfigObj
@@ -16,7 +20,7 @@ from configobj import ConfigObj
 from .base import CoreModule
 from shakelib.utils.containers import ShakeMapInputContainer
 from shakemap.utils.config import get_config_paths, get_custom_validator,\
-    config_error, check_config, get_configspec
+    config_error, check_config, get_configspec, get_logging_config
 
 
 class AugmentModule(CoreModule):
@@ -26,6 +30,18 @@ class AugmentModule(CoreModule):
     """
 
     command_name = 'augment'
+
+    def __init__(self, eventid, comment=None):
+        """
+        Instantiate a CoreModule class with an event ID.
+        """
+        self._eventid = eventid
+        log_config = get_logging_config()
+        log_name = log_config['loggers'].keys()[0]
+        self.logger = logging.getLogger(log_name)
+        if comment is not None:
+            self.comment = comment
+
 
     def execute(self):
         """
@@ -54,6 +70,18 @@ class AugmentModule(CoreModule):
                                     hdf_file)
         shake_data = ShakeMapInputContainer.load(hdf_file)
 
+        # Prompt for a comment string if none is provided on the command line
+        if self.comment is None:
+            if sys.stdout.isatty():
+                self.comment = input(
+                        'Please enter a comment for this version.\n'
+                        '(Start with "+" if you wish to append to the\n'
+                        'existing comment; "+" by itself will preserve\n'
+                        'existing comments.)\n'
+                        'comment: ')
+            else:
+                self.comment = ''
+
         #
         # Clear away results from previous runs
         #
@@ -79,17 +107,17 @@ class AugmentModule(CoreModule):
 
         modules_file = os.path.join(install_path, 'config', 'modules.conf')
         if os.path.isfile(modules_file):
-            self.logger.info('Found a modules file.')
+            self.logger.debug('Found a modules file.')
             modules = ConfigObj(modules_file, configspec=spec_file)
             shake_config.merge(modules)
         gmpe_file = os.path.join(install_path, 'config', 'gmpe_sets.conf')
         if os.path.isfile(gmpe_file):
-            self.logger.info('Found a gmpe file.')
+            self.logger.debug('Found a gmpe file.')
             gmpe_sets = ConfigObj(gmpe_file, configspec=spec_file)
             shake_config.merge(gmpe_sets)
         config_file = os.path.join(install_path, 'config', 'model.conf')
         if os.path.isfile(config_file):
-            self.logger.info('Found a global config file.')
+            self.logger.debug('Found a global config file.')
             global_config = ConfigObj(config_file, configspec=spec_file)
             shake_config.merge(global_config)
         #
@@ -99,12 +127,12 @@ class AugmentModule(CoreModule):
         event_config_file = os.path.join(datadir, 'model.conf')
         event_config_zc_file = os.path.join(datadir, 'model_zc.conf')
         if os.path.isfile(event_config_file):
-            self.logger.info('Found an event specific model.conf file.')
+            self.logger.debug('Found an event specific model.conf file.')
             event_config = ConfigObj(event_config_file,
                                      configspec=spec_file)
             shake_config.merge(event_config)
         elif os.path.isfile(event_config_zc_file):
-            self.logger.info('Found an event specific model_zc file.')
+            self.logger.debug('Found an event specific model_zc file.')
             event_config = ConfigObj(event_config_zc_file,
                                      configspec=spec_file)
             shake_config.merge(event_config)
@@ -154,7 +182,7 @@ class AugmentModule(CoreModule):
         if os.path.isfile(os.path.join(datadir, 'stationlist.xml')):
             datafiles.append(os.path.join(datadir, 'stationlist.xml'))
         if datafiles:
-            self.logger.info('Found additional data files...')
+            self.logger.debug('Found additional data files...')
             shake_data.addStationData(datafiles)
         #
         # Look for a rupture file and replace the existing one if found
@@ -167,7 +195,7 @@ class AugmentModule(CoreModule):
         if not os.path.isfile(eventxml):
             eventxml = None
         if rupturefile is not None or eventxml is not None:
-            self.logger.info('Updating rupture/origin information.')
+            self.logger.debug('Updating rupture/origin information.')
             shake_data.updateRupture(
                 eventxml=eventxml, rupturefile=rupturefile)
 
@@ -182,10 +210,44 @@ class AugmentModule(CoreModule):
         history = shake_data.getVersionHistory()
         if history['history'][-1][1] == originator:
             history['history'][-1][0] = timestamp
+            if self.comment.startswith('+'):
+                if self.comment.replace('+', '') != '':
+                    history['history'][-1][3] += self.comment.replace('+', ' ')
+            else:
+                history['history'][-1][3] = self.comment
         else:
             version = int(history['history'][-1][2]) + 1
-            new_line = [timestamp, originator, version]
+            if self.comment.startswith('+'):
+                new_line = [timestamp, originator, version,
+                            self.comment.replace('+', '')]
+            else:
+                new_line = [timestamp, originator, version, self.comment]
             history['history'].append(new_line)
         shake_data.setVersionHistory(history)
 
         shake_data.close()
+
+    def parseArgs(self, arglist):
+        """
+        Set up the object to accept the --comment flag.
+        """
+        parser = argparse.ArgumentParser(prog=self.__class__.command_name,
+                    description=inspect.getdoc(self.__class__))
+        parser.add_argument('-c', '--comment', help='Provide a comment for '
+                            'this version of the ShakeMap. If the comment '
+                            'has spaces, the string should be quoted (e.g., '
+                            '--comment "This is a comment.")')
+        #
+        # This line should be in any modules that overrides this
+        # one. It will collect up everything after the current
+        # modules options in args.rem, which should be returned
+        # by this function. Note: doing parser.parse_known_args()
+        # will not work as it will suck up any later modules'
+        # options that are the same as this one's.
+        #
+        parser.add_argument('rem', nargs=argparse.REMAINDER,
+                            help=argparse.SUPPRESS)
+        args = parser.parse_args(arglist)
+        self.comment = args.comment
+        return args.rem
+

@@ -1,4 +1,6 @@
 # stdlib imports
+import argparse
+import inspect
 import logging
 from abc import ABC, abstractmethod
 import os.path
@@ -32,6 +34,28 @@ class CoreModule(ABC):
     @abstractmethod
     def execute(self):
         pass
+
+    def parseArgs(self, arglist):
+        """
+        This is the default parseArgs which is sufficient for most
+        modules. It will respond to '-h' or '--help' but nothing
+        else. If a module needs to accept command line arguments,
+        it will need to override this module.
+        """
+        parser = argparse.ArgumentParser(prog=self.__class__.command_name,
+                    description=inspect.getdoc(self.__class__))
+        #
+        # This line should be in any modules that overrides this
+        # one. It will collect up everything after the current
+        # modules options in args.rem, which should be returned
+        # by this function. Note: doing parser.parse_known_args()
+        # will not work as it will suck up any later modules'
+        # options that are the same as this one's.
+        #
+        parser.add_argument('rem', nargs=argparse.REMAINDER,
+                            help=argparse.SUPPRESS)
+        args = parser.parse_args(arglist)
+        return args.rem
 
     def writeContents(self):
         # if the module has not defined a contents dictionary

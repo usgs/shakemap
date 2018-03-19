@@ -17,7 +17,7 @@ def test_assemble():
     installpath, datapath = get_config_paths()
 
     # Process a non-existent event (should fail)
-    amod = AssembleModule('not_an_event')
+    amod = AssembleModule('not_an_event', comment='Test comment.')
     with pytest.raises(NotADirectoryError):
         amod.execute()
 
@@ -25,7 +25,7 @@ def test_assemble():
     event_file = os.path.join(datapath, 'wenchuan', 'current', 'event.xml')
     os.rename(event_file, event_file + '_safe')
     try:
-        amod = AssembleModule('wenchuan')
+        amod = AssembleModule('wenchuan', comment='Test comment.')
         with pytest.raises(FileNotFoundError):
             amod.execute()
     finally:
@@ -36,7 +36,7 @@ def test_assemble():
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
-        amod = AssembleModule('wenchuan')
+        amod = AssembleModule('wenchuan', comment='Test comment.')
         amod.execute()
         #
         # Run a second time to exercise a different branch of the code
@@ -53,7 +53,7 @@ def test_assemble():
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
-        amod = AssembleModule('nc72282711')
+        amod = AssembleModule('nc72282711', comment='Test comment.')
         amod.execute()
     finally:
         if os.path.isfile(data_file):
@@ -68,7 +68,7 @@ def test_assemble():
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
-        amod = AssembleModule('nc72282711')
+        amod = AssembleModule('nc72282711', comment='Test comment.')
         amod.execute()
     finally:
         os.rename(model_file + '_safe', model_file)
@@ -81,7 +81,7 @@ def test_assemble():
     if os.path.isfile(hdf_file):
         os.rename(hdf_file, hdf_file + '_safe')
     try:
-        amod = AssembleModule('nc72282711_dyfi')
+        amod = AssembleModule('nc72282711_dyfi', comment='Test comment.')
         amod.execute()
     finally:
         if os.path.isfile(hdf_file + '_safe'):
@@ -96,7 +96,8 @@ def test_assemble():
     os.rename(model_file, model_file + '_safe')
     shutil.copyfile(model_file + '.bad0', model_file)
     try:
-        amod = AssembleModule('nc72282711_nodata_nofault')
+        amod = AssembleModule('nc72282711_nodata_nofault',
+                              comment='Test comment.')
         with pytest.raises(RuntimeError):
             amod.execute()
     finally:
@@ -108,7 +109,8 @@ def test_assemble():
     os.rename(model_file, model_file + '_safe')
     shutil.copyfile(model_file + '.bad1', model_file)
     try:
-        amod = AssembleModule('nc72282711_nodata_nofault')
+        amod = AssembleModule('nc72282711_nodata_nofault',
+                              comment='Test comment.')
         with pytest.raises(FileNotFoundError):
             amod.execute()
     finally:
@@ -120,7 +122,8 @@ def test_assemble():
     os.rename(model_file, model_file + '_safe')
     shutil.copyfile(model_file + '.bad2', model_file)
     try:
-        amod = AssembleModule('nc72282711_nodata_nofault')
+        amod = AssembleModule('nc72282711_nodata_nofault',
+                              comment='Test comment.')
         with pytest.raises(FileNotFoundError):
             amod.execute()
     finally:
@@ -133,7 +136,7 @@ def test_assemble():
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
-        amod = AssembleModule('northridge_points')
+        amod = AssembleModule('northridge_points', comment='Test comment.')
         amod.execute()
     finally:
         if os.path.isfile(data_file):

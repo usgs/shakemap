@@ -1,5 +1,6 @@
 # stdlib
 import os.path
+from collections import OrderedDict
 
 # third party
 
@@ -15,12 +16,58 @@ from .base import CoreModule
 from shakelib.utils.imt_string import oq_to_file
 
 
-class XPlotRegr(CoreModule):
+class PlotRegr(CoreModule):
     """
-    xplotregr -- Plot the regression curves from a data file
+    plotregr -- Plot the regression curves from a data file
     """
 
-    command_name = 'xplotregr'
+    command_name = 'plotregr'
+
+    # supply here a data structure with information about files that
+    # can be created by this module.
+    regr_page = {'title': 'Regression Plots', 'slug': 'regression'}
+    contents = OrderedDict.fromkeys(['miRegr',
+                                     'pgaRegr',
+                                     'pgvRegr',
+                                     'psa[PERIOD]Regr'])
+    contents['miRegr'] = {
+	'title': 'Intensity Regression',
+        'caption': 'Regression plot of macroseismic intensity.',
+        'page': regr_page,
+        'formats': [{'filename':'MMI_regr.png',
+                     'type':'image/png'}
+        ]
+    }
+
+    contents['pgaRegr'] = {
+	'title': 'PGA Regression',
+        'caption': 'Regression plot of [COMPONENT] peak ground '\
+                   'acceleration (%g).',
+        'page': regr_page,
+        'formats': [{'filename':'PGA_regr.png',
+                     'type':'image/png'}
+        ]
+    }
+    contents['pgvRegr'] = {
+	'title': 'PGV Regression',
+        'caption': 'Regression plot of [COMPONENT] peak ground '\
+                   'velocity (cm/s).',
+        'page': regr_page,
+        'formats': [{'filename':'PGV_regr.png',
+                     'type':'image/png'}
+        ]
+    }
+    psacap = 'Regression plot of [COMPONENT] [FPERIOD] sec 5% damped '\
+             'pseudo-spectral acceleration(%g).'
+    contents['psa[PERIOD]Regr'] = {
+	'title': 'PSA[PERIOD] Regression',
+        'page': regr_page,
+        'caption': psacap,
+        'formats': [{'filename':'PSA[0-9]p[0-9]_regr.png',
+                     'type':'image/png'}
+        ]
+    }
+
 
     def execute(self):
         """
@@ -40,7 +87,7 @@ class XPlotRegr(CoreModule):
         # Open the ShakeMapOutputContainer and extract the data
         ic = ShakeMapOutputContainer.load(datafile)
         if ic.getDataType() != 'grid':
-            raise NotImplementedError('xplotregr module can only operate on '
+            raise NotImplementedError('plotregr module can only operate on '
                                       'gridded data not sets of points')
 
         #
@@ -148,8 +195,7 @@ class XPlotRegr(CoreModule):
             plt.legend()
 
             fileimt = oq_to_file(myimt)
-            pfile = os.path.join(datadir,
-                    self._eventid + '_regression_' + fileimt + '.pdf')
+            pfile = os.path.join(datadir, fileimt + '_regr.png')
             plt.savefig(pfile)
             plt.close()
 

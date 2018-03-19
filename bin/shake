@@ -102,13 +102,16 @@ def get_parser():
             continue
         epilog += '    - %s\n' % inspect.getdoc(core_class)
 
+    epilog += '\nUse "shake help command" to see the options for a '\
+              'specific command.\n'
+
     parser = argparse.ArgumentParser(
         description=description,
         epilog=epilog,
         formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('eventid',
                         help='The id of the event to process.')
-    parser.add_argument('cmds', nargs='+',
+    parser.add_argument('cmds', nargs=argparse.REMAINDER,
                         help='The modules to run.')
     parser.add_argument('-d', '--debug', action='store_true',
                         help='Print all informational messages.')
@@ -141,22 +144,39 @@ def main(args):
     logger = get_logger(args.eventid, log_option=log_option)
 
     try:
-        for cmd in args.cmds:
+        cmd_list = OrderedDict()
+        arglist = args.cmds.copy()
+        oldcmd = ''
+        while(len(arglist) > 0):
+            cmd = arglist.pop(0)
+
+            if cmd.startswith('-'):
+                raise KeyError('Command "%s" cannot process option "%s"' %
+                               (oldcmd, cmd))
+
             if cmd not in _classes_:
                 raise KeyError('Command "%s" not found in ShakeMap.' % cmd)
 
-        for cmd in args.cmds:
-            logger.info('Running command %s' % cmd)
             cmd_class = _classes_[cmd]
             cmd_obj = cmd_class(args.eventid)
+            cmd_list[cmd] = cmd_obj
+
+            if args.eventid.lower() == 'help':
+                arglist = ['-h']
+
+            arglist = cmd_obj.parseArgs(arglist)
+            oldcmd = cmd
+
+        for cmd, obj in cmd_list.items():
+            logger.info('Running command %s' % cmd)
             t1 = time.time()
-            cmd_obj.execute()
+            obj.execute()
             t2 = time.time()
             elapsed = t2 - t1
             logger.info('Finished running command %s: Elapsed %.2f secs'
                         % (cmd, elapsed))
             # create/update the contents.xml file
-            cmd_obj.writeContents()
+            obj.writeContents()
 
     except Exception as e:
         error_msg = _format_error_info(e, args.eventid)
@@ -167,5 +187,8 @@ def main(args):
 if __name__ == '__main__':
     parser = get_parser()
     pargs = parser.parse_args()
-    main(pargs)
+    if pargs.eventid.lower() == 'help' and len(pargs.cmds) == 0:
+        parser.print_help()
+    else:
+        main(pargs)
     sys.exit(0)

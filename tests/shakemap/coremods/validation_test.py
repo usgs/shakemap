@@ -13,7 +13,7 @@ from shakemap.coremods.assemble import AssembleModule
 from shakemap.coremods.xtestplot import XTestPlot
 from shakemap.coremods.xtestplot_spectra import XTestPlotSpectra
 from shakemap.coremods.xtestimage import XTestImage
-from shakemap.coremods.xplotregr import XPlotRegr
+from shakemap.coremods.plotregr import PlotRegr
 
 ########################################################################
 # Test the nullgmpe and the dummy correlation function as well as
@@ -28,7 +28,8 @@ def test_validation():
         #
         # Test xtestplot on validation event 0006
         #
-        assemble = AssembleModule('validation_test_0006')
+        assemble = AssembleModule('validation_test_0006',
+                                  comment='Test comment.')
         assemble.execute()
         model = ModelModule('validation_test_0006')
         model.execute()
@@ -38,7 +39,8 @@ def test_validation():
         #
         # Test xtestplot_spectra on validation event 0007
         #
-        assemble = AssembleModule('validation_test_0007')
+        assemble = AssembleModule('validation_test_0007',
+                                  comment='Test comment.')
         assemble.execute()
         model = ModelModule('validation_test_0007')
         model.execute()
@@ -48,13 +50,14 @@ def test_validation():
         #
         # Test xtestimage on validation event 0013
         #
-        assemble = AssembleModule('validation_test_0013')
+        assemble = AssembleModule('validation_test_0013',
+                                  comment='Test comment.')
         assemble.execute()
         model = ModelModule('validation_test_0013')
         model.execute()
         plot = XTestImage('validation_test_0013')
         plot.execute()
-        regr = XPlotRegr('validation_test_0013')
+        regr = PlotRegr('validation_test_0013')
         regr.execute()
     finally:
         data_file = os.path.join(datapath, 'validation_test_0006', 'current',
