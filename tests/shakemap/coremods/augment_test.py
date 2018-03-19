@@ -18,7 +18,7 @@ def test_augment():
     installpath, datapath = get_config_paths()
 
     # Process a non-existent event (should fail)
-    augment = AugmentModule('not_an_event')
+    augment = AugmentModule('not_an_event', comment='Test comment.')
     with pytest.raises(NotADirectoryError):
         augment.execute()
 
@@ -27,7 +27,7 @@ def test_augment():
     if os.path.isfile(hdf_file):
         os.rename(hdf_file, hdf_file + '_safe')
     try:
-        augment = AugmentModule('wenchuan')
+        augment = AugmentModule('wenchuan', comment='Test comment.')
         with pytest.raises(FileNotFoundError):
             augment.execute()
     finally:
@@ -39,9 +39,9 @@ def test_augment():
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
-        assemble = AssembleModule('wenchuan')
+        assemble = AssembleModule('wenchuan', comment='Test comment.')
         assemble.execute()
-        augment = AugmentModule('wenchuan')
+        augment = AugmentModule('wenchuan', comment='Test comment.')
         augment.execute()
     finally:
         if os.path.isfile(data_file):
@@ -54,9 +54,9 @@ def test_augment():
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
-        assemble = AssembleModule('nc72282711')
+        assemble = AssembleModule('nc72282711', comment='Test comment.')
         assemble.execute()
-        augment = AugmentModule('nc72282711')
+        augment = AugmentModule('nc72282711', comment='Test comment.')
         augment.execute()
     finally:
         if os.path.isfile(data_file):
@@ -70,9 +70,9 @@ def test_augment():
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
-        assemble = AssembleModule('northridge_points')
+        assemble = AssembleModule('northridge_points', comment='Test comment.')
         assemble.execute()
-        augment = AugmentModule('northridge_points')
+        augment = AugmentModule('northridge_points', comment='Test comment.')
         augment.execute()
     finally:
         if os.path.isfile(data_file):
@@ -86,7 +86,8 @@ def test_augment():
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
-        assemble = AssembleModule('nc72282711_nodata_nofault')
+        assemble = AssembleModule('nc72282711_nodata_nofault',
+                                  comment='Test comment.')
         assemble.execute()
         # Should fail validation
         model_file = os.path.join(datapath, 'nc72282711_nodata_nofault',
@@ -94,7 +95,8 @@ def test_augment():
         os.rename(model_file, model_file + '_safe')
         shutil.copyfile(model_file + '.bad0', model_file)
         try:
-            augment = AugmentModule('nc72282711_nodata_nofault')
+            augment = AugmentModule('nc72282711_nodata_nofault',
+                                    comment='Test comment.')
             with pytest.raises(RuntimeError):
                 augment.execute()
         finally:
@@ -106,7 +108,8 @@ def test_augment():
         os.rename(model_file, model_file + '_safe')
         shutil.copyfile(model_file + '.bad1', model_file)
         try:
-            augment = AugmentModule('nc72282711_nodata_nofault')
+            augment = AugmentModule('nc72282711_nodata_nofault',
+                                    comment='Test comment.')
             with pytest.raises(FileNotFoundError):
                 augment.execute()
         finally:
@@ -118,7 +121,8 @@ def test_augment():
         os.rename(model_file, model_file + '_safe')
         shutil.copyfile(model_file + '.bad2', model_file)
         try:
-            augment = AugmentModule('nc72282711_nodata_nofault')
+            augment = AugmentModule('nc72282711_nodata_nofault',
+                                    comment='Test comment.')
             with pytest.raises(FileNotFoundError):
                 augment.execute()
         finally:
@@ -139,9 +143,9 @@ def test_augment():
     if os.path.isfile(data_file):
         os.remove(data_file)
     try:
-        assemble = AssembleModule('nc72282711')
+        assemble = AssembleModule('nc72282711', comment='Test comment.')
         assemble.execute()
-        augment = AugmentModule('nc72282711')
+        augment = AugmentModule('nc72282711', comment='Test comment.')
         augment.execute()
     finally:
         os.rename(model_file + '_safe', model_file)

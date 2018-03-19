@@ -15,12 +15,12 @@ from .base import CoreModule
 from shakelib.utils.imt_string import oq_to_file
 
 
-class XPlotRegr(CoreModule):
+class PlotRegr(CoreModule):
     """
-    xplotregr -- Plot the regression curves from a data file
+    plotregr -- Plot the regression curves from a data file
     """
 
-    command_name = 'xplotregr'
+    command_name = 'plotregr'
 
     def execute(self):
         """
@@ -40,7 +40,7 @@ class XPlotRegr(CoreModule):
         # Open the ShakeMapOutputContainer and extract the data
         ic = ShakeMapOutputContainer.load(datafile)
         if ic.getDataType() != 'grid':
-            raise NotImplementedError('xplotregr module can only operate on '
+            raise NotImplementedError('plotregr module can only operate on '
                                       'gridded data not sets of points')
 
         #
