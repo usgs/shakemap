@@ -90,7 +90,7 @@
 <div class="viewcode-block" id="get_data_path"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_data_path">[docs]</a><span class="k">def</span> <span class="nf">get_data_path</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Return the path to the shakemap package data directory holding</span>
-<span class="sd">    configspec.conf, the template config files, and the example config</span>
+<span class="sd">    modelspec.conf, the template config files, and the example config</span>
 <span class="sd">    files.</span>
 
 <span class="sd">    Returns:</span>
@@ -112,7 +112,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;configspec.conf&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;modelspec.conf&#39;</span><span class="p">)</span>
     <span class="n">fname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">spec.conf&#39;</span> <span class="o">%</span> <span class="n">config</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;No file &quot;</span><span class="si">%s</span><span class="s1">&quot; exists.&#39;</span> <span class="o">%</span> <span class="n">fname</span><span class="p">)</span>

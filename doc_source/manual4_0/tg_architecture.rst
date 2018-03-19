@@ -174,7 +174,9 @@ ID and a list of modules as arguments. The modules do the work of
 assembling the input data, producing interpolated grids, and deriving
 products from the grids and associated metadata. See the
 :ref:`shake man page <shake>` or run ``shake --help`` for a list
-of available modules.
+of available modules.  Each of the modules may have
+its own command-line options; run "shake help MODULE" to see the help
+for a given module. 
 
 The behavior of **shake** and many of its modules are controlled by
 the configuration files *shake.conf* and *products.conf*. *shake.conf*
@@ -295,7 +297,18 @@ nearest layer. If an earthquake falls
 within more than one layer (possible if layers are nested), the first one
 encountered in the *select.conf* is used and any other(s) will be ignored.
 
-See :meth:`shakemap.coremods.select` for more.
+See :meth:`shakemap.coremods.select` for the module's API
+documentation.
+
+dyfi
+````
+
+The **dyfi** module queries ComCat for any "Did You Feel It?" data 
+associated with an event and writes that data to a file in the event's
+*current* directory. 
+
+See :meth:`shakemap.coremods.dyfi` for the module's API
+documentation.
 
 assemble
 ````````
@@ -343,7 +356,16 @@ with the current timestamp, originator, and version.
 *shake_data.hdf* in the event's *current* directory. If *shake_data.hdf*
 already exists in that location, it will be overwritten.
 
-See :meth:`shakemap.coremods.assemble` for more.
+**assemble** takes an optional command-line argument (``-c COMMENT``
+or ``--comment COMMENT``) to provide a comment
+that will be added to the history for the
+current version of the event's ShakeMap. If run from a terminal,
+and a comment is not provided on the command line, **assemble** 
+will prompt the user for a comment.
+Run "shake help assemble" for more.
+
+See :meth:`shakemap.coremods.assemble` for the module's API
+documentation.
 
 .. _shake-assemble:
 
@@ -376,7 +398,17 @@ will replace the existing fault data in *shake_data.hdf*.
 The history information will be updated to reflect the update time and
 originator (if applicable).
 
-See :meth:`shakemap.coremods.augment` for more.
+As with **assemble**, **augment** takes an optional command-line 
+argument (``-c COMMENT``
+or ``--comment COMMENT``) to provide a comment
+that will be added to the history for the
+current version of the event's ShakeMap. If run from a terminal,
+and a comment is not provided on the command line, **assemble** 
+will prompt the user for a comment.
+Run "shake help augment" for more.
+
+See :meth:`shakemap.coremods.augment` for the module's API 
+documentation.
 
 model
 `````
@@ -397,7 +429,8 @@ the documentation within those files for more information.
 
 A great deal of this manual is devoted to the way the interpolation is
 performed, and the effect of various configuration options. See the
-relevant sections for more.
+relevant sections for more. In particular, the section :ref:`sec-processing-4`
+goes into detail on the way the model program works.
 
 **model** writes a file, *shake_result.hdf*, in the *products*
 subdirectory of the event's *current* directory.
@@ -405,7 +438,8 @@ See :ref:`the formats section <sec-formats-4>`
 of this manual for more on the format and
 content of *shake_result.hdf*.
 
-See :meth:`shakemap.coremods.model` for more.
+See :meth:`shakemap.coremods.model` for the module's API
+documentation.
 
 contour
 ```````
@@ -431,7 +465,8 @@ directly from *shake_result.hdf*. See :ref:`the formats section <sec-formats-4>`
 of this manual for more on
 using *shake_result.hdf*.
 
-See :meth:`shakemap.coremods.gridxml` for more details.
+See :meth:`shakemap.coremods.gridxml` for the module's API
+documentation.
 
 info
 ```````
@@ -439,7 +474,8 @@ info
 **info** reads an event's *shake_result.hdf* and produces *info.json*,
 which contains metadata about the ShakeMap.
 
-See :meth:`shakemap.coremods.info` for more details.
+See :meth:`shakemap.coremods.info` for the module's API
+documentation.
 
 mapping
 ```````
@@ -453,9 +489,29 @@ and we may not maintain or support it in its current form in the
 future. In particular, it uses the **basemap** mapping package,
 which is disappearing in favor of **cartopy**.
 
-See :meth:`shakemap.coremods.mapping` for more details. See the
+See :meth:`shakemap.coremods.mapping` for the module's API
+documentation. See the
 configuration file *products.conf* for information on configuring
 the **mapping** module.
+
+plotregr
+````````
+
+**plotregr** makes plots of an approximation of the GMPE's predicted
+ground motion as a function of distance for each
+output IMT, along with the data for that IMT. The plotted value at each
+distance is the average value of the GMPE's gridded values in that 
+particular distance bin. The values are predicted on soil (Vs30=180 m/s)
+and rock (Vs30=760 m/s), which are plotted as green and red lines, 
+respectively. The +/- 1 standard deviation lines are also plotted.
+The station and dyfi data are plotted at their
+computed distance from the source. If no finite fault is available for
+the map, then the approximated point-source to finite-fault  distance 
+is used.
+
+The **plotregr** module is fairly simplistic and of limited utility. 
+Our hope it that it will be rendered obsolete by
+more sophisticated interactive plots.
 
 raster
 ```````
@@ -464,7 +520,8 @@ raster
 raster files of the mean and standard deviation for each of the
 IMTs in *shake_result.hdf*.
 
-See :meth:`shakemap.coremods.raster` for more details.
+See :meth:`shakemap.coremods.raster` for the module's API
+documentation.
 
 rupture
 ```````
@@ -473,7 +530,8 @@ rupture
 file, *rupture.json* containing the coordinates of the rupture
 plane(s) supplied via the input file *<>_fault.txt* or *<>_fault.json*.
 
-See :meth:`shakemap.coremods.rupture` for more details.
+See :meth:`shakemap.coremods.rupture` for the module's API
+documentation.
 
 stations
 ````````
@@ -481,7 +539,34 @@ stations
 **stations** reads an event's *shake_result.hdf* and produces a
 JSON file, *stationlist.json*, of the input station data.
 
-See :meth:`shakemap.coremods.stations` for more details.
+See :meth:`shakemap.coremods.stations` for the module's API
+documentation.
+
+
+Additional Programs
+===================
+
+ShakeMap provides a few auxiliary programs that may occasionally be 
+useful.
+
+getdyfi
+-------
+
+**getdyfi** is a standalone program implementing the **dyfi** module's
+functionality.  See the :ref:`getdyfi man page <getdyfi>` for usage and a 
+list of options.
+
+
+sm_clone
+--------
+
+**sm_clone** queries the NEIC ComCat database for ShakeMap data 
+associated with an event and writes that data into the event's
+local *current* directory. The event will then be available for
+local processing.
+
+See the :ref:`sm_clone man page <sm-clone>` for usage and a 
+list of options.
 
 
 .. rubric:: Footnotes

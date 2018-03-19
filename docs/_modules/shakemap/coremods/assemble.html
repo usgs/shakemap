@@ -47,10 +47,14 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># stdlib imports</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
@@ -59,7 +63,7 @@
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapInputContainer</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span> <span class="n">get_custom_validator</span><span class="p">,</span>\
-    <span class="n">config_error</span><span class="p">,</span> <span class="n">check_config</span><span class="p">,</span> <span class="n">get_configspec</span>
+    <span class="n">config_error</span><span class="p">,</span> <span class="n">check_config</span><span class="p">,</span> <span class="n">get_configspec</span><span class="p">,</span> <span class="n">get_logging_config</span>
 
 
 <div class="viewcode-block" id="AssembleModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.assemble.html#shakemap.coremods.assemble.AssembleModule">[docs]</a><span class="k">class</span> <span class="nc">AssembleModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
@@ -69,6 +73,18 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;assemble&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Instantiate a CoreModule class with an event ID.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span> <span class="o">=</span> <span class="n">eventid</span>
+        <span class="n">log_config</span> <span class="o">=</span> <span class="n">get_logging_config</span><span class="p">()</span>
+        <span class="n">log_name</span> <span class="o">=</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">log_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">comment</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">comment</span>
+
 
 <div class="viewcode-block" id="AssembleModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.assemble.html#shakemap.coremods.assemble.AssembleModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -94,6 +110,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for event.xml file...&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">eventxml</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">eventxml</span><span class="p">)</span>
+
+        <span class="c1"># Prompt for a comment string if none is provided on the command line</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">isatty</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="nb">input</span><span class="p">(</span>
+                        <span class="s1">&#39;Please enter a comment for this version.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="s1">&#39;comment: &#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
         <span class="c1"># find any source.txt or moment.xml files</span>
         <span class="n">momentfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;moment.xml&#39;</span><span class="p">)</span>
@@ -201,7 +226,7 @@
         <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">utcnow</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%F</span><span class="s1">T%TZ&#39;</span><span class="p">)</span>
         <span class="n">originator</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;source_network&#39;</span><span class="p">]</span>
         <span class="n">backup_dirs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
-            <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;.backup*&#39;</span><span class="p">)),</span>
+            <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;backup*&#39;</span><span class="p">)),</span>
             <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">backup_dirs</span><span class="p">):</span>
             <span class="c1">#</span>
@@ -214,9 +239,9 @@
             <span class="n">bu_ic</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="n">version</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
                 <span class="n">backup_dirs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;.backup&#39;</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;backup&#39;</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
             <span class="n">version</span> <span class="o">+=</span> <span class="mi">1</span>
-            <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="n">version</span><span class="p">]</span>
+            <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">]</span>
             <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_line</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)):</span>
             <span class="c1">#</span>
@@ -230,18 +255,19 @@
             <span class="n">history</span> <span class="o">=</span> <span class="n">bu_ic</span><span class="o">.</span><span class="n">getVersionHistory</span><span class="p">()</span>
             <span class="n">bu_ic</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">if</span> <span class="s1">&#39;history&#39;</span> <span class="ow">in</span> <span class="n">history</span><span class="p">:</span>
-                <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]]</span>
+                <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">],</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">]</span>
                 <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_line</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">history</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;history&#39;</span><span class="p">:</span> <span class="p">[]}</span>
-                <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">]</span>
                 <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_line</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1">#</span>
             <span class="c1"># No backup and no existing file. Make this version 1</span>
             <span class="c1">#</span>
             <span class="n">history</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;history&#39;</span><span class="p">:</span> <span class="p">[]}</span>
-            <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+            <span class="n">new_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">timestamp</span><span class="p">,</span> <span class="n">originator</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">comment</span><span class="p">]</span>
             <span class="n">history</span><span class="p">[</span><span class="s1">&#39;history&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_line</span><span class="p">)</span>
 
         <span class="n">hdf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">)</span>
@@ -258,7 +284,32 @@
             <span class="n">datafiles</span><span class="o">=</span><span class="n">datafiles</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created HDF5 input container in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
                           <span class="n">shake_data</span><span class="o">.</span><span class="n">getFileName</span><span class="p">())</span>
-        <span class="n">shake_data</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+        <span class="n">shake_data</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="AssembleModule.parseArgs"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.assemble.html#shakemap.coremods.assemble.AssembleModule.parseArgs">[docs]</a>    <span class="k">def</span> <span class="nf">parseArgs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arglist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set up the object to accept the --comment flag.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">command_name</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">))</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--comment&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Provide a comment for &#39;</span>
+                            <span class="s1">&#39;this version of the ShakeMap. If the comment &#39;</span>
+                            <span class="s1">&#39;has spaces, the string should be quoted (e.g., &#39;</span>
+                            <span class="s1">&#39;--comment &quot;This is a comment.&quot;)&#39;</span><span class="p">)</span>
+        <span class="c1">#</span>
+        <span class="c1"># This line should be in any modules that overrides this</span>
+        <span class="c1"># one. It will collect up everything after the current</span>
+        <span class="c1"># modules options in args.rem, which should be returned</span>
+        <span class="c1"># by this function. Note: doing parser.parse_known_args()</span>
+        <span class="c1"># will not work as it will suck up any later modules&#39;</span>
+        <span class="c1"># options that are the same as this one&#39;s.</span>
+        <span class="c1">#</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;rem&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">SUPPRESS</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">arglist</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">comment</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">comment</span>
+        <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">rem</span></div></div>
+
 </pre></div>
 
           </div>

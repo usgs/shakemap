@@ -14,12 +14,12 @@ Submodules
    shakemap.coremods.info
    shakemap.coremods.mapping
    shakemap.coremods.model
+   shakemap.coremods.plotregr
    shakemap.coremods.raster
    shakemap.coremods.rupture
    shakemap.coremods.select
    shakemap.coremods.stations
    shakemap.coremods.transfer
-   shakemap.coremods.xplotregr
    shakemap.coremods.xtestimage
    shakemap.coremods.xtestplot
    shakemap.coremods.xtestplot_spectra
