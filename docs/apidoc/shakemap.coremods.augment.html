@@ -48,7 +48,7 @@
 configs, data, etc., then writes a new shake_data.hdf.</p>
 <dl class="class">
 <dt id="shakemap.coremods.augment.AugmentModule">
-<em class="property">class </em><code class="descclassname">shakemap.coremods.augment.</code><code class="descname">AugmentModule</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">shakemap.coremods.augment.</code><code class="descname">AugmentModule</code><span class="sig-paren">(</span><em>eventid</em>, <em>comment=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
 <dl class="docutils">
 <dt>augment – Incorporate additional content into the shake_data.hdf input</dt>
@@ -83,6 +83,12 @@ configured.</li>
 </tr>
 </tbody>
 </table>
+</dd></dl>
+
+<dl class="method">
+<dt id="shakemap.coremods.augment.AugmentModule.parseArgs">
+<code class="descname">parseArgs</code><span class="sig-paren">(</span><em>arglist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/augment.html#AugmentModule.parseArgs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.augment.AugmentModule.parseArgs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the object to accept the –comment flag.</p>
 </dd></dl>
 
 </dd></dl>
@@ -127,12 +133,12 @@ configured.</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.info.html">shakemap.coremods.info</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.mapping.html">shakemap.coremods.mapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.model.html">shakemap.coremods.model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.plotregr.html">shakemap.coremods.plotregr</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.raster.html">shakemap.coremods.raster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.rupture.html">shakemap.coremods.rupture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.select.html">shakemap.coremods.select</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.stations.html">shakemap.coremods.stations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.transfer.html">shakemap.coremods.transfer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xplotregr.html">shakemap.coremods.xplotregr</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestimage.html">shakemap.coremods.xtestimage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestplot.html">shakemap.coremods.xtestplot</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestplot_spectra.html">shakemap.coremods.xtestplot_spectra</a></li>

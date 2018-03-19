@@ -42,6 +42,8 @@
             
   <h1>Source code for shakemap.coremods.base</h1><div class="highlight"><pre>
 <span></span><span class="c1"># stdlib imports</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">inspect</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
@@ -75,6 +77,28 @@
 <div class="viewcode-block" id="CoreModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.base.html#shakemap.coremods.base.CoreModule.execute">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="CoreModule.parseArgs"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.base.html#shakemap.coremods.base.CoreModule.parseArgs">[docs]</a>    <span class="k">def</span> <span class="nf">parseArgs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arglist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is the default parseArgs which is sufficient for most</span>
+<span class="sd">        modules. It will respond to &#39;-h&#39; or &#39;--help&#39; but nothing</span>
+<span class="sd">        else. If a module needs to accept command line arguments,</span>
+<span class="sd">        it will need to override this module.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="o">.</span><span class="n">command_name</span><span class="p">,</span>
+                    <span class="n">description</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__class__</span><span class="p">))</span>
+        <span class="c1">#</span>
+        <span class="c1"># This line should be in any modules that overrides this</span>
+        <span class="c1"># one. It will collect up everything after the current</span>
+        <span class="c1"># modules options in args.rem, which should be returned</span>
+        <span class="c1"># by this function. Note: doing parser.parse_known_args()</span>
+        <span class="c1"># will not work as it will suck up any later modules&#39;</span>
+        <span class="c1"># options that are the same as this one&#39;s.</span>
+        <span class="c1">#</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;rem&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span>
+                            <span class="n">help</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">SUPPRESS</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">(</span><span class="n">arglist</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">rem</span></div>
 
 <div class="viewcode-block" id="CoreModule.writeContents"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.base.html#shakemap.coremods.base.CoreModule.writeContents">[docs]</a>    <span class="k">def</span> <span class="nf">writeContents</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># if the module has not defined a contents dictionary</span>

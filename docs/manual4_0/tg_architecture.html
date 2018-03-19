@@ -191,7 +191,9 @@ ID and a list of modules as arguments. The modules do the work of
 assembling the input data, producing interpolated grids, and deriving
 products from the grids and associated metadata. See the
 <a class="reference internal" href="../programs/shake.html#shake"><span class="std std-ref">shake man page</span></a> or run <code class="docutils literal"><span class="pre">shake</span> <span class="pre">--help</span></code> for a list
-of available modules.</p>
+of available modules.  Each of the modules may have
+its own command-line options; run “shake help MODULE” to see the help
+for a given module.</p>
 <p>The behavior of <strong>shake</strong> and many of its modules are controlled by
 the configuration files <em>shake.conf</em> and <em>products.conf</em>. <em>shake.conf</em>
 is largely concerned with the way logging is handled. See <em>shake.conf</em>
@@ -297,10 +299,19 @@ above).</p>
 nearest layer. If an earthquake falls
 within more than one layer (possible if layers are nested), the first one
 encountered in the <em>select.conf</em> is used and any other(s) will be ignored.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.select.html#module-shakemap.coremods.select" title="shakemap.coremods.select"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.select()</span></code></a> for more.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.select.html#module-shakemap.coremods.select" title="shakemap.coremods.select"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.select()</span></code></a> for the module’s API
+documentation.</p>
+</div>
+<div class="section" id="dyfi">
+<h4>2.1.2.3.2. dyfi<a class="headerlink" href="#dyfi" title="Permalink to this headline">¶</a></h4>
+<p>The <strong>dyfi</strong> module queries ComCat for any “Did You Feel It?” data
+associated with an event and writes that data to a file in the event’s
+<em>current</em> directory.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.dyfi.html#module-shakemap.coremods.dyfi" title="shakemap.coremods.dyfi"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.dyfi()</span></code></a> for the module’s API
+documentation.</p>
 </div>
 <div class="section" id="assemble">
-<h4>2.1.2.3.2. assemble<a class="headerlink" href="#assemble" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.3.3. assemble<a class="headerlink" href="#assemble" title="Permalink to this headline">¶</a></h4>
 <p>The <strong>assemble</strong> module collects event and configuration data and creates the
 file <em>shake_data.hdf</em>. It first reads <em>event.xml</em> and stores it in a
 data structure. <strong>sm_assemble</strong> then reads the configuration files</p>
@@ -335,14 +346,22 @@ with the current timestamp, originator, and version.</p>
 <p><strong>assemble</strong> then consolidated all of this data and writes
 <em>shake_data.hdf</em> in the event’s <em>current</em> directory. If <em>shake_data.hdf</em>
 already exists in that location, it will be overwritten.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.assemble.html#module-shakemap.coremods.assemble" title="shakemap.coremods.assemble"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.assemble()</span></code></a> for more.</p>
+<p><strong>assemble</strong> takes an optional command-line argument (<code class="docutils literal"><span class="pre">-c</span> <span class="pre">COMMENT</span></code>
+or <code class="docutils literal"><span class="pre">--comment</span> <span class="pre">COMMENT</span></code>) to provide a comment
+that will be added to the history for the
+current version of the event’s ShakeMap. If run from a terminal,
+and a comment is not provided on the command line, <strong>assemble</strong>
+will prompt the user for a comment.
+Run “shake help assemble” for more.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.assemble.html#module-shakemap.coremods.assemble" title="shakemap.coremods.assemble"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.assemble()</span></code></a> for the module’s API
+documentation.</p>
 <div class="figure align-left" id="id5">
 <span id="shake-assemble"></span><a class="reference internal image-reference" href="../_images/assemble.png"><img alt="../_images/assemble.png" src="../_images/assemble.png" style="width: 700px;" /></a>
 <p class="caption"><span class="caption-text">Figure 4: Data flow of the <em>assemble</em> module.</span></p>
 </div>
 </div>
 <div class="section" id="augment">
-<h4>2.1.2.3.3. augment<a class="headerlink" href="#augment" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.3.4. augment<a class="headerlink" href="#augment" title="Permalink to this headline">¶</a></h4>
 <p>The <strong>augment</strong> module behaves very similarly to <strong>assemble</strong> except that it
 will first read <em>shake_data.hdf</em> from the event’s <em>current</em> directory.
 If <em>exven.xml</em> exists in the event’s <em>current</em> directory, its data will
@@ -359,10 +378,19 @@ the <em>_dat.xml</em> extension) will be added to any data already found in
 will replace the existing fault data in <em>shake_data.hdf</em>.</p>
 <p>The history information will be updated to reflect the update time and
 originator (if applicable).</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.augment.html#module-shakemap.coremods.augment" title="shakemap.coremods.augment"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.augment()</span></code></a> for more.</p>
+<p>As with <strong>assemble</strong>, <strong>augment</strong> takes an optional command-line
+argument (<code class="docutils literal"><span class="pre">-c</span> <span class="pre">COMMENT</span></code>
+or <code class="docutils literal"><span class="pre">--comment</span> <span class="pre">COMMENT</span></code>) to provide a comment
+that will be added to the history for the
+current version of the event’s ShakeMap. If run from a terminal,
+and a comment is not provided on the command line, <strong>assemble</strong>
+will prompt the user for a comment.
+Run “shake help augment” for more.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.augment.html#module-shakemap.coremods.augment" title="shakemap.coremods.augment"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.augment()</span></code></a> for the module’s API
+documentation.</p>
 </div>
 <div class="section" id="model">
-<h4>2.1.2.3.4. model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.3.5. model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h4>
 <p>The <strong>model</strong> module reads the data in <em>shake_data.hdf</em> and produces an
 interpolated ShakeMap. Depending upon the settings found in <em>model.conf</em>,
 the interpolation product may be a grid or a set of points. See
@@ -378,16 +406,18 @@ reside in the current profile’s <em>INSTALL_DIR/config</em> directory. See
 the documentation within those files for more information.</p>
 <p>A great deal of this manual is devoted to the way the interpolation is
 performed, and the effect of various configuration options. See the
-relevant sections for more.</p>
+relevant sections for more. In particular, the section <a class="reference internal" href="tg_processing.html#sec-processing-4"><span class="std std-ref">Data Processing</span></a>
+goes into detail on the way the model program works.</p>
 <p><strong>model</strong> writes a file, <em>shake_result.hdf</em>, in the <em>products</em>
 subdirectory of the event’s <em>current</em> directory.
 See <a class="reference internal" href="tg_formats.html#sec-formats-4"><span class="std std-ref">the formats section</span></a>
 of this manual for more on the format and
 content of <em>shake_result.hdf</em>.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.model.html#module-shakemap.coremods.model" title="shakemap.coremods.model"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.model()</span></code></a> for more.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.model.html#module-shakemap.coremods.model" title="shakemap.coremods.model"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.model()</span></code></a> for the module’s API
+documentation.</p>
 </div>
 <div class="section" id="contour">
-<h4>2.1.2.3.5. contour<a class="headerlink" href="#contour" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.3.6. contour<a class="headerlink" href="#contour" title="Permalink to this headline">¶</a></h4>
 <p><strong>contour</strong> reads an event’s <em>shake_result.hdf</em> and produces iso-seismal
 contours for each of the intensity measure types found therein. The contours
 are written as GeoJSON to files called <em>&lt;imt_type&gt;_cont.json</em> in the event’s
@@ -396,7 +426,7 @@ are written as GeoJSON to files called <em>&lt;imt_type&gt;_cont.json</em> in th
 may be specified in the <em>products.conf</em> configuration file.</p>
 </div>
 <div class="section" id="gridxml">
-<h4>2.1.2.3.6. gridxml<a class="headerlink" href="#gridxml" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.3.7. gridxml<a class="headerlink" href="#gridxml" title="Permalink to this headline">¶</a></h4>
 <p><strong>gridxml</strong> reads an event’s <em>shake_result.hdf</em> and produces the ShakeMap 3.5
 files <em>grid.xml</em> and <em>uncertainty.xml</em>. Note that these files will eventually
 become deprecated in favor of the new <em>shake_result.hdf</em> file.
@@ -406,16 +436,18 @@ deprecated. System designers should extract the relevant information
 directly from <em>shake_result.hdf</em>. See <a class="reference internal" href="tg_formats.html#sec-formats-4"><span class="std std-ref">the formats section</span></a>
 of this manual for more on
 using <em>shake_result.hdf</em>.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.gridxml.html#module-shakemap.coremods.gridxml" title="shakemap.coremods.gridxml"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.gridxml()</span></code></a> for more details.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.gridxml.html#module-shakemap.coremods.gridxml" title="shakemap.coremods.gridxml"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.gridxml()</span></code></a> for the module’s API
+documentation.</p>
 </div>
 <div class="section" id="info">
-<h4>2.1.2.3.7. info<a class="headerlink" href="#info" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.3.8. info<a class="headerlink" href="#info" title="Permalink to this headline">¶</a></h4>
 <p><strong>info</strong> reads an event’s <em>shake_result.hdf</em> and produces <em>info.json</em>,
 which contains metadata about the ShakeMap.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.info.html#module-shakemap.coremods.info" title="shakemap.coremods.info"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.info()</span></code></a> for more details.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.info.html#module-shakemap.coremods.info" title="shakemap.coremods.info"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.info()</span></code></a> for the module’s API
+documentation.</p>
 </div>
 <div class="section" id="mapping">
-<h4>2.1.2.3.8. mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.3.9. mapping<a class="headerlink" href="#mapping" title="Permalink to this headline">¶</a></h4>
 <p><strong>mapping</strong> reads an event’s <em>shake_result.hdf</em> and produces a set of
 maps of the IMTs for use in quality control and evaluation of the
 performance of the system. Currently, this module is a placeholder
@@ -424,29 +456,71 @@ production-ready maps, equivalent of ShakeMap 3.5’s static maps,
 and we may not maintain or support it in its current form in the
 future. In particular, it uses the <strong>basemap</strong> mapping package,
 which is disappearing in favor of <strong>cartopy</strong>.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.mapping.html#module-shakemap.coremods.mapping" title="shakemap.coremods.mapping"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.mapping()</span></code></a> for more details. See the
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.mapping.html#module-shakemap.coremods.mapping" title="shakemap.coremods.mapping"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.mapping()</span></code></a> for the module’s API
+documentation. See the
 configuration file <em>products.conf</em> for information on configuring
 the <strong>mapping</strong> module.</p>
 </div>
+<div class="section" id="plotregr">
+<h4>2.1.2.3.10. plotregr<a class="headerlink" href="#plotregr" title="Permalink to this headline">¶</a></h4>
+<p><strong>plotregr</strong> makes plots of an approximation of the GMPE’s predicted
+ground motion as a function of distance for each
+output IMT, along with the data for that IMT. The plotted value at each
+distance is the average value of the GMPE’s gridded values in that
+particular distance bin. The values are predicted on soil (Vs30=180 m/s)
+and rock (Vs30=760 m/s), which are plotted as green and red lines,
+respectively. The +/- 1 standard deviation lines are also plotted.
+The station and dyfi data are plotted at their
+computed distance from the source. If no finite fault is available for
+the map, then the approximated point-source to finite-fault  distance
+is used.</p>
+<p>The <strong>plotregr</strong> module is fairly simplistic and of limited utility.
+Our hope it that it will be rendered obsolete by
+more sophisticated interactive plots.</p>
+</div>
 <div class="section" id="raster">
-<h4>2.1.2.3.9. raster<a class="headerlink" href="#raster" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.3.11. raster<a class="headerlink" href="#raster" title="Permalink to this headline">¶</a></h4>
 <p><strong>raster</strong> reads an event’s <em>shake_result.hdf</em> and produces GIS
 raster files of the mean and standard deviation for each of the
 IMTs in <em>shake_result.hdf</em>.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.raster.html#module-shakemap.coremods.raster" title="shakemap.coremods.raster"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.raster()</span></code></a> for more details.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.raster.html#module-shakemap.coremods.raster" title="shakemap.coremods.raster"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.raster()</span></code></a> for the module’s API
+documentation.</p>
 </div>
 <div class="section" id="rupture">
-<h4>2.1.2.3.10. rupture<a class="headerlink" href="#rupture" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.3.12. rupture<a class="headerlink" href="#rupture" title="Permalink to this headline">¶</a></h4>
 <p><strong>rupture</strong> reads an event’s <em>shake_result.hdf</em> and produces a
 file, <em>rupture.json</em> containing the coordinates of the rupture
 plane(s) supplied via the input file <em>&lt;&gt;_fault.txt</em> or <em>&lt;&gt;_fault.json</em>.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.rupture.html#module-shakemap.coremods.rupture" title="shakemap.coremods.rupture"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.rupture()</span></code></a> for more details.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.rupture.html#module-shakemap.coremods.rupture" title="shakemap.coremods.rupture"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.rupture()</span></code></a> for the module’s API
+documentation.</p>
 </div>
 <div class="section" id="stations">
-<h4>2.1.2.3.11. stations<a class="headerlink" href="#stations" title="Permalink to this headline">¶</a></h4>
+<h4>2.1.2.3.13. stations<a class="headerlink" href="#stations" title="Permalink to this headline">¶</a></h4>
 <p><strong>stations</strong> reads an event’s <em>shake_result.hdf</em> and produces a
 JSON file, <em>stationlist.json</em>, of the input station data.</p>
-<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.stations.html#module-shakemap.coremods.stations" title="shakemap.coremods.stations"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.stations()</span></code></a> for more details.</p>
+<p>See <a class="reference internal" href="../apidoc/shakemap.coremods.stations.html#module-shakemap.coremods.stations" title="shakemap.coremods.stations"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.stations()</span></code></a> for the module’s API
+documentation.</p>
+</div>
+</div>
+</div>
+<div class="section" id="additional-programs">
+<h2>2.1.3. Additional Programs<a class="headerlink" href="#additional-programs" title="Permalink to this headline">¶</a></h2>
+<p>ShakeMap provides a few auxiliary programs that may occasionally be
+useful.</p>
+<div class="section" id="getdyfi">
+<h3>2.1.3.1. getdyfi<a class="headerlink" href="#getdyfi" title="Permalink to this headline">¶</a></h3>
+<p><strong>getdyfi</strong> is a standalone program implementing the <strong>dyfi</strong> module’s
+functionality.  See the <a class="reference internal" href="../programs/getdyfi.html#getdyfi"><span class="std std-ref">getdyfi man page</span></a> for usage and a
+list of options.</p>
+</div>
+<div class="section" id="sm-clone">
+<h3>2.1.3.2. sm_clone<a class="headerlink" href="#sm-clone" title="Permalink to this headline">¶</a></h3>
+<p><strong>sm_clone</strong> queries the NEIC ComCat database for ShakeMap data
+associated with an event and writes that data into the event’s
+local <em>current</em> directory. The event will then be available for
+local processing.</p>
+<p>See the <a class="reference internal" href="../programs/sm_clone.html#sm-clone"><span class="std std-ref">sm_clone man page</span></a> for usage and a
+list of options.</p>
 <p class="rubric">Footnotes</p>
 <table class="docutils footnote" frame="void" id="fn1" rules="none">
 <colgroup><col class="label" /><col /></colgroup>
@@ -457,7 +531,6 @@ and slab probabilities for events outside of the defined subduction
 zones.</td></tr>
 </tbody>
 </table>
-</div>
 </div>
 </div>
 </div>
@@ -498,18 +571,25 @@ zones.</td></tr>
 <li class="toctree-l6"><a class="reference internal" href="#shake">2.1.2.2. shake</a></li>
 <li class="toctree-l6"><a class="reference internal" href="#shake-modules">2.1.2.3. shake Modules</a><ul>
 <li class="toctree-l7"><a class="reference internal" href="#select">2.1.2.3.1. select</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#assemble">2.1.2.3.2. assemble</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#augment">2.1.2.3.3. augment</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#model">2.1.2.3.4. model</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#contour">2.1.2.3.5. contour</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#gridxml">2.1.2.3.6. gridxml</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#info">2.1.2.3.7. info</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#mapping">2.1.2.3.8. mapping</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#raster">2.1.2.3.9. raster</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#rupture">2.1.2.3.10. rupture</a></li>
-<li class="toctree-l7"><a class="reference internal" href="#stations">2.1.2.3.11. stations</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#dyfi">2.1.2.3.2. dyfi</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#assemble">2.1.2.3.3. assemble</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#augment">2.1.2.3.4. augment</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#model">2.1.2.3.5. model</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#contour">2.1.2.3.6. contour</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#gridxml">2.1.2.3.7. gridxml</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#info">2.1.2.3.8. info</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#mapping">2.1.2.3.9. mapping</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#plotregr">2.1.2.3.10. plotregr</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#raster">2.1.2.3.11. raster</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#rupture">2.1.2.3.12. rupture</a></li>
+<li class="toctree-l7"><a class="reference internal" href="#stations">2.1.2.3.13. stations</a></li>
 </ul>
 </li>
+</ul>
+</li>
+<li class="toctree-l5"><a class="reference internal" href="#additional-programs">2.1.3. Additional Programs</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#getdyfi">2.1.3.1. getdyfi</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#sm-clone">2.1.3.2. sm_clone</a></li>
 </ul>
 </li>
 </ul>

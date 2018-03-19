@@ -5,7 +5,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>shakemap.coremods.raster &#8212; ShakeMap Documentation  documentation</title>
+    <title>shakemap.coremods.plotregr &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
@@ -25,8 +25,8 @@
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="shakemap.coremods.rupture" href="shakemap.coremods.rupture.html" />
-    <link rel="prev" title="shakemap.coremods.plotregr" href="shakemap.coremods.plotregr.html" />
+    <link rel="next" title="shakemap.coremods.raster" href="shakemap.coremods.raster.html" />
+    <link rel="prev" title="shakemap.coremods.model" href="shakemap.coremods.model.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -42,31 +42,51 @@
         <div class="bodywrapper">
           <div class="body" role="main">
             
-  <div class="section" id="module-shakemap.coremods.raster">
-<span id="shakemap-coremods-raster"></span><h1>shakemap.coremods.raster<a class="headerlink" href="#module-shakemap.coremods.raster" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-shakemap.coremods.plotregr">
+<span id="shakemap-coremods-plotregr"></span><h1>shakemap.coremods.plotregr<a class="headerlink" href="#module-shakemap.coremods.plotregr" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="shakemap.coremods.raster.RasterModule">
-<em class="property">class </em><code class="descclassname">shakemap.coremods.raster.</code><code class="descname">RasterModule</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/raster.html#RasterModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.raster.RasterModule" title="Permalink to this definition">¶</a></dt>
+<dt id="shakemap.coremods.plotregr.PlotRegr">
+<em class="property">class </em><code class="descclassname">shakemap.coremods.plotregr.</code><code class="descname">PlotRegr</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/plotregr.html#PlotRegr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
-<dl class="docutils">
-<dt>raster – Generate GIS raster files of all configured IMT values from</dt>
-<dd>shake_result.hdf.</dd>
-</dl>
+<p>plotregr – Plot the regression curves from a data file</p>
 <p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="attribute">
-<dt id="shakemap.coremods.raster.RasterModule.command_name">
-<code class="descname">command_name</code><em class="property"> = 'raster'</em><a class="headerlink" href="#shakemap.coremods.raster.RasterModule.command_name" title="Permalink to this definition">¶</a></dt>
+<dt id="shakemap.coremods.plotregr.PlotRegr.command_name">
+<code class="descname">command_name</code><em class="property"> = 'plotregr'</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.command_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
-<dt id="shakemap.coremods.raster.RasterModule.contents">
-<code class="descname">contents</code><em class="property"> = OrderedDict([('rasterData', {'title': 'ESRI Raster Files', 'formats': [{'type': 'application/zip', 'filename': 'raster.zip'}], 'caption': 'Data and uncertainty grids in ESRI raster format'})])</em><a class="headerlink" href="#shakemap.coremods.raster.RasterModule.contents" title="Permalink to this definition">¶</a></dt>
+<dt id="shakemap.coremods.plotregr.PlotRegr.regr_page">
+<code class="descname">regr_page</code><em class="property"> = {'title': 'Regression Plots', 'slug': 'regression'}</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.regr_page" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakemap.coremods.plotregr.PlotRegr.contents">
+<code class="descname">contents</code><em class="property"> = OrderedDict([('miRegr', {'title': 'Intensity Regression', 'formats': [{'type': 'image/png', 'filename': 'MMI_regr.png'}], 'caption': 'Regression plot of macroseismic intensity.', 'page': {'title': 'Regression Plots', 'slug': 'regression'}}), ('pgaRegr', {'title': 'PGA Regression', 'formats': [{'type': 'image/png', 'filename': 'PGA_regr.png'}], 'caption': 'Regression plot of [COMPONENT] peak ground acceleration (%g).', 'page': {'title': 'Regression Plots', 'slug': 'regression'}}), ('pgvRegr', {'title': 'PGV Regression', 'formats': [{'type': 'image/png', 'filename': 'PGV_regr.png'}], 'caption': 'Regression plot of [COMPONENT] peak ground velocity (cm/s).', 'page': {'title': 'Regression Plots', 'slug': 'regression'}}), ('psa[PERIOD]Regr', {'title': 'PSA[PERIOD] Regression', 'formats': [{'type': 'image/png', 'filename': 'PSA[0-9]p[0-9]_regr.png'}], 'caption': 'Regression plot of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).', 'page': {'title': 'Regression Plots', 'slug': 'regression'}})])</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.contents" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakemap.coremods.plotregr.PlotRegr.psacap">
+<code class="descname">psacap</code><em class="property"> = 'Regression plot of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.psacap" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
-<dt id="shakemap.coremods.raster.RasterModule.execute">
-<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/raster.html#RasterModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.raster.RasterModule.execute" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dt id="shakemap.coremods.plotregr.PlotRegr.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/plotregr.html#PlotRegr.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.execute" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#NotADirectoryError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">NotADirectoryError</span></code></a> – When the event data directory does not exist.</li>
+<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#FileNotFoundError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">FileNotFoundError</span></code></a> – When the the shake_result HDF file does not
+exist.</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
 
 </dd></dl>
 
@@ -110,8 +130,8 @@
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.info.html">shakemap.coremods.info</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.mapping.html">shakemap.coremods.mapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.model.html">shakemap.coremods.model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.plotregr.html">shakemap.coremods.plotregr</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.raster</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.plotregr</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.raster.html">shakemap.coremods.raster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.rupture.html">shakemap.coremods.rupture</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.select.html">shakemap.coremods.select</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.stations.html">shakemap.coremods.stations</a></li>

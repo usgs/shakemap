@@ -45,6 +45,9 @@
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
@@ -104,7 +107,32 @@
         <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 
         <span class="c1"># call the transfer method</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">)</span>
+
+        <span class="c1"># copy the current folder to a new backup directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_backup</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_make_backup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data_path</span><span class="p">):</span>
+        <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
+        <span class="n">current_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span><span class="s1">&#39;current&#39;</span><span class="p">)</span>
+        <span class="n">backup_dirs</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span><span class="s1">&#39;backup*&#39;</span><span class="p">))</span>
+        <span class="n">latest_version</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># and get the most recent version number</span>
+        <span class="k">for</span> <span class="n">backup_dir</span> <span class="ow">in</span> <span class="n">backup_dirs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">backup_dir</span><span class="p">):</span>
+                <span class="k">continue</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;[0-9]*$&#39;</span><span class="p">,</span><span class="n">backup_dir</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">version</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+                <span class="k">if</span> <span class="n">version</span> <span class="o">&gt;</span> <span class="n">latest_version</span><span class="p">:</span>
+                    <span class="n">latest_version</span> <span class="o">=</span> <span class="n">version</span>
+
+        <span class="n">new_version</span> <span class="o">=</span> <span class="n">latest_version</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="n">backup</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_dir</span><span class="p">,</span><span class="s1">&#39;backup</span><span class="si">%04i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">new_version</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">current_dir</span><span class="p">,</span><span class="n">backup</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created backup directory </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">backup</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_transfer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">config</span><span class="p">,</span><span class="n">container</span><span class="p">,</span><span class="n">products_dir</span><span class="p">):</span>
         <span class="c1"># extract the info.json object from the container</span>
