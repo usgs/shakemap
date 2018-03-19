@@ -47,7 +47,7 @@ LOG_LEVELS = {
 def get_data_path():
     """
     Return the path to the shakemap package data directory holding
-    configspec.conf, the template config files, and the example config
+    modelspec.conf, the template config files, and the example config
     files.
 
     Returns:
@@ -69,7 +69,7 @@ def get_configspec(config=None):
 
     """
     if config is None:
-        return os.path.join(get_data_path(), 'configspec.conf')
+        return os.path.join(get_data_path(), 'modelspec.conf')
     fname = os.path.join(get_data_path(), '%sspec.conf' % config)
     if not os.path.isfile(fname):
         raise FileNotFoundError('No file "%s" exists.' % fname)
