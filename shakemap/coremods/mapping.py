@@ -109,7 +109,7 @@ class MappingModule(CoreModule):
                                             'type':'application/pdf'}
                                           ]
                                 }
-    
+
     contents['pgaMap'] = {'title':'PGA Map',
                               'caption':'Map of peak ground acceleration (%g).',
                               'page':mapping_page,
@@ -138,7 +138,7 @@ class MappingModule(CoreModule):
                                                   'type':'application/pdf'},
                                                 ]
                                      }
-    
+
     def execute(self):
         """
         Raises:
@@ -165,7 +165,7 @@ class MappingModule(CoreModule):
         config = ConfigObj(config_file)
 
         # create contour files
-        self.logger.info('Mapping...')
+        self.logger.debug('Mapping...')
 
         # get all of the pieces needed for the mapmaker
         layerdict = {}
@@ -182,16 +182,22 @@ class MappingModule(CoreModule):
             layers['states'], install_path, data_path)
         topofile = path_macro_sub(
             layers['topography'], install_path, data_path)
-        cities = path_macro_sub(layers['cities'], install_path, data_path)
+        cities = path_macro_sub(
+            layers['cities'], install_path, data_path)
         mapmaker = MapMaker(container, topofile, layerdict, cities,
-                            self.logger)
-        self.logger.info('Drawing intensity map...')
-        intensity_map = mapmaker.drawIntensityMap(datadir)
-        self.logger.info('Created intensity map %s' % intensity_map)
-        for imt in config['products']['mapping']['imts']:
-            self.logger.info('Drawing %s contour map...' % imt)
-            contour_file = mapmaker.drawContourMap(imt, datadir)
-            self.logger.info('Created contour map %s' % contour_file)
+                            self.logger,
+                            config['products']['mapping']['operator'])
+
+        imtlist = container.getIMTs()
+        for imt in imtlist:
+            if imt == 'MMI':
+                self.logger.debug('Drawing intensity map...')
+                intensity_map = mapmaker.drawIntensityMap(datadir)
+                self.logger.debug('Created intensity map %s' % intensity_map)
+            else:
+                self.logger.debug('Drawing %s contour map...' % imt)
+                contour_file = mapmaker.drawContourMap(imt, datadir)
+                self.logger.debug('Created contour map %s' % contour_file)
 
         ###########################
         # Make a placeholder plot of standard deviation
@@ -212,11 +218,11 @@ class MappingModule(CoreModule):
         cax = divider.append_axes("right", size="5%", pad=0.05)
         #draw colorbar in new divider axes
         plt.colorbar(im, cax=cax)
-        sd_file = os.path.join(datadir,'sd.jpg')
+        sd_file = os.path.join(datadir, 'sd.jpg')
         fig = plt.gcf()
         _save_jpg(fig,sd_file)
         ###########################
-            
+
 
 def getProjectedPolygon(polygon, m):
     """
@@ -282,7 +288,8 @@ class MapMaker(object):
 
     """
 
-    def __init__(self, container, topofile, layerdict, cities_file, logger):
+    def __init__(self, container, topofile, layerdict, cities_file, logger,
+                 operator=''):
         """Initialize MapMaker object.
 
         Args:
@@ -301,6 +308,8 @@ class MapMaker(object):
 
             cities_file (str): Path to geonames cities1000.txt file.
             logger (Logger): Python logging instance.
+            operator (str): The name of the ShakeMap operator to be
+                printed on the map.
 
         Raises:
             KeyError: When any of layerdict keys are missing.
@@ -341,6 +350,7 @@ class MapMaker(object):
         self.fig_width = FIG_WIDTH
         self.fig_height = FIG_HEIGHT
         self.logger = logger
+        self.operator = operator
 
         # clip all the vector data now so that map rendering will be fast
         t1 = time.time()
@@ -745,9 +755,10 @@ class MapMaker(object):
         dep = origin.depth
         eid = edict['event_id']
 #        tpl = (timestr, mag, latstr, lonstr, dep, eid)
-        fmt = ('USGS ShakeMap (%s): %s\n %s UTC M%.1f %s %s '
+        fmt = ('%s ShakeMap (%s): %s\n %s UTC M%.1f %s %s '
                'Depth: %.1fkm ID:%s')
-        tstr = fmt % (imt, eloc, timestr, mag, latstr, lonstr, dep, eid)
+        tstr = fmt % (self.operator, imt, eloc, timestr, mag, latstr,
+                      lonstr, dep, eid)
         # plt.suptitle('USGS ShakeMap (%s): %s' % (layername, eloc),
         #              fontsize=14, verticalalignment='bottom', y=0.95)
         # plt.title('%s UTC M%.1f %s %s Depth: %.1fkm ID:%s' %
@@ -996,10 +1007,10 @@ class MapMaker(object):
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
 
         # make the thumbnail image
-        dpi = THUMBNAIL_WIDTH_PIXELS / self.fig_width 
+        dpi = THUMBNAIL_WIDTH_PIXELS / self.fig_width
         thumbfile = os.path.join(outfolder, 'pin-thumbnail.png')
         plt.savefig(thumbfile,dpi=dpi)
-        
+
         return outfile
 
     def _getShaded(self, ptopo):
@@ -1263,19 +1274,20 @@ class MapMaker(object):
         _save_jpg(fig,outfile_old)
         ######################
 
-        
-        
+
         tn = time.time()
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
         return outfile
 
 def _select_font():
-    # I really don't care that much about fonts, just trying to find one that will
-    # work on any given platform.  Can't seem to reliably find whatever default font
-    # is supposed to come with matplotlib, so just loop over font names found on the system
-    # and pick the shortest one we can find that matches the input
+    # I really don't care that much about fonts, just trying to find one
+    # that will work on any given platform.  Can't seem to reliably find
+    # whatever default font is supposed to come with matplotlib, so just
+    # loop over font names found on the system and pick the shortest one
+    # we can find that matches the input
     fontlist = [f.name for f in matplotlib.font_manager.fontManager.ttflist]
-    preferences = ['Arial','Helvetica','Bitstream Vera Sans','DejaVu','Times','Courier','Verdana']
+    preferences = ['Arial', 'Helvetica', 'Bitstream Vera Sans', 'DejaVu',
+                   'Times', 'Courier', 'Verdana']
     selected_font = 'TEST'*128
     for preference in preferences:
         for font in fontlist:
@@ -1283,7 +1295,7 @@ def _select_font():
                 selected_font = font
         if not selected_font.startswith('TEST'):
             break
-    
+
     if selected_font.startswith('TEST'):
         raise Exception('Could not find any font from system font list')
     return selected_font

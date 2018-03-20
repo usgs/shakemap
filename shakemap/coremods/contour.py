@@ -4,6 +4,9 @@ import glob
 import json
 from collections import OrderedDict
 import shutil
+import logging
+import argparse
+import inspect
 
 # third party imports
 from shapely.geometry import MultiLineString
@@ -14,15 +17,13 @@ from skimage import measure
 from scipy.ndimage.filters import median_filter
 from shakelib.utils.containers import ShakeMapOutputContainer
 from shakelib.utils.imt_string import oq_to_file
-from configobj import ConfigObj
 
 # local imports
 from .base import CoreModule
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import get_config_paths, get_logging_config
 from impactutils.colors.cpalette import ColorPalette
 
 FORMATS = {
-    'shapefile': ('ESRI Shapefile', 'shp'),
     'geojson': ('GeoJSON', 'json')
 }
 
@@ -31,7 +32,7 @@ DEFAULT_FILTER_SIZE = 10
 
 class ContourModule(CoreModule):
     """
-    contour -- Generate contours of all configured IMT values from the
+    contour -- Generate contours of all IMT values from the
                      shake_result.hdf output file.
     """
 
@@ -39,42 +40,60 @@ class ContourModule(CoreModule):
 
     # supply here a data structure with information about files that
     # can be created by this module.
-    contour_page = {'title':'Ground Motion Contours','slug':'contours'}
-    contents = OrderedDict.fromkeys(['miContour','pgaContour','pgvContour','psa[PERIOD]Contour'])
-    contents['miContour'] = {'title':'Intensity Contours',
-                             'caption':'Contours of macroseismic intensity.',
-                             'page':contour_page,
-                             'formats':[{'filename':'cont_*MMI.json',
-                                         'type':'application/json'}
-                                       ]
-                            }
-    
-    contents['pgaContour'] = {'title':'PGA Contours',
-                              'caption':'Contours of [COMPONENT] peak ground acceleration (%g).',
-                              'page':contour_page,
-                              'formats':[{'filename':'cont_*PGA.json',
-                                          'type':'application/json'}
-                                          ]
-                             }
-    contents['pgvContour'] = {'title':'PGV Contours',
-                              'caption':'Contours of [COMPONENT] peak ground velocity (cm/s).',
-                              'page':contour_page,
-                              'formats':[{'filename':'cont_*PGV.json',
-                                          'type':'application/json'}
-                                          ]
-                             }
-    psacap = 'Contours of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'
-    contents['psa[PERIOD]Contour'] = {'title':'PSA[PERIOD] Contour',
-                                      'page':contour_page,
-                                      'caption':psacap,
-                                      'formats':[{'filename':'cont_*PSA[0-9]p[0-9].json',
-                                                  'type':'application/json'}
-                                                ]
-                                     }
-               
+    contour_page = {'title': 'Ground Motion Contours', 'slug': 'contours'}
+    contents = OrderedDict.fromkeys(['miContour', 'pgaContour', 'pgvContour',
+                                     'psa[PERIOD]Contour'])
+    contents['miContour'] = {'title': 'Intensity Contours',
+                             'caption': 'Contours of macroseismic intensity.',
+                             'page': contour_page,
+                             'formats': [{'filename': 'cont_*MMI.json',
+                                         'type': 'application/json'}
+                                        ]
+    }
+    contents['pgaContour'] = {'title': 'PGA Contours',
+                              'caption': 'Contours of [COMPONENT] peak '\
+                                         'ground acceleration (%g).',
+                              'page': contour_page,
+                              'formats': [{'filename': 'cont_*PGA.json',
+                                          'type': 'application/json'}
+                                         ]
+    }
+    contents['pgvContour'] = {'title': 'PGV Contours',
+                              'caption': 'Contours of [COMPONENT] peak '\
+                                         'ground velocity (cm/s).',
+                              'page': contour_page,
+                              'formats': [{'filename': 'cont_*PGV.json',
+                                          'type': 'application/json'}
+                                         ]
+    }
+    psacap = 'Contours of [COMPONENT] [FPERIOD] sec 5% damped '\
+             'pseudo-spectral acceleration(%g).'
+    contents['psa[PERIOD]Contour'] = {
+            'title': 'PSA[PERIOD] Contour',
+            'page': contour_page,
+            'caption': psacap,
+            'formats': [{'filename':'cont_*PSA[0-9]p[0-9].json',
+                         'type':'application/json'}
+                       ]
+    }
+
+
+    def __init__(self, eventid, filter=None):
+        """
+        Instantiate a ContourModule class with an event ID.
+        """
+        self._eventid = eventid
+        log_config = get_logging_config()
+        log_name = log_config['loggers'].keys()[0]
+        self.logger = logging.getLogger(log_name)
+        if filter is not None:
+            self.filter_size = filter
+        else:
+            self.filter_size = DEFAULT_FILTER_SIZE
 
     def execute(self):
-        """Create contour files for all configured IMT values.
+        """
+        Create contour files for all configured IMT values.
 
         Raises:
             NotADirectoryError: When the event data directory does not exist.
@@ -92,17 +111,44 @@ class ContourModule(CoreModule):
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
 
-        # get the path to the products.conf file, load the config
-        config_file = os.path.join(install_path, 'config', 'products.conf')
-        config = ConfigObj(config_file)
+        if container.getDataType() != 'grid':
+            raise NotImplementedError('contour module can only contour '
+                                      'gridded data, not sets of points')
 
         # create contour files
-        self.logger.info('Contouring to files...')
-        contour_to_files(container, config, datadir, self.logger)
+        self.logger.debug('Contouring to files...')
+        contour_to_files(container, datadir, self.logger, self.filter_size)
+
+    def parseArgs(self, arglist):
+        """
+        Set up the object to accept the --filter flag.
+        """
+        parser = argparse.ArgumentParser(prog=self.__class__.command_name,
+                    description=inspect.getdoc(self.__class__))
+        parser.add_argument('-f', '--filter', help='Specify the filter '
+                            'size (in grid points) for smoothing the '
+                            'grids before contouring. Must be a positive'
+                            'integer (default=10; use 0 to disable '
+                            'filtering).', type=int)
+        #
+        # This line should be in any modules that overrides this
+        # one. It will collect up everything after the current
+        # modules options in args.rem, which should be returned
+        # by this function. Note: doing parser.parse_known_args()
+        # will not work as it will suck up any later modules'
+        # options that are the same as this one's.
+        #
+        parser.add_argument('rem', nargs=argparse.REMAINDER,
+                            help=argparse.SUPPRESS)
+        args = parser.parse_args(arglist)
+        if args.filter is None:
+            self.filter_size = DEFAULT_FILTER_SIZE
+        else:
+            self.filter_size = args.filter
+        return args.rem
 
 
-def contour(container, imtype, component,
-            filter_size=DEFAULT_FILTER_SIZE):
+def contour(container, imtype, component, filter_size):
     """
     Generate contours of a specific IMT and return as a Shapely
     MultiLineString object.
@@ -126,27 +172,25 @@ def contour(container, imtype, component,
     Raises:
         NotImplementedError -- if the user attempts to contour a data file
             with sets of points rather than grids.
-    """
+    """  # noqa
     intensity_colormap = ColorPalette.fromPreset('mmi')
-    if container.getDataType() != 'grid':
-        raise NotImplementedError('contour module can only contour '
-                                  'gridded data, not sets of points')
     imtdict = container.getIMTGrids(imtype, component)
     gridobj = imtdict['mean']
     grid = gridobj.getData()
     metadata = gridobj.getGeoDict().asDict()
     if imtype == 'MMI':
         sgrid = grid
-        fgrid = median_filter(sgrid, size=filter_size)
         units = 'mmi'
     elif imtype == 'PGV':
         sgrid = np.exp(grid)
-        fgrid = median_filter(sgrid, size=filter_size)
         units = 'cms'
     else:
         sgrid = np.exp(grid) * 100.0
-        fgrid = median_filter(sgrid, size=filter_size)
         units = 'pctg'
+    if filter_size > 0:
+        fgrid = median_filter(sgrid, size=filter_size)
+    else:
+        fgrid = sgrid
 
     interval_type = 'log'
     if imtype == 'MMI':
@@ -206,30 +250,27 @@ def contour(container, imtype, component,
     return line_strings
 
 
-def contour_to_files(container, config, output_dir, logger):
+def contour_to_files(container, output_dir, logger,
+                     filter_size=DEFAULT_FILTER_SIZE):
     """
-    Generate contours of all configured IMT values.
+    Generate contours of all IMT values.
 
     Args:
       container (ShakeMapOutputContainer): ShakeMapOutputContainer with
           ShakeMap output data.
-      config (dict): Product configuration information (from product.conf).
       output_dir (str): Path to directory where output files will be written.
       logger (logging.Logger): Python logging Logger instance.
 
     Raises:
-        LookupError: When configured file format is not supported, or
-            when configured IMT is not found in container.
-
+        LookupError: When configured file format is not supported
     """
 
-    imtlist = config['products']['contours']['IMTS'].keys()
+    imtlist = container.getIMTs()
 
-    file_format = config['products']['contours']['format']
+    # Right now geojson is all we support; if that changes, we'll have
+    # to add a configuration or command-line option
+    file_format = 'geojson'
     # open a file for writing
-    if file_format not in FORMATS:
-        raise LookupError(
-            'File format %s not supported for contours.' % file_format)
     driver, extension = FORMATS[file_format]
     sa_schema = {
         'geometry': 'MultiLineString',
@@ -256,80 +297,72 @@ def contour_to_files(container, config, output_dir, logger):
 
     for imtype in imtlist:
         fileimt = oq_to_file(imtype)
-        try:
-            components = container.getComponents(imtype)
-        except LookupError as look_error:
-            fmt = 'No IMT called %s in container %s. Skipping.'
-            logger.warn(fmt % (imtype, container.getFileName()))
-            continue
-        imtype_spec = config['products']['contours']['IMTS'][imtype]
-        filter_size = int(imtype_spec['filter_size'])
-        for component in components:
-            if component == 'GREATER_OF_TWO_HORIZONTAL':
-                fname = 'cont_%s.%s' % (fileimt, extension)
+        component = container.getComponents(imtype)[0]
+        if component == 'GREATER_OF_TWO_HORIZONTAL':
+            fname = 'cont_%s.%s' % (fileimt, extension)
+        else:
+            fname = 'cont_%s_%s.%s' % (fileimt, component, extension)
+        filename = os.path.join(output_dir, fname)
+        if os.path.isfile(filename):
+            fpath, fext = os.path.splitext(filename)
+            flist = glob.glob(fpath + '.*')
+            for fname in flist:
+                os.remove(fname)
+
+        # fiona spews a warning here when driver is geojson
+        # this warning appears to be un-catchable using
+        # with warnings.catch_warnings()
+        # or
+        # logging.captureWarning()
+        # or
+        # even redirecting stderr/stdout to IO streams
+        # not sure where the warning is coming from,
+        # but there appears to be no way to stop it...
+        with fiona.drivers():
+            if imtype == 'MMI':
+                selected_schema = mmi_schema
             else:
-                fname = 'cont_%s_%s.%s' % (fileimt, component, extension)
-            filename = os.path.join(output_dir, fname)
-            if os.path.isfile(filename):
-                fpath, fext = os.path.splitext(filename)
-                flist = glob.glob(fpath + '.*')
-                for fname in flist:
-                    os.remove(fname)
+                selected_schema = sa_schema
+            vector_file = fiona.open(
+                filename, 'w',
+                driver=driver,
+                schema=selected_schema,
+                crs=crs
+            )
 
-            # fiona spews a warning here when driver is geojson
-            # this warning appears to be un-catchable using
-            # with warnings.catch_warnings()
-            # or
-            # logging.captureWarning()
-            # or
-            # even redirecting stderr/stdout to IO streams
-            # not sure where the warning is coming from,
-            # but there appears to be no way to stop it...
-            with fiona.drivers():
-                if imtype == 'MMI':
-                    selected_schema = mmi_schema
-                else:
-                    selected_schema = sa_schema
-                vector_file = fiona.open(
-                    filename, 'w',
-                    driver=driver,
-                    schema=selected_schema,
-                    crs=crs
-                )
+            line_strings = contour(
+                container,
+                imtype,
+                component,
+                filter_size
+            )
 
-                line_strings = contour(
-                    container,
-                    imtype,
-                    component,
-                    filter_size
-                )
-
-                for feature in line_strings:
-                    vector_file.write(feature)
+            for feature in line_strings:
+                vector_file.write(feature)
 
                 # Grab some metadata
-                meta = container.getMetadata()
-                event_info = meta['input']['event_information']
-                mdict = {
-                    'eventid': event_info['event_id'],
-                    'longitude': float(event_info['longitude']),
-                    'latitude': float(event_info['latitude'])
-                }
+            meta = container.getMetadata()
+            event_info = meta['input']['event_information']
+            mdict = {
+                'eventid': event_info['event_id'],
+                'longitude': float(event_info['longitude']),
+                'latitude': float(event_info['latitude'])
+            }
 
-                logger.debug('Writing contour file %s' % filename)
-                vector_file.close()
+            logger.debug('Writing contour file %s' % filename)
+            vector_file.close()
 
-                # Get bounds
-                tmp = fiona.open(filename)
-                bounds = tmp.bounds
-                tmp.close()
+            # Get bounds
+            tmp = fiona.open(filename)
+            bounds = tmp.bounds
+            tmp.close()
 
-                # Read back in to add metadata/bounds
-                data = json.load(open(filename))
-                data['metadata'] = mdict
-                data['bbox'] = bounds
-                with open(filename, 'w') as outfile:
-                    json.dump(data, outfile)
+            # Read back in to add metadata/bounds
+            data = json.load(open(filename))
+            data['metadata'] = mdict
+            data['bbox'] = bounds
+            with open(filename, 'w') as outfile:
+                json.dump(data, outfile)
 
             #####################################
             # Make an extra version of the MMI contour file
@@ -339,11 +372,12 @@ def contour_to_files(container, config, output_dir, logger):
 
             if imtype == 'MMI':
                 old_file = os.path.join(output_dir, 'cont_mi.json')
-                shutil.copy(filename,old_file)
+                shutil.copy(filename, old_file)
             #####################################
-            
+
 def getContourLevels(dmin, dmax, itype='log'):
-    """Get contour levels given min/max values and desired IMT.
+    """
+    Get contour levels given min/max values and desired IMT.
 
     Use itype='log' for any IMT that is logarithmically distributed, such as
     PGA, PGV, and Sa. Linear for MMI.
@@ -380,3 +414,4 @@ def getContourLevels(dmin, dmax, itype='log'):
             0.5
         )
     return levels
+

@@ -6,7 +6,6 @@ from collections import OrderedDict
 # third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
 from mapio.gdal import GDALGrid
-from configobj import ConfigObj
 
 # local imports
 from .base import CoreModule
@@ -23,7 +22,7 @@ DEFAULT_FILTER_SIZE = 10
 
 class RasterModule(CoreModule):
     """
-    raster -- Generate GIS raster files of all configured IMT values from
+    raster -- Generate GIS raster files of all IMT values from
                     shake_result.hdf.
     """
 
@@ -38,8 +37,17 @@ class RasterModule(CoreModule):
                                 }
 
     def execute(self):
+        """
+        Write raster.zip file containing ESRI Raster files of all the IMTs
+        in shake_result.hdf.
+
+        Raises:
+            NotADirectoryError: When the event data directory does not exist.
+            FileNotFoundError: When the the shake_result HDF file does not
+                exist.
+        """
+
         install_path, data_path = get_config_paths()
-        datadir = os.path.join(data_path, self._eventid, 'current', 'products')
         datadir = os.path.join(data_path, self._eventid, 'current', 'products')
         if not os.path.isdir(datadir):
             raise NotADirectoryError('%s is not a valid directory.' % datadir)
@@ -53,23 +61,23 @@ class RasterModule(CoreModule):
             raise NotImplementedError('raster module can only operate on '
                                       'gridded data, not sets of points')
 
-        # get the path to the products.conf file, load the config
-        config_file = os.path.join(install_path, 'config', 'products.conf')
-        config = ConfigObj(config_file)
-
         # create GIS-readable .flt files of imt and uncertainty
-        self.logger.info('Creating GIS grids...')
-        layers = config['products']['raster']['layers']
+        self.logger.debug('Creating GIS grids...')
+        layers = container.getIMTs()
 
         # Package up all of these files into one zip file.
-        zfilename = os.path.join(datadir,'rasters.zip')
+        zfilename = os.path.join(datadir, 'rasters.zip')
         zfile = zipfile.ZipFile(zfilename,mode='w',
                                 compression=zipfile.ZIP_DEFLATED)
 
         files_written = []
         for layer in layers:
             fileimt = oq_to_file(layer)
-            imtdict = container.getIMTGrids(layer, 'GREATER_OF_TWO_HORIZONTAL')
+            # This is a bit hacky -- we only produce the raster for the
+            # first IMC returned. It should work as long as we only have
+            # one IMC produced per ShakeMap run.
+            imclist = container.getComponents(layer)
+            imtdict = container.getIMTGrids(layer, imclist[0])
             mean_grid = imtdict['mean']
             std_grid = imtdict['std']
             mean_gdal = GDALGrid.copyFromGrid(mean_grid)
@@ -78,18 +86,18 @@ class RasterModule(CoreModule):
             mean_hdr = os.path.join(datadir, '%s_mean.hdr' % fileimt)
             std_fname = os.path.join(datadir, '%s_std.flt' % fileimt)
             std_hdr = os.path.join(datadir, '%s_std.hdr' % fileimt)
-            self.logger.info('Saving %s...' % mean_fname)
+            self.logger.debug('Saving %s...' % mean_fname)
             mean_gdal.save(mean_fname)
             files_written.append(mean_fname)
             files_written.append(mean_hdr)
-            self.logger.info('Saving %s...' % std_fname)
+            self.logger.debug('Saving %s...' % std_fname)
             std_gdal.save(std_fname)
             files_written.append(std_fname)
             files_written.append(std_hdr)
             zfile.write(mean_fname,'%s_mean.flt' % fileimt)
-            zfile.write(mean_fname,'%s_mean.hdr' % fileimt)
+            zfile.write(mean_hdr,'%s_mean.hdr' % fileimt)
             zfile.write(std_fname,'%s_std.flt' % fileimt)
-            zfile.write(std_fname,'%s_std.hdr' % fileimt)
+            zfile.write(std_hdr,'%s_std.hdr' % fileimt)
             
         zfile.close()
 
