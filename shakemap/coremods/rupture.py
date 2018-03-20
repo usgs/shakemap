@@ -5,13 +5,12 @@ from collections import OrderedDict
 
 # third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
-from configobj import ConfigObj
 
 # local imports
 from .base import CoreModule
 from shakemap.utils.config import get_config_paths
 
-ALLLOWED_FORMATS = ['json']
+ALLOWED_FORMATS = ['json']
 
 
 class RuptureModule(CoreModule):
@@ -50,17 +49,9 @@ class RuptureModule(CoreModule):
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
-        # get the path to the products.conf file, load the config
-        config_file = os.path.join(install_path, 'config', 'products.conf')
-        config = ConfigObj(config_file)
 
         # create ShakeMap rupture file
-        formats = config['products']['info']['formats']
-        for fformat in formats:
-            if fformat not in ALLLOWED_FORMATS:
-                self.logger.warn('Specified format %s not in list of defined '
-                                 'formats.  Skipping.' % fformat)
-                continue
+        for fformat in ALLOWED_FORMATS:
             if fformat == 'json':
                 self.logger.info('Writing rupture.json file...')
                 rupture_dict = container.getRuptureDict()

@@ -4,13 +4,10 @@ from collections import OrderedDict
 
 # third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
-from configobj import ConfigObj
 
 # local imports
 from .base import CoreModule
 from shakemap.utils.config import get_config_paths
-
-ALLLOWED_FORMATS = ['json']
 
 
 class InfoModule(CoreModule):
@@ -51,21 +48,11 @@ class InfoModule(CoreModule):
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
 
-        # get the path to the products.conf file, load the config
-        config_file = os.path.join(install_path, 'config', 'products.conf')
-        config = ConfigObj(config_file)
-
         # create ShakeMap metadata file
-        formats = config['products']['info']['formats']
-        for fformat in formats:
-            if fformat not in ALLLOWED_FORMATS:
-                self.logger.warn('Specified format %s not in list of defined '
-                                 'formats.  Skipping.' % fformat)
-                continue
-            if fformat == 'json':
-                self.logger.info('Writing info.json file...')
-                infostring = container.getString('info.json')
-                info_file = os.path.join(datadir, 'info.json')
-                f = open(info_file, 'wt')
-                f.write(infostring)
-                f.close()
+        self.logger.debug('Writing info.json file...')
+        infostring = container.getString('info.json')
+        info_file = os.path.join(datadir, 'info.json')
+        f = open(info_file, 'wt')
+        f.write(infostring)
+        f.close()
+
