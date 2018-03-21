@@ -48,13 +48,12 @@
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
-<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 
-<span class="n">ALLLOWED_FORMATS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;json&#39;</span><span class="p">]</span>
+<span class="n">ALLOWED_FORMATS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;json&#39;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="RuptureModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.rupture.html#shakemap.coremods.rupture.RuptureModule">[docs]</a><span class="k">class</span> <span class="nc">RuptureModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
@@ -93,17 +92,9 @@
 
         <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
-        <span class="c1"># get the path to the products.conf file, load the config</span>
-        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
 
         <span class="c1"># create ShakeMap rupture file</span>
-        <span class="n">formats</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;info&#39;</span><span class="p">][</span><span class="s1">&#39;formats&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">fformat</span> <span class="ow">in</span> <span class="n">formats</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">fformat</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">ALLLOWED_FORMATS</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Specified format </span><span class="si">%s</span><span class="s1"> not in list of defined &#39;</span>
-                                 <span class="s1">&#39;formats.  Skipping.&#39;</span> <span class="o">%</span> <span class="n">fformat</span><span class="p">)</span>
-                <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">fformat</span> <span class="ow">in</span> <span class="n">ALLOWED_FORMATS</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">fformat</span> <span class="o">==</span> <span class="s1">&#39;json&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Writing rupture.json file...&#39;</span><span class="p">)</span>
                 <span class="n">rupture_dict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getRuptureDict</span><span class="p">()</span>

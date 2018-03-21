@@ -178,10 +178,10 @@ of available modules.  Each of the modules may have
 its own command-line options; run "shake help MODULE" to see the help
 for a given module. 
 
-The behavior of **shake** and many of its modules are controlled by
+The behavior of **shake** and some of its modules are controlled by
 the configuration files *shake.conf* and *products.conf*. *shake.conf*
 is largely concerned with the way logging is handled. See *shake.conf*
-for details. *products.conf* controls the behavior of many of the
+for details. *products.conf* controls the behavior of some of the
 core modules that produce ShakeMap products. See the documentation
 within the file for more information. Both files should be in the
 user's current profile's *INSTALL_DIR/config* directory.
@@ -449,8 +449,7 @@ contours for each of the intensity measure types found therein. The contours
 are written as GeoJSON to files called *<imt_type>_cont.json* in the event's
 *current/products* subdirectory.
 
-See :meth:`shakemap.coremods.contour` for more details. Contour parameters
-may be specified in the *products.conf* configuration file.
+See :meth:`shakemap.coremods.contour` for the module's API documentation..
 
 gridxml
 ```````
