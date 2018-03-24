@@ -1,0 +1,54 @@
+#!/usr/bin/env python
+
+# stdlib imports
+import argparse
+from urllib.parse import urlparse
+import os.path
+import sys
+import re
+import glob
+
+# local imports
+from shakemap.utils.config import get_config_paths
+from shakemap.utils.amps import AmplitudeHandler
+
+def get_parser():
+    description = '''Insert strong motion unassociated peak amplitude files into a database.
+
+    '''
+    parser = argparse.ArgumentParser(description=description)
+    parser.add_argument('--directory',
+                        help='Directory containing unassociated strong motion peak amplitudes')
+    
+    return parser
+
+def main(args):
+    install_path, data_path = get_config_paths()
+    if not os.path.isdir(data_path):
+        print('%s is not a valid directory.' % data_path)
+        sys.exit(1)
+
+    # what to do if the database is locked by another process?
+    handler = AmplitudeHandler(install_path,data_path)
+    handler.lock()
+
+    print('Searching %s...' % args.directory)
+    xmlfiles = glob.glob(os.path.join(args.directory,'*.xml'))
+    nloaded = 0
+    for xmlfile in xmlfiles:
+        try:
+            handler.insert(xmlfile)
+            nloaded += 1
+        except Exception as e:
+            # TODO: change this to a logger?
+            print('Could not insert file: "%s"' % (str(e)))
+            continue
+    handler.unlock()
+    # logger?
+    print('Inserted %i amplitude files into the database.' % nloaded)
+    
+if __name__ == '__main__':
+    parser = get_parser()
+    pargs,unknown = parser.parse_known_args()
+    main(pargs)
+    
