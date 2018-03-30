@@ -7,12 +7,47 @@ import os.path
 import sys
 import re
 import glob
+import logging
 
 # local imports
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.amps import AmplitudeHandler
 
+LOG_CFG = { 
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': { 
+        'standard': { 
+            'format': '%(levelname)s ; %(asctime)s ; %(module)s.%(funcName)s ; %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
+    'handlers': { 
+        'default': { 
+            'level': 'INFO',
+            'formatter': 'standard',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': 'midnight',
+        },
+    },
+    'loggers': { 
+        '': { 
+            'handlers': ['default'],
+            'level': 'INFO',
+            'propagate': True
+        },
+    } 
+}
+
+LOGFILE = 'amps.log'
+    
+
 def get_parser():
+    """Set up the argparse instance for this script.
+    
+    Returns:
+        ArgumentParser: argparse instance for this script.
+    """
     description = '''Insert strong motion unassociated peak amplitude files into a database.
 
     '''
@@ -23,29 +58,38 @@ def get_parser():
     return parser
 
 def main(args):
+    """Main method for script.
+
+    """
     install_path, data_path = get_config_paths()
     if not os.path.isdir(data_path):
         print('%s is not a valid directory.' % data_path)
         sys.exit(1)
 
-    # what to do if the database is locked by another process?
-    handler = AmplitudeHandler(install_path,data_path)
-    handler.lock()
+    # set up a daily rotating file handler logger
+    logfile = os.path.join(install_path,'logs',LOGFILE)
+    log_cfg = LOG_CFG.copy()
+    log_cfg['handlers']['default']['filename'] = logfile
+    logging.config.dictConfig(log_cfg)
+    logger = logging.getLogger()
 
-    print('Searching %s...' % args.directory)
+    logger.info('Parsing input directory %s' % args.directory)
+    
+    # Create a handler object
+    handler = AmplitudeHandler(install_path,data_path)
+
+    logger.info('Searching %s...' % args.directory)
     xmlfiles = glob.glob(os.path.join(args.directory,'*.xml'))
     nloaded = 0
     for xmlfile in xmlfiles:
         try:
-            handler.insert(xmlfile)
+            handler.insertAmps(xmlfile)
             nloaded += 1
         except Exception as e:
-            # TODO: change this to a logger?
-            print('Could not insert file: "%s"' % (str(e)))
+            logger.info('Could not insert file %s: "%s"' % (xmlfile,str(e)))
+            # TODO - configure a directory where "bad" amps files can go
             continue
-    handler.unlock()
-    # logger?
-    print('Inserted %i amplitude files into the database.' % nloaded)
+    logger.info('Inserted %i amplitude files into the database.' % nloaded)
     
 if __name__ == '__main__':
     parser = get_parser()

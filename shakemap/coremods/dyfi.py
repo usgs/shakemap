@@ -8,6 +8,7 @@ import json
 from shakelib.utils.containers import ShakeMapInputContainer
 from libcomcat.search import get_event_by_id, search
 from libcomcat.classes import DetailEvent
+from amptools.table import dataframe_to_xml
 import pandas as pd
 from lxml import etree
 import time
@@ -62,52 +63,24 @@ class DYFIModule(CoreModule):
         _, data_path = get_config_paths()
         datadir = os.path.join(data_path, self._eventid, 'current')
         if not os.path.isdir(datadir):
-            raise NotADirectoryError('%s is not a valid directory.' % datadir)
-        datafile = os.path.join(datadir, 'shake_data.hdf')
-        if not os.path.isfile(datafile):
-            raise FileNotFoundError('%s does not exist.' % datafile)
+            os.makedirs(datadir)
 
         # try to find the event by our event id
         try:
             detail = get_event_by_id(self._eventid)
         except Exception as e:
-            # load the container, get the basic event info
-            container = ShakeMapInputContainer.load(datafile)
-            origin = container.getRuptureObject()._origin
-            lat = origin.lat
-            lon = origin.lon
-            mag = origin.magnitude
-            etime = origin.time
-            tstart = etime-timedelta(seconds=TIMEWINDOW)
-            tend = etime+timedelta(seconds=TIMEWINDOW)
-            minlat = lat - DEGWINDOW
-            minlon = lon - DEGWINDOW
-            maxlat = lat + DEGWINDOW
-            maxlon = lon + DEGWINDOW
-            minmag  = mag - MAGWINDOW
-            maxmag  = mag + MAGWINDOW
-            summary = search(starttime=tstart,
-                             endtime=tend,
-                             minlatitude=minlat,
-                             maxlatitude=maxlat,
-                             minlonitude=minlon,
-                             maxlonitude=maxlon,
-                             minmagnitude=minmag,
-                             maxmagnitude=maxmag)
-            if not len(summary) or len(summary) > 1:
-                self.logging.info('No single event found matching %s' % self._eventid)
-                return
-
-            detail = summary[0]
-
+            fmt = 'Could not retrieve DYFI data for %s - error "%s"'
+            raise Exception(fmt % (self._eventid,str(e)))
         
         dataframe,msg = _get_dyfi_dataframe(detail)
         if dataframe is None:
-            self.logging.info(msg)
+            self.logger.info(msg)
             return
 
         reference = 'USGS Did You Feel It? System'
-        _dataframe_to_xml(dataframe,self._eventid,datadir,reference)
+        xmlfile = os.path.join(datadir,'dyfi_dat.xml')
+        dataframe_to_xml(dataframe,xmlfile,reference)
+        self.logger.info('Wrote %i DYFI records to %s' % (len(dataframe),xmlfile))
 
 def _get_dyfi_dataframe(detail_or_url):
     if isinstance(detail_or_url,str):
@@ -193,80 +166,3 @@ def _parse_geocoded(bytes_data):
                                       'name':'station'})
     return df
 
-def _dataframe_to_xml(df,eventid,outdir,reference=None):
-    """Write a dataframe to ShakeMap XML format.
-    
-    Args:
-        df (DataFrame): Pandas dataframe, as described in read_excel.
-        eventid (str): Event ID string.
-        outdir (str): Path to directory where XML file should be written.
-    Returns:
-        str: Path to output XML file.
-    """
-    #######################################################################
-    # TODO: This function is a copy of one from amptools.  Resolve this
-    # in some intelligent way.
-    #######################################################################
-    if hasattr(df.columns,'levels'):
-        top_headers = df.columns.levels[0]
-        channels = (set(top_headers) - set(required_columns)) - set(optional)
-    else:
-        channels = []
-    root = etree.Element('shakemap-data',code_version="3.5",map_version="3")
-
-    create_time = int(time.time())
-    stationlist = etree.SubElement(root,'stationlist',created='%i' % create_time)
-    if reference is not None:
-        stationlist.attrib['reference'] = reference
-    
-    for _,row in df.iterrows():
-        station = etree.SubElement(stationlist,'station')
-
-        tmprow = row.copy()
-        if isinstance(tmprow.index,pd.core.indexes.multi.MultiIndex):
-            tmprow.index = tmprow.index.droplevel(1)
-        
-        # assign required columns
-        stationcode = tmprow['station'].strip()
-        netid = tmprow['network'].strip()
-        if not stationcode.startswith(netid):
-            stationcode = '%s.%s' % (netid,stationcode)
-
-        station.attrib['code'] = stationcode
-        station.attrib['lat'] = '%.4f' % tmprow['lat']
-        station.attrib['lon'] = '%.4f' % tmprow['lon']
-
-        # assign optional columns
-        if 'location' in tmprow:
-            station.attrib['name'] = tmprow['location'].strip()
-        if 'network' in tmprow:
-            station.attrib['netid'] = tmprow['network'].strip()
-        if 'distance' in tmprow:
-            station.attrib['dist'] = '%.1f' % tmprow['distance']
-        if 'intensity' in tmprow:
-            station.attrib['intensity'] = '%.1f' % tmprow['intensity']
-        if 'source' in tmprow:
-            station.attrib['source'] = tmprow['source'].strip()
-
-        # sort channels by N,E,Z or H1,H2,Z
-        channels = sorted(list(channels))
-            
-        for channel in channels:
-            component = etree.SubElement(station,'comp')
-            component.attrib['name'] = channel.upper()
-
-            # create sub elements out of any of the PGMs
-            for pgm in ['pga','pgv','psa03','psa10','psa30']:
-                if pgm not in row[channel] or np.isnan(row[channel][pgm]):
-                    continue
-                if pgm in row[channel]:
-                    pgm_el = etree.SubElement(component,pgm)
-                    pgm_el.attrib['flag'] = '0'
-                    pgm_el.attrib['value'] = '%.4f' % row[channel][pgm]
-
-    
-    outfile = os.path.join(outdir,'%s_dat.xml' % eventid)
-    tree = etree.ElementTree(root)
-    tree.write(outfile,pretty_print=True)
-
-    return outfile

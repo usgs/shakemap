@@ -49,11 +49,6 @@ fi
 # Turn off whatever other virtual environment user might be in
 source deactivate
 
-# Download dependencies not in conda or pypi
-curl --max-time 60 --retry 3 -L \
-     https://github.com/usgs/strec/archive/master.zip -o strec.zip
-
-
 # Create a conda virtual environment
 echo "Creating the $VENV virtual environment:"
 conda env create -f $env_file --force
@@ -62,8 +57,6 @@ conda env create -f $env_file --force
 # Clean up zip files we've downloaded
 if [ $? -ne 0 ]; then
     echo "Failed to create conda environment.  Resolve any conflicts, then try again."
-    echo "Cleaning up zip files..."
-    rm strec.zip
     exit
 fi
 
@@ -71,16 +64,6 @@ fi
 # Activate the new environment
 echo "Activating the $VENV virtual environment"
 source activate $VENV
-
-# Install OpenQuake -- note that I have pulled this out of environment.yml
-# because the requirements are too narrow to work with our other dependencies,
-# but the openquake.hazardlib tests pass with this environment. We need to
-# remember to check this when we change the environemnt.yml file though.
-# conda install -y --no-deps -c conda-forge openquake.engine
-
-
-# Clean up downloaded packages
-rm strec.zip
 
 # This package
 echo "Installing shakemap..."

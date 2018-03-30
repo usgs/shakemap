@@ -7,13 +7,44 @@ import os.path
 import sys
 import re
 import glob
+import logging
 
 # local imports
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.amps import AmplitudeHandler
 
+LOG_CFG = { 
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': { 
+        'standard': { 
+            'format': '%(levelname)s ; %(asctime)s ; %(module)s.%(funcName)s ; %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
+    'handlers': { 
+        'default': { 
+            'level': 'INFO',
+            'formatter': 'standard',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'when': 'midnight',
+        },
+    },
+    'loggers': { 
+        '': { 
+            'handlers': ['default'],
+            'level': 'INFO',
+            'propagate': True
+        },
+    } 
+}
+
+LOGFILE = 'associate.log'
+    
 def get_parser():
     description = '''Associate any un-associated amplitudes with existing ShakeMap events.
+
+    Amplitude data will be written to event data directories in ShakeMap station XML format.
 
     '''
     parser = argparse.ArgumentParser(description=description)
@@ -25,19 +56,21 @@ def main(args):
         print('%s is not a valid directory.' % data_path)
         sys.exit(1)
 
+    # set up a daily rotating file handler logger
+    logfile = os.path.join(install_path,'logs',LOGFILE)
+    log_cfg = LOG_CFG.copy()
+    log_cfg['handlers']['default']['filename'] = logfile
+    logging.config.dictConfig(log_cfg)
+    logger = logging.getLogger()
+        
     # what to do if the database is locked by another process?
     handler = AmplitudeHandler(install_path,data_path)
-    handler.lock()
-
-    # update the database with any events added after last write
-    nadded,ndeleted = handler.update()
 
     # scan the event table and find any data that is associated with each event
     nassociated = handler.associateAll()
     
-    handler.unlock()
     # logger?
-    print('Added %i events into database, deleted %i.' % (nadded,ndeleted))
+    logger.info('Found amplitude data for %i events.' % (nassociated))
     
 if __name__ == '__main__':
     parser = get_parser()
