@@ -5,7 +5,7 @@ import glob
 import os.path
 import re
 from xml.dom import minidom
-from datetime import datetime
+from datetime import datetime,timezone
 from collections import OrderedDict
 
 # third party libraries
@@ -144,7 +144,7 @@ class AmplitudeHandler(object):
         fmt = 'INSERT INTO event %s VALUES ("%s",%i,%.4f,%.4f,%.1f,%.1f)'
         einsert = fmt % (cols,
                          event['id'],
-                         event['time'].timestamp(),
+                         dt_to_timestamp(event['time']),
                          event['lat'],
                          event['lon'],
                          event['depth'],
@@ -306,7 +306,7 @@ class AmplitudeHandler(object):
             self._cursor.execute(delete_cmd)
 
         # # ensure that the station field is a string
-        dataframe['station']= dataframe['station'].astype(int)
+        # dataframe['station']= dataframe['station'].astype(int)
         dataframe['station']= dataframe['station'].astype(str)
 
         self._disconnect()
@@ -368,17 +368,19 @@ class AmplitudeHandler(object):
                 time_dict['msec'] = int(child.getAttribute('value'))
         if has_pgm:
             pgmtime_str = reference.getElementsByTagName('PGMTime')[0].firstChild.nodeValue
-            pgmtime = int(datetime.strptime(pgmtime_str[0:19],TIMEFMT).timestamp())
+            pgmdate = datetime.strptime(pgmtime_str[0:19],TIMEFMT).replace(tzinfo=timezone.utc)
+            pgmtime = int(dt_to_timestamp(pgmdate))
         else:
             if not len(time_dict):
                 print('No time data for file %s' % fname)
                 return
-            pgmtime = int(datetime(time_dict['year'],
+            pgmdate = datetime(time_dict['year'],
                                time_dict['month'],
                                time_dict['day'],
                                time_dict['hour'],
                                time_dict['minute'],
-                               time_dict['second']).timestamp())
+                               time_dict['second'])
+            pgmtime = dt_to_timestamp(pgmdate)
 
         # there are often multiple stations per file, but they're all duplicates
         # of each other, so just grab the information from the first one
@@ -529,6 +531,10 @@ class AmplitudeHandler(object):
 
         self._disconnect()
         return results
+
+def dt_to_timestamp(dt):
+    timestamp = int(dt.replace(tzinfo=timezone.utc).timestamp())
+    return timestamp
 
 def _invalid_xml_remove(c):
     #http://stackoverflow.com/questions/1707890/fast-way-to-filter-illegal-xml-unicode-chars-in-python

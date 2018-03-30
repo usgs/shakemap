@@ -4,7 +4,7 @@
 from xml.dom import minidom
 import warnings
 import os.path
-from datetime import datetime
+from datetime import datetime, timezone
 
 # third party
 from lxml import etree
@@ -259,8 +259,10 @@ def write_event_file(event,xmlfile):
     root.attrib['second'] = str(event['time'].second)
     root.attrib['timezone'] = 'GMT'
     root.attrib['locstring'] = event['location']
-    root.attrib['created'] = str(int(datetime.utcnow().timestamp()))
-    root.attrib['otime'] = str(int(event['time'].timestamp()))
+    dtnow = datetime.utcnow().replace(tzinfo=timezone.utc)
+    root.attrib['created'] = str(dtnow.timestamp()))
+    eqtime = event['time'].replace(tzinfo=timezone.utc)
+    root.attrib['otime'] = str(int(eqtime.timestamp()))
     
     tree = etree.ElementTree(root)
     tree.write(xmlfile,pretty_print=True)
