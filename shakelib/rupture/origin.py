@@ -4,8 +4,10 @@
 from xml.dom import minidom
 import warnings
 import os.path
+from datetime import datetime, timezone
 
 # third party
+from lxml import etree
 from openquake.hazardlib.geo import point
 from obspy.io.quakeml.core import _is_quakeml
 from obspy.core.event import read_events
@@ -228,6 +230,42 @@ class Origin(object):
         self.rake = rake
         self.mech = mech
 
+def write_event_file(event,xmlfile):
+    """Write event.xml file.
+
+    Args:
+       event (dict): Dictionary containing fields [field, (type, example)]:
+           - id (str, "us2008abcd")
+           - lat (float, 42.1234)
+           - lon (float, -85.1234)
+           - depth (float, 24.1)
+           - mag (float, 7.9)
+           - time (datetime, datetime(2018,3,27,6,23,34)
+           - location (str, "East of the Poconos")
+           
+    """
+    root = etree.Element('earthquake')
+    root.attrib['id'] = event['id']
+    root.attrib['lat'] = '%.4f' % event['lat']
+    root.attrib['lon'] = '%.4f' % event['lon']
+    root.attrib['depth'] = '%.1f' % event['depth']
+    root.attrib['mag'] = '%.1f' % event['mag']
+
+    root.attrib['year'] = str(event['time'].year)
+    root.attrib['month'] = str(event['time'].month)
+    root.attrib['day'] = str(event['time'].day)
+    root.attrib['hour'] = str(event['time'].hour)
+    root.attrib['minute'] = str(event['time'].minute)
+    root.attrib['second'] = str(event['time'].second)
+    root.attrib['timezone'] = 'GMT'
+    root.attrib['locstring'] = event['location']
+    dtnow = datetime.utcnow().replace(tzinfo=timezone.utc)
+    root.attrib['created'] = str(int(dtnow.timestamp()))
+    eqtime = event['time'].replace(tzinfo=timezone.utc)
+    root.attrib['otime'] = str(int((eqtime.timestamp())))
+    
+    tree = etree.ElementTree(root)
+    tree.write(xmlfile,pretty_print=True)
 
 def read_event_file(eventxml):
     """

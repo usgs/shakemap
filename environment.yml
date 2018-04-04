@@ -6,6 +6,7 @@ channels:
 - ioos
 dependencies:
 - affine
+- amptools
 - basemap
 - beautifulsoup4
 - cartopy
@@ -20,12 +21,14 @@ dependencies:
 - ipython
 - jupyter
 - libcomcat
+- mapio
 - matplotlib
 - numexpr
 - numpy
 - obspy
 - openquake.engine
 - pandas
+- ps2ff
 - psutil
 - pyproj
 - pyshp
@@ -40,6 +43,7 @@ dependencies:
 - scipy
 - shapely
 - sphinx
+- strec
 - versioneer
 - paramiko
 - pip:
@@ -50,7 +54,4 @@ dependencies:
   - jupyter-core==4.4.0
   - prompt-toolkit==1.0.15
   - sphinx-argparse==0.2.1
-  - ./mapio.zip
-  - ./strec.zip
-  - ./ps2ff.zip
 

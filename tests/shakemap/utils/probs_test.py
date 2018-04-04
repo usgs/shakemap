@@ -8,7 +8,7 @@ from shakemap.coremods.select import validate_config
 from configobj import ConfigObj
 
 
-def test_probs():
+def test_amps():
     install_path, config_path = get_config_paths()
     config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
     validate_config(config, install_path)

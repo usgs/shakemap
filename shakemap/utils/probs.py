@@ -163,22 +163,13 @@ def get_region_probs(eid, depth, strec_results, config):
         # If we're considering subduction zones but not IN a subduction zone
         x1 = 0.0
         p2 = 0.0
-        if region == 'subduction':
-            x2 = 100.0  # this doesn't matter
-            if distance > 0:
-                p1 = 0.0
-            else:
-                p1 = 1.0
-        else:
-            p1 = 1.0
-            x2 = rdict['horizontal_buffer']
+
+        p1 = 1.0
+        x2 = rdict['horizontal_buffer']
 
         region_prob = get_probability(distance, x1, p1, x2, p2)
         region_probs[region] = region_prob
-
-        if region == 'subduction':
-            continue
-
+        
         region_layer_probs = {}
         # now do the weights for each depth zone
         for i in range(0, len(rdict['min_depth'])):

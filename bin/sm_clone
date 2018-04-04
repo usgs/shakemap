@@ -15,7 +15,9 @@ from libcomcat.search import get_event_by_id
 
 # local imports
 from shakemap.utils.config import get_config_paths
+from shakemap.utils.amps import AmplitudeHandler
 
+TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
 def get_parser():
     description = '''
@@ -44,7 +46,7 @@ def _write_event_xml(network, eventid, infodict, event_dir):
     """
     event_info = infodict['input']['event_information']
 
-    otime = datetime.strptime(event_info['origin_time'], '%Y-%m-%dT%H:%M:%SZ')
+    otime = datetime.strptime(event_info['origin_time'], TIMEFMT)
     eqdict = {'id': eventid,
               'network': network,
               'lat': '%.4f' % event_info['latitude'],
@@ -84,9 +86,30 @@ def main(args):
         os.makedirs(event_dir)
 
     detail = get_event_by_id(args.eventid)
+
+    # Insert this event into the profile's amps database.
+    handler = AmplitudeHandler(install_path,data_path)
+    event = {'id':detail.id,
+             'time':detail.time,
+             'lat':detail.latitude,
+             'lon':detail.longitude,
+             'depth':detail.depth,
+             'mag':detail.magnitude}
+    handler.insertEvent(event)
+    
     if not detail.hasProduct('shakemap'):
-        print('Event %s has no ShakeMap product.  Exiting.' % args.eventid)
-        sys.exit(1)
+        print('Event %s has no ShakeMap product.  Creating a basic ShakeMap.' % args.eventid)
+        event_info = {'latitude':detail.latitude,
+                      'longitude':detail.longitude,
+                      'depth':detail.depth,
+                      'magnitude':detail.magnitude,
+                      'origin_time':detail.time.strftime(TIMEFMT),
+                      'event_description':detail.location}
+        infodict = {'input':{'event_information':event_info}}
+        _write_event_xml(detail['net'],args.eventid,infodict,event_dir)
+        print('Created event.xml file in %s.' % event_dir)
+        sys.exit(0)
+                      
     shakemap = detail.getProducts('shakemap')[0]
     tmpdir = None
     try:
