@@ -7,17 +7,18 @@ channels:
 dependencies:
 - affine=2.2.0
 - alabaster=0.7.10
-- amptools=1.0.1
+- amptools=1.0.2
 - appnope=0.1.0
 - asn1crypto=0.24.0
 - attrs=17.4.0
 - babel=2.5.3
+- backcall=0.1.0
 - basemap=1.1.0
 - beautifulsoup4=4.6.0
 - blas=1.1
 - bleach=2.1.3
-- boto3=1.6.19
-- botocore=1.9.19
+- boto3=1.6.22
+- botocore=1.9.22
 - ca-certificates=2018.1.18
 - cartopy=0.16.0
 - certifi=2018.1.18
@@ -33,7 +34,7 @@ dependencies:
 - dask-core=0.17.2
 - decorator=4.2.1
 - descartes=1.1.0
-- django=2.0.3
+- django=2.0.4
 - docutils=0.14
 - entrypoints=0.2.3
 - et_xmlfile=1.0.1
@@ -56,9 +57,9 @@ dependencies:
 - imagesize=1.0.0
 - impactutils=0.8.1
 - ipykernel=4.8.2
-- ipython=6.2.1
+- ipython=6.3.0
 - ipython_genutils=0.2.0
-- ipywidgets=7.1.2
+- ipywidgets=7.2.0
 - jdcal=1.3
 - jedi=0.11.1
 - jinja2=2.10
@@ -71,7 +72,7 @@ dependencies:
 - jupyter_console=5.2.0
 - jupyter_core=4.4.0
 - kealib=1.4.7
-- krb5=1.14.2
+- krb5=1.14.6
 - libcomcat=1.2.2
 - libdap4=3.18.3
 - libffi=3.2.1
@@ -88,7 +89,7 @@ dependencies:
 - libxml2=2.9.8
 - libxslt=1.1.32
 - lxml=4.2.1
-- mapio=0.7.2
+- mapio=0.7.3
 - markupsafe=1.0
 - matplotlib=2.0.0rc2
 - mistune=0.8.3
@@ -116,12 +117,12 @@ dependencies:
 - pandocfilters=1.4.1
 - paramiko=2.4.1
 - parso=0.1.1
-- pbr=3.1.1
+- pbr=4.0.0
 - pcre=8.39
 - pexpect=4.4.0
 - pickleshare=0.7.4
 - pillow=4.0.0
-- pip=9.0.1
+- pip=9.0.3
 - pluggy=0.6.0
 - proj4=4.9.3
 - prompt_toolkit=1.0.15
@@ -167,7 +168,7 @@ dependencies:
 - snuggs=1.4.1
 - sphinx=1.7.2
 - sphinxcontrib-websupport=1.0.1
-- sqlalchemy=1.2.5
+- sqlalchemy=1.2.6
 - sqlite=3.20.1
 - strec=2.0.1
 - terminado=0.8.1
@@ -181,8 +182,8 @@ dependencies:
 - versioneer=0.18
 - wcwidth=0.1.7
 - webencodings=0.5
-- wheel=0.30.0
-- widgetsnbextension=3.1.4
+- wheel=0.31.0
+- widgetsnbextension=3.2.0
 - xerces-c=3.2.0
 - xlrd=1.1.0
 - xlsxwriter=1.0.2
@@ -203,3 +204,4 @@ dependencies:
   - jupyter-core==4.4.0
   - prompt-toolkit==1.0.15
   - sphinx-argparse==0.2.1
+
