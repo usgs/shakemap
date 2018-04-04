@@ -1,17 +1,13 @@
 # stdlib imports
 import os.path
-from datetime import timedelta
 from io import StringIO
 import json
 
 # third party imports
-from shakelib.utils.containers import ShakeMapInputContainer
-from libcomcat.search import get_event_by_id, search
+from libcomcat.search import get_event_by_id
 from libcomcat.classes import DetailEvent
 from amptools.table import dataframe_to_xml
 import pandas as pd
-from lxml import etree
-import time
 import numpy as np
 
 # local imports
@@ -151,7 +147,13 @@ def _parse_geocoded(bytes_data):
     df_dict = dict(zip(columns,arrays))
     for feature in jdict['features']:
         for column in prop_columns:
-            df_dict[column].append(feature['properties'][column])
+            if column == 'name':
+                prop = feature['properties'][column]
+                prop = prop[0:prop.find('<br>')]
+            else:
+                prop = feature['properties'][column]
+                
+            df_dict[column].append(prop)
         # the geojson defines a box, so let's grab the center point
         lons = [c[0] for c in feature['geometry']['coordinates'][0]]
         lats = [c[1] for c in feature['geometry']['coordinates'][0]]

@@ -67,9 +67,9 @@ def main(args):
     handler = AmplitudeHandler(install_path,data_path)
 
     # scan the event table and find any data that is associated with each event
+
+    logger.info('Searching for amp data to associate.')
     nassociated = handler.associateAll()
-    
-    # logger?
     logger.info('Found amplitude data for %i events.' % (nassociated))
     
 if __name__ == '__main__':

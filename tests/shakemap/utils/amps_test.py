@@ -55,12 +55,28 @@ def test_amps():
 
         del handler
         os.remove(dbfile)
-        
+
+        # test global associator
         handler = AmplitudeHandler(install_path,data_path)
         handler.insertEvent(event)
         handler.insertAmps(xmlfile)
         nassociated = handler.associateAll(write_data=False)
         assert nassociated == 1
+
+        del handler
+        os.remove(dbfile)
+
+        #test clean methods
+        handler = AmplitudeHandler(install_path,data_path)
+        handler.insertEvent(event)
+        handler.insertAmps(xmlfile)
+        handler.cleanEvents(threshold=1)
+        handler.cleanAmps(threshold=1)
+        info = handler.getStats()
+        assert info['events'] == 0
+        assert info['stations'] == 0
+        assert info['channels'] == 0
+        assert info['pgms'] == 0
     except:
         assert 1==2
     finally:

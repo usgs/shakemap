@@ -1,11 +1,9 @@
-import argparse
 import sys
 import sqlite3
-import glob
 import os.path
 import re
 from xml.dom import minidom
-from datetime import datetime,timezone
+from datetime import datetime, timezone, timedelta
 from collections import OrderedDict
 
 # third party libraries
@@ -91,12 +89,12 @@ class AmplitudeHandler(object):
         self._disconnect()
 
     def _connect(self):
-        for i in range(0,3):
+        for _ in range(0,3):
             try:
                 self._connection = sqlite3.connect(self._dbfile)
                 self._cursor = self._connection.cursor()
                 break
-            except:
+            except Exception as e:
                 continue
         if self._connection is None:
             raise Exception('Could not connect to %s' % self._dbfile)
@@ -213,10 +211,11 @@ class AmplitudeHandler(object):
                        - network: Station contributing network.
                        - location: String describing station location.
                        - distance: Distance (km) from station to origin.
+                       - flag: Value will be 0.
         """
         self._connect()
         columns = ['station', 'channel','imt','value',
-               'lat', 'lon', 'network','location', 'distance']
+               'lat', 'lon', 'network','location', 'distance','flag']
         dataframe = pd.DataFrame(columns=columns)
         conditions = ['timestamp > %i' % (eqtime-TMIN),
                       'timestamp < %i' % (eqtime+TMAX)]
@@ -234,7 +233,7 @@ class AmplitudeHandler(object):
         inear = np.where(dist < DISTANCE)[0]
         eqdata = eqdata[inear]
         dist = dist[inear]
-        nrows,ncols = eqdata.shape
+        nrows,_ = eqdata.shape
 
         stations = []
 
@@ -290,6 +289,7 @@ class AmplitudeHandler(object):
                     data_row['network'] = network
                     data_row['location'] = name
                     data_row['distance'] = distance
+                    data_row['flag'] = 0
                     dataframe = dataframe.append(data_row,ignore_index=True)
 
         # clean up rows that have been associated
@@ -328,7 +328,7 @@ class AmplitudeHandler(object):
             
         """
         self._connect()
-        fpath,fname = os.path.split(xmlfile)
+        _,fname = os.path.split(xmlfile)
         try:
             xmlstr = open(xmlfile,'r').read()
             # sometimes these records have non-ascii bytes in them
@@ -391,6 +391,8 @@ class AmplitudeHandler(object):
         name = station.getAttribute('name')
         if station.hasAttribute('net'):
             network = station.getAttribute('net')
+        elif station.hasAttribute('netid'):
+            network = station.getAttribute('netid')
         else:
             network = agency
 
@@ -423,7 +425,6 @@ class AmplitudeHandler(object):
                 fmt = 'INSERT INTO pgm %s VALUES (%i,"%s",%.4f)'
                 insert_cmd = fmt % (cols,cid,imt,value)
                 self._cursor.execute(insert_cmd)
-                pid = self._cursor.lastrowid
 
         root.unlink()
         self._disconnect()
@@ -436,25 +437,26 @@ class AmplitudeHandler(object):
         Returns:
             int: Number of stations deleted.
         """
-        tnow = int(datetime.utcnow().timestamp())
+        thresh_date = dt_to_timestamp(datetime.utcnow() - timedelta(days=threshold))
         self._connect()
-        squery = 'SELECT id FROM station WHERE timestamp < %i' % tnow
+        squery = 'SELECT id FROM station WHERE timestamp < %i' % thresh_date
         self._cursor.execute(squery)
         station_ids = self._cursor.fetchall()
         for station_id in station_ids:
             cquery = 'SELECT id FROM channel WHERE station_id=%i' % station_id
-            self._cursor.execute(squery)
+            self._cursor.execute(cquery)
             channel_ids = self._cursor.fetchall()
             for channel_id in channel_ids:
                 pquery = 'SELECT id FROM pgm WHERE channel_id=%i' % channel_id
                 self._cursor.execute(pquery)
-                pmg_ids = self._cursor.fetchall()
+                pgm_ids = self._cursor.fetchall()
                 for pgm_id in pgm_ids:
-                    pdelete = 'DELETE FROM pmg WHERE id=%i' % pgm_id
-                    self.cursor.execute(pdelete)
+                    pdelete = 'DELETE FROM pgm WHERE id=%i' % pgm_id
+                    self._cursor.execute(pdelete)
                 cdelete = 'DELETE FROM channel WHERE id=%i' % channel_id
+                self._cursor.execute(cdelete)
             sdelete = 'DELETE FROM station WHERE id=%i' % station_id
-            self.cursor.execute(sdelete)
+            self._cursor.execute(sdelete)
 
         self._disconnect()
         return len(station_ids)
@@ -468,8 +470,8 @@ class AmplitudeHandler(object):
             int: Number of events deleted.
         """
         self._connect()
-        tnow = int(datetime.utcnow().timestamp())
-        equery = 'DELETE FROM event WHERE time < %i' % tnow
+        thresh_date = dt_to_timestamp(datetime.utcnow() - timedelta(days=threshold))
+        equery = 'DELETE FROM event WHERE time < %i' % thresh_date
         self._cursor.execute(equery)
         nevents = self._cursor.rowcount
         self._disconnect()
