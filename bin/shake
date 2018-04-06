@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # stdlib imports
+import os.path
 import argparse
 import sys
 import traceback
@@ -11,6 +12,7 @@ import inspect
 import importlib
 import time
 from collections import OrderedDict
+from configobj import ConfigObj
 
 import matplotlib
 matplotlib.use('Agg')
@@ -19,10 +21,18 @@ matplotlib.use('Agg')
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.config import get_logger
 
-import shakemap.coremods
+
+def _get_config():
+    """
+    Read the config file and return the resulting structure.
+    """
+    install_path, data_path = get_config_paths()
+    config_file = os.path.join(install_path, 'config', 'shake.conf')
+    config = ConfigObj(config_file)
+    return config
 
 
-def _get_command_classes():
+def _get_command_classes(config):
     """
     Create a dictionary of classname:class to be used in main().
 
@@ -30,12 +40,15 @@ def _get_command_classes():
         dict: Dictionary of classname:class where each class
             is a subclass of shakemap.coremods.base.CoreModule.
     """
-    coremods = {
-        name: importlib.import_module(name)
-        for finder, name, ispkg
-        in pkgutil.iter_modules(shakemap.coremods.__path__,
-                                shakemap.coremods.__name__ + ".")
-    }
+    coremods = {}
+    for modname in config['coremods']:
+        mod = importlib.import_module(modname)
+        cm = {
+            name: importlib.import_module(name)
+            for finder, name, ispkg
+            in pkgutil.iter_modules(mod.__path__, mod.__name__ + ".")
+        }
+        coremods.update(cm)
 
     classes = {}
     for name, module in coremods.items():
@@ -58,7 +71,8 @@ def _get_command_classes():
     return ordered_classes
 
 
-_classes_ = _get_command_classes()
+_config_ = _get_config()
+_classes_ = _get_command_classes(_config_)
 
 
 def _format_error_info(exception, eventid):

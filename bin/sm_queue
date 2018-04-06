@@ -1,0 +1,186 @@
+#! /usr/bin/env python
+
+# System imports
+import os.path
+from collections import OrderedDict
+import logging
+from logging.handlers import TimedRotatingFileHandler
+import socket
+import json
+
+# Third-party imports
+import daemon
+import lockfile
+from configobj import ConfigObj
+from validate import Validator
+from shapely.geometry import (Polygon, 
+                              Point)
+
+# Local imports
+from shakemap.utils.config import (get_config_paths,
+                                   config_error,
+                                   get_configspec)
+
+PORT = 9755
+
+
+def str_to_seconds(tstring):
+    '''
+    Convert time strings to seconds. Strings can be of the
+    form:
+        <int>   (ninutes)
+        <int>m  (minutes)
+        <int>h  (hours)
+        <int>d  (days)
+        <int>y  (years)
+    '''
+    if tstring.endswith('m'):
+        secs = 60 * int(tstring.replace('m', ''))
+    elif tstring.endswith('h'):
+        secs = 60 * 60 * int(tstring.replace('h', ''))
+    elif tstring.endswith('d'):
+        secs = 24 * 60 * 60 * int(tstring.replace('d', ''))
+    elif tstring.endswith('y'):
+        secs = 365 * 24 * 60 * 60 * int(tstring.replace('y', ''))
+    else:
+        secs = 60 * int(tstring.replace('m', ''))
+        if secs < 0:
+            secs = -1
+
+    return secs
+
+def parse_config(config):
+    '''
+    Parse the config file to get usable data.
+    '''
+    if '' in config['servers']:
+        config['servers'].remove('')
+    if 'localhost' not in config['servers']:
+        config['servers'].append('localhost')
+
+    config['old_event_age'] = str_to_seconds(config['old_event_age'])
+    config['future_event_age'] = str_to_seconds(config['future_event_age'])
+
+    boxes = OrderedDict()
+    for key, value in config['boxes'].items():
+        coords = [float(x) for x in value.split(',')]
+        mag = coords.pop(0)
+        # The config is in lat, lon order, but wee want lon, lat
+        coords2 = list(zip(coords[1::2], coords[0::2]))
+        coords2.append(coords2[0])
+        boxes[key] = {'mag': mag, 'poly': Polygon(coords2)}
+
+    repeats = {}
+    for key, value in config['repeats'].items():
+        tlist = [str_to_seconds(x) for x in value]
+        repeats[float(key)] = tlist
+
+    return config, boxes, repeats
+
+def do_periodic_tasks():
+    #
+    # Do routine stuff: check for finished children,
+    # check for reruns
+    #
+    return
+
+
+
+if __name__ == '__main__':
+
+    install_path, data_path = get_config_paths()
+    #
+    # Read the config and get it into a usable state
+    #
+    config_file = os.path.join(install_path, 'config', 'queue.conf')
+    configspec = get_configspec('queue')
+    validator = Validator()
+    config = ConfigObj(config_file, configspec=configspec)
+    results = config.validate(validator)
+    if not isinstance(results, bool) or not results:
+        config_error(config, results)
+    config, boxes, repeats = parse_config(config)
+
+    #
+    # Turn this process into a daemon
+    #
+
+    logpath = os.path.join(install_path, 'logs')
+    if not os.path.isdir(logpath):
+        os.makedirs(logpath)
+    pidfile = os.path.join(logpath, 'queue.pid')
+    context = daemon.DaemonContext(
+            working_directory=data_path,
+            pidfile=lockfile.FileLock(pidfile))
+
+#    with context:
+    for i in range(1):
+        #
+        # Set up the logging
+        #
+        logger = logging.getLogger('queue_logger')
+        logger.setLevel(logging.INFO)
+        logfile = os.path.join(logpath, 'queue.log')
+        handler = TimedRotatingFileHandler(logfile,
+                                           when='midnight',
+                                           backupCount=60)
+        formatter = logging.Formatter(
+                fmt='%(asctime)s - %(levelname)s - %(message)s',
+                datefmt='%Y-%m-%d %H:%M:%S')
+        handler.setFormatter(formatter)
+        logger.addHandler(handler)
+
+        logger.debug('Debug message')
+        logger.info('Info message')
+        logger.warning('Warning message')
+        logger.error('Error message')
+
+        #
+        # Create the socket
+        #
+        qsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        qsocket.bind(('', PORT))
+        qsocket.settimeout(60)
+        qsocket.listen(5)
+
+        while True:
+            #
+            # Do routine stuff
+            #
+            do_periodic_tasks()
+            #
+            # Now wait for a connection 
+            #
+            try:
+                (clientsocket, address) = qsocket.accept()
+            except socket.timeout:
+                print('Socket timed out')
+                continue
+            hostname, _, _ = socket.gethostbyaddr(address[0])
+#            hostname = socket.getfqdn(hostname)
+            print('Got connection from %s at port %s' % (hostname, address[1]))
+
+            if hostname not in config['servers']:
+                print('Connection from %s refused: not in valid servers list' % hostname)
+                clientsocket.close()
+                continue
+
+            data = clientsocket.recv(4096)
+            print('Got data: ', data)
+
+            clientsocket.close()
+            #
+            # Decode the data and do something
+            #
+            cmd = json.loads(data)
+            if cmd['type'] == 'origin':
+                process_origin(cmd['data'])
+            elif cmd['type'] == 'fault':
+                process_fault(cmd['data'])
+            elif cmd['type'] == 'moment-tensor':
+                process_moment_tensor(cmd['data'])
+            else:
+                print('Unknown trigger type: %s; ignoring' % cmd['type'])
+                
+
+

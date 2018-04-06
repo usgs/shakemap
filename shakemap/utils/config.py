@@ -481,31 +481,6 @@ def cfg_float(value):
     return fval
 
 
-def get_shake_config():
-    """
-    Return a dictionary containing input required to run the shake program,
-    including logging.
-
-    See https://docs.python.org/3.5/library/logging.config.html.
-
-    Returns:
-       dict: Dictionary containing shake config information.
-    """
-    install_path, data_path = get_config_paths()
-    conf_file = os.path.join(install_path, 'config', 'shake.conf')
-    spec_file = get_configspec(config='shake')
-    shake_conf = ConfigObj(conf_file,
-                           configspec=spec_file,
-                           interpolation='template')
-
-    val = Validator()
-    results = shake_conf.validate(val)
-    if not isinstance(results, bool) or not results:
-        config_error(shake_conf, results)
-
-    return shake_conf
-
-
 def get_logger(eventid, log_option=None):
     """Return the logger instance for ShakeMap.  Only use once!
 
@@ -574,7 +549,7 @@ def get_logger(eventid, log_option=None):
 
 
 def get_logging_config():
-    """Extract logging configuration from shake config.
+    """Extract logging configuration from logging.conf.
 
     See this URL for example of config.
     https://gist.github.com/st4lk/6287746
@@ -585,8 +560,18 @@ def get_logging_config():
         dict: Dictionary suitable for use with logging.config.dictConfig().
     """
 
-    shake_conf = get_shake_config()
-    log_config = shake_conf['shake']
+    install_path, data_path = get_config_paths()
+    conf_file = os.path.join(install_path, 'config', 'logging.conf')
+    spec_file = get_configspec(config='logging')
+    log_config = ConfigObj(conf_file,
+                           configspec=spec_file,
+                           interpolation='template')
+
+    val = Validator()
+    results = log_config.validate(val)
+    if not isinstance(results, bool) or not results:
+        config_error(log_config, results)
+
     _clean_log_dict(log_config)
 
     # Here follows a bit of trickery...
