@@ -120,6 +120,15 @@ class AugmentModule(CoreModule):
             self.logger.debug('Found a global config file.')
             global_config = ConfigObj(config_file, configspec=spec_file)
             shake_config.merge(global_config)
+
+        # extent conf (may not be present)
+        extent_config = os.path.join(install_path, 'config', 'extent.conf')
+        if os.path.isfile(extent_config):
+            extent_config = ConfigObj(extent_config,
+                                      configspec=spec_file)
+        else:
+            extent_config = ConfigObj()
+        shake_config.merge(extent_config)
         #
         # this is the event specific model.conf (may not be present)
         # prefer model.conf to model_zc.conf

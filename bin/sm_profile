@@ -187,6 +187,7 @@ def create(config, profile, accept, ppath):
                   'select.conf',
                   'products.conf',
                   'shake.conf',
+                  'extent.conf',
                   'transfer.conf']
 
     # if any of these files are not present in the install config

@@ -430,7 +430,7 @@ class ModelModule(CoreModule):
                 self.W, self.S, self.E, self.N = \
                         self.config['interp']['prediction_location']['extent']
             else:
-                self.W, self.E, self.S, self.N = get_extent(self.rupture_obj)
+                self.W, self.E, self.S, self.N = get_extent(self.rupture_obj,config=self.config)
 
             self.sites_obj_out = Sites.fromBounds(self.W, self.E, self.S,
                                                   self.N, self.smdx, self.smdy,
