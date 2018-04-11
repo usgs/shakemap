@@ -108,6 +108,13 @@ class AssembleModule(CoreModule):
             os.path.join(install_path, 'config', 'model.conf'),
             configspec=spec_file)
 
+        extent_config_file = os.path.join(install_path, 'config', 'extent.conf')
+        if os.path.isfile(extent_config_file):
+            extent_config = ConfigObj(extent_config_file,
+                                      configspec=spec_file)
+        else:
+            extent_config = ConfigObj()
+
         #
         # this is the event specific model.conf (may not be present)
         # prefer model.conf to model_zc.conf
@@ -129,6 +136,7 @@ class AssembleModule(CoreModule):
         global_config.merge(event_config)
         global_config.merge(modules)
         global_config.merge(gmpe_sets)
+        global_config.merge(extent_config)
 
         results = global_config.validate(validator)
         if not isinstance(results, bool) or not results:

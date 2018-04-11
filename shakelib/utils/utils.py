@@ -11,8 +11,13 @@ from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.base import Rupture
 
+from strec.gmreg import Regionalizer
 
-def get_extent(rupture):
+DEFAULT_ACTIVE_COEFFS = [27.24,250.4,579.1]
+DEFAULT_STABLE_COEFFS = [63.4,465.4,581.3]
+
+
+def get_extent(rupture,config=None):
     """
     Method to compute map extent from rupture.
 
@@ -25,6 +30,30 @@ def get_extent(rupture):
 
     """
 
+    # check to see what parameters are specified in the extent config
+    coeffs = []
+    spans = {}
+    bounds = []
+    if config is not None:
+        if 'extent' in config:
+            if 'coefficients' in config['extent']:
+                if 'coeffs' in config['extent']['coefficients']:
+                    if config['extent']['coefficients']['coeffs'][0] != 0.0:
+                        coeffs = config['extent']['coefficients']['coeffs']
+            if 'magnitude_spans' in config['extent']:
+                if len(config['extent']['magnitude_spans']):
+                    if isinstance(config['extent']['magnitude_spans'],dict):
+                        spans = config['extent']['magnitude_spans']
+            if 'bounds' in config['extent']:
+                if 'extent' in config['extent']['bounds']:
+                    if config['extent']['bounds']['extent'][0] != -999.0:
+                        bounds = config['extent']['bounds']['extent']
+
+    if len(bounds):
+        return bounds
+
+            
+    
     if not rupture or not isinstance(rupture, Rupture):
         raise TypeError('get_extent() takes exactly 1 argument (0 given)')
 
@@ -45,6 +74,21 @@ def get_extent(rupture):
 
     mag = origin.mag
 
+    if len(spans):
+        xmin = None
+        xmax = None
+        ymin = None
+        ymax = None
+        for spankey,span in spans.items():
+            if mag > span[0] and mag <= span[1]:
+                ymin = clat - span[2]/2
+                ymax = clat + span[2]/2
+                xmin = clon - span[3]/2
+                xmax = clon + span[3]/2
+                break
+        if xmin is not None:
+            return (xmin,xmax,ymin,ymax)
+    
     # Is this a stable or active tectonic event?
     # (this could be made an attribute of the ShakeMap Origin class)
     hypo = origin.getHypo()
@@ -54,12 +98,20 @@ def get_extent(rupture):
         if mag < 6.48:
             mindist_km = 100.
         else:
-            mindist_km = 27.24 * mag**2 - 250.4 * mag + 579.1
+            if len(coeffs):
+                C1,C2,C3 = coeffs
+            else:
+                C1,C2,C3 = DEFAULT_ACTIVE_COEFFS
+            mindist_km = C1 * mag**2 - C2 * mag + C3
     else:
         if mag < 6.10:
             mindist_km = 100.
         else:
-            mindist_km = 63.4 * mag**2 - 465.4 * mag + 581.3
+            if len(coeffs):
+                C1,C2,C3 = coeffs
+            else:
+                C1,C2,C3 = DEFAULT_STABLE_COEFFS
+            mindist_km = C1 * mag**2 - C2 * mag + C3
 
     # Apply an upper limit on extent. This should only matter for large
     # magnitudes (> ~8.25) in stable tectonic environments.
@@ -131,16 +183,6 @@ def is_stable(lon, lat):
         bool: Is the point classified as tectonically stable.
 
     """
-    p = Point((lon, lat))
-    pfile = pkg_resources.resource_filename(
-        'shakelib.utils',
-        os.path.join('data', 'cratons.geojson')
-    )
-    with open(pfile) as f:
-        cratons = json.load(f)
-    coord_list = cratons['features'][0]['geometry']['coordinates']
-    for clist in coord_list:
-        poly = Polygon(clist[0])
-        if p.within(poly):
-            return True
-    return False
+    reg = Regionalizer.load()
+    region_info = reg.getRegions(lat,lon,0)
+    return region_info['TectonicRegion'] == 'Stable'
