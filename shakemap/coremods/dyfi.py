@@ -134,7 +134,7 @@ def _get_dyfi_dataframe(detail_or_url):
             df = df.rename(index=str,columns=OLD_DYFI_COLUMNS_REPLACE)
         df = df.drop(['No. of responses','Suspect?','City','State'],axis=1)
 
-    df['network'] = 'DYFI'
+    df['netid'] = 'DYFI'
     df['source'] = "USGS (Did You Feel It?)"
     return (df,'')
 
