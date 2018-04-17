@@ -23,5 +23,5 @@
   created	CDATA	#REQUIRED
 >
 ]>
-<earthquake id="validation_test_0013" lat="34.213" lon="-118.5357" mag="6.7" year="1994" month="01" day="17" hour="12" minute="30" second="55" timezone="GMT" depth="18" locstring="Northridge" description="Northridge Mean" type="RS" created="1056046245" network="ci" />
+<earthquake id="validation_test_0013" lat="34.213" lon="-118.5357" mag="6.7" year="1994" month="01" day="17" hour="12" minute="30" second="55" timezone="GMT" depth="18" locstring="Northridge" description="Northridge Mean" type="RS" created="1056046245" network="" netid="ci" />
 

@@ -51,7 +51,7 @@ def test_input_container():
     <earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9" year="2008"
     month="05" day="12" hour="06" minute="28" second="01" timezone="GMT"
     depth="19.0" locstring="EASTERN SICHUAN, CHINA" created="1211173621" productcode="us2008ryan"
-    otime="1210573681" type="" network="" />"""
+    otime="1210573681" type="" netid="us" network="" />"""
         eventfile = io.StringIO(event_text)
         datafiles = [os.path.join(
             homedir, 'container_data/northridge_stations_dat.xml')]

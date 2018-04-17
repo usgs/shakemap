@@ -1,0 +1,466 @@
+#! /usr/bin/env python
+
+# System imports
+import os
+import os.path
+import socket
+import json
+from datetime import datetime, timezone
+import time as time
+import argparse
+import psutil
+from pathlib import Path
+
+# Third-party imports
+import daemon
+import lockfile
+
+# Local imports
+from shakemap.utils.config import get_config_paths
+import shakemap.utils.queue as queue
+from shakelib.rupture.origin import write_event_file
+from shakemap.utils.amps import AmplitudeHandler
+
+MEMORY_UPDATE_TIME = 0
+
+
+def do_periodic_tasks(handler, logger, data_path, config, children):
+    """ Check for finished children and start any needed timed repeats.
+
+    Args:
+        handler (AmplitudeHandler object): An object of type AmplitudeHandler.
+        logger (object): The process logging object.
+        data_path (str): The path where the ShakeMap data directories
+                         live.
+        config (dict): The configuration data.
+
+    Returns:
+        nothing: Nothing.
+    """
+    #
+    # Do routine stuff: check for finished children,
+    # check for reruns
+    #
+    global MEMORY_UPDATE_TIME
+
+    queue.reap_children(children, config, logger)
+
+    current_time = time.time()
+    repeats = handler.getRepeats()
+    for eventid, otime, reps in repeats:
+        if eventid in children:
+            continue
+        rep_list = json.loads(reps)
+        if otime + rep_list[0] < current_time:
+            logger.info('Running repeat of event %s' % eventid)
+            # Update the XML because the DB may have newer information
+            event = handler.getEvent(eventid)
+            write_event_xml(data_path, event, logger)
+            queue.dispatch_event(eventid, logger, children, 'run')
+            rep_list.pop(0)
+            if len(rep_list) == 0:
+                rep_list = None
+            else:
+                rep_list = json.dumps(rep_list)
+            event['repeats'] = rep_list
+            event['lastrun'] = current_time
+            handler.insertEvent(event, update=True)
+
+    #
+    # Print out memory usage to see how much we're leaking...
+    #
+    if MEMORY_UPDATE_TIME + 3600 < current_time:
+        MEMORY_UPDATE_TIME = current_time
+        process = psutil.Process(os.getpid())
+        mem = getattr(process.memory_full_info(), 'uss', 0) / 1048576.0
+        logger.info('Currently using %.1f MB' % mem)
+
+    return
+
+
+def write_event_xml(data_path, event, logger):
+    """ Create the event directory if it doesn't exist and write/re-write
+    the event.xml file
+
+    Args:
+        data_path (str): The path where the ShakeMap data directories
+                         live.
+        event (dict): The event data structure.
+        logger (object): The process logging object.
+
+    Returns:
+        nothing: Nothing.
+    """
+    event_dir = os.path.join(data_path, event['id'], 'current')
+    if not os.path.isdir(event_dir):
+        os.makedirs(event_dir)
+    event_xml = os.path.join(event_dir, 'event.xml')
+    logger.info('Writing event %s to event.xml' % (event['id']))
+    write_event_file(event, event_xml)
+
+    return
+
+
+def process_origin(event, handler, data_path, logger, config, children):
+    """ Determine if an event should be processed (or reprocessed) and
+    dispatch it for processing.
+
+    Args:
+        event (dict): The event data structure.
+        handler (AmplitudeHandler object): An instance of the
+                                           AmplitudeHandler object.
+        data_path (str): The path where the ShakeMap data directories
+                         live.
+        logger (object): The process logging object.
+        config (dict): The (cleaned-up) configuration object.
+
+    Returns:
+        nothing: Nothing.
+    """
+    current_time = int(time.time())
+    #
+    # See if we already have this event, make a decision
+    #
+    existing = handler.getEvent(event['id'])
+    if existing is None:
+        #
+        # This is a new event
+        #
+        update = False
+        # Do we want to run this event?
+        if queue.magnitude_too_small(event['mag'], event['lon'], event['lat'],
+                                     config):
+            logger.info('Event %s (mag=%f) too small, skipping' %
+                        (event['id'], event['mag']))
+            return
+        if queue.event_too_old_or_in_future(event, config):
+            logger.info('Event %s too old or in future, skipping' %
+                        event['id'])
+            return
+        #
+        # Looks like we'll be running this event, get the repeats
+        # (if any) and toss the ones that have already passed
+        #
+        repeats = None
+        event_timestamp = int(datetime.strptime(event['time'], queue.TIMEFMT).
+                              replace(tzinfo=timezone.utc).timestamp())
+        for mag in sorted(config['repeats'].keys(), reverse=True):
+            if event['mag'] > mag:
+                replist = [x for x in config['repeats'][mag]
+                           if event_timestamp + x > current_time]
+                if len(replist) > 0:
+                    repeats = json.dumps(replist)
+                break
+        event['repeats'] = repeats
+    else:
+        #
+        # We've run this event before
+        #
+        update = True
+        #
+        # Whatever we decide below, we want to update the event
+        # info in the database
+        #
+        event['lastrun'] = existing['lastrun']
+        event['repeats'] = existing['repeats']
+        if event['id'] in children:
+            #
+            # Event is currently running, don't run it
+            #
+            handler.insertEvent(event, update=update)
+            logger.info('Event %s is currently running, shelving this '
+                        'update' % event['id'])
+            return
+        if current_time - existing['lastrun'] < 300:
+            #
+            # We ran this event very recently, let's skip this one
+            #
+            handler.insertEvent(event, update=update)
+            logger.info('Event %s ran recently, shelving this update' %
+                        event['id'])
+            return
+        if existing['repeats']:
+            repeats = json.loads(existing['repeats'])
+            delta_t = current_time - (existing['time'] + repeats[0])
+            if delta_t >= 0 or delta_t < -300:
+                # We're due for a rerun anyway, so just insert the
+                # new data in the database and return
+                handler.insertEvent(event, update=update)
+                logger.info('Event %s will repeat soon, shelving this '
+                            'update' % event['id'])
+                return
+    #
+    # Run this event
+    #
+    event['lastrun'] = current_time
+
+    handler.insertEvent(event, update=update)
+
+    write_event_xml(data_path, event, logger)
+
+    queue.dispatch_event(event['id'], logger, children, 'run')
+
+    return
+
+
+def process_rupture(data, handler, data_path, logger, config, children):
+    """ A rupture model is available for an event. Treat this as
+    an origin update. If the event in question is not in our
+    database, ignore the message.
+
+    Args:
+        data (dict): The dictionary must have an event ID
+                     under the 'id' key.
+        handler (AmplitudeHandler object): An instance of the
+                                           AmplitudeHandler object.
+        data_path (str): The path where the ShakeMap data directories
+                         live.
+        logger (object): The process logging object.
+        config (dict): The (cleaned-up) configuration object.
+
+    Returns:
+        nothing: Nothing.
+    """
+    existing = handler.getEvent(data['id'])
+    if existing:
+        process_origin(existing, handler, data_path, logger, config, children)
+    else:
+        logger.info('Rupture is for unprocessed event %s: ignoring' %
+                    data['id'])
+    return
+
+
+def process_moment_tensor(data, handler, data_path, logger, config, children):
+    """ A moment tensor is available for an event. Treat this as
+    an origin update. If the event in question is not in our
+    database, ignore the message.
+
+    Args:
+        data (dict): The dictionary must have an event ID
+                     under the 'id' key.
+        handler (AmplitudeHandler object): An instance of the
+                                           AmplitudeHandler object.
+        data_path (str): The path where the ShakeMap data directories
+                         live.
+        logger (object): The process logging object.
+        config (dict): The (cleaned-up) configuration object.
+
+    Returns:
+        nothing: Nothing.
+    """
+    existing = handler.getEvent(data['id'])
+    if existing:
+        process_origin(existing, handler, data_path, logger, config, children)
+    else:
+        logger.info('Moment tensor is for unprocessed event %s: ignoring' %
+                    data['id'])
+    return
+
+
+def process_cancel(data, handler, data_path, logger, config, children):
+    """We've received a cancellation of an event. Write the cancel
+    file in the event's directory, remove the event from the database,
+    and then run shake cancel.
+
+    Args:
+        data (dict): The dictionary must have an event ID
+                     under the 'id' key.
+        handler (AmplitudeHandler object): An instance of the
+                                           AmplitudeHandler object.
+        data_path (str): The path where the ShakeMap data directories
+                         live.
+        logger (object): The process logging object.
+        config (dict): The (cleaned-up) configuration object.
+
+    Returns:
+        nothing: Nothing.
+    """
+    eventid = data['id']
+    existing = handler.getEvent(eventid)
+    if not existing:
+        logger.info('cancel is for unprocessed event %s: ignoring' %
+                    eventid)
+        return
+
+    pp = Path(os.path.join(data_path, eventid, 'current', 'CANCELED'))
+    pp.touch(exist_ok=True)
+
+    handler.deleteEvent(eventid)
+
+    queue.dispatch_event(eventid, logger, children, 'cancel')
+
+    return
+
+
+class Dummycontext(object):
+    """This is a dummy context that can be used with 'with'. It doesn't
+    do anything.
+    """
+    def __enter__(self): return self
+
+    def __exit__(*x): pass
+
+
+def get_context(context, attached):
+    """Returns a context based on the value of the 'attached' argument.
+
+    Args:
+        context (Context manager): A valid context manager.
+        attached (bool): If attached is True, then the function returns
+                         an instance of the Dummycontext; if it is False
+                         the function returns the 'context' argument.
+
+    Returns:
+        Context manager: If attached is True, the function returns an
+                         instance of the Dummycontext; if False, returns
+                         the 'context' argument.
+    """
+    if attached:
+        return Dummycontext()
+    else:
+        return context
+
+
+def get_parser():
+    """Make an argument parser.
+
+    Returns:
+        ArgumentParser: an argparse argument parser.
+    """
+    description = """
+    Run a daemon process to accept origin, rupture, fault, etc., messages
+    and run shake on the event.
+    """
+    parser = argparse.ArgumentParser(
+        description=description,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('-a', '--attached', action='store_true',
+                        help='Inhibit daemonization and remain attached '
+                             'to the terminal.')
+    return parser
+
+
+def main(pargs):
+    children = {}
+
+    install_path, data_path = get_config_paths()
+
+    config = queue.get_config(install_path)
+    #
+    # Turn this process into a daemon
+    #
+    logpath = os.path.join(install_path, 'logs')
+    if not os.path.isdir(logpath):
+        os.makedirs(logpath)
+    pidfile = os.path.join(logpath, 'queue.pid')
+    context = daemon.DaemonContext(
+            working_directory=data_path,
+            pidfile=lockfile.FileLock(pidfile))
+
+    with get_context(context, pargs.attached):
+        logger = queue.get_logger(logpath, pargs.attached)
+        #
+        # Create the socket
+        #
+        qsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        qsocket.bind(('', queue.PORT))
+        # Set a timeout so that we can occasionally look for other
+        # things to do
+        qsocket.settimeout(30)
+        qsocket.listen(5)
+        #
+        # Get a connection to the event database
+        #
+        handler = AmplitudeHandler(install_path, data_path)
+
+        logger.info('sm_queue initiated')
+
+        while True:
+            #
+            # Do routine stuff
+            #
+            do_periodic_tasks(handler, logger, data_path, config, children)
+            #
+            # Now wait for a connection
+            #
+            try:
+                (clientsocket, address) = qsocket.accept()
+            except socket.timeout:
+                #
+                # Normal timeout; do routine tasks and then go
+                # back to waiting for a connection
+                #
+                continue
+            #
+            # Got a connection
+            #
+            hostname, _, _ = socket.gethostbyaddr(address[0])
+#            hostname = socket.getfqdn(hostname)
+            logger.info('Got connection from %s at port %s' %
+                        (hostname, address[1]))
+
+            if hostname not in config['servers']:
+                logger.warning('Connection from %s refused: not in valid '
+                               'servers list' % hostname)
+                clientsocket.close()
+                continue
+
+            #
+            # The accept() should guarantee that there's something
+            # to read, but something could go wrong...
+            #
+            try:
+                clientsocket.settimeout(5)
+                data = clientsocket.recv(queue.MAX_SIZE)
+            except socket.timeout:
+                logger.warning('Did not get data from connection, continuing')
+                clientsocket.close()
+                continue
+            else:
+                clientsocket.close()
+            #
+            # Decode the data and do something
+            #
+            try:
+                cmd = json.loads(data.decode('utf8'))
+            except json.decoder.JSONDecodeError:
+                logger.warning("Couldn't decode data from %s: ignoring" %
+                               hostname)
+                continue
+
+            if not isinstance(cmd, dict) or 'type' not in cmd or \
+               'data' not in cmd or 'id' not in cmd['data']:
+                logger.warning('Bad data from %s: ignoring' % hostname)
+                continue
+
+            if cmd['type'] == 'origin':
+                logger.info('Received "origin" for event %s' %
+                            cmd['data']['id'])
+                process_origin(cmd['data'], handler, data_path, logger,
+                               config, children)
+            elif cmd['type'] == 'rupture':
+                logger.info('Received "rupture" for event %s' %
+                            cmd['data']['id'])
+                process_rupture(cmd['data'], handler, data_path, logger,
+                                config, children)
+            elif cmd['type'] == 'moment-tensor':
+                logger.info('Received "moment-tensor" for event %s' %
+                            cmd['data']['id'])
+                process_moment_tensor(cmd['data'], handler, data_path, logger,
+                                      config, children)
+            elif cmd['type'] == 'cancel':
+                logger.info('Received "cancel" for event %s' %
+                            cmd['data']['id'])
+                process_cancel(cmd['data'], handler, data_path, logger,
+                               config, children)
+            else:
+                logger.warning('Unknown trigger type: %s; ignoring' %
+                               cmd['type'])
+
+
+if __name__ == '__main__':
+
+    parser = get_parser()
+    pargs = parser.parse_args()
+
+    main(pargs)

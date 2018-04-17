@@ -31,5 +31,7 @@ setup(name='shakemap',
                        os.path.join('utils', 'data', '*'),
                        os.path.join('rupture', 'ps2ff', '*.csv')]
       },
-      scripts=['bin/shake', 'bin/sm_clone', 'bin/sm_profile'],
+      scripts=['bin/shake', 'bin/sm_clone', 'bin/sm_profile',
+               'bin/sm_queue', 'bin/receive_origins', 'bin/receive_amps',
+               'bin/getdyfi', 'bin/associate_amps'],
       )

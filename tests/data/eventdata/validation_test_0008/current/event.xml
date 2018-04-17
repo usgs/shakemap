@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<earthquake id="validation_test_0008" lat="38.0" lon="-122.0" mag="6.0" year="2017" month="12" day="31" hour="0" minute="0" second="0" timezone="GMT" depth="5.0" network="nc" locstring="Validation Test 0008" created="1489641910" />
+<earthquake id="validation_test_0008" lat="38.0" lon="-122.0" mag="6.0" year="2017" month="12" day="31" hour="0" minute="0" second="0" timezone="GMT" depth="5.0" network="" netid="nc" locstring="Validation Test 0008" created="1489641910" />

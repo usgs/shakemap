@@ -6,9 +6,8 @@ from datetime import datetime
 import numpy as np
 
 from shakemap.utils.config import get_config_paths
-from shakemap.utils.amps import AmplitudeHandler, dt_to_timestamp
-from shakemap.coremods.select import validate_config
-from configobj import ConfigObj
+from shakemap.utils.amps import AmplitudeHandler, timestr_to_timestamp
+import shakemap.utils.queue as queue
 
 
 def test_amps():
@@ -25,15 +24,18 @@ def test_amps():
 
         # test inserting events into the database
         event = {'id':'ci37889959',
-                 'time':datetime(2018,3,7,18,5,0 ),
+                 'netid': 'ci',
+                 'network': '',
+                 'time':datetime(2018,3,7,18,5,0 ).strftime(queue.TIMEFMT),
                  'lat':35.487,
                  'lon':-120.027,
                  'depth':8.0,
+                 'location': 'Somewhere in California',
                  'mag':3.7}
         handler.insertEvent(event)
         info = handler.getStats()
         assert info['events'] == 1
-        
+
         homedir = os.path.dirname(os.path.abspath(__file__))
         xmlfile = os.path.join(homedir,'..','..',
                                'data','ampdata','USR_100416_20180307_180450.xml')
@@ -46,7 +48,7 @@ def test_amps():
         assert info['station_max'] == datetime(2018, 3, 7, 18, 4, 49)
         assert info['channels'] == 3
         assert info['pgms'] == 15
-        eqtime = dt_to_timestamp(event['time'])
+        eqtime = timestr_to_timestamp(event['time'])
         eqlat = event['lat']
         eqlon = event['lon']
         df = handler.associate(eqtime,eqlat,eqlon)
@@ -82,7 +84,7 @@ def test_amps():
     finally:
         if os.path.isfile(dbfile):
             os.remove(dbfile)
-    
+
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'
     test_amps()

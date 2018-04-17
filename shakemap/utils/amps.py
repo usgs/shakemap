@@ -5,6 +5,7 @@ import re
 from xml.dom import minidom
 from datetime import datetime, timezone, timedelta
 from collections import OrderedDict
+import time
 
 # third party libraries
 import numpy as np
@@ -12,36 +13,44 @@ import pandas as pd
 from openquake.hazardlib.geo.geodetic import geodetic_distance
 from amptools.table import dataframe_to_xml
 
+# local libraries
+import shakemap.utils.queue as queue
+
 # define all of the tables as dictionaries
-EVENT = OrderedDict([('id','INTEGER PRIMARY KEY'),
-                     ('eventid','TEXT'),
-                     ('time','INTEGER'),
-                     ('lat','REAL'),
-                     ('lon','REAL'),
-                     ('depth','REAL'),
-                     ('magnitude','REAL')])
+EVENT = OrderedDict([('id', 'INTEGER PRIMARY KEY'),
+                     ('eventid', 'TEXT'),
+                     ('netid', 'TEXT'),
+                     ('network', 'TEXT'),
+                     ('time', 'INTEGER'),
+                     ('lat', 'REAL'),
+                     ('lon', 'REAL'),
+                     ('depth', 'REAL'),
+                     ('magnitude', 'REAL'),
+                     ('location', 'TEXT'),
+                     ('repeats', 'TEXT'),
+                     ('lastrun', 'INTEGER')])
 
-STATION = OrderedDict([('id','INTEGER PRIMARY KEY'),
-                       ('timestamp','INTEGER'),
-                       ('lat','REAL'),
-                       ('lon','REAL'),
-                       ('network','TEXT'),
-                       ('name','TEXT'),
-                       ('code','TEXT')])
+STATION = OrderedDict([('id', 'INTEGER PRIMARY KEY'),
+                       ('timestamp', 'INTEGER'),
+                       ('lat', 'REAL'),
+                       ('lon', 'REAL'),
+                       ('network', 'TEXT'),
+                       ('name', 'TEXT'),
+                       ('code', 'TEXT')])
 
-CHANNEL = OrderedDict([('id','INTEGER PRIMARY KEY'),
-                       ('station_id','INTEGER'),
-                       ('channel','TEXT')])
+CHANNEL = OrderedDict([('id', 'INTEGER PRIMARY KEY'),
+                       ('station_id', 'INTEGER'),
+                       ('channel', 'TEXT')])
 
-PGM = OrderedDict([('id','INTEGER PRIMARY KEY'),
-                   ('channel_id','INTEGER'),
-                   ('imt','TEXT'),
-                   ('value','REAL')])
+PGM = OrderedDict([('id', 'INTEGER PRIMARY KEY'),
+                   ('channel_id', 'INTEGER'),
+                   ('imt', 'TEXT'),
+                   ('value', 'REAL')])
 
-TABLES = {'event':EVENT,
-          'station':STATION,
-          'channel':CHANNEL,
-          'pgm':PGM}
+TABLES = {'event': EVENT,
+          'station': STATION,
+          'channel': CHANNEL,
+          'pgm': PGM}
 
 # 2018-03-21T21:19:16.625Z
 TIMEFMT = '%Y-%m-%dT%H:%M:%S'
@@ -49,10 +58,10 @@ TIMEFMT = '%Y-%m-%dT%H:%M:%S'
 # database file name
 DBFILE = 'amps.db'
 
-IMTS = ['acc','vel','sa','pga','pgv']
+IMTS = ['acc', 'vel', 'sa', 'pga', 'pgv']
 # sometimes (sigh) pga/pgv labeled as acc/vel
-IMTDICT = {'acc':'pga',
-           'vel':'pgv'}
+IMTDICT = {'acc': 'pga',
+           'vel': 'pgv'}
 
 # association algorithm - any peak with:
 # time > origin - TMIN and time < origin + TMAX
@@ -62,39 +71,41 @@ TMIN = 30
 TMAX = 180
 DISTANCE = 500
 
-class AmplitudeHandler(object):
-    """Store and associate strong motion peak amplitudes with earthquake events.
 
+class AmplitudeHandler(object):
+    """Store and associate strong motion peak amplitudes with
+    earthquake events.
     """
     MAX_CONNECT_ATTEMPTS = 3
-    CONNECT_TIMEOUT = 5 # number of seconds to try getting past lock
-    def __init__(self,install_path,data_path):
+    CONNECT_TIMEOUT = 5  # number of seconds to try getting past lock
+
+    def __init__(self, install_path, data_path):
         """Instantiate amplitude handler with ShakeMap profile paths.
 
         """
         self._data_path = data_path
-        self._dbfile = os.path.join(install_path,'data',DBFILE)
+        self._dbfile = os.path.join(install_path, 'data', DBFILE)
         db_exists = os.path.isfile(self._dbfile)
         self._connection = None
         self._cursor = None
         self._connect()
         if not db_exists:
-            for table,tdict in TABLES.items():
+            for table, tdict in TABLES.items():
                 createcmd = 'CREATE TABLE %s (' % table
                 nuggets = []
-                for column,ctype in tdict.items():
-                    nuggets.append('%s %s' % (column,ctype))
+                for column, ctype in tdict.items():
+                    nuggets.append('%s %s' % (column, ctype))
                 createcmd += ','.join(nuggets) + ')'
                 self._cursor.execute(createcmd)
         self._disconnect()
 
     def _connect(self):
-        for _ in range(0,3):
+        for _ in range(0, 3):
             try:
                 self._connection = sqlite3.connect(self._dbfile)
                 self._cursor = self._connection.cursor()
                 break
-            except Exception as e:
+            except OSError:
                 continue
         if self._connection is None:
             raise Exception('Could not connect to %s' % self._dbfile)
@@ -109,88 +120,188 @@ class AmplitudeHandler(object):
         self._cursor = None
 
     def _lock(self):
-        """Lock the sqlite database to prevent other processes from opening the file.
-
+        """Lock the sqlite database to prevent other processes from
+        opening the file.
         """
         self._cursor.execute('PRAGMA locking_mode = EXCLUSIVE')
         self._cursor.execute('BEGIN EXCLUSIVE')
 
     def _unlock(self):
-        """UnLock the sqlite database and commit the changes made since locking.
-
+        """UnLock the sqlite database and commit the changes made
+        since locking.
         """
         self._connection.commit()
 
-
-    def insertEvent(self,event):
+    def insertEvent(self, event, update=False):
         """Insert an event into the database.
-        
-        An directory with name of event['id'] should exist in data_path.
+
+        A directory with name of event['id'] should exist in data_path.
 
         Args:
             event (dict): Dictionary containing fields:
                           - id: Event ID (i.e., us2008abcd).
+                          - netid: Network code (i.e., us).
+                          - network: Network name (i.e., "USGS Network").
                           - time: Origin time in UTC (datetime).
                           - lat: Origin latitude (dd).
                           - lon: Origin longitude (dd).
                           - depth: Origin depth (km).
                           - mag: Earthquake magnitude.
+                          - location: Location string (i.e. '2 mi SSE of Reno')
+                          - repeats: A string containing a list of repeat times
+                            (optional)
+                          - lastrun: Timestamp of the last run of the event.
+                            (optional)
+            update (bool): Update an existing event with new info (True) or
+                           insert a new event (False)
         """
         self._connect()
 
-        cols = '(eventid,time,lat,lon,depth,magnitude)'
-        fmt = 'INSERT INTO event %s VALUES ("%s",%i,%.4f,%.4f,%.1f,%.1f)'
-        einsert = fmt % (cols,
-                         event['id'],
-                         dt_to_timestamp(event['time']),
-                         event['lat'],
-                         event['lon'],
-                         event['depth'],
-                         event['mag'])
-        self._cursor.execute(einsert)
-        
+        cols = '(eventid, netid, network, time, lat, lon, depth, magnitude, '\
+               'location, repeats, lastrun)'
+        if update:
+            pre = 'UPDATE event SET %s =' % cols
+            post = ' WHERE eventid = "%s"' % event['id']
+        else:
+            pre = 'INSERT INTO event %s VALUES' % cols
+            post = ''
+        fmt = '%s (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)%s'
+        einsert = fmt % (pre, post)
+        if 'network' in event:
+            network = event['network']
+        else:
+            network = ''
+        if 'repeats' in event:
+            repeats = event['repeats']
+        else:
+            repeats = None
+        if 'lastrun' in event:
+            lastrun = event['lastrun']
+        else:
+            lastrun = time.time()
+        self._cursor.execute(einsert, (event['id'],
+                                       event['netid'],
+                                       network,
+                                       timestr_to_timestamp(event['time']),
+                                       event['lat'],
+                                       event['lon'],
+                                       event['depth'],
+                                       event['mag'],
+                                       event['location'],
+                                       repeats,
+                                       lastrun))
+
         self._disconnect()
 
-    def associateAll(self,write_data=True):
-        """Associate peak ground motions with appropriate events, write station XML to file system.
-        
-        Ground motion records associated with events will be deleted from the database.
+    def getEvent(self, eventid):
+        """Return the event parameters for the specified event.
 
         Args:
-            write_data (bool): Control whether associated data is written to directory.
-                               Used for testing.
-        
+            eventid (str): The id of the event to query
+
+        Returns:
+            dictionary: A dictionary of the columns of the table and
+            their values for the the event; a None is
+            returned if the event is not in the database.
+        """
+        query = 'SELECT * FROM event WHERE eventid = ?'
+        self._connect()
+        self._cursor.execute(query, (eventid,))
+        row = self._cursor.fetchone()
+        if row is None:
+            self._disconnect()
+            return None
+        cols = [col[0] for col in self._cursor.description]
+        self._disconnect()
+        event = dict(zip(cols, row))
+        #
+        # Deal with differences between the database column names
+        # and the event keys
+        #
+        event['id'] = event['eventid']
+        del event['eventid']
+        event['mag'] = event['magnitude']
+        del event['magnitude']
+        event['time'] = datetime.fromtimestamp(event['time']).\
+            strftime(queue.TIMEFMT)
+        return event
+
+    def deleteEvent(self, eventid):
+        """Delete the event from the database.
+
+        Args:
+            eventid (str): The id of the event to delete
+
+        Returns:
+            nothing: Nothing.
+        """
+        query = 'DELETE FROM event WHERE eventid = ?'
+        self._connect()
+        self._cursor.execute(query, (eventid,))
+        self._disconnect()
+        return
+
+    def getRepeats(self):
+        """Return all the rows from the event table where the 'repeats' column
+        is not NULL.
+
+        Args:
+            none
+
+        Returns:
+            (list): List of tuples of (eventid, origin_time, repeats).
+        """
+        query = "SELECT eventid, time, repeats FROM event WHERE "\
+                "repeats IS NOT NULL"
+        self._connect()
+        self._cursor.execute(query)
+        repeats = self._cursor.fetchall()
+        self._disconnect()
+        return repeats
+
+    def associateAll(self, write_data=True):
+        """Associate peak ground motions with appropriate events,
+        write station XML to file system.
+
+        Ground motion records associated with events will be deleted
+        from the database.
+
+        Args:
+            write_data (bool): Control whether associated data is written
+                               to directory. Used for testing.
+
         Returns:
             int: Number of events with associated ground motions.
         """
         self._connect()
-        equery = 'SELECT eventid,time,lat,lon FROM event'
+        equery = 'SELECT eventid, time, lat, lon FROM event'
         self._cursor.execute(equery)
         events = self._cursor.fetchall()
         self._disconnect()
-        
+
         nassociated = 0
         for event in events:
             eventid = event[0]
             eqtime = event[1]
             lat = event[2]
             lon = event[3]
-            dataframe = self.associate(eqtime,lat,lon)
+            dataframe = self.associate(eqtime, lat, lon)
             if not len(dataframe):
                 continue
             amptime = datetime.utcnow().strftime('%Y%m%d%H%M%S')
-            data_folder = os.path.join(self._data_path,eventid,'current')
+            data_folder = os.path.join(self._data_path, eventid, 'current')
             if write_data:
                 if not os.path.isdir(data_folder):
                     os.makedirs(data_folder)
-                xmlfile = os.path.join(data_folder,'unassoc_%s_dat.xml' % amptime)
-                dataframe_to_xml(dataframe,xmlfile)
-                
+                xmlfile = os.path.join(data_folder,
+                                       'unassoc_%s_dat.xml' % amptime)
+                dataframe_to_xml(dataframe, xmlfile)
+
             nassociated += 1
 
         return nassociated
-        
-    def associate(self,eqtime,eqlat,eqlon):
+
+    def associate(self, eqtime, eqlat, eqlon):
         """Find peak ground motion records associated with input event info.
 
         Ground motion records associated with input event are deleted from the
@@ -201,10 +312,12 @@ class AmplitudeHandler(object):
             eqlat (float): Latitude of earthquake origin.
             eqlon (float): Longitude of earthquake origin.
         Returns:
-            DataFrame: Pandas dataframe containing peak ground motions.  Columns:
+            DataFrame: Pandas dataframe containing peak ground motions.
+                       Columns:
+
                        - station: Station code
-                       - channel: Channel (HHE,HHN, etc.)
-                       - imt: Intensity measure type (pga,pgv, etc.)
+                       - channel: Channel (HHE, HHN, etc.)
+                       - imt: Intensity measure type (pga, pgv, etc.)
                        - value: IMT value.
                        - lat: Station latitude.
                        - lon: Station longitude.
@@ -214,26 +327,27 @@ class AmplitudeHandler(object):
                        - flag: Value will be 0.
         """
         self._connect()
-        columns = ['station', 'channel','imt','value',
-               'lat', 'lon', 'network','location', 'distance','flag']
+        columns = ['station', 'channel', 'imt', 'value',
+                   'lat', 'lon', 'network', 'location', 'distance', 'flag']
         dataframe = pd.DataFrame(columns=columns)
         conditions = ['timestamp > %i' % (eqtime-TMIN),
                       'timestamp < %i' % (eqtime+TMAX)]
         cond_str = ' AND '.join(conditions)
-        time_cmd = 'SELECT id,timestamp,lat,lon FROM station WHERE %s ORDER by timestamp DESC' % cond_str
+        time_cmd = 'SELECT id, timestamp, lat, lon FROM station '\
+                   'WHERE %s ORDER by timestamp DESC' % cond_str
         self._cursor.execute(time_cmd)
         # numpy array of id, timestamp, lat, lon
         eqdata = np.array(self._cursor.fetchall())
 
         if not len(eqdata):
             return dataframe
-        
-        dist = geodetic_distance(eqlon,eqlat,eqdata[:,3],eqdata[:,2])
+
+        dist = geodetic_distance(eqlon, eqlat, eqdata[:, 3], eqdata[:, 2])
 
         inear = np.where(dist < DISTANCE)[0]
         eqdata = eqdata[inear]
         dist = dist[inear]
-        nrows,_ = eqdata.shape
+        nrows, _ = eqdata.shape
 
         stations = []
 
@@ -241,11 +355,11 @@ class AmplitudeHandler(object):
         station_ids = []
         channel_ids = []
         pgm_ids = []
-        
-        for idx in range(0,nrows):
-            station_id = int(eqdata[idx,0])
+
+        for idx in range(0, nrows):
+            station_id = int(eqdata[idx, 0])
             station_ids.append(station_id)
-            fmt = 'SELECT network,name,code FROM station WHERE id=%i'
+            fmt = 'SELECT network, name, code FROM station WHERE id=%i'
             squery = fmt % station_id
             self._cursor.execute(squery)
             station = self._cursor.fetchone()
@@ -253,14 +367,14 @@ class AmplitudeHandler(object):
             if code in stations:
                 continue
             stations.append(code)
-            lat = eqdata[idx,2]
-            lon = eqdata[idx,3]
+            lat = eqdata[idx, 2]
+            lon = eqdata[idx, 3]
             distance = dist[idx]
             network = station[0]
             name = station[1]
 
             # find all the channels associated with this station
-            fmt = 'SELECT id,channel FROM channel WHERE station_id=%i'
+            fmt = 'SELECT id, channel FROM channel WHERE station_id=%i'
             cquery = fmt % station_id
             self._cursor.execute(cquery)
             channels = self._cursor.fetchall()
@@ -270,7 +384,7 @@ class AmplitudeHandler(object):
                 channel_name = channel[1]
 
                 # find all of the pgms associated with that channel
-                fmt = 'SELECT id,imt,value FROM pgm WHERE channel_id=%i'
+                fmt = 'SELECT id, imt, value FROM pgm WHERE channel_id=%i'
                 pquery = fmt % channel_id
                 self._cursor.execute(pquery)
                 pgms = self._cursor.fetchall()
@@ -290,13 +404,13 @@ class AmplitudeHandler(object):
                     data_row['location'] = name
                     data_row['distance'] = distance
                     data_row['flag'] = 0
-                    dataframe = dataframe.append(data_row,ignore_index=True)
+                    dataframe = dataframe.append(data_row, ignore_index=True)
 
         # clean up rows that have been associated
         for pgm_id in pgm_ids:
             delete_cmd = 'DELETE FROM pgm WHERE id=%i' % pgm_id
             self._cursor.execute(delete_cmd)
-            
+
         for channel_id in channel_ids:
             delete_cmd = 'DELETE FROM channel WHERE id=%i' % channel_id
             self._cursor.execute(delete_cmd)
@@ -307,10 +421,10 @@ class AmplitudeHandler(object):
 
         # # ensure that the station field is a string
         # dataframe['station']= dataframe['station'].astype(int)
-        dataframe['station']= dataframe['station'].astype(str)
+        dataframe['station'] = dataframe['station'].astype(str)
 
         self._disconnect()
-        
+
         return dataframe
 
     def __del__(self):
@@ -319,30 +433,31 @@ class AmplitudeHandler(object):
         """
         if self._connection is not None:
             self._disconnect()
-    
-    def insertAmps(self,xmlfile):
+
+    def insertAmps(self, xmlfile):
         """Insert data from amps file into database.
-        
+
         Args:
             xmlfile (str): XML file containing peak ground motion data.
-            
         """
         self._connect()
-        _,fname = os.path.split(xmlfile)
+        _, fname = os.path.split(xmlfile)
         try:
-            xmlstr = open(xmlfile,'r').read()
+            xmlstr = open(xmlfile, 'r').read()
             # sometimes these records have non-ascii bytes in them
-            newxmlstr = re.sub(r'[^\x00-\x7F]+',' ', xmlstr)
+            newxmlstr = re.sub(r'[^\x00-\x7F]+', ' ', xmlstr)
             # newxmlstr = _invalid_xml_remove(xmlstr)
-            newxmlstr = newxmlstr.encode('utf-8',errors='xmlcharrefreplace')
+            newxmlstr = newxmlstr.encode('utf-8', errors='xmlcharrefreplace')
             root = minidom.parseString(newxmlstr)
         except Exception as e:
-            raise Exception('Could not parse %s, due to error "%s"' % (xmlfile,str(e)))
+            raise Exception('Could not parse %s, due to error "%s"' %
+                            (xmlfile, str(e)))
 
         try:
             amps = root.getElementsByTagName('amplitudes')[0]
         except:
-            raise Exception('%s does not appear to be an amplitude XML file.' % xmlfile)
+            raise Exception('%s does not appear to be an amplitude XML '
+                            'file.' % xmlfile)
         agency = amps.getAttribute('agency')
         record = amps.getElementsByTagName('record')[0]
         timing = record.getElementsByTagName('timing')[0]
@@ -367,8 +482,10 @@ class AmplitudeHandler(object):
             if child.nodeName == 'msec':
                 time_dict['msec'] = int(child.getAttribute('value'))
         if has_pgm:
-            pgmtime_str = reference.getElementsByTagName('PGMTime')[0].firstChild.nodeValue
-            pgmdate = datetime.strptime(pgmtime_str[0:19],TIMEFMT).replace(tzinfo=timezone.utc)
+            pgmtime_str = reference.getElementsByTagName('PGMTime')[0].\
+                firstChild.nodeValue
+            pgmdate = datetime.strptime(pgmtime_str[0:19], TIMEFMT).\
+                replace(tzinfo=timezone.utc)
             pgmtime = int(dt_to_timestamp(pgmdate))
         else:
             if not len(time_dict):
@@ -382,8 +499,9 @@ class AmplitudeHandler(object):
                                time_dict['second'])
             pgmtime = dt_to_timestamp(pgmdate)
 
-        # there are often multiple stations per file, but they're all duplicates
-        # of each other, so just grab the information from the first one
+        # there are often multiple stations per file, but they're
+        # all duplicates of each other, so just grab the information
+        # from the first one
         station = record.getElementsByTagName('station')[0]
         lat = float(station.getAttribute('lat'))
         lon = float(station.getAttribute('lon'))
@@ -396,18 +514,19 @@ class AmplitudeHandler(object):
         else:
             network = agency
 
-        cols = '(timestamp,lat,lon,name,code,network)'
-        fmt = 'INSERT INTO station %s VALUES (%i,%.4f,%.4f,"%s","%s","%s")'
-        insert_cmd = fmt % (cols,pgmtime,lat,lon,name,code,network)
+        cols = '(timestamp, lat, lon, name, code, network)'
+        fmt = 'INSERT INTO station %s VALUES (%i, %.4f, %.4f, "%s", '\
+              '"%s", "%s")'
+        insert_cmd = fmt % (cols, pgmtime, lat, lon, name, code, network)
         self._cursor.execute(insert_cmd)
         sid = self._cursor.lastrowid
 
         # loop over components
         for channel in record.getElementsByTagName('component'):
             cname = channel.getAttribute('name')
-            cols = '(station_id,channel)'
-            fmt = 'INSERT INTO channel %s VALUES (%i,"%s")'
-            insert_cmd = fmt % (cols,sid,cname)
+            cols = '(station_id, channel)'
+            fmt = 'INSERT INTO channel %s VALUES (%i, "%s")'
+            insert_cmd = fmt % (cols, sid, cname)
             self._cursor.execute(insert_cmd)
             cid = self._cursor.lastrowid
 
@@ -417,27 +536,30 @@ class AmplitudeHandler(object):
                 if imt not in IMTS:
                     continue
                 if imt == 'sa':
-                    imt = 'p'+imt+pgm.getAttribute('period').replace('.','')
+                    imt = 'p'+imt+pgm.getAttribute('period').replace('.', '')
                 if imt in IMTDICT:
                     imt = IMTDICT[imt]
                 value = float(pgm.getAttribute('value'))
                 cols = '(channel_id,imt,value)'
                 fmt = 'INSERT INTO pgm %s VALUES (%i,"%s",%.4f)'
-                insert_cmd = fmt % (cols,cid,imt,value)
+                insert_cmd = fmt % (cols, cid, imt, value)
                 self._cursor.execute(insert_cmd)
 
         root.unlink()
         self._disconnect()
 
-    def cleanAmps(self,threshold=30):
-        """Clean out amplitude data that is older than the threshold number of days.
+    def cleanAmps(self, threshold=30):
+        """Clean out amplitude data that is older than the threshold
+        number of days.
 
         Args:
-            threshold (int): Maximum age in days of amplitude data in the database.
+            threshold (int): Maximum age in days of amplitude data in
+                             the database.
         Returns:
             int: Number of stations deleted.
         """
-        thresh_date = dt_to_timestamp(datetime.utcnow() - timedelta(days=threshold))
+        thresh_date = dt_to_timestamp(datetime.utcnow() -
+                                      timedelta(days=threshold))
         self._connect()
         squery = 'SELECT id FROM station WHERE timestamp < %i' % thresh_date
         self._cursor.execute(squery)
@@ -461,8 +583,9 @@ class AmplitudeHandler(object):
         self._disconnect()
         return len(station_ids)
 
-    def cleanEvents(self,threshold=365):
-        """Clean out event data that is older than the threshold number of days.
+    def cleanEvents(self, threshold=365):
+        """Clean out event data that is older than the threshold number
+        of days.
 
         Args:
             threshold (int): Maximum age in days of events in the database.
@@ -470,7 +593,8 @@ class AmplitudeHandler(object):
             int: Number of events deleted.
         """
         self._connect()
-        thresh_date = dt_to_timestamp(datetime.utcnow() - timedelta(days=threshold))
+        thresh_date = dt_to_timestamp(datetime.utcnow() -
+                                      timedelta(days=threshold))
         equery = 'DELETE FROM event WHERE time < %i' % thresh_date
         self._cursor.execute(equery)
         nevents = self._cursor.rowcount
@@ -481,22 +605,24 @@ class AmplitudeHandler(object):
         """Get summary statistics about the database.
 
         Returns:
-            dict: Fields: 
+            dict: Fields:
+
                   - events Number of events in database.
                   - stations Number of stations in database.
                   - channels Number of unique channels in database.
                   - pgms Number of unique pgms in database.
                   - event_min: Datetime of earliest event in database.
                   - event_max: Datetime of most recent event in database.
-                  - station_min: Datetime of earliest amplitude data in database.
-                  - station_max: Datetime of most recent amplitude data in database.
-
+                  - station_min: Datetime of earliest amplitude data in
+                                 database.
+                  - station_max: Datetime of most recent amplitude data
+                                 in database.
         """
         self._connect()
         results = {}
 
         # event stuff
-        equery = 'SELECT count(*),min(time),max(time) FROM event'
+        equery = 'SELECT count(*), min(time), max(time) FROM event'
         self._cursor.execute(equery)
         row = self._cursor.fetchone()
         results['events'] = row[0]
@@ -534,28 +660,40 @@ class AmplitudeHandler(object):
         self._disconnect()
         return results
 
+
 def dt_to_timestamp(dt):
     timestamp = int(dt.replace(tzinfo=timezone.utc).timestamp())
     return timestamp
 
-def _invalid_xml_remove(c):
-    #http://stackoverflow.com/questions/1707890/fast-way-to-filter-illegal-xml-unicode-chars-in-python
-    illegal_unichrs = [ (0x00, 0x08), (0x0B, 0x1F), (0x7F, 0x84), (0x86, 0x9F),
-                    (0xD800, 0xDFFF), (0xFDD0, 0xFDDF), (0xFFFE, 0xFFFF),
-                    (0x1FFFE, 0x1FFFF), (0x2FFFE, 0x2FFFF), (0x3FFFE, 0x3FFFF),
-                    (0x4FFFE, 0x4FFFF), (0x5FFFE, 0x5FFFF), (0x6FFFE, 0x6FFFF),
-                    (0x7FFFE, 0x7FFFF), (0x8FFFE, 0x8FFFF), (0x9FFFE, 0x9FFFF),
-                    (0xAFFFE, 0xAFFFF), (0xBFFFE, 0xBFFFF), (0xCFFFE, 0xCFFFF),
-                    (0xDFFFE, 0xDFFFF), (0xEFFFE, 0xEFFFF), (0xFFFFE, 0xFFFFF),
-                    (0x10FFFE, 0x10FFFF) ]
 
-    illegal_ranges = ["%s-%s" % (unichr(low), unichr(high)) 
-                  for (low, high) in illegal_unichrs 
-                  if low < sys.maxunicode]
+def timestr_to_timestamp(timestr):
+    timestamp = int(datetime.strptime(timestr, queue.TIMEFMT).
+                    replace(tzinfo=timezone.utc).timestamp())
+    return timestamp
+
+
+def _invalid_xml_remove(c):
+    # http://stackoverflow.com/questions/1707890/fast-way-to-filter-illegal-xml-unicode-chars-in-python
+    # noqa
+    illegal_unichrs = [(0x00, 0x08), (0x0B, 0x1F), (0x7F, 0x84), (0x86, 0x9F),
+                       (0xD800, 0xDFFF), (0xFDD0, 0xFDDF), (0xFFFE, 0xFFFF),
+                       (0x1FFFE, 0x1FFFF), (0x2FFFE, 0x2FFFF),
+                       (0x3FFFE, 0x3FFFF), (0x4FFFE, 0x4FFFF),
+                       (0x5FFFE, 0x5FFFF), (0x6FFFE, 0x6FFFF),
+                       (0x7FFFE, 0x7FFFF), (0x8FFFE, 0x8FFFF),
+                       (0x9FFFE, 0x9FFFF), (0xAFFFE, 0xAFFFF),
+                       (0xBFFFE, 0xBFFFF), (0xCFFFE, 0xCFFFF),
+                       (0xDFFFE, 0xDFFFF), (0xEFFFE, 0xEFFFF),
+                       (0xFFFFE, 0xFFFFF),
+                       (0x10FFFE, 0x10FFFF)]
+
+    illegal_ranges = ["%s-%s" % (unichr(low), unichr(high))
+                      for (low, high) in illegal_unichrs
+                      if low < sys.maxunicode]
 
     illegal_xml_re = re.compile(u'[%s]' % u''.join(illegal_ranges))
     if illegal_xml_re.search(c) is not None:
-        #Replace with space
+        # Replace with space
         return ' '
     else:
         return c

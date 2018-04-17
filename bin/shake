@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 # stdlib imports
+import os.path
 import argparse
 import sys
 import traceback
@@ -11,18 +12,36 @@ import inspect
 import importlib
 import time
 from collections import OrderedDict
+from configobj import ConfigObj
+from validate import Validator
+import shlex
+
+# local imports
+from shakemap.utils.config import (get_config_paths,
+                                   get_logger,
+                                   get_configspec,
+                                   config_error)
 
 import matplotlib
 matplotlib.use('Agg')
 
-# local imports
-from shakemap.utils.config import get_config_paths
-from shakemap.utils.config import get_logger
 
-import shakemap.coremods
+def _get_config():
+    """
+    Read the config file and return the resulting structure.
+    """
+    install_path, data_path = get_config_paths()
+    config_file = os.path.join(install_path, 'config', 'shake.conf')
+    spec_file = get_configspec('shake')
+    config = ConfigObj(config_file, configspec=spec_file)
+    results = config.validate(Validator())
+    if not isinstance(results, bool) or not results:
+        config_error(config, results)
+
+    return config
 
 
-def _get_command_classes():
+def _get_command_classes(config):
     """
     Create a dictionary of classname:class to be used in main().
 
@@ -30,12 +49,15 @@ def _get_command_classes():
         dict: Dictionary of classname:class where each class
             is a subclass of shakemap.coremods.base.CoreModule.
     """
-    coremods = {
-        name: importlib.import_module(name)
-        for finder, name, ispkg
-        in pkgutil.iter_modules(shakemap.coremods.__path__,
-                                shakemap.coremods.__name__ + ".")
-    }
+    coremods = {}
+    for modname in config['coremods']:
+        mod = importlib.import_module(modname)
+        cm = {
+            name: importlib.import_module(name)
+            for finder, name, ispkg
+            in pkgutil.iter_modules(mod.__path__, mod.__name__ + ".")
+        }
+        coremods.update(cm)
 
     classes = {}
     for name, module in coremods.items():
@@ -58,7 +80,8 @@ def _get_command_classes():
     return ordered_classes
 
 
-_classes_ = _get_command_classes()
+_config_ = _get_config()
+_classes_ = _get_command_classes(_config_)
 
 
 def _format_error_info(exception, eventid):
@@ -119,6 +142,10 @@ def get_parser():
                         help='Print only errors.')
     parser.add_argument('-l', '--log', action='store_true',
                         help='Log all output.')
+    parser.add_argument('-a', '--autorun', action='store_true',
+                        help='Run the modules defined in shake.conf with the '
+                             'autorun_modules parameter ratherthan any '
+                             'found on the command line.')
     return parser
 
 
@@ -128,9 +155,7 @@ def main(args):
     command.
 
     Args:
-        ArgumentParser: argparse argument parser.
-
-
+        ArgumentParser: argparse argument object.
     """
     install_path, data_path = get_config_paths()
     log_option = None
@@ -140,8 +165,17 @@ def main(args):
         log_option = 'quiet'
     if args.log:
         log_option = 'log'
+    if args.autorun:
+        args.cmds = shlex.split(_config_['autorun_modules'])
 
     logger = get_logger(args.eventid, log_option=log_option)
+
+    cancel_file = os.path.join(data_path, args.eventid, 'current',
+                               'CANCELED')
+    if os.path.isfile(cancel_file) and args.cmds[0] != 'cancel':
+        logger.error('Event %s has been canceled: aborting run' %
+                     args.eventid)
+        return
 
     try:
         cmd_list = OrderedDict()

@@ -575,7 +575,9 @@ def test_with_quakeml():
     event = Event(focal_mechanisms=[focal])
     catalog = Catalog(events=[event])
     event_text = '''<shakemap-data code_version="4.0" map_version="1">
-<earthquake id="us2000cmy3" lat="56.046" lon="-149.073" mag="7.9" year="2018" month="1" day="23" hour="9" minute="31" second="42" timezone="GMT" depth="25.00" locstring="280km SE of Kodiak, Alaska" network="us"/>
+<earthquake id="us2000cmy3" lat="56.046" lon="-149.073" mag="7.9" year="2018"
+month="1" day="23" hour="9" minute="31" second="42" timezone="GMT"
+depth="25.00" locstring="280km SE of Kodiak, Alaska" netid="us" network=""/>
 </shakemap-data>'''
     try:
         tempdir = tempfile.mkdtemp()
