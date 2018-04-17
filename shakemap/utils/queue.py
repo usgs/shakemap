@@ -215,7 +215,7 @@ def get_logger(logpath, attached):
         logging.logger: An instance of a logger.
     """
     if not os.path.isdir(logpath):
-        os.mkdirs(logpath)
+        os.makedirs(logpath)
     logger = logging.getLogger('queue_logger')
     logger.setLevel(logging.INFO)
     if not attached:
