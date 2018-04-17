@@ -2,74 +2,78 @@
 
 # stdlib imports
 import argparse
-from urllib.parse import urlparse
 import os.path
 import sys
-import re
-import glob
 import logging
-from datetime import datetime
 
 # local imports
 from shakemap.utils.config import get_config_paths
-from shakelib.rupture.origin import write_event_file
-from shakemap.utils.amps import AmplitudeHandler
+import shakemap.utils.queue as queue
 
-LOG_CFG = { 
+LOG_CFG = {
     'version': 1,
     'disable_existing_loggers': False,
-    'formatters': { 
-        'standard': { 
-            'format': '%(levelname)s ; %(asctime)s ; %(module)s.%(funcName)s ; %(message)s',
+    'formatters': {
+        'standard': {
+            'format': '%(levelname)s ; %(asctime)s ; '
+                      '%(module)s.%(funcName)s ; %(message)s',
             'datefmt': '%Y-%m-%d %H:%M:%S',
         },
     },
-    'handlers': { 
-        'default': { 
+    'handlers': {
+        'default': {
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'when': 'midnight',
         },
     },
-    'loggers': { 
-        '': { 
+    'loggers': {
+        '': {
             'handlers': ['default'],
             'level': 'INFO',
             'propagate': True
         },
-    } 
+    }
 }
 
 LOGFILE = 'origins.log'
-TIMEFMT = '%Y-%m-%dT%H:%M:%S.%fZ'
+
 
 def get_parser():
     """Set up the argparse instance for this script.
-    
+
     Returns:
         ArgumentParser: argparse instance for this script.
     """
-    description = '''Insert strong motion unassociated peak amplitude files into a database.
-
+    description = '''
+    Insert strong motion unassociated peak amplitude files into a database.
     '''
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument('--type',help='Product type')
-    parser.add_argument('--status',help='Event status')
-    parser.add_argument('--action',help='Event action type')
-    parser.add_argument('--property-title',help='Event location')
-    parser.add_argument('--property-event-type',help='Event type (earthquake, explosion, etc.)')
-    
-    parser.add_argument('--preferred-eventid',help='Event ID (i.e., us2008abcd)')
-    parser.add_argument('--preferred-eventsource',help='Event source ("us", "nc", etc.)')
-    parser.add_argument('--preferred-eventsourcecode',help='Event source code (i.e., 2008abcd')
-    parser.add_argument('--preferred-magnitude',type=float,help='Event magnitude')
-    parser.add_argument('--preferred-latitude',type=float,help='Event latitude')
-    parser.add_argument('--preferred-longitude',type=float,help='Event longitude')
-    parser.add_argument('--preferred-depth',type=float,help='Event depth')
-    parser.add_argument('--preferred-eventtime',help='Event time')
-    
+    parser.add_argument('--type', help='Product type')
+    parser.add_argument('--status', help='Event status')
+    parser.add_argument('--action', help='Event action type')
+    parser.add_argument('--property-title', help='Event location')
+    parser.add_argument('--property-event-type',
+                        help='Event type (earthquake, explosion, etc.)')
+
+    parser.add_argument('--preferred-eventid',
+                        help='Event ID (i.e., us2008abcd)')
+    parser.add_argument('--preferred-eventsource',
+                        help='Event source ("us", "nc", etc.)')
+    parser.add_argument('--preferred-eventsourcecode',
+                        help='Event source code (i.e., 2008abcd')
+    parser.add_argument('--preferred-magnitude', type=float,
+                        help='Event magnitude')
+    parser.add_argument('--preferred-latitude', type=float,
+                        help='Event latitude')
+    parser.add_argument('--preferred-longitude', type=float,
+                        help='Event longitude')
+    parser.add_argument('--preferred-depth', type=float, help='Event depth')
+    parser.add_argument('--preferred-eventtime', help='Event time')
+
     return parser
+
 
 def main(args):
     """Main method for script.
@@ -81,59 +85,47 @@ def main(args):
         sys.exit(1)
 
     # set up a daily rotating file handler logger
-    logfile = os.path.join(install_path,'logs',LOGFILE)
+    logfile = os.path.join(install_path, 'logs', LOGFILE)
     log_cfg = LOG_CFG.copy()
     log_cfg['handlers']['default']['filename'] = logfile
     logging.config.dictConfig(log_cfg)
     logger = logging.getLogger()
-    
-    # Create a handler object
-    handler = AmplitudeHandler(install_path,data_path)
 
     if args.type != 'origin':
         logger.info('No action on product type %s' % args.type)
         sys.exit(0)
-    
+
     if args.status != 'UPDATE':
         logger.info('No action on status %s' % args.status)
         sys.exit(0)
 
-    if args.action not in ['EVENT_ADDED','EVENT_UPDATED']:
+    if args.action not in ['EVENT_ADDED', 'EVENT_UPDATED']:
         logger.info('No action on action %s' % args.action)
         sys.exit(0)
 
     if args.property_event_type != 'earthquake':
-        logger.info('No action on event types of %s' % args.property_event_type)
+        logger.info('No action on event types of %s' %
+                    args.property_event_type)
         sys.exit(0)
 
-    # We've weeded out the messages we don't want, so construct an event dictionary
-    # and load it into the database.
-    etime = datetime.strptime(args.preferred_eventtime,TIMEFMT)
-    event = {'id':args.preferred_eventid,
-             'time':etime,
-             'lat':args.preferred_latitude,
-             'lon':args.preferred_longitude,
-             'depth':args.preferred_depth,
-             'mag':args.preferred_magnitude,
-             'location':args.property_title}
-    logger.info('Adding event %s to database.' % args.preferred_eventid)
-    handler.insertEvent(event)
+    # We've weeded out the messages we don't want, so construct an event
+    # dictionary and send it to the queue
+    event = {'id': args.preferred_eventid,
+             'netid': args.preferred_eventsource,
+             'network': '',
+             'time': args.preferred_eventtime,
+             'lat': args.preferred_latitude,
+             'lon': args.preferred_longitude,
+             'depth': args.preferred_depth,
+             'mag': args.preferred_magnitude,
+             'location': args.property_title}
+    logger.info('Sending event %s to queue.' % args.preferred_eventid)
 
-    # Now create the event directory if it doesn't exist and write/re-write the event.xml file
-    event_dir = os.path.join(data_path,args.preferred_eventid,'current')
-    if not os.path.isdir(event_dir):
-        os.makedirs(event_dir)
-    event_xml = os.path.join(event_dir,'event.xml')
-    logger.info('Writing event %s to %s.' % (args.preferred_eventid,event_xml))
-    write_event_file(event,event_xml)
+    # Poke the queue to run shake on this event.
+    queue.send_queue('origin', event)
 
-    # TODO When queuing mechanism is written, poke that process to run shake on this event.
-    
-    
-    
-    
+
 if __name__ == '__main__':
     parser = get_parser()
-    pargs,unknown = parser.parse_known_args()
+    pargs, unknown = parser.parse_known_args()
     main(pargs)
-    

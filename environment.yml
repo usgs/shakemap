@@ -21,6 +21,7 @@ dependencies:
 - ipython
 - jupyter
 - libcomcat
+- lockfile
 - mapio
 - matplotlib
 - numexpr
@@ -35,6 +36,7 @@ dependencies:
 - pytest
 - pytest-cov
 - python=3.5
+- python-daemon
 - pyyaml
 - pyzmq
 - rasterio

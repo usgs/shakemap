@@ -76,5 +76,5 @@
 >
 ]>
 <shakemap-data code_version="3.2" map_version="14">
-<earthquake id="Calexico" lat="32.2587" lon="-115.2872" mag="7.2" year="2010" month="4" day="4" hour="22" minute="40" second="42" timezone="GMT" depth="10.00" locstring="Sierra El Mayor" created="1281648703" network="us"/>
+<earthquake id="Calexico" lat="32.2587" lon="-115.2872" mag="7.2" year="2010" month="4" day="4" hour="22" minute="40" second="42" timezone="GMT" depth="10.00" locstring="Sierra El Mayor" created="1281648703" netid="us" network=""/>
 </shakemap-data>

@@ -13,13 +13,17 @@ import importlib
 import time
 from collections import OrderedDict
 from configobj import ConfigObj
+from validate import Validator
+import shlex
+
+# local imports
+from shakemap.utils.config import (get_config_paths,
+                                   get_logger,
+                                   get_configspec,
+                                   config_error)
 
 import matplotlib
 matplotlib.use('Agg')
-
-# local imports
-from shakemap.utils.config import get_config_paths
-from shakemap.utils.config import get_logger
 
 
 def _get_config():
@@ -28,7 +32,12 @@ def _get_config():
     """
     install_path, data_path = get_config_paths()
     config_file = os.path.join(install_path, 'config', 'shake.conf')
-    config = ConfigObj(config_file)
+    spec_file = get_configspec('shake')
+    config = ConfigObj(config_file, configspec=spec_file)
+    results = config.validate(Validator())
+    if not isinstance(results, bool) or not results:
+        config_error(config, results)
+
     return config
 
 
@@ -133,6 +142,10 @@ def get_parser():
                         help='Print only errors.')
     parser.add_argument('-l', '--log', action='store_true',
                         help='Log all output.')
+    parser.add_argument('-a', '--autorun', action='store_true',
+                        help='Run the modules defined in shake.conf with the '
+                             'autorun_modules parameter ratherthan any '
+                             'found on the command line.')
     return parser
 
 
@@ -142,9 +155,7 @@ def main(args):
     command.
 
     Args:
-        ArgumentParser: argparse argument parser.
-
-
+        ArgumentParser: argparse argument object.
     """
     install_path, data_path = get_config_paths()
     log_option = None
@@ -154,8 +165,17 @@ def main(args):
         log_option = 'quiet'
     if args.log:
         log_option = 'log'
+    if args.autorun:
+        args.cmds = shlex.split(_config_['autorun_modules'])
 
     logger = get_logger(args.eventid, log_option=log_option)
+
+    cancel_file = os.path.join(data_path, args.eventid, 'current',
+                               'CANCELED')
+    if os.path.isfile(cancel_file) and args.cmds[0] != 'cancel':
+        logger.error('Event %s has been canceled: aborting run' %
+                     args.eventid)
+        return
 
     try:
         cmd_list = OrderedDict()

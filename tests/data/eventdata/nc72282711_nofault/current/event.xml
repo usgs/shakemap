@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<earthquake id="nc72282711" lat="38.21520" lon="-122.31230" mag="6.0" year="2014" month="8" day="24" hour="10" minute="20" second="44" timezone="GMT" depth="11.12" network="nc" locstring="6.4 km (3.9 mi) NW of American Canyon, CA" created="1489641910" />
+<earthquake id="nc72282711" lat="38.21520" lon="-122.31230" mag="6.0" year="2014" month="8" day="24" hour="10" minute="20" second="44" timezone="GMT" depth="11.12" netid="nc" network="" locstring="6.4 km (3.9 mi) NW of American Canyon, CA" created="1489641910" />

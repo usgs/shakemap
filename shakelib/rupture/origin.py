@@ -16,16 +16,14 @@ from strec.tensor import fill_tensor_from_components
 from impactutils.time.ancient_time import HistoricTime
 from shakelib.utils.exception import ShakeLibException
 from shakelib.rupture import constants
-
-TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
+import shakemap.utils.queue as queue
 
 
 class Origin(object):
-    """
-    The purpose of this class is to read/store event origin information, which
-    is usually derived from an xml file called "event.xml". There is also a
-    mechanism to overwrite information in event.xml with a file in the input
-    directory called "source.txt".
+    """The purpose of this class is to read/store event origin information,
+    which is usually derived from an xml file called "event.xml". There is
+    also a mechanism to overwrite information in event.xml with a file in
+    the input directory called "source.txt".
 
     Note that this class is generally contained within a Rupture instance.
 
@@ -51,12 +49,10 @@ class Origin(object):
 
     For backward-compatibility, we also check for 'type'. If both 'mech' and
     'type' are missing (or empty strings) then 'mech' is set to ALL.
-
     """
 
     def __init__(self, event):
-        """
-        Construct an Origin object.
+        """ Construct an Origin object.
 
         Args:
             event (dict): Dictionary of values. See list above for required
@@ -64,6 +60,7 @@ class Origin(object):
 
         Returns:
             Origin object.
+
         Raises:
             ValueError: When input time is not and cannot be converted to
                 HistoricTime object.
@@ -98,11 +95,15 @@ class Origin(object):
             if isinstance(event['time'], str):
                 try:
                     event['time'] = HistoricTime.strptime(
-                        event['time'], TIMEFMT)
+                        event['time'], queue.TIMEFMT)
                 except ValueError:
-                    fmt = 'Input time string %s cannot be '\
-                          'converted to datetime.'
-                    raise ValueError(fmt % event['time'])
+                    try:
+                        event['time'] = HistoricTime.strptime(
+                            event['time'], queue.ALT_TIMEFMT)
+                    except ValueError:
+                        fmt = 'Input time string %s cannot be '\
+                              'converted to datetime.'
+                        raise ValueError(fmt % event['time'])
 
         if 'mech' in event.keys():
             if event['mech'] == '':
@@ -140,9 +141,8 @@ class Origin(object):
 
     @classmethod
     def fromFile(cls, eventxmlfile, sourcefile=None, momentfile=None):
-        """
-        Class method to create a Origin object by specifying an event.xml file,
-        a rupture file, a source.txt file, and a moment.xml file.
+        """Class method to create a Origin object by specifying an event.xml
+        file, a rupture file, a source.txt file, and a moment.xml file.
 
         Args:
             eventxmlfile (str): Event xml file (see read_event_file()).
@@ -151,7 +151,6 @@ class Origin(object):
 
         Returns:
             Origin object.
-
         """
         event = read_event_file(eventxmlfile)
         params = None
@@ -171,8 +170,7 @@ class Origin(object):
         return point.Point(self.lon, self.lat, self.depth)
 
     def setMechanism(self, mech=None, rake=None, dip=None):
-        """
-        Set the earthquake mechanism manually (overriding any values read
+        """Set the earthquake mechanism manually (overriding any values read
         in from event.xml or source.txt. If rake and dip are not specified,
         they will be assigned by mechanism as follows:
 
@@ -197,7 +195,6 @@ class Origin(object):
                 default value for mechanism (see table above). Value will be
                 converted to range between -180 and 180 degrees.
         """
-
         mechs = {'RS': {'rake': 90.0, 'dip': 40.0},
                  'NM': {'rake': -90.0, 'dip': 50.0},
                  'SS': {'rake': 0.0, 'dip': 90.0},
@@ -230,52 +227,66 @@ class Origin(object):
         self.rake = rake
         self.mech = mech
 
-def write_event_file(event,xmlfile):
+
+def write_event_file(event, xmlfile):
     """Write event.xml file.
 
     Args:
        event (dict): Dictionary containing fields [field, (type, example)]:
+
            - id (str, "us2008abcd")
+           - netid (str, "us")
+           - network (str, "USGS National Network")
            - lat (float, 42.1234)
            - lon (float, -85.1234)
            - depth (float, 24.1)
            - mag (float, 7.9)
-           - time (datetime, datetime(2018,3,27,6,23,34)
+           - time (str in format of queue.TIMEFMT)
            - location (str, "East of the Poconos")
-           
+           - mech (str, "RS", "SS", or "NM") (optional)
+
+    Returns:
+        nothing: Nothing.
     """
     root = etree.Element('earthquake')
     root.attrib['id'] = event['id']
+    root.attrib['netid'] = event['netid']
+    root.attrib['network'] = event['network']
     root.attrib['lat'] = '%.4f' % event['lat']
     root.attrib['lon'] = '%.4f' % event['lon']
     root.attrib['depth'] = '%.1f' % event['depth']
     root.attrib['mag'] = '%.1f' % event['mag']
 
-    root.attrib['year'] = str(event['time'].year)
-    root.attrib['month'] = str(event['time'].month)
-    root.attrib['day'] = str(event['time'].day)
-    root.attrib['hour'] = str(event['time'].hour)
-    root.attrib['minute'] = str(event['time'].minute)
-    root.attrib['second'] = str(event['time'].second)
+    dt = datetime.strptime(event['time'], queue.TIMEFMT)
+    root.attrib['year'] = str(dt.year)
+    root.attrib['month'] = str(dt.month)
+    root.attrib['day'] = str(dt.day)
+    root.attrib['hour'] = str(dt.hour)
+    root.attrib['minute'] = str(dt.minute)
+    root.attrib['second'] = str(dt.second)
     root.attrib['timezone'] = 'GMT'
     root.attrib['locstring'] = event['location']
     dtnow = datetime.utcnow().replace(tzinfo=timezone.utc)
     root.attrib['created'] = str(int(dtnow.timestamp()))
-    eqtime = event['time'].replace(tzinfo=timezone.utc)
+    eqtime = dt.replace(tzinfo=timezone.utc)
     root.attrib['otime'] = str(int((eqtime.timestamp())))
-    
+    if 'mech' in event:
+        root.attrib['mech'] = event['mech']
+
     tree = etree.ElementTree(root)
-    tree.write(xmlfile,pretty_print=True)
+    tree.write(xmlfile, pretty_print=True)
+
 
 def read_event_file(eventxml):
-    """
-    Read event.xml file from disk, returning a dictionary of attributes.
+    """Read event.xml file from disk, returning a dictionary of attributes.
     Input XML format looks like this:
 
     .. code-block:: xml
 
          <earthquake
-             id="2008ryan "
+             id="2008ryan"
+             netid="us"
+             network="USGS National Network"
              lat="30.9858"
              lon="103.3639"
              mag="7.9"
@@ -307,13 +318,14 @@ def read_event_file(eventxml):
          - mag Origin magnitude
          - created Process time as an HistoricTime object.
          - locstring Location string
+         - netid (the network identifier, e.g. 'us')
+         - network (A long-form description of the network)
          - mechanism Moment mechanism, one of:
            - 'RS' (Reverse)
            - 'SS' (Strike-Slip)
            - 'NM' (Normal)
            - 'ALL' (Undetermined)
     """
-
     # fill in default values for mechanism, rake and dip
     # these may be overriden by values in event.xml, source.txt, or by values
     # passed in after reading input data.
@@ -351,17 +363,22 @@ def read_event_file(eventxml):
     # container, in an effort to reduce confusion about their
     # meaning. Time will tell.
     #########################################################
-    
+
     # read in the id fields
     eqdict['eventsourcecode'] = xmldict['id']
     if 'network' in xmldict:
-        eqdict['eventsource'] = xmldict['network']
+        eqdict['network'] = xmldict['network']
     else:
-        raise Exception('Input event dictionary is missing the "network" field! ')
+        eqdict['network'] = ""
+    if 'netid' in xmldict:
+        eqdict['eventsource'] = xmldict['netid']
+    else:
+        raise Exception('Input event dictionary is missing the "netid" '
+                        'field!')
 
     # fix eventsourcecode if not specified correctly
     if eqdict['eventsourcecode'].startswith(eqdict['eventsource']):
-        newcode = eqdict['eventsourcecode'].replace(eqdict['eventsource'],'')
+        newcode = eqdict['eventsourcecode'].replace(eqdict['eventsource'], '')
         eqdict['eventsourcecode'] = newcode
 
     # look for the productcode attribute in the xml,
@@ -374,7 +391,7 @@ def read_event_file(eventxml):
             eqdict['productcode'] = path_parts[-3]
         else:
             eqdict['productcode'] = eqdict['eventsourcecode']
-            
+
     year = int(xmldict['year'])
     month = int(xmldict['month'])
     day = int(xmldict['day'])
@@ -480,8 +497,7 @@ def read_moment_quakeml(momentfile):
 
 
 def read_source(sourcefile):
-    """
-    Read source.txt file, which has lines like key=value.
+    """Read source.txt file, which has lines like key=value.
 
     Args:
         sourcefile: Path to source.txt file OR file-like object
