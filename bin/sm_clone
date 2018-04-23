@@ -9,15 +9,47 @@ from datetime import datetime
 import shutil
 import json
 import argparse
+from urllib import request
 
 # third party imports
 from libcomcat.search import get_event_by_id
 
 # local imports
 from shakemap.utils.config import get_config_paths
+from shakelib.rupture.origin import write_event_file
 from shakemap.utils.amps import AmplitudeHandler
 
 TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
+TIMEFMT2 = '%Y-%m-%dT%H:%M:%S.%fZ'
+
+
+# url template for json file describing everything we know about a network
+NETWORK_TEMPLATE = 'https://earthquake.usgs.gov/data/comcat/contributor/[NETID]/index.json'
+
+
+def _get_network_name(netid):
+    """Return a string representing a name of a network given its ID.
+
+    Args:
+        netid (str): Usually two-character network ID (us,ci, etc.)
+    Returns:
+        str: Network name.
+    """
+    url = NETWORK_TEMPLATE.replace('[NETID]', netid)
+    network = 'unknown'
+    try:
+        fh = request.urlopen(url)
+        data = fh.read().decode('utf-8')
+        jdict = json.loads(data)
+        fh.close()
+        network = jdict['title']
+    except HTTPError as he:
+        error = '''No network description found for %s. You may
+want to make sure that the pages of the form %s still exist,
+and contact the ShakeMap developers if they do not.
+''' % netid
+        print(error)
+    return network
 
 
 def get_parser():
@@ -27,8 +59,18 @@ def get_parser():
     Where eventid is a ComCat event ID.  For example, for this event:
     https://earthquake.usgs.gov/earthquakes/eventpage/us2000ar20
     The event ID is us2000ar20.
+
+    If no source is specified, then the event ID used for the event directory, 
+    eventid field in event.xml file, and names of data and fault files will
+    be that of the *authoritative* origin.
+
+    If a source (us, ci, nc, etc.) is specified, then that ID is used instead 
+    of the authoritative ID.
+
     '''
-    parser = argparse.ArgumentParser(description=description)
+    formatter = argparse.RawDescriptionHelpFormatter
+    parser = argparse.ArgumentParser(description=description,
+                                     formatter_class=formatter)
     parser.add_argument('eventid',
                         help='ID of the event to process')
     parser.add_argument('-f', '--force', action='store_true',
@@ -38,36 +80,49 @@ def get_parser():
     return parser
 
 
-def _write_event_xml(network, eventid, infodict, event_dir):
-    """
-    Write event.xml file given dictionary derived from info.json.
+def _insert_event(install_path, data_path, detail):
+    handler = AmplitudeHandler(install_path, data_path)
+    event = {'id': detail.id,
+             'netid': detail['net'],
+             'time': detail.time.strftime(TIMEFMT2),
+             'lat': detail.latitude,
+             'lon': detail.longitude,
+             'depth': detail.depth,
+             'location': detail.location,
+             'mag': detail.magnitude}
+    handler.insertEvent(event)
 
-    Args:
-        infodict (dict): Dictionary derived from info.json.
-        event_dir (str): Path to directory where event data is stored.
 
-    """
-    event_info = infodict['input']['event_information']
+def _get_event_dictionary(detail, source):
+    edict = None
 
-    otime = datetime.strptime(event_info['origin_time'], TIMEFMT)
-    eqdict = {'id': eventid,
-              'network': network,
-              'lat': '%.4f' % event_info['latitude'],
-              'lon': '%.4f' % event_info['longitude'],
-              'depth': '%.1f' % event_info['depth'],
-              'mag': '%.1f' % event_info['magnitude'],
-              'year': '%i' % otime.year,
-              'month': '%i' % otime.month,
-              'day': '%i' % otime.day,
-              'hour': '%i' % otime.hour,
-              'minute': '%i' % otime.minute,
-              'second': '%i' % otime.second,
-              'timezone': 'GMT',
-              'locstring': event_info['event_description']}
-    eq = Element('earthquake', eqdict)
-    xmlfile = os.path.join(event_dir, 'event.xml')
-    tree = ElementTree(eq)
-    tree.write(xmlfile)
+    if source is not None:
+        # get basic event information from an origin contributed by input source
+        try:
+            origin = detail.getProducts('origin', source=source)[0]
+            eventid = source + origin['eventsourcecode']
+            edict = {'id': eventid,
+                     'netid': source,
+                     'network': _get_network_name(source),
+                     'lat': float(origin['latitude']),
+                     'lon': float(origin['longitude']),
+                     'depth': float(origin['depth']),
+                     'mag': float(origin['magnitude']),
+                     'time': origin['eventtime'],
+                     'location': detail.location}
+        except ValueError as ve:
+            print('No %s origin for event %s.' % args.source)
+    else:  # no source specified, use detail object
+        edict = {'id': detail.id,
+                 'netid': detail['net'],
+                 'network': _get_network_name(detail['net']),
+                 'lat': detail.latitude,
+                 'lon': detail.longitude,
+                 'depth': detail.depth,
+                 'mag': detail.magnitude,
+                 'time': detail.time.strftime(TIMEFMT2),
+                 'location': detail.location}
+    return edict
 
 
 def main(args):
@@ -76,8 +131,17 @@ def main(args):
         print('%s is not a valid directory.' % data_path)
         sys.exit(1)
 
+    # Get the DetailEvent product for this event ID
+    # regardless of input, the output directory and files
+    # will contain the *authoritative* event ID from ComCat,
+    # unless source is specified.
+    detail = get_event_by_id(args.eventid)
+    # get input data
+    edict = _get_event_dictionary(detail, args.source)
+    eventid = edict['id']
+
     # check to see if the event directory exists
-    event_dir = os.path.join(data_path, args.eventid, 'current')
+    event_dir = os.path.join(data_path, eventid, 'current')
     if not os.path.isdir(event_dir):
         os.makedirs(event_dir)
     else:
@@ -88,66 +152,32 @@ def main(args):
         shutil.rmtree(event_dir)
         os.makedirs(event_dir)
 
-    detail = get_event_by_id(args.eventid)
-
     # Insert this event into the profile's amps database.
-    handler = AmplitudeHandler(install_path, data_path)
-    event = {'id': detail.id,
-             'time': detail.time,
-             'lat': detail.latitude,
-             'lon': detail.longitude,
-             'depth': detail.depth,
-             'mag': detail.magnitude}
-    handler.insertEvent(event)
+    _insert_event(install_path, data_path, detail)
 
+    # name the event.xml file
+    event_xml_file = os.path.join(event_dir, 'event.xml')
+
+    # write the event.xml file
+    write_event_file(edict, event_xml_file)
+
+    # if this event has a shakemap, then we have more to do
     if not detail.hasProduct('shakemap'):
         print('Event %s has no ShakeMap product.  Creating a basic ShakeMap.' %
-              args.eventid)
-        if args.source is not None:
-            try:
-                origin = detail.getProducts('origin', source=args.source)[0]
-                eventid = args.source + origin['eventsourcecode']
-                etime = origin['eventtime'][0:19]+'Z'
-                event_info = {'latitude': float(origin['latitude']),
-                              'longitude': float(origin['longitude']),
-                              'depth': float(origin['depth']),
-                              'magnitude': float(origin['magnitude']),
-                              'origin_time': etime,
-                              'event_description': detail.location}
-            except ValueError as ve:
-                print('No %s origin for event %s.  Exiting.' % args.source)
-                sys.exit(1)
-        else:
-            event_info = {'latitude': detail.latitude,
-                          'longitude': detail.longitude,
-                          'depth': detail.depth,
-                          'magnitude': detail.magnitude,
-                          'origin_time': detail.time.strftime(TIMEFMT),
-                          'event_description': detail.location}
-            eventid = args.eventid
-        infodict = {'input': {'event_information': event_info}}
-        _write_event_xml(detail['net'], eventid, infodict, event_dir)
-        print('Created event.xml file in %s.' % event_dir)
-        sys.exit(0)
-
-    if args.source is not None:
-        try:
-            shakemap = detail.getProducts('shakemap', source=args.source)[0]
-            eventid = args.source + shakemap['eventsourcecode']
-        except ValueError as ve:
-            print('No %s shakemap for event %s.  Exiting.' % args.source)
-            sys.exit(1)
+              detail.id)
     else:
-        shakemap = detail.getProducts('shakemap')[0]
-        eventid = args.eventid
-    tmpdir = None
-    try:
-        tmpdir = tempfile.mkdtemp()
-        info_file = os.path.join(tmpdir, 'info.json')
-        shakemap.getContent('info.json', filename=info_file)
-        infodict = json.load(open(info_file, 'r'))
-        _write_event_xml(detail['net'], detail.id, infodict, event_dir)
-        data_file = os.path.join(event_dir, '%s_dat.xml' % args.eventid)
+        if args.source:
+            source = args.source
+        else:
+            source = 'preferred'
+        try:
+            shakemap = detail.getProducts('shakemap', source=source)[0]
+        except AttributeError as ae:
+            msg = 'No ShakeMap product from source % s exists.'
+            print(msg)
+            sys.exit(0)
+
+        data_file = os.path.join(event_dir, '%s_dat.xml' % eventid)
         shakemap.getContent('stationlist.xml', filename=data_file)
         fault_files = shakemap.getContentsMatching('fault.txt')
         if len(fault_files):
@@ -155,11 +185,6 @@ def main(args):
             shakemap.getContent(fault_files[0], filename=data_file)
         print('Wrote %i files to %s.' %
               (len(os.listdir(event_dir)), event_dir))
-    except Exception as e:
-        pass
-    finally:
-        if tmpdir is not None:
-            shutil.rmtree(tmpdir)
 
 
 if __name__ == '__main__':

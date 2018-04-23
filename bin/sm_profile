@@ -188,20 +188,21 @@ def create(config, profile, accept, ppath):
                   'products.conf',
                   'shake.conf',
                   'extent.conf',
+                  'logging.conf',
                   'transfer.conf']
 
     # if any of these files are not present in the install config
     # directory, copy them from the repository into the install directory.
     for conf_name in conf_names:
-        config_file = os.path.join(shakeconfig_data_path,conf_name)
+        config_file = os.path.join(shakeconfig_data_path, conf_name)
         if os.path.isfile(os.path.join(config_path, config_file)):
             shutil.copy(config_file, config_path)
-        
+
     layer_dir = os.path.join(shakeconfig_data_path, 'layers')
     install_layer_dir = os.path.join(install_path, 'layers')
     install_data_dir = os.path.join(install_path, 'data')
     mapping_data_dir = os.path.join(install_data_dir, 'mapping')
-    
+
     if not os.path.isdir(install_layer_dir):
         shutil.copytree(layer_dir, install_layer_dir)
 
@@ -212,12 +213,12 @@ def create(config, profile, accept, ppath):
         os.mkdir(mapping_data_dir)
 
     # copy mapping data into data install directory
-    test_mapping_dir = os.path.join(shakeconfig_data_path,'..','..',
-                                 'tests','data','install','data','mapping')
-    allfiles = glob.glob(os.path.join(test_mapping_dir,'*.*'))
+    test_mapping_dir = os.path.join(shakeconfig_data_path, '..', '..',
+                                    'tests', 'data', 'install', 'data', 'mapping')
+    allfiles = glob.glob(os.path.join(test_mapping_dir, '*.*'))
     for fname in allfiles:
-        shutil.copy(fname,mapping_data_dir)
-        
+        shutil.copy(fname, mapping_data_dir)
+
     if 'profiles' not in config:
         config['profiles'] = {}
     config['profiles'][profile] = {
