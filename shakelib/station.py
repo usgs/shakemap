@@ -351,7 +351,11 @@ class StationList(object):
             lat = station_attributes['lat']
             lon = station_attributes['lon']
             code = station_attributes['code']
-            network = station_attributes['netid']
+            # the attributes dictionary may not have the same
+            # netid that we created. Use instead the first part of
+            # the station id
+            netid = sta_id[0:sta_id.find('.')]
+            network = netid
             if 'name' in station_attributes:
                 name = station_attributes['name']
             else:
@@ -692,6 +696,8 @@ class StationList(object):
                 attributes = station.attrib.copy()
                 if 'netid' in attributes:
                     netid = attributes['netid']
+                    if not len(netid.strip()):
+                        netid = 'unknown'
                 else:
                     netid = 'unknown'
                     attributes['netid'] = netid

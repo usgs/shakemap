@@ -356,7 +356,7 @@ Rupture: <class \'shakelib.rupture.quad_rupture.QuadRupture\'>
 Config: use \'getConfig\' method
 Stations: use \'getStationDict\' method
     # instrumental stations: 185
-    # macroseismic stations: 977
+    # macroseismic stations: 1328
 Metadata: use \'getMetadata\' method
 Available IMTs (components):
     MMI (GREATER_OF_TWO_HORIZONTAL)

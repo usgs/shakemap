@@ -19,6 +19,7 @@ from shakemap.utils.amps import AmplitudeHandler
 
 TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
+
 def get_parser():
     description = '''
     Download ShakeMap data from NEIC Comcat into a local data directory.
@@ -32,6 +33,8 @@ def get_parser():
                         help='ID of the event to process')
     parser.add_argument('-f', '--force', action='store_true',
                         help='Force overwrite of event data.')
+    parser.add_argument('-s', '--source',
+                        help='Specify the source network of desired shakemap.')
     return parser
 
 
@@ -88,29 +91,55 @@ def main(args):
     detail = get_event_by_id(args.eventid)
 
     # Insert this event into the profile's amps database.
-    handler = AmplitudeHandler(install_path,data_path)
-    event = {'id':detail.id,
-             'time':detail.time,
-             'lat':detail.latitude,
-             'lon':detail.longitude,
-             'depth':detail.depth,
-             'mag':detail.magnitude}
+    handler = AmplitudeHandler(install_path, data_path)
+    event = {'id': detail.id,
+             'time': detail.time,
+             'lat': detail.latitude,
+             'lon': detail.longitude,
+             'depth': detail.depth,
+             'mag': detail.magnitude}
     handler.insertEvent(event)
-    
+
     if not detail.hasProduct('shakemap'):
-        print('Event %s has no ShakeMap product.  Creating a basic ShakeMap.' % args.eventid)
-        event_info = {'latitude':detail.latitude,
-                      'longitude':detail.longitude,
-                      'depth':detail.depth,
-                      'magnitude':detail.magnitude,
-                      'origin_time':detail.time.strftime(TIMEFMT),
-                      'event_description':detail.location}
-        infodict = {'input':{'event_information':event_info}}
-        _write_event_xml(detail['net'],args.eventid,infodict,event_dir)
+        print('Event %s has no ShakeMap product.  Creating a basic ShakeMap.' %
+              args.eventid)
+        if args.source is not None:
+            try:
+                origin = detail.getProducts('origin', source=args.source)[0]
+                eventid = args.source + origin['eventsourcecode']
+                etime = origin['eventtime'][0:19]+'Z'
+                event_info = {'latitude': float(origin['latitude']),
+                              'longitude': float(origin['longitude']),
+                              'depth': float(origin['depth']),
+                              'magnitude': float(origin['magnitude']),
+                              'origin_time': etime,
+                              'event_description': detail.location}
+            except ValueError as ve:
+                print('No %s origin for event %s.  Exiting.' % args.source)
+                sys.exit(1)
+        else:
+            event_info = {'latitude': detail.latitude,
+                          'longitude': detail.longitude,
+                          'depth': detail.depth,
+                          'magnitude': detail.magnitude,
+                          'origin_time': detail.time.strftime(TIMEFMT),
+                          'event_description': detail.location}
+            eventid = args.eventid
+        infodict = {'input': {'event_information': event_info}}
+        _write_event_xml(detail['net'], eventid, infodict, event_dir)
         print('Created event.xml file in %s.' % event_dir)
         sys.exit(0)
-                      
-    shakemap = detail.getProducts('shakemap')[0]
+
+    if args.source is not None:
+        try:
+            shakemap = detail.getProducts('shakemap', source=args.source)[0]
+            eventid = args.source + shakemap['eventsourcecode']
+        except ValueError as ve:
+            print('No %s shakemap for event %s.  Exiting.' % args.source)
+            sys.exit(1)
+    else:
+        shakemap = detail.getProducts('shakemap')[0]
+        eventid = args.eventid
     tmpdir = None
     try:
         tmpdir = tempfile.mkdtemp()

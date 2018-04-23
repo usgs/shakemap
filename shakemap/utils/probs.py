@@ -22,6 +22,7 @@ def get_weights(origin, config, tensor_params):
         ndarray: Float weights for corresponding GMPEs.
         Series: Pandas series containing STREC output.
     """
+    logging.debug('Testing')
     tprobs, strec_results = get_probs(origin, config, tensor_params)
     gmpelist = []
     weightlist = []
@@ -169,7 +170,7 @@ def get_region_probs(eid, depth, strec_results, config):
 
         region_prob = get_probability(distance, x1, p1, x2, p2)
         region_probs[region] = region_prob
-        
+
         region_layer_probs = {}
         # now do the weights for each depth zone
         for i in range(0, len(rdict['min_depth'])):

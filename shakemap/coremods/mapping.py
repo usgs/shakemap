@@ -98,46 +98,47 @@ class MappingModule(CoreModule):
 
     # supply here a data structure with information about files that
     # can be created by this module.
-    mapping_page = {'title':'Ground Motion Maps','slug':'maps'}
-    contents = OrderedDict.fromkeys(['intensityMap','pgaMap','pgvMap','psa[PERIOD]Map'])
-    contents['intensityMap'] = {'title':'Intensity Map',
-                                'caption':'Map of macroseismic intensity.',
-                                'page':mapping_page,
-                                'formats':[{'filename':'intensity.jpg',
-                                            'type':'image/jpeg'},
-                                           {'filename':'intensity.pdf',
-                                            'type':'application/pdf'}
-                                          ]
+    mapping_page = {'title': 'Ground Motion Maps', 'slug': 'maps'}
+    contents = OrderedDict.fromkeys(
+        ['intensityMap', 'pgaMap', 'pgvMap', 'psa[PERIOD]Map'])
+    contents['intensityMap'] = {'title': 'Intensity Map',
+                                'caption': 'Map of macroseismic intensity.',
+                                'page': mapping_page,
+                                'formats': [{'filename': 'intensity.jpg',
+                                             'type': 'image/jpeg'},
+                                            {'filename': 'intensity.pdf',
+                                             'type': 'application/pdf'}
+                                            ]
                                 }
 
-    contents['pgaMap'] = {'title':'PGA Map',
-                              'caption':'Map of peak ground acceleration (%g).',
-                              'page':mapping_page,
-                              'formats':[{'filename':'pga.jpg',
-                                          'type':'image/jpeg'},
-                                          {'filename':'PGA_contour.pdf',
-                                          'type':'image/jpeg'}
-                                          ]
-                             }
-    contents['pgvMap'] = {'title':'PGV Map',
-                              'caption':'Map of peak ground velocity (cm/s).',
-                              'page':mapping_page,
-                              'formats':[{'filename':'pgv.jpg',
-                                          'type':'image/jpeg'},
-                                          {'filename':'PGV_contour.pdf',
-                                          'type':'application/pdf'},
-                                          ]
-                             }
+    contents['pgaMap'] = {'title': 'PGA Map',
+                          'caption': 'Map of peak ground acceleration (%g).',
+                          'page': mapping_page,
+                          'formats': [{'filename': 'pga.jpg',
+                                       'type': 'image/jpeg'},
+                                      {'filename': 'PGA_contour.pdf',
+                                       'type': 'image/jpeg'}
+                                      ]
+                          }
+    contents['pgvMap'] = {'title': 'PGV Map',
+                          'caption': 'Map of peak ground velocity (cm/s).',
+                          'page': mapping_page,
+                          'formats': [{'filename': 'pgv.jpg',
+                                       'type': 'image/jpeg'},
+                                      {'filename': 'PGV_contour.pdf',
+                                       'type': 'application/pdf'},
+                                      ]
+                          }
     psacap = 'Map of [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).'
-    contents['psa[PERIOD]Map'] = {'title':'PSA[PERIOD] Map',
-                                      'page':mapping_page,
-                                      'caption':psacap,
-                                      'formats':[{'filename':'psa[0-9][0-9].jpg',
-                                                  'type':'image/jpeg'},
-                                                 {'filename':'PSA[0-9]p[0-9]_contour.pdf',
-                                                  'type':'application/pdf'},
-                                                ]
-                                     }
+    contents['psa[PERIOD]Map'] = {'title': 'PSA[PERIOD] Map',
+                                  'page': mapping_page,
+                                  'caption': psacap,
+                                  'formats': [{'filename': 'psa[0-9][0-9].jpg',
+                                               'type': 'image/jpeg'},
+                                              {'filename': 'PSA[0-9]p[0-9]_contour.pdf',
+                                               'type': 'application/pdf'},
+                                              ]
+                                  }
 
     def execute(self):
         """
@@ -202,25 +203,25 @@ class MappingModule(CoreModule):
         ###########################
         # Make a placeholder plot of standard deviation
         # fill this in later if necessary
-        plt.figure(figsize=(FIG_WIDTH,FIG_HEIGHT))
+        plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
         components = container.getComponents('PGA')
         if not len(components):
             return
         component = components[0]
-        imt_dict = container.getIMTGrids('PGA',component)
-        im = plt.imshow(imt_dict['std'].getData(),interpolation='none',
-                        cmap='jet',vmin=0,vmax=1.25)
+        imt_dict = container.getIMTGrids('PGA', component)
+        im = plt.imshow(imt_dict['std'].getData(), interpolation='none',
+                        cmap='jet', vmin=0, vmax=1.25)
         plt.title('PGA Standard Deviation')
-        ax = plt.gca() #get the current axes object
+        ax = plt.gca()  # get the current axes object
 
-        #do some magic stuff to make a new axes
+        # do some magic stuff to make a new axes
         divider = make_axes_locatable(ax)
         cax = divider.append_axes("right", size="5%", pad=0.05)
-        #draw colorbar in new divider axes
+        # draw colorbar in new divider axes
         plt.colorbar(im, cax=cax)
         sd_file = os.path.join(datadir, 'sd.jpg')
         fig = plt.gcf()
-        _save_jpg(fig,sd_file)
+        _save_jpg(fig, sd_file)
         ###########################
 
 
@@ -1002,14 +1003,14 @@ class MapMaker(object):
         # so, let's grab the figure as an RGB image, and then write it to a file
         # manually
         fig = plt.gcf()
-        _save_jpg(fig,outfile2)
+        _save_jpg(fig, outfile2)
         tn = time.time()
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
 
         # make the thumbnail image
         dpi = THUMBNAIL_WIDTH_PIXELS / self.fig_width
         thumbfile = os.path.join(outfolder, 'pin-thumbnail.png')
-        plt.savefig(thumbfile,dpi=dpi)
+        plt.savefig(thumbfile, dpi=dpi)
 
         return outfile
 
@@ -1266,18 +1267,18 @@ class MapMaker(object):
         # old style naming convention.  Stop making this when
         # all contributing networks are using this code.
         if 'PSA' in fileimt:
-            oldimt = fileimt.replace('p','').lower()
+            oldimt = fileimt.replace('p', '').lower()
         else:
             oldimt = fileimt.lower()
         outfile_old = os.path.join(outfolder, '%s.jpg' % oldimt)
         fig = plt.gcf()
-        _save_jpg(fig,outfile_old)
+        _save_jpg(fig, outfile_old)
         ######################
-
 
         tn = time.time()
         self.logger.debug('%.1f seconds to render entire map.' % (tn - t0))
         return outfile
+
 
 def _select_font():
     # I really don't care that much about fonts, just trying to find one
@@ -1300,7 +1301,8 @@ def _select_font():
         raise Exception('Could not find any font from system font list')
     return selected_font
 
-def _save_jpg(fig,filename):
+
+def _save_jpg(fig, filename):
     canvas = FigureCanvas(fig)
     canvas.draw()       # draw the canvas, cache the renderer
     image = np.fromstring(canvas.tostring_rgb(), dtype='uint8')
