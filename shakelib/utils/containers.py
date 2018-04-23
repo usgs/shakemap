@@ -7,7 +7,6 @@ import json
 from mapio.grid2d import Grid2D
 from mapio.geodict import GeoDict
 from mapio.gridcontainer import GridHDFContainer, _split_dset_attrs
-from impactutils.io.container import _get_type_list
 
 # local imports
 from shakelib.rupture.factory import (rupture_from_dict,
@@ -15,6 +14,8 @@ from shakelib.rupture.factory import (rupture_from_dict,
                                       rupture_from_dict_and_origin)
 from shakelib.rupture.origin import Origin
 from shakelib.station import StationList
+
+GROUPS = {'imt': '__imts__'}
 
 
 class ShakeMapContainer(GridHDFContainer):
@@ -139,7 +140,7 @@ class ShakeMapContainer(GridHDFContainer):
 
     def setStationDict(self, stationdict):
         """
-        Store (JSON-like) station dictiionary in container.
+        Store (JSON-like) station dictionary in container.
 
         Args:
             stationdict (dict-like): Station dict object.
@@ -451,17 +452,20 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             raise TypeError('Setting grid data in a file containing points')
         self.setDataType('grid')
 
-        # set up the name of the group holding all the information for the IMT
-        group_name = '__imt_%s_%s__' % (imt_name, component)
-        if group_name in self._hdfobj:
-            raise Exception(
-                'An IMT group called %s already exists.' % imt_name)
-        imt_group = self._hdfobj.create_group(group_name)
+        # create name of group containing IMT datasets
+        imt_name = '__%s_%s__' % (imt_name, component)
+        if GROUPS['imt'] not in self._hdfobj:
+            imt_group = self._hdfobj.create_group(GROUPS['imt'])
+        else:
+            imt_group = self._hdfobj[GROUPS['imt']]
+
+        # create a group for all the IMT datasets with this name/component
+        imt_sub_group = imt_group.create_group(imt_name)
 
         # create the data set containing the mean IMT data and metadata
         mean_data = imt_mean.getData()
-        mean_set = imt_group.create_dataset('mean', data=mean_data,
-                                            compression=compression)
+        mean_set = imt_sub_group.create_dataset('mean', data=mean_data,
+                                                compression=compression)
         if mean_metadata is not None:
             for key, value in mean_metadata.items():
                 mean_set.attrs[key] = value
@@ -470,15 +474,15 @@ class ShakeMapOutputContainer(ShakeMapContainer):
 
         # create the data set containing the std IMT data and metadata
         std_data = imt_std.getData()
-        std_set = imt_group.create_dataset('std', data=std_data,
-                                           compression=compression)
+        std_set = imt_sub_group.create_dataset('std', data=std_data,
+                                               compression=compression)
         if std_metadata is not None:
             for key, value in std_metadata.items():
                 std_set.attrs[key] = value
         for key, value in imt_std.getGeoDict().asDict().items():
             std_set.attrs[key] = value
 
-        return imt_group
+        return imt_sub_group
 
     def getIMTGrids(self, imt_name, component):
         """
@@ -502,11 +506,14 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         if self.getDataType() != 'grid':
             raise TypeError('Requesting grid data from file containing points')
 
-        group_name = '__imt_%s_%s__' % (imt_name, component)
-        if group_name not in self._hdfobj:
+        group_name = '__%s_%s__' % (imt_name, component)
+        if GROUPS['imt'] not in self._hdfobj:
+            raise LookupError('No IMTs stored in HDF file %s'
+                              % (self.getFileName()))
+        if group_name not in self._hdfobj[GROUPS['imt']]:
             raise LookupError('No group called %s in HDF file %s'
                               % (imt_name, self.getFileName()))
-        imt_group = self._hdfobj[group_name]
+        imt_group = self._hdfobj[GROUPS['imt']][group_name]
 
         # get the mean data and metadata
         mean_dset = imt_group['mean']
@@ -576,32 +583,36 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             raise ValueError('All input arrays must be the same shape')
 
         # set up the name of the group holding all the information for the IMT
-        group_name = '__imt_%s_%s__' % (imt_name, component)
-        if group_name in self._hdfobj:
-            raise ValueError('An IMT group called %s already exists.' %
-                             imt_name)
-        imt_group = self._hdfobj.create_group(group_name)
+        sub_group_name = '__%s_%s__' % (imt_name, component)
+        if GROUPS['imt'] not in self._hdfobj:
+            imt_group = self._hdfobj.create_group(GROUPS['imt'])
+        else:
+            imt_group = self._hdfobj[GROUPS['imt']]
+
+        imt_sub_group = imt_group.create_group(sub_group_name)
 
         # create data sets containing the longitudes, latitudes, and ids
-        imt_group.create_dataset('lons', data=lons, compression=compression)
-        imt_group.create_dataset('lats', data=lats, compression=compression)
-        imt_group.create_dataset('ids', data=ids, compression=compression)
+        imt_sub_group.create_dataset(
+            'lons', data=lons, compression=compression)
+        imt_sub_group.create_dataset(
+            'lats', data=lats, compression=compression)
+        imt_sub_group.create_dataset('ids', data=ids, compression=compression)
 
         # create the data set containing the mean IMT data and metadata
-        dataset = imt_group.create_dataset('mean', data=imt_mean,
-                                           compression=compression)
+        dataset = imt_sub_group.create_dataset('mean', data=imt_mean,
+                                               compression=compression)
         if mean_metadata is not None:
             for key, value in mean_metadata.items():
                 dataset.attrs[key] = value
 
         # create the data set containing the std IMT data and metadata
-        dataset = imt_group.create_dataset('std', data=imt_std,
-                                           compression=compression)
+        dataset = imt_sub_group.create_dataset('std', data=imt_std,
+                                               compression=compression)
         if std_metadata is not None:
             for key, value in std_metadata.items():
                 dataset.attrs[key] = value
 
-        return imt_group
+        return imt_sub_group
 
     def getIMTArrays(self, imt_name, component):
         """
@@ -626,22 +637,24 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         if self.getDataType() != 'points':
             raise TypeError('Requesting point data from file containing grids')
 
-        group_name = '__imt_%s_%s__' % (imt_name, component)
-        if group_name not in self._hdfobj:
-            raise LookupError('No group called %s in HDF file %s'
-                              % (imt_name, self.getFileName()))
-        imt_group = self._hdfobj[group_name]
+        sub_group_name = '__%s_%s__' % (imt_name, component)
+        if GROUPS['imt'] not in self._hdfobj:
+            imt_group = self._hdfobj.create_group(GROUPS['imt'])
+        else:
+            imt_group = self._hdfobj[GROUPS['imt']]
+
+        imt_sub_group = imt_group[sub_group_name]
 
         # get the coordinates and ids
-        dset = imt_group['lons']
+        dset = imt_sub_group['lons']
         lons = dset[()]
-        dset = imt_group['lats']
+        dset = imt_sub_group['lats']
         lats = dset[()]
-        dset = imt_group['ids']
+        dset = imt_sub_group['ids']
         ids = dset[()]
 
         # get the mean data and metadata
-        mean_dset = imt_group['mean']
+        mean_dset = imt_sub_group['mean']
         mean_data = mean_dset[()]
 
         mean_metadata = {}
@@ -649,7 +662,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             mean_metadata[key] = mean_dset.attrs[key]
 
         # get the std data and metadata
-        std_dset = imt_group['std']
+        std_dset = imt_sub_group['std']
         std_data = std_dset[()]
 
         std_metadata = {}
@@ -679,14 +692,22 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         Returns:
             list: List of names of IMTs.
         """
-        imt_groups = _get_type_list(self._hdfobj, 'imt')
-        if component is not None:
-            imts = []
-            for imt_group in imt_groups:
-                if imt_group.find(component) > -1:
-                    imts.append(imt_group.replace('_' + component, ''))
-        else:
-            imts = list(set([i.split('_')[0] for i in imt_groups]))
+
+        imts = []
+        if GROUPS['imt'] not in self._hdfobj:
+            return imts
+
+        imt_groups = list(self._hdfobj[GROUPS['imt']].keys())
+        for imt_group in imt_groups:
+            imt_group = imt_group.replace('__', '')
+            parts = imt_group.split('_')
+            imt = parts[0]
+            comp = '_'.join(parts[1:])
+            if component is not None and component != comp:
+                continue
+            if imt not in imts:
+                imts.append(imt)
+
         return imts
 
     def getComponents(self, imt_name):
@@ -699,7 +720,21 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         Returns:
             list: List of names of components for given IMT.
         """
-        components = _get_type_list(self._hdfobj, 'imt_' + imt_name)
+        components = []
+        if GROUPS['imt'] not in self._hdfobj:
+            return components
+
+        imt_groups = list(self._hdfobj[GROUPS['imt']].keys())
+        for imt_group in imt_groups:
+            imt_group = imt_group.replace('__', '')
+            parts = imt_group.split('_')
+            imt = parts[0]
+            comp = '_'.join(parts[1:])
+            if imt_name is not None and imt_name != imt:
+                continue
+            if comp not in components:
+                components.append(comp)
+
         return components
 
     def dropIMT(self, imt_name):
@@ -710,10 +745,14 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             name (str): The name of the IMT to be deleted.
 
         """
+        if GROUPS['imt'] not in self._hdfobj:
+            raise LookupError('No IMTs stored in HDF file %s'
+                              % (self.getFileName()))
+        imt_group = self._hdfobj[GROUPS['imt']]
         components = self.getComponents(imt_name)
         for component in components:
-            group_name = '__imt_%s_%s__' % (imt_name, component)
-            if group_name not in self._hdfobj:
+            group_name = '__%s_%s__' % (imt_name, component)
+            if group_name not in imt_group:
                 raise LookupError('No group called %s in HDF file %s'
                                   % (imt_name, self.getFileName()))
-            del self._hdfobj[group_name]
+            del imt_group[group_name]
