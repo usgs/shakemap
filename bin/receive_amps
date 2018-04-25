@@ -91,7 +91,6 @@ def main(args):
             # TODO - configure a directory where "bad" amps files can go
             continue
     logger.info('Inserted %i amplitude files into the database.' % nloaded)
-    handler.print_insert_times()
 
 
 if __name__ == '__main__':
