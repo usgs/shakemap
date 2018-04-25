@@ -19,8 +19,14 @@ from configobj import ConfigObj
 # local imports
 from .base import CoreModule
 from shakelib.utils.containers import ShakeMapInputContainer
-from shakemap.utils.config import get_config_paths, get_custom_validator,\
-    config_error, check_config, get_configspec, get_logging_config
+from shakemap.utils.config import (get_config_paths,
+                                   get_custom_validator,
+                                   config_error,
+                                   check_config,
+                                   get_configspec,
+                                   get_logging_config)
+from shakemap.utils.amps import AmplitudeHandler
+import shakemap.utils.queue as queue
 
 
 class AssembleModule(CoreModule):
@@ -41,7 +47,6 @@ class AssembleModule(CoreModule):
         self.logger = logging.getLogger(log_name)
         if comment is not None:
             self.comment = comment
-
 
     def execute(self):
         """
@@ -108,7 +113,8 @@ class AssembleModule(CoreModule):
             os.path.join(install_path, 'config', 'model.conf'),
             configspec=spec_file)
 
-        extent_config_file = os.path.join(install_path, 'config', 'extent.conf')
+        extent_config_file = os.path.join(install_path, 'config',
+                                          'extent.conf')
         if os.path.isfile(extent_config_file):
             extent_config = ConfigObj(extent_config_file,
                                       configspec=spec_file)
@@ -249,14 +255,29 @@ class AssembleModule(CoreModule):
             datafiles=datafiles)
         self.logger.debug('Created HDF5 input container in %s' %
                           shake_data.getFileName())
+        ah = AmplitudeHandler(install_path, data_path)
+        event = ah.getEvent(self._eventid)
+        if event is None:
+            origin = shake_data.getRuptureObject().getOrigin()
+            event = {'id': self._eventid,
+                     'netid': origin.eventsource,
+                     'network': origin.network,
+                     'time': origin.time.strftime(queue.TIMEFMT),
+                     'lat': origin.lat,
+                     'lon': origin.lon,
+                     'depth': origin.depth,
+                     'mag': origin.mag,
+                     'location': origin.locstring}
+            ah.insertEvent(event)
         shake_data.close()
 
     def parseArgs(self, arglist):
         """
         Set up the object to accept the --comment flag.
         """
-        parser = argparse.ArgumentParser(prog=self.__class__.command_name,
-                    description=inspect.getdoc(self.__class__))
+        parser = argparse.ArgumentParser(
+            prog=self.__class__.command_name,
+            description=inspect.getdoc(self.__class__))
         parser.add_argument('-c', '--comment', help='Provide a comment for '
                             'this version of the ShakeMap. If the comment '
                             'has spaces, the string should be quoted (e.g., '
@@ -274,4 +295,3 @@ class AssembleModule(CoreModule):
         args = parser.parse_args(arglist)
         self.comment = args.comment
         return args.rem
-

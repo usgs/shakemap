@@ -144,7 +144,7 @@ def get_parser():
                         help='Log all output.')
     parser.add_argument('-a', '--autorun', action='store_true',
                         help='Run the modules defined in shake.conf with the '
-                             'autorun_modules parameter ratherthan any '
+                             'autorun_modules parameter rather than any '
                              'found on the command line.')
     return parser
 
@@ -170,9 +170,8 @@ def main(args):
 
     logger = get_logger(args.eventid, log_option=log_option)
 
-    cancel_file = os.path.join(data_path, args.eventid, 'current',
-                               'CANCELED')
-    if os.path.isfile(cancel_file) and args.cmds[0] != 'cancel':
+    cancel_file = os.path.join(data_path, args.eventid, 'current', 'CANCELED')
+    if os.path.isfile(cancel_file):
         logger.error('Event %s has been canceled: aborting run' %
                      args.eventid)
         return
