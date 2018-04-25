@@ -8,7 +8,7 @@
   <trigger value="0"/> 
 </timing> 
 <station code="RWSVT" net="NC" lat=" 37.944" lon="-122.263" name="San Pablo Dam Toe 2, CA "> 
-<component name="HN3" loc="05" qual="12"> 
+<component name="HN3" loc="05" qual="3"> 
   <pga value="0.0315"  units="cm/s/s" datetime="2018-03-07T18:04:52.925Z"/> 
   <pgv value="0.00297"  units="cm/s"   datetime="2018-03-07T18:05:59.605Z"/> 
   <pgd value="0.001932"  units="cm"     datetime="2018-03-07T18:05:59.065Z"/> 
@@ -19,7 +19,7 @@
 </station> 
 
 <station code="RWSVT" net="NC" lat=" 37.944" lon="-122.263" name="San Pablo Dam Toe 2, CA "> 
-<component name="HN2" loc="05" qual="12"> 
+<component name="HN2" loc="05" qual="3"> 
   <pga value="0.0360"  units="cm/s/s" datetime="2018-03-07T18:05:15.555Z"/> 
   <pgv value="0.00315"  units="cm/s"   datetime="2018-03-07T18:05:16.065Z"/> 
   <pgd value="0.002014"  units="cm"     datetime="2018-03-07T18:06:27.545Z"/> 
@@ -30,7 +30,7 @@
 </station> 
 
 <station code="RWSVT" net="NC" lat=" 37.944" lon="-122.263" name="San Pablo Dam Toe 2, CA "> 
-<component name="HNZ" loc="05" qual="12"> 
+<component name="HNZ" loc="05" qual="3"> 
   <pga value="0.0367"  units="cm/s/s" datetime="2018-03-07T18:05:58.160Z"/> 
   <pgv value="0.00329"  units="cm/s"   datetime="2018-03-07T18:05:25.575Z"/> 
   <pgd value="0.002567"  units="cm"     datetime="2018-03-07T18:05:26.765Z"/> 
