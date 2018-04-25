@@ -111,11 +111,13 @@ class AmplitudeHandler(object):
                                  'station(code)')
             self._cursor.execute('CREATE INDEX stanet_index ON '
                                  'station(network)')
+            self._cursor.execute('PRAGMA journal_mode = WAL')
 
     def _connect(self):
         self._connection = sqlite3.connect(self._dbfile, timeout=10)
         if self._connection is None:
             raise RuntimeError('Could not connect to %s' % self._dbfile)
+        self._connection.isolation_level = 'EXCLUSIVE'
         self._cursor = self._connection.cursor()
         self._cursor.execute('PRAGMA foreign_keys = ON')
 
@@ -362,6 +364,7 @@ class AmplitudeHandler(object):
                        - flag: Value will be 0.
                        - loccode: The location code of the instrument.
         """
+        self._cursor.execute('BEGIN EXCLUSIVE')
         time_query = ('SELECT id, timestamp, lat, lon, code, network '
                       'FROM station WHERE timestamp > ? AND timestamp < ? ')
         self._cursor.execute(time_query, ((eqtime - TMIN), (eqtime + TMAX)))
@@ -369,6 +372,7 @@ class AmplitudeHandler(object):
         eqdata = np.array(self._cursor.fetchall())
 
         if not len(eqdata):
+            self.commit()
             return []
 
         dist = geodetic_distance(eqlon, eqlat, eqdata[:, 3].astype(float),
@@ -409,6 +413,7 @@ class AmplitudeHandler(object):
                 sta_sids.append(coded['sid'])
 
         if not len(sta_sids):
+            self.commit()
             return []
 
         amp_query = ('SELECT s.network, s.name, s.code, s.lat, s.lon, '
@@ -440,7 +445,6 @@ class AmplitudeHandler(object):
             # Delete the stations now, since we have them queued up
             self._cursor.execute('DELETE FROM station where id in %s' %
                                  varstr, sta_sids[start:end])
-            self.commit()
             start = end
 
         # clean up rows that have been associated but didn't make the cut
@@ -454,9 +458,9 @@ class AmplitudeHandler(object):
                 ', '.join('?' for _ in junk_sids[start:end]))
             query = 'DELETE FROM station WHERE id in %s' % varstr
             self._cursor.execute(query, junk_sids[start:end])
-            self.commit()
             start = end
 
+        self.commit()
         return data_list
 
     def writeXML(self, data_list, eventid, pretty_print=False):
@@ -628,6 +632,7 @@ class AmplitudeHandler(object):
         # The station (at this pgmtime +/- 10 seconds) might already exist
         # in the DB; if it does, use it
         #
+        self._cursor.execute('BEGIN EXCLUSIVE')
         query = ('SELECT id, timestamp FROM station where network = ? and '
                  'code = ? and timestamp > ? and timestamp < ?')
         self._cursor.execute(query,
@@ -650,7 +655,6 @@ class AmplitudeHandler(object):
             fmt = 'INSERT INTO station %s VALUES (?, ?, ?, ?, ?, ?)' % cols
             self._cursor.execute(fmt, (pgmtime, lat, lon, name, code, network))
             best_sid = self._cursor.lastrowid
-            self.commit()
             inserted_station = True
 
         #
@@ -695,7 +699,6 @@ class AmplitudeHandler(object):
             else:
                 self._cursor.execute(insert_channel, (best_sid, cname, loc))
                 best_cid = self._cursor.lastrowid
-                self.commit()
                 inserted_channel = True
                 channels_inserted += 1
 
@@ -738,7 +741,6 @@ class AmplitudeHandler(object):
                 # Insert the new amps
                 #
                 self._cursor.executemany(insert_pgm, pgm_list)
-                self.commit()
             elif inserted_channel:
                 #
                 # If we didn't insert any amps, but we inserted the channel,
@@ -746,7 +748,6 @@ class AmplitudeHandler(object):
                 #
                 channel_delete = 'DELETE FROM channel WHERE id = ?'
                 self._cursor.execute(channel_delete, (best_cid,))
-                self.commit()
                 channels_inserted -= 1
             # End of pgm loop
         # End of channel loop
@@ -757,8 +758,9 @@ class AmplitudeHandler(object):
         if channels_inserted == 0 and inserted_station:
             station_delete = 'DELETE FROM station WHERE id = ?'
             self._cursor.execute(station_delete, (best_sid,))
-            self.commit()
 
+#        self._cursor.execute('COMMIT')
+        self.commit()
         return
 
     def cleanAmps(self, threshold=30):

@@ -90,21 +90,39 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
     if config['associate_interval'] >= 0 and \
        ASSOCIATE_UPDATE_TIME + config['associate_interval'] < current_time:
         ASSOCIATE_UPDATE_TIME = current_time
-        event_list = handler.associateAll(pretty_print=True)
-        for eventid in event_list:
-            event = handler.getEvent(eventid)
-            process_origin(event, handler, data_path,
-                           logger, config, children)
+        associate_all(handler, data_path, logger, config, children)
+
     #
     # Do the occasional DB cleanup once per day; keep amps for 30
     # days and events for 1 year
     #
     if DB_MAINTENANCE_TIME + 86400 < current_time:
         DB_MAINTENANCE_TIME = current_time
+        #
+        # First do the assocication to make sure we don't drop any
+        # amps that might associate
+        #
+        if config['associate_interval'] >= 0:
+            ASSOCIATE_UPDATE_TIME = current_time
+            associate_all(handler, data_path, logger, config, children)
+        #
+        # Now clean out the amps and events
+        #
         handler.cleanAmps(threshold=30)
         handler.cleanEvents(threshold=365)
 
     return
+
+
+def associate_all(handler, data_path, logger, config, children):
+    """Do the associateAll method of the the AmplitudeHandler and
+    then process all of the events with updated data.
+    """
+    event_list = handler.associateAll(pretty_print=True)
+    for eventid in event_list:
+        event = handler.getEvent(eventid)
+        process_origin(event, handler, data_path,
+                       logger, config, children)
 
 
 def write_event_xml(data_path, event, logger):
