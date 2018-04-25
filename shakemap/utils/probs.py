@@ -17,10 +17,13 @@ def get_weights(origin, config, tensor_params):
             type.
         tensor_params (dict): Containing fields NP1/NP2, each a dict with
             strike/dip/rake.
+
     Returns:
-        list: String GMPEs selected for this earthquake.
-        ndarray: Float weights for corresponding GMPEs.
-        Series: Pandas series containing STREC output.
+        tuple: Tuple with elements that are:
+            - list of strings indicating the GMPEs selected for this
+              earthquake.
+            - ndarray (float) of GMPE weights.
+            - Pandas series containing STREC output.
     """
     logging.debug('Testing')
     tprobs, strec_results = get_probs(origin, config, tensor_params)
@@ -78,6 +81,7 @@ def get_probs(origin, config, tensor_params):
             type.
         tensor_params (dict): Containing fields NP1/NP2, each a dict with
             strike/dip/rake.
+
     Returns:
         dict: Probabilities for each earthquake type, with fields:
               - acr Probability that the earthquake is in an active region.
@@ -135,6 +139,7 @@ def get_region_probs(eid, depth, strec_results, config):
         strec_results (Series): Pandas series containing STREC output.
         config (dict-like): Configuration information regarding earthquake
             type.
+
     Returns:
         dict: Probabilities for each earthquake type, with fields:
               - acr Probability that the earthquake is in an active region.
@@ -223,6 +228,7 @@ def get_subduction_probs(strec_results, depth, mag, config,
         config (dict-like): Configuration information regarding earthquake
             type.
         above_slab (bool): Is earthquake above a defined slab?
+
     Returns:
         dict: Probabilities for each earthquake type, with fields:
               - crustal Probability that the earthquake is in the crust above
@@ -304,7 +310,11 @@ def get_subduction_probs(strec_results, depth, mag, config,
 
         p_int_depth = p_int_depth_upper + p_int_depth_lower
 
-        p_int = p_int_mag * p_int_depth
+        # This functional form is used so that the probability of interface
+        # inflates and appraoches 1 as magnitude gets large, assuming
+        # that the ramp function for p_int_mag is zero at small magnitudes
+        # and 1 at large magnitudes.
+        p_int = p_int_depth + (1 - p_int_depth)*p_int_mag
 
     # Calculate probability that the earthquake lies above the slab
     # and is thus crustal.
@@ -328,9 +338,11 @@ def get_subduction_probs(strec_results, depth, mag, config,
     # Calculate probability of intraslab
     p_slab = 1 - (p_int + p_crustal)
 
-    probs = {'crustal': p_crustal,
-             'interface': p_int,
-             'intraslab': p_slab}
+    probs = {
+        'crustal': p_crustal,
+        'interface': p_int,
+        'intraslab': p_slab
+    }
     return probs
 
 
@@ -339,20 +351,21 @@ def get_probability(x, x1, p1, x2, p2):
 
     The subsections and parameters below reflect a series of ramp functions
     we use to calculate various probabilities.
-    p1  |----x1
-        |     \
-        |      \
-        |       \
-    p2  |        x2------
-        |
-        ------------------
-
+      p1  |----+
+          |     \
+          |      \
+          |       \
+      p2  |        +-------
+          |
+          +-----------------
+               x1  x2
     Args:
         x (float): Quantity for which we want corresponding probability.
         x1 (float): Minimum X value.
         p1 (float): Probability at or below minimum X value.
         x2 (float): Maximum X value.
         p2 (float): Probability at or below maximum X value.
+
     Returns:
         float: Probability at input x value.
     """

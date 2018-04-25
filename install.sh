@@ -1,5 +1,12 @@
 #!/bin/bash
 
+unamestr=`uname`
+if [ "$unamestr" == 'Linux' ]; then
+    source ~/.bashrc
+elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
+    source ~/.bash_profile
+fi
+
 echo "Path:"
 echo $PATH
 
@@ -17,18 +24,24 @@ while getopts r FLAG; do
 done
 
 # Is conda installed?
-conda=$(which conda)
-if [ ! "$conda" ] ; then
-    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-        -O miniconda.sh;
+conda --version
+if [ $? -ne 0 ]; then
+    echo "No conda detected, installing miniconda..."
+    exit
+    curl https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+         -o miniconda.sh;
+    echo "Install directory: $HOME/miniconda"
     bash miniconda.sh -f -b -p $HOME/miniconda
-    export PATH="$HOME/miniconda/bin:$PATH"
+    # Need this to get conda into path
+    . $HOME/miniconda/etc/profile.d/conda.sh
+else
+    echo "conda detected, installing $VENV environment..."
 fi
 
-################
-# In newer versions of conda, the no-deps option is broken.
-conda install -y conda=4.3.31
-################
+echo "PATH:"
+echo $PATH
+echo ""
+
 
 # Choose an environment file based on platform
 unamestr=`uname`
@@ -46,8 +59,9 @@ if [ $reset == 1 ]; then
     env_file=environment.yml
 fi
 
-# Turn off whatever other virtual environment user might be in
-source deactivate
+# Start in conda base environment
+echo "Activate base virtual environment"
+conda activate base
 
 # Create a conda virtual environment
 echo "Creating the $VENV virtual environment:"
@@ -63,7 +77,7 @@ fi
 
 # Activate the new environment
 echo "Activating the $VENV virtual environment"
-source activate $VENV
+conda activate $VENV
 
 # This package
 echo "Installing shakemap..."
@@ -73,4 +87,4 @@ pip install -e .
 #python bin/sm_profile -c default -a
 
 # Tell the user they have to activate this environment
-echo "Type 'source activate $VENV' to use this new virtual environment."
+echo "Type 'conda activate $VENV' to use this new virtual environment."
