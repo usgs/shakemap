@@ -9,7 +9,6 @@ from collections import OrderedDict
 # third party imports
 from configobj import ConfigObj
 from validate import ValidateError
-from strec.subtype import SubductionSelector
 
 # local imports
 from .base import CoreModule
@@ -65,20 +64,6 @@ class SelectModule(CoreModule):
         org = Origin.fromFile(
             eventxml, sourcefile=sourcefile, momentfile=momentfile)
 
-        # ---------------------------------------------------------------------
-        # Look for basic event and moment tensor information in the origin
-        # object. If moment is not found, try to find tensor information in
-        # ComCat.
-        # ---------------------------------------------------------------------
-        eid = org.eventsourcecode
-        if hasattr(org, 'moment'):
-            tensor_params = org.moment.copy()
-        else:
-            selector = SubductionSelector()
-            mlat, _, mdepth, tensor_params = selector.getOnlineTensor(eid)
-            if mlat is None:
-                tensor_params = None
-
         #
         # Clear away results from previous runs
         #
@@ -103,8 +88,7 @@ class SelectModule(CoreModule):
         # ---------------------------------------------------------------------
         # Get the default weighting for this event
         # ---------------------------------------------------------------------
-        gmpe_list, weight_list, strec_results = get_weights(org, config,
-                                                            tensor_params)
+        gmpe_list, weight_list, strec_results = get_weights(org, config)
 
         # ---------------------------------------------------------------------
         # Create ConfigObj object for output to model_zc.conf

@@ -7,7 +7,7 @@ import logging
 from strec.subtype import SubductionSelector
 
 
-def get_weights(origin, config, tensor_params):
+def get_weights(origin, config):
     """Get list of GMPEs and their weights for a given earthquake.
 
     Args:
@@ -15,8 +15,6 @@ def get_weights(origin, config, tensor_params):
             info.
         config (dict-like): Configuration information regarding earthquake
             type.
-        tensor_params (dict): Containing fields NP1/NP2, each a dict with
-            strike/dip/rake.
 
     Returns:
         tuple: Tuple with elements that are:
@@ -26,7 +24,7 @@ def get_weights(origin, config, tensor_params):
             - Pandas series containing STREC output.
     """
     logging.debug('Testing')
-    tprobs, strec_results = get_probs(origin, config, tensor_params)
+    tprobs, strec_results = get_probs(origin, config)
     gmpelist = []
     weightlist = []
 
@@ -63,7 +61,7 @@ def get_weights(origin, config, tensor_params):
     return gmpelist, weightlist, strec_results
 
 
-def get_probs(origin, config, tensor_params):
+def get_probs(origin, config):
     """Calculate probabilities for each earthquake type.
 
     The results here contain probabilities that can be rolled up in many ways:
@@ -79,8 +77,6 @@ def get_probs(origin, config, tensor_params):
             info.
         config (dict-like): Configuration information regarding earthquake
             type.
-        tensor_params (dict): Containing fields NP1/NP2, each a dict with
-            strike/dip/rake.
 
     Returns:
         dict: Probabilities for each earthquake type, with fields:
@@ -105,9 +101,14 @@ def get_probs(origin, config, tensor_params):
     """
     selector = SubductionSelector()
     lat, lon, depth, mag = origin.lat, origin.lon, origin.depth, origin.mag
-    eid = origin.eventsourcecode
-    strec_results = selector.getSubductionType(lat, lon, depth,
-                                               tensor_params=tensor_params)
+
+    if not origin.eventsourcecode.startswith(origin.eventsource):
+        eid = origin.eventsource + origin.eventsourcecode
+    else:
+        eid = origin.eventsourcecode
+
+    strec_results = selector.getSubductionType(
+        lat, lon, depth, eid, tensor_params=None)
     region_probs = get_region_probs(eid, depth, strec_results, config)
     in_subduction = strec_results['TectonicRegion'] == 'Subduction'
     above_slab = not np.isnan(strec_results['SlabModelDepth'])
