@@ -160,8 +160,7 @@ class AmplitudeHandler(object):
         Returns:
             nothing: Nothing.
         """
-        cols = ('eventid', 'netid', 'network', 'time', 'lat', 'lon', 'depth',
-                'magnitude', 'location', 'repeats', 'lastrun')
+        cols = [x for x in EVENT.keys() if x != 'id']
         if update:
             # This makes a string like 'eventid = ?, netid = ?, ...'
             einsert = ('UPDATE event SET '
@@ -391,7 +390,7 @@ class AmplitudeHandler(object):
         stadict = {}
         junk_sids = []
         for idx, row in enumerate(eqdata):
-            sid, timestamp, lat, lon, code, network = row
+            sid, timestamp, code, network = [row[x] for x in (0, 1, 4, 5)]
             timestamp = int(timestamp)
             if network not in stadict:
                 stadict[network] = {code: {'sid': sid,

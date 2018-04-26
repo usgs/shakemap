@@ -12,6 +12,7 @@ dependencies:
 - cartopy
 - configobj
 - decorator
+- defusedxml
 - descartes
 - docutils
 - fiona
