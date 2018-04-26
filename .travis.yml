@@ -6,7 +6,8 @@ python:
 install:
     # Install shakemap and requirements
     - bash install.sh
-    - source activate shakemap
+    - . $HOME/miniconda/etc/profile.d/conda.sh
+    - conda activate shakemap
 before_script:
     # This is to take care of Invalid DISPLAY variable
     - "export DISPLAY=:99.0"
