@@ -6,8 +6,10 @@ from xml.dom import minidom
 from datetime import datetime, timezone, timedelta
 from collections import OrderedDict
 import time
+import defusedxml.cElementTree as dET
 import xml.etree.cElementTree as ET
 import json
+from itertools import zip_longest
 
 # third party libraries
 import numpy as np
@@ -158,16 +160,22 @@ class AmplitudeHandler(object):
         Returns:
             nothing: Nothing.
         """
-        cols = '(eventid, netid, network, time, lat, lon, depth, magnitude, '\
-               'location, repeats, lastrun)'
+        cols = ('eventid', 'netid', 'network', 'time', 'lat', 'lon', 'depth',
+                'magnitude', 'location', 'repeats', 'lastrun')
         if update:
-            pre = 'UPDATE event SET %s =' % cols
-            post = ' WHERE eventid = "%s"' % event['id']
+            # This makes a string like 'eventid = ?, netid = ?, ...'
+            einsert = ('UPDATE event SET '
+                       + ', '.join([' = '.join(x) for x in zip_longest(
+                           cols, [], fillvalue='?')])
+                       + ' WHERE eventid = "'
+                       + str(event['id'])
+                       + '"')
         else:
-            pre = 'INSERT INTO event %s VALUES' % cols
-            post = ''
-        fmt = '%s (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)%s'
-        einsert = fmt % (pre, post)
+            einsert = ('INSERT INTO event ('
+                       + ', '.join(cols)
+                       + ') VALUES ('
+                       + ', '.join('?' * len(cols))
+                       + ')')
         if 'network' in event:
             network = event['network']
         else:
@@ -408,8 +416,8 @@ class AmplitudeHandler(object):
                                       'distance': dist[idx]}
 
         sta_sids = []
-        for net, netd in stadict.items():
-            for code, coded in netd.items():
+        for netd in stadict.values():
+            for coded in netd.values():
                 sta_sids.append(coded['sid'])
 
         if not len(sta_sids):
@@ -421,6 +429,7 @@ class AmplitudeHandler(object):
                      'channel c, pgm p WHERE s.id IN %s AND '
                      'c.station_id = s.id AND p.channel_id = c.id '
                      'ORDER BY s.network, s.code, c.channel, p.imt')
+        delete_query = 'DELETE FROM station where id in %s'
 
         # data_list will hold the rows of the dataframe
         nstas = len(sta_sids)
@@ -443,8 +452,7 @@ class AmplitudeHandler(object):
                             stadict[row[0]][row[2]]['distance'], 0, row[6])
                 data_list.append(data_row)
             # Delete the stations now, since we have them queued up
-            self._cursor.execute('DELETE FROM station where id in %s' %
-                                 varstr, sta_sids[start:end])
+            self._cursor.execute(delete_query % varstr, sta_sids[start:end])
             start = end
 
         # clean up rows that have been associated but didn't make the cut
@@ -456,8 +464,7 @@ class AmplitudeHandler(object):
                 end = njunk
             varstr = '({0})'.format(
                 ', '.join('?' for _ in junk_sids[start:end]))
-            query = 'DELETE FROM station WHERE id in %s' % varstr
-            self._cursor.execute(query, junk_sids[start:end])
+            self._cursor.execute(delete_query % varstr, junk_sids[start:end])
             start = end
 
         self.commit()
@@ -564,7 +571,7 @@ class AmplitudeHandler(object):
             newxmlstr = re.sub(r'[^\x00-\x7F]+', ' ', xmlstr)
             # newxmlstr = _invalid_xml_remove(xmlstr)
             newxmlstr = newxmlstr.encode('utf-8', errors='xmlcharrefreplace')
-            amps = ET.fromstring(newxmlstr)
+            amps = dET.fromstring(newxmlstr)
         except Exception as e:
             raise Exception('Could not parse %s, due to error "%s"' %
                             (xmlfile, str(e)))
@@ -651,8 +658,9 @@ class AmplitudeHandler(object):
                 best_sid = row[0]
         inserted_station = False
         if best_sid is None:
-            cols = '(timestamp, lat, lon, name, code, network)'
-            fmt = 'INSERT INTO station %s VALUES (?, ?, ?, ?, ?, ?)' % cols
+            fmt = ('INSERT INTO station '
+                   '(timestamp, lat, lon, name, code, network) '
+                   'VALUES (?, ?, ?, ?, ?, ?)')
             self._cursor.execute(fmt, (pgmtime, lat, lon, name, code, network))
             best_sid = self._cursor.lastrowid
             inserted_station = True
@@ -668,10 +676,12 @@ class AmplitudeHandler(object):
             existing_channels = dict(rows)
 
         # might need these
-        cols = '(station_id, channel, loc)'
-        insert_channel = 'INSERT INTO channel %s VALUES (?, ?, ?)' % cols
-        cols = '(channel_id, imt, value)'
-        insert_pgm = 'INSERT INTO pgm %s VALUES (?, ?, ?)' % cols
+        insert_channel = ('INSERT INTO channel '
+                          '(station_id, channel, loc)'
+                          'VALUES (?, ?, ?)')
+        insert_pgm = ('INSERT INTO pgm '
+                      '(channel_id, imt, value)'
+                      'VALUES (?, ?, ?)')
 
         # loop over components
         channels_inserted = 0
@@ -759,7 +769,6 @@ class AmplitudeHandler(object):
             station_delete = 'DELETE FROM station WHERE id = ?'
             self._cursor.execute(station_delete, (best_sid,))
 
-#        self._cursor.execute('COMMIT')
         self.commit()
         return
 
@@ -775,8 +784,8 @@ class AmplitudeHandler(object):
         """
         thresh_date = dt_to_timestamp(datetime.utcnow() -
                                       timedelta(days=threshold))
-        squery = 'DELETE FROM station WHERE timestamp < %i' % thresh_date
-        self._cursor.execute(squery)
+        squery = 'DELETE FROM station WHERE timestamp < ?'
+        self._cursor.execute(squery, [thresh_date])
         nrows = self._cursor.rowcount
         self.commit()
         return nrows
