@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 import time as time
 import argparse
 import psutil
-from pathlib import Path
+import copy
 
 # Third-party imports
 import daemon
@@ -22,6 +22,8 @@ from shakelib.rupture.origin import write_event_file
 from shakemap.utils.amps import AmplitudeHandler
 
 MEMORY_UPDATE_TIME = 0
+ASSOCIATE_UPDATE_TIME = 0
+DB_MAINTENANCE_TIME = 0
 
 
 def do_periodic_tasks(handler, logger, data_path, config, children):
@@ -42,26 +44,33 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
     # check for reruns
     #
     global MEMORY_UPDATE_TIME
+    global ASSOCIATE_UPDATE_TIME
+    global DB_MAINTENANCE_TIME
 
     queue.reap_children(children, config, logger)
 
-    current_time = time.time()
+    current_time = int(time.time())
     repeats = handler.getRepeats()
-    for eventid, otime, reps in repeats:
-        if eventid in children:
-            continue
-        rep_list = json.loads(reps)
-        if otime + rep_list[0] < current_time:
+    for eventid, otime, rep_list in repeats:
+        if rep_list[0] < current_time:
+            event = handler.getEvent(eventid)
+            if eventid in children:
+                #
+                # Event is already running; pop this repeat and move on
+                #
+                rep_list.pop(0)
+                if len(rep_list) == 0:
+                    rep_list = None
+                event['repeats'] = rep_list
+                handler.insertEvent(event, update=True)
+                continue
             logger.info('Running repeat of event %s' % eventid)
             # Update the XML because the DB may have newer information
-            event = handler.getEvent(eventid)
             write_event_xml(data_path, event, logger)
             queue.dispatch_event(eventid, logger, children, 'run')
             rep_list.pop(0)
             if len(rep_list) == 0:
                 rep_list = None
-            else:
-                rep_list = json.dumps(rep_list)
             event['repeats'] = rep_list
             event['lastrun'] = current_time
             handler.insertEvent(event, update=True)
@@ -75,7 +84,45 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
         mem = getattr(process.memory_full_info(), 'uss', 0) / 1048576.0
         logger.info('Currently using %.1f MB' % mem)
 
+    #
+    # Run the associator and get a list of events with new data
+    #
+    if config['associate_interval'] >= 0 and \
+       ASSOCIATE_UPDATE_TIME + config['associate_interval'] < current_time:
+        ASSOCIATE_UPDATE_TIME = current_time
+        associate_all(handler, data_path, logger, config, children)
+
+    #
+    # Do the occasional DB cleanup once per day; keep amps for 30
+    # days and events for 1 year
+    #
+    if DB_MAINTENANCE_TIME + 86400 < current_time:
+        DB_MAINTENANCE_TIME = current_time
+        #
+        # First do the assocication to make sure we don't drop any
+        # amps that might associate
+        #
+        if config['associate_interval'] >= 0:
+            ASSOCIATE_UPDATE_TIME = current_time
+            associate_all(handler, data_path, logger, config, children)
+        #
+        # Now clean out the amps and events
+        #
+        handler.cleanAmps(threshold=30)
+        handler.cleanEvents(threshold=365)
+
     return
+
+
+def associate_all(handler, data_path, logger, config, children):
+    """Do the associateAll method of the the AmplitudeHandler and
+    then process all of the events with updated data.
+    """
+    event_list = handler.associateAll(pretty_print=True)
+    for eventid in event_list:
+        event = handler.getEvent(eventid)
+        process_origin(event, handler, data_path,
+                       logger, config, children)
 
 
 def write_event_xml(data_path, event, logger):
@@ -134,24 +181,24 @@ def process_origin(event, handler, data_path, logger, config, children):
                         (event['id'], event['mag']))
             return
         if queue.event_too_old_or_in_future(event, config):
-            logger.info('Event %s too old or in future, skipping' %
+            logger.info('Event %s too old or too far in the future, skipping' %
                         event['id'])
             return
         #
         # Looks like we'll be running this event, get the repeats
         # (if any) and toss the ones that have already passed
         #
-        repeats = None
+        replist = None
         event_timestamp = int(datetime.strptime(event['time'], queue.TIMEFMT).
                               replace(tzinfo=timezone.utc).timestamp())
         for mag in sorted(config['repeats'].keys(), reverse=True):
             if event['mag'] > mag:
-                replist = [x for x in config['repeats'][mag]
+                replist = [x + event_timestamp for x in config['repeats'][mag]
                            if event_timestamp + x > current_time]
-                if len(replist) > 0:
-                    repeats = json.dumps(replist)
+                if len(replist) == 0:
+                    replist = None
                 break
-        event['repeats'] = repeats
+        event['repeats'] = replist
     else:
         #
         # We've run this event before
@@ -162,26 +209,23 @@ def process_origin(event, handler, data_path, logger, config, children):
         # info in the database
         #
         event['lastrun'] = existing['lastrun']
-        event['repeats'] = existing['repeats']
+        event['repeats'] = copy.copy(existing['repeats'])
         if event['id'] in children:
             #
-            # Event is currently running, don't run it
+            # Event is currently running, don't run it but make sure
+            # there's a repeat pretty soon
             #
+            if event['repeats']:
+                if event['repeats'][0] > current_time + 300:
+                    event['repeats'].insert(0, current_time + 300)
+            else:
+                event['repeats'] = [current_time + 300]
             handler.insertEvent(event, update=update)
             logger.info('Event %s is currently running, shelving this '
                         'update' % event['id'])
             return
-        if current_time - existing['lastrun'] < 300:
-            #
-            # We ran this event very recently, let's skip this one
-            #
-            handler.insertEvent(event, update=update)
-            logger.info('Event %s ran recently, shelving this update' %
-                        event['id'])
-            return
-        if existing['repeats']:
-            repeats = json.loads(existing['repeats'])
-            delta_t = current_time - (existing['time'] + repeats[0])
+        if event['repeats']:
+            delta_t = current_time - event['repeats'][0]
             if delta_t >= 0 or delta_t < -300:
                 # We're due for a rerun anyway, so just insert the
                 # new data in the database and return
@@ -189,6 +233,20 @@ def process_origin(event, handler, data_path, logger, config, children):
                 logger.info('Event %s will repeat soon, shelving this '
                             'update' % event['id'])
                 return
+        if current_time - event['lastrun'] < 300:
+            #
+            # We ran this event very recently, but don't have a repeat
+            # scheduled in the near future, so let's skip this one
+            # but make sure something happens relatively soon
+            #
+            if event['repeats']:
+                event['repeats'].insert(0, current_time + 300)
+            else:
+                event['repeats'] = [current_time + 300]
+            handler.insertEvent(event, update=update)
+            logger.info('Event %s ran recently, shelving this update' %
+                        event['id'])
+            return
     #
     # Run this event
     #
@@ -257,18 +315,14 @@ def process_moment_tensor(data, handler, data_path, logger, config, children):
     return
 
 
-def process_cancel(data, handler, data_path, logger, config, children):
-    """We've received a cancellation of an event. Write the cancel
-    file in the event's directory, remove the event from the database,
-    and then run shake cancel.
+def process_cancel(data, handler, logger, config, children):
+    """We've received a cancellation of an event: run 'shake cancel'.
 
     Args:
         data (dict): The dictionary must have an event ID
                      under the 'id' key.
         handler (AmplitudeHandler object): An instance of the
                                            AmplitudeHandler object.
-        data_path (str): The path where the ShakeMap data directories
-                         live.
         logger (object): The process logging object.
         config (dict): The (cleaned-up) configuration object.
 
@@ -278,14 +332,8 @@ def process_cancel(data, handler, data_path, logger, config, children):
     eventid = data['id']
     existing = handler.getEvent(eventid)
     if not existing:
-        logger.info('cancel is for unprocessed event %s: ignoring' %
-                    eventid)
+        logger.info('cancel is for unprocessed event %s: ignoring' % eventid)
         return
-
-    pp = Path(os.path.join(data_path, eventid, 'current', 'CANCELED'))
-    pp.touch(exist_ok=True)
-
-    handler.deleteEvent(eventid)
 
     queue.dispatch_event(eventid, logger, children, 'cancel')
 
@@ -293,8 +341,8 @@ def process_cancel(data, handler, data_path, logger, config, children):
 
 
 class Dummycontext(object):
-    """This is a dummy context that can be used with 'with'. It doesn't
-    do anything.
+    """This is a dummy context that can be used as a context manager
+    with 'with'. It doesn't do anything.
     """
     def __enter__(self): return self
 
@@ -451,7 +499,7 @@ def main(pargs):
             elif cmd['type'] == 'cancel':
                 logger.info('Received "cancel" for event %s' %
                             cmd['data']['id'])
-                process_cancel(cmd['data'], handler, data_path, logger,
+                process_cancel(cmd['data'], handler,  logger,
                                config, children)
             else:
                 logger.warning('Unknown trigger type: %s; ignoring' %
