@@ -75,7 +75,9 @@ def main(args):
     alleventids = []
     networks = {}
 
-    unique_flags = []
+    # accumulate a list of errors so we can print them all at the end.
+    errors = []
+    print('Processing events...')
 
     # loop over events in the input tarball
     tarball = tarfile.open(args.tarfile, mode='r:gz')
@@ -86,7 +88,9 @@ def main(args):
         filename = parts[-1]
         eventid = parts[-3]
         if eventid not in alleventids:
-            print('Processing event %s...' % eventid)
+            # print('Processing event %s...' % eventid)
+            sys.stdout.write('.')
+            sys.stdout.flush()
             alleventids.append(eventid)
 
         if not eventid.startswith(netid):
@@ -101,7 +105,8 @@ def main(args):
             event_dir = create_event_directory(eventid, data_path)
 
         if filename.endswith('.conf'):
-            parse_config(event_dir, tarball, member)
+            cfg_errors = parse_config(event_dir, tarball, member)
+            errors += cfg_errors
         elif filename.endswith('_dat.xml'):
             tarball.extract(member, path=event_dir)
         elif filename.endswith('_fault.txt'):
@@ -111,13 +116,23 @@ def main(args):
         elif filename in ['info.json']:
             if 'download' in member:
                 continue
-            edict = save_info(event_dir, tarball, member,
-                              netid, networks, module_conf, skip_bounds=args.skip_bounds)
+            edict, info_errors = save_info(event_dir, tarball, member,
+                                           netid, networks, module_conf, skip_bounds=args.skip_bounds)
+            errors += info_errors
             handler.insertEvent(edict)
+        elif filename == 'source.txt':
+            tarball.extract(member, path=event_dir)
         else:
-            print('Unknown input file: %s' % filename)
+            errors.append('Unknown input file %s for event %s' %
+                          (filename, eventid))
 
     tarball.close()
+    sys.stdout.write('\n')
+
+    print('%i event directories written.' % len(alleventids))
+    print('The following errors or warnings were detected:')
+    for error in errors:
+        print('\t"%s"' % error)
 
     # go back through the data, convert fault.txt files into json rupture format,
     # also make sure we have all required components
@@ -131,7 +146,7 @@ def make_rupture(event_dir):
     if not len(fault_files):
         return
     fault_file = fault_files[0]
-    origin =
+    pass
 
 
 def parse_grind(event_dir, tarball, member):
@@ -148,6 +163,8 @@ on how to configure GMPEs for different depths and magnitude ranges in select.co
     model['system'] = {}
     model['data'] = {'outlier': {}}
 
+    errors = []
+
     for line in lines:
         line = line.decode('utf-8').strip()
         if line.strip().startswith('#'):
@@ -158,9 +175,9 @@ on how to configure GMPEs for different depths and magnitude ranges in select.co
         key = key.strip()
         value = value.strip()
         if key == 'gmpe':
-            print(gmpe_msg)
+            errors.append(gmpe_msg % (value, eventid))
         elif key == 'ipe':
-            print(gmpe_msg)
+            errors.append(gmpe_msg % (value, eventid))
         elif key == 'mi2pgm' or key == 'pgm2mi':
             if value == 'WGRW11':
                 value = 'WGRW12'
@@ -178,6 +195,8 @@ on how to configure GMPEs for different depths and magnitude ranges in select.co
         model.merge(existing_model)
     model.filename = model_file
     model.write()
+
+    return errors
 
 
 def parse_transfer(event_dir, tarball, member):
@@ -200,12 +219,14 @@ def parse_transfer(event_dir, tarball, member):
 
 
 def parse_config(event_dir, tarball, member):
+    errors = []
     if 'shake.conf' in member:
         pass
     elif 'grind_zc2.conf' in member:
         pass
     elif 'grind.conf' in member:
-        parse_grind(event_dir, tarball, member)
+        grind_errors = parse_grind(event_dir, tarball, member)
+        errors += grind_errors
     elif 'db.conf' in member:
         pass
     elif 'timezone.conf':
@@ -215,7 +236,9 @@ def parse_config(event_dir, tarball, member):
     elif 'transfer.conf' in member:
         parse_transfer(event_dir, tarball, member)
     else:
-        print('Unknown config file type %s' % member)
+        errors.append('Unknown config file type %s' % member)
+
+    return errors
 
 
 def save_info(event_dir, tarball, member, netid, networks,
@@ -223,6 +246,9 @@ def save_info(event_dir, tarball, member, netid, networks,
     jsonfile = tarball.extractfile(member)
     jsonstring = jsonfile.read().decode('utf-8')
     jsondict = json.loads(jsonstring)
+
+    # accumulate error messages
+    errors = []
 
     # get the origin information out of the json
     xmlfile = os.path.join(event_dir, 'event.xml')
@@ -289,7 +315,8 @@ def save_info(event_dir, tarball, member, netid, networks,
     if gmice == 'WGRW11':
         gmice = 'WGRW12'
     if gmice not in allowed_gmice:
-        sys.stderr.write('GMICE %s not yet supported in ShakeMap 4.' % gmice)
+        errors.append('GMICE %s (event %s) not yet supported in ShakeMap 4.' % (
+            gmice, root.attrib['id']))
     else:
         model['modeling']['gmice'] = gmice
 
@@ -327,7 +354,7 @@ def save_info(event_dir, tarball, member, netid, networks,
         extent.filename = extent_file
         extent.write()
 
-    return edict
+    return (edict, errors)
 
 
 def create_event_directory(eventid, data_path):

@@ -17,7 +17,6 @@ from libcomcat.search import get_event_by_id
 # local imports
 from shakemap.utils.config import get_config_paths
 from shakelib.rupture.origin import write_event_file
-from shakemap.utils.amps import AmplitudeHandler
 from shakemap.utils.utils import get_network_name
 
 TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
@@ -50,19 +49,6 @@ def get_parser():
     parser.add_argument('-s', '--source',
                         help='Specify the source network of desired shakemap.')
     return parser
-
-
-def _insert_event(install_path, data_path, detail):
-    handler = AmplitudeHandler(install_path, data_path)
-    event = {'id': detail.id,
-             'netid': detail['net'],
-             'time': detail.time.strftime(TIMEFMT2),
-             'lat': detail.latitude,
-             'lon': detail.longitude,
-             'depth': detail.depth,
-             'location': detail.location,
-             'mag': detail.magnitude}
-    handler.insertEvent(event)
 
 
 def _get_event_dictionary(detail, source):
@@ -123,9 +109,6 @@ def main(args):
             sys.exit(1)
         shutil.rmtree(event_dir)
         os.makedirs(event_dir)
-
-    # Insert this event into the profile's amps database.
-    _insert_event(install_path, data_path, detail)
 
     # name the event.xml file
     event_xml_file = os.path.join(event_dir, 'event.xml')
