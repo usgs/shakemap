@@ -1,5 +1,40 @@
 import sys
 from importlib import import_module
+from urllib import request
+from urllib.error import HTTPError
+import json
+import logging
+
+# url template for json file describing everything we know about a network
+NETWORK_TEMPLATE = 'https://earthquake.usgs.gov/data/comcat/contributor/[NETID]/index.json'
+
+
+def get_network_name(netid):
+    """Return a string representing a name of a network given its ID.
+
+    Note: Uses an internet connection to ComCat.
+
+    Args:
+        netid (str): Usually two-character network ID (us,ci, etc.)
+    Returns:
+        str: Network name, or "unknown" if input netid is invalid.
+    """
+    url = NETWORK_TEMPLATE.replace('[NETID]', netid)
+    network = 'unknown'
+    try:
+        fh = request.urlopen(url)
+        data = fh.read().decode('utf-8')
+        jdict = json.loads(data)
+        fh.close()
+        network = jdict['title']
+    except HTTPError as he:
+        error_str = '''No network description found for %s. You may
+want to make sure that the pages of the form %s still exist,
+and contact the ShakeMap developers if they do not.
+''' % (netid, NETWORK_TEMPLATE)
+        logging.info(error_str)
+
+    return network
 
 
 def get_object_from_config(obj, section, cfg, *args):

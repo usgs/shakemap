@@ -18,38 +18,10 @@ from libcomcat.search import get_event_by_id
 from shakemap.utils.config import get_config_paths
 from shakelib.rupture.origin import write_event_file
 from shakemap.utils.amps import AmplitudeHandler
+from shakemap.utils.utils import get_network_name
 
 TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 TIMEFMT2 = '%Y-%m-%dT%H:%M:%S.%fZ'
-
-
-# url template for json file describing everything we know about a network
-NETWORK_TEMPLATE = 'https://earthquake.usgs.gov/data/comcat/contributor/[NETID]/index.json'
-
-
-def _get_network_name(netid):
-    """Return a string representing a name of a network given its ID.
-
-    Args:
-        netid (str): Usually two-character network ID (us,ci, etc.)
-    Returns:
-        str: Network name.
-    """
-    url = NETWORK_TEMPLATE.replace('[NETID]', netid)
-    network = 'unknown'
-    try:
-        fh = request.urlopen(url)
-        data = fh.read().decode('utf-8')
-        jdict = json.loads(data)
-        fh.close()
-        network = jdict['title']
-    except HTTPError as he:
-        error = '''No network description found for %s. You may
-want to make sure that the pages of the form %s still exist,
-and contact the ShakeMap developers if they do not.
-''' % netid
-        print(error)
-    return network
 
 
 def get_parser():
@@ -103,7 +75,7 @@ def _get_event_dictionary(detail, source):
             eventid = source + origin['eventsourcecode']
             edict = {'id': eventid,
                      'netid': source,
-                     'network': _get_network_name(source),
+                     'network': get_network_name(source),
                      'lat': float(origin['latitude']),
                      'lon': float(origin['longitude']),
                      'depth': float(origin['depth']),
@@ -115,7 +87,7 @@ def _get_event_dictionary(detail, source):
     else:  # no source specified, use detail object
         edict = {'id': detail.id,
                  'netid': detail['net'],
-                 'network': _get_network_name(detail['net']),
+                 'network': get_network_name(detail['net']),
                  'lat': detail.latitude,
                  'lon': detail.longitude,
                  'depth': detail.depth,

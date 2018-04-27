@@ -18,6 +18,8 @@ from shakemap.utils.config import get_config_paths, get_data_path
 
 TIMEFMT = '%Y-%m-%d %H:%M:%S'
 
+NO_TRANSFER = 'NO_TRANSFER'
+
 # what are the names of the cancel files for the different transfer methods
 # that use them?
 CANCEL_FILES = {'ftp': 'CANCEL',
@@ -46,6 +48,14 @@ class TransferModule(CoreModule):
         datadir = os.path.join(data_path, self._eventid, 'current')
         if not os.path.isdir(datadir):
             raise NotADirectoryError('%s is not a valid directory.' % datadir)
+
+        # look for the presence of a NO_TRANSFER file in the datadir.
+        notransfer = os.path.join(datadir, NO_TRANSFER)
+        if os.path.isfile(notransfer):
+            self.logger.info(
+                'Event has a %s file blocking transfer.' % NO_TRANSFER)
+            return
+
         products_dir = os.path.join(datadir, 'products')
         if not os.path.isdir(products_dir):
             raise NotADirectoryError('%s does not exist.' % products_dir)
