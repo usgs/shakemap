@@ -373,8 +373,7 @@ def read_event_file(eventxml):
     if 'netid' in xmldict:
         eqdict['eventsource'] = xmldict['netid']
     else:
-        raise Exception('Input event dictionary is missing the "netid" '
-                        'field!')
+        eqdict['eventsource'] = eqdict['network']
 
     # fix eventsourcecode if not specified correctly
     if eqdict['eventsourcecode'].startswith(eqdict['eventsource']):
