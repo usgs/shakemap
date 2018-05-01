@@ -8,6 +8,7 @@ import io
 import copy
 import tempfile
 import shutil
+import time
 
 # third party
 import numpy as np
@@ -27,6 +28,7 @@ from shakelib.rupture.factory import rupture_from_dict
 from shakelib.rupture.utils import get_local_unit_slip_vector
 from shakelib.rupture.utils import get_quad_slip
 from shakelib.rupture.factory import text_to_json
+from impactutils.time.ancient_time import HistoricTime
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
@@ -35,8 +37,10 @@ sys.path.insert(0, shakedir)
 
 def test_rupture_from_dict():
     # Grab an EdgeRupture
-    origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0, 'eventsource':'us'})
+    origin = Origin({'id': 'test', 'lat': 0, 'lon': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
 
     file = os.path.join(homedir, 'rupture_data/cascadia.json')
     rup_original = get_rupture(origin, file)
@@ -61,9 +65,11 @@ def test_rupture_from_dict():
     # the origin and both get retained.
 
     # Point rupture
-    origin = Origin({'eventsourcecode': 'test',
+    origin = Origin({'id': 'test',
                      'lon': -122.5, 'lat': 37.3,
-                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
+                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
     rup_original = get_rupture(origin)
     d = rup_original._geojson
     rup_from_dict = rupture_from_dict(d)
@@ -73,8 +79,11 @@ def test_rupture_from_dict():
 
 def test_EdgeRupture():
     # Rupture requires an origin even when not used:
-    origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
+    origin = Origin({'id': 'test',
+                     'lon': 0, 'lat': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
 
     file = os.path.join(homedir, 'rupture_data/cascadia.json')
     rup = get_rupture(origin, file)
@@ -163,8 +172,11 @@ def test_EdgeRupture():
 
 def test_QuadRupture():
     # Rupture requires an origin even when not used:
-    origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
+    origin = Origin({'id': 'test',
+                     'lon': 0, 'lat': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
 
     # First with json file
     file = os.path.join(homedir, 'rupture_data/izmit.json')
@@ -284,8 +296,11 @@ def test_rupture_depth(interactive=False):
         widths = np.ones(xp0.shape) * WIDTH
         dips = np.ones(xp0.shape) * DIP
         strike = [strike]
-        origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                         'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
+        origin = Origin({'id': 'test',
+                         'lon': 0, 'lat': 0,
+                         'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                         'network': '', 'locstring': '',
+                         'time': HistoricTime.utcfromtimestamp(time.time())})
         rupture = QuadRupture.fromTrace(
             xp0, yp0, xp1, yp1, zp, widths, dips, origin, strike=strike)
 
@@ -332,8 +347,11 @@ def test_rupture_depth(interactive=False):
 
 def test_slip():
     # Rupture requires an origin even when not used:
-    origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
+    origin = Origin({'id': 'test',
+                     'lon': 0, 'lat': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
     # Make a rupture
     lat0 = np.array([34.1])
     lon0 = np.array([-118.2])
@@ -363,8 +381,11 @@ def test_northridge():
     """  # noqa
 
     # Rupture requires an origin even when not used:
-    origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
+    origin = Origin({'id': 'test',
+                     'lon': 0, 'lat': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
     cbuf = io.StringIO(rupture_text)
     rupture = get_rupture(origin, cbuf)
     strike = rupture.getStrike()
@@ -445,8 +466,11 @@ def test_parse_complicated_rupture():
     40.80199 30.94688 0"""  # noqa
 
     # Rupture requires an origin even when not used:
-    origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
+    origin = Origin({'id': 'test',
+                     'lon': 0, 'lat': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
     cbuf = io.StringIO(rupture_text)
     rupture = get_rupture(origin, cbuf)
     strike = rupture.getStrike()
@@ -528,8 +552,11 @@ def test_incorrect():
     23.60400 120.97200	17"""  # noqa
 
     # Rupture requires an origin even when not used:
-    origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
+    origin = Origin({'id': 'test',
+                     'lon': 0, 'lat': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
     cbuf = io.StringIO(rupture_text)
     with pytest.raises(Exception):
         get_rupture(origin, cbuf)
@@ -545,8 +572,11 @@ def test_fromTrace():
     dips = [45.0]
 
     # Rupture requires an origin even when not used:
-    origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0,'eventsource':'us'})
+    origin = Origin({'id': 'test',
+                     'lon': 0, 'lat': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
     rupture = QuadRupture.fromTrace(
         xp0, yp0, xp1, yp1, zp, widths,
         dips, origin,
@@ -575,8 +605,8 @@ def test_with_quakeml():
     event = Event(focal_mechanisms=[focal])
     catalog = Catalog(events=[event])
     event_text = '''<shakemap-data code_version="4.0" map_version="1">
-<earthquake id="us2000cmy3" lat="56.046" lon="-149.073" mag="7.9" year="2018"
-month="1" day="23" hour="9" minute="31" second="42" timezone="GMT"
+<earthquake id="us2000cmy3" lat="56.046" lon="-149.073" mag="7.9"
+time="2018-01-23T09:31:42Z"
 depth="25.00" locstring="280km SE of Kodiak, Alaska" netid="us" network=""/>
 </shakemap-data>'''
     try:

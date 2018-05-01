@@ -17,6 +17,7 @@ from shakelib.utils.exception import ShakeLibException
 from shakelib.rupture.base import Rupture
 from shakelib.rupture import utils
 from shakelib.rupture import gc2
+import shakelib.rupture.constants as constants
 
 
 class QuadRupture(Rupture):
@@ -59,7 +60,7 @@ class QuadRupture(Rupture):
         odict = origin.__dict__
         for k, v in odict.items():
             if isinstance(v, HistoricTime):
-                d['metadata'][k] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+                d['metadata'][k] = v.strftime(constants.TIMEFMT)
             else:
                 d['metadata'][k] = v
 
@@ -378,7 +379,7 @@ class QuadRupture(Rupture):
         odict = origin.__dict__
         for k, v in odict.items():
             if isinstance(v, HistoricTime):
-                d['metadata'][k] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+                d['metadata'][k] = v.strftime(constants.TIMEFMT)
             else:
                 d['metadata'][k] = v
 
@@ -544,7 +545,7 @@ class QuadRupture(Rupture):
         odict = origin.__dict__
         for k, v in odict.items():
             if isinstance(v, HistoricTime):
-                d['metadata'][k] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+                d['metadata'][k] = v.strftime(constants.TIMEFMT)
             else:
                 d['metadata'][k] = v
         if hasattr(origin, 'id'):

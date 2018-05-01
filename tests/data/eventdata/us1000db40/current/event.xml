@@ -24,5 +24,5 @@
   created	CDATA	#REQUIRED
 >
 ]>
-<earthquake id="us1000db40" lat="-5.4954" lon="151.5068" mag="6.9" year="2018" month="03" day="29" hour="21" minute="25" second="36" timezone="GMT" depth="35" locstring="NEW BRITAIN REGION, PAPUA NEW GUINEA" created="1522733300" otime="1522358736" type="" network="us" netid=""/>
+<earthquake id="us1000db40" lat="-5.4954" lon="151.5068" mag="6.9" time="2018-03-29T21:25:36Z" depth="35" locstring="NEW BRITAIN REGION, PAPUA NEW GUINEA" type="" network="" netid="us"/>
 

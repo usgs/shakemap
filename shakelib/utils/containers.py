@@ -14,6 +14,7 @@ from shakelib.rupture.factory import (rupture_from_dict,
                                       rupture_from_dict_and_origin)
 from shakelib.rupture.origin import Origin
 from shakelib.station import StationList
+import shakemap.utils.queue as queue
 
 GROUPS = {'imt': '__imts__'}
 
@@ -352,7 +353,8 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             out = out + "Rupture: %s\n" % type(rupt_obj)
             out = out + "    locstring: %s\n" % rupt_obj._origin.locstring
             out = out + "    magnitude: %.1f\n" % rupt_obj._origin.mag
-            out = out + "    time: %s\n" % rupt_obj._origin.time
+            out = out + "    time: %s\n" % \
+                rupt_obj._origin.time.strftime(queue.TIMEFMT)
         except AttributeError:
             out = out + "Rupture: None\n"
         try:
