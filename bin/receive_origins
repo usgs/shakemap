@@ -118,7 +118,7 @@ def main(args):
              'lon': args.preferred_longitude,
              'depth': args.preferred_depth,
              'mag': args.preferred_magnitude,
-             'location': args.property_title}
+             'locstring': args.property_title}
     logger.info('Sending event %s to queue.' % args.preferred_eventid)
 
     # Poke the queue to run shake on this event.

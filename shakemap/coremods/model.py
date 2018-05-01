@@ -65,10 +65,10 @@ SM_CONSTS = {'default_mmi_stddev': 0.3,
 
 class DataFrame:
     def __init__(self):
-        df = None
-        imts = None
-        sx = None
-        dx = None
+        df = None  # noqa
+        imts = None  # noqa
+        sx = None  # noqa
+        dx = None  # noqa
 
 
 class ModelModule(CoreModule):
@@ -81,12 +81,12 @@ class ModelModule(CoreModule):
     # supply here a data structure with information about files that
     # can be created by this module.
     contents = OrderedDict.fromkeys(['shakemapHDF'])
-    contents['shakemapHDF'] = {'title':'Comprehensive ShakeMap HDF Data File',
-                                'caption':'HDF file containing all ShakeMap results.',
-                                'formats':[{'filename':'shake_result.hdf',
-                                         'type':'application/x-bag'}
-                                          ]
-                                }
+    contents['shakemapHDF'] = {
+        'title': 'Comprehensive ShakeMap HDF Data File',
+        'caption': 'HDF file containing all ShakeMap results.',
+        'formats': [{'filename': 'shake_result.hdf',
+                     'type': 'application/x-bag'}]
+    }
 
     def execute(self):
         """
@@ -430,7 +430,8 @@ class ModelModule(CoreModule):
                 self.W, self.S, self.E, self.N = \
                         self.config['interp']['prediction_location']['extent']
             else:
-                self.W, self.E, self.S, self.N = get_extent(self.rupture_obj,config=self.config)
+                self.W, self.E, self.S, self.N = get_extent(self.rupture_obj,
+                                                            config=self.config)
 
             self.sites_obj_out = Sites.fromBounds(self.W, self.E, self.S,
                                                   self.N, self.smdx, self.smdy,
@@ -645,12 +646,12 @@ class ModelModule(CoreModule):
 
             np.seterr(invalid='ignore')
             df1['derived_MMI_from_' + imtstr], _ = \
-                    self.gmice.getMIfromGM(df1[imtstr], oqimt,
-                                           dists=df1['rrup'],
-                                           mag=self.rx.mag)
+                self.gmice.getMIfromGM(df1[imtstr], oqimt,
+                                       dists=df1['rrup'],
+                                       mag=self.rx.mag)
             np.seterr(invalid='warn')
             df1['derived_MMI_from_' + imtstr + '_sd'] = \
-                    np.full_like(df1[imtstr], self.gmice.getGM2MIsd()[oqimt])
+                np.full_like(df1[imtstr], self.gmice.getGM2MIsd()[oqimt])
 
         preferred_imts = ['PGV', 'PGA', 'SA(1.0)', 'SA(0.3)', 'SA(3.0']
         df1['MMI'] = np.full_like(df1['lon'], np.nan)
@@ -660,7 +661,7 @@ class ModelModule(CoreModule):
                 ixx = np.isnan(df1['MMI'])
                 df1['MMI'][ixx] = df1['derived_MMI_from_' + imtstr][ixx]
                 df1['MMI_sd'][ixx] = \
-                        df1['derived_MMI_from_' + imtstr + '_sd'][ixx]
+                    df1['derived_MMI_from_' + imtstr + '_sd'][ixx]
         if np.all(np.isnan(df1['MMI'])):
             del df1['MMI']
             del df1['MMI_sd']
@@ -704,7 +705,6 @@ class ModelModule(CoreModule):
             imtsets[ndf], sasets[ndf] = _get_imt_lists(getattr(self, ndf))
 
         for imtstr in self.combined_imt_set:
-            time1 = time.time()
             #
             # Fill the station arrays; here we use lists and append to
             # them because it is much faster than appending to a numpy
@@ -722,7 +722,6 @@ class ModelModule(CoreModule):
             rrups = []      # The rupture distance of the input station
             for ndf in self.dataframes:
                 sdf = getattr(self, ndf).df
-                imts = getattr(self, ndf).imts
                 for i in range(np.size(sdf['lon'])):
                     #
                     # Each station can provide 0, 1, or 2 IMTs:
@@ -1071,12 +1070,12 @@ class ModelModule(CoreModule):
         info[ip][ei]['event_id'] = self._eventid
 
         # the following items are primarily useful for PDL
-        info[ip][ei]['eventsource'] = self.rupture_obj._origin.eventsource
-        info[ip][ei]['eventsourcecode'] = self.rupture_obj._origin.eventsourcecode
+        info[ip][ei]['eventsource'] = self.rupture_obj._origin.netid
+        info[ip][ei]['eventsourcecode'] = \
+            self.rupture_obj._origin.id
         info[ip][ei]['productcode'] = self.rupture_obj._origin.productcode
         info[ip][ei]['productsource'] = self.config['system']['source_network']
         info[ip][ei]['producttype'] = self.config['system']['product_type']
-
 
         info[ip][ei]['fault_ref'] = self.rupture_obj.getReference()
         if 'df2' in self.dataframes:
@@ -1388,7 +1387,7 @@ class ModelModule(CoreModule):
             # Set the generic distance property (this is rrup)
             #
             station['properties']['distance'] = \
-                    _round_float(sdf['rrup'][six], 3)
+                _round_float(sdf['rrup'][six], 3)
             #
             # Set the specific distances properties
             #
@@ -1863,15 +1862,17 @@ def _gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types, apply_gafs):
         pe = ipe
     else:
         pe = gmpe
-    mean, stddevs = pe.get_mean_and_stddevs(copy.deepcopy(sx), rx, copy.deepcopy(dx), oqimt, stddev_types)
+    mean, stddevs = pe.get_mean_and_stddevs(copy.deepcopy(sx), rx,
+                                            copy.deepcopy(dx), oqimt,
+                                            stddev_types)
     if apply_gafs:
         gafs = get_generic_amp_factors(sx, str(oqimt))
         if gafs is not None:
             mean += gafs
     return mean, stddevs
 
+
 def _round_float(val, digits):
     if val == 'null':
         return val
     return float(('%.' + str(digits) + 'f') % val)
-

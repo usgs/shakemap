@@ -28,7 +28,7 @@ EVENT = OrderedDict([('id', 'INTEGER PRIMARY KEY'),
                      ('lon', 'REAL'),
                      ('depth', 'REAL'),
                      ('magnitude', 'REAL'),
-                     ('location', 'TEXT'),
+                     ('locstring', 'TEXT'),
                      ('repeats', 'TEXT'),
                      ('lastrun', 'INTEGER')])
 
@@ -150,7 +150,7 @@ class AmplitudeHandler(object):
                           - lon: Origin longitude (dd).
                           - depth: Origin depth (km).
                           - mag: Earthquake magnitude.
-                          - location: Location string (i.e. '2 mi SSE of Reno')
+                          - locstring: Location string (i.e. '2 mi SE of Reno')
                           - repeats: A list of repeat times (optional)
                           - lastrun: Timestamp of the last run of the event.
                                      (optional)
@@ -196,7 +196,7 @@ class AmplitudeHandler(object):
                                        event['lon'],
                                        event['depth'],
                                        event['mag'],
-                                       event['location'],
+                                       event['locstring'],
                                        repeats,
                                        lastrun))
 

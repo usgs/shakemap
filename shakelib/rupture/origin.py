@@ -1,13 +1,12 @@
 #!/usr/bin/env python
 
 # stdlib imports
-from xml.dom import minidom
 import warnings
 import os.path
-from datetime import datetime, timezone
 
 # third party
 from lxml import etree
+import defusedxml.ElementTree as dET
 from openquake.hazardlib.geo import point
 from obspy.io.quakeml.core import _is_quakeml
 from obspy.core.event import read_events
@@ -29,23 +28,20 @@ class Origin(object):
 
     Event values are:
 
-        - eventsourcecode: the event id.
-        - created: file creation time (Unix epoch - seconds since Jan 1, 1970).
+        - id: the event id.
+        - netid: the source network code
+        - network: a string describing the source network
         - lat: hypocenter latitude (decimal degrees; -90 to 90).
         - lon: hypocenter longitude (decimal degrees; -180 to 180).
         - depth: hypocenter depth (km, positive down).
         - locstring: a free-form descriptive string of location.
         - mag: earthquake magnitude.
-        - year: 4 digit format.
-        - month: 1-12.
-        - day: 1-31.
-        - hour: 0-23.
-        - minute: 0-59.
-        - second: 0-59.
-        - timezone: abbreviation (i.e., GMT, PST, PDT).
+        - time: a HistoricTime object containing the origin date/time
         - mech: a string specifying the rupture mechanism; the accepted types
           are RS, SS, NM, and ALL, for reverse slip, strike slip, normal, and
           unspecified ruptures, respectively.
+        - reference: A string describing the data source (optional)
+        - productcode: The PDL product code for this ShakeMap
 
     For backward-compatibility, we also check for 'type'. If both 'mech' and
     'type' are missing (or empty strings) then 'mech' is set to ALL.
@@ -62,60 +58,47 @@ class Origin(object):
             Origin object.
 
         Raises:
-            ValueError: When input time is not and cannot be converted to
-                HistoricTime object.
+            KeyError: When one or more required values are missing from the
+                      event object.
+            TypeError: If the event ID is not a string.
+            ValueError: If the latitude or longitude are outside of the
+                        allowed ranges, or if the 'mech' value is not
+                        an allowed type.
         """
 
         # ---------------------------------------------------------------------
         # Check for missing keys
         # ---------------------------------------------------------------------
         missing = []
+        ekeys = list(event.keys())
         for req in constants.ORIGIN_REQUIRED_KEYS:
-            if req not in list(event.keys()):
+            if req not in ekeys:
                 missing.append(req)
 
         if len(missing):
-            raise Exception('Input event dictionary is missing the following '
-                            'required keys: "%s"' % (','.join(missing)))
+            raise KeyError('Input event dictionary is missing the following '
+                           'required keys: "%s"' % (','.join(missing)))
 
         # ---------------------------------------------------------------------
         # Check some types, ranges, and defaults
         # ---------------------------------------------------------------------
-        if not type(event['eventsourcecode']) is str:
-            raise Exception('eventsourcecode must be a string.')
+        if not type(event['id']) is str:
+            raise TypeError('event id  must be a string.')
 
-        if (event['lat'] > 90) or (event['lat'] < -90):
-            raise Exception('lat must be between -90 and 90 degrees.')
+        if float(event['lat']) > 90 or float(event['lat']) < -90:
+            raise ValueError('lat must be between -90 and 90 degrees.')
 
-        if (event['lon'] > 180) or (event['lon'] < -180):
-            raise Exception('lat must be between -180 and 180 degrees.')
+        if float(event['lon']) > 180 or float(event['lon']) < -180:
+            raise ValueError('lon must be between -180 and 180 degrees.')
 
-        # make sure that time is an HistoricTime instance
-        if 'time' in event:
-            if isinstance(event['time'], str):
-                try:
-                    event['time'] = HistoricTime.strptime(
-                        event['time'], queue.TIMEFMT)
-                except ValueError:
-                    try:
-                        event['time'] = HistoricTime.strptime(
-                            event['time'], queue.ALT_TIMEFMT)
-                    except ValueError:
-                        fmt = 'Input time string %s cannot be '\
-                              'converted to datetime.'
-                        raise ValueError(fmt % event['time'])
-
+        if 'type' in ekeys and 'mech' not in ekeys:
+            event['mech'] = event['type']
+            del event['type']
         if 'mech' in event.keys():
             if event['mech'] == '':
                 event['mech'] = constants.DEFAULT_MECH
             if not event['mech'] in constants.RAKEDICT.keys():
-                raise Exception('mech must be SS, NM, RS, or ALL.')
-        elif 'type' in event.keys():
-            event['mech'] = event['type']
-            if event['mech'] == '':
-                event['mech'] = constants.DEFAULT_MECH
-            if not event['mech'] in constants.RAKEDICT.keys():
-                raise Exception('mech must be SS, NM, RS, or ALL.')
+                raise ValueError('mech must be SS, NM, RS, or ALL.')
         else:
             event['mech'] = constants.DEFAULT_MECH
 
@@ -138,6 +121,8 @@ class Origin(object):
 
         if self.rake is None:
             self.rake = 0.0
+
+        return
 
     @classmethod
     def fromFile(cls, eventxmlfile, sourcefile=None, momentfile=None):
@@ -226,6 +211,7 @@ class Origin(object):
         self.dip = dip
         self.rake = rake
         self.mech = mech
+        return
 
 
 def write_event_file(event, xmlfile):
@@ -241,9 +227,11 @@ def write_event_file(event, xmlfile):
            - lon (float, -85.1234)
            - depth (float, 24.1)
            - mag (float, 7.9)
-           - time (str in format of queue.TIMEFMT)
-           - location (str, "East of the Poconos")
-           - mech (str, "RS", "SS", or "NM") (optional)
+           - time (HistoricTime object)
+           - locstring (str, "East of the Poconos")
+           - mech (str, "RS", "SS", "NM", or 'ALL') (optional)
+           - reference (str, data source: 'Smith et al. 2016') (optional)
+           - productcode (str, 'us2000wxyz_zoom')
 
     Returns:
         nothing: Nothing.
@@ -256,52 +244,41 @@ def write_event_file(event, xmlfile):
     root.attrib['lon'] = '%.4f' % event['lon']
     root.attrib['depth'] = '%.1f' % event['depth']
     root.attrib['mag'] = '%.1f' % event['mag']
-
-    dt = datetime.strptime(event['time'], queue.TIMEFMT)
-    root.attrib['year'] = str(dt.year)
-    root.attrib['month'] = str(dt.month)
-    root.attrib['day'] = str(dt.day)
-    root.attrib['hour'] = str(dt.hour)
-    root.attrib['minute'] = str(dt.minute)
-    root.attrib['second'] = str(dt.second)
-    root.attrib['timezone'] = 'GMT'
-    root.attrib['locstring'] = event['location']
-    dtnow = datetime.utcnow().replace(tzinfo=timezone.utc)
-    root.attrib['created'] = str(int(dtnow.timestamp()))
-    eqtime = dt.replace(tzinfo=timezone.utc)
-    root.attrib['otime'] = str(int((eqtime.timestamp())))
+    root.attrib['time'] = event['time'].strftime(queue.ALT_TIMEFMT)
+    root.attrib['locstring'] = event['locstring']
     if 'mech' in event:
         root.attrib['mech'] = event['mech']
+    if 'reference' in event:
+        root.attrib['reference'] = event['reference']
+    if 'productcode' in event:
+        root.attrib['productcode'] = event['productcode']
 
     tree = etree.ElementTree(root)
     tree.write(xmlfile, pretty_print=True)
+    return
 
 
 def read_event_file(eventxml):
     """Read event.xml file from disk, returning a dictionary of attributes.
-    Input XML format looks like this:
+    Input XML format looks like this (all elements are required unless
+    explicitly labeled optional):
 
     .. code-block:: xml
 
          <earthquake
              id="2008ryan"
              netid="us"
-             network="USGS National Network"
+             network="USGS National Network" (required but may be empty string)
              lat="30.9858"
              lon="103.3639"
              mag="7.9"
-             year="2008"
-             month="05"
-             day="12"
-             hour="06"
-             minute="28"
-             second="01"
-             timezone="GMT"
              depth="19.0"
+             time="YYYY-mm-ddTHH:MM:SS.ffffffZ" (omitting fractional seconds
+                                                is also supported)
              locstring="EASTERN SICHUAN, CHINA"
-             created="1211173621"
-             otime="1210573681"
-             type=""
+             mech='SS' | 'NM' | 'RS' | 'ALL' (optional)
+             reference="Smith et al. 2016" (optional)
+             productcode='us2008ryan' (optional)
          />
 
     Args:
@@ -309,40 +286,41 @@ def read_event_file(eventxml):
 
     Returns:
        dict: Dictionary with keys:
-         - eventsourcecode Origin network and origin code (i.e., us2017abcd).
-         - eventsource Origin network ("us").
-         - time Origin time as an HistoricTime object.
-         - lat Origin latitude
-         - lon Origin longitude
-         - depth Origin depth
-         - mag Origin magnitude
-         - created Process time as an HistoricTime object.
-         - locstring Location string
-         - netid (the network identifier, e.g. 'us')
-         - network (A long-form description of the network)
-         - mechanism Moment mechanism, one of:
+         - id: Origin network and origin code (i.e., us2017abcd).
+         - netid: Origin network ("us").
+         - network: (A long-form description of the network)
+         - lat: Origin latitude
+         - lon: Origin longitude
+         - mag: Origin magnitude
+         - depth: Origin depth
+         - time: Origin time as an HistoricTime object.
+         - locstring: Location string
+         - mech: (optional) Moment mechanism, one of:
            - 'RS' (Reverse)
            - 'SS' (Strike-Slip)
            - 'NM' (Normal)
            - 'ALL' (Undetermined)
-    """
-    # fill in default values for mechanism, rake and dip
-    # these may be overriden by values in event.xml, source.txt, or by values
-    # passed in after reading input data.
-#    event = {'mech': DEFAULT_MECH,
-#             'rake': DEFAULT_RAKE,
-#             'dip': DEFAULT_DIP}
+         - reference: (optional) A description of the source of the data.
+         - productcode: (optional) This product source's unique code for this
+                        particular ShakeMap.
 
+    Raises:
+        ValueError: If the time string cannot be parsed into a datetime object
+        KeyError: If any of the required attributes are missing from event.xml
+    """
     if isinstance(eventxml, str):
-        root = minidom.parse(eventxml)
+        tree = dET.parse(eventxml)
+        root = tree.getroot()
     else:
         data = eventxml.read()
-        root = minidom.parseString(data)
+        root = dET.fromstring(data)
 
     # Turn XML content into dictionary
-    eq = root.getElementsByTagName('earthquake')[0]
-    xmldict = dict(eq.attributes.items())
-    root.unlink()
+    if root.tag == 'earthquake':
+        xmldict = dict(root.items())
+    else:
+        eq = root.find('earthquake')
+        xmldict = dict(eq.items())
 
     eqdict = {}
 
@@ -365,58 +343,48 @@ def read_event_file(eventxml):
     #########################################################
 
     # read in the id fields
-    eqdict['eventsourcecode'] = xmldict['id']
+    eqdict['id'] = xmldict['id']
+    # This isn't optional, but maybe it isn't in some old files
     if 'network' in xmldict:
         eqdict['network'] = xmldict['network']
     else:
         eqdict['network'] = ""
-    if 'netid' in xmldict:
-        eqdict['eventsource'] = xmldict['netid']
-    else:
-        eqdict['eventsource'] = eqdict['network']
 
-    # fix eventsourcecode if not specified correctly
-    if eqdict['eventsourcecode'].startswith(eqdict['eventsource']):
-        newcode = eqdict['eventsourcecode'].replace(eqdict['eventsource'], '')
-        eqdict['eventsourcecode'] = newcode
+    eqdict['netid'] = xmldict['netid']
 
     # look for the productcode attribute in the xml,
     # otherwise use the event directory name.
     if 'productcode' in xmldict:
         eqdict['productcode'] = xmldict['productcode']
+    elif isinstance(eventxml, str):
+        path_parts = eventxml.split(os.sep)
+        eqdict['productcode'] = path_parts[-3]
     else:
-        if isinstance(eventxml, str):
-            path_parts = eventxml.split(os.sep)
-            eqdict['productcode'] = path_parts[-3]
-        else:
-            eqdict['productcode'] = eqdict['eventsourcecode']
+        # It's up to the user of this data how to construct the
+        # product code
+        pass
 
-    year = int(xmldict['year'])
-    month = int(xmldict['month'])
-    day = int(xmldict['day'])
-    hour = int(xmldict['hour'])
-    minute = int(xmldict['minute'])
-    second = int(xmldict['second'])
-    microseconds = int((second - int(xmldict['second'])) * 1e6)
-    eqdict['time'] = HistoricTime(
-        year, month, day, hour, minute, second, microseconds)
+    try:
+        eqdict['time'] = HistoricTime.strptime(xmldict['time'], queue.TIMEFMT)
+    except ValueError:
+        try:
+            eqdict['time'] = HistoricTime.strptime(xmldict['time'],
+                                                   queue.ALT_TIMEFMT)
+        except ValueError:
+            raise ValueError("Couldn't convert %s to HistoricTime" %
+                             xmldict['time'])
+
     eqdict['lat'] = float(xmldict['lat'])
     eqdict['lon'] = float(xmldict['lon'])
     eqdict['depth'] = float(xmldict['depth'])
     eqdict['mag'] = float(xmldict['mag'])
-
-    # make created field in event.xml optional - set to current UTC time if not
-    # supplied.
-    if 'created' in xmldict:
-        eqdict['created'] = HistoricTime.utcfromtimestamp(
-            int(xmldict['created']))
-    else:
-        eqdict['created'] = HistoricTime.utcnow()
-
     eqdict['locstring'] = xmldict['locstring']
 
     if 'mech' in xmldict:
         eqdict['mech'] = xmldict['mech']
+    if 'reference' in xmldict:
+        eqdict['reference'] = xmldict['reference']
+
     return eqdict
 
 

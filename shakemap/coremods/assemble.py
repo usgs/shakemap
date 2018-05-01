@@ -260,14 +260,14 @@ class AssembleModule(CoreModule):
         if event is None:
             origin = shake_data.getRuptureObject().getOrigin()
             event = {'id': self._eventid,
-                     'netid': origin.eventsource,
+                     'netid': origin.netid,
                      'network': origin.network,
                      'time': origin.time.strftime(queue.TIMEFMT),
                      'lat': origin.lat,
                      'lon': origin.lon,
                      'depth': origin.depth,
                      'mag': origin.mag,
-                     'location': origin.locstring}
+                     'locstring': origin.locstring}
             ah.insertEvent(event)
         shake_data.close()
 

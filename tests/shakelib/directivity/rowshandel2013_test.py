@@ -5,6 +5,7 @@ import sys
 
 import numpy as np
 import pytest
+import time
 
 import openquake.hazardlib.geo as geo
 from openquake.hazardlib.geo import point
@@ -15,6 +16,7 @@ from shakelib.rupture.origin import Origin
 from shakelib.directivity.rowshandel2013 import Rowshandel2013
 from impactutils.vectorutils.vector import Vector
 from impactutils.vectorutils.ecef import ecef2latlon
+from impactutils.time.ancient_time import HistoricTime
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..', '..'))
@@ -42,8 +44,11 @@ def test_exceptions():
                      'lon': epilon[0],
                      'depth': 10,
                      'mag': magnitude,
-                     'eventsourcecode': 'ss3',
-                     'eventsource':'us',
+                     'id': 'ss3',
+                     'netid': 'us',
+                     'network': '',
+                     'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(int(time.time())),
                      'rake': rake})
 
     # Rupture
@@ -92,8 +97,11 @@ def test_fromSites():
                      'lon': epilon[0],
                      'depth': 10,
                      'mag': magnitude,
-                     'eventsourcecode': '',
-                     'eventsource':'',
+                     'id': '',
+                     'netid': '',
+                     'network': '',
+                     'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(int(time.time())),
                      'rake': rake})
 
     # Rupture
@@ -155,8 +163,11 @@ def test_ss3():
                      'lon': epilon[0],
                      'depth': 10,
                      'mag': magnitude,
-                     'eventsourcecode': 'ss3',
-                     'eventsource':'',
+                     'id': 'ss3',
+                     'netid': '',
+                     'network': '',
+                     'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(int(time.time())),
                      'rake': rake})
 
     # Rupture
@@ -1879,8 +1890,11 @@ def test_rv4():
                      'lon': 0,
                      'depth': 0,
                      'mag': 0,
-                     'eventsourcecode': '',
-                     'eventsource':'',
+                     'id': '',
+                     'netid': '',
+                     'network': '',
+                     'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(int(time.time())),
                      'rake': rake})
 
     # Rupture
@@ -1912,8 +1926,11 @@ def test_rv4():
                      'lon': epilon,
                      'depth': epidepth,
                      'mag': magnitude,
-                     'eventsourcecode': 'rv4',
-                     'eventsource':'',
+                     'id': 'rv4',
+                     'netid': '',
+                     'network': '',
+                     'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(int(time.time())),
                      'rake': rake})
 
     # Sites
@@ -1985,8 +2002,11 @@ def test_so6():
                      'lon': 0,
                      'depth': 0,
                      'mag': 0,
-                     'eventsourcecode': 'so6',
-                     'eventsource':'',
+                     'id': 'so6',
+                     'netid': '',
+                     'network': '',
+                     'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(int(time.time())),
                      'rake': rake})
 
     # Rupture
@@ -2025,8 +2045,11 @@ def test_so6():
                      'lon': epilon,
                      'depth': epidepth,
                      'mag': magnitude,
-                     'eventsourcecode': 'so6',
-                     'eventsource':'',
+                     'id': 'so6',
+                     'netid': '',
+                     'network': '',
+                     'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(int(time.time())),
                      'rake': rake})
 
     ruplat = [a.latitude for a in rup.getQuadrilaterals()[0]]

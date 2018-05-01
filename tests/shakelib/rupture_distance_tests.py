@@ -2,6 +2,7 @@
 import os
 import sys
 import numpy as np
+import time
 
 import openquake.hazardlib.geo as geo
 
@@ -10,6 +11,7 @@ from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.origin import Origin
 from shakelib.sites import Sites
 from shakelib.distance import get_distance
+from impactutils.time.ancient_time import HistoricTime
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
@@ -44,7 +46,9 @@ def test_multisegment_discordant():
     # Make an Origin object; most of the 'event' values don't matter for
     # this example
     origin = Origin({'lat': 0,  'lon': 0, 'depth': 0,
-                     'mag': 7.2, 'eventsourcecode': '','eventsource':''})
+                     'mag': 7.2, 'id': '', 'netid': '',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
     rup = QuadRupture.fromVertices(
         lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3,
         origin, group_index=[0, 0, 0, 1, 1, 1])
@@ -333,8 +337,10 @@ def test_EdgeRupture_vs_QuadRupture():
     widths = np.array([30, 20])
     dips = np.array([30, 40])
 
-    origin = Origin({'lat': 0,  'lon': 0, 'depth': 0,
-                     'mag': 7.2, 'eventsourcecode': '','eventsource':''})
+    origin = Origin({'lat': 33.15,  'lon': -122.15, 'depth': 0,
+                     'mag': 7.2, 'id': '', 'netid': '',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
     qrup = QuadRupture.fromTrace(xp0, yp0, xp1, yp1, zp, widths, dips, origin)
     rrup_q = qrup.computeRrup(lon, lat, dep)
     rjb_q = qrup.computeRjb(lon, lat, dep)

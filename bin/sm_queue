@@ -124,6 +124,8 @@ def associate_all(handler, data_path, logger, config, children):
         process_origin(event, handler, data_path,
                        logger, config, children)
 
+    return
+
 
 def write_event_xml(data_path, event, logger):
     """ Create the event directory if it doesn't exist and write/re-write
@@ -138,12 +140,26 @@ def write_event_xml(data_path, event, logger):
     Returns:
         nothing: Nothing.
     """
+    ttemp = event['time']
+    try:
+        dt = datetime.strptime(event['time'], queue.TIMEFMT)
+    except ValueError:
+        try:
+            dt = datetime.strptime(event['time'], queue.ALT_TIMEFMT)
+        except ValueError:
+            logger.error("Can't parse input time %s" % event['time'])
+            return
+    event['time'] = dt
+
     event_dir = os.path.join(data_path, event['id'], 'current')
     if not os.path.isdir(event_dir):
         os.makedirs(event_dir)
     event_xml = os.path.join(event_dir, 'event.xml')
+
     logger.info('Writing event %s to event.xml' % (event['id']))
     write_event_file(event, event_xml)
+
+    event['time'] = ttemp
 
     return
 
@@ -189,8 +205,15 @@ def process_origin(event, handler, data_path, logger, config, children):
         # (if any) and toss the ones that have already passed
         #
         replist = None
-        event_timestamp = int(datetime.strptime(event['time'], queue.TIMEFMT).
-                              replace(tzinfo=timezone.utc).timestamp())
+        try:
+            dt = datetime.strptime(event['time'], queue.TIMEFMT)
+        except ValueError:
+            try:
+                dt = datetime.strptime(event['time'], queue.ALT_TIMEFMT)
+            except ValueError:
+                logger.error("Can't parse input time %s" % event['time'])
+                return
+        event_timestamp = int(dt.replace(tzinfo=timezone.utc).timestamp())
         for mag in sorted(config['repeats'].keys(), reverse=True):
             if event['mag'] > mag:
                 replist = [x + event_timestamp for x in config['repeats'][mag]

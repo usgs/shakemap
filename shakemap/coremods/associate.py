@@ -43,14 +43,14 @@ class AssociateModule(CoreModule):
             origin = read_event_file(eventxml)
 
             event = {'id': self._eventid,
-                     'netid': origin['eventsource'],
+                     'netid': origin['netid'],
                      'network': origin['network'],
                      'time': origin['time'].strftime(queue.TIMEFMT),
                      'lat': origin['lat'],
                      'lon': origin['lon'],
                      'depth': origin['depth'],
                      'mag': origin['mag'],
-                     'location': origin['locstring']}
+                     'locstring': origin['locstring']}
             amp_handler.insertEvent(event)
 
         amp_handler.associateOne(self._eventid, pretty_print=True)

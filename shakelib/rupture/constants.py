@@ -19,4 +19,6 @@ DEFAULT_RAKE = 0.0
 DEFAULT_WIDTH = 0.0
 DEFAULT_ZTOR = 0.0
 
-ORIGIN_REQUIRED_KEYS = ['lat', 'lon', 'depth', 'mag', 'eventsourcecode','eventsource']
+ORIGIN_REQUIRED_KEYS = ['id', 'netid', 'network', 'lat', 'lon', 'depth',
+                        'locstring', 'mag', 'time']
+TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'

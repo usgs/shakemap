@@ -136,9 +136,10 @@ def _transfer(config, container, products_dir, cancel=False):
             # try to send the data
             try:
                 if transfer_method == 'pdl':
-                    sender = sender_class(properties=params,
-                                          local_directory=products_dir,
-                                          product_properties=product_properties)
+                    sender = sender_class(
+                        properties=params,
+                        local_directory=products_dir,
+                        product_properties=product_properties)
                 else:
                     cancelfile = CANCEL_FILES[transfer_method]
                     sender = sender_class(properties=params,
@@ -153,10 +154,11 @@ def _transfer(config, container, products_dir, cancel=False):
                 tpl = (nfiles, msg)
                 logging.info(fmt % tpl)
             except Exception as e:
-                # for the standard config, this should generate an email to the developer
-                # list.
+                # for the standard config, this should generate an email to
+                # the developer list.
                 msg = str(e)
-                fmt = 'Transfer for %s method, %s destination failed with error "%s".'
+                fmt = ('Transfer for %s method, %s destination '
+                       'failed with error "%s".')
                 tpl = (transfer_method, destination, msg)
                 logging.warning(fmt % tpl)
                 continue
@@ -167,8 +169,8 @@ def _get_properties(info):
     product_properties = {}
     # origin info
     origin = info['input']['event_information']
-    properties['eventsource'] = origin['eventsource']
-    properties['eventsourcecode'] = origin['eventsourcecode']
+    properties['eventsource'] = origin['netid']
+    properties['eventsourcecode'] = origin['id']
     properties['code'] = origin['productcode']
     properties['source'] = origin['productsource']
     properties['type'] = origin['producttype']
@@ -207,13 +209,20 @@ def _get_properties(info):
     product_properties['maxpsa30'] = psa30_info['max']
     product_properties['maxpsa30-grid'] = psa30_info['max_grid']
 
-    product_properties['minimum-longitude'] = info['output']['map_information']['min']['longitude']
-    product_properties['minimum-latitude'] = info['output']['map_information']['min']['latitude']
-    product_properties['maximum-longitude'] = info['output']['map_information']['max']['longitude']
-    product_properties['maximum-latitude'] = info['output']['map_information']['max']['latitude']
+    product_properties['minimum-longitude'] = \
+        info['output']['map_information']['min']['longitude']
+    product_properties['minimum-latitude'] = \
+        info['output']['map_information']['min']['latitude']
+    product_properties['maximum-longitude'] = \
+        info['output']['map_information']['max']['longitude']
+    product_properties['maximum-latitude'] = \
+        info['output']['map_information']['max']['latitude']
 
-    product_properties['process-timestamp'] = info['processing']['shakemap_versions']['process_time']
-    product_properties['version'] = info['processing']['shakemap_versions']['map_version']
-    product_properties['map-status'] = info['processing']['shakemap_versions']['map_status']
+    product_properties['process-timestamp'] = \
+        info['processing']['shakemap_versions']['process_time']
+    product_properties['version'] = \
+        info['processing']['shakemap_versions']['map_version']
+    product_properties['map-status'] = \
+        info['processing']['shakemap_versions']['map_status']
 
     return (properties, product_properties)

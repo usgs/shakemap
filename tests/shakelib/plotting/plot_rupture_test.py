@@ -2,6 +2,7 @@
 
 import os.path
 import sys
+import time
 
 from openquake.hazardlib.geo.geodetic import azimuth
 import numpy as np
@@ -10,6 +11,7 @@ import matplotlib.pyplot as plt
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.origin import Origin
 from shakelib.plotting.plotrupture import plot_rupture_wire3d, map_rupture
+from impactutils.time.ancient_time import HistoricTime
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
@@ -30,8 +32,11 @@ def test_plot_rupture(interactive=False):
                      'lon': 0.0,
                      'depth': 0.0,
                      'mag': 5.5,
-                     'eventsource':'',
-                     'eventsourcecode': 'abcd'})
+                     'id': '',
+                     'netid': 'abcd',
+                     'network': '',
+                     'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
     interface_width = MAX_DEPTH / np.sin(np.radians(DIP))
     widths = np.ones(xp0.shape) * interface_width
     dips = np.ones(xp0.shape) * DIP
@@ -57,8 +62,11 @@ def test_map_rupture(interactive=False):
                      'lon': 0.0,
                      'depth': 0.0,
                      'mag': 5.5,
-                     'eventsource':'',
-                     'eventsourcecode': 'abcd'})
+                     'id': '',
+                     'netid': 'abcd',
+                     'network': '',
+                     'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
     interface_width = MAX_DEPTH / np.sin(np.radians(DIP))
     widths = np.ones(xp0.shape) * interface_width
     dips = np.ones(xp0.shape) * DIP
