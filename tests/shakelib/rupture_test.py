@@ -9,6 +9,7 @@ import copy
 import tempfile
 import shutil
 import time
+import json
 
 # third party
 import numpy as np
@@ -22,7 +23,7 @@ from obspy.core.event.source import NodalPlane, NodalPlanes
 from shakelib.rupture.origin import Origin, read_moment_quakeml
 from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.edge_rupture import EdgeRupture
-from shakelib.rupture.factory import get_rupture
+from shakelib.rupture.factory import get_rupture, text_to_json
 from shakelib.rupture.factory import rupture_from_dict
 
 from shakelib.rupture.utils import get_local_unit_slip_vector
@@ -35,7 +36,78 @@ shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 sys.path.insert(0, shakedir)
 
 
+def test_text_to_json():
+    sm_data = '''#Oglesby, D. D., D. S. Dreger, R. A. Harris, N. Ratchkovski, and R. Hansen (2004). Inverse kinematic and forward dynamic models of the 2002 Denali fault earthquake, Alaska, Bull. Seism. Soc. Am. 94, S214-S233.
+-147.807 63.434        0.000
+-147.210 63.472        0.000
+-147.267 63.650        22.294
+-147.864 63.613        22.294
+-147.807 63.434        0.000
+>
+-146.951 63.551        0.000
+-147.551 63.518        0.000
+-147.551 63.518        30.000
+-146.951 63.551        30.000
+-146.951 63.551        0.000
+>
+-145.968 63.453        0.000
+-146.952 63.547        0.000
+-146.952 63.547        30.000
+-145.968 63.453        30.000
+-145.968 63.453        0.000
+>
+-143.586 62.872        0.000
+-145.996 63.427        0.000
+-145.996 63.427        30.000
+-143.586 62.872        30.000
+-143.586 62.872        0.000
+>
+-142.500 62.114        0.000
+-143.669 62.831        0.000
+-143.669 62.831        30.000
+-142.500 62.114        30.000
+-142.500 62.114        0.000'''
+    stringio = io.StringIO(sm_data)
+    jdict = text_to_json(stringio)
+    refcmp = '''Oglesby, D. D., D. S. Dreger, R. A. Harris,
+N. Ratchkovski, and R. Hansen (2004). Inverse kinematic and forward dynamic
+models of the 2002 Denali fault earthquake, Alaska, Bull. Seism. Soc. Am. 94, S214-S233.'''
+    assert jdict['metadata']['reference'] == refcmp.replace('\n', '')
+    cstart = [[-147.807, 63.434, 0.0], [-147.21, 63.472, 0.0], [-147.267,
+                                                                63.65, 22.294], [-147.864, 63.613, 22.294], [-147.807, 63.434, 0.0]]
+    cend = [[-142.5, 62.114, 0.0], [-143.669, 62.831, 0.0], [-143.669,
+                                                             62.831, 30.0], [-142.5, 62.114, 30.0], [-142.5, 62.114, 0.0]]
+
+    assert len(jdict['features'][0]['geometry']['coordinates'][0]) == 5
+    assert jdict['features'][0]['geometry']['coordinates'][0][0] == cstart
+    assert jdict['features'][0]['geometry']['coordinates'][0][-1] == cend
+
+    sm_data2 = '''#Source: NEIC (2004) based on aftershock distribution
+12.0 93.5 40.0
+10.0 93.5 40.0
+8.0  94.2 40.0
+7.0  94.2 40.0
+6.0  95.0 40.0
+5.0  95.2 40.0
+3.30 95.78 40.0
+2.98 94.45 10.0
+5.0  94.0 10.0
+6.0  93.5 10.0
+7.0  93.2 10.0
+8.0  93.1 10.0
+10.0 92.5 10.0
+12.0 92.5 10.0
+12.0 93.5 40.0'''
+    stringio = io.StringIO(sm_data2)
+    jdict = text_to_json(stringio, new_format=False)
+    coords = [[93.5, 12.0, 40.0], [93.5, 12.0, 40.0], [94.2, 12.0, 40.0], [94.2, 10.0, 40.0], [95.0, 8.0, 40.0], [95.2, 7.0, 40.0], [95.78, 6.0, 40.0], [
+        94.45, 5.0, 10.0], [94.0, 2.98, 10.0], [93.5, 3.3, 10.0], [93.2, 5.0, 10.0], [93.1, 6.0, 10.0], [92.5, 7.0, 10.0], [92.5, 8.0, 10.0], [93.5, 10.0, 40.0]]
+    # assert len(jdict['features'][0]['geometry']['coordinates']) == 1
+    # assert jdict['features'][0]['geometry']['coordinates'][0] == coords
+
+
 def test_rupture_from_dict():
+
     # Grab an EdgeRupture
     origin = Origin({'id': 'test', 'lat': 0, 'lon': 0,
                      'depth': 5.0, 'mag': 7.0, 'netid': 'us',
@@ -70,6 +142,7 @@ def test_rupture_from_dict():
                      'depth': 5.0, 'mag': 7.0, 'netid': 'us',
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(time.time())})
+
     rup_original = get_rupture(origin)
     d = rup_original._geojson
     rup_from_dict = rupture_from_dict(d)
@@ -78,6 +151,7 @@ def test_rupture_from_dict():
 
 
 def test_EdgeRupture():
+
     # Rupture requires an origin even when not used:
     origin = Origin({'id': 'test',
                      'lon': 0, 'lat': 0,
@@ -91,7 +165,7 @@ def test_EdgeRupture():
 
     # Force read Northridge as EdgeRupture
     file = os.path.join(homedir, 'rupture_data/northridge_fault.txt')
-    d = text_to_json(file)
+    d = text_to_json(file, new_format=False)
     rupt = EdgeRupture(d, origin)
     strike = rupt.getStrike()
     np.testing.assert_allclose(strike, 121.97, atol=0.01)
@@ -106,7 +180,7 @@ def test_EdgeRupture():
 
     # And again for the same vertices but reversed order
     file = os.path.join(homedir, 'rupture_data/northridge_fixed_fault.txt')
-    d = text_to_json(file)
+    d = text_to_json(file, new_format=False)
     rupt = EdgeRupture(d, origin)
     strike = rupt.getStrike()
     np.testing.assert_allclose(strike, 121.97, atol=0.01)
@@ -171,6 +245,7 @@ def test_EdgeRupture():
 
 
 def test_QuadRupture():
+
     # Rupture requires an origin even when not used:
     origin = Origin({'id': 'test',
                      'lon': 0, 'lat': 0,
@@ -178,7 +253,7 @@ def test_QuadRupture():
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(time.time())})
 
-    # First with json file
+# First with json file
     file = os.path.join(homedir, 'rupture_data/izmit.json')
     rupj = get_rupture(origin, file)
     # Then with text file:
@@ -296,63 +371,67 @@ def test_rupture_depth(interactive=False):
         widths = np.ones(xp0.shape) * WIDTH
         dips = np.ones(xp0.shape) * DIP
         strike = [strike]
-        origin = Origin({'id': 'test',
-                         'lon': 0, 'lat': 0,
-                         'depth': 5.0, 'mag': 7.0, 'netid': 'us',
-                         'network': '', 'locstring': '',
-                         'time': HistoricTime.utcfromtimestamp(time.time())})
-        rupture = QuadRupture.fromTrace(
-            xp0, yp0, xp1, yp1, zp, widths, dips, origin, strike=strike)
 
-        # make a grid of points over both quads, ask for depths
-        ymin = np.nanmin(rupture.lats)
-        ymax = np.nanmax(rupture.lats)
-        xmin = np.nanmin(rupture.lons)
-        xmax = np.nanmax(rupture.lons)
+    origin = Origin({'id': 'test',
+                     'lon': 0, 'lat': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
 
-        xmin = np.floor(xmin * (1 / GRIDRES)) / (1 / GRIDRES)
-        xmax = np.ceil(xmax * (1 / GRIDRES)) / (1 / GRIDRES)
-        ymin = np.floor(ymin * (1 / GRIDRES)) / (1 / GRIDRES)
-        ymax = np.ceil(ymax * (1 / GRIDRES)) / (1 / GRIDRES)
-        geodict = GeoDict.createDictFromBox(
-            xmin, xmax, ymin, ymax, GRIDRES, GRIDRES)
-        nx = geodict.nx
-        ny = geodict.ny
-        depths = np.zeros((ny, nx))
-        for row in range(0, ny):
-            for col in range(0, nx):
-                lat, lon = geodict.getLatLon(row, col)
-                depth = rupture.getDepthAtPoint(lat, lon)
-                depths[row, col] = depth
+    rupture = QuadRupture.fromTrace(
+        xp0, yp0, xp1, yp1, zp, widths, dips, origin, strike=strike)
 
-        np.testing.assert_almost_equal(np.nanmean(depths), mean_value)
-        np.testing.assert_almost_equal(np.nanstd(depths), std_value)
+    # make a grid of points over both quads, ask for depths
+    ymin = np.nanmin(rupture.lats)
+    ymax = np.nanmax(rupture.lats)
+    xmin = np.nanmin(rupture.lons)
+    xmax = np.nanmax(rupture.lons)
 
-        if interactive:
-            fig, axes = plt.subplots(nrows=2, ncols=1)
-            ax1, ax2 = axes
-            xdata = np.append(xp0, xp1[-1])
-            ydata = np.append(yp0, yp1[-1])
-            plt.sca(ax1)
-            plt.plot(xdata, ydata, 'b')
-            plt.sca(ax2)
-            im = plt.imshow(depths, cmap='viridis_r')  # noqa
-            ch = plt.colorbar()  # noqa
-            fname = os.path.join(os.path.expanduser('~'),
-                                 'quad_%s_test.png' % name)
-            print('Saving image for %s quad test... %s' % (name, fname))
-            plt.savefig(fname)
-            plt.close()
+    xmin = np.floor(xmin * (1 / GRIDRES)) / (1 / GRIDRES)
+    xmax = np.ceil(xmax * (1 / GRIDRES)) / (1 / GRIDRES)
+    ymin = np.floor(ymin * (1 / GRIDRES)) / (1 / GRIDRES)
+    ymax = np.ceil(ymax * (1 / GRIDRES)) / (1 / GRIDRES)
+    geodict = GeoDict.createDictFromBox(
+        xmin, xmax, ymin, ymax, GRIDRES, GRIDRES)
+    nx = geodict.nx
+    ny = geodict.ny
+    depths = np.zeros((ny, nx))
+    for row in range(0, ny):
+        for col in range(0, nx):
+            lat, lon = geodict.getLatLon(row, col)
+            depth = rupture.getDepthAtPoint(lat, lon)
+            depths[row, col] = depth
+
+    np.testing.assert_almost_equal(np.nanmean(depths), mean_value)
+    np.testing.assert_almost_equal(np.nanstd(depths), std_value)
+
+    if interactive:
+        fig, axes = plt.subplots(nrows=2, ncols=1)
+        ax1, ax2 = axes
+        xdata = np.append(xp0, xp1[-1])
+        ydata = np.append(yp0, yp1[-1])
+        plt.sca(ax1)
+        plt.plot(xdata, ydata, 'b')
+        plt.sca(ax2)
+        im = plt.imshow(depths, cmap='viridis_r')  # noqa
+        ch = plt.colorbar()  # noqa
+        fname = os.path.join(os.path.expanduser('~'),
+                             'quad_%s_test.png' % name)
+        print('Saving image for %s quad test... %s' % (name, fname))
+        plt.savefig(fname)
+        plt.close()
 
 
 def test_slip():
+
     # Rupture requires an origin even when not used:
     origin = Origin({'id': 'test',
                      'lon': 0, 'lat': 0,
                      'depth': 5.0, 'mag': 7.0, 'netid': 'us',
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(time.time())})
-    # Make a rupture
+
+# Make a rupture
     lat0 = np.array([34.1])
     lon0 = np.array([-118.2])
     lat1 = np.array([34.2])
@@ -373,11 +452,11 @@ def test_slip():
 
 def test_northridge():
     rupture_text = """# Source: Wald, D. J., T. H. Heaton, and K. W. Hudnut (1996). The Slip History of the 1994 Northridge, California, Earthquake Determined from Strong-Motion, Teleseismic, GPS, and Leveling Data, Bull. Seism. Soc. Am. 86, S49-S70.
-    34.315 -118.421 5.000
-    34.401 -118.587 5.000
-    34.261 -118.693 20.427
-    34.175 -118.527 20.427
-    34.315 -118.421 5.000
+    -118.421 34.315  5.000
+    -118.587 34.401  5.000
+    -118.693 34.261 20.427
+    -118.527 34.175 20.427
+    -118.421 34.315 5.000
     """  # noqa
 
     # Rupture requires an origin even when not used:
@@ -386,6 +465,7 @@ def test_northridge():
                      'depth': 5.0, 'mag': 7.0, 'netid': 'us',
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(time.time())})
+
     cbuf = io.StringIO(rupture_text)
     rupture = get_rupture(origin, cbuf)
     strike = rupture.getStrike()
@@ -419,51 +499,51 @@ def test_northridge():
 
 def test_parse_complicated_rupture():
     rupture_text = """# SOURCE: Barka, A., H. S. Akyz, E. Altunel, G. Sunal, Z. Akir, A. Dikbas, B. Yerli, R. Armijo, B. Meyer, J. B. d. Chabalier, T. Rockwell, J. R. Dolan, R. Hartleb, T. Dawson, S. Christofferson, A. Tucker, T. Fumal, R. Langridge, H. Stenner, W. Lettis, J. Bachhuber, and W. Page (2002). The Surface Rupture and Slip Distribution of the 17 August 1999 Izmit Earthquake (M 7.4), North Anatolian Fault, Bull. Seism. Soc. Am. 92, 43-60.
-    40.70985 29.33760 0
-    40.72733 29.51528 0
-    40.72933 29.51528 20
-    40.71185 29.33760 20
-    40.70985 29.33760 0
+    29.33760 40.70985 0
+    29.51528 40.72733 0
+    29.51528 40.72933 20
+    29.33760 40.71185 20
+    29.33760 40.70985 0
     >
-    40.70513 29.61152 0
-    40.74903 29.87519 0
-    40.75103 29.87519 20
-    40.70713 29.61152 20
-    40.70513 29.61152 0
+    29.61152 40.70513 0
+    29.87519 40.74903 0
+    29.87519 40.75103 20
+    29.61152 40.70713 20
+    29.61152 40.70513 0
     >
-    40.72582 29.88662 0
-    40.72336 30.11126 0
-    40.73432 30.19265 0
-    40.73632 30.19265 20
-    40.72536 30.11126 20
-    40.72782 29.88662 20
-    40.72582 29.88662 0
+    29.88662 40.72582 0
+    30.11126 40.72336 0
+    30.19265 40.73432 0
+    30.19265 40.73632 20
+    30.11126 40.72536 20
+    29.88662 40.72782 20
+    29.88662 40.72582 0
     >
-    40.71210 30.30494 0
-    40.71081 30.46540 0
-    40.70739 30.56511 0
-    40.70939 30.56511 20
-    40.71281 30.46540 20
-    40.71410 30.30494 20
-    40.71210 30.30494 0
+    30.30494 40.71210 0
+    30.46540 40.71081 0
+    30.56511 40.70739 0
+    30.56511 40.70939 20
+    30.46540 40.71281 20
+    30.30494 40.71410 20
+    30.30494 40.71210 0
     >
-    40.71621 30.57658 0
-    40.70068 30.63731 0
-    40.70268 30.63731 20
-    40.71821 30.57658 20
-    40.71621 30.57658 0
+    30.57658 40.71621 0
+    30.63731 40.70068 0
+    30.63731 40.70268 20
+    30.57658 40.71821 20
+    30.57658 40.71621 0
     >
-    40.69947 30.72900 0
-    40.79654 30.93655 0
-    40.79854 30.93655 20
-    40.70147 30.72900 20
-    40.69947 30.72900 0
+    30.72900 40.69947 0
+    30.93655 40.79654 0
+    30.93655 40.79854 20
+    30.72900 40.70147 20
+    30.72900 40.69947 0
     >
-    40.80199 30.94688 0
-    40.84501 31.01799 0
-    40.84701 31.01799 20
-    40.80399 30.94688 20
-    40.80199 30.94688 0"""  # noqa
+    30.94688 40.80199 0
+    31.01799 40.84501 0
+    31.01799 40.84701 20
+    30.94688 40.80399 20
+    30.94688 40.80199 0"""  # noqa
 
     # Rupture requires an origin even when not used:
     origin = Origin({'id': 'test',
@@ -532,24 +612,24 @@ def test_parse_complicated_rupture():
 
 def test_incorrect():
     rupture_text = """# Source: Ji, C., D. V. Helmberger, D. J. Wald, and K.-F. Ma (2003). Slip history and dynamic implications of the 1999 Chi-Chi, Taiwan, earthquake, J. Geophys. Res. 108, 2412, doi:10.1029/2002JB001764.
-    24.27980 120.72300	0
-    24.05000 121.00000	17
-    24.07190 121.09300	17
-    24.33120 121.04300	17
-    24.33120 121.04300	17
-    24.27980 120.72300	0
+    120.72300 24.27980 	0
+    121.00000 24.05000	17
+    121.09300 24.07190	17
+    121.04300 24.33120	17
+    121.04300 24.33120	17
+    120.72300 24.27980	0
     >
-    24.27980 120.72300	0
-    23.70000 120.68000	0
-    23.60400 120.97200	17
-    24.05000 121.00000	17
-    24.27980 120.72300	0
+    120.72300 24.27980	0
+    120.68000 23.70000	0
+    120.97200 23.60400	17
+    121.00000 24.05000	17
+    120.72300 24.27980	0
     >
-    23.60400 120.97200	17
-    23.70000 120.68000	0
-    23.58850 120.58600	0
-    23.40240 120.78900	17
-    23.60400 120.97200	17"""  # noqa
+    120.97200 23.60400	17
+    120.68000 23.70000	0
+    120.58600 23.58850	0
+    120.78900 23.40240	17
+    120.97200 23.60400	17"""  # noqa
 
     # Rupture requires an origin even when not used:
     origin = Origin({'id': 'test',
@@ -557,6 +637,7 @@ def test_incorrect():
                      'depth': 5.0, 'mag': 7.0, 'netid': 'us',
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(time.time())})
+
     cbuf = io.StringIO(rupture_text)
     with pytest.raises(Exception):
         get_rupture(origin, cbuf)
@@ -577,6 +658,7 @@ def test_fromTrace():
                      'depth': 5.0, 'mag': 7.0, 'netid': 'us',
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(time.time())})
+
     rupture = QuadRupture.fromTrace(
         xp0, yp0, xp1, yp1, zp, widths,
         dips, origin,
@@ -627,6 +709,7 @@ depth="25.00" locstring="280km SE of Kodiak, Alaska" netid="us" network=""/>
 
 
 if __name__ == "__main__":
+    test_text_to_json()
     test_rupture_from_dict()
     test_rupture_depth(interactive=True)
     test_EdgeRupture()

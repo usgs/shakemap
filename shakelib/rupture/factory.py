@@ -2,6 +2,7 @@
 
 # stdlib modules
 import json
+import logging
 
 # third party imports
 import numpy as np
@@ -150,80 +151,108 @@ def rupture_from_dict(d):
     return rupt
 
 
-def text_to_json(file):
+def _check_polygon(polygon, new_format):
+    xyz = np.array(polygon)
+    if not new_format:
+        # switch from lat/lon/z to lon/lat/z
+        tmp = xyz[:, 0].copy()
+        xyz[:, 0] = xyz[:, 1].copy()
+        xyz[:, 1] = tmp.copy()
+
+    # ensure the polygon is closed
+    if not np.array_equal(xyz[-1, :], xyz[0, :]):
+        raise ShakeLibException(
+            'Rupture file %s has unclosed segments.' % file)
+
+    # ensure the polygon is specified top-edge first
+    if xyz[1, 2] > xyz[-2, 2]:  # does this file specify bottom edge first?
+        if new_format:
+            raise ShakeLibException(
+                'Rupture file %s must be specified top-edge first.' % file)
+        xyz[1:, -2] = np.flipud(xyz[1:, -2])  # reverse the order
+
+    # turn numpy back into list of x,y,z sequences
+    polygon = xyz.tolist()
+    return polygon
+
+
+def text_to_json(file, new_format=True):
     """
-    Read in old ShakeMap 3 textfile rupture format and convert to GeoJSON.
+    Read in old or new ShakeMap 3 textfile rupture format and convert to GeoJSON.
+
+    This will handle ShakeMap3.5-style fault text files, which can have the following
+    format:
+     - # at the top indicates a reference.
+     - Lines beginning with a > indicate the end of one segment and the
+       beginning of another.
+     - Coordinates are specified in lat,lon,depth order.
+     - Coordinates can be separated by commas or spaces.
+     - Vertices can be specified in top-edge or bottom-edge first order.
 
     Args:
-        rupturefile (srt): Path to rupture file OR file-like object in GMT
+        rupturefile (str): Path to rupture file OR file-like object in GMT
             psxy format, where:
 
-                * Rupture vertices are space separated lat, lon, depth triplets
+                * Rupture vertices are space/comma separated lat, lon, depth triplets
                   on a single line.
                 * Rupture groups are separated by lines containing ">"
                 * Rupture groups must be closed.
                 * Verticies within a rupture group must start along the top
                   edge and move in the strike direction then move to the bottom
                   edge and move back in the opposite direction.
+        new_format (bool): Indicates whether text rupture format is 
+            "old" or "new" style.
 
     Returns:
         dict: GeoJSON rupture dictionary.
 
     """
-
-    # -------------------------------------------------------------------------
-    # First read in the data
-    # -------------------------------------------------------------------------
-    x = []
-    y = []
-    z = []
-    isFile = False
-    if isinstance(file, str):
-        isFile = True
-        file = open(file, 'rt')
-        lines = file.readlines()
+    isfile = False
+    if hasattr(file, 'read'):
+        f = file
     else:
-        lines = file.readlines()
+        f = open(file, 'rt')
+        isfile = True
+
     reference = ''
-    for line in lines:
-        sline = line.strip()
-        if sline.startswith('#'):
-            reference += sline
+    polygons = []
+    polygon = []
+    for line in f.readlines():
+        if not len(line.strip()):
             continue
-        if sline.startswith('>'):
-            if len(x):  # start of new line segment
-                x.append(np.nan)
-                y.append(np.nan)
-                z.append(np.nan)
-                continue
-            else:  # start of file
-                continue
-        if not len(sline.strip()):
+        if line.strip().startswith('#'):
+            reference += line.strip().replace('#', '')
             continue
-        parts = sline.split()
-        if len(parts) < 3:
-            raise ShakeLibException(
-                'Rupture file %s has no depth values.' % file)
-        y.append(float(parts[0]))
-        x.append(float(parts[1]))
-        z.append(float(parts[2]))
-    if isFile:
-        file.close()
-
-    # Construct GeoJSON dictionary
-
-    coords = []
-    poly = []
-    for lon, lat, dep in zip(x, y, z):
-        if np.isnan(lon):
-            coords.append(poly)
-            poly = []
-        else:
-            poly.append([lon, lat, dep])
-    if poly != []:
-        coords.append(poly)
-
-    d = {
+        if line.strip().startswith('>'):
+            if not len(polygon):
+                continue
+            polygon = _check_polygon(polygon, new_format)
+            polygons.append(polygon)
+            polygon = []
+            continue
+        # first try to split on whitespace
+        parts = line.split()
+        if len(parts) == 1:
+            if new_format:
+                raise ShakeLibException(
+                    'Rupture file %s has unspecified delimiters.' % file)
+            parts = line.split(',')
+            if len(parts) == 1:
+                raise ShakeLibException(
+                    'Rupture file %s has unspecified delimiters.' % file)
+        if len(parts) != 3:
+            msg = 'Rupture file %s is not in lat,lon,depth format.'
+            if new_format:
+                'Rupture file %s is not in lon,lat,depth format.'
+            raise ShakeLibException(msg % file)
+        parts = [float(p) for p in parts]
+        polygon.append(parts)
+    if len(polygon):
+        polygon = _check_polygon(polygon, new_format)
+        polygons.append(polygon)
+    if isfile:
+        f.close()
+    json_dict = {
         "type": "FeatureCollection",
         "metadata": {
             'reference': reference
@@ -236,12 +265,112 @@ def text_to_json(file):
                 },
                 "geometry": {
                     "type": "MultiPolygon",
-                    "coordinates": [coords]
+                    "coordinates": [polygons]
                 }
             }
         ]
     }
-    return d
+    return json_dict
+
+
+# def text_to_json(file):
+#     """
+#     Read in textfile rupture format and convert to GeoJSON.
+
+#     Args:
+#         rupturefile (srt): Path to rupture file OR file-like object in GMT
+#             psxy format, where:
+
+#                 * Rupture vertices are space separated lon, lat, depth triplets
+#                   on a single line.
+#                 * Rupture groups are separated by lines containing ">"
+#                 * Rupture groups must be closed.
+#                 * Vertices within a rupture group must start along the top
+#                   edge and move in the strike direction then move to the bottom
+#                   edge and move back in the opposite direction.
+
+#     Returns:
+#         dict: GeoJSON rupture dictionary.
+
+#     """
+#     msg = '''In ShakeMap 4.0, the order of coordinates in fault.txt files
+# has changed from lat,lon,depth to lon, lat, depth.  If you have specified
+# your vertices in the older-style, your results will likely not be what you
+# expected.'''
+#     logging.warn(msg)
+#     # -------------------------------------------------------------------------
+#     # First read in the data
+#     # -------------------------------------------------------------------------
+#     x = []
+#     y = []
+#     z = []
+#     isFile = False
+#     if isinstance(file, str):
+#         isFile = True
+#         file = open(file, 'rt')
+#         lines = file.readlines()
+#     else:
+#         lines = file.readlines()
+#     reference = ''
+#     for line in lines:
+#         sline = line.strip()
+#         if sline.startswith('#'):
+#             reference += sline
+#             continue
+#         if sline.startswith('>'):
+#             if len(x):  # start of new line segment
+#                 x.append(np.nan)
+#                 y.append(np.nan)
+#                 z.append(np.nan)
+#                 continue
+#             else:  # start of file
+#                 continue
+#         if not len(sline.strip()):
+#             continue
+#         parts = sline.split()
+#         if len(parts) < 3:
+#             parts = sline.split(',')
+#             if len(parts) < 3:
+#                 raise ShakeLibException(
+#                     'Rupture file %s has no depth values.' % file)
+#         y.append(float(parts[0]))
+#         x.append(float(parts[1]))
+#         z.append(float(parts[2]))
+#     if isFile:
+#         file.close()
+
+#     # Construct GeoJSON dictionary
+
+#     coords = []
+#     poly = []
+#     for lon, lat, dep in zip(x, y, z):
+#         if np.isnan(lon):
+#             coords.append(poly)
+#             poly = []
+#         else:
+#             poly.append([lon, lat, dep])
+#     if poly != []:
+#         coords.append(poly)
+
+#     d = {
+#         "type": "FeatureCollection",
+#         "metadata": {
+#             'reference': reference
+#         },
+#         "features": [
+#             {
+#                 "type": "Feature",
+#                 "properties": {
+#                     "rupture type": "rupture extent"
+#                 },
+#                 "geometry": {
+#                     "type": "MultiPolygon",
+#                     "coordinates": [coords]
+#                 }
+#             }
+#         ]
+#     }
+#     return d
 
 
 def validate_json(d):
