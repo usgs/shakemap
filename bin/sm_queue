@@ -67,7 +67,7 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
             logger.info('Running repeat of event %s' % eventid)
             # Update the XML because the DB may have newer information
             write_event_xml(data_path, event, logger)
-            queue.dispatch_event(eventid, logger, children, 'run')
+            queue.dispatch_event(eventid, logger, children, 'run', config)
             rep_list.pop(0)
             if len(rep_list) == 0:
                 rep_list = None
@@ -157,7 +157,9 @@ def write_event_xml(data_path, event, logger):
     event_xml = os.path.join(event_dir, 'event.xml')
 
     logger.info('Writing event %s to event.xml' % (event['id']))
-    write_event_file(event, event_xml)
+    val = write_event_file(event, event_xml)
+    if val:
+        logger.error('Error writing event.xml: %s' % val)
 
     event['time'] = ttemp
 
@@ -249,7 +251,7 @@ def process_origin(event, handler, data_path, logger, config, children):
             return
         if event['repeats']:
             delta_t = current_time - event['repeats'][0]
-            if delta_t >= 0 or delta_t < -300:
+            if delta_t > -300:
                 # We're due for a rerun anyway, so just insert the
                 # new data in the database and return
                 handler.insertEvent(event, update=update)
@@ -279,7 +281,7 @@ def process_origin(event, handler, data_path, logger, config, children):
 
     write_event_xml(data_path, event, logger)
 
-    queue.dispatch_event(event['id'], logger, children, 'run')
+    queue.dispatch_event(event['id'], logger, children, 'run', config)
 
     return
 
@@ -358,7 +360,7 @@ def process_cancel(data, handler, logger, config, children):
         logger.info('cancel is for unprocessed event %s: ignoring' % eventid)
         return
 
-    queue.dispatch_event(eventid, logger, children, 'cancel')
+    queue.dispatch_event(eventid, logger, children, 'cancel', config)
 
     return
 
