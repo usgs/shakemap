@@ -96,7 +96,8 @@ def main(args):
 
 
 if __name__ == '__main__':
-    clean_argv = [x.replace('"', '') for x in sys.argv]
+    clean_argv = ' '.join([x.replace('"', '').replace('=', ' ', 1)
+                           for x in sys.argv]).split()
     parser = get_parser()
     pargs, unknown = parser.parse_known_args(clean_argv)
     main(pargs)

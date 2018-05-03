@@ -219,17 +219,19 @@ def get_logger(logpath, attached):
         os.makedirs(logpath)
     logger = logging.getLogger('queue_logger')
     logger.setLevel(logging.INFO)
-    if not attached:
+    if attached:
+        handler = logging.StreamHandler()
+    else:
         logfile = os.path.join(logpath, 'queue.log')
         handler = TimedRotatingFileHandler(logfile,
                                            when='midnight',
-                                           backupCount=60)
-        formatter = logging.Formatter(
-                fmt='%(asctime)s - %(levelname)s - %(message)s',
-                datefmt='%Y-%m-%d %H:%M:%S')
-        handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        logger.propagate = False
+                                           backupCount=30)
+    formatter = logging.Formatter(
+            fmt='%(asctime)s - %(levelname)s - %(message)s',
+            datefmt='%Y-%m-%d %H:%M:%S')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.propagate = False
     return logger
 
 

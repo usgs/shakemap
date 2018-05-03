@@ -53,7 +53,7 @@ def get_parser():
     parser.add_argument('--type', help='Product type')
     parser.add_argument('--status', help='Event status')
     parser.add_argument('--action', help='Event action type')
-    parser.add_argument('--property-title', help='Event location')
+    parser.add_argument('--property-title', nargs='*', help='Event location')
     parser.add_argument('--property-event-type',
                         help='Event type (earthquake, explosion, etc.)')
 
@@ -141,7 +141,8 @@ def main(args):
 
 
 if __name__ == '__main__':
-    clean_argv = [x.replace('"', '') for x in sys.argv]
+    clean_argv = ' '.join([x.replace('"', '').replace('=', ' ', 1)
+                           for x in sys.argv]).split()
     parser = get_parser()
     pargs, unknown = parser.parse_known_args(clean_argv)
     main(pargs)
