@@ -233,7 +233,7 @@ def get_logger(logpath, attached):
     return logger
 
 
-def dispatch_event(eventid, logger, children, action):
+def dispatch_event(eventid, logger, children, action, config):
     """ Start a subprocess to run the specified event and add its data
     to the children structure.
 
@@ -245,6 +245,7 @@ def dispatch_event(eventid, logger, children, action):
                       process 'shake --autorun eventid', 'cancel' starts
                       the process 'shake eventid cancel', and 'test' starts
                       the process 'echo eventid'.
+        config (dict): The configuration dictionary.
 
     Returns:
         nothing: Nothing.
@@ -254,10 +255,10 @@ def dispatch_event(eventid, logger, children, action):
     """
     if action == 'run':
         logger.info('Running event %s' % eventid)
-        p = subprocess.Popen(['shake', '--autorun', eventid])
+        p = subprocess.Popen([config['shake_path'], '--autorun', eventid])
     elif action == 'cancel':
         logger.info('Canceling event %s' % eventid)
-        p = subprocess.Popen(['shake', eventid, 'cancel'])
+        p = subprocess.Popen([config['shake_path'], eventid, 'cancel'])
     elif action == 'test':
         logger.info('Testing event %s' % eventid)
         p = subprocess.Popen(['echo', eventid])

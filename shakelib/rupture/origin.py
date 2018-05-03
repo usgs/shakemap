@@ -236,26 +236,30 @@ def write_event_file(event, xmlfile):
     Returns:
         nothing: Nothing.
     """
-    root = etree.Element('earthquake')
-    root.attrib['id'] = event['id']
-    root.attrib['netid'] = event['netid']
-    root.attrib['network'] = event['network']
-    root.attrib['lat'] = '%.4f' % event['lat']
-    root.attrib['lon'] = '%.4f' % event['lon']
-    root.attrib['depth'] = '%.1f' % event['depth']
-    root.attrib['mag'] = '%.1f' % event['mag']
-    root.attrib['time'] = event['time'].strftime(queue.ALT_TIMEFMT)
-    root.attrib['locstring'] = event['locstring']
-    if 'mech' in event:
-        root.attrib['mech'] = event['mech']
-    if 'reference' in event:
-        root.attrib['reference'] = event['reference']
-    if 'productcode' in event:
-        root.attrib['productcode'] = event['productcode']
+    try:
+        root = etree.Element('earthquake')
+        root.attrib['id'] = event['id']
+        root.attrib['netid'] = event['netid']
+        root.attrib['network'] = event['network']
+        root.attrib['lat'] = '%.4f' % event['lat']
+        root.attrib['lon'] = '%.4f' % event['lon']
+        root.attrib['depth'] = '%.1f' % event['depth']
+        root.attrib['mag'] = '%.1f' % event['mag']
+        root.attrib['time'] = event['time'].strftime(queue.ALT_TIMEFMT)
+        root.attrib['locstring'] = event['locstring']
+        if 'mech' in event:
+            root.attrib['mech'] = event['mech']
+        if 'reference' in event:
+            root.attrib['reference'] = event['reference']
+        if 'productcode' in event:
+            root.attrib['productcode'] = event['productcode']
 
-    tree = etree.ElementTree(root)
-    tree.write(xmlfile, pretty_print=True)
-    return
+        tree = etree.ElementTree(root)
+        tree.write(xmlfile, pretty_print=True)
+    except Exception as e:
+        return str(e)
+
+    return None
 
 
 def read_event_file(eventxml):
