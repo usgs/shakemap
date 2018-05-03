@@ -29,12 +29,12 @@ class RasterModule(CoreModule):
     command_name = 'raster'
 
     contents = OrderedDict.fromkeys(['rasterData'])
-    contents['rasterData'] = {'title':'ESRI Raster Files',
-                                'caption':'Data and uncertainty grids in ESRI raster format',
-                                'formats':[{'filename':'raster.zip',
-                                         'type':'application/zip'}
-                                          ]
-                                }
+    contents['rasterData'] = {
+        'title': 'ESRI Raster Files',
+        'caption': 'Data and uncertainty grids in ESRI raster format',
+        'formats': [{'filename': 'rasters.zip',
+                    'type': 'application/zip'}]
+    }
 
     def execute(self):
         """
@@ -67,7 +67,7 @@ class RasterModule(CoreModule):
 
         # Package up all of these files into one zip file.
         zfilename = os.path.join(datadir, 'rasters.zip')
-        zfile = zipfile.ZipFile(zfilename,mode='w',
+        zfile = zipfile.ZipFile(zfilename, mode='w',
                                 compression=zipfile.ZIP_DEFLATED)
 
         files_written = []
@@ -94,15 +94,13 @@ class RasterModule(CoreModule):
             std_gdal.save(std_fname)
             files_written.append(std_fname)
             files_written.append(std_hdr)
-            zfile.write(mean_fname,'%s_mean.flt' % fileimt)
-            zfile.write(mean_hdr,'%s_mean.hdr' % fileimt)
-            zfile.write(std_fname,'%s_std.flt' % fileimt)
-            zfile.write(std_hdr,'%s_std.hdr' % fileimt)
-            
+            zfile.write(mean_fname, '%s_mean.flt' % fileimt)
+            zfile.write(mean_hdr, '%s_mean.hdr' % fileimt)
+            zfile.write(std_fname, '%s_std.flt' % fileimt)
+            zfile.write(std_hdr, '%s_std.hdr' % fileimt)
+
         zfile.close()
 
         # nuke all of the copies of the files we just put in the zipfile
         for file_written in files_written:
             os.remove(file_written)
-        
-        
