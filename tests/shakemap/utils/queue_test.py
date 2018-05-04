@@ -129,7 +129,8 @@ def test_get_logger():
 def test_dispatch_event():
     logger, logstring = get_dummy_logger('test_dispatch')
     children = {}
-    queue.dispatch_event('Testing dispatch', logger, children, 'test')
+    config = {}
+    queue.dispatch_event('Testing dispatch', logger, children, 'test', config)
     returncode = children['Testing dispatch']['popen'].wait()
     assert returncode == 0
     assert 'Testing event Testing dispatch' in logstring.getvalue()

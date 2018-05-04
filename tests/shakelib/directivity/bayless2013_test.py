@@ -44,9 +44,12 @@ def test_ss3():
                      'lon': epilon[0],
                      'depth': 10,
                      'mag': magnitude,
-                     'eventsourcecode': 'ss3',
-                     'eventsource':'us',
-                     'rake': rake})
+                     'id': 'ss3',
+                     'netid': 'us',
+                     'network': '',
+                     'locstring': '',
+                     'rake': rake,
+                     'time': HistoricTime.utcfromtimestamp(int(time.time()))})
 
     rup = QuadRupture.fromTrace(
         np.array([tlon[0]]), np.array([tlat[0]]),
@@ -327,9 +330,12 @@ def test_ss3_m6():
                      'lon': epilon[0],
                      'depth': 10,
                      'mag': magnitude,
-                     'eventsourcecode': 'ss3',
-                     'eventsource':'',
-                     'rake': rake})
+                     'id': 'ss3',
+                     'netid': '',
+                     'network': '',
+                     'locstring': '',
+                     'rake': rake,
+                     'time': HistoricTime.utcfromtimestamp(int(time.time()))})
 
     rup = QuadRupture.fromTrace(
         np.array([tlon[0]]), np.array([tlat[0]]),
@@ -394,9 +400,12 @@ def test_ss3_move_hypo1():
                      'lon': epilon[0],
                      'depth': -1,
                      'mag': magnitude,
-                     'eventsourcecode': 'ss3',
-                     'eventsource':'',
-                     'rake': rake})
+                     'id': 'ss3',
+                     'netid': '',
+                     'network': '',
+                     'locstring': '',
+                     'rake': rake,
+                     'time': HistoricTime.utcfromtimestamp(int(time.time()))})
 
     rup = QuadRupture.fromTrace(
         np.array([tlon[0]]), np.array([tlat[0]]),
@@ -445,13 +454,12 @@ def test_ss3_move_hypo1():
              'lon': epilon[0],
              'depth': 1.0,
              'mag': magnitude,
-             'eventsourcecode': '',
-             'eventsource':'',
+             'id': '',
+             'netid': '',
+             'network': '',
              'locstring': 'test',
-             'type': 'SS',
-             'timezone': 'UTC'}
+             'mech': 'SS'}
     event['time'] = HistoricTime.utcfromtimestamp(int(time.time()))
-    event['created'] = HistoricTime.utcfromtimestamp(int(time.time()))
     x = np.linspace(0, 20, 6)
     y = np.linspace(0, 90, 11)
     site_x, site_y = np.meshgrid(x, y)
@@ -507,9 +515,12 @@ def test_ss3_m4p5():
                      'lon': epilon[0],
                      'depth': 10,
                      'mag': magnitude,
-                     'eventsourcecode': 'ss3',
-                     'eventsource':'',
-                     'rake': rake})
+                     'id': 'ss3',
+                     'netid': '',
+                     'network': '',
+                     'locstring': '',
+                     'rake': rake,
+                     'time': HistoricTime.utcfromtimestamp(int(time.time()))})
 
     rup = QuadRupture.fromTrace(
         np.array([tlon[0]]), np.array([tlat[0]]),
@@ -560,9 +571,12 @@ def test_rv4():
                      'lon': 0,
                      'depth': 0,
                      'mag': 0,
-                     'eventsourcecode': 'rv4',
-                     'eventsource':'us',
-                     'rake': rake})
+                     'id': 'rv4',
+                     'netid': 'us',
+                     'network': '',
+                     'locstring': '',
+                     'rake': rake,
+                     'time': HistoricTime.utcfromtimestamp(int(time.time()))})
 
     # Rupture
     rup = QuadRupture.fromTrace(
@@ -593,9 +607,12 @@ def test_rv4():
                      'lon': epilon,
                      'depth': epidepth,
                      'mag': magnitude,
-                     'eventsourcecode': 'rv4',
-                     'eventsource':'us',
-                     'rake': rake})
+                     'id': 'rv4',
+                     'netid': 'us',
+                     'network': '',
+                     'locstring': '',
+                     'rake': rake,
+                     'time': HistoricTime.utcfromtimestamp(int(time.time()))})
 
     x = np.linspace(-50, 50, 11)
     y = np.linspace(-50, 50, 11)
@@ -675,9 +692,12 @@ def test_so6():
                      'lon': 0,
                      'depth': 0,
                      'mag': 0,
-                     'eventsourcecode': 'so6',
-                     'eventsource':'us',
-                     'rake': rake})
+                     'id': 'so6',
+                     'netid': 'us',
+                     'network': '',
+                     'locstring': '',
+                     'rake': rake,
+                     'time': HistoricTime.utcfromtimestamp(int(time.time()))})
 
     # Rupture
     rup = QuadRupture.fromTrace(
@@ -714,9 +734,12 @@ def test_so6():
                      'lon': epilon,
                      'depth': epidepth,
                      'mag': magnitude,
-                     'eventsourcecode': 'so6',
-                     'eventsource':'us',
-                     'rake': rake})
+                     'id': 'so6',
+                     'netid': 'us',
+                     'network': '',
+                     'locstring': '',
+                     'rake': rake,
+                     'time': HistoricTime.utcfromtimestamp(int(time.time()))})
 
     ruplat = [a.latitude for a in rup.getQuadrilaterals()[0]]
     ruplon = [a.longitude for a in rup.getQuadrilaterals()[0]]
@@ -886,4 +909,3 @@ if __name__ == '__main__':
     test_ss3_move_hypo1()
     test_ss3_m4p5()
     test_rv4()
-    

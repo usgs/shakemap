@@ -37,6 +37,11 @@ def dict_equal(d1, d2):
 def test_input_container():
     f, datafile = tempfile.mkstemp()
     os.close(f)
+    event_text = """<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
+<earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9"
+time="2008-05-12T06:28:01Z"
+depth="19.0" locstring="EASTERN SICHUAN, CHINA" productcode="us2008ryan"
+mech="" netid="us" network="" />"""
     try:
         config = {
             'alliance': 'chaotic neutral',
@@ -47,11 +52,6 @@ def test_input_container():
         }
         rupturefile = os.path.join(homedir, 'container_data',
                                    'Barkaetal02_fault.txt')
-        event_text = """<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
-    <earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9" year="2008"
-    month="05" day="12" hour="06" minute="28" second="01" timezone="GMT"
-    depth="19.0" locstring="EASTERN SICHUAN, CHINA" created="1211173621" productcode="us2008ryan"
-    otime="1210573681" type="" netid="us" network="" />"""
         eventfile = io.StringIO(event_text)
         datafiles = [os.path.join(
             homedir, 'container_data/northridge_stations_dat.xml')]
@@ -125,14 +125,14 @@ def test_input_container():
             'intelligence': 10
         }
         with pytest.raises(AttributeError):
-            junk = container3.getStationDict()
+            container3.getStationDict()
         with pytest.raises(TypeError):
             container3.setStationDict(None)
         container3.setStationDict(config)
         config2 = container3.getStationDict()
         assert dict_equal(config, config2)
 
-    except:
+    except Exception:
         assert 1 == 2
     finally:
         os.remove(datafile)
@@ -315,7 +315,7 @@ def test_output_arrays():
         #
         # Shouldn't be able to find this IMT
         with pytest.raises(LookupError):
-            junk = container.getIMTArrays('JUNK', 'Larger')
+            container.getIMTArrays('JUNK', 'Larger')
         # Shapes of inputs not the same
         with pytest.raises(ValueError):
             empty = np.array([])
@@ -349,15 +349,15 @@ def test_output_repr():
     container_str = repr(shake_result)
     assert container_str == '''Data type: grid
     use "getIMTGrids" method to access interpolated IMTs
-Rupture: <class \'shakelib.rupture.quad_rupture.QuadRupture\'>
-    locstring: Northridge, California
-    magnitude: 6.6
-    time: 1994-01-17 12:30:55
-Config: use \'getConfig\' method
-Stations: use \'getStationDict\' method
+Rupture: <class 'shakelib.rupture.quad_rupture.QuadRupture'>
+    locstring: Northridge
+    magnitude: 6.7
+    time: 1994-01-17T12:30:55.000000Z
+Config: use 'getConfig' method
+Stations: use 'getStationDict' method
     # instrumental stations: 185
-    # macroseismic stations: 1328
-Metadata: use \'getMetadata\' method
+    # macroseismic stations: 547
+Metadata: use 'getMetadata' method
 Available IMTs (components):
     MMI (GREATER_OF_TWO_HORIZONTAL)
     PGA (GREATER_OF_TWO_HORIZONTAL)
@@ -366,7 +366,8 @@ Available IMTs (components):
     SA(1.0) (GREATER_OF_TWO_HORIZONTAL)
     SA(3.0) (GREATER_OF_TWO_HORIZONTAL)
 '''
-    test = shake_result.getIMTGrids("SA(1.0)", "GREATER_OF_TWO_HORIZONTAL")
+
+    shake_result.getIMTGrids("SA(1.0)", "GREATER_OF_TWO_HORIZONTAL")
 
 
 if __name__ == '__main__':

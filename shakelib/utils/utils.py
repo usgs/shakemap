@@ -52,8 +52,8 @@ def get_extent(rupture,config=None):
     if len(bounds):
         return bounds
 
-            
-    
+
+
     if not rupture or not isinstance(rupture, Rupture):
         raise TypeError('get_extent() takes exactly 1 argument (0 given)')
 
@@ -88,7 +88,7 @@ def get_extent(rupture,config=None):
                 break
         if xmin is not None:
             return (xmin,xmax,ymin,ymax)
-    
+
     # Is this a stable or active tectonic event?
     # (this could be made an attribute of the ShakeMap Origin class)
     hypo = origin.getHypo()

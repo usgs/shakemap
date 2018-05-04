@@ -11,6 +11,7 @@ from impactutils.vectorutils.ecef import latlon2ecef
 from impactutils.vectorutils.vector import Vector
 from impactutils.time.ancient_time import HistoricTime
 from shakelib.rupture.base import Rupture
+import shakelib.rupture.constants as constants
 import shakelib.rupture.utils as utils
 import shakelib.rupture.gc2 as gc2
 
@@ -83,7 +84,7 @@ class EdgeRupture(Rupture):
         odict = origin.__dict__
         for k, v in odict.items():
             if isinstance(v, HistoricTime):
-                d['metadata'][k] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+                d['metadata'][k] = v.strftime(constants.TIMEFMT)
             else:
                 d['metadata'][k] = v
         d['metadata']['mesh_dx'] = mesh_dx
@@ -172,7 +173,7 @@ class EdgeRupture(Rupture):
         odict = origin.__dict__
         for k, v in odict.items():
             if isinstance(v, HistoricTime):
-                d['metadata'][k] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+                d['metadata'][k] = v.strftime(constants.TIMEFMT)
             else:
                 d['metadata'][k] = v
         d['metadata']['mesh_dx'] = mesh_dx

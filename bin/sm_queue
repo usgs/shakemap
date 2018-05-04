@@ -67,7 +67,7 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
             logger.info('Running repeat of event %s' % eventid)
             # Update the XML because the DB may have newer information
             write_event_xml(data_path, event, logger)
-            queue.dispatch_event(eventid, logger, children, 'run')
+            queue.dispatch_event(eventid, logger, children, 'run', config)
             rep_list.pop(0)
             if len(rep_list) == 0:
                 rep_list = None
@@ -124,6 +124,8 @@ def associate_all(handler, data_path, logger, config, children):
         process_origin(event, handler, data_path,
                        logger, config, children)
 
+    return
+
 
 def write_event_xml(data_path, event, logger):
     """ Create the event directory if it doesn't exist and write/re-write
@@ -138,12 +140,28 @@ def write_event_xml(data_path, event, logger):
     Returns:
         nothing: Nothing.
     """
+    ttemp = event['time']
+    try:
+        dt = datetime.strptime(event['time'], queue.TIMEFMT)
+    except ValueError:
+        try:
+            dt = datetime.strptime(event['time'], queue.ALT_TIMEFMT)
+        except ValueError:
+            logger.error("Can't parse input time %s" % event['time'])
+            return
+    event['time'] = dt
+
     event_dir = os.path.join(data_path, event['id'], 'current')
     if not os.path.isdir(event_dir):
         os.makedirs(event_dir)
     event_xml = os.path.join(event_dir, 'event.xml')
+
     logger.info('Writing event %s to event.xml' % (event['id']))
-    write_event_file(event, event_xml)
+    val = write_event_file(event, event_xml)
+    if val:
+        logger.error('Error writing event.xml: %s' % val)
+
+    event['time'] = ttemp
 
     return
 
@@ -189,8 +207,15 @@ def process_origin(event, handler, data_path, logger, config, children):
         # (if any) and toss the ones that have already passed
         #
         replist = None
-        event_timestamp = int(datetime.strptime(event['time'], queue.TIMEFMT).
-                              replace(tzinfo=timezone.utc).timestamp())
+        try:
+            dt = datetime.strptime(event['time'], queue.TIMEFMT)
+        except ValueError:
+            try:
+                dt = datetime.strptime(event['time'], queue.ALT_TIMEFMT)
+            except ValueError:
+                logger.error("Can't parse input time %s" % event['time'])
+                return
+        event_timestamp = int(dt.replace(tzinfo=timezone.utc).timestamp())
         for mag in sorted(config['repeats'].keys(), reverse=True):
             if event['mag'] > mag:
                 replist = [x + event_timestamp for x in config['repeats'][mag]
@@ -226,7 +251,7 @@ def process_origin(event, handler, data_path, logger, config, children):
             return
         if event['repeats']:
             delta_t = current_time - event['repeats'][0]
-            if delta_t >= 0 or delta_t < -300:
+            if delta_t > -300:
                 # We're due for a rerun anyway, so just insert the
                 # new data in the database and return
                 handler.insertEvent(event, update=update)
@@ -256,7 +281,7 @@ def process_origin(event, handler, data_path, logger, config, children):
 
     write_event_xml(data_path, event, logger)
 
-    queue.dispatch_event(event['id'], logger, children, 'run')
+    queue.dispatch_event(event['id'], logger, children, 'run', config)
 
     return
 
@@ -335,7 +360,7 @@ def process_cancel(data, handler, logger, config, children):
         logger.info('cancel is for unprocessed event %s: ignoring' % eventid)
         return
 
-    queue.dispatch_event(eventid, logger, children, 'cancel')
+    queue.dispatch_event(eventid, logger, children, 'cancel', config)
 
     return
 

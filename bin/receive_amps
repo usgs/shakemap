@@ -83,6 +83,8 @@ def main(args):
     xmlfiles = glob.glob(os.path.join(args.directory, '*.xml'))
     nloaded = 0
     for xmlfile in xmlfiles:
+        if xmlfile.endswith('product.xml'):
+            continue
         try:
             handler.insertAmps(xmlfile)
             nloaded += 1
@@ -94,6 +96,8 @@ def main(args):
 
 
 if __name__ == '__main__':
+    clean_argv = ' '.join([x.replace('"', '').replace('=', ' ', 1)
+                           for x in sys.argv]).split()
     parser = get_parser()
-    pargs, unknown = parser.parse_known_args()
+    pargs, unknown = parser.parse_known_args(clean_argv)
     main(pargs)

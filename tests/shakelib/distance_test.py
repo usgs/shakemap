@@ -8,6 +8,7 @@ import sys
 import numpy as np
 import pandas as pd
 import pytest
+import time
 
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
@@ -22,6 +23,7 @@ from shakelib.rupture.gc2 import _computeGC2
 from shakelib.sites import Sites
 from shakelib.distance import Distance
 from shakelib.distance import get_distance
+from impactutils.time.ancient_time import HistoricTime
 
 do_tests = True
 
@@ -57,15 +59,18 @@ def test_san_fernando():
     lon3, lat3 = proj(x3, y3, reverse=True)
 
     # Rupture requires an origin even when not used:
-    origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0,'eventsource':''})
+    origin = Origin({'id': 'test', 'lat': 0, 'lon': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': '',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(int(time.time()))})
     rup = QuadRupture.fromVertices(
         lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3,
         origin)
     # Make a origin object; most of the 'event' values don't matter
     event = {'lat': 0,  'lon': 0, 'depth': 0, 'mag': 6.61,
-             'eventsourcecode': '', 'locstring': '', 'type': 'ALL',
-             'timezone': 'UTC','eventsource':''}
+             'id': '', 'locstring': '', 'type': 'ALL',
+             'netid': '', 'network': '',
+             'time': HistoricTime.utcfromtimestamp(int(time.time()))}
     origin = Origin(event)
 
     # Grid of sites
@@ -175,14 +180,17 @@ def test_exceptions():
     dip = np.array([30.])
 
     # Rupture requires an origin even when not used:
-    origin = Origin({'eventsourcecode': 'test', 'lat': 0, 'lon': 0,
-                     'depth': 5.0, 'mag': 7.0,'eventsource':''})
+    origin = Origin({'id': 'test', 'lat': 0, 'lon': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': '',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(int(time.time()))})
     rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip,
                                 origin)
 
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
-             'eventsourcecode': '', 'locstring': '', 'type': 'U', 'mech': 'RS',
-             'rake': 90, 'timezone': 'UTC','eventsource':''}
+             'id': '', 'locstring': '', 'mech': 'RS',
+             'rake': 90, 'netid': '', 'network': '',
+             'time': HistoricTime.utcfromtimestamp(int(time.time()))}
     origin = Origin(event)
 
     gmpelist = ["Primate"]
@@ -204,7 +212,9 @@ def test_exceptions():
 
 def test_distance_no_rupture():
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
-             'eventsourcecode': '', 'locstring': '', 'timezone': 'UTC','eventsource':''}
+             'id': '', 'locstring': '', 'mech': 'RS',
+             'rake': 90, 'netid': '', 'network': '',
+             'time': HistoricTime.utcfromtimestamp(int(time.time()))}
     origin = Origin(event)
     origin.setMechanism('ALL')
     # Make sites instance
@@ -861,8 +871,9 @@ def test_distance_from_sites_origin():
     dip = np.array([30.])
 
     event = {'lat': 34.1, 'lon': -118.2, 'depth': 1, 'mag': 6,
-             'eventsourcecode': '', 'locstring': '', 'type': 'ALL',
-             'timezone': 'UTC','eventsource':''}
+             'id': '', 'locstring': '', 'mech': 'ALL',
+             'netid': '', 'network': '',
+             'time': HistoricTime.utcfromtimestamp(int(time.time()))}
     origin = Origin(event)
 
     rup = QuadRupture.fromTrace(lon0, lat0, lon1, lat1, z, W, dip, origin)
@@ -1027,8 +1038,9 @@ def test_chichi_with_get_distance():
     lon3, lat3 = proj(x3, y3, reverse=True)
     # event information doesn't matter except hypocenter
     event = {'lat': 23.85, 'lon': 120.82, 'depth': 8, 'mag': 7.62,
-             'eventsourcecode': '', 'locstring': '', 'type': 'ALL',
-             'timezone': 'UTC','eventsource':''}
+             'id': '', 'locstring': '', 'mech': 'ALL',
+             'netid': '', 'network': '',
+             'time': HistoricTime.utcfromtimestamp(int(time.time()))}
     origin = Origin(event)
     rup = QuadRupture.fromVertices(
         lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3,
