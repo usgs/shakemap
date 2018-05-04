@@ -58,7 +58,7 @@ class PointRupture(Rupture):
         odict = origin.__dict__
         for k, v in odict.items():
             if isinstance(v, HistoricTime):
-                d['metadata'][k] = v.strftime('%Y-%m-%dT%H:%M:%SZ')
+                d['metadata'][k] = v.strftime(constants.TIMEFMT)
             else:
                 d['metadata'][k] = v
 

@@ -15,6 +15,7 @@ from shakelib.rupture.origin import Origin
 from shakelib.rupture import utils
 from shakelib.rupture import constants
 from shakelib.utils.exception import ShakeLibException
+from impactutils.time.ancient_time import HistoricTime
 
 
 def get_rupture(origin, file=None, mesh_dx=0.5):
@@ -130,6 +131,8 @@ def rupture_from_dict(d):
     """
     validate_json(d)
 
+    d['metadata']['time'] = HistoricTime.strptime(d['metadata']['time'],
+                                                  constants.TIMEFMT)
     origin = Origin(d['metadata'])
 
     # What type of rupture is this?
@@ -328,7 +331,7 @@ def is_quadrupture_class(d):
     polygons = geom['coordinates'][0]
     try:
         len(polygons)
-    except Exception as e:
+    except Exception:
         return False
     n_polygons = len(polygons)
     for i in range(n_polygons):

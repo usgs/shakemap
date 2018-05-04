@@ -102,10 +102,10 @@ def get_probs(origin, config):
     selector = SubductionSelector()
     lat, lon, depth, mag = origin.lat, origin.lon, origin.depth, origin.mag
 
-    if not origin.eventsourcecode.startswith(origin.eventsource):
-        eid = origin.eventsource + origin.eventsourcecode
+    if not origin.id.startswith(origin.netid):
+        eid = origin.netid + origin.id
     else:
-        eid = origin.eventsourcecode
+        eid = origin.id
 
     strec_results = selector.getSubductionType(
         lat, lon, depth, eid, tensor_params=None)

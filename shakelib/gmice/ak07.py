@@ -251,7 +251,7 @@ class AK07(object):
                 self.__pgv: lfact * 0.52,
                 self.__sa03: lfact * 0.63,
                 self.__sa10: lfact * 57,
-                self.__sa30: lfact * 81
+                self.__sa30: lfact * 81}
 
     @staticmethod
     def getName():

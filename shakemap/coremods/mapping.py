@@ -31,7 +31,6 @@ from shapely.geometry import shape as sShape
 import numpy as np
 from descartes import PolygonPatch
 from scipy.ndimage import gaussian_filter
-import pandas as pd
 
 # local imports
 from mapio.gmt import GMTGrid
@@ -46,6 +45,7 @@ from shakemap.coremods.contour import getContourLevels
 from shakemap.utils.config import get_config_paths
 from .base import CoreModule
 from shakemap.utils.utils import path_macro_sub
+from impactutils.time.ancient_time import HistoricTime
 
 
 CITY_COLS = 2
@@ -135,7 +135,8 @@ class MappingModule(CoreModule):
                                   'caption': psacap,
                                   'formats': [{'filename': 'psa[0-9][0-9].jpg',
                                                'type': 'image/jpeg'},
-                                              {'filename': 'PSA[0-9]p[0-9]_contour.pdf',
+                                              {'filename':
+                                               'PSA[0-9]p[0-9]_contour.pdf',
                                                'type': 'application/pdf'},
                                               ]
                                   }
@@ -335,12 +336,15 @@ class MapMaker(object):
         info_dict = json.loads(
             container.getString('info.json'))['input']['event_information']
         event_dict = {
-            'eventsourcecode': info_dict['event_id'],
-            'eventsource': info_dict['eventsource'],
+            'id': info_dict['event_id'],
+            'netid': info_dict['eventsource'],
             'lat': float(info_dict['latitude']),
             'lon': float(info_dict['longitude']),
             'depth': float(info_dict['depth']),
-            'mag': float(info_dict['magnitude'])
+            'mag': float(info_dict['magnitude']),
+            'network': '',
+            'locstring': '',
+            'time': HistoricTime.utcfromtimestamp(time.time())
         }
         origin = Origin(event_dict)
         if rupture_dict['features'][0]['geometry']['type'] == 'Point':
@@ -999,9 +1003,9 @@ class MapMaker(object):
         outfile2 = os.path.join(outfolder, 'intensity.jpg')
 
         # newer versions of PIL don't support writing of RGBA images to JPEG,
-        # or at least they won't handle getting rid of the alpha channel for you.
-        # so, let's grab the figure as an RGB image, and then write it to a file
-        # manually
+        # or at least they won't handle getting rid of the alpha channel for
+        # you. so, let's grab the figure as an RGB image, and then write it
+        # to a file manually
         fig = plt.gcf()
         _save_jpg(fig, outfile2)
         tn = time.time()

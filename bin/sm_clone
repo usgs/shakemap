@@ -3,13 +3,9 @@
 # stdlib imports
 import sys
 import os.path
-import tempfile
-from xml.etree.ElementTree import Element, ElementTree
-from datetime import datetime
 import shutil
-import json
 import argparse
-from urllib import request
+import datetime
 
 # third party imports
 from libcomcat.search import get_event_by_id
@@ -19,8 +15,7 @@ from shakemap.utils.config import get_config_paths
 from shakelib.rupture.origin import write_event_file
 from shakemap.utils.utils import get_network_name
 
-TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
-TIMEFMT2 = '%Y-%m-%dT%H:%M:%S.%fZ'
+TIMEFMT = '%Y-%m-%dT%H:%M:%S.%fZ'
 
 
 def get_parser():
@@ -31,11 +26,11 @@ def get_parser():
     https://earthquake.usgs.gov/earthquakes/eventpage/us2000ar20
     The event ID is us2000ar20.
 
-    If no source is specified, then the event ID used for the event directory, 
+    If no source is specified, then the event ID used for the event directory,
     eventid field in event.xml file, and names of data and fault files will
     be that of the *authoritative* origin.
 
-    If a source (us, ci, nc, etc.) is specified, then that ID is used instead 
+    If a source (us, ci, nc, etc.) is specified, then that ID is used instead
     of the authoritative ID.
 
     '''
@@ -55,7 +50,8 @@ def _get_event_dictionary(detail, source):
     edict = None
 
     if source is not None:
-        # get basic event information from an origin contributed by input source
+        # get basic event information from an origin contributed by input
+        # source
         try:
             origin = detail.getProducts('origin', source=source)[0]
             eventid = source + origin['eventsourcecode']
@@ -66,10 +62,11 @@ def _get_event_dictionary(detail, source):
                      'lon': float(origin['longitude']),
                      'depth': float(origin['depth']),
                      'mag': float(origin['magnitude']),
-                     'time': origin['eventtime'],
-                     'location': detail.location}
-        except ValueError as ve:
-            print('No %s origin for event %s.' % args.source)
+                     'time': datetime.datetime.strptime(origin['eventtime'],
+                                                        TIMEFMT),
+                     'locstring': detail.location}
+        except ValueError:
+            print('No origin for event %s.' % source)
     else:  # no source specified, use detail object
         edict = {'id': detail.id,
                  'netid': detail['net'],
@@ -78,8 +75,8 @@ def _get_event_dictionary(detail, source):
                  'lon': detail.longitude,
                  'depth': detail.depth,
                  'mag': detail.magnitude,
-                 'time': detail.time.strftime(TIMEFMT2),
-                 'location': detail.location}
+                 'time': detail.time,
+                 'locstring': detail.location}
     return edict
 
 
@@ -96,6 +93,9 @@ def main(args):
     detail = get_event_by_id(args.eventid)
     # get input data
     edict = _get_event_dictionary(detail, args.source)
+    if edict is None:
+        print('No event dictionary, quitting.')
+        exit(1)
     eventid = edict['id']
 
     # check to see if the event directory exists
@@ -118,7 +118,7 @@ def main(args):
 
     # if this event has a shakemap, then we have more to do
     if not detail.hasProduct('shakemap'):
-        print('Event %s has no ShakeMap product.  Creating a basic ShakeMap.' %
+        print('Event %s has no ShakeMap product. Creating a basic ShakeMap.' %
               detail.id)
     else:
         if args.source:
@@ -127,8 +127,8 @@ def main(args):
             source = 'preferred'
         try:
             shakemap = detail.getProducts('shakemap', source=source)[0]
-        except AttributeError as ae:
-            msg = 'No ShakeMap product from source % s exists.'
+        except AttributeError:
+            msg = 'No ShakeMap product from source %s exists.' % source
             print(msg)
             sys.exit(0)
 

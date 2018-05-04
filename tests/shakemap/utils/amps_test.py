@@ -34,7 +34,7 @@ def test_amps():
                  'lat': 35.487,
                  'lon': -120.027,
                  'depth': 8.0,
-                 'location': 'Somewhere in California',
+                 'locstring': 'Somewhere in California',
                  'mag': 3.7}
         handler.insertEvent(event)
         info = handler.getStats()
