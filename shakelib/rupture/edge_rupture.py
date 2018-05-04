@@ -101,7 +101,7 @@ class EdgeRupture(Rupture):
         self._group_index = np.array(group_index)
         self._mesh_dx = mesh_dx
         self._reference = reference
-        self._computeStikeDip()
+        self._computeStrikeDip()
 
     @classmethod
     def fromArrays(cls, toplons, toplats, topdeps, botlons, botlats, botdeps,
@@ -372,7 +372,7 @@ class EdgeRupture(Rupture):
         """
         return copy.deepcopy(self._group_index)
 
-    def _computeStikeDip(self):
+    def _computeStrikeDip(self):
         """
         Loop over all triangles and get the average normal, north, and up
         vectors in ECEF. Use these to compute a representative strike and dip.

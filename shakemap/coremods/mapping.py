@@ -996,6 +996,16 @@ class MapMaker(object):
         # draw station and macroseismic locations
         self._drawStations(m)  # need stationlist object
 
+        # draw surface projection of finite fault
+        rdict = self.container.getRuptureDict()
+        for feature in rdict['features']:
+            polygons = feature['geometry']['coordinates'][0]
+            for polygon in polygons:
+                xyz = np.array(polygon)
+                x = xyz[:, 0]
+                y = xyz[:, 1]
+                m.plot(x, y, 'k', latlon=True, zorder=SCALE_ZORDER)
+
         # save plot to file
         plt.draw()
         outfile = os.path.join(outfolder, 'intensity.pdf')

@@ -169,7 +169,12 @@ def _check_polygon(polygon, new_format):
         if new_format:
             raise ShakeLibException(
                 'Rupture file %s must be specified top-edge first.' % file)
-        xyz[1:, -2] = np.flipud(xyz[1:, -2])  # reverse the order
+        # drop last point
+        xyz = xyz[0:-1, :]
+        # reverse order of points
+        xyz = np.flipud(xyz)
+        # put new first point onto the end so that it is closed.
+        xyz = np.append(xyz, np.reshape(xyz[0, :], (1, 3)), axis=0)
 
     # turn numpy back into list of x,y,z sequences
     polygon = xyz.tolist()
@@ -200,7 +205,7 @@ def text_to_json(file, new_format=True):
                 * Verticies within a rupture group must start along the top
                   edge and move in the strike direction then move to the bottom
                   edge and move back in the opposite direction.
-        new_format (bool): Indicates whether text rupture format is 
+        new_format (bool): Indicates whether text rupture format is
             "old" or "new" style.
 
     Returns:

@@ -72,7 +72,7 @@ def test_text_to_json():
     refcmp = '''Oglesby, D. D., D. S. Dreger, R. A. Harris,
 N. Ratchkovski, and R. Hansen (2004). Inverse kinematic and forward dynamic
 models of the 2002 Denali fault earthquake, Alaska, Bull. Seism. Soc. Am. 94, S214-S233.'''
-    assert jdict['metadata']['reference'] == refcmp.replace('\n', '')
+    assert jdict['metadata']['reference'] == refcmp.replace('\n', ' ')
     cstart = [[-147.807, 63.434, 0.0], [-147.21, 63.472, 0.0], [-147.267,
                                                                 63.65, 22.294], [-147.864, 63.613, 22.294], [-147.807, 63.434, 0.0]]
     cend = [[-142.5, 62.114, 0.0], [-143.669, 62.831, 0.0], [-143.669,
@@ -165,7 +165,7 @@ def test_EdgeRupture():
 
     # Force read Northridge as EdgeRupture
     file = os.path.join(homedir, 'rupture_data/northridge_fault.txt')
-    d = text_to_json(file, new_format=False)
+    d = text_to_json(file, new_format=True)
     rupt = EdgeRupture(d, origin)
     strike = rupt.getStrike()
     np.testing.assert_allclose(strike, 121.97, atol=0.01)
@@ -180,7 +180,7 @@ def test_EdgeRupture():
 
     # And again for the same vertices but reversed order
     file = os.path.join(homedir, 'rupture_data/northridge_fixed_fault.txt')
-    d = text_to_json(file, new_format=False)
+    d = text_to_json(file, new_format=True)
     rupt = EdgeRupture(d, origin)
     strike = rupt.getStrike()
     np.testing.assert_allclose(strike, 121.97, atol=0.01)
