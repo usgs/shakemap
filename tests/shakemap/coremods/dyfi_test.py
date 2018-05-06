@@ -21,7 +21,7 @@ def test_geocoded():
     eventid = 'ci14745580'
     detail = get_event_by_id(eventid)
     df,msg = _get_dyfi_dataframe(detail)
-    np.testing.assert_almost_equal(df['intensity'].sum(),1162.8)
+    np.testing.assert_almost_equal(df['intensity'].sum(),800.4)
 
 def test_dyfi():
     eventid = 'nc72282711'

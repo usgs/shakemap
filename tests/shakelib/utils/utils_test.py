@@ -152,7 +152,7 @@ def test_extent_config():
     cmp_extent = (-99.416, -95.416, 32.679, 38.679)
     np.testing.assert_almost_equal(cmp_extent, extent)
 
-    config = {'extent': {'bounds': {'extent': [-100, -95, 32, 37]}}}
+    config = {'extent': {'bounds': {'extent': [-100, 32, -95, 37]}}}
     extent = get_extent(rupture, config)
     cmp_extent = [-100, -95, 32, 37]
     np.testing.assert_almost_equal(extent, cmp_extent)

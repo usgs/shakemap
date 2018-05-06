@@ -72,6 +72,7 @@ STATIONS_ZORDER = 1150
 CITIES_ZORDER = 1200
 GRATICULE_ZORDER = 1200
 SCALE_ZORDER = 1500
+SCENARIO_ZORDER = 2000
 
 THUMBNAIL_WIDTH_PIXELS = 800
 
@@ -998,13 +999,25 @@ class MapMaker(object):
 
         # draw surface projection of finite fault
         rdict = self.container.getRuptureDict()
-        for feature in rdict['features']:
-            polygons = feature['geometry']['coordinates'][0]
-            for polygon in polygons:
-                xyz = np.array(polygon)
-                x = xyz[:, 0]
-                y = xyz[:, 1]
-                m.plot(x, y, 'k', latlon=True, zorder=SCALE_ZORDER)
+        if rdict['features'][0]['geometry']['type'] != 'Point':
+            for feature in rdict['features']:
+                polygons = feature['geometry']['coordinates'][0]
+                for polygon in polygons:
+                    xyz = np.array(polygon)
+                    x = xyz[:, 0]
+                    y = xyz[:, 1]
+                    m.plot(x, y, 'k', latlon=True, zorder=SCALE_ZORDER)
+
+        # if event is a scenario, make watermark of the word scenario diagonally across map
+        metadata = self.container.getMetadata()
+        eventid = metadata['input']['event_information']['event_id']
+        if eventid.endswith('_se'):
+            cx, cy = m(hlon, hlat)
+            plt.text(cx, cy, 'SCENARIO', fontsize=64,
+                     zorder=SCENARIO_ZORDER, rotation=45,
+                     alpha=0.2, color='red',
+                     horizontalalignment='center',
+                     verticalalignment='center')
 
         # save plot to file
         plt.draw()
@@ -1267,6 +1280,17 @@ class MapMaker(object):
 
         # draw title and supertitle
         self._drawTitle(imt)
+
+        # if event is a scenario, make watermark of the word scenario diagonally across map
+        metadata = self.container.getMetadata()
+        eventid = metadata['input']['event_information']['event_id']
+        if eventid.endswith('_se'):
+            cx, cy = m(hlon, hlat)
+            plt.text(cx, cy, 'SCENARIO', fontsize=64,
+                     zorder=SCENARIO_ZORDER, rotation=45,
+                     alpha=0.2, color='red',
+                     horizontalalignment='center',
+                     verticalalignment='center')
 
         # save plot to file
         fileimt = oq_to_file(imt)

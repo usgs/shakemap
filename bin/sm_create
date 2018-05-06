@@ -11,14 +11,17 @@ import json
 # third party imports
 from libcomcat.search import get_event_by_id
 from configobj import ConfigObj
+from impactutils.time.ancient_time import HistoricTime
 
 # local imports
 from shakemap.utils.config import get_config_paths
 from shakelib.rupture.origin import write_event_file, Origin
 from shakelib.rupture.factory import text_to_json, rupture_from_dict_and_origin
-from shakemap.utils.utils import get_network_name
+from shakemap.utils.utils import get_network_name, migrate_gmpe, set_gmpe
 
-TIMEFMT = '%Y-%m-%dT%H:%M:%S.%fZ'
+TIMEFMT1 = '%Y-%m-%dT%H:%M:%S.%fZ'
+TIMEFMT2 = '%Y-%m-%dT%H:%M:%S'
+KM2SEC = 3600.0/111  # seconds per kilometer
 
 
 def get_parser():
@@ -50,7 +53,12 @@ def get_parser():
     parser.add_argument('-s', '--source',
                         help='Specify the source network of desired shakemap.')
     parser.add_argument('-e', '--event',
-                        help='Specify the event parameters: [netid, time, lon, lat, depth, mag].')
+                        nargs=7,
+                        metavar=('NETID', 'TIME', 'LON', 'LAT',
+                                 'DEP', 'MAG', 'LOCSTR'),
+                        help='Specify the event parameters (locstr should be in quotes)')
+    parser.add_argument('-b', '--skip-bounds', action='store_true', default=False,
+                        help='Skip bounds set in online shakemap.')
     parser.add_argument('-n', '--no-scenario', action='store_true', default=False,
                         help='When used with -e, disable scenario mode.')
     parser.add_argument('-p', '--preserve-params', action='store_true', default=False,
@@ -98,24 +106,36 @@ def main(args):
         print('%s is not a valid directory.' % data_path)
         sys.exit(1)
 
+    # get the global config for modules.conf
+    module_file = os.path.join(install_path, 'config', 'modules.conf')
+    module_conf = ConfigObj(module_file)
+
+    # get the global config for migrate.conf
+    migrate_file = os.path.join(install_path, 'config', 'migrate.conf')
+    migrate_conf = ConfigObj(migrate_file)
+
     if args.event:
         locstring = ''
         netid = args.event[0]
         timestr = args.event[1]
-        time = HistoricTime.strptime(timestr, TIMEFMT)
-        lon = args.event[2]
-        lat = args.event[3]
-        depth = args.event[4]
-        mag = args.event[5]
-        if len(args.event) > 6:
-            locstring = args.event[6]
+        time = HistoricTime.strptime(timestr, TIMEFMT2)
+        lon = float(args.event[2])
+        lat = float(args.event[3])
+        depth = float(args.event[4])
+        mag = float(args.event[5])
+        locstring = args.event[6]
+
+        # quick check of coordinates
+        if lat > 90 or lat < -90:
+            print('You seem to have flipped your lon/lat values. Exiting.')
+            sys.exit(1)
 
         network = get_network_name(netid)
         if network == 'unknown':
             network = ''
 
         eventid = args.eventid
-        if args.no_scenario:
+        if not args.no_scenario:
             if not args.eventid.endswith('_se'):
                 eventid = eventid + '_se'
 
@@ -195,17 +215,20 @@ def main(args):
 
             # if the user wanted to preserve the model parameters found in info.json, set those here
             if args.preserve_params:
-                _write_model_conf(shakemap)
+                _write_model_conf(shakemap, module_conf, migrate_conf,
+                                  event_dir, skip_bounds=args.skip_bounds)
 
         print('Wrote %i files to %s.' %
               (len(os.listdir(event_dir)), event_dir))
 
 
-def _write_model_conf(shakemap):
-    info_json = shakemap.getContentBytes(
-        'info.json').decode('utf-8')
+def _write_model_conf(shakemap, module_conf, migrate_conf, event_dir, skip_bounds=False):
+    info_json, _ = shakemap.getContentBytes('info.json')
+    info_json = info_json.decode('utf-8')
     jsondict = json.loads(info_json)
-    model = ConfigObj()
+    eventid = jsondict['input']['event_information']['event_id']
+    model = ConfigObj(indent_type='  ')
+
     model['modeling'] = {'bias': {}}
     bias_max_mag = jsondict['processing']['miscellaneous']['bias_max_mag']
     max_range = jsondict['processing']['miscellaneous']['bias_max_range']
@@ -227,7 +250,7 @@ def _write_model_conf(shakemap):
     else:
         model['data']['outlier']['do_outlier'] = False
 
-    # get the gmice stuff
+    # set the gmice in model.conf
     allowed_gmice = module_conf['gmice_modules'].keys()
     gmice = jsondict['processing']['ground_motion_modules']['mi2pgm']['module']
     # WGRW11 in SM3.5 is WGRW12 in SM4.0
@@ -239,6 +262,11 @@ def _write_model_conf(shakemap):
     else:
         model['modeling']['gmice'] = gmice
 
+    # set the gmpe in model.conf
+    old_gmpe = jsondict['processing']['ground_motion_modules']['gmpe']['module']
+    new_gmpe, reference = migrate_gmpe(old_gmpe, config=migrate_conf)
+    model = set_gmpe(new_gmpe, model, eventid)
+        
     # work on map extent/resolution data
     if not skip_bounds:
         model['interp'] = {'prediction_location': {}}
@@ -247,8 +275,6 @@ def _write_model_conf(shakemap):
         model['interp']['prediction_location']['xres'] = '%ic' % yres_sec
         model['interp']['prediction_location']['yres'] = '%ic' % yres_sec
 
-    # set the bounds of the map, unless user asked to ignore that
-    if not skip_bounds:
         model['extent'] = {'bounds': {}}
         xmin = jsondict['output']['map_information']['min']['longitude']
         xmax = jsondict['output']['map_information']['max']['longitude']

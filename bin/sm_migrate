@@ -200,7 +200,7 @@ def parse_grind(event_dir, tarball, member, migrate_conf=None):
 on how to configure IPEs for different depths and magnitude ranges in select.conf.
 '''
     # model.conf
-    model = ConfigObj()
+    model = ConfigObj(indent_type='  ')
     model['modeling'] = {}
     model['system'] = {}
     model['data'] = {'outlier': {}}
