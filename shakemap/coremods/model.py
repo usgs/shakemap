@@ -418,7 +418,8 @@ class ModelModule(CoreModule):
             self.sites_obj_out = Sites.fromBounds(self.W, self.E, self.S,
                                                   self.N, self.smdx, self.smdy,
                                                   defaultVs30=self.vs30default,
-                                                  vs30File=self.vs30_file)
+                                                  vs30File=self.vs30_file,
+                                                  padding=True, resample=True)
 
             self.sx_out = self.sites_obj_out.getSitesContext(
                 {'lats': self.lats,
@@ -444,7 +445,7 @@ class ModelModule(CoreModule):
                                                   self.N, self.smdx, self.smdy,
                                                   defaultVs30=self.vs30default,
                                                   vs30File=self.vs30_file,
-                                                  padding=True)
+                                                  padding=True, resample=True)
             self.smnx, self.smny = self.sites_obj_out.getNxNy()
             self.sx_out = self.sites_obj_out.getSitesContext()
             #
