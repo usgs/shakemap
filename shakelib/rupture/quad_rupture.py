@@ -2,6 +2,7 @@
 
 # stdlib modules
 import copy
+from datetime import datetime
 
 # third party imports
 import numpy as np
@@ -59,7 +60,7 @@ class QuadRupture(Rupture):
         # Add origin information to metadata
         odict = origin.__dict__
         for k, v in odict.items():
-            if isinstance(v, HistoricTime):
+            if isinstance(v, datetime):
                 d['metadata'][k] = v.strftime(constants.TIMEFMT)
             else:
                 d['metadata'][k] = v

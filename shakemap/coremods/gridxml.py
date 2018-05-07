@@ -76,13 +76,13 @@ class GridXMLModule(CoreModule):
 
     command_name = 'gridxml'
 
-    contents = {'xmlGrids':{'title':'XML Grid',
-                            'caption':'XML grid of ground motions',
-                            'formats':[{'filename':'grid.xml',
-                                        'type':'text/xml'}
-                                      ]
-                           }
-               }
+    contents = {'xmlGrids': {'title': 'XML Grid',
+                             'caption': 'XML grid of ground motions',
+                             'formats': [{'filename': 'grid.xml',
+                                          'type': 'text/xml'}
+                                         ]
+                             }
+                }
 
     def execute(self):
         """Create grid.xml and uncertainty.xml files.
@@ -170,8 +170,9 @@ class GridXMLModule(CoreModule):
             shake_dict['shakemap_originator'] = \
                 config['system']['source_network']
             shake_dict['map_status'] = config['system']['map_status']
-            # TODO - we need a source for this!!!
             shake_dict['shakemap_event_type'] = 'ACTUAL'
+            if event_dict['event_id'].endswith('_se'):
+                shake_dict['shakemap_event_type'] = 'SCENARIO'
 
             shake_grid = ShakeGrid(
                 layers, geodict, event_dict,

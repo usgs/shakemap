@@ -50,7 +50,8 @@ def get_extent(rupture,config=None):
                         bounds = config['extent']['bounds']['extent']
 
     if len(bounds):
-        return bounds
+        xmin,ymin,xmax,ymax = bounds
+        return (xmin,xmax,ymin,ymax)
 
 
 

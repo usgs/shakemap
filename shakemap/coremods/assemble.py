@@ -77,8 +77,8 @@ class AssembleModule(CoreModule):
         if self.comment is None:
             if sys.stdout.isatty():
                 self.comment = input(
-                        'Please enter a comment for this version.\n'
-                        'comment: ')
+                    'Please enter a comment for this version.\n'
+                    'comment: ')
             else:
                 self.comment = ''
 
@@ -186,10 +186,18 @@ class AssembleModule(CoreModule):
             datafiles.append(os.path.join(datadir, 'stationlist.xml'))
 
         self.logger.debug('Looking for rupture files...')
-        rupturefiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
+        # look for geojson versions of rupture files
+        rupturefiles = glob.glob(os.path.join(datadir, '*_fault.geojson'))
         rupturefile = None
         if len(rupturefiles):
             rupturefile = rupturefiles[0]
+        else:
+            # failing any of those, look for text file versions
+            rupturefiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
+            rupturefile = None
+            if len(rupturefiles):
+                rupturefile = rupturefiles[0]
+
         #
         # Sort out the version history. Get the most recent backup file and
         # extract the existing history. Then add a new line for this run.

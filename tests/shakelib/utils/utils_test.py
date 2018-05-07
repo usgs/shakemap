@@ -64,11 +64,11 @@ def test_get_extent_aspect():
     #
     rrep = io.StringIO(
         """
-            30.0 100.0 0.0
-            30.0 110.0 0.0
-            30.0 110.0 5.0
-            30.0 100.0 5.0
-            30.0 100.0 0.0
+            100.0 30.0  0.0
+            110.0 30.0 0.0
+            110.0 30.0 5.0
+            100.0 30.0 5.0
+            100.0 30.0 0.0
             """
     )
     rupture = get_rupture(origin, rrep)
@@ -82,11 +82,11 @@ def test_get_extent_aspect():
     #
     rrep = io.StringIO(
         """
-            24.0 100.0 0.0
-            36.0 100.0 0.0
-            36.0 100.0 5.0
-            24.0 100.0 5.0
-            24.0 100.0 0.0
+            100.0 24.0 0.0
+            100.0 36.0 0.0
+            100.0 36.0 5.0
+            100.0 24.0 5.0
+            100.0 24.0 0.0
             """
     )
     rupture = get_rupture(origin, rrep)
@@ -129,33 +129,34 @@ def test_get_extent_stable_large():
 
 def test_is_stable():
 
-    assert is_stable(0, 0) # Gulf of Guinea
-    assert is_stable(-87.0, 36.0) # Nashville
-    assert not is_stable(-112.0, 39.0) #Wasatch 
-    assert is_stable(135.0, -30.0) # South Australia
-    assert not is_stable(180.0, 0.0) # South Pacific
-    assert is_stable(-60.0, -15.0) # Brazil, near border of Bolivia
+    assert is_stable(0, 0)  # Gulf of Guinea
+    assert is_stable(-87.0, 36.0)  # Nashville
+    assert not is_stable(-112.0, 39.0)  # Wasatch
+    assert is_stable(135.0, -30.0)  # South Australia
+    assert not is_stable(180.0, 0.0)  # South Pacific
+    assert is_stable(-60.0, -15.0)  # Brazil, near border of Bolivia
+
 
 def test_extent_config():
     eventfile = os.path.join(datadir, 'event_oklahoma_large.xml')
     origin = Origin.fromFile(eventfile)
     rupture = get_rupture(origin)
-    config = {'extent':{'coefficients':{'coeffs':[27.24, 250.4, 579.1]}}}
+    config = {'extent': {'coefficients': {'coeffs': [27.24, 250.4, 579.1]}}}
     cmp_extent = (-100.61666666666666, -93.95, 32.916666666666664, 38.35)
-    extent = get_extent(rupture,config)
-    np.testing.assert_almost_equal(cmp_extent,extent)
+    extent = get_extent(rupture, config)
+    np.testing.assert_almost_equal(cmp_extent, extent)
 
-    config = {'extent':{'magnitude_spans':{'span1':[0, 6, 4, 3],
-                                           'span2':[6, 10, 6, 4]}}}
-    extent = get_extent(rupture,config)
+    config = {'extent': {'magnitude_spans': {'span1': [0, 6, 4, 3],
+                                             'span2': [6, 10, 6, 4]}}}
+    extent = get_extent(rupture, config)
     cmp_extent = (-99.416, -95.416, 32.679, 38.679)
-    np.testing.assert_almost_equal(cmp_extent,extent)
+    np.testing.assert_almost_equal(cmp_extent, extent)
 
-    config = {'extent':{'bounds':{'extent':[-100,-95,32,37]}}}
-    extent = get_extent(rupture,config)
-    cmp_extent = [-100,-95,32,37]
-    np.testing.assert_almost_equal(extent,cmp_extent)
-                                        
+    config = {'extent': {'bounds': {'extent': [-100, 32, -95, 37]}}}
+    extent = get_extent(rupture, config)
+    cmp_extent = [-100, -95, 32, 37]
+    np.testing.assert_almost_equal(extent, cmp_extent)
+
 
 if __name__ == '__main__':
     test_get_extent_small_point()

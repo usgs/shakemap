@@ -4,9 +4,56 @@ from urllib import request
 from urllib.error import HTTPError
 import json
 import logging
+from collections import OrderedDict
+
+# third party imports
+from configobj import ConfigObj
 
 # url template for json file describing everything we know about a network
 NETWORK_TEMPLATE = 'https://earthquake.usgs.gov/data/comcat/contributor/[NETID]/index.json'
+
+
+def migrate_gmpe(old_gmpe, config=None):
+    """Return the GMPE that should be used to replace SM3.5 GMPE
+
+    By default, this uses the migrate.conf file found in the ShakeMap repository.
+    Users can optionally pass in their own config.
+
+    Args:
+        old_gmpe (str): ShakeMap 3.5 GMPE string
+        config (dict): Input configobj dict or None.
+    Returns:
+        (str): New GMPE string.
+        (str): GMPE reference string.
+    """
+    if config is None:
+        install_path, data_path = get_config_paths()
+        if not os.path.isdir(data_path):
+            raise Exception('%s is not a valid directory.' % data_path)
+        config_file = os.path.join(install_path, 'data', 'migrate.conf')
+        config = ConfigObj(config_file)
+    if old_gmpe not in config['modules']:
+        raise KeyError(
+            'ShakeMap 3.5 GMPE %s not found in migrate.conf.' % old_gmpe)
+    new_gmpe = config['modules'][old_gmpe]['openquake']
+    reference = config['modules'][old_gmpe]['reference']
+    return (new_gmpe, reference)
+
+
+def set_gmpe(gmpe, config, eventid):
+    gmpe_list = [gmpe]
+    weight_list = [1.0]
+    gmpe_set = 'gmpe_' + eventid + '_custom'
+    config['gmpe_sets'] = OrderedDict([
+        (gmpe_set, OrderedDict([
+            ('gmpes', gmpe_list),
+            ('weights', weight_list),
+            ('weights_large_dist', 'None'),
+            ('dist_cutoff', 'nan'),
+            ('site_gmpes', 'None'),
+            ('weights_site_gmpes', 'None')
+        ]))])
+    return config
 
 
 def get_network_name(netid):
