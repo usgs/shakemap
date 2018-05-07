@@ -52,6 +52,7 @@ def set_gmpe(gmpe, config, eventid):
     gmpe_list = [gmpe]
     weight_list = [1.0]
     gmpe_set = 'gmpe_' + eventid + '_custom'
+    config['modeling']['gmpe'] = gmpe_set
     config['gmpe_sets'] = OrderedDict([
         (gmpe_set, OrderedDict([
             ('gmpes', gmpe_list),
