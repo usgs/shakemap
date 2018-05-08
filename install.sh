@@ -23,6 +23,13 @@ while getopts r FLAG; do
   esac
 done
 
+# create a matplotlibrc file with the non-interactive backend "Agg" in it.
+if [ ! -d ~/.config/matplotlib ]; then
+    mkdir -p ~/.config/matplotlib
+    echo "backend : Agg" > ~/.config/matplotlib/matplotlibrc
+    echo "NOTE: A non-interactive matplotlib backend (Agg) has been set for this user."
+fi
+
 # Is conda installed?
 conda --version
 if [ $? -ne 0 ]; then
