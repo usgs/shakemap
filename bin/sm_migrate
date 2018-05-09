@@ -18,15 +18,16 @@ from configobj import ConfigObj
 
 # local imports
 from shakemap.utils.config import get_config_paths, get_configspec
-from shakemap.utils.utils import get_network_name
+from shakemap.utils.utils import get_network_name, migrate_gmpe, set_gmpe
 from shakemap.utils.amps import AmplitudeHandler
-from shakelib.rupture.origin import read_event_file
-from shakelib.rupture.factory import get_rupture
+from shakelib.rupture.origin import read_event_file, write_event_file, Origin
+from shakelib.rupture.factory import text_to_json, rupture_from_dict_and_origin
 from impactutils.time.ancient_time import HistoricTime
 import shakemap.utils.queue as queue
 from shakemap.coremods import transfer
 
 KM2SEC = 3600.0/111  # seconds per kilometer
+TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def get_parser():
@@ -48,9 +49,22 @@ does not prepend eventid'''
                         help=hlptxt)
     hlptxt2 = '''Ignore previous bounds/resolution settings discovered
 in input data.'''
-    parser.add_argument('-s', '--skip-bounds', action='store_true', default=False,
+    parser.add_argument('-b', '--skip-bounds', action='store_true', default=False,
                         help=hlptxt2)
+    parser.add_argument('-s', '--skip-settings', action='store_true', default=False,
+                        help=hlptxt2)
+    parser.add_argument('-m', '--migrate-file',
+                        help='Supply custom migrate.conf')
     return parser
+
+
+def _extract_file(member, tarball, filename, event_dir):
+    datafile_object = tarball.extractfile(member)
+    data = datafile_object.read().decode('utf-8')
+    datafile_object.close()
+    datafile = os.path.join(event_dir, filename)
+    with open(datafile, 'wt') as dfile:
+        dfile.write(data)
 
 
 def main(args):
@@ -63,6 +77,12 @@ def main(args):
     modelfile = os.path.join(install_path, 'config', 'model.conf')
     model_config = ConfigObj(modelfile)
     netid = model_config['system']['source_network']
+
+    # load the migrate.conf file specified by user, if any
+    if args.migrate_file:
+        migrate_conf = ConfigObj(args.migrate_file)
+    else:
+        migrate_conf = None
 
     # get the system modules.conf file, which tells us about implemented
     # GMICE
@@ -77,6 +97,7 @@ def main(args):
 
     # accumulate a list of errors so we can print them all at the end.
     errors = []
+    conversions = {}
     print('Processing events...')
 
     # loop over events in the input tarball
@@ -105,23 +126,24 @@ def main(args):
             event_dir = create_event_directory(eventid, data_path)
 
         if filename.endswith('.conf'):
-            cfg_errors = parse_config(event_dir, tarball, member)
+            cfg_errors, tconversions = parse_config(
+                event_dir, tarball, member, migrate_conf=migrate_conf)
             errors += cfg_errors
+            conversions.update(tconversions)
         elif filename.endswith('_dat.xml'):
-            tarball.extract(member, path=event_dir)
+            _extract_file(member, tarball, filename, event_dir)
         elif filename.endswith('_fault.txt'):
-            # I can't save this as a rupture json file until I know the origin info
-            # fix after the fact?
-            tarball.extract(member, path=event_dir)
+            _extract_file(member, tarball, filename, event_dir)
         elif filename in ['info.json']:
             if 'download' in member:
                 continue
             edict, info_errors = save_info(event_dir, tarball, member,
-                                           netid, networks, module_conf, skip_bounds=args.skip_bounds)
+                                           netid, networks, module_conf,
+                                           skip_bounds=args.skip_bounds)
             errors += info_errors
             handler.insertEvent(edict)
         elif filename == 'source.txt':
-            tarball.extract(member, path=event_dir)
+            _extract_file(member, tarball, filename, event_dir)
         else:
             errors.append('Unknown input file %s for event %s' %
                           (filename, eventid))
@@ -134,6 +156,13 @@ def main(args):
     for error in errors:
         print('\t"%s"' % error)
 
+    print('The following GMPE conversions were applied:')
+    for old_gmpe, new_dict in conversions.items():
+        new_gmpe = new_dict['new_gmpe']
+        ref = new_dict['reference']
+        print('\t"%s" (%s) was converted to new GMPE "%s".' %
+              (old_gmpe, ref, new_gmpe))
+
     # go back through the data, convert fault.txt files into json rupture format,
     # also make sure we have all required components
     for eventid in alleventids:
@@ -142,28 +171,42 @@ def main(args):
 
 
 def make_rupture(event_dir):
-    fault_files = glob.glob('*_fault.txt')
+    fault_files = glob.glob(os.path.join(event_dir, '*_fault.txt'))
     if not len(fault_files):
         return
     fault_file = fault_files[0]
-    pass
+    xmlfile = os.path.join(event_dir, 'event.xml')
+    eqdict = read_event_file(xmlfile)
+    jdict = text_to_json(fault_file, new_format=False)
+    origin = Origin(eqdict)
+    try:
+        rupt = rupture_from_dict_and_origin(jdict, origin)
+    except Exception as e:
+        x = 1
+    _, ffile = os.path.split(fault_file)
+    fbase, _ = os.path.splitext(ffile)
+    jsonfile = os.path.join(event_dir, fbase+'.geojson')
+    rupt.writeGeoJson(jsonfile)
+    for ffile in fault_files:
+        os.remove(ffile)
 
 
-def parse_grind(event_dir, tarball, member):
+def parse_grind(event_dir, tarball, member, migrate_conf=None):
     parts = member.split('/')
     eventid = parts[-3]
     grindfile = tarball.extractfile(member)
     lines = grindfile.readlines()
-    gmpe_msg = '''gmpe setting of %s detected in event %s. Please read the documentation
-on how to configure GMPEs for different depths and magnitude ranges in select.conf.
+    gmpe_msg = '''IPE setting of %s detected in event %s. Please read the documentation
+on how to configure IPEs for different depths and magnitude ranges in select.conf.
 '''
     # model.conf
-    model = ConfigObj()
+    model = ConfigObj(indent_type='  ')
     model['modeling'] = {}
     model['system'] = {}
     model['data'] = {'outlier': {}}
 
     errors = []
+    conversions = {}
 
     for line in lines:
         line = line.decode('utf-8').strip()
@@ -175,7 +218,12 @@ on how to configure GMPEs for different depths and magnitude ranges in select.co
         key = key.strip()
         value = value.strip()
         if key == 'gmpe':
-            errors.append(gmpe_msg % (value, eventid))
+            old_gmpe = value.split()[0]
+            new_gmpe, reference = migrate_gmpe(old_gmpe, config=migrate_conf)
+            model = set_gmpe(new_gmpe, model, eventid)
+            if old_gmpe not in conversions:
+                conversions[old_gmpe] = {'reference': reference,
+                                         'new_gmpe': new_gmpe}
         elif key == 'ipe':
             errors.append(gmpe_msg % (value, eventid))
         elif key == 'mi2pgm' or key == 'pgm2mi':
@@ -196,7 +244,7 @@ on how to configure GMPEs for different depths and magnitude ranges in select.co
     model.filename = model_file
     model.write()
 
-    return errors
+    return (errors, conversions)
 
 
 def parse_transfer(event_dir, tarball, member):
@@ -218,15 +266,18 @@ def parse_transfer(event_dir, tarball, member):
                     f.write('transfer blocked by sm_migrate.')
 
 
-def parse_config(event_dir, tarball, member):
+def parse_config(event_dir, tarball, member, migrate_conf=None):
     errors = []
+    conversions = {}
     if 'shake.conf' in member:
         pass
     elif 'grind_zc2.conf' in member:
         pass
     elif 'grind.conf' in member:
-        grind_errors = parse_grind(event_dir, tarball, member)
+        grind_errors, tconversions = parse_grind(
+            event_dir, tarball, member, migrate_conf=migrate_conf)
         errors += grind_errors
+        conversions.update(tconversions)
     elif 'db.conf' in member:
         pass
     elif 'timezone.conf':
@@ -238,7 +289,7 @@ def parse_config(event_dir, tarball, member):
     else:
         errors.append('Unknown config file type %s' % member)
 
-    return errors
+    return (errors, conversions)
 
 
 def save_info(event_dir, tarball, member, netid, networks,
@@ -252,38 +303,37 @@ def save_info(event_dir, tarball, member, netid, networks,
 
     # get the origin information out of the json
     xmlfile = os.path.join(event_dir, 'event.xml')
-    root = etree.Element('earthquake')
-    root.attrib['id'] = jsondict['input']['event_information']['event_id']
-    timestring = jsondict['input']['event_information']['origin_time'][0:19]+'.000Z'
-    root.attrib['time'] = timestring
-    root.attrib['netid'] = netid
+    edict = {}
+    edict['id'] = jsondict['input']['event_information']['event_id']
+    timestring = jsondict['input']['event_information']['origin_time']
+    edict['time'] = HistoricTime.strptime(timestring, TIMEFMT)
+    edict['netid'] = netid
     if netid in networks:
-        root.attrib['network'] = networks[netid]
+        edict['network'] = networks[netid]
     else:
         network = get_network_name(netid)
         if network == 'unknown':
             network = ''
         networks[netid] = network
-        root.attrib['network'] = network
-    root.attrib['lat'] = '%.4f' % jsondict['input']['event_information']['latitude']
-    root.attrib['lon'] = '%.4f' % jsondict['input']['event_information']['longitude']
-    root.attrib['depth'] = '%.1f' % jsondict['input']['event_information']['depth']
-    root.attrib['mag'] = '%.1f' % jsondict['input']['event_information']['magnitude']
-    root.attrib['locstring'] = jsondict['input']['event_information']['location']
-    root.attrib['mech'] = jsondict['input']['event_information']['src_mech']
-    tree = etree.ElementTree(root)
-    tree.write(xmlfile, pretty_print=True)
+        edict['network'] = network
+    edict['lat'] = jsondict['input']['event_information']['latitude']
+    edict['lon'] = jsondict['input']['event_information']['longitude']
+    edict['depth'] = jsondict['input']['event_information']['depth']
+    edict['mag'] = jsondict['input']['event_information']['magnitude']
+    edict['locstring'] = jsondict['input']['event_information']['location']
+    edict['mech'] = jsondict['input']['event_information']['src_mech']
+    write_event_file(edict, xmlfile)
 
     # get the above info as an amps.db event dictionary
-    edict = {'id': root.attrib['id'],
-             'netid': root.attrib['netid'],
-             'network': root.attrib['network'],
-             'time': root.attrib['time'],
-             'lat': root.attrib['lat'],
-             'lon': root.attrib['lon'],
-             'depth': root.attrib['depth'],
-             'mag': root.attrib['mag'],
-             'location': root.attrib['locstring']}
+    eqdict = {'id': edict['id'],
+              'netid': edict['netid'],
+              'network': edict['network'],
+              'time': timestring[0:19]+'.000Z',
+              'lat': edict['lat'],
+              'lon': edict['lon'],
+              'depth': edict['depth'],
+              'mag': edict['mag'],
+              'locstring': edict['locstring']}
 
     # get all of the bias information
     model = ConfigObj()
@@ -316,7 +366,7 @@ def save_info(event_dir, tarball, member, netid, networks,
         gmice = 'WGRW12'
     if gmice not in allowed_gmice:
         errors.append('GMICE %s (event %s) not yet supported in ShakeMap 4.' % (
-            gmice, root.attrib['id']))
+            gmice, edict['id']))
     else:
         model['modeling']['gmice'] = gmice
 
@@ -328,6 +378,15 @@ def save_info(event_dir, tarball, member, netid, networks,
         model['interp']['prediction_location']['xres'] = '%ic' % yres_sec
         model['interp']['prediction_location']['yres'] = '%ic' % yres_sec
 
+    # set the bounds of the map, unless user asked to ignore that
+    if not skip_bounds:
+        model['extent'] = {'bounds': {}}
+        xmin = jsondict['output']['map_information']['min']['longitude']
+        xmax = jsondict['output']['map_information']['max']['longitude']
+        ymin = jsondict['output']['map_information']['min']['latitude']
+        ymax = jsondict['output']['map_information']['max']['latitude']
+        model['extent']['bounds']['extent'] = [xmin, ymin, xmax, ymax]
+
     # done with model.conf, merge with existing file and save
     model_file = os.path.join(event_dir, 'model.conf')
     if os.path.isfile(model_file):
@@ -336,25 +395,7 @@ def save_info(event_dir, tarball, member, netid, networks,
     model.filename = model_file
     model.write()
 
-    # modify extent.conf
-    if not skip_bounds:
-        extent = ConfigObj()
-        extent['extent'] = {'bounds': {}}
-        xmin = jsondict['output']['map_information']['min']['longitude']
-        xmax = jsondict['output']['map_information']['max']['longitude']
-        ymin = jsondict['output']['map_information']['min']['latitude']
-        ymax = jsondict['output']['map_information']['max']['latitude']
-        extent['extent']['bounds']['extent'] = [xmin, ymin, xmax, ymax]
-
-        # done with extent.conf, merge with existing file and save
-        extent_file = os.path.join(event_dir, 'extent.conf')
-        if os.path.isfile(extent_file):
-            existing_extent = ConfigObj(extent_file)
-            extent.merge(existing_extent)
-        extent.filename = extent_file
-        extent.write()
-
-    return (edict, errors)
+    return (eqdict, errors)
 
 
 def create_event_directory(eventid, data_path):

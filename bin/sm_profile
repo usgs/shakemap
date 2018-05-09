@@ -189,7 +189,8 @@ def create(config, profile, accept, ppath):
                   'shake.conf',
                   'extent.conf',
                   'logging.conf',
-                  'transfer.conf']
+                  'transfer.conf',
+                  'migrate.conf']
 
     # if any of these files are not present in the install config
     # directory, copy them from the repository into the install directory.

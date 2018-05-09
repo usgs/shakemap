@@ -1,9 +1,12 @@
+# third party imports
 import numpy as np
 
+# stdlib imports
 from openquake.hazardlib.imt import PGA, PGV
+from shakelib.gmice.gmice import GMICE
 
 
-class Wald99(object):
+class Wald99(GMICE):
     """
     Implements the ground motion intensity conversion equations (GMICE) of
     Wald et al. (1999). This module implements a simplified version in that
@@ -26,22 +29,23 @@ class Wald99(object):
     # Imm = 2.10 * log10(PGV) + 3.40  for Imm < 5
     #
     # -----------------------------------------------------------------------
+    def __init__(self):
+        super().__init__()
+        self.name = 'Wald et al. (1999)'
+        self.scale = 'scale_wald99.ps'
+        self.__constants = {
+            self._pga: {'C1':  3.66, 'C2': -1.66, 'C3':  2.20, 'C4': 1.00,
+                    'T1':  1.82, 'T2': 5.00, 'SMMI': 1.08, 'SPGM': 0.295},
+            self._pgv: {'C1':  3.47, 'C2':  2.35, 'C3':  2.10, 'C4': 3.40,
+                    'T1':  0.76, 'T2': 5.00, 'SMMI': 0.98, 'SPGM': 0.282},
+        }
 
-    __pga = PGA()
-    __pgv = PGV()
-    __constants = {
-        __pga: {'C1':  3.66, 'C2': -1.66, 'C3':  2.20, 'C4': 1.00,
-                'T1':  1.82, 'T2': 5.00, 'SMMI': 1.08, 'SPGM': 0.295},
-        __pgv: {'C1':  3.47, 'C2':  2.35, 'C3':  2.10, 'C4': 3.40,
-                'T1':  0.76, 'T2': 5.00, 'SMMI': 0.98, 'SPGM': 0.282},
-    }
+        self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
+            PGA,
+            PGV
+        ])
 
-    DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
-        PGA,
-        PGV
-    ])
-
-    DEFINED_FOR_SA_PERIODS = set([])
+        self.DEFINED_FOR_SA_PERIODS = set([])
 
     def getMIfromGM(self, amps, imt, dists=None, mag=None):
         """
@@ -68,13 +72,13 @@ class Wald99(object):
             point in question).
         """  # noqa
         lfact = np.log10(np.e)
-        c = self.__getConsts(imt)
+        c = self._getConsts(imt)
 
         #
         # Convert (for accelerations) from ln(g) to cm/s^2
         # then take the log10
         #
-        if imt == self.__pga:
+        if imt == self._pga:
             units = 981.0
         else:
             units = 1.0
@@ -128,7 +132,7 @@ class Wald99(object):
             (i.e., the slope of the relationship at the point in question).
         """  # noqa
         lfact = np.log10(np.e)
-        c = self.__getConsts(imt)
+        c = self._getConsts(imt)
         mmi = mmi.copy()
         ix_nan = np.isnan(mmi)
         mmi[ix_nan] = 1.0
@@ -149,7 +153,7 @@ class Wald99(object):
         pgm[idx] = np.power(10, (mmi[idx] - c['C4']) / c['C3'])
         dpgm_dmmi[idx] = 1.0 / (c['C3'] * lfact)
 
-        if imt != self.__pgv:
+        if imt != self._pgv:
             units = 981.0
         else:
             units = 1.0
@@ -168,8 +172,8 @@ class Wald99(object):
         Returns:
             Dictionary of GM to MI sigmas (in MMI units).
         """
-        return {self.__pga: self.__constants[self.__pga]['SMMI'],
-                self.__pgv: self.__constants[self.__pgv]['SMMI']}
+        return {self._pga: self.__constants[self._pga]['SMMI'],
+                self._pgv: self.__constants[self._pgv]['SMMI']}
 
     def getMI2GMsd(self):
         """
@@ -184,49 +188,14 @@ class Wald99(object):
         # Need to convert log10 to ln units
         #
         lfact = np.log(10.0)
-        return {self.__pga: lfact * self.__constants[self.__pga]['SPGM'],
-                self.__pgv: lfact * self.__constants[self.__pgv]['SPGM']}
+        return {self._pga: lfact * self.__constants[self._pga]['SPGM'],
+                self._pgv: lfact * self.__constants[self._pgv]['SPGM']}
 
-    @staticmethod
-    def getName():
-        """
-        Get the name of this GMICE.
-
-        Returns:
-            String containing name of this GMICE.
-        """
-        return 'Wald et al. (1999)'
-
-    @staticmethod
-    def getScale():
-        """
-        Get the name of the PostScript file containing this GMICE's
-        scale.
-
-        Returns:
-            Name of GMICE scale file.
-        """
-        return 'scale_wald99.ps'
-
-    @staticmethod
-    def getMinMax():
-        """
-        Get the minimum and maximum MMI values produced by this GMICE.
-
-        Returns:
-            Tuple of min and max values of GMICE.
-        """
-        return (1.0, 10.0)
-
-    @staticmethod
-    def getDistanceType():
-        return 'rrup'
-
-    def __getConsts(self, imt):
+    def _getConsts(self, imt):
         """
         Helper function to get the constants.
         """
 
-        if imt != self.__pga and imt != self.__pgv:
+        if imt != self._pga and imt != self._pgv:
             raise ValueError("Invalid IMT " + str(imt))
         return self.__constants[imt]

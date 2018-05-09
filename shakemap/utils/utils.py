@@ -1,12 +1,68 @@
 import sys
+import os
 from importlib import import_module
 from urllib import request
 from urllib.error import HTTPError
 import json
 import logging
+from collections import OrderedDict
+from shakemap.utils.config import get_config_paths
+
+# third party imports
+from configobj import ConfigObj
 
 # url template for json file describing everything we know about a network
-NETWORK_TEMPLATE = 'https://earthquake.usgs.gov/data/comcat/contributor/[NETID]/index.json'
+NETWORK_TEMPLATE = ('https://earthquake.usgs.gov/data/comcat/'
+                    'contributor/[NETID]/index.json')
+
+
+def migrate_gmpe(old_gmpe, config=None):
+    """Return the GMPE that should be used to replace SM3.5 GMPE
+
+    By default, this uses the migrate.conf file found in the ShakeMap
+    repository. Users can optionally pass in their own config.
+
+    Args:
+        old_gmpe (str):
+            ShakeMap 3.5 GMPE string
+        config (dict):
+            Input configobj dict or None.
+
+    Returns:
+        tuple: New GMPE string, and GMPE reference string.
+    """
+    if config is None:
+        install_path, data_path = get_config_paths()
+        if not os.path.isdir(data_path):
+            raise OSError('%s is not a valid directory.' % data_path)
+        config_file = os.path.join(install_path, 'data', 'migrate.conf')
+        if os.path.isfile(config_file):
+            config = ConfigObj(config_file)
+        else:
+            raise OSError('%s not found.' % config_file)
+    if old_gmpe not in config['modules']:
+        raise KeyError(
+            'ShakeMap 3.5 GMPE %s not found in migrate.conf.' % old_gmpe)
+    new_gmpe = config['modules'][old_gmpe]['openquake']
+    reference = config['modules'][old_gmpe]['reference']
+    return (new_gmpe, reference)
+
+
+def set_gmpe(gmpe, config, eventid):
+    gmpe_list = [gmpe]
+    weight_list = [1.0]
+    gmpe_set = 'gmpe_' + eventid + '_custom'
+    config['modeling']['gmpe'] = gmpe_set
+    config['gmpe_sets'] = OrderedDict([
+        (gmpe_set, OrderedDict([
+            ('gmpes', gmpe_list),
+            ('weights', weight_list),
+            ('weights_large_dist', 'None'),
+            ('dist_cutoff', 'nan'),
+            ('site_gmpes', 'None'),
+            ('weights_site_gmpes', 'None')
+        ]))])
+    return config
 
 
 def get_network_name(netid):
@@ -45,12 +101,16 @@ def get_object_from_config(obj, section, cfg, *args):
     'name'_module dictionary of class name, module path.
 
     Args:
-        obj (str): Name of the parameter in the config file that specifies
+        obj (str):
+            Name of the parameter in the config file that specifies
             the object to be instantiated.
-        section (str): The section of the config in which 'obj' resides.
-        cfg (dict): The configuration file in which 'obj' and the
+        section (str):
+            The section of the config in which 'obj' resides.
+        cfg (dict):
+            The configuration file in which 'obj' and the
             module definitions reside.
-        args: Additional arguments that will be passed to the constructor
+        args:
+            Additional arguments that will be passed to the constructor
             of the thing being instantiated.
 
     Returns:
@@ -115,9 +175,12 @@ def path_macro_sub(s, ip, dp):
     does not contain one or both of <INSTALL_DIR> or <DATA_DIR>.
 
     Args:
-        s (str): The string into which the replacements are made.
-        ip (str): The string with which to replace <INSTALL_DIR>.
-        dp (str): The string with which to replace <DATA_DIR>.
+        s (str):
+            The string into which the replacements are made.
+        ip (str):
+            The string with which to replace <INSTALL_DIR>.
+        dp (str):
+            The string with which to replace <DATA_DIR>.
 
     Returns:
         str: A new string with the sub-string replacements.

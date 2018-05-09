@@ -2,6 +2,7 @@
 
 # stdlib modules
 import json
+import logging
 
 # third party imports
 import numpy as np
@@ -87,9 +88,12 @@ def rupture_from_dict_and_origin(rupdict, origin, mesh_dx=0.5):
     .. seealso:: :func:`rupture_from_dict`
 
     Args:
-        rupdictd (dict): Rupture GeoJSON dictionary.
-        origin (Origin): A ShakeMap origin object.
-        mesh_dx (float): Target spacing (in km) for rupture discretization;
+        rupdictd (dict):
+            Rupture GeoJSON dictionary.
+        origin (Origin):
+            A ShakeMap origin object.
+        mesh_dx (float):
+            Target spacing (in km) for rupture discretization;
             default is 0.5 km and it is only used if the rupture file is an
             EdgeRupture.
 
@@ -122,7 +126,8 @@ def rupture_from_dict(d):
         :func:`rupture_from_dict_and_origin`
 
     Args:
-        d (dict): Rupture GeoJSON dictionary, which must contain origin
+        d (dict):
+            Rupture GeoJSON dictionary, which must contain origin
             information in the 'metadata' field.
 
     Returns:
@@ -150,80 +155,198 @@ def rupture_from_dict(d):
     return rupt
 
 
-def text_to_json(file):
+def _rotate_polygon(p):
     """
-    Read in old ShakeMap 3 textfile rupture format and convert to GeoJSON.
+    This is a method to rotate a polygon, which is used to try to
+    fix incorrectly specified polygons.
 
     Args:
-        rupturefile (srt): Path to rupture file OR file-like object in GMT
+        p (list):
+            A list of lon/lat/depth lists.
+
+    Returns:
+        list: Same as before but the points have been incremented
+        by one in position.
+
+    """
+    # Convert to numpy array for better indexing support
+    parray = np.array(p)
+
+    # Ensure the polygon is closed
+    if not np.array_equal(parray[-1, :], parray[0, :]):
+        raise ShakeLibException('Rupture file has unclosed segments.')
+
+    # Drop last point
+    parray = parray[0:-1, :]
+
+    # Rotate by putting first at end
+    parray = np.append(parray[1:, :],
+                       np.reshape(parray[0, :], (1, -1)),
+                       axis=0)
+
+    # Put new first point onto the end so that it is closed.
+    parray = np.append(parray,
+                       np.reshape(parray[0, :], (1, -1)),
+                       axis=0)
+
+    # Turn numpy array back into a list
+    polygon = parray.tolist()
+    return polygon
+
+
+def _check_polygon(p):
+    """
+    Check if the verticies are specified top first.
+
+    Args:
+        p (list):
+            A list of five lon/lat/depth lists.
+
+    Raises:
+        Exception: Incorrectly specified polygon.
+
+    """
+    n_points = len(p)
+    if n_points % 2 == 0:
+        raise Exception('Number of points in polyon must be odd.')
+
+    if p[0] != p[-1]:
+        raise Exception('First and last points in polygon must be '
+                        'identical.')
+
+    n_pairs = int((n_points - 1) / 2)
+    for j in range(n_pairs):
+        # -------------------------------------------------------------
+        # Points are paired and in each pair the top is first, as in:
+        #
+        #      _.-P1-._
+        #   P0'        'P2---P3
+        #   |                  \
+        #   P7---P6----P5-------P4
+        #
+        # Pairs: P0-P7, P1-P6, P2-P5, P3-P4
+        # -------------------------------------------------------------
+        top_depth = p[j][2]
+        bot_depth = p[-(j + 2)][2]
+        if top_depth >= bot_depth:
+            raise Exception(
+                'Top points must be ordered before bottom points.')
+
+
+def text_to_json(file, new_format=True):
+    """
+    Read in old or new ShakeMap 3 textfile rupture format and convert to
+    GeoJSON.
+
+    This will handle ShakeMap3.5-style fault text files, which can have the
+    following format:
+     - # at the top indicates a reference.
+     - Lines beginning with a > indicate the end of one segment and the
+       beginning of another.
+     - Coordinates are specified in lat,lon,depth order.
+     - Coordinates can be separated by commas or spaces.
+     - Vertices can be specified in top-edge or bottom-edge first order.
+
+    Args:
+        rupturefile (str):
+            Path to rupture file OR file-like object in GMT
             psxy format, where:
 
-                * Rupture vertices are space separated lat, lon, depth triplets
-                  on a single line.
+                * Rupture vertices are space/comma separated lat, lon, depth
+                  triplets on a single line.
                 * Rupture groups are separated by lines containing ">"
                 * Rupture groups must be closed.
                 * Verticies within a rupture group must start along the top
                   edge and move in the strike direction then move to the bottom
                   edge and move back in the opposite direction.
 
+        new_format (bool):
+            Indicates whether text rupture format is
+            "old" (lat, lon, depth) or "new" (lon, lat, depth) style.
+
     Returns:
         dict: GeoJSON rupture dictionary.
 
     """
-
-    # -------------------------------------------------------------------------
-    # First read in the data
-    # -------------------------------------------------------------------------
-    x = []
-    y = []
-    z = []
-    isFile = False
-    if isinstance(file, str):
-        isFile = True
-        file = open(file, 'rt')
-        lines = file.readlines()
+    isfile = False
+    if hasattr(file, 'read'):
+        f = file
     else:
-        lines = file.readlines()
+        f = open(file, 'rt')
+        isfile = True
+
     reference = ''
-    for line in lines:
-        sline = line.strip()
-        if sline.startswith('#'):
-            reference += sline
+    polygons = []
+    polygon = []
+    for line in f.readlines():
+        if not len(line.strip()):
             continue
-        if sline.startswith('>'):
-            if len(x):  # start of new line segment
-                x.append(np.nan)
-                y.append(np.nan)
-                z.append(np.nan)
-                continue
-            else:  # start of file
-                continue
-        if not len(sline.strip()):
+
+        if line.strip().startswith('#'):
+            # Get reference string
+            reference += line.strip().replace('#', '')
             continue
-        parts = sline.split()
-        if len(parts) < 3:
-            raise ShakeLibException(
-                'Rupture file %s has no depth values.' % file)
-        y.append(float(parts[0]))
-        x.append(float(parts[1]))
-        z.append(float(parts[2]))
-    if isFile:
-        file.close()
 
-    # Construct GeoJSON dictionary
+        if line.strip().startswith('>'):
+            if not len(polygon):
+                continue
+            polygons.append(polygon)
+            polygon = []
+            continue
 
-    coords = []
-    poly = []
-    for lon, lat, dep in zip(x, y, z):
-        if np.isnan(lon):
-            coords.append(poly)
-            poly = []
+        # first try to split on whitespace
+        parts = line.split()
+        if len(parts) == 1:
+            if new_format:
+                raise ShakeLibException(
+                    'Rupture file %s has unspecified delimiters.' % file)
+            parts = line.split(',')
+            if len(parts) == 1:
+                raise ShakeLibException(
+                    'Rupture file %s has unspecified delimiters.' % file)
+
+        if len(parts) != 3:
+            msg = 'Rupture file %s is not in lat,lon,depth format.'
+            if new_format:
+                'Rupture file %s is not in lon,lat,depth format.'
+            raise ShakeLibException(msg % file)
+
+        parts = [float(p) for p in parts]
+        if not new_format:
+            old_parts = parts.copy()
+            parts[0] = old_parts[1]
+            parts[1] = old_parts[0]
+        polygon.append(parts)
+
+    if len(polygon):
+        polygons.append(polygon)
+
+    if isfile:
+        f.close()
+
+    # Try to fix polygons
+    original_polygons = polygons.copy()
+    fixed = []
+    n_polygons = len(polygons)
+    for i in range(n_polygons):
+        n_verts = len(polygons[i])
+        success = False
+        for j in range(n_verts - 1):
+            try:
+                _check_polygon(polygons[i])
+                success = True
+                continue
+            except:
+                polygons[i] = _rotate_polygon(polygons[i])
+        if success:
+            fixed.append(True)
         else:
-            poly.append([lon, lat, dep])
-    if poly != []:
-        coords.append(poly)
+            fixed.append(False)
 
-    d = {
+    if not all(fixed):
+        polygons = original_polygons
+
+    json_dict = {
         "type": "FeatureCollection",
         "metadata": {
             'reference': reference
@@ -236,12 +359,14 @@ def text_to_json(file):
                 },
                 "geometry": {
                     "type": "MultiPolygon",
-                    "coordinates": [coords]
+                    "coordinates": [polygons]
                 }
             }
         ]
     }
-    return d
+    validate_json(json_dict)
+
+    return json_dict
 
 
 def validate_json(d):
@@ -283,32 +408,7 @@ def validate_json(d):
     if geom['type'] == 'MultiPolygon':
         n_polygons = len(polygons)
         for i in range(n_polygons):
-            p = polygons[i]
-            n_points = len(p)
-            if n_points % 2 == 0:
-                raise Exception('Number of points in polyon must be odd.')
-
-            if p[0] != p[-1]:
-                raise Exception('First and last points in polygon must be '
-                                'identical.')
-
-            n_pairs = int((n_points - 1) / 2)
-            for j in range(n_pairs):
-                # -------------------------------------------------------------
-                # Points are paired and in each pair the top is first, as in:
-                #
-                #      _.-P1-._
-                #   P0'        'P2---P3
-                #   |                  \
-                #   P7---P6----P5-------P4
-                #
-                # Pairs: P0-P7, P1-P6, P2-P5, P3-P4
-                # -------------------------------------------------------------
-                top_depth = p[j][2]
-                bot_depth = p[-(j + 2)][2]
-                if top_depth >= bot_depth:
-                    raise Exception(
-                        'Top points must be ordered before bottom points.')
+            _check_polygon(polygons[i])
 
 
 def is_quadrupture_class(d):

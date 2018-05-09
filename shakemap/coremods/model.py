@@ -96,7 +96,7 @@ class ModelModule(CoreModule):
             NotADirectoryError: When the event data directory does not exist.
             FileNotFoundError: When the the shake_data HDF file does not exist.
         """
-
+        self.logger.debug('Starting model...')
         # ------------------------------------------------------------------
         # Make the input container and extract the config
         # ------------------------------------------------------------------
@@ -141,6 +141,7 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         # The output locations: either a grid or a list of points
         # ------------------------------------------------------------------
+        self.logger.debug('Setting output params...')
         self._setOutputParams()
         # ------------------------------------------------------------------
         # If the gmpe doesn't break down its stardard deviation into
@@ -161,10 +162,12 @@ class ModelModule(CoreModule):
         # df1 for instrumented data
         # df2 for non-instrumented data
         # ------------------------------------------------------------------
+        self.logger.debug('Setting data frames...')
         self._setDataFrames()
         # ------------------------------------------------------------------
         # Add the predictions, etc. to the data frames
         # ------------------------------------------------------------------
+        self.logger.debug('Populating data frames...')
         self._populateDataFrames()
         # ------------------------------------------------------------------
         # Try to make all the derived IMTs possible from MMI (if we have MMI)
@@ -174,6 +177,7 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         self._deriveMMIFromIMTs()
 
+        self.logger.debug('Getting combined IMTs')
         # ------------------------------------------------------------------
         # Get the combined set of input and output IMTs, their periods,
         # and an index dictionary, then make the cross-correlation function
@@ -183,9 +187,11 @@ class ModelModule(CoreModule):
             self.combined_imt_set |= getattr(self, ndf).imts
 
         self.imt_per, self.imt_per_ix = _get_period_arrays(
-                self.combined_imt_set)
+            self.combined_imt_set)
         self.ccf = get_object_from_config('ccf', 'modeling',
                                           self.config, self.imt_per)
+
+        self.logger.debug('Doing bias')
         # ------------------------------------------------------------------
         # Do the bias for all of the input and output IMTs. Hold on
         # to some of the products that will be used for the interpolation.
@@ -230,6 +236,7 @@ class ModelModule(CoreModule):
         self.rocksd = {}
         self.soilsd = {}
 
+        self.logger.debug('Doing MVN...')
         with cf.ThreadPoolExecutor(max_workers=self.max_workers) as ex:
             ex.map(self._computeMVN, self.imt_out_set)
 #        self._computeMVN()
@@ -411,11 +418,12 @@ class ModelModule(CoreModule):
             self.sites_obj_out = Sites.fromBounds(self.W, self.E, self.S,
                                                   self.N, self.smdx, self.smdy,
                                                   defaultVs30=self.vs30default,
-                                                  vs30File=self.vs30_file)
+                                                  vs30File=self.vs30_file,
+                                                  padding=True, resample=True)
 
             self.sx_out = self.sites_obj_out.getSitesContext(
-                    {'lats': self.lats,
-                     'lons': self.lons})
+                {'lats': self.lats,
+                 'lons': self.lons})
             # Replace the Vs30 from the grid (or default) with the Vs30
             # provided with the site list.
             if np.any(self.vs30 > 0):
@@ -428,7 +436,7 @@ class ModelModule(CoreModule):
 
             if self.config['interp']['prediction_location']['extent']:
                 self.W, self.S, self.E, self.N = \
-                        self.config['interp']['prediction_location']['extent']
+                    self.config['interp']['prediction_location']['extent']
             else:
                 self.W, self.E, self.S, self.N = get_extent(self.rupture_obj,
                                                             config=self.config)
@@ -437,7 +445,7 @@ class ModelModule(CoreModule):
                                                   self.N, self.smdx, self.smdy,
                                                   defaultVs30=self.vs30default,
                                                   vs30File=self.vs30_file,
-                                                  padding=True)
+                                                  padding=True, resample=True)
             self.smnx, self.smny = self.sites_obj_out.getNxNy()
             self.sx_out = self.sites_obj_out.getSitesContext()
             #
@@ -886,9 +894,9 @@ class ModelModule(CoreModule):
         #
         if self.total_sd_only:
             self.psd[imtstr] = np.sqrt(
-                    pout_sd[0]**2 - SM_CONSTS['default_stddev_inter']**2)
+                pout_sd[0]**2 - SM_CONSTS['default_stddev_inter']**2)
             self.tsd[imtstr] = np.full_like(
-                    self.psd[imtstr], SM_CONSTS['default_stddev_inter'])
+                self.psd[imtstr], SM_CONSTS['default_stddev_inter'])
         else:
             self.psd[imtstr] = pout_sd[2]
             self.tsd[imtstr] = pout_sd[1]
@@ -914,13 +922,13 @@ class ModelModule(CoreModule):
             in_bias = self.bias_num[imtin] * in_bias_var
             self.sta_resids[imtstr][i, 0] -= in_bias
             self.sta_phi[imtstr][i, 0] = np.sqrt(
-                    self.sta_phi[imtstr][i, 0]**2 + in_bias_var)
+                self.sta_phi[imtstr][i, 0]**2 + in_bias_var)
         #
         # Update the omega factors to account for the bias and the
         # new value of phi
         #
         corr_adj = self.sta_phi[imtstr] / np.sqrt(
-                self.sta_phi[imtstr]**2 + self.sta_sig_extra[imtstr]**2)
+            self.sta_phi[imtstr]**2 + self.sta_sig_extra[imtstr]**2)
         corr_adj22 = corr_adj * corr_adj.T
         np.fill_diagonal(corr_adj22, 1.0)
         #
@@ -1081,7 +1089,7 @@ class ModelModule(CoreModule):
         info[ip][ei]['fault_ref'] = self.rupture_obj.getReference()
         if 'df2' in self.dataframes:
             info[ip][ei]['intensity_observations'] = \
-                    str(np.size(self.df2.df['lon']))
+                str(np.size(self.df2.df['lon']))
         else:
             info[ip][ei]['intensity_observations'] = '0'
         info[ip][ei]['latitude'] = str(self.rx.hypo_lat)
@@ -1092,7 +1100,7 @@ class ModelModule(CoreModule):
             self.rupture_obj._origin.time.strftime('%Y-%m-%d %H:%M:%S')
         if 'df1' in self.dataframes:
             info[ip][ei]['seismic_stations'] = \
-                    str(np.size(self.df1.df['lon']))
+                str(np.size(self.df1.df['lon']))
         else:
             info[ip][ei]['seismic_stations'] = '0'
         info[ip][ei]['src_mech'] = self.rupture_obj._origin.mech
@@ -1188,7 +1196,7 @@ class ModelModule(CoreModule):
         info[pp][ms]['bias_max_range'] = str(self.bias_max_range)
         info[pp][ms]['median_dist'] = 'True'
         info[pp][ms]['outlier_deviation_level'] = str(
-                self.outlier_deviation_level)
+            self.outlier_deviation_level)
         info[pp][ms]['outlier_max_mag'] = str(self.outlier_max_mag)
         info[pp][sv] = {}
         info[pp][sv]['shakemap_revision'] = get_versions()['version']
@@ -1395,7 +1403,7 @@ class ModelModule(CoreModule):
             station['properties']['distances'] = {}
             for dm, dm_arr in dist_dict[ndf].items():
                 station['properties']['distances'][dm] = \
-                        _round_float(dm_arr[six], 3)
+                    _round_float(dm_arr[six], 3)
             #
             # Set the outlier flags
             #
@@ -1493,7 +1501,7 @@ class ModelModule(CoreModule):
         # Store the IMTs
         #
         ascii_ids = np.array(
-                [x.encode('ascii') for x in self.idents]).flatten()
+            [x.encode('ascii') for x in self.idents]).flatten()
         component = self.config['interp']['component']
         for key, value in self.outgrid.items():
             # set the data grid
