@@ -256,8 +256,7 @@ The following text file has been left in place for you to edit manually:
                 _write_model_conf(shakemap, module_conf, migrate_conf,
                                   event_dir, skip_bounds=args.skip_bounds)
 
-        print('Wrote %i files to %s' %
-              (len(os.listdir(event_dir)), event_dir))
+    print('Wrote %i files to %s' % (len(os.listdir(event_dir)), event_dir))
 
 
 def _write_model_conf(shakemap, module_conf, migrate_conf, event_dir,

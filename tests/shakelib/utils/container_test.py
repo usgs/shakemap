@@ -131,6 +131,7 @@ mech="" netid="us" network="" />"""
         container3.setStationDict(config)
         config2 = container3.getStationDict()
         assert dict_equal(config, config2)
+        container3.close()
 
     except Exception:
         assert 1 == 2
@@ -260,6 +261,7 @@ Available IMTs (components):
         container.dropIMT('mmi')
         imts = container.getIMTs('maximum')
         assert imts == ['pga']
+        container.close()
 
     except Exception as e:
         raise(e)
@@ -334,6 +336,8 @@ def test_output_arrays():
         # Trying to get a grid in a file with points
         with pytest.raises(TypeError):
             container.getIMTGrids('PGA', 'Larger')
+
+        container.close()
 
     except Exception as e:
         raise(e)
