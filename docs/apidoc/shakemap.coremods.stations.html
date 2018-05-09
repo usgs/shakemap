@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.coremods.stations &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -33,8 +25,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -47,7 +38,7 @@
 <dl class="class">
 <dt id="shakemap.coremods.stations.StationModule">
 <em class="property">class </em><code class="descclassname">shakemap.coremods.stations.</code><code class="descname">StationModule</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/stations.html#StationModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.stations.StationModule" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
 <p>stations – Generate stationlist.json from shake_result.hdf.</p>
 <p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="attribute">
@@ -57,7 +48,7 @@
 
 <dl class="attribute">
 <dt id="shakemap.coremods.stations.StationModule.contents">
-<code class="descname">contents</code><em class="property"> = OrderedDict([('stationJSON', {'formats': [{'type': 'application/json', 'filename': 'stationlist.json'}], 'title': 'Station Lists', 'caption': 'Lists of ShakeMap input data.'})])</em><a class="headerlink" href="#shakemap.coremods.stations.StationModule.contents" title="Permalink to this definition">¶</a></dt>
+<code class="descname">contents</code><em class="property"> = {'stationJSON': {'formats': [{'type': 'application/json', 'filename': 'stationlist.json'}], 'caption': 'Lists of ShakeMap input data.', 'title': 'Station Lists'}}</em><a class="headerlink" href="#shakemap.coremods.stations.StationModule.contents" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="method">
@@ -69,8 +60,8 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
-<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#NotADirectoryError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">NotADirectoryError</span></code></a> – When the event data directory does not exist.</li>
-<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#FileNotFoundError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">FileNotFoundError</span></code></a> – When the the shake_result HDF file does not
+<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#NotADirectoryError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">NotADirectoryError</span></code></a> – When the event data directory does not exist.</li>
+<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#FileNotFoundError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">FileNotFoundError</span></code></a> – When the the shake_result HDF file does not
 exist.</li>
 </ul>
 </td>
@@ -113,12 +104,15 @@ exist.</li>
 <li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0a API</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.assemble.html">shakemap.coremods.assemble</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.associate.html">shakemap.coremods.associate</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.augment.html">shakemap.coremods.augment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.base.html">shakemap.coremods.base</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.cancel.html">shakemap.coremods.cancel</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.contour.html">shakemap.coremods.contour</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.dyfi.html">shakemap.coremods.dyfi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.gridxml.html">shakemap.coremods.gridxml</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.info.html">shakemap.coremods.info</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.kml.html">shakemap.coremods.kml</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.mapping.html">shakemap.coremods.mapping</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.model.html">shakemap.coremods.model</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.plotregr.html">shakemap.coremods.plotregr</a></li>
@@ -129,6 +123,7 @@ exist.</li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.transfer.html">shakemap.coremods.transfer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestimage.html">shakemap.coremods.xtestimage</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestplot.html">shakemap.coremods.xtestplot</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestplot_multi.html">shakemap.coremods.xtestplot_multi</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestplot_spectra.html">shakemap.coremods.xtestplot_spectra</a></li>
 </ul>
 </li>
@@ -141,12 +136,14 @@ exist.</li>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

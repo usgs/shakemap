@@ -19,6 +19,6 @@ ShakeMap software are indicated in parentheses.
    tg_architecture.rst
    tg_processing.rst
    tg_formats.rst
-   tg_validation.rst
+   tg_verification.rst
    tg_contributing.rst
 

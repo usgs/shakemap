@@ -1,17 +1,20 @@
-shakemap\.coremods
-==========================
+shakemap.coremods
+=========================
 
 Submodules
 
 .. toctree::
 
    shakemap.coremods.assemble
+   shakemap.coremods.associate
    shakemap.coremods.augment
    shakemap.coremods.base
+   shakemap.coremods.cancel
    shakemap.coremods.contour
    shakemap.coremods.dyfi
    shakemap.coremods.gridxml
    shakemap.coremods.info
+   shakemap.coremods.kml
    shakemap.coremods.mapping
    shakemap.coremods.model
    shakemap.coremods.plotregr
@@ -22,6 +25,7 @@ Submodules
    shakemap.coremods.transfer
    shakemap.coremods.xtestimage
    shakemap.coremods.xtestplot
+   shakemap.coremods.xtestplot_multi
    shakemap.coremods.xtestplot_spectra
 
 Module contents

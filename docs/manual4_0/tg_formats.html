@@ -4,28 +4,20 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>2.3. Data Formats &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="2.4. Validation" href="tg_validation.html" />
+    <link rel="next" title="2.4. Verification" href="tg_verification.html" />
     <link rel="prev" title="2.2. Data Processing" href="tg_processing.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -33,8 +25,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -99,7 +90,7 @@ the HDF5 data format can be found
 implementation of HDF5 uses groups to contain Python dictionaries,
 strings, and numpy arrays.  Dictionaries are stored as recursive groups.
 For example, a Python <em>config</em> dictionary consisting of the following information:</p>
-<div class="highlight-python"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span>
     <span class="s1">&#39;gmpe_set&#39;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s1">&#39;Active_Crustal&#39;</span><span class="p">:</span> <span class="s1">&#39;Campbell2003&#39;</span>
@@ -108,7 +99,7 @@ For example, a Python <em>config</em> dictionary consisting of the following inf
 <span class="p">}</span>
 </pre></div>
 </div>
-<p>would be stored in a group called <code class="docutils literal"><span class="pre">__dictionary_config__</span></code>, with attributes
+<p>would be stored in a group called <code class="docutils literal notranslate"><span class="pre">__dictionary_config__</span></code>, with attributes
 ‘name’ and ‘depth’.  There will be a sub-group called ‘gmpe_set’, with an attribute
 called ‘Active_Crustal’.  Groups like this can contain any number (within reason)
 of dictionaries, which can consist of a number of Python data types (strings, numbers,
@@ -165,9 +156,9 @@ finite fault</td>
 <p>Each IMT dataset (MMI, PGA, etc.) is stored as a group containing two
 datasets, the mean values for each cell and the standard deviations.
 MMI data for the component ‘Larger’ will be stored under a group called
-<code class="docutils literal"><span class="pre">__imt_MMI_GREATER_OF_TWO_HORIZONTAL__</span></code>. The mean array will be stored as
-<code class="docutils literal"><span class="pre">mean</span></code>, and the standard deviation array will be stored as
-<code class="docutils literal"><span class="pre">std</span></code>.  All IMT grid datasets will be accompanied by a dictionary of
+<code class="docutils literal notranslate"><span class="pre">__imt_MMI_GREATER_OF_TWO_HORIZONTAL__</span></code>. The mean array will be stored as
+<code class="docutils literal notranslate"><span class="pre">mean</span></code>, and the standard deviation array will be stored as
+<code class="docutils literal notranslate"><span class="pre">std</span></code>.  All IMT grid datasets will be accompanied by a dictionary of
 attributes:</p>
 <p>For grids, the attributes are:</p>
 <table border="1" class="docutils">
@@ -215,8 +206,8 @@ attributes:</p>
 </table>
 <p>For datasets that are lists of points, the storage of IMTS is the same
 as for grids, except that the data are stored as one-dimensional arrays.
-Each IMT group wll also contains datasets <code class="docutils literal"><span class="pre">lons</span></code>, <code class="docutils literal"><span class="pre">lats</span></code>,
-and <code class="docutils literal"><span class="pre">ids</span></code>, which provide the coordinates of the points in longitude
+Each IMT group wll also contains datasets <code class="docutils literal notranslate"><span class="pre">lons</span></code>, <code class="docutils literal notranslate"><span class="pre">lats</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">ids</span></code>, which provide the coordinates of the points in longitude
 and latitude, and their IDs, respectively. For sets of points the metadata
 attributes are:</p>
 <table border="1" class="docutils">
@@ -238,29 +229,29 @@ attributes are:</p>
 </tr>
 </tbody>
 </table>
-<p>All <em>shake_result.hdf</em> files will have a group <code class="docutils literal"><span class="pre">__file_data_type__</span></code>
-which will have a single attribute <code class="docutils literal"><span class="pre">data_type</span></code> that will be one of
+<p>All <em>shake_result.hdf</em> files will have a group <code class="docutils literal notranslate"><span class="pre">__file_data_type__</span></code>
+which will have a single attribute <code class="docutils literal notranslate"><span class="pre">data_type</span></code> that will be one of
 ‘points’ or ‘grid’. This way the user can distinguish between the two
 types of storage.</p>
 <p>For grid files, there will also be sets of regression curves stored
 as one-dimensional arrays. These
-will be labeled like <code class="docutils literal"><span class="pre">__array_regression_&lt;IMT&gt;_&lt;site&gt;_&lt;type&gt;</span></code> Where
-<code class="docutils literal"><span class="pre">&lt;IMT&gt;</span></code> will be one of the output IMTs (e.g., <code class="docutils literal"><span class="pre">SA(3.0)</span></code>),
-<code class="docutils literal"><span class="pre">&lt;site&gt;</span></code> will be one of <code class="docutils literal"><span class="pre">rock</span></code> or <code class="docutils literal"><span class="pre">soil</span></code> (for which <code class="docutils literal"><span class="pre">rock</span></code>
-means a Vs30 of 760 m/s, and <code class="docutils literal"><span class="pre">soil</span></code> means a Vs30 of 180 m/s), and
-<code class="docutils literal"><span class="pre">&lt;type&gt;</span></code> is one of <code class="docutils literal"><span class="pre">mean</span></code> (for the mean values) or <code class="docutils literal"><span class="pre">sd</span></code> (for
+will be labeled like <code class="docutils literal notranslate"><span class="pre">__array_regression_&lt;IMT&gt;_&lt;site&gt;_&lt;type&gt;</span></code> Where
+<code class="docutils literal notranslate"><span class="pre">&lt;IMT&gt;</span></code> will be one of the output IMTs (e.g., <code class="docutils literal notranslate"><span class="pre">SA(3.0)</span></code>),
+<code class="docutils literal notranslate"><span class="pre">&lt;site&gt;</span></code> will be one of <code class="docutils literal notranslate"><span class="pre">rock</span></code> or <code class="docutils literal notranslate"><span class="pre">soil</span></code> (for which <code class="docutils literal notranslate"><span class="pre">rock</span></code>
+means a Vs30 of 760 m/s, and <code class="docutils literal notranslate"><span class="pre">soil</span></code> means a Vs30 of 180 m/s), and
+<code class="docutils literal notranslate"><span class="pre">&lt;type&gt;</span></code> is one of <code class="docutils literal notranslate"><span class="pre">mean</span></code> (for the mean values) or <code class="docutils literal notranslate"><span class="pre">sd</span></code> (for
 the standard deviations). All units are in natural log space (except
 for MMI). There will also be an array called
-<code class="docutils literal"><span class="pre">__array_regression_distances__</span></code> which will contain the distances
+<code class="docutils literal notranslate"><span class="pre">__array_regression_distances__</span></code> which will contain the distances
 (in km) corresponding to the points in the data arrays.</p>
 <p>Regardless of whether the file stores grids or arrays of points, it will
 also contain datasets of various distance parameters. These will be
-named <code class="docutils literal"><span class="pre">distance_*</span></code> where the wildcard will be replaced with  one of
+named <code class="docutils literal notranslate"><span class="pre">distance_*</span></code> where the wildcard will be replaced with  one of
 the typical
 source distance metrics (e.g., ‘rrup’ for rupture distance, ‘rjb’ for
 Joyner-Boore distance, ‘rhypo’ for hypocentral distance, ‘rx’, ‘ry0’,
 etc.)
-Similarly, the Vs30 data are found in a dataset named <code class="docutils literal"><span class="pre">vs30</span></code>.
+Similarly, the Vs30 data are found in a dataset named <code class="docutils literal notranslate"><span class="pre">vs30</span></code>.
 The metadata for distances and Vs30 consists of ‘units’ and ‘digits’.</p>
 <p>JSON datasets are stored as continuous strings.</p>
 <p>There will typically be multiple <em>IMT</em> (Intensity Measure Type) datasets
@@ -270,7 +261,7 @@ The metadata for distances and Vs30 consists of ‘units’ and ‘digits’.</p
 ‘SA(1.0)’].</p>
 <p>Python developers will likely want to access <em>shake_result.hdf</em> through
 the <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">shakelib OutputContainer class</a>.
-Also see, for example, the <em>contour</em> module [<a class="reference internal" href="../apidoc/shakemap.coremods.contour.html#module-shakemap.coremods.contour" title="shakemap.coremods.contour"><code class="xref py py-meth docutils literal"><span class="pre">shakemap.coremods.contour()</span></code></a>]
+Also see, for example, the <em>contour</em> module [<a class="reference internal" href="../apidoc/shakemap.coremods.contour.html#module-shakemap.coremods.contour" title="shakemap.coremods.contour"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.contour()</span></code></a>]
 for some basic access patterns.</p>
 <p>Matlab developers can use the function <em>read_shake_data.m</em>, which is included in
 the repository for ShakeMap
@@ -296,7 +287,7 @@ or more Grid2D objects corresponding to the IMTs to which they apply. For
 instance, the following program creates a file <strong>Test.hdf</strong> which contains
 grids for PGA, SA(0.3), SA(1.0), and SA(3.0). The grids are derived from
 GMT <strong>.grd</strong> files residing in the local directory:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/env python</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ch">#! /usr/bin/env python</span>
 
 <span class="kn">from</span> <span class="nn">mapio.gmt</span> <span class="k">import</span> <span class="n">GMTGrid</span>
 <span class="kn">from</span> <span class="nn">mapio.gridcontainer</span> <span class="k">import</span> <span class="n">GridHDFContainer</span>
@@ -374,7 +365,7 @@ macroseismic observations.</p>
 <p>The file consists of a list of “features,” each representing one seismic station or
 macroseismic observation. A typical seismic station feature will have a structure
 like this:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
   <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;NC.J051&quot;</span><span class="p">,</span>
   <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -638,7 +629,7 @@ them).</li>
 have the string value ‘null’.</li>
 </ul>
 <p>A typical macroseismic “station” feature will have the following structure:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="p">{</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;DYFI.87&quot;</span><span class="p">,</span>
   <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
   <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -828,7 +819,7 @@ PGM (i.e., they will have the value ‘null’).</li>
 <li class="toctree-l5"><a class="reference internal" href="#stationlist-geojson">2.3.5. Stationlist GeoJSON</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="tg_validation.html">2.4. Validation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_verification.html">2.4. Verification</a></li>
 <li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.5. Guidelines for Contributors</a></li>
 </ul>
 </li>
@@ -846,12 +837,14 @@ PGM (i.e., they will have the value ‘null’).</li>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

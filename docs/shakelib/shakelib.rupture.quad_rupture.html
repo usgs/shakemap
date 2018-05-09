@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.rupture.quad_rupture &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -33,8 +25,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -47,7 +38,7 @@
 <dl class="class">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture">
 <em class="property">class </em><code class="descclassname">shakelib.rupture.quad_rupture.</code><code class="descname">QuadRupture</code><span class="sig-paren">(</span><em>d</em>, <em>origin</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference internal" href="shakelib.rupture.base.html#shakelib.rupture.base.Rupture" title="shakelib.rupture.base.Rupture"><code class="xref py py-class docutils literal"><span class="pre">shakelib.rupture.base.Rupture</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="shakelib.rupture.base.html#shakelib.rupture.base.Rupture" title="shakelib.rupture.base.Rupture"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.rupture.base.Rupture</span></code></a></p>
 <p>Rupture class that represents the rupture surface as a combination of
 quadrilaterals. Each quadrilateral must have horizontal top and bottom
 edges and must be coplanar. These restrictions make the computation of
@@ -137,16 +128,16 @@ the top edges and the width and dip of the quadrilateral.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>xp0</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of longitudes (floats) of p0.</li>
-<li><strong>yp0</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of latitudes (floats) of p0.</li>
-<li><strong>xp1</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of longitudes (floats) of p1.</li>
-<li><strong>yp1</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of latitudes (floats) of p1.</li>
-<li><strong>zp</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of depths for each of the top of rupture
+<li><strong>xp0</strong> (<em>array</em>) – Array or list of longitudes (floats) of p0.</li>
+<li><strong>yp0</strong> (<em>array</em>) – Array or list of latitudes (floats) of p0.</li>
+<li><strong>xp1</strong> (<em>array</em>) – Array or list of longitudes (floats) of p1.</li>
+<li><strong>yp1</strong> (<em>array</em>) – Array or list of latitudes (floats) of p1.</li>
+<li><strong>zp</strong> (<em>array</em>) – Array or list of depths for each of the top of rupture
 rectangles (km).</li>
-<li><strong>widths</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array of widths for each of rectangle (km).</li>
-<li><strong>dips</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array of dips for each of rectangle (degrees).</li>
+<li><strong>widths</strong> (<em>array</em>) – Array of widths for each of rectangle (km).</li>
+<li><strong>dips</strong> (<em>array</em>) – Array of dips for each of rectangle (degrees).</li>
 <li><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – Reference to a ShakeMap origin object.</li>
-<li><strong>strike</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – If None then strike is computed from verticies of
+<li><strong>strike</strong> (<em>array</em>) – If None then strike is computed from verticies of
 top edge of each quadrilateral. If a scalar, then all
 quadrilaterals are constructed assuming this strike direction.
 If an array with the same length as the trace coordinates then
@@ -191,7 +182,7 @@ object.</td>
 <dd><p>Create a QuadDrupture instance from the vector of vertices that fully
 define the quadrilaterals. The points p0, …, p3 are labeled below for
 a trapezoid:</p>
-<div class="highlight-default"><div class="highlight"><pre><span></span>   <span class="n">p0</span><span class="o">--------</span><span class="n">p1</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   <span class="n">p0</span><span class="o">--------</span><span class="n">p1</span>
   <span class="o">/</span>          <span class="o">|</span>
  <span class="o">/</span>           <span class="o">|</span>
 <span class="n">p3</span><span class="o">-----------</span><span class="n">p2</span>
@@ -203,18 +194,18 @@ a trapezoid:</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>xp0</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of longitudes (floats) of p0.</li>
-<li><strong>yp0</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of latitudes (floats) of p0.</li>
-<li><strong>zp0</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of depths (floats) of p0.</li>
-<li><strong>xp1</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of longitudes (floats) of p1.</li>
-<li><strong>yp1</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of latitudes (floats) of p1.</li>
-<li><strong>zp1</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of depths (floats) of p1.</li>
-<li><strong>xp2</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of longitudes (floats) of p2.</li>
-<li><strong>yp2</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of latitudes (floats) of p2.</li>
-<li><strong>zp2</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of depths (floats) of p2.</li>
-<li><strong>xp3</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of longitudes (floats) of p3.</li>
-<li><strong>yp3</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of latitudes (floats) of p3.</li>
-<li><strong>zp3</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Array or list of depths (floats) of p3.</li>
+<li><strong>xp0</strong> (<em>array</em>) – Array or list of longitudes (floats) of p0.</li>
+<li><strong>yp0</strong> (<em>array</em>) – Array or list of latitudes (floats) of p0.</li>
+<li><strong>zp0</strong> (<em>array</em>) – Array or list of depths (floats) of p0.</li>
+<li><strong>xp1</strong> (<em>array</em>) – Array or list of longitudes (floats) of p1.</li>
+<li><strong>yp1</strong> (<em>array</em>) – Array or list of latitudes (floats) of p1.</li>
+<li><strong>zp1</strong> (<em>array</em>) – Array or list of depths (floats) of p1.</li>
+<li><strong>xp2</strong> (<em>array</em>) – Array or list of longitudes (floats) of p2.</li>
+<li><strong>yp2</strong> (<em>array</em>) – Array or list of latitudes (floats) of p2.</li>
+<li><strong>zp2</strong> (<em>array</em>) – Array or list of depths (floats) of p2.</li>
+<li><strong>xp3</strong> (<em>array</em>) – Array or list of longitudes (floats) of p3.</li>
+<li><strong>yp3</strong> (<em>array</em>) – Array or list of latitudes (floats) of p3.</li>
+<li><strong>zp3</strong> (<em>array</em>) – Array or list of depths (floats) of p3.</li>
 <li><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – Reference to a ShakeMap Origin object.</li>
 <li><strong>group_index</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)"><em>list</em></a>) – List of integers to indicate group index. If
 None then each quadrilateral is assumed to be in a different
@@ -354,7 +345,7 @@ segments.</p>
 </dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
 </tr>
 </tbody>
 </table>
@@ -376,7 +367,7 @@ segments.</p>
 </dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
 </tr>
 </tbody>
 </table>
@@ -398,7 +389,7 @@ segments.</p>
 </dl>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
 </tr>
 </tbody>
 </table>
@@ -414,7 +405,7 @@ segments.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Numpy array of latitude values.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">array</td>
 </tr>
 </tbody>
 </table>
@@ -498,9 +489,9 @@ coordinates. Rupture groups are separated by numpy.NaN values.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of longitudes.</li>
-<li><strong>lat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of latitudes.</li>
-<li><strong>depth</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of depths (km; positive down).</li>
+<li><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</li>
+<li><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</li>
+<li><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</li>
 <li><strong>var</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also return variance of prediction. Unused, and
 will raise an exception if not False.</li>
 </ul>
@@ -509,7 +500,7 @@ will raise an exception if not False.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Joyner-Boore distance (km).</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array</p>
 </td>
 </tr>
 </tbody>
@@ -525,9 +516,9 @@ will raise an exception if not False.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of longitudes.</li>
-<li><strong>lat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of latitudes.</li>
-<li><strong>depth</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of depths (km; positive down).</li>
+<li><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</li>
+<li><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</li>
+<li><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</li>
 <li><strong>var</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also return variance of prediction. Unused, and
 will raise an exception if not False.</li>
 </ul>
@@ -536,7 +527,7 @@ will raise an exception if not False.</li>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Rupture distance (km).</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)">array</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array</p>
 </td>
 </tr>
 </tbody>
@@ -553,9 +544,9 @@ will raise an exception if not False.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lon</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of longitudes.</li>
-<li><strong>lat</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of latitudes.</li>
-<li><strong>depth</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/array.html#module-array" title="(in Python v3.6)"><em>array</em></a>) – Numpy array of depths (km; positive down).</li>
+<li><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</li>
+<li><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</li>
+<li><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</li>
 </ul>
 </td>
 </tr>
@@ -637,12 +628,14 @@ will raise an exception if not False.</li>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

@@ -1,5 +1,5 @@
-shakelib\.distance
-=========================
+shakelib.distance
+========================
 
 .. automodule:: shakelib.distance
     :members:

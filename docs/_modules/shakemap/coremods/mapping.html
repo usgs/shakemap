@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.coremods.mapping &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -74,7 +65,6 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">descartes</span> <span class="k">import</span> <span class="n">PolygonPatch</span>
 <span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="k">import</span> <span class="n">gaussian_filter</span>
-<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">mapio.gmt</span> <span class="k">import</span> <span class="n">GMTGrid</span>
@@ -89,6 +79,7 @@
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">path_macro_sub</span>
+<span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="k">import</span> <span class="n">HistoricTime</span>
 
 
 <span class="n">CITY_COLS</span> <span class="o">=</span> <span class="mi">2</span>
@@ -115,6 +106,7 @@
 <span class="n">CITIES_ZORDER</span> <span class="o">=</span> <span class="mi">1200</span>
 <span class="n">GRATICULE_ZORDER</span> <span class="o">=</span> <span class="mi">1200</span>
 <span class="n">SCALE_ZORDER</span> <span class="o">=</span> <span class="mi">1500</span>
+<span class="n">SCENARIO_ZORDER</span> <span class="o">=</span> <span class="mi">2000</span>
 
 <span class="n">THUMBNAIL_WIDTH_PIXELS</span> <span class="o">=</span> <span class="mi">800</span>
 
@@ -141,46 +133,48 @@
 
     <span class="c1"># supply here a data structure with information about files that</span>
     <span class="c1"># can be created by this module.</span>
-    <span class="n">mapping_page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;Ground Motion Maps&#39;</span><span class="p">,</span><span class="s1">&#39;slug&#39;</span><span class="p">:</span><span class="s1">&#39;maps&#39;</span><span class="p">}</span>
-    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;intensityMap&#39;</span><span class="p">,</span><span class="s1">&#39;pgaMap&#39;</span><span class="p">,</span><span class="s1">&#39;pgvMap&#39;</span><span class="p">,</span><span class="s1">&#39;psa[PERIOD]Map&#39;</span><span class="p">])</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;intensityMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;Intensity Map&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="s1">&#39;Map of macroseismic intensity.&#39;</span><span class="p">,</span>
-                                <span class="s1">&#39;page&#39;</span><span class="p">:</span><span class="n">mapping_page</span><span class="p">,</span>
-                                <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;intensity.jpg&#39;</span><span class="p">,</span>
-                                            <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
-                                           <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;intensity.pdf&#39;</span><span class="p">,</span>
-                                            <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">}</span>
-                                          <span class="p">]</span>
+    <span class="n">mapping_page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Ground Motion Maps&#39;</span><span class="p">,</span> <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="s1">&#39;maps&#39;</span><span class="p">}</span>
+    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">(</span>
+        <span class="p">[</span><span class="s1">&#39;intensityMap&#39;</span><span class="p">,</span> <span class="s1">&#39;pgaMap&#39;</span><span class="p">,</span> <span class="s1">&#39;pgvMap&#39;</span><span class="p">,</span> <span class="s1">&#39;psa[PERIOD]Map&#39;</span><span class="p">])</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;intensityMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Intensity Map&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Map of macroseismic intensity.&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">mapping_page</span><span class="p">,</span>
+                                <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity.jpg&#39;</span><span class="p">,</span>
+                                             <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
+                                            <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity.pdf&#39;</span><span class="p">,</span>
+                                             <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/pdf&#39;</span><span class="p">}</span>
+                                            <span class="p">]</span>
                                 <span class="p">}</span>
 
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgaMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;PGA Map&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="s1">&#39;Map of peak ground acceleration (</span><span class="si">%g</span><span class="s1">).&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;page&#39;</span><span class="p">:</span><span class="n">mapping_page</span><span class="p">,</span>
-                              <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;pga.jpg&#39;</span><span class="p">,</span>
-                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
-                                          <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;PGA_contour.pdf&#39;</span><span class="p">,</span>
-                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">}</span>
-                                          <span class="p">]</span>
-                             <span class="p">}</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgvMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;PGV Map&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="s1">&#39;Map of peak ground velocity (cm/s).&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;page&#39;</span><span class="p">:</span><span class="n">mapping_page</span><span class="p">,</span>
-                              <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;pgv.jpg&#39;</span><span class="p">,</span>
-                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
-                                          <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;PGV_contour.pdf&#39;</span><span class="p">,</span>
-                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">},</span>
-                                          <span class="p">]</span>
-                             <span class="p">}</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgaMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PGA Map&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Map of peak ground acceleration (</span><span class="si">%g</span><span class="s1">).&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">mapping_page</span><span class="p">,</span>
+                          <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;pga.jpg&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
+                                      <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;PGA_contour.pdf&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">}</span>
+                                      <span class="p">]</span>
+                          <span class="p">}</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgvMap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PGV Map&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Map of peak ground velocity (cm/s).&#39;</span><span class="p">,</span>
+                          <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">mapping_page</span><span class="p">,</span>
+                          <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;pgv.jpg&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
+                                      <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;PGV_contour.pdf&#39;</span><span class="p">,</span>
+                                       <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/pdf&#39;</span><span class="p">},</span>
+                                      <span class="p">]</span>
+                          <span class="p">}</span>
     <span class="n">psacap</span> <span class="o">=</span> <span class="s1">&#39;Map of [FPERIOD] sec 5</span><span class="si">% d</span><span class="s1">amped pseudo-spectral acceleration(</span><span class="si">%g</span><span class="s1">).&#39;</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;psa[PERIOD]Map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;PSA[PERIOD] Map&#39;</span><span class="p">,</span>
-                                      <span class="s1">&#39;page&#39;</span><span class="p">:</span><span class="n">mapping_page</span><span class="p">,</span>
-                                      <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="n">psacap</span><span class="p">,</span>
-                                      <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;psa[0-9][0-9].jpg&#39;</span><span class="p">,</span>
-                                                  <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
-                                                 <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;PSA[0-9]p[0-9]_contour.pdf&#39;</span><span class="p">,</span>
-                                                  <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/pdf&#39;</span><span class="p">},</span>
-                                                <span class="p">]</span>
-                                     <span class="p">}</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;psa[PERIOD]Map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PSA[PERIOD] Map&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">mapping_page</span><span class="p">,</span>
+                                  <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">psacap</span><span class="p">,</span>
+                                  <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;psa[0-9][0-9].jpg&#39;</span><span class="p">,</span>
+                                               <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
+                                              <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span>
+                                               <span class="s1">&#39;PSA[0-9]p[0-9]_contour.pdf&#39;</span><span class="p">,</span>
+                                               <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/pdf&#39;</span><span class="p">},</span>
+                                              <span class="p">]</span>
+                                  <span class="p">}</span>
 
 <div class="viewcode-block" id="MappingModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MappingModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -245,25 +239,25 @@
         <span class="c1">###########################</span>
         <span class="c1"># Make a placeholder plot of standard deviation</span>
         <span class="c1"># fill this in later if necessary</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">FIG_WIDTH</span><span class="p">,</span><span class="n">FIG_HEIGHT</span><span class="p">))</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">FIG_WIDTH</span><span class="p">,</span> <span class="n">FIG_HEIGHT</span><span class="p">))</span>
         <span class="n">components</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="s1">&#39;PGA&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">):</span>
             <span class="k">return</span>
         <span class="n">component</span> <span class="o">=</span> <span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">imt_dict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="s1">&#39;PGA&#39;</span><span class="p">,</span><span class="n">component</span><span class="p">)</span>
-        <span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getData</span><span class="p">(),</span><span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
-                        <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">,</span><span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="n">vmax</span><span class="o">=</span><span class="mf">1.25</span><span class="p">)</span>
+        <span class="n">imt_dict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="s1">&#39;PGA&#39;</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">imt_dict</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">getData</span><span class="p">(),</span> <span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;none&#39;</span><span class="p">,</span>
+                        <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;jet&#39;</span><span class="p">,</span> <span class="n">vmin</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">vmax</span><span class="o">=</span><span class="mf">1.25</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;PGA Standard Deviation&#39;</span><span class="p">)</span>
-        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span> <span class="c1">#get the current axes object</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>  <span class="c1"># get the current axes object</span>
 
-        <span class="c1">#do some magic stuff to make a new axes</span>
+        <span class="c1"># do some magic stuff to make a new axes</span>
         <span class="n">divider</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">ax</span><span class="p">)</span>
         <span class="n">cax</span> <span class="o">=</span> <span class="n">divider</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span>
-        <span class="c1">#draw colorbar in new divider axes</span>
+        <span class="c1"># draw colorbar in new divider axes</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax</span><span class="p">)</span>
         <span class="n">sd_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;sd.jpg&#39;</span><span class="p">)</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
-        <span class="n">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span><span class="n">sd_file</span><span class="p">)</span></div></div>
+        <span class="n">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">sd_file</span><span class="p">)</span></div></div>
         <span class="c1">###########################</span>
 
 
@@ -377,12 +371,15 @@
         <span class="n">info_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span>
             <span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">))[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]</span>
         <span class="n">event_dict</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;eventsourcecode&#39;</span><span class="p">:</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;event_id&#39;</span><span class="p">],</span>
-            <span class="s1">&#39;eventsource&#39;</span><span class="p">:</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;id&#39;</span><span class="p">:</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;event_id&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;netid&#39;</span><span class="p">:</span> <span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">],</span>
             <span class="s1">&#39;lat&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;latitude&#39;</span><span class="p">]),</span>
             <span class="s1">&#39;lon&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;longitude&#39;</span><span class="p">]),</span>
             <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;depth&#39;</span><span class="p">]),</span>
-            <span class="s1">&#39;mag&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;magnitude&#39;</span><span class="p">])</span>
+            <span class="s1">&#39;mag&#39;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">info_dict</span><span class="p">[</span><span class="s1">&#39;magnitude&#39;</span><span class="p">]),</span>
+            <span class="s1">&#39;network&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;locstring&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;time&#39;</span><span class="p">:</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">utcfromtimestamp</span><span class="p">(</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">())</span>
         <span class="p">}</span>
         <span class="n">origin</span> <span class="o">=</span> <span class="n">Origin</span><span class="p">(</span><span class="n">event_dict</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">rupture_dict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Point&#39;</span><span class="p">:</span>
@@ -1034,6 +1031,28 @@
         <span class="c1"># draw station and macroseismic locations</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawStations</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>  <span class="c1"># need stationlist object</span>
 
+        <span class="c1"># draw surface projection of finite fault</span>
+        <span class="n">rdict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getRuptureDict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;Point&#39;</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
+                <span class="n">polygons</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">polygon</span> <span class="ow">in</span> <span class="n">polygons</span><span class="p">:</span>
+                    <span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span>
+                    <span class="n">x</span> <span class="o">=</span> <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span>
+                    <span class="n">y</span> <span class="o">=</span> <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span>
+                    <span class="n">m</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">latlon</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">SCALE_ZORDER</span><span class="p">)</span>
+
+        <span class="c1"># if event is a scenario, make watermark of the word scenario diagonally across map</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
+        <span class="n">eventid</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">eventid</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_se&#39;</span><span class="p">):</span>
+            <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">hlon</span><span class="p">,</span> <span class="n">hlat</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="s1">&#39;SCENARIO&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+                     <span class="n">zorder</span><span class="o">=</span><span class="n">SCENARIO_ZORDER</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+                     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span>
+                     <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                     <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
         <span class="c1"># save plot to file</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
         <span class="n">outfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;intensity.pdf&#39;</span><span class="p">)</span>
@@ -1041,18 +1060,18 @@
         <span class="n">outfile2</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;intensity.jpg&#39;</span><span class="p">)</span>
 
         <span class="c1"># newer versions of PIL don&#39;t support writing of RGBA images to JPEG,</span>
-        <span class="c1"># or at least they won&#39;t handle getting rid of the alpha channel for you.</span>
-        <span class="c1"># so, let&#39;s grab the figure as an RGB image, and then write it to a file</span>
-        <span class="c1"># manually</span>
+        <span class="c1"># or at least they won&#39;t handle getting rid of the alpha channel for</span>
+        <span class="c1"># you. so, let&#39;s grab the figure as an RGB image, and then write it</span>
+        <span class="c1"># to a file manually</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
-        <span class="n">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span><span class="n">outfile2</span><span class="p">)</span>
+        <span class="n">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">outfile2</span><span class="p">)</span>
         <span class="n">tn</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
 
         <span class="c1"># make the thumbnail image</span>
         <span class="n">dpi</span> <span class="o">=</span> <span class="n">THUMBNAIL_WIDTH_PIXELS</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig_width</span>
         <span class="n">thumbfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;pin-thumbnail.png&#39;</span><span class="p">)</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">thumbfile</span><span class="p">,</span><span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">thumbfile</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">outfile</span></div>
 
@@ -1296,6 +1315,17 @@
         <span class="c1"># draw title and supertitle</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawTitle</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
 
+        <span class="c1"># if event is a scenario, make watermark of the word scenario diagonally across map</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
+        <span class="n">eventid</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">eventid</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_se&#39;</span><span class="p">):</span>
+            <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">hlon</span><span class="p">,</span> <span class="n">hlat</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="s1">&#39;SCENARIO&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+                     <span class="n">zorder</span><span class="o">=</span><span class="n">SCENARIO_ZORDER</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
+                     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span>
+                     <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                     <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+
         <span class="c1"># save plot to file</span>
         <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
@@ -1309,18 +1339,18 @@
         <span class="c1"># old style naming convention.  Stop making this when</span>
         <span class="c1"># all contributing networks are using this code.</span>
         <span class="k">if</span> <span class="s1">&#39;PSA&#39;</span> <span class="ow">in</span> <span class="n">fileimt</span><span class="p">:</span>
-            <span class="n">oldimt</span> <span class="o">=</span> <span class="n">fileimt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span><span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="n">oldimt</span> <span class="o">=</span> <span class="n">fileimt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;p&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">oldimt</span> <span class="o">=</span> <span class="n">fileimt</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
         <span class="n">outfile_old</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.jpg&#39;</span> <span class="o">%</span> <span class="n">oldimt</span><span class="p">)</span>
         <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
-        <span class="n">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span><span class="n">outfile_old</span><span class="p">)</span>
+        <span class="n">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">outfile_old</span><span class="p">)</span>
         <span class="c1">######################</span>
-
 
         <span class="n">tn</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> seconds to render entire map.&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">tn</span> <span class="o">-</span> <span class="n">t0</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">outfile</span></div></div>
+
 
 <span class="k">def</span> <span class="nf">_select_font</span><span class="p">():</span>
     <span class="c1"># I really don&#39;t care that much about fonts, just trying to find one</span>
@@ -1343,7 +1373,8 @@
         <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Could not find any font from system font list&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">selected_font</span>
 
-<span class="k">def</span> <span class="nf">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+
+<span class="k">def</span> <span class="nf">_save_jpg</span><span class="p">(</span><span class="n">fig</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
     <span class="n">canvas</span> <span class="o">=</span> <span class="n">FigureCanvas</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>
     <span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>       <span class="c1"># draw the canvas, cache the renderer</span>
     <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">canvas</span><span class="o">.</span><span class="n">tostring_rgb</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;uint8&#39;</span><span class="p">)</span>
@@ -1386,12 +1417,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

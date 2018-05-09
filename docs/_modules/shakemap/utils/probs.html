@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.utils.probs &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -50,7 +41,7 @@
 <span class="kn">from</span> <span class="nn">strec.subtype</span> <span class="k">import</span> <span class="n">SubductionSelector</span>
 
 
-<div class="viewcode-block" id="get_weights"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.probs.html#shakemap.utils.probs.get_weights">[docs]</a><span class="k">def</span> <span class="nf">get_weights</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">tensor_params</span><span class="p">):</span>
+<div class="viewcode-block" id="get_weights"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.probs.html#shakemap.utils.probs.get_weights">[docs]</a><span class="k">def</span> <span class="nf">get_weights</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Get list of GMPEs and their weights for a given earthquake.</span>
 
 <span class="sd">    Args:</span>
@@ -58,14 +49,16 @@
 <span class="sd">            info.</span>
 <span class="sd">        config (dict-like): Configuration information regarding earthquake</span>
 <span class="sd">            type.</span>
-<span class="sd">        tensor_params (dict): Containing fields NP1/NP2, each a dict with</span>
-<span class="sd">            strike/dip/rake.</span>
+
 <span class="sd">    Returns:</span>
-<span class="sd">        list: String GMPEs selected for this earthquake.</span>
-<span class="sd">        ndarray: Float weights for corresponding GMPEs.</span>
-<span class="sd">        Series: Pandas series containing STREC output.</span>
+<span class="sd">        tuple: Tuple with elements that are:</span>
+<span class="sd">            - list of strings indicating the GMPEs selected for this</span>
+<span class="sd">              earthquake.</span>
+<span class="sd">            - ndarray (float) of GMPE weights.</span>
+<span class="sd">            - Pandas series containing STREC output.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">tprobs</span><span class="p">,</span> <span class="n">strec_results</span> <span class="o">=</span> <span class="n">get_probs</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">tensor_params</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Testing&#39;</span><span class="p">)</span>
+    <span class="n">tprobs</span><span class="p">,</span> <span class="n">strec_results</span> <span class="o">=</span> <span class="n">get_probs</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
     <span class="n">gmpelist</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">weightlist</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -102,7 +95,7 @@
     <span class="k">return</span> <span class="n">gmpelist</span><span class="p">,</span> <span class="n">weightlist</span><span class="p">,</span> <span class="n">strec_results</span></div>
 
 
-<div class="viewcode-block" id="get_probs"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.probs.html#shakemap.utils.probs.get_probs">[docs]</a><span class="k">def</span> <span class="nf">get_probs</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">tensor_params</span><span class="p">):</span>
+<div class="viewcode-block" id="get_probs"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.probs.html#shakemap.utils.probs.get_probs">[docs]</a><span class="k">def</span> <span class="nf">get_probs</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Calculate probabilities for each earthquake type.</span>
 
 <span class="sd">    The results here contain probabilities that can be rolled up in many ways:</span>
@@ -118,8 +111,7 @@
 <span class="sd">            info.</span>
 <span class="sd">        config (dict-like): Configuration information regarding earthquake</span>
 <span class="sd">            type.</span>
-<span class="sd">        tensor_params (dict): Containing fields NP1/NP2, each a dict with</span>
-<span class="sd">            strike/dip/rake.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Probabilities for each earthquake type, with fields:</span>
 <span class="sd">              - acr Probability that the earthquake is in an active region.</span>
@@ -143,9 +135,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">selector</span> <span class="o">=</span> <span class="n">SubductionSelector</span><span class="p">()</span>
     <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">mag</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">lon</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span>
-    <span class="n">eid</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">eventsourcecode</span>
-    <span class="n">strec_results</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">getSubductionType</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span>
-                                               <span class="n">tensor_params</span><span class="o">=</span><span class="n">tensor_params</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">origin</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">origin</span><span class="o">.</span><span class="n">netid</span><span class="p">):</span>
+        <span class="n">eid</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">netid</span> <span class="o">+</span> <span class="n">origin</span><span class="o">.</span><span class="n">id</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">eid</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">id</span>
+
+    <span class="n">strec_results</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">getSubductionType</span><span class="p">(</span>
+        <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">eid</span><span class="p">,</span> <span class="n">tensor_params</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
     <span class="n">region_probs</span> <span class="o">=</span> <span class="n">get_region_probs</span><span class="p">(</span><span class="n">eid</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">strec_results</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
     <span class="n">in_subduction</span> <span class="o">=</span> <span class="n">strec_results</span><span class="p">[</span><span class="s1">&#39;TectonicRegion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Subduction&#39;</span>
     <span class="n">above_slab</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">strec_results</span><span class="p">[</span><span class="s1">&#39;SlabModelDepth&#39;</span><span class="p">])</span>
@@ -177,6 +174,7 @@
 <span class="sd">        strec_results (Series): Pandas series containing STREC output.</span>
 <span class="sd">        config (dict-like): Configuration information regarding earthquake</span>
 <span class="sd">            type.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Probabilities for each earthquake type, with fields:</span>
 <span class="sd">              - acr Probability that the earthquake is in an active region.</span>
@@ -206,21 +204,12 @@
         <span class="c1"># If we&#39;re considering subduction zones but not IN a subduction zone</span>
         <span class="n">x1</span> <span class="o">=</span> <span class="mf">0.0</span>
         <span class="n">p2</span> <span class="o">=</span> <span class="mf">0.0</span>
-        <span class="k">if</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;subduction&#39;</span><span class="p">:</span>
-            <span class="n">x2</span> <span class="o">=</span> <span class="mf">100.0</span>  <span class="c1"># this doesn&#39;t matter</span>
-            <span class="k">if</span> <span class="n">distance</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">p1</span> <span class="o">=</span> <span class="mf">0.0</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">p1</span> <span class="o">=</span> <span class="mf">1.0</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">p1</span> <span class="o">=</span> <span class="mf">1.0</span>
-            <span class="n">x2</span> <span class="o">=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;horizontal_buffer&#39;</span><span class="p">]</span>
+
+        <span class="n">p1</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">x2</span> <span class="o">=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;horizontal_buffer&#39;</span><span class="p">]</span>
 
         <span class="n">region_prob</span> <span class="o">=</span> <span class="n">get_probability</span><span class="p">(</span><span class="n">distance</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">p1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">p2</span><span class="p">)</span>
         <span class="n">region_probs</span><span class="p">[</span><span class="n">region</span><span class="p">]</span> <span class="o">=</span> <span class="n">region_prob</span>
-
-        <span class="k">if</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;subduction&#39;</span><span class="p">:</span>
-            <span class="k">continue</span>
 
         <span class="n">region_layer_probs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="c1"># now do the weights for each depth zone</span>
@@ -274,6 +263,7 @@
 <span class="sd">        config (dict-like): Configuration information regarding earthquake</span>
 <span class="sd">            type.</span>
 <span class="sd">        above_slab (bool): Is earthquake above a defined slab?</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Probabilities for each earthquake type, with fields:</span>
 <span class="sd">              - crustal Probability that the earthquake is in the crust above</span>
@@ -355,7 +345,11 @@
 
         <span class="n">p_int_depth</span> <span class="o">=</span> <span class="n">p_int_depth_upper</span> <span class="o">+</span> <span class="n">p_int_depth_lower</span>
 
-        <span class="n">p_int</span> <span class="o">=</span> <span class="n">p_int_mag</span> <span class="o">*</span> <span class="n">p_int_depth</span>
+        <span class="c1"># This functional form is used so that the probability of interface</span>
+        <span class="c1"># inflates and appraoches 1 as magnitude gets large, assuming</span>
+        <span class="c1"># that the ramp function for p_int_mag is zero at small magnitudes</span>
+        <span class="c1"># and 1 at large magnitudes.</span>
+        <span class="n">p_int</span> <span class="o">=</span> <span class="n">p_int_depth</span> <span class="o">+</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">p_int_depth</span><span class="p">)</span><span class="o">*</span><span class="n">p_int_mag</span>
 
     <span class="c1"># Calculate probability that the earthquake lies above the slab</span>
     <span class="c1"># and is thus crustal.</span>
@@ -379,9 +373,11 @@
     <span class="c1"># Calculate probability of intraslab</span>
     <span class="n">p_slab</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">p_int</span> <span class="o">+</span> <span class="n">p_crustal</span><span class="p">)</span>
 
-    <span class="n">probs</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;crustal&#39;</span><span class="p">:</span> <span class="n">p_crustal</span><span class="p">,</span>
-             <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="n">p_int</span><span class="p">,</span>
-             <span class="s1">&#39;intraslab&#39;</span><span class="p">:</span> <span class="n">p_slab</span><span class="p">}</span>
+    <span class="n">probs</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;crustal&#39;</span><span class="p">:</span> <span class="n">p_crustal</span><span class="p">,</span>
+        <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="n">p_int</span><span class="p">,</span>
+        <span class="s1">&#39;intraslab&#39;</span><span class="p">:</span> <span class="n">p_slab</span>
+    <span class="p">}</span>
     <span class="k">return</span> <span class="n">probs</span></div>
 
 
@@ -390,20 +386,21 @@
 
 <span class="sd">    The subsections and parameters below reflect a series of ramp functions</span>
 <span class="sd">    we use to calculate various probabilities.</span>
-<span class="sd">    p1  |----x1</span>
-<span class="sd">        |     \</span>
-<span class="sd">        |      \</span>
-<span class="sd">        |       \</span>
-<span class="sd">    p2  |        x2------</span>
-<span class="sd">        |</span>
-<span class="sd">        ------------------</span>
-
+<span class="sd">      p1  |----+</span>
+<span class="sd">          |     \</span>
+<span class="sd">          |      \</span>
+<span class="sd">          |       \</span>
+<span class="sd">      p2  |        +-------</span>
+<span class="sd">          |</span>
+<span class="sd">          +-----------------</span>
+<span class="sd">               x1  x2</span>
 <span class="sd">    Args:</span>
 <span class="sd">        x (float): Quantity for which we want corresponding probability.</span>
 <span class="sd">        x1 (float): Minimum X value.</span>
 <span class="sd">        p1 (float): Probability at or below minimum X value.</span>
 <span class="sd">        x2 (float): Maximum X value.</span>
 <span class="sd">        p2 (float): Probability at or below maximum X value.</span>
+
 <span class="sd">    Returns:</span>
 <span class="sd">        float: Probability at input x value.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -451,12 +448,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

@@ -1,5 +1,5 @@
-shakemap\.utils\.probs
-=============================
+shakemap.utils.probs
+===========================
 
 .. automodule:: shakemap.utils.probs
     :members:

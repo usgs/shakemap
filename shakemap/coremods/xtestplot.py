@@ -45,33 +45,42 @@ class XTestPlot(CoreModule):
         datadict = {}
         imtlist = container.getIMTs('GREATER_OF_TWO_HORIZONTAL')
         for myimt in imtlist:
-            datadict[myimt] = container.getIMTArrays(myimt,
-                                                     'GREATER_OF_TWO_HORIZONTAL')
+            datadict[myimt] = container.getIMTArrays(
+                myimt, 'GREATER_OF_TWO_HORIZONTAL')
 
         #
         # Make plots
         #
         for myimt in imtlist:
             data = datadict[myimt]
-            fig = plt.figure(figsize=(10, 8))
-            plt.plot(data['lons'],
-                     data['mean'],
-                     color='k', label='mean')
-            plt.plot(data['lons'],
-                     data['mean'] + data['std'],
-                     '--b', label='mean +/- stddev')
-            plt.plot(data['lons'],
-                     data['mean'] - data['std'],
-                     '--b')
-            plt.plot(data['lons'],
-                     data['std'],
-                     '-.r', label='stddev')
+            fig, axa = plt.subplots(2, sharex=True, figsize=(10, 8))
+            plt.subplots_adjust(hspace=0.1)
+            axa[0].plot(data['lons'],
+                        data['mean'],
+                        color='k', label='mean')
+            axa[0].plot(data['lons'],
+                        data['mean'] + data['std'],
+                        '--b', label='mean +/- stddev')
+            axa[0].plot(data['lons'],
+                        data['mean'] - data['std'],
+                        '--b')
+            axa[1].plot(data['lons'],
+                        data['std'],
+                        '-.r', label='stddev')
             plt.xlabel('Longitude')
-            plt.ylabel('ln(%s) (g)' % myimt)
-            plt.legend(loc='best')
-            plt.title(self._eventid)
-            plt.grid()
+            axa[0].set_ylabel('Mean ln(%s) (g)' % myimt)
+            axa[1].set_ylabel('Stddev ln(%s) (g)' % myimt)
+            axa[0].legend(loc='best')
+            axa[1].legend(loc='best')
+            axa[0].set_title(self._eventid)
+            axa[0].grid()
+            axa[1].grid()
+            axa[1].set_ylim(ymin=0)
             fileimt = oq_to_file(myimt)
-            pfile = os.path.join(datadir, self._eventid + '_' + fileimt + '.pdf')
-            plt.savefig(pfile)
+            pfile = os.path.join(datadir,
+                                 self._eventid + '_' + fileimt + '.pdf')
+            plt.savefig(pfile, tight_layout=True)
+            pfile = os.path.join(datadir,
+                                 self._eventid + '_' + fileimt + '.png')
+            plt.savefig(pfile, tight_layout=True)
             plt.close()

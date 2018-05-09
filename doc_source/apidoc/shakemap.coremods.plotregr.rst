@@ -1,5 +1,5 @@
-shakemap\.coremods\.plotregr
-===================================
+shakemap.coremods.plotregr
+=================================
 
 .. automodule:: shakemap.coremods.plotregr
     :members:

@@ -1,5 +1,5 @@
-shakelib\.correlation\.dummy
-===================================
+shakelib.correlation.dummy
+=================================
 
 .. automodule:: shakelib.correlation.dummy
     :members:

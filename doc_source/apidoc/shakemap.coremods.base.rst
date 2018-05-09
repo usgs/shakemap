@@ -1,5 +1,5 @@
-shakemap\.coremods\.base
-===============================
+shakemap.coremods.base
+=============================
 
 .. automodule:: shakemap.coremods.base
     :members:

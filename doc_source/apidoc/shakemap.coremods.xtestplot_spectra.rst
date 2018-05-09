@@ -1,5 +1,5 @@
-shakemap\.coremods\.xtestplot\_spectra
-=============================================
+shakemap.coremods.xtestplot\_spectra
+===========================================
 
 .. automodule:: shakemap.coremods.xtestplot_spectra
     :members:

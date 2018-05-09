@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>getdyfi &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -26,15 +18,14 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shakemap" href="../apidoc/shakemap.html" />
-    <link rel="prev" title="sm_profile" href="sm_profile.html" />
+    <link rel="prev" title="sm_queue" href="sm_queue.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -46,13 +37,13 @@
 <span id="id1"></span><h1>getdyfi<a class="headerlink" href="#getdyfi" title="Permalink to this headline">¶</a></h1>
 <p><blockquote>
 <div><p>Download DYFI data from NEIC Comcat into a local data directory.</p>
-<p>Where url_or_id is a ComCat event page URL or event ID.  
+<p>Where url_or_id is a ComCat event page URL or event ID.
 For example, the url for the 2014 South Napa event is:
 <a class="reference external" href="https://earthquake.usgs.gov/earthquakes/eventpage/nc72282711">https://earthquake.usgs.gov/earthquakes/eventpage/nc72282711</a>
 and the event ID is nc72282711.</p>
 </div></blockquote>
 </p>
-<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">getdyfi</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">file</span> <span class="n">FILE</span><span class="p">]</span> <span class="n">url_or_id</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">getdyfi</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">file</span> <span class="n">FILE</span><span class="p">]</span> <span class="n">url_or_id</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -109,8 +100,10 @@ and the event ID is nc72282711.</p>
 <li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="programs.html">ShakeMap 4.0a Command Line Interface</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="shake.html">shake</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sm_clone.html">sm_clone</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_create.html">sm_create</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_migrate.html">sm_migrate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sm_profile.html">sm_profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sm_queue.html">sm_queue</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">getdyfi</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#Positional Arguments">Positional Arguments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
@@ -125,12 +118,14 @@ and the event ID is nc72282711.</p>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

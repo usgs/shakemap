@@ -1,5 +1,5 @@
-shakelib\.utils\.imt\_string
-===================================
+shakelib.utils.imt\_string
+=================================
 
 .. automodule:: shakelib.utils.imt_string
     :members:

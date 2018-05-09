@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.utils.utils &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -42,7 +33,98 @@
             
   <h1>Source code for shakemap.utils.utils</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
+<span class="kn">from</span> <span class="nn">urllib</span> <span class="k">import</span> <span class="n">request</span>
+<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="k">import</span> <span class="n">HTTPError</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
+
+<span class="c1"># third party imports</span>
+<span class="kn">from</span> <span class="nn">configobj</span> <span class="k">import</span> <span class="n">ConfigObj</span>
+
+<span class="c1"># url template for json file describing everything we know about a network</span>
+<span class="n">NETWORK_TEMPLATE</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;https://earthquake.usgs.gov/data/comcat/&#39;</span>
+                    <span class="s1">&#39;contributor/[NETID]/index.json&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="migrate_gmpe"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.utils.html#shakemap.utils.utils.migrate_gmpe">[docs]</a><span class="k">def</span> <span class="nf">migrate_gmpe</span><span class="p">(</span><span class="n">old_gmpe</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return the GMPE that should be used to replace SM3.5 GMPE</span>
+
+<span class="sd">    By default, this uses the migrate.conf file found in the ShakeMap</span>
+<span class="sd">    repository. Users can optionally pass in their own config.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        old_gmpe (str):</span>
+<span class="sd">            ShakeMap 3.5 GMPE string</span>
+<span class="sd">        config (dict):</span>
+<span class="sd">            Input configobj dict or None.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: New GMPE string, and GMPE reference string.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">data_path</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a valid directory.&#39;</span> <span class="o">%</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;migrate.conf&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> not found.&#39;</span> <span class="o">%</span> <span class="n">config_file</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">old_gmpe</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modules&#39;</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+            <span class="s1">&#39;ShakeMap 3.5 GMPE </span><span class="si">%s</span><span class="s1"> not found in migrate.conf.&#39;</span> <span class="o">%</span> <span class="n">old_gmpe</span><span class="p">)</span>
+    <span class="n">new_gmpe</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modules&#39;</span><span class="p">][</span><span class="n">old_gmpe</span><span class="p">][</span><span class="s1">&#39;openquake&#39;</span><span class="p">]</span>
+    <span class="n">reference</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modules&#39;</span><span class="p">][</span><span class="n">old_gmpe</span><span class="p">][</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">new_gmpe</span><span class="p">,</span> <span class="n">reference</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="set_gmpe"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.utils.html#shakemap.utils.utils.set_gmpe">[docs]</a><span class="k">def</span> <span class="nf">set_gmpe</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
+    <span class="n">gmpe_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">gmpe</span><span class="p">]</span>
+    <span class="n">weight_list</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">]</span>
+    <span class="n">gmpe_set</span> <span class="o">=</span> <span class="s1">&#39;gmpe_&#39;</span> <span class="o">+</span> <span class="n">eventid</span> <span class="o">+</span> <span class="s1">&#39;_custom&#39;</span>
+    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gmpe_set</span>
+    <span class="n">config</span><span class="p">[</span><span class="s1">&#39;gmpe_sets&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">([</span>
+        <span class="p">(</span><span class="n">gmpe_set</span><span class="p">,</span> <span class="n">OrderedDict</span><span class="p">([</span>
+            <span class="p">(</span><span class="s1">&#39;gmpes&#39;</span><span class="p">,</span> <span class="n">gmpe_list</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;weights&#39;</span><span class="p">,</span> <span class="n">weight_list</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;weights_large_dist&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;dist_cutoff&#39;</span><span class="p">,</span> <span class="s1">&#39;nan&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;site_gmpes&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s1">&#39;weights_site_gmpes&#39;</span><span class="p">,</span> <span class="s1">&#39;None&#39;</span><span class="p">)</span>
+        <span class="p">]))])</span>
+    <span class="k">return</span> <span class="n">config</span></div>
+
+
+<div class="viewcode-block" id="get_network_name"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.utils.html#shakemap.utils.utils.get_network_name">[docs]</a><span class="k">def</span> <span class="nf">get_network_name</span><span class="p">(</span><span class="n">netid</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return a string representing a name of a network given its ID.</span>
+
+<span class="sd">    Note: Uses an internet connection to ComCat.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        netid (str): Usually two-character network ID (us,ci, etc.)</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Network name, or &quot;unknown&quot; if input netid is invalid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">NETWORK_TEMPLATE</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[NETID]&#39;</span><span class="p">,</span> <span class="n">netid</span><span class="p">)</span>
+    <span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;unknown&#39;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">fh</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">urlopen</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+        <span class="n">jdict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">network</span> <span class="o">=</span> <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">he</span><span class="p">:</span>
+        <span class="n">error_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;No network description found for </span><span class="si">%s</span><span class="s1">. You may</span>
+<span class="s1">want to make sure that the pages of the form </span><span class="si">%s</span><span class="s1"> still exist,</span>
+<span class="s1">and contact the ShakeMap developers if they do not.</span>
+<span class="s1">&#39;&#39;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">netid</span><span class="p">,</span> <span class="n">NETWORK_TEMPLATE</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">error_str</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">network</span></div>
 
 
 <div class="viewcode-block" id="get_object_from_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.utils.html#shakemap.utils.utils.get_object_from_config">[docs]</a><span class="k">def</span> <span class="nf">get_object_from_config</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">section</span><span class="p">,</span> <span class="n">cfg</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -53,12 +135,16 @@
 <span class="sd">    &#39;name&#39;_module dictionary of class name, module path.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        obj (str): Name of the parameter in the config file that specifies</span>
+<span class="sd">        obj (str):</span>
+<span class="sd">            Name of the parameter in the config file that specifies</span>
 <span class="sd">            the object to be instantiated.</span>
-<span class="sd">        section (str): The section of the config in which &#39;obj&#39; resides.</span>
-<span class="sd">        cfg (dict): The configuration file in which &#39;obj&#39; and the</span>
+<span class="sd">        section (str):</span>
+<span class="sd">            The section of the config in which &#39;obj&#39; resides.</span>
+<span class="sd">        cfg (dict):</span>
+<span class="sd">            The configuration file in which &#39;obj&#39; and the</span>
 <span class="sd">            module definitions reside.</span>
-<span class="sd">        args: Additional arguments that will be passed to the constructor</span>
+<span class="sd">        args:</span>
+<span class="sd">            Additional arguments that will be passed to the constructor</span>
 <span class="sd">            of the thing being instantiated.</span>
 
 <span class="sd">    Returns:</span>
@@ -123,9 +209,12 @@
 <span class="sd">    does not contain one or both of &lt;INSTALL_DIR&gt; or &lt;DATA_DIR&gt;.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        s (str): The string into which the replacements are made.</span>
-<span class="sd">        ip (str): The string with which to replace &lt;INSTALL_DIR&gt;.</span>
-<span class="sd">        dp (str): The string with which to replace &lt;DATA_DIR&gt;.</span>
+<span class="sd">        s (str):</span>
+<span class="sd">            The string into which the replacements are made.</span>
+<span class="sd">        ip (str):</span>
+<span class="sd">            The string with which to replace &lt;INSTALL_DIR&gt;.</span>
+<span class="sd">        dp (str):</span>
+<span class="sd">            The string with which to replace &lt;DATA_DIR&gt;.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        str: A new string with the sub-string replacements.</span>
@@ -167,12 +256,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

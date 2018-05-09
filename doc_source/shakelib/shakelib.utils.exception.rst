@@ -1,5 +1,5 @@
-shakelib\.utils\.exception
-=================================
+shakelib.utils.exception
+===============================
 
 .. automodule:: shakelib.utils.exception
     :members:
