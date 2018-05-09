@@ -2,6 +2,7 @@
 
 import os
 import pytest
+import sys
 
 import numpy as np
 
@@ -56,7 +57,7 @@ def make_generic_amps():
 
 def test_generic_amp():
     try:
-        east_west, north_south = make_generic_amps()
+        east_west_file, north_south_file = make_generic_amps()
         #
         # Using the LA basin test data set, make a set of lons and lats
         # Bounds of data set: -119.284/-117.284/32.9/34.6
@@ -134,10 +135,9 @@ def test_generic_amp():
     except Exception as e:
         assert 1==2
     finally:
-        os.remove(east_west)
-        os.remove(north_south)
-        
-
+        os.remove(east_west_file)
+        os.remove(north_south_file)
+            
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'
     test_generic_amp()
