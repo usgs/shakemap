@@ -131,6 +131,7 @@ mech="" netid="us" network="" />"""
         container3.setStationDict(config)
         config2 = container3.getStationDict()
         assert dict_equal(config, config2)
+        container3.close()
 
     except Exception:
         assert 1 == 2
@@ -260,6 +261,7 @@ Available IMTs (components):
         container.dropIMT('mmi')
         imts = container.getIMTs('maximum')
         assert imts == ['pga']
+        container.close()
 
     except Exception as e:
         raise(e)
@@ -335,6 +337,8 @@ def test_output_arrays():
         with pytest.raises(TypeError):
             container.getIMTGrids('PGA', 'Larger')
 
+        container.close()
+
     except Exception as e:
         raise(e)
     finally:
@@ -350,13 +354,13 @@ def test_output_repr():
     assert container_str == '''Data type: grid
     use "getIMTGrids" method to access interpolated IMTs
 Rupture: <class 'shakelib.rupture.quad_rupture.QuadRupture'>
-    locstring: Northridge
+    locstring: 1km NNW of Reseda, CA
     magnitude: 6.7
     time: 1994-01-17T12:30:55.000000Z
 Config: use 'getConfig' method
 Stations: use 'getStationDict' method
     # instrumental stations: 185
-    # macroseismic stations: 547
+    # macroseismic stations: 977
 Metadata: use 'getMetadata' method
 Available IMTs (components):
     MMI (GREATER_OF_TWO_HORIZONTAL)

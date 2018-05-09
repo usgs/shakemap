@@ -203,12 +203,16 @@ def create(config, profile, accept, ppath):
     install_layer_dir = os.path.join(install_path, 'layers')
     install_data_dir = os.path.join(install_path, 'data')
     mapping_data_dir = os.path.join(install_data_dir, 'mapping')
-
+    generic_amps_dir = os.path.join(install_data_dir, 'GenericAmpFactors')
+    
     if not os.path.isdir(install_layer_dir):
         shutil.copytree(layer_dir, install_layer_dir)
 
     if not os.path.isdir(install_data_dir):
         os.mkdir(install_data_dir)
+
+    if not os.path.isdir(generic_amps_dir):
+        os.mkdir(generic_amps_dir)
 
     if not os.path.isdir(mapping_data_dir):
         os.mkdir(mapping_data_dir)

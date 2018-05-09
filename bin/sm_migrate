@@ -38,6 +38,24 @@ def get_parser():
 
     find . -name "*_dat.xml" -o -name "*_fault.txt" -o -name "source.txt" -o -name "info.json" -o -name "*.conf" | tar -czvf ~/sm35_inputs.tgz -T -
 
+    This program takes a subset of the ShakeMap 3.5 input data and the info.json file
+    and uses those files to create the corresponding ShakeMap 4.0 input data.
+
+    Files used:
+      - *_dat.xml data files in XML format. These are unchanged in ShakeMap 4.0.
+      - *_fault.txt fault files in text format. These will be converted to GeoJSON.
+      - source.txt Text file possibly containing mechanism and ??
+      - info.json Metadata file from which we extract:
+        - Origin information for new event.xml file.
+        - bias settings (see -s option) 
+
+      - *.conf Config files, of which generally speaking only grind.conf is supported:
+               - IPEs are currently not supported.
+               - A smaller subset of GMICE are supported in ShakeMap 4.0 at the time of this writing.
+               - GMPE selections will be converted to the closest matching GEM equivalent (see -m).
+               - outlier max_deviation and max_mag values will be converted.
+               - 
+
     '''
     parser = argparse.ArgumentParser(description=description,
                                      formatter_class=argparse.RawTextHelpFormatter)
@@ -137,10 +155,12 @@ def main(args):
         elif filename in ['info.json']:
             if 'download' in member:
                 continue
-            edict, info_errors = save_info(event_dir, tarball, member,
-                                           netid, networks, module_conf,
-                                           skip_bounds=args.skip_bounds)
+            edict, info_errors, info_conversions = parse_info(event_dir, tarball, member,
+                                            netid, networks, module_conf,
+                                            skip_bounds=args.skip_bounds,
+                                            skip_settings=args.skip_settings)
             errors += info_errors
+            conversions.update(info_conversions)
             handler.insertEvent(edict)
         elif filename == 'source.txt':
             _extract_file(member, tarball, filename, event_dir)
@@ -157,9 +177,8 @@ def main(args):
         print('\t"%s"' % error)
 
     print('The following GMPE conversions were applied:')
-    for old_gmpe, new_dict in conversions.items():
-        new_gmpe = new_dict['new_gmpe']
-        ref = new_dict['reference']
+    for old_gmpe, gmpe_tuple in conversions.items():
+        new_gmpe, ref = gmpe_tuple
         print('\t"%s" (%s) was converted to new GMPE "%s".' %
               (old_gmpe, ref, new_gmpe))
 
@@ -191,62 +210,6 @@ def make_rupture(event_dir):
         os.remove(ffile)
 
 
-def parse_grind(event_dir, tarball, member, migrate_conf=None):
-    parts = member.split('/')
-    eventid = parts[-3]
-    grindfile = tarball.extractfile(member)
-    lines = grindfile.readlines()
-    gmpe_msg = '''IPE setting of %s detected in event %s. Please read the documentation
-on how to configure IPEs for different depths and magnitude ranges in select.conf.
-'''
-    # model.conf
-    model = ConfigObj(indent_type='  ')
-    model['modeling'] = {}
-    model['system'] = {}
-    model['data'] = {'outlier': {}}
-
-    errors = []
-    conversions = {}
-
-    for line in lines:
-        line = line.decode('utf-8').strip()
-        if line.strip().startswith('#'):
-            continue
-        if not len(line.strip()):
-            continue
-        key, value = line.split(':')
-        key = key.strip()
-        value = value.strip()
-        if key == 'gmpe':
-            old_gmpe = value.split()[0]
-            new_gmpe, reference = migrate_gmpe(old_gmpe, config=migrate_conf)
-            model = set_gmpe(new_gmpe, model, eventid)
-            if old_gmpe not in conversions:
-                conversions[old_gmpe] = {'reference': reference,
-                                         'new_gmpe': new_gmpe}
-        elif key == 'ipe':
-            errors.append(gmpe_msg % (value, eventid))
-        elif key == 'mi2pgm' or key == 'pgm2mi':
-            if value == 'WGRW11':
-                value = 'WGRW12'
-            model['modeling']['gmice'] = value
-        elif key == 'outlier_deviation_level':
-            model['data']['outlier']['max_deviation'] = value
-        elif key == 'max_mag':
-            model['data']['outlier']['max_mag'] = value
-        elif key == 'source_network':
-            model['system']['source_network'] = value
-
-    model_file = os.path.join(event_dir, 'model.conf')
-    if os.path.isfile(model_file):
-        existing_model = ConfigObj(model_file)
-        model.merge(existing_model)
-    model.filename = model_file
-    model.write()
-
-    return (errors, conversions)
-
-
 def parse_transfer(event_dir, tarball, member):
     parts = member.split('/')
     eventid = parts[-3]
@@ -274,10 +237,7 @@ def parse_config(event_dir, tarball, member, migrate_conf=None):
     elif 'grind_zc2.conf' in member:
         pass
     elif 'grind.conf' in member:
-        grind_errors, tconversions = parse_grind(
-            event_dir, tarball, member, migrate_conf=migrate_conf)
-        errors += grind_errors
-        conversions.update(tconversions)
+        pass
     elif 'db.conf' in member:
         pass
     elif 'timezone.conf':
@@ -292,14 +252,17 @@ def parse_config(event_dir, tarball, member, migrate_conf=None):
     return (errors, conversions)
 
 
-def save_info(event_dir, tarball, member, netid, networks,
-              module_conf, skip_bounds=False):
+def parse_info(event_dir, tarball, member, netid, networks,
+               module_conf, skip_bounds=False, skip_settings=False, migrate_conf=None):
     jsonfile = tarball.extractfile(member)
     jsonstring = jsonfile.read().decode('utf-8')
     jsondict = json.loads(jsonstring)
 
     # accumulate error messages
     errors = []
+
+    # accumulate gmpe conversions
+    conversions = {}
 
     # get the origin information out of the json
     xmlfile = os.path.join(event_dir, 'event.xml')
@@ -335,40 +298,50 @@ def save_info(event_dir, tarball, member, netid, networks,
               'mag': edict['mag'],
               'locstring': edict['locstring']}
 
-    # get all of the bias information
     model = ConfigObj()
-    model['modeling'] = {'bias': {}}
-    bias_max_mag = jsondict['processing']['miscellaneous']['bias_max_mag']
-    max_range = jsondict['processing']['miscellaneous']['bias_max_range']
-    if bias_max_mag > 0 and max_range > 0:
-        model['modeling']['bias']['do_bias'] = True
-        model['modeling']['bias']['max_range'] = max_range
-        model['modeling']['bias']['max_mag'] = bias_max_mag
-    else:
-        model['modeling']['bias']['do_bias'] = False
+    if not skip_settings:
+        # get all of the bias information
+        model['modeling'] = {'bias': {}}
+        bias_max_mag = jsondict['processing']['miscellaneous']['bias_max_mag']
+        max_range = jsondict['processing']['miscellaneous']['bias_max_range']
+        if bias_max_mag > 0 and max_range > 0:
+            model['modeling']['bias']['do_bias'] = True
+            model['modeling']['bias']['max_range'] = max_range
+            model['modeling']['bias']['max_mag'] = bias_max_mag
+        else:
+            model['modeling']['bias']['do_bias'] = False
 
-    # get the outlier information
-    model['data'] = {'outlier': {}}
-    max_deviation = jsondict['processing']['miscellaneous']['outlier_deviation_level']
-    outlier_max_mag = jsondict['processing']['miscellaneous']['outlier_max_mag']
-    if outlier_max_mag > 0 and max_deviation > 0:
-        model['data']['outlier']['do_outlier'] = True
-        model['data']['outlier']['max_deviation'] = max_deviation
-        model['data']['outlier']['max_mag'] = outlier_max_mag
-    else:
-        model['data']['outlier']['do_outlier'] = False
+        # get the outlier information
+        model['data'] = {'outlier': {}}
+        max_deviation = jsondict['processing']['miscellaneous']['outlier_deviation_level']
+        outlier_max_mag = jsondict['processing']['miscellaneous']['outlier_max_mag']
+        if outlier_max_mag > 0 and max_deviation > 0:
+            model['data']['outlier']['do_outlier'] = True
+            model['data']['outlier']['max_deviation'] = max_deviation
+            model['data']['outlier']['max_mag'] = outlier_max_mag
+        else:
+            model['data']['outlier']['do_outlier'] = False
 
-    # get the gmice stuff
-    allowed_gmice = module_conf['gmice_modules'].keys()
-    gmice = jsondict['processing']['ground_motion_modules']['mi2pgm']['module']
-    # WGRW11 in SM3.5 is WGRW12 in SM4.0
-    if gmice == 'WGRW11':
-        gmice = 'WGRW12'
-    if gmice not in allowed_gmice:
-        errors.append('GMICE %s (event %s) not yet supported in ShakeMap 4.' % (
-            gmice, edict['id']))
-    else:
-        model['modeling']['gmice'] = gmice
+        # get the gmice information
+        allowed_gmice = module_conf['gmice_modules'].keys()
+        gmice = jsondict['processing']['ground_motion_modules']['mi2pgm']['module']
+        # WGRW11 in SM3.5 is WGRW12 in SM4.0
+        if gmice == 'WGRW11':
+            gmice = 'WGRW12'
+        if gmice not in allowed_gmice:
+            errors.append('GMICE %s (event %s) not yet supported in ShakeMap 4.' % (
+                gmice, edict['id']))
+        else:
+            model['modeling']['gmice'] = gmice
+
+        # get the GMPE information
+        gmm_dict = jsondict['processing']['ground_motion_modules']
+        old_gmpe = gmm_dict['gmpe']['module']
+        new_gmpe, reference = migrate_gmpe(old_gmpe, config=migrate_conf)
+        model = set_gmpe(new_gmpe, model, edict['id'])
+        if old_gmpe not in conversions:
+            conversions[old_gmpe] = (new_gmpe,reference)
+        
 
     # work on map extent/resolution data
     if not skip_bounds:
@@ -378,8 +351,6 @@ def save_info(event_dir, tarball, member, netid, networks,
         model['interp']['prediction_location']['xres'] = '%ic' % yres_sec
         model['interp']['prediction_location']['yres'] = '%ic' % yres_sec
 
-    # set the bounds of the map, unless user asked to ignore that
-    if not skip_bounds:
         model['extent'] = {'bounds': {}}
         xmin = jsondict['output']['map_information']['min']['longitude']
         xmax = jsondict['output']['map_information']['max']['longitude']
@@ -388,14 +359,15 @@ def save_info(event_dir, tarball, member, netid, networks,
         model['extent']['bounds']['extent'] = [xmin, ymin, xmax, ymax]
 
     # done with model.conf, merge with existing file and save
-    model_file = os.path.join(event_dir, 'model.conf')
-    if os.path.isfile(model_file):
-        existing_model = ConfigObj(model_file)
-        model.merge(existing_model)
-    model.filename = model_file
-    model.write()
+    if len(model):
+        model_file = os.path.join(event_dir, 'model.conf')
+        if os.path.isfile(model_file):
+            existing_model = ConfigObj(model_file)
+            model.merge(existing_model)
+        model.filename = model_file
+        model.write()
 
-    return (eqdict, errors)
+    return (eqdict, errors, conversions)
 
 
 def create_event_directory(eventid, data_path):
