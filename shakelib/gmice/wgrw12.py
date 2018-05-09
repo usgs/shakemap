@@ -1,9 +1,12 @@
+# third party imports
 import numpy as np
 
+# stdlib imports
 from openquake.hazardlib.imt import PGA, PGV, SA
+from shakelib.gmice.gmice import GMICE
 
 
-class WGRW12(object):
+class WGRW12(GMICE):
     """
     Implements the ground motion intensity conversion equations (GMICE) of
     Worden et al. (2012).
@@ -33,45 +36,43 @@ class WGRW12(object):
     # Limit the magnitude residuals to between M3.0 and M7.3.
     #
     # -----------------------------------------------------------------------
+    def __init__(self):
+        super().__init__()
+        self.name = 'Worden et al. (2012)'
+        self.scale = 'scale_wgrw12.ps'
+        self._constants = {
+            self._pga: {'C1':  1.78, 'C2':  1.55, 'C3': -1.60, 'C4': 3.70,
+                    'C5': -0.91, 'C6':  1.02, 'C7': -0.17, 'T1':  1.57,
+                    'T2': 4.22, 'SMMI': 0.66, 'SPGM': 0.35},
+            self._pgv: {'C1':  3.78, 'C2':  1.47, 'C3':  2.89, 'C4': 3.16,
+                    'C5':  0.90, 'C6':  0.00, 'C7': -0.18, 'T1':  0.53,
+                    'T2': 4.56, 'SMMI': 0.63, 'SPGM': 0.38},
+            self._sa03: {'C1':  1.26, 'C2':  1.69, 'C3': -4.15, 'C4': 4.14,
+                     'C5': -1.05, 'C6':  0.60, 'C7':  0.00, 'T1':  2.21,
+                     'T2': 4.99, 'SMMI': 0.82, 'SPGM': 0.44},
+            self._sa10: {'C1':  2.50, 'C2':  1.51, 'C3':  0.20, 'C4': 2.90,
+                     'C5':  2.27, 'C6': -0.49, 'C7': -0.29, 'T1':  1.65,
+                     'T2': 4.98, 'SMMI': 0.75, 'SPGM': 0.47},
+            self._sa30: {'C1':  3.81, 'C2':  1.17, 'C3':  1.99, 'C4': 3.01,
+                     'C5':  1.91, 'C6': -0.57, 'C7': -0.21, 'T1':  0.99,
+                     'T2': 4.96, 'SMMI': 0.89, 'SPGM': 0.64}
+        }
 
-    __pga = PGA()
-    __pgv = PGV()
-    __sa03 = SA(0.3)
-    __sa10 = SA(1.0)
-    __sa30 = SA(3.0)
-    __constants = {
-        __pga: {'C1':  1.78, 'C2':  1.55, 'C3': -1.60, 'C4': 3.70,
-                'C5': -0.91, 'C6':  1.02, 'C7': -0.17, 'T1':  1.57,
-                'T2': 4.22, 'SMMI': 0.66, 'SPGM': 0.35},
-        __pgv: {'C1':  3.78, 'C2':  1.47, 'C3':  2.89, 'C4': 3.16,
-                'C5':  0.90, 'C6':  0.00, 'C7': -0.18, 'T1':  0.53,
-                'T2': 4.56, 'SMMI': 0.63, 'SPGM': 0.38},
-        __sa03: {'C1':  1.26, 'C2':  1.69, 'C3': -4.15, 'C4': 4.14,
-                 'C5': -1.05, 'C6':  0.60, 'C7':  0.00, 'T1':  2.21,
-                 'T2': 4.99, 'SMMI': 0.82, 'SPGM': 0.44},
-        __sa10: {'C1':  2.50, 'C2':  1.51, 'C3':  0.20, 'C4': 2.90,
-                 'C5':  2.27, 'C6': -0.49, 'C7': -0.29, 'T1':  1.65,
-                 'T2': 4.98, 'SMMI': 0.75, 'SPGM': 0.47},
-        __sa30: {'C1':  3.81, 'C2':  1.17, 'C3':  1.99, 'C4': 3.01,
-                 'C5':  1.91, 'C6': -0.57, 'C7': -0.21, 'T1':  0.99,
-                 'T2': 4.96, 'SMMI': 0.89, 'SPGM': 0.64}
-    }
+        self._constants2 = {
+            self._pga: {'C1':  1.71, 'C2':  2.08, 'T1':  0.14, 'T2': 2.0},
+            self._pgv: {'C1':  4.62, 'C2':  2.17, 'T1': -1.21, 'T2': 2.0},
+            self._sa03: {'C1':  1.15, 'C2':  1.92, 'T1':  0.44, 'T2': 2.0},
+            self._sa10: {'C1':  2.71, 'C2':  2.17, 'T1': -0.33, 'T2': 2.0},
+            self._sa30: {'C1':  7.35, 'C2':  3.45, 'T1': -1.55, 'T2': 2.0}
+        }
 
-    __constants2 = {
-        __pga: {'C1':  1.71, 'C2':  2.08, 'T1':  0.14, 'T2': 2.0},
-        __pgv: {'C1':  4.62, 'C2':  2.17, 'T1': -1.21, 'T2': 2.0},
-        __sa03: {'C1':  1.15, 'C2':  1.92, 'T1':  0.44, 'T2': 2.0},
-        __sa10: {'C1':  2.71, 'C2':  2.17, 'T1': -0.33, 'T2': 2.0},
-        __sa30: {'C1':  7.35, 'C2':  3.45, 'T1': -1.55, 'T2': 2.0}
-    }
+        self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
+            PGA,
+            PGV,
+            SA
+        ])
 
-    DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
-        PGA,
-        PGV,
-        SA
-    ])
-
-    DEFINED_FOR_SA_PERIODS = set([0.3, 1.0, 3.0])
+        self.DEFINED_FOR_SA_PERIODS = set([0.3, 1.0, 3.0])
 
     def getMIfromGM(self, amps, imt, dists=None, mag=None):
         """
@@ -98,7 +99,7 @@ class WGRW12(object):
             point in question).
         """  # noqa
         lfact = np.log10(np.e)
-        c, c2 = self.__getConsts(imt)
+        c, c2 = self._getConsts(imt)
 
         if dists is not None and mag is not None:
             doresid = True
@@ -111,7 +112,7 @@ class WGRW12(object):
         # Convert (for accelerations) from ln(g) to cm/s^2
         # then take the log10
         #
-        if imt != self.__pgv:
+        if imt != self._pgv:
             units = 981.0
         else:
             units = 1.0
@@ -174,7 +175,7 @@ class WGRW12(object):
             (i.e., the slope of the relationship at the point in question).
         """  # noqa
         lfact = np.log10(np.e)
-        c, c2 = self.__getConsts(imt)
+        c, c2 = self._getConsts(imt)
         mmi = mmi.copy()
         ix_nan = np.isnan(mmi)
         mmi[ix_nan] = 1.0
@@ -211,7 +212,7 @@ class WGRW12(object):
         pgm[idx] = np.power(10, (mmi[idx] - c['C3']) / c['C4'])
         dpgm_dmmi[idx] = 1.0 / (c['C4'] * lfact)
 
-        if imt != self.__pgv:
+        if imt != self._pgv:
             units = 981.0
         else:
             units = 1.0
@@ -230,11 +231,11 @@ class WGRW12(object):
         Returns:
             Dictionary of GM to MI sigmas (in MMI units).
         """
-        return {self.__pga: self.__constants[self.__pga]['SMMI'],
-                self.__pgv: self.__constants[self.__pgv]['SMMI'],
-                self.__sa03: self.__constants[self.__sa03]['SMMI'],
-                self.__sa10: self.__constants[self.__sa10]['SMMI'],
-                self.__sa30: self.__constants[self.__sa30]['SMMI']}
+        return {self._pga: self._constants[self._pga]['SMMI'],
+                self._pgv: self._constants[self._pgv]['SMMI'],
+                self._sa03: self._constants[self._sa03]['SMMI'],
+                self._sa10: self._constants[self._sa10]['SMMI'],
+                self._sa30: self._constants[self._sa30]['SMMI']}
 
     def getMI2GMsd(self):
         """
@@ -249,55 +250,20 @@ class WGRW12(object):
         # Need to convert log10 to ln units
         #
         lfact = np.log(10.0)
-        return {self.__pga: lfact * self.__constants[self.__pga]['SPGM'],
-                self.__pgv: lfact * self.__constants[self.__pgv]['SPGM'],
-                self.__sa03: lfact * self.__constants[self.__sa03]['SPGM'],
-                self.__sa10: lfact * self.__constants[self.__sa10]['SPGM'],
-                self.__sa30: lfact * self.__constants[self.__sa30]['SPGM']}
+        return {self._pga: lfact * self._constants[self._pga]['SPGM'],
+                self._pgv: lfact * self._constants[self._pgv]['SPGM'],
+                self._sa03: lfact * self._constants[self._sa03]['SPGM'],
+                self._sa10: lfact * self._constants[self._sa10]['SPGM'],
+                self._sa30: lfact * self._constants[self._sa30]['SPGM']}
 
-    @staticmethod
-    def getName():
-        """
-        Get the name of this GMICE.
-
-        Returns:
-            String containing name of this GMICE.
-        """
-        return 'Worden et al. (2012)'
-
-    @staticmethod
-    def getScale():
-        """
-        Get the name of the PostScript file containing this GMICE's
-        scale.
-
-        Returns:
-            Name of GMICE scale file.
-        """
-        return 'scale_wgrw12.ps'
-
-    @staticmethod
-    def getMinMax():
-        """
-        Get the minimum and maximum MMI values produced by this GMICE.
-
-        Returns:
-            Tuple of min and max values of GMICE.
-        """
-        return (1.0, 10.0)
-
-    @staticmethod
-    def getDistanceType():
-        return 'rrup'
-
-    def __getConsts(self, imt):
+    def _getConsts(self, imt):
         """
         Helper function to get the constants.
         """
 
-        if (imt != self.__pga and imt != self.__pgv and imt != self.__sa03 and
-                imt != self.__sa10 and imt != self.__sa30):
+        if (imt != self._pga and imt != self._pgv and imt != self._sa03 and
+                imt != self._sa10 and imt != self._sa30):
             raise ValueError("Invalid IMT " + str(imt))
-        c = self.__constants[imt]
-        c2 = self.__constants2[imt]
+        c = self._constants[imt]
+        c2 = self._constants2[imt]
         return (c, c2)

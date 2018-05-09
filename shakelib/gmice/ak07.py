@@ -1,9 +1,12 @@
+# third party imports
 import numpy as np
 
+# stdlib imports
 from openquake.hazardlib.imt import PGA, PGV, SA
+from shakelib.gmice.gmice import GMICE
 
 
-class AK07(object):
+class AK07(GMICE):
     """
     Implements the ground motion intensity conversion equations (GMICE) of
     Atkinson and Kaka (2007). This module implements a simplified version.
@@ -36,37 +39,35 @@ class AK07(object):
     # Constants taken from Table 4 and 5 in the reference material
     #
     # -----------------------------------------------------------------------
+    def __init__(self):
+        super().__init__()
+        self.name = 'Atkinson and Kaka (2007)'
+        self.scale = 'scale_ak07.ps'
+        self._constants = {
+            self._pga: {'C1':  2.65, 'C2':  1.39, 'C3':  -1.91, 'C4': 4.09,
+                    'C5':  -1.96, 'C6':  0.02, 'C7': 0.98, 'T1':  1.69,
+                    'T2': 5, 'SMMI': 0.89},
+            self._pgv: {'C1':  4.37, 'C2':  1.32, 'C3': 3.54, 'C4': 3.03,
+                    'C5': 0.47, 'C6':  -0.19, 'C7': 0.26, 'T1': 0.48,
+                    'T2': 5, 'SMMI': 0.76},
+            self._sa03: {'C1':  2.4, 'C2':  1.36, 'C3': -1.83, 'C4': 3.56,
+                     'C5': -0.11, 'C6':  -0.2, 'C7':  0.64, 'T1':  1.92,
+                     'T2': 5, 'SMMI': 0.79},
+            self._sa10: {'C1':  3.23, 'C2':  1.18, 'C3':  0.57, 'C4': 2.95,
+                     'C5':  1.92, 'C6': -0.39, 'C7': 0.04, 'T1':  1.5,
+                     'T2': 5, 'SMMI': 0.73},
+            self._sa30: {'C1':  3.72, 'C2':  1.29, 'C3':  1.99, 'C4': 3.0,
+                     'C5':  2.24, 'C6': -0.33, 'C7': -0.31, 'T1':  1,
+                     'T2': 5, 'SMMI': 0.72}
+        }
 
-    __pga = PGA()
-    __pgv = PGV()
-    __sa03 = SA(0.3)
-    __sa10 = SA(1.0)
-    __sa30 = SA(3.0)
-    __constants = {
-        __pga: {'C1':  2.65, 'C2':  1.39, 'C3':  -1.91, 'C4': 4.09,
-                'C5':  -1.96, 'C6':  0.02, 'C7': 0.98, 'T1':  1.69,
-                'T2': 5, 'SMMI': 0.89},
-        __pgv: {'C1':  4.37, 'C2':  1.32, 'C3': 3.54, 'C4': 3.03,
-                'C5': 0.47, 'C6':  -0.19, 'C7': 0.26, 'T1': 0.48,
-                'T2': 5, 'SMMI': 0.76},
-        __sa03: {'C1':  2.4, 'C2':  1.36, 'C3': -1.83, 'C4': 3.56,
-                 'C5': -0.11, 'C6':  -0.2, 'C7':  0.64, 'T1':  1.92,
-                 'T2': 5, 'SMMI': 0.79},
-        __sa10: {'C1':  3.23, 'C2':  1.18, 'C3':  0.57, 'C4': 2.95,
-                 'C5':  1.92, 'C6': -0.39, 'C7': 0.04, 'T1':  1.5,
-                 'T2': 5, 'SMMI': 0.73},
-        __sa30: {'C1':  3.72, 'C2':  1.29, 'C3':  1.99, 'C4': 3.0,
-                 'C5':  2.24, 'C6': -0.33, 'C7': -0.31, 'T1':  1,
-                 'T2': 5, 'SMMI': 0.72}
-    }
+        self.DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
+            PGA,
+            PGV,
+            SA
+        ])
 
-    DEFINED_FOR_INTENSITY_MEASURE_TYPES = set([
-        PGA,
-        PGV,
-        SA
-    ])
-
-    DEFINED_FOR_SA_PERIODS = set([0.3, 1.0, 3.0])
+        self.DEFINED_FOR_SA_PERIODS = set([0.3, 1.0, 3.0])
 
     def getMIfromGM(self, amps, imt, dists=None, mag=None):
         """
@@ -93,7 +94,7 @@ class AK07(object):
             point in question).
         """
         lfact = np.log10(np.e)
-        c = self.__getConsts(imt)
+        c = self._getConsts(imt)
         if dists is not None and mag is not None:
             doresid = True
             # Limit distances and take the log10
@@ -107,7 +108,7 @@ class AK07(object):
         # Convert (for accelerations) from ln(g) to cm/s^2
         # then take the log10
         #
-        if imt != self.__pgv:
+        if imt != self._pgv:
             units = 981.0
         else:
             units = 1.0
@@ -168,7 +169,7 @@ class AK07(object):
             (i.e., the slope of the relationship at the point in question).
         """
         lfact = np.log10(np.e)
-        c = self.__getConsts(imt)
+        c = self._getConsts(imt)
         mmi = mmi.copy()
         # Set nan values to 1
         ix_nan = np.isnan(mmi)
@@ -205,7 +206,7 @@ class AK07(object):
         pgm[idx] = np.power(10, (mmi[idx] - c['C3']) / c['C4'])
         dpgm_dmmi[idx] = 1.0 / (c['C4'] * lfact)
 
-        if imt != self.__pgv:
+        if imt != self._pgv:
             units = 981.0
         else:
             units = 1.0
@@ -228,11 +229,11 @@ class AK07(object):
         Returns:
             Dictionary of GM to MI sigmas (in MMI units).
         """
-        return {self.__pga: self.__constants[self.__pga]['SMMI'],
-                self.__pgv: self.__constants[self.__pgv]['SMMI'],
-                self.__sa03: self.__constants[self.__sa03]['SMMI'],
-                self.__sa10: self.__constants[self.__sa10]['SMMI'],
-                self.__sa30: self.__constants[self.__sa30]['SMMI']}
+        return {self._pga: self._constants[self._pga]['SMMI'],
+                self._pgv: self._constants[self._pgv]['SMMI'],
+                self._sa03: self._constants[self._sa03]['SMMI'],
+                self._sa10: self._constants[self._sa10]['SMMI'],
+                self._sa30: self._constants[self._sa30]['SMMI']}
 
     def getMI2GMsd(self):
         """
@@ -247,54 +248,19 @@ class AK07(object):
         # Need to convert log10 to ln units
         #
         lfact = np.log(10.0)
-        return {self.__pga: lfact * 0.57,
-                self.__pgv: lfact * 0.52,
-                self.__sa03: lfact * 0.63,
-                self.__sa10: lfact * 57,
-                self.__sa30: lfact * 81}
+        return {self._pga: lfact * 0.57,
+                self._pgv: lfact * 0.52,
+                self._sa03: lfact * 0.63,
+                self._sa10: lfact * 57,
+                self._sa30: lfact * 81}
 
-    @staticmethod
-    def getName():
-        """
-        Get the name of this GMICE.
-
-        Returns:
-            String containing name of this GMICE.
-        """
-        return 'Atkinson and Kaka (2007)'
-
-    @staticmethod
-    def getScale():
-        """
-        Get the name of the PostScript file containing this GMICE's
-        scale.
-
-        Returns:
-            Name of GMICE scale file.
-        """
-        return 'scale_ak07.ps'
-
-    @staticmethod
-    def getMinMax():
-        """
-        Get the minimum and maximum MMI values produced by this GMICE.
-
-        Returns:
-            Tuple of min and max values of GMICE.
-        """
-        return (1.0, 10.0)
-
-    @staticmethod
-    def getDistanceType():
-        return 'rrup'
-
-    def __getConsts(self, imt):
+    def _getConsts(self, imt):
         """
         Helper function to get the constants.
         """
 
-        if (imt != self.__pga and imt != self.__pgv and imt != self.__sa03 and
-                imt != self.__sa10 and imt != self.__sa30):
+        if (imt != self._pga and imt != self._pgv and imt != self._sa03 and
+                imt != self._sa10 and imt != self._sa30):
             raise ValueError("Invalid IMT " + str(imt))
-        c = self.__constants[imt]
+        c = self._constants[imt]
         return c
