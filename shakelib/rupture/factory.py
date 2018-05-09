@@ -325,15 +325,26 @@ def text_to_json(file, new_format=True):
         f.close()
 
     # Try to fix polygons
+    original_polygons = polygons.copy()
+    fixed = []
     n_polygons = len(polygons)
     for i in range(n_polygons):
-        valid_polygon = False
-        while valid_polygon is False:
+        n_verts = len(polygons[i])
+        success = False
+        for j in range(n_verts - 1):
             try:
                 _check_polygon(polygons[i])
-                valid_polygon = True
+                success = True
+                continue
             except:
                 polygons[i] = _rotate_polygon(polygons[i])
+        if success:
+            fixed.append(True)
+        else:
+            fixed.append(False)
+
+    if not all(fixed):
+        polygons = original_polygons
 
     json_dict = {
         "type": "FeatureCollection",

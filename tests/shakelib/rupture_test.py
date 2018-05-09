@@ -9,7 +9,6 @@ import copy
 import tempfile
 import shutil
 import time
-import json
 
 # third party
 import numpy as np
@@ -28,7 +27,6 @@ from shakelib.rupture.factory import rupture_from_dict
 
 from shakelib.rupture.utils import get_local_unit_slip_vector
 from shakelib.rupture.utils import get_quad_slip
-from shakelib.rupture.factory import text_to_json
 from impactutils.time.ancient_time import HistoricTime
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
@@ -73,10 +71,16 @@ def test_text_to_json():
 N. Ratchkovski, and R. Hansen (2004). Inverse kinematic and forward dynamic
 models of the 2002 Denali fault earthquake, Alaska, Bull. Seism. Soc. Am. 94, S214-S233.'''
     assert jdict['metadata']['reference'] == refcmp.replace('\n', ' ')
-    cstart = [[-147.807, 63.434, 0.0], [-147.21, 63.472, 0.0], [-147.267,
-                                                                63.65, 22.294], [-147.864, 63.613, 22.294], [-147.807, 63.434, 0.0]]
-    cend = [[-142.5, 62.114, 0.0], [-143.669, 62.831, 0.0], [-143.669,
-                                                             62.831, 30.0], [-142.5, 62.114, 30.0], [-142.5, 62.114, 0.0]]
+    cstart = [[-147.807, 63.434, 0.0],
+              [-147.21,  63.472, 0.0],
+              [-147.267, 63.65,  22.294],
+              [-147.864, 63.613, 22.294],
+              [-147.807, 63.434, 0.0]]
+    cend = [[-142.5,   62.114, 0.0],
+            [-143.669, 62.831, 0.0],
+            [-143.669, 62.831, 30.0],
+            [-142.5,   62.114, 30.0],
+            [-142.5,   62.114, 0.0]]
 
     assert len(jdict['features'][0]['geometry']['coordinates'][0]) == 5
     assert jdict['features'][0]['geometry']['coordinates'][0][0] == cstart
@@ -100,8 +104,21 @@ models of the 2002 Denali fault earthquake, Alaska, Bull. Seism. Soc. Am. 94, S2
 12.0 93.5 40.0'''
     stringio = io.StringIO(sm_data2)
     jdict = text_to_json(stringio, new_format=False)
-    coords = [[93.5, 12.0, 40.0], [93.5, 12.0, 40.0], [94.2, 12.0, 40.0], [94.2, 10.0, 40.0], [95.0, 8.0, 40.0], [95.2, 7.0, 40.0], [95.78, 6.0, 40.0], [
-        94.45, 5.0, 10.0], [94.0, 2.98, 10.0], [93.5, 3.3, 10.0], [93.2, 5.0, 10.0], [93.1, 6.0, 10.0], [92.5, 7.0, 10.0], [92.5, 8.0, 10.0], [93.5, 10.0, 40.0]]
+    coords = [[93.5, 12.0,  40.0],
+              [93.5, 12.0,  40.0],
+              [94.2, 12.0,  40.0],
+              [94.2, 10.0,  40.0],
+              [95.0,  8.0,  40.0],
+              [95.2,  7.0,  40.0],
+              [95.78, 6.0,  40.0],
+              [94.45, 5.0,  10.0],
+              [94.0,  2.98, 10.0],
+              [93.5,  3.3,  10.0],
+              [93.2,  5.0,  10.0],
+              [93.1,  6.0,  10.0],
+              [92.5,  7.0,  10.0],
+              [92.5,  8.0,  10.0],
+              [93.5, 10.0,  40.0]]
     # assert len(jdict['features'][0]['geometry']['coordinates']) == 1
     # assert jdict['features'][0]['geometry']['coordinates'][0] == coords
 
