@@ -350,13 +350,13 @@ def test_output_repr():
     assert container_str == '''Data type: grid
     use "getIMTGrids" method to access interpolated IMTs
 Rupture: <class 'shakelib.rupture.quad_rupture.QuadRupture'>
-    locstring: Northridge
+    locstring: 1km NNW of Reseda, CA
     magnitude: 6.7
     time: 1994-01-17T12:30:55.000000Z
 Config: use 'getConfig' method
 Stations: use 'getStationDict' method
     # instrumental stations: 185
-    # macroseismic stations: 547
+    # macroseismic stations: 977
 Metadata: use 'getMetadata' method
 Available IMTs (components):
     MMI (GREATER_OF_TWO_HORIZONTAL)
