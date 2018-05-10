@@ -60,7 +60,7 @@ dependencies:
 - idna=2.6
 - imageio=2.3.0
 - imagesize=1.0.0
-- impactutils=0.8.1
+- impactutils=0.8.2
 - ipykernel=4.8.2
 - ipython=6.3.0
 - ipython_genutils=0.2.0
