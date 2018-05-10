@@ -1,5 +1,5 @@
-shakemap\.coremods\.dyfi
-===============================
+shakemap.coremods.dyfi
+=============================
 
 .. automodule:: shakemap.coremods.dyfi
     :members:

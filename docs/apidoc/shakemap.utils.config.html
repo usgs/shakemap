@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakemap.utils.config &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -26,15 +18,14 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shakemap.utils.generic_amp" href="shakemap.utils.generic_amp.html" />
-    <link rel="prev" title="shakemap.utils" href="shakemap.utils.html" />
+    <link rel="prev" title="shakemap.utils.amps" href="shakemap.utils.amps.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -121,7 +112,7 @@ files.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">A Validator object.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">Validator</span></code></td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal notranslate"><span class="pre">Validator</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -151,7 +142,7 @@ the ‘config’ arguments.</li>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">Nothing</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal"><span class="pre">RuntimeError</span></code></a> – Should always raise this exception.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#RuntimeError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">RuntimeError</span></code></a> – Should always raise this exception.</p>
 </td>
 </tr>
 </tbody>
@@ -344,7 +335,7 @@ converted to a list of floats.</td>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#list" title="(in Python v3.6)">list</a></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValidateError</span></code></td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValidateError</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -365,25 +356,7 @@ ValidateError if the input can’t be converted to a float.</p>
 </tr>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)">float</a></td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal"><span class="pre">ValidateError</span></code></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="shakemap.utils.config.get_shake_config">
-<code class="descclassname">shakemap.utils.config.</code><code class="descname">get_shake_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_shake_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.get_shake_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return a dictionary containing input required to run the shake program,
-including logging.</p>
-<p>See <a class="reference external" href="https://docs.python.org/3.5/library/logging.config.html">https://docs.python.org/3.5/library/logging.config.html</a>.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Dictionary containing shake config information.</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValidateError</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -416,7 +389,7 @@ including logging.</p>
 <dl class="function">
 <dt id="shakemap.utils.config.get_logging_config">
 <code class="descclassname">shakemap.utils.config.</code><code class="descname">get_logging_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_logging_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.get_logging_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract logging configuration from shake config.</p>
+<dd><p>Extract logging configuration from logging.conf.</p>
 <p>See this URL for example of config.
 <a class="reference external" href="https://gist.github.com/st4lk/6287746">https://gist.github.com/st4lk/6287746</a></p>
 <p>See <a class="reference external" href="https://docs.python.org/3.5/library/logging.config.html">https://docs.python.org/3.5/library/logging.config.html</a></p>
@@ -464,10 +437,12 @@ including logging.</p>
 <li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0a API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.amps.html">shakemap.utils.amps</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.config</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.generic_amp.html">shakemap.utils.generic_amp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>
 </ul>
 </li>
@@ -479,12 +454,14 @@ including logging.</p>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

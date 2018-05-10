@@ -1,14 +1,16 @@
-shakemap\.utils
-=======================
+shakemap.utils
+======================
 
 Submodules
 
 .. toctree::
 
+   shakemap.utils.amps
    shakemap.utils.config
    shakemap.utils.generic_amp
    shakemap.utils.layers
    shakemap.utils.probs
+   shakemap.utils.queue
    shakemap.utils.utils
 
 Module contents

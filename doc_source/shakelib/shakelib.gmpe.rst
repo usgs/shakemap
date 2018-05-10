@@ -1,5 +1,5 @@
-shakelib\.gmpe
-======================
+shakelib.gmpe
+=====================
 
 Submodules
 

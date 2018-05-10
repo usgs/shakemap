@@ -1,5 +1,5 @@
-shakelib\.conversions
-=============================
+shakelib.conversions
+============================
 
 
 .. toctree::

@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.utils.utils &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -54,8 +45,13 @@
 <span class="kn">from</span> <span class="nn">shakelib.rupture.quad_rupture</span> <span class="k">import</span> <span class="n">QuadRupture</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.base</span> <span class="k">import</span> <span class="n">Rupture</span>
 
+<span class="kn">from</span> <span class="nn">strec.gmreg</span> <span class="k">import</span> <span class="n">Regionalizer</span>
 
-<div class="viewcode-block" id="get_extent"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.utils.html#shakelib.utils.utils.get_extent">[docs]</a><span class="k">def</span> <span class="nf">get_extent</span><span class="p">(</span><span class="n">rupture</span><span class="p">):</span>
+<span class="n">DEFAULT_ACTIVE_COEFFS</span> <span class="o">=</span> <span class="p">[</span><span class="mf">27.24</span><span class="p">,</span><span class="mf">250.4</span><span class="p">,</span><span class="mf">579.1</span><span class="p">]</span>
+<span class="n">DEFAULT_STABLE_COEFFS</span> <span class="o">=</span> <span class="p">[</span><span class="mf">63.4</span><span class="p">,</span><span class="mf">465.4</span><span class="p">,</span><span class="mf">581.3</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="get_extent"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.utils.html#shakelib.utils.utils.get_extent">[docs]</a><span class="k">def</span> <span class="nf">get_extent</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span><span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Method to compute map extent from rupture.</span>
 
@@ -67,6 +63,31 @@
 <span class="sd">        arc-minute..</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># check to see what parameters are specified in the extent config</span>
+    <span class="n">coeffs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">spans</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">bounds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">config</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;extent&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;coefficients&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s1">&#39;coeffs&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;coefficients&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;coefficients&#39;</span><span class="p">][</span><span class="s1">&#39;coeffs&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="mf">0.0</span><span class="p">:</span>
+                        <span class="n">coeffs</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;coefficients&#39;</span><span class="p">][</span><span class="s1">&#39;coeffs&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;magnitude_spans&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;magnitude_spans&#39;</span><span class="p">]):</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;magnitude_spans&#39;</span><span class="p">],</span><span class="nb">dict</span><span class="p">):</span>
+                        <span class="n">spans</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;magnitude_spans&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s1">&#39;bounds&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="s1">&#39;extent&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;bounds&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="o">-</span><span class="mf">999.0</span><span class="p">:</span>
+                        <span class="n">bounds</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;extent&#39;</span><span class="p">][</span><span class="s1">&#39;bounds&#39;</span><span class="p">][</span><span class="s1">&#39;extent&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bounds</span><span class="p">):</span>
+        <span class="n">xmin</span><span class="p">,</span><span class="n">ymin</span><span class="p">,</span><span class="n">xmax</span><span class="p">,</span><span class="n">ymax</span> <span class="o">=</span> <span class="n">bounds</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span><span class="n">xmax</span><span class="p">,</span><span class="n">ymin</span><span class="p">,</span><span class="n">ymax</span><span class="p">)</span>
+
+
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">rupture</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">Rupture</span><span class="p">):</span>
         <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;get_extent() takes exactly 1 argument (0 given)&#39;</span><span class="p">)</span>
@@ -88,6 +109,21 @@
 
     <span class="n">mag</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span>
 
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">spans</span><span class="p">):</span>
+        <span class="n">xmin</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">xmax</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">ymin</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">ymax</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">spankey</span><span class="p">,</span><span class="n">span</span> <span class="ow">in</span> <span class="n">spans</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">mag</span> <span class="o">&gt;</span> <span class="n">span</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="n">mag</span> <span class="o">&lt;=</span> <span class="n">span</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+                <span class="n">ymin</span> <span class="o">=</span> <span class="n">clat</span> <span class="o">-</span> <span class="n">span</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+                <span class="n">ymax</span> <span class="o">=</span> <span class="n">clat</span> <span class="o">+</span> <span class="n">span</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+                <span class="n">xmin</span> <span class="o">=</span> <span class="n">clon</span> <span class="o">-</span> <span class="n">span</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+                <span class="n">xmax</span> <span class="o">=</span> <span class="n">clon</span> <span class="o">+</span> <span class="n">span</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">/</span><span class="mi">2</span>
+                <span class="k">break</span>
+        <span class="k">if</span> <span class="n">xmin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">xmin</span><span class="p">,</span><span class="n">xmax</span><span class="p">,</span><span class="n">ymin</span><span class="p">,</span><span class="n">ymax</span><span class="p">)</span>
+
     <span class="c1"># Is this a stable or active tectonic event?</span>
     <span class="c1"># (this could be made an attribute of the ShakeMap Origin class)</span>
     <span class="n">hypo</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">getHypo</span><span class="p">()</span>
@@ -97,12 +133,20 @@
         <span class="k">if</span> <span class="n">mag</span> <span class="o">&lt;</span> <span class="mf">6.48</span><span class="p">:</span>
             <span class="n">mindist_km</span> <span class="o">=</span> <span class="mf">100.</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">mindist_km</span> <span class="o">=</span> <span class="mf">27.24</span> <span class="o">*</span> <span class="n">mag</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">250.4</span> <span class="o">*</span> <span class="n">mag</span> <span class="o">+</span> <span class="mf">579.1</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coeffs</span><span class="p">):</span>
+                <span class="n">C1</span><span class="p">,</span><span class="n">C2</span><span class="p">,</span><span class="n">C3</span> <span class="o">=</span> <span class="n">coeffs</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">C1</span><span class="p">,</span><span class="n">C2</span><span class="p">,</span><span class="n">C3</span> <span class="o">=</span> <span class="n">DEFAULT_ACTIVE_COEFFS</span>
+            <span class="n">mindist_km</span> <span class="o">=</span> <span class="n">C1</span> <span class="o">*</span> <span class="n">mag</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">C2</span> <span class="o">*</span> <span class="n">mag</span> <span class="o">+</span> <span class="n">C3</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">mag</span> <span class="o">&lt;</span> <span class="mf">6.10</span><span class="p">:</span>
             <span class="n">mindist_km</span> <span class="o">=</span> <span class="mf">100.</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">mindist_km</span> <span class="o">=</span> <span class="mf">63.4</span> <span class="o">*</span> <span class="n">mag</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="mf">465.4</span> <span class="o">*</span> <span class="n">mag</span> <span class="o">+</span> <span class="mf">581.3</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coeffs</span><span class="p">):</span>
+                <span class="n">C1</span><span class="p">,</span><span class="n">C2</span><span class="p">,</span><span class="n">C3</span> <span class="o">=</span> <span class="n">coeffs</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">C1</span><span class="p">,</span><span class="n">C2</span><span class="p">,</span><span class="n">C3</span> <span class="o">=</span> <span class="n">DEFAULT_STABLE_COEFFS</span>
+            <span class="n">mindist_km</span> <span class="o">=</span> <span class="n">C1</span> <span class="o">*</span> <span class="n">mag</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">C2</span> <span class="o">*</span> <span class="n">mag</span> <span class="o">+</span> <span class="n">C3</span>
 
     <span class="c1"># Apply an upper limit on extent. This should only matter for large</span>
     <span class="c1"># magnitudes (&gt; ~8.25) in stable tectonic environments.</span>
@@ -174,19 +218,9 @@
 <span class="sd">        bool: Is the point classified as tectonically stable.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">p</span> <span class="o">=</span> <span class="n">Point</span><span class="p">((</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">))</span>
-    <span class="n">pfile</span> <span class="o">=</span> <span class="n">pkg_resources</span><span class="o">.</span><span class="n">resource_filename</span><span class="p">(</span>
-        <span class="s1">&#39;shakelib.utils&#39;</span><span class="p">,</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;data&#39;</span><span class="p">,</span> <span class="s1">&#39;cratons.geojson&#39;</span><span class="p">)</span>
-    <span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">pfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">cratons</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-    <span class="n">coord_list</span> <span class="o">=</span> <span class="n">cratons</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">clist</span> <span class="ow">in</span> <span class="n">coord_list</span><span class="p">:</span>
-        <span class="n">poly</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">clist</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="k">if</span> <span class="n">p</span><span class="o">.</span><span class="n">within</span><span class="p">(</span><span class="n">poly</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">True</span>
-    <span class="k">return</span> <span class="kc">False</span></div>
+    <span class="n">reg</span> <span class="o">=</span> <span class="n">Regionalizer</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">region_info</span> <span class="o">=</span> <span class="n">reg</span><span class="o">.</span><span class="n">getRegions</span><span class="p">(</span><span class="n">lat</span><span class="p">,</span><span class="n">lon</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">region_info</span><span class="p">[</span><span class="s1">&#39;TectonicRegion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Stable&#39;</span></div>
 </pre></div>
 
           </div>
@@ -222,12 +256,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

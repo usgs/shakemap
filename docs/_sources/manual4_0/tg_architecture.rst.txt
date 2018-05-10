@@ -556,15 +556,15 @@ functionality.  See the :ref:`getdyfi man page <getdyfi>` for usage and a
 list of options.
 
 
-sm_clone
---------
+sm_create
+---------
 
-**sm_clone** queries the NEIC ComCat database for ShakeMap data 
+**sm_create** queries the NEIC ComCat database for ShakeMap data 
 associated with an event and writes that data into the event's
 local *current* directory. The event will then be available for
 local processing.
 
-See the :ref:`sm_clone man page <sm-clone>` for usage and a 
+See the :ref:`sm_create man page <sm-create>` for usage and a 
 list of options.
 
 

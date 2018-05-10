@@ -4,21 +4,13 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <title>shakelib.utils.containers &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -31,8 +23,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  </head><body>
   
 
     <div class="document">
@@ -50,7 +41,6 @@
 <span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
 <span class="kn">from</span> <span class="nn">mapio.geodict</span> <span class="k">import</span> <span class="n">GeoDict</span>
 <span class="kn">from</span> <span class="nn">mapio.gridcontainer</span> <span class="k">import</span> <span class="n">GridHDFContainer</span><span class="p">,</span> <span class="n">_split_dset_attrs</span>
-<span class="kn">from</span> <span class="nn">impactutils.io.container</span> <span class="k">import</span> <span class="n">_get_type_list</span>
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.factory</span> <span class="k">import</span> <span class="p">(</span><span class="n">rupture_from_dict</span><span class="p">,</span>
@@ -58,6 +48,9 @@
                                       <span class="n">rupture_from_dict_and_origin</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">shakelib.rupture.origin</span> <span class="k">import</span> <span class="n">Origin</span>
 <span class="kn">from</span> <span class="nn">shakelib.station</span> <span class="k">import</span> <span class="n">StationList</span>
+<span class="kn">import</span> <span class="nn">shakemap.utils.queue</span> <span class="k">as</span> <span class="nn">queue</span>
+
+<span class="n">GROUPS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;imt&#39;</span><span class="p">:</span> <span class="s1">&#39;__imts__&#39;</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="ShakeMapContainer"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer">[docs]</a><span class="k">class</span> <span class="nc">ShakeMapContainer</span><span class="p">(</span><span class="n">GridHDFContainer</span><span class="p">):</span>
@@ -182,7 +175,7 @@
 
 <div class="viewcode-block" id="ShakeMapContainer.setStationDict"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setStationDict">[docs]</a>    <span class="k">def</span> <span class="nf">setStationDict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stationdict</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Store (JSON-like) station dictiionary in container.</span>
+<span class="sd">        Store (JSON-like) station dictionary in container.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            stationdict (dict-like): Station dict object.</span>
@@ -254,7 +247,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 <div class="viewcode-block" id="ShakeMapInputContainer.createFromInput"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapInputContainer.createFromInput">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">createFromInput</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventfile</span><span class="p">,</span> <span class="n">version_history</span><span class="p">,</span>
+    <span class="k">def</span> <span class="nf">createFromInput</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">eventfile</span><span class="p">,</span> <span class="n">version_history</span><span class="p">,</span>
                         <span class="n">rupturefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sourcefile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">momentfile</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                         <span class="n">datafiles</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -276,7 +269,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            InputContainer: Instance of InputContainer.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">container</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
         <span class="n">container</span><span class="o">.</span><span class="n">setConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
 
         <span class="c1"># create an origin from the event file</span>
@@ -394,7 +387,8 @@
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;Rupture: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">rupt_obj</span><span class="p">)</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;    locstring: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rupt_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">locstring</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;    magnitude: </span><span class="si">%.1f</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rupt_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">mag</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;    time: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">rupt_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">time</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;    time: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> \
+                <span class="n">rupt_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">queue</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s2">&quot;Rupture: None</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="k">try</span><span class="p">:</span>
@@ -494,17 +488,20 @@
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Setting grid data in a file containing points&#39;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setDataType</span><span class="p">(</span><span class="s1">&#39;grid&#39;</span><span class="p">)</span>
 
-        <span class="c1"># set up the name of the group holding all the information for the IMT</span>
-        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s1">&#39;An IMT group called </span><span class="si">%s</span><span class="s1"> already exists.&#39;</span> <span class="o">%</span> <span class="n">imt_name</span><span class="p">)</span>
-        <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
+        <span class="c1"># create name of group containing IMT datasets</span>
+        <span class="n">imt_name</span> <span class="o">=</span> <span class="s1">&#39;__</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]]</span>
+
+        <span class="c1"># create a group for all the IMT datasets with this name/component</span>
+        <span class="n">imt_sub_group</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">imt_name</span><span class="p">)</span>
 
         <span class="c1"># create the data set containing the mean IMT data and metadata</span>
         <span class="n">mean_data</span> <span class="o">=</span> <span class="n">imt_mean</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
-        <span class="n">mean_set</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">mean_data</span><span class="p">,</span>
-                                            <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="n">mean_set</span> <span class="o">=</span> <span class="n">imt_sub_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">mean_data</span><span class="p">,</span>
+                                                <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">mean_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">mean_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">mean_set</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
@@ -513,15 +510,15 @@
 
         <span class="c1"># create the data set containing the std IMT data and metadata</span>
         <span class="n">std_data</span> <span class="o">=</span> <span class="n">imt_std</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
-        <span class="n">std_set</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">std_data</span><span class="p">,</span>
-                                           <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="n">std_set</span> <span class="o">=</span> <span class="n">imt_sub_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">std_data</span><span class="p">,</span>
+                                               <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">std_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">std_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">std_set</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">imt_std</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">std_set</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-        <span class="k">return</span> <span class="n">imt_group</span></div>
+        <span class="k">return</span> <span class="n">imt_sub_group</span></div>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.getIMTGrids"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTGrids">[docs]</a>    <span class="k">def</span> <span class="nf">getIMTGrids</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -545,11 +542,14 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Requesting grid data from file containing points&#39;</span><span class="p">)</span>
 
-        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No IMTs stored in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
+        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]]:</span>
             <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No group called </span><span class="si">%s</span><span class="s1"> in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
                               <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
-        <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
+        <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]][</span><span class="n">group_name</span><span class="p">]</span>
 
         <span class="c1"># get the mean data and metadata</span>
         <span class="n">mean_dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
@@ -619,32 +619,36 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;All input arrays must be the same shape&#39;</span><span class="p">)</span>
 
         <span class="c1"># set up the name of the group holding all the information for the IMT</span>
-        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;An IMT group called </span><span class="si">%s</span><span class="s1"> already exists.&#39;</span> <span class="o">%</span>
-                             <span class="n">imt_name</span><span class="p">)</span>
-        <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">group_name</span><span class="p">)</span>
+        <span class="n">sub_group_name</span> <span class="o">=</span> <span class="s1">&#39;__</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]]</span>
+
+        <span class="n">imt_sub_group</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">sub_group_name</span><span class="p">)</span>
 
         <span class="c1"># create data sets containing the longitudes, latitudes, and ids</span>
-        <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;lons&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">lons</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
-        <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;lats&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">lats</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
-        <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;ids&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="n">imt_sub_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
+            <span class="s1">&#39;lons&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">lons</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="n">imt_sub_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span>
+            <span class="s1">&#39;lats&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">lats</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="n">imt_sub_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;ids&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">ids</span><span class="p">,</span> <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
 
         <span class="c1"># create the data set containing the mean IMT data and metadata</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">imt_mean</span><span class="p">,</span>
-                                           <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">imt_sub_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;mean&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">imt_mean</span><span class="p">,</span>
+                                               <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">mean_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">mean_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
         <span class="c1"># create the data set containing the std IMT data and metadata</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">imt_std</span><span class="p">,</span>
-                                           <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">imt_sub_group</span><span class="o">.</span><span class="n">create_dataset</span><span class="p">(</span><span class="s1">&#39;std&#39;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">imt_std</span><span class="p">,</span>
+                                               <span class="n">compression</span><span class="o">=</span><span class="n">compression</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">std_metadata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">std_metadata</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">dataset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-        <span class="k">return</span> <span class="n">imt_group</span></div>
+        <span class="k">return</span> <span class="n">imt_sub_group</span></div>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.getIMTArrays"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getIMTArrays">[docs]</a>    <span class="k">def</span> <span class="nf">getIMTArrays</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -669,22 +673,24 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;points&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Requesting point data from file containing grids&#39;</span><span class="p">)</span>
 
-        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No group called </span><span class="si">%s</span><span class="s1"> in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
-                              <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
-        <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
+        <span class="n">sub_group_name</span> <span class="o">=</span> <span class="s1">&#39;__</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]]</span>
+
+        <span class="n">imt_sub_group</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="n">sub_group_name</span><span class="p">]</span>
 
         <span class="c1"># get the coordinates and ids</span>
-        <span class="n">dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;lons&#39;</span><span class="p">]</span>
+        <span class="n">dset</span> <span class="o">=</span> <span class="n">imt_sub_group</span><span class="p">[</span><span class="s1">&#39;lons&#39;</span><span class="p">]</span>
         <span class="n">lons</span> <span class="o">=</span> <span class="n">dset</span><span class="p">[()]</span>
-        <span class="n">dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;lats&#39;</span><span class="p">]</span>
+        <span class="n">dset</span> <span class="o">=</span> <span class="n">imt_sub_group</span><span class="p">[</span><span class="s1">&#39;lats&#39;</span><span class="p">]</span>
         <span class="n">lats</span> <span class="o">=</span> <span class="n">dset</span><span class="p">[()]</span>
-        <span class="n">dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;ids&#39;</span><span class="p">]</span>
+        <span class="n">dset</span> <span class="o">=</span> <span class="n">imt_sub_group</span><span class="p">[</span><span class="s1">&#39;ids&#39;</span><span class="p">]</span>
         <span class="n">ids</span> <span class="o">=</span> <span class="n">dset</span><span class="p">[()]</span>
 
         <span class="c1"># get the mean data and metadata</span>
-        <span class="n">mean_dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
+        <span class="n">mean_dset</span> <span class="o">=</span> <span class="n">imt_sub_group</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
         <span class="n">mean_data</span> <span class="o">=</span> <span class="n">mean_dset</span><span class="p">[()]</span>
 
         <span class="n">mean_metadata</span> <span class="o">=</span> <span class="p">{}</span>
@@ -692,7 +698,7 @@
             <span class="n">mean_metadata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">mean_dset</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
         <span class="c1"># get the std data and metadata</span>
-        <span class="n">std_dset</span> <span class="o">=</span> <span class="n">imt_group</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span>
+        <span class="n">std_dset</span> <span class="o">=</span> <span class="n">imt_sub_group</span><span class="p">[</span><span class="s1">&#39;std&#39;</span><span class="p">]</span>
         <span class="n">std_data</span> <span class="o">=</span> <span class="n">std_dset</span><span class="p">[()]</span>
 
         <span class="n">std_metadata</span> <span class="o">=</span> <span class="p">{}</span>
@@ -722,14 +728,22 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            list: List of names of IMTs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">imt_groups</span> <span class="o">=</span> <span class="n">_get_type_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">,</span> <span class="s1">&#39;imt&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">component</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">imts</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">imt_group</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">component</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
-                    <span class="n">imts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imt_group</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="n">component</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">imts</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">]))</span>
+
+        <span class="n">imts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">imts</span>
+
+        <span class="n">imt_groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">imt_group</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">:</span>
+            <span class="n">imt_group</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+            <span class="n">imt</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">component</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">component</span> <span class="o">!=</span> <span class="n">comp</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">imt</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imts</span><span class="p">:</span>
+                <span class="n">imts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">imts</span></div>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.getComponents"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getComponents">[docs]</a>    <span class="k">def</span> <span class="nf">getComponents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">):</span>
@@ -742,7 +756,21 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            list: List of names of components for given IMT.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">components</span> <span class="o">=</span> <span class="n">_get_type_list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">,</span> <span class="s1">&#39;imt_&#39;</span> <span class="o">+</span> <span class="n">imt_name</span><span class="p">)</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">components</span>
+
+        <span class="n">imt_groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">imt_group</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">:</span>
+            <span class="n">imt_group</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+            <span class="n">imt</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">comp</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="k">if</span> <span class="n">imt_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">imt_name</span> <span class="o">!=</span> <span class="n">imt</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">comp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
+                <span class="n">components</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">components</span></div>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.dropIMT"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.dropIMT">[docs]</a>    <span class="k">def</span> <span class="nf">dropIMT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">):</span>
@@ -753,13 +781,17 @@
 <span class="sd">            name (str): The name of the IMT to be deleted.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No IMTs stored in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
+                              <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
+        <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]]</span>
         <span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="n">imt_name</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
-            <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__imt_</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
+            <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imt_group</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No group called </span><span class="si">%s</span><span class="s1"> in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
                                   <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
-            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span></div></div>
+            <span class="k">del</span> <span class="n">imt_group</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span></div></div>
 </pre></div>
 
           </div>
@@ -795,12 +827,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>

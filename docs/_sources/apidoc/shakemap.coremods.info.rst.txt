@@ -1,5 +1,5 @@
-shakemap\.coremods\.info
-===============================
+shakemap.coremods.info
+=============================
 
 .. automodule:: shakemap.coremods.info
     :members:

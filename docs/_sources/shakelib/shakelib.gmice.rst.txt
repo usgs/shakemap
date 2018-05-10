@@ -1,10 +1,11 @@
-shakelib\.gmice
-=======================
+shakelib.gmice
+======================
 
 Submodules
 
 .. toctree::
 
+   shakelib.gmice.ak07
    shakelib.gmice.wald99
    shakelib.gmice.wgrw12
 

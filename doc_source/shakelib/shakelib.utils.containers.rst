@@ -1,5 +1,5 @@
-shakelib\.utils\.containers
-==================================
+shakelib.utils.containers
+================================
 
 .. automodule:: shakelib.utils.containers
     :members:

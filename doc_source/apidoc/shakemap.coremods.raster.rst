@@ -1,5 +1,5 @@
-shakemap\.coremods\.raster
-=================================
+shakemap.coremods.raster
+===============================
 
 .. automodule:: shakemap.coremods.raster
     :members:

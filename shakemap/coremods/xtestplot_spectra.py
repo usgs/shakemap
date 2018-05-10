@@ -63,24 +63,31 @@ class XTestPlotSpectra(CoreModule):
         #
         # Make plots
         #
-        fig = plt.figure(figsize=(10, 8))
-        plt.semilogx(periodlist[indxx],
-                     datalist[indxx],
-                     color='k', label='mean')
-        plt.semilogx(periodlist[indxx],
-                     datalist[indxx] + stddevlist[indxx],
-                     '--b', label='mean +/- stddev')
-        plt.semilogx(periodlist[indxx],
-                     datalist[indxx] - stddevlist[indxx],
-                     '--b')
-        plt.semilogx(periodlist[indxx],
-                     stddevlist[indxx],
-                     '-.r', label='stddev')
-        plt.xlabel('Period (s)')
-        plt.ylabel('ln(SA) (g)')
-        plt.legend(loc='best')
-        plt.title(self._eventid)
-        plt.grid()
+        fig, axa = plt.subplots(2, sharex=True, figsize=(10, 8))
+        plt.subplots_adjust(hspace=0.1)
+        axa[0].semilogx(periodlist[indxx],
+                        datalist[indxx],
+                        color='k', label='mean')
+        axa[0].semilogx(periodlist[indxx],
+                        datalist[indxx] + stddevlist[indxx],
+                        '--b', label='mean +/- stddev')
+        axa[0].semilogx(periodlist[indxx],
+                        datalist[indxx] - stddevlist[indxx],
+                        '--b')
+        axa[1].semilogx(periodlist[indxx],
+                        stddevlist[indxx],
+                        '-.r', label='stddev')
+        axa[1].set_xlabel('Period (s)')
+        axa[0].set_ylabel('Mean ln(SA) (g)')
+        axa[1].set_ylabel('Stddev ln(SA) (g)')
+        axa[0].legend(loc='best')
+        axa[1].legend(loc='best')
+        axa[0].set_title(self._eventid)
+        axa[0].grid()
+        axa[1].grid()
+        axa[1].set_ylim(ymin=0)
         pfile = os.path.join(datadir, self._eventid + '_spectra_plot.pdf')
+        plt.savefig(pfile)
+        pfile = os.path.join(datadir, self._eventid + '_spectra_plot.png')
         plt.savefig(pfile)
         plt.close()

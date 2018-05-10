@@ -1,5 +1,5 @@
-shakelib\.gmice\.wgrw12
-==============================
+shakelib.gmice.wgrw12
+============================
 
 .. automodule:: shakelib.gmice.wgrw12
     :members:

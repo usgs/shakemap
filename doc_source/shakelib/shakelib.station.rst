@@ -1,5 +1,5 @@
-shakelib\.station
-========================
+shakelib.station
+=======================
 
 .. automodule:: shakelib.station
     :members:
