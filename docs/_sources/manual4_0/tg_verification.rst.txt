@@ -56,7 +56,7 @@ Test 0001
 :num:`Figure #verification-test-one` shows the results of Test 0001. This
 test places two observation points along a line. 
 As discussed above, the GMPE evaluates to 0 (in log units) everywhere.  
-Each observation in this test also has an amplitude of 0.0 (in log units), 
+Both observations in this test also have an amplitude of 0.0 (in log units), 
 so the computed bias of the event is 0.
 Thus, the conditional mean amplitude evaluates to 0 everywhere. The standard 
 deviation is 0 at the location of the observations, and at great distances
@@ -76,8 +76,8 @@ MVN implementation is not introducing a bias or other anomalies.
    amplitudes of 0.
    The black line shows the conditional mean, the blue lines
    show the conditional mean +/-- the conditional standard
-   deviation, and the red line shows the conditional standard
-   deviation.
+   deviation (upper plot), and the red line shows the conditional
+   standard deviation (lower plot).
 
 
 Test 0002
@@ -103,8 +103,8 @@ at great distance from the observations.
    amplitudes of +1.0 and --1.0.
    The black line shows the conditional mean, the blue lines
    show the conditional mean +/-- the conditional standard
-   deviation, and the red line shows the conditional standard
-   deviation.
+   deviation (upper plot), and the red line shows the
+   conditional standard deviation (lower plot).
 
 Test 0003
 ====================
@@ -133,8 +133,9 @@ In the bivariate case, this reduces to:
 In our case the GMPE mean is 0 and the observation is 1, giving 
 :math:`\zeta = 1.0`. Because the observed IMT is the same as the
 desired output IMT, the factors :math:`z` are 1.0. The within-event
-standard deviation is 0.8, 
-and the between-event standard deviation is 0.6. Thus we have
+standard deviation (:math:`\phi`) is 0.8, 
+and the between-event standard deviation (:math:`\tau`) is 0.6. Thus
+we have
 
 .. math::
 
@@ -204,8 +205,8 @@ and can verify from the data produced by ShakeMap.
    an amplitude of +1.0.
    The black line shows the conditional mean, the blue lines
    show the conditional mean +/-- the conditional standard
-   deviation, and the red line shows the conditional standard
-   deviation.
+   deviation (upper plot), and the red line shows the conditional
+   standard deviation (lower plot).
 
 Test 0004
 ====================
@@ -232,8 +233,9 @@ has only one observation).
    amplitudes of +1.0.
    The black line shows the conditional mean, the blue lines
    show the conditional mean +/-- the conditional standard
-   deviation, and the red line shows the conditional standard
-   deviation. Compare with :num:`Figure #verification-test-three`.
+   deviation (upper plot), and the red line shows the conditional
+   standard deviation (lower plot). Compare with 
+   :num:`Figure #verification-test-three`.
 
 
 Test 0005
@@ -258,8 +260,8 @@ observation with the mean amplitude of the two observations (i.e.,
    location along a line, with amplitudes of +1.0 and --1.0.
    The black line shows the conditional mean, the blue lines
    show the conditional mean +/-- the conditional standard
-   deviation, and the red line shows the conditional standard
-   deviation.
+   deviation (upper plot), and the red line shows the 
+   conditional standard deviation (lower plot).
 
 
 Test 0006
@@ -287,8 +289,8 @@ value of 0.8.
    extend some distance off the left edge of the figure).
    The black line shows the conditional mean, the blue lines
    show the conditional mean +/-- the conditional standard
-   deviation, and the red line shows the conditional standard
-   deviation.
+   deviation (upper plot), and the red line shows the conditional
+   standard deviation (lower plot).
 
 Test 0007
 ====================
@@ -321,8 +323,8 @@ standard deviation (which, in our tests is 1.0).
    at periods from 0.1 s to 10.0 s.
    The black line shows the conditional mean, the blue lines
    show the conditional mean +/-- the conditional standard
-   deviation, and the red line shows the conditional standard
-   deviation.
+   deviation (upper plot), and the red line shows the 
+   conditional standard deviation (lower plot).
 
 Test 0008
 ====================
@@ -353,7 +355,8 @@ uncertainty in the observation (see Equation 32 of
 
 In our case, for the five values of :math:`\sigma_\epsilon`, and using
 a within-event standard deviation of :math:`\sigma = 0.8`, 
-:math:`\omega` is 1.0, 0.73, 0.47, 0.26, and 0.13. As we saw in 
+:math:`\omega` is approximately 1.0, 0.73, 0.47, 0.26, and 0.13. As
+we saw in 
 Test 0003, the bias for the case of :math:`\sigma_\epsilon = 0` is
 0.36. For the second case, where :math:`\sigma_\epsilon = 0.75` we
 have:
@@ -371,8 +374,8 @@ or,
     \mu_{\delta B_{i,m}} = 0.23
 
 By application of the same process, we find the bias values for the
-other cases. Thus, the bias values for the five cases are 0.36, 0.23,
-0.11, 0.037, and 0.01.
+other cases. Thus, the bias values for the five cases are about 0.36,
+0.23, 0.11, 0.037, and 0.01.
 These values can be observed in the top plot in 
 :num:`Figure #verification-test-eight`
 at distance from the observation point.
@@ -381,7 +384,7 @@ Similarly the standard deviation of the bias,
 
 .. math::
 
-    \sigma{\delta B_{i,m}} = 
+    \sigma_{\delta B_{i,m}} = 
     \frac{1}  
     {\tau_{i, m}^{-2} + z \frac{1}{\phi^2} z},
 
@@ -399,11 +402,11 @@ at distance from the observation point.
 
 Equations 42 and 43 of :ref:`Worden et al. (2018) <worden2018>`
 apply to the bivariate case where the observation is at the site we
-wish to estimate:
+wish to estimate. The mean and variance are given by:
 
 .. math::
 
-    \mu | z = \mu + \frac{\sigma^2}{\sigma^2 + \sigma^2_\epsilon}\left( z - \mu )\right),
+    \mu | z = \mu + \frac{\sigma^2}{\sigma^2 + \sigma^2_\epsilon}\left( z - \mu \right),
 
 and
 
@@ -418,13 +421,13 @@ value returned by the GMPE is 0). Again, for the case of
 
 .. math::
 
-    \mu | z = 0.23 + \frac{0.96^2}{0.96^2 + 0.75^2}\left( 1.0 - 0.23 )\right),
+    \mu | z = 0.23 + \frac{0.96^2}{0.96^2 + 0.75^2}\left( 1.0 - 0.23 \right),
 
 or
 
 .. math::
 
-    \mu | z = 0.71
+    \mu | z = 0.71.
 
 Then
 
@@ -440,11 +443,12 @@ or
 
 Thus, at 
 the observation point we get mean values for each of our five cases of 1.0, 0.71,
-0.38, 0.13, and 0.04. These values can be seen in 
+0.38, 0.13, and 0.04. These values can be seen for each of the five lines in 
 :num:`Figure #verification-test-eight`
-at the observation point. Similarly, the standard deviation at the observation
+at the location of the observation point. Similarly, the standard deviation 
+at the observation
 point for each case is 0.0, 0.59, 0.82, 0.94, and 0.99. These values also
-correspond to what we see in 
+correspond to what we see in the lower plot of 
 :num:`Figure #verification-test-eight`.
 
 
@@ -454,12 +458,13 @@ correspond to what we see in
    :width: 700
    :align: left
 
-   Verification Test 0008. A single observation with an
-   amplitude of +1.0, and a standard deviation of 0.5.
-   The black line shows the conditional mean, the blue lines
-   show the conditional mean +/-- the conditional standard
-   deviation, and the red line shows the conditional standard
-   deviation. Compare with :num:`Figure #verification-test-three`.
+   Verification Test 0008. Five separates runs of ShakeMap
+   each using a single observation with an
+   amplitude of +1.0, but with increasing uncertainty.
+   The upper plot (solid lines) shows the conditional means,
+   and the lower plot (dashed lines) shows the conditional standard
+   deviations. The black lines should be identical to their 
+   counterparts in :num:`Figure #verification-test-three`.
 
 Test 0009
 ====================
@@ -489,8 +494,8 @@ exceed it.
    a standard deviation of 0.2.
    The black line shows the conditional mean, the blue lines
    show the conditional mean +/-- the conditional standard
-   deviation, and the red line shows the conditional standard
-   deviation.
+   deviation (upper plot), and the red line shows the 
+   conditional standard deviation (lower plot).
 
 Test 0010
 ====================
@@ -520,8 +525,9 @@ observational value (0.75), or go below it.
    a standard deviation of 0.2.
    The black line shows the conditional mean, the blue lines
    show the conditional mean +/-- the conditional standard
-   deviation, and the red line shows the conditional standard
-   deviation. Compare with :num:`Figure #verification-test-nine`.
+   deviation (upper plot), and the red line shows the conditional
+   standard deviation (lower plot). Compare with
+   :num:`Figure #verification-test-nine`.
 
 Test 0011
 ====================

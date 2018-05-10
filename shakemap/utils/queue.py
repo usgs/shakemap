@@ -165,7 +165,8 @@ def magnitude_too_small(mag, lon, lat, config):
         bool: True if the event is too small to process; False otherwise.
     """
     pt = Point((lon, lat))
-    for boxname, boxdict in config['boxes'].items():
+    for boxname in sorted(config['boxes']):
+        boxdict = config['boxes'][boxname]
         if pt.within(boxdict['poly']):
             if mag >= boxdict['mag']:
                 return False
@@ -257,10 +258,12 @@ def dispatch_event(eventid, logger, children, action, config):
     """
     if action == 'run':
         logger.info('Running event %s' % eventid)
-        p = subprocess.Popen([config['shake_path'], '--autorun', eventid])
+        p = subprocess.Popen([config['shake_path'], '--log',
+                              '--autorun', eventid])
     elif action == 'cancel':
         logger.info('Canceling event %s' % eventid)
-        p = subprocess.Popen([config['shake_path'], eventid, 'cancel'])
+        p = subprocess.Popen([config['shake_path'], '--log',
+                              eventid, 'cancel'])
     elif action == 'test':
         logger.info('Testing event %s' % eventid)
         p = subprocess.Popen(['echo', eventid])

@@ -1035,7 +1035,6 @@ class ModelModule(CoreModule):
         # Don't know what to do about this warning; hopefully someone
         # will fix maskoceans()
         #
-        print(list(self.outgrid.keys()))
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore",
                                     category=np.VisibleDeprecationWarning)

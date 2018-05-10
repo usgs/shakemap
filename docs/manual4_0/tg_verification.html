@@ -82,7 +82,7 @@ not work on all systems. The plots can be found in
 <p><a class="pageref" href="#verification-test-one">Figure  1</a> shows the results of Test 0001. This
 test places two observation points along a line.
 As discussed above, the GMPE evaluates to 0 (in log units) everywhere.
-Each observation in this test also has an amplitude of 0.0 (in log units),
+Both observations in this test also have an amplitude of 0.0 (in log units),
 so the computed bias of the event is 0.
 Thus, the conditional mean amplitude evaluates to 0 everywhere. The standard
 deviation is 0 at the location of the observations, and at great distances
@@ -96,8 +96,8 @@ MVN implementation is not introducing a bias or other anomalies.</p>
 amplitudes of 0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
-deviation, and the red line shows the conditional standard
-deviation.</span></p>
+deviation (upper plot), and the red line shows the conditional
+standard deviation (lower plot).</span></p>
 </div>
 </div>
 <div class="section" id="test-0002">
@@ -116,8 +116,8 @@ at great distance from the observations.</p>
 amplitudes of +1.0 and –1.0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
-deviation, and the red line shows the conditional standard
-deviation.</span></p>
+deviation (upper plot), and the red line shows the
+conditional standard deviation (lower plot).</span></p>
 </div>
 </div>
 <div class="section" id="test-0003">
@@ -140,8 +140,9 @@ can determine the expected bias:</p>
 </div><p>In our case the GMPE mean is 0 and the observation is 1, giving
 <img class="math" src="../_images/math/f7b77a921c15c982166df89ae059553df2bc0679.png" alt="\zeta = 1.0"/>. Because the observed IMT is the same as the
 desired output IMT, the factors <img class="math" src="../_images/math/4540c708673eeb99c2962c0e08084347f3aa5814.png" alt="z"/> are 1.0. The within-event
-standard deviation is 0.8,
-and the between-event standard deviation is 0.6. Thus we have</p>
+standard deviation (<img class="math" src="../_images/math/c8f6ee4c832e7d910199a0031862e079359b2799.png" alt="\phi"/>) is 0.8,
+and the between-event standard deviation (<img class="math" src="../_images/math/6e4cfb62da3ba7335dc29c04325453107ebc8ddb.png" alt="\tau"/>) is 0.6. Thus
+we have</p>
 <div class="math">
 <p><img src="../_images/math/c1fb6f985c74cb8d542219ee7994b517a2d52677.png" alt="\mu_{\delta B_{i,m}} =
 \frac{1 \times \frac{1}{0.8^2} \times 1}
@@ -181,8 +182,8 @@ and can verify from the data produced by ShakeMap.</p>
 an amplitude of +1.0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
-deviation, and the red line shows the conditional standard
-deviation.</span></p>
+deviation (upper plot), and the red line shows the conditional
+standard deviation (lower plot).</span></p>
 </div>
 </div>
 <div class="section" id="test-0004">
@@ -203,8 +204,9 @@ location along a line, both with
 amplitudes of +1.0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
-deviation, and the red line shows the conditional standard
-deviation. Compare with <a class="pageref" href="#verification-test-three">Figure  3</a>.</span></p>
+deviation (upper plot), and the red line shows the conditional
+standard deviation (lower plot). Compare with
+<a class="pageref" href="#verification-test-three">Figure  3</a>.</span></p>
 </div>
 </div>
 <div class="section" id="test-0005">
@@ -222,8 +224,8 @@ observation with the mean amplitude of the two observations (i.e.,
 location along a line, with amplitudes of +1.0 and –1.0.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
-deviation, and the red line shows the conditional standard
-deviation.</span></p>
+deviation (upper plot), and the red line shows the
+conditional standard deviation (lower plot).</span></p>
 </div>
 </div>
 <div class="section" id="test-0006">
@@ -244,8 +246,8 @@ a line, with amplitudes of +1.0 (note that the observations
 extend some distance off the left edge of the figure).
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
-deviation, and the red line shows the conditional standard
-deviation.</span></p>
+deviation (upper plot), and the red line shows the conditional
+standard deviation (lower plot).</span></p>
 </div>
 </div>
 <div class="section" id="test-0007">
@@ -272,8 +274,8 @@ acceleration (with an amplitude of 1.0) at a period of
 at periods from 0.1 s to 10.0 s.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
-deviation, and the red line shows the conditional standard
-deviation.</span></p>
+deviation (upper plot), and the red line shows the
+conditional standard deviation (lower plot).</span></p>
 </div>
 </div>
 <div class="section" id="test-0008">
@@ -298,7 +300,8 @@ uncertainty in the observation (see Equation 32 of
 <p><img src="../_images/math/3444b8cbf7bfac7b6acac72a939cc65f9c1bc438.png" alt="\omega = \sqrt{\frac{\sigma^2}{\sigma^2 + \sigma^2_\epsilon}}"/></p>
 </div><p>In our case, for the five values of <img class="math" src="../_images/math/f223c8f1139b2a2904111c5bfe5b0e5c96385871.png" alt="\sigma_\epsilon"/>, and using
 a within-event standard deviation of <img class="math" src="../_images/math/4ab949ae6a55c1551c123b17e957b59c31b3a659.png" alt="\sigma = 0.8"/>,
-<img class="math" src="../_images/math/8bf8e934183163dc9998112744b31d562622aeab.png" alt="\omega"/> is 1.0, 0.73, 0.47, 0.26, and 0.13. As we saw in
+<img class="math" src="../_images/math/8bf8e934183163dc9998112744b31d562622aeab.png" alt="\omega"/> is approximately 1.0, 0.73, 0.47, 0.26, and 0.13. As
+we saw in
 Test 0003, the bias for the case of <img class="math" src="../_images/math/5daf8d788d705c240a9dc4e7beb9fdd89b958e20.png" alt="\sigma_\epsilon = 0"/> is
 0.36. For the second case, where <img class="math" src="../_images/math/d9023b8ce295351744d798cee08510e8e45d30b0.png" alt="\sigma_\epsilon = 0.75"/> we
 have:</p>
@@ -310,14 +313,14 @@ have:</p>
 <div class="math">
 <p><img src="../_images/math/d2b3ec44ef4b9c34478d79ca53b003bb147993ad.png" alt="\mu_{\delta B_{i,m}} = 0.23"/></p>
 </div><p>By application of the same process, we find the bias values for the
-other cases. Thus, the bias values for the five cases are 0.36, 0.23,
-0.11, 0.037, and 0.01.
+other cases. Thus, the bias values for the five cases are about 0.36,
+0.23, 0.11, 0.037, and 0.01.
 These values can be observed in the top plot in
 <a class="pageref" href="#verification-test-eight">Figure  8</a>
 at distance from the observation point.</p>
 <p>Similarly the standard deviation of the bias,</p>
 <div class="math">
-<p><img src="../_images/math/86ecb13e52698087539b1bf7d0bbf7fca2db45fd.png" alt="\sigma{\delta B_{i,m}} =
+<p><img src="../_images/math/608f683078e45cd0aa09c9ba0756112eaabce67f.png" alt="\sigma_{\delta B_{i,m}} =
 \frac{1}
 {\tau_{i, m}^{-2} + z \frac{1}{\phi^2} z},"/></p>
 </div><p>for each of the cases is approximately 0.48, 0.53, 0.57, 0.59,
@@ -330,9 +333,9 @@ and 0.60. Thus, using the formula:</p>
 at distance from the observation point.</p>
 <p>Equations 42 and 43 of <a class="reference internal" href="references.html#worden2018"><span class="std std-ref">Worden et al. (2018)</span></a>
 apply to the bivariate case where the observation is at the site we
-wish to estimate:</p>
+wish to estimate. The mean and variance are given by:</p>
 <div class="math">
-<p><img src="../_images/math/03254722f156091541bcee2846cfb530a2f9a19d.png" alt="\mu | z = \mu + \frac{\sigma^2}{\sigma^2 + \sigma^2_\epsilon}\left( z - \mu )\right),"/></p>
+<p><img src="../_images/math/163cdd00441d86af17e9b41c994240e0f54c7782.png" alt="\mu | z = \mu + \frac{\sigma^2}{\sigma^2 + \sigma^2_\epsilon}\left( z - \mu \right),"/></p>
 </div><p>and</p>
 <div class="math">
 <p><img src="../_images/math/1726748e7a1e1de292bd3229ddc45fb8950c3dfe.png" alt="\sigma^2 | z = \frac{\sigma^2 \sigma^2_\epsilon}{\sigma^2 + \sigma^2_\epsilon}."/></p>
@@ -341,10 +344,10 @@ deviation for <img class="math" src="../_images/math/6c426ae9c91bc627cad6f1d89ba
 value returned by the GMPE is 0). Again, for the case of
 <img class="math" src="../_images/math/d9023b8ce295351744d798cee08510e8e45d30b0.png" alt="\sigma_\epsilon = 0.75"/>, we have</p>
 <div class="math">
-<p><img src="../_images/math/0917a048cfef7af3ea9792d0c70259d11937c566.png" alt="\mu | z = 0.23 + \frac{0.96^2}{0.96^2 + 0.75^2}\left( 1.0 - 0.23 )\right),"/></p>
+<p><img src="../_images/math/ff38ba1a27f157caedb2dd888cbd80efef7858eb.png" alt="\mu | z = 0.23 + \frac{0.96^2}{0.96^2 + 0.75^2}\left( 1.0 - 0.23 \right),"/></p>
 </div><p>or</p>
 <div class="math">
-<p><img src="../_images/math/2062c462f3bb0347f80f1a7ef8e91f7f809039ac.png" alt="\mu | z = 0.71"/></p>
+<p><img src="../_images/math/3c55c5972df3e94c7daa4081a19d8d6f7577e226.png" alt="\mu | z = 0.71."/></p>
 </div><p>Then</p>
 <div class="math">
 <p><img src="../_images/math/c3ff3fff91333152813aa6372301933c46ad0891.png" alt="\sigma | z = \sqrt{\frac{0.96^2 \times 0.75^2}{0.96^2 + 0.75^2}},"/></p>
@@ -353,20 +356,22 @@ value returned by the GMPE is 0). Again, for the case of
 <p><img src="../_images/math/ab4e07551f441a75f0d5e3ce3f96e14f7d70be73.png" alt="\sigma | z = 0.59"/></p>
 </div><p>Thus, at
 the observation point we get mean values for each of our five cases of 1.0, 0.71,
-0.38, 0.13, and 0.04. These values can be seen in
+0.38, 0.13, and 0.04. These values can be seen for each of the five lines in
 <a class="pageref" href="#verification-test-eight">Figure  8</a>
-at the observation point. Similarly, the standard deviation at the observation
+at the location of the observation point. Similarly, the standard deviation
+at the observation
 point for each case is 0.0, 0.59, 0.82, 0.94, and 0.99. These values also
-correspond to what we see in
+correspond to what we see in the lower plot of
 <a class="pageref" href="#verification-test-eight">Figure  8</a>.</p>
 <div class="figure align-left" id="id8">
 <span id="verification-test-eight"></span><a class="reference internal image-reference" href="../_images/verification_test_0008_PGA.png"><img alt="../_images/verification_test_0008_PGA.png" src="../_images/verification_test_0008_PGA.png" style="width: 700px;" /></a>
-<p class="caption"><span class="caption-text">Figure 8: Verification Test 0008. A single observation with an
-amplitude of +1.0, and a standard deviation of 0.5.
-The black line shows the conditional mean, the blue lines
-show the conditional mean +/– the conditional standard
-deviation, and the red line shows the conditional standard
-deviation. Compare with <a class="pageref" href="#verification-test-three">Figure  3</a>.</span></p>
+<p class="caption"><span class="caption-text">Figure 8: Verification Test 0008. Five separates runs of ShakeMap
+each using a single observation with an
+amplitude of +1.0, but with increasing uncertainty.
+The upper plot (solid lines) shows the conditional means,
+and the lower plot (dashed lines) shows the conditional standard
+deviations. The black lines should be identical to their
+counterparts in <a class="pageref" href="#verification-test-three">Figure  3</a>.</span></p>
 </div>
 </div>
 <div class="section" id="test-0009">
@@ -390,8 +395,8 @@ four have amplitudes of 1.0. All five observations have
 a standard deviation of 0.2.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
-deviation, and the red line shows the conditional standard
-deviation.</span></p>
+deviation (upper plot), and the red line shows the
+conditional standard deviation (lower plot).</span></p>
 </div>
 </div>
 <div class="section" id="test-0010">
@@ -415,8 +420,9 @@ four have amplitudes of 1.0. All five observations have
 a standard deviation of 0.2.
 The black line shows the conditional mean, the blue lines
 show the conditional mean +/– the conditional standard
-deviation, and the red line shows the conditional standard
-deviation. Compare with <a class="pageref" href="#verification-test-nine">Figure  9</a>.</span></p>
+deviation (upper plot), and the red line shows the conditional
+standard deviation (lower plot). Compare with
+<a class="pageref" href="#verification-test-nine">Figure  9</a>.</span></p>
 </div>
 </div>
 <div class="section" id="test-0011">

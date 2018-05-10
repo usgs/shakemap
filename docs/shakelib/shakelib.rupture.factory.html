@@ -129,9 +129,10 @@ information in the ‘metadata’ field.</td>
 <dl class="function">
 <dt id="shakelib.rupture.factory.text_to_json">
 <code class="descclassname">shakelib.rupture.factory.</code><code class="descname">text_to_json</code><span class="sig-paren">(</span><em>file</em>, <em>new_format=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#text_to_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.text_to_json" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read in old or new ShakeMap 3 textfile rupture format and convert to GeoJSON.</p>
-<p>This will handle ShakeMap3.5-style fault text files, which can have the following
-format:</p>
+<dd><p>Read in old or new ShakeMap 3 textfile rupture format and convert to
+GeoJSON.</p>
+<p>This will handle ShakeMap3.5-style fault text files, which can have the
+following format:</p>
 <blockquote>
 <div><ul class="simple">
 <li># at the top indicates a reference.</li>
@@ -151,8 +152,8 @@ beginning of another.</li>
 psxy format, where:</p>
 <blockquote>
 <div><ul>
-<li>Rupture vertices are space/comma separated lat, lon, depth triplets
-on a single line.</li>
+<li>Rupture vertices are space/comma separated lat, lon, depth
+triplets on a single line.</li>
 <li>Rupture groups are separated by lines containing “&gt;”</li>
 <li>Rupture groups must be closed.</li>
 <li>Verticies within a rupture group must start along the top
@@ -162,7 +163,7 @@ edge and move back in the opposite direction.</li>
 </div></blockquote>
 </li>
 <li><strong>new_format</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Indicates whether text rupture format is
-“old” or “new” style.</li>
+“old” (lat, lon, depth) or “new” (lon, lat, depth) style.</li>
 </ul>
 </td>
 </tr>

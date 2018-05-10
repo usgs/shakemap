@@ -123,6 +123,8 @@ def main(args):
     # dictionary and send it to the queue
     if not args.property_title:
         args.property_title = ''
+    elif isinstance(args.property_title, list):
+        args.property_title = ' '.join(args.property_title)
     if not args.preferred_eventsource:
         args.preferred_eventsource = ''
     event = {'id': args.preferred_eventid,

@@ -122,9 +122,12 @@
 <span class="sd">    .. seealso:: :func:`rupture_from_dict`</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        rupdictd (dict): Rupture GeoJSON dictionary.</span>
-<span class="sd">        origin (Origin): A ShakeMap origin object.</span>
-<span class="sd">        mesh_dx (float): Target spacing (in km) for rupture discretization;</span>
+<span class="sd">        rupdictd (dict):</span>
+<span class="sd">            Rupture GeoJSON dictionary.</span>
+<span class="sd">        origin (Origin):</span>
+<span class="sd">            A ShakeMap origin object.</span>
+<span class="sd">        mesh_dx (float):</span>
+<span class="sd">            Target spacing (in km) for rupture discretization;</span>
 <span class="sd">            default is 0.5 km and it is only used if the rupture file is an</span>
 <span class="sd">            EdgeRupture.</span>
 
@@ -157,7 +160,8 @@
 <span class="sd">        :func:`rupture_from_dict_and_origin`</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        d (dict): Rupture GeoJSON dictionary, which must contain origin</span>
+<span class="sd">        d (dict):</span>
+<span class="sd">            Rupture GeoJSON dictionary, which must contain origin</span>
 <span class="sd">            information in the &#39;metadata&#39; field.</span>
 
 <span class="sd">    Returns:</span>
@@ -185,42 +189,91 @@
     <span class="k">return</span> <span class="n">rupt</span></div>
 
 
-<span class="k">def</span> <span class="nf">_check_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">new_format</span><span class="p">):</span>
-    <span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">new_format</span><span class="p">:</span>
-        <span class="c1"># switch from lat/lon/z to lon/lat/z</span>
-        <span class="n">tmp</span> <span class="o">=</span> <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">xyz</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">_rotate_polygon</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a method to rotate a polygon, which is used to try to</span>
+<span class="sd">    fix incorrectly specified polygons.</span>
 
-    <span class="c1"># ensure the polygon is closed</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">xyz</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]):</span>
-        <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span>
-            <span class="s1">&#39;Rupture file </span><span class="si">%s</span><span class="s1"> has unclosed segments.&#39;</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span>
+<span class="sd">    Args:</span>
+<span class="sd">        p (list):</span>
+<span class="sd">            A list of lon/lat/depth lists.</span>
 
-    <span class="c1"># ensure the polygon is specified top-edge first</span>
-    <span class="k">if</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">xyz</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>  <span class="c1"># does this file specify bottom edge first?</span>
-        <span class="k">if</span> <span class="n">new_format</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span>
-                <span class="s1">&#39;Rupture file </span><span class="si">%s</span><span class="s1"> must be specified top-edge first.&#39;</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span>
-        <span class="c1"># drop last point</span>
-        <span class="n">xyz</span> <span class="o">=</span> <span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
-        <span class="c1"># reverse order of points</span>
-        <span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">xyz</span><span class="p">)</span>
-        <span class="c1"># put new first point onto the end so that it is closed.</span>
-        <span class="n">xyz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">xyz</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">xyz</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">)),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        list: Same as before but the points have been incremented</span>
+<span class="sd">        by one in position.</span>
 
-    <span class="c1"># turn numpy back into list of x,y,z sequences</span>
-    <span class="n">polygon</span> <span class="o">=</span> <span class="n">xyz</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert to numpy array for better indexing support</span>
+    <span class="n">parray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+    <span class="c1"># Ensure the polygon is closed</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">array_equal</span><span class="p">(</span><span class="n">parray</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:],</span> <span class="n">parray</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:]):</span>
+        <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span><span class="s1">&#39;Rupture file has unclosed segments.&#39;</span><span class="p">)</span>
+
+    <span class="c1"># Drop last point</span>
+    <span class="n">parray</span> <span class="o">=</span> <span class="n">parray</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+
+    <span class="c1"># Rotate by putting first at end</span>
+    <span class="n">parray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parray</span><span class="p">[</span><span class="mi">1</span><span class="p">:,</span> <span class="p">:],</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">parray</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+                       <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Put new first point onto the end so that it is closed.</span>
+    <span class="n">parray</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parray</span><span class="p">,</span>
+                       <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">parray</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="p">:],</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)),</span>
+                       <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># Turn numpy array back into a list</span>
+    <span class="n">polygon</span> <span class="o">=</span> <span class="n">parray</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">polygon</span>
+
+
+<span class="k">def</span> <span class="nf">_check_polygon</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the verticies are specified top first.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        p (list):</span>
+<span class="sd">            A list of five lon/lat/depth lists.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        Exception: Incorrectly specified polygon.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">n_points</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Number of points in polyon must be odd.&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;First and last points in polygon must be &#39;</span>
+                        <span class="s1">&#39;identical.&#39;</span><span class="p">)</span>
+
+    <span class="n">n_pairs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">n_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_pairs</span><span class="p">):</span>
+        <span class="c1"># -------------------------------------------------------------</span>
+        <span class="c1"># Points are paired and in each pair the top is first, as in:</span>
+        <span class="c1">#</span>
+        <span class="c1">#      _.-P1-._</span>
+        <span class="c1">#   P0&#39;        &#39;P2---P3</span>
+        <span class="c1">#   |                  \</span>
+        <span class="c1">#   P7---P6----P5-------P4</span>
+        <span class="c1">#</span>
+        <span class="c1"># Pairs: P0-P7, P1-P6, P2-P5, P3-P4</span>
+        <span class="c1"># -------------------------------------------------------------</span>
+        <span class="n">top_depth</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="n">bot_depth</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)][</span><span class="mi">2</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">top_depth</span> <span class="o">&gt;=</span> <span class="n">bot_depth</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s1">&#39;Top points must be ordered before bottom points.&#39;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="text_to_json"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.text_to_json">[docs]</a><span class="k">def</span> <span class="nf">text_to_json</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">new_format</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Read in old or new ShakeMap 3 textfile rupture format and convert to GeoJSON.</span>
+<span class="sd">    Read in old or new ShakeMap 3 textfile rupture format and convert to</span>
+<span class="sd">    GeoJSON.</span>
 
-<span class="sd">    This will handle ShakeMap3.5-style fault text files, which can have the following</span>
-<span class="sd">    format:</span>
+<span class="sd">    This will handle ShakeMap3.5-style fault text files, which can have the</span>
+<span class="sd">    following format:</span>
 <span class="sd">     - # at the top indicates a reference.</span>
 <span class="sd">     - Lines beginning with a &gt; indicate the end of one segment and the</span>
 <span class="sd">       beginning of another.</span>
@@ -229,18 +282,21 @@
 <span class="sd">     - Vertices can be specified in top-edge or bottom-edge first order.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        rupturefile (str): Path to rupture file OR file-like object in GMT</span>
+<span class="sd">        rupturefile (str):</span>
+<span class="sd">            Path to rupture file OR file-like object in GMT</span>
 <span class="sd">            psxy format, where:</span>
 
-<span class="sd">                * Rupture vertices are space/comma separated lat, lon, depth triplets</span>
-<span class="sd">                  on a single line.</span>
+<span class="sd">                * Rupture vertices are space/comma separated lat, lon, depth</span>
+<span class="sd">                  triplets on a single line.</span>
 <span class="sd">                * Rupture groups are separated by lines containing &quot;&gt;&quot;</span>
 <span class="sd">                * Rupture groups must be closed.</span>
 <span class="sd">                * Verticies within a rupture group must start along the top</span>
 <span class="sd">                  edge and move in the strike direction then move to the bottom</span>
 <span class="sd">                  edge and move back in the opposite direction.</span>
-<span class="sd">        new_format (bool): Indicates whether text rupture format is</span>
-<span class="sd">            &quot;old&quot; or &quot;new&quot; style.</span>
+
+<span class="sd">        new_format (bool):</span>
+<span class="sd">            Indicates whether text rupture format is</span>
+<span class="sd">            &quot;old&quot; (lat, lon, depth) or &quot;new&quot; (lon, lat, depth) style.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: GeoJSON rupture dictionary.</span>
@@ -259,16 +315,19 @@
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()):</span>
             <span class="k">continue</span>
+
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">):</span>
+            <span class="c1"># Get reference string</span>
             <span class="n">reference</span> <span class="o">+=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
             <span class="k">continue</span>
+
         <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;&gt;&#39;</span><span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">polygon</span><span class="p">):</span>
                 <span class="k">continue</span>
-            <span class="n">polygon</span> <span class="o">=</span> <span class="n">_check_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">new_format</span><span class="p">)</span>
             <span class="n">polygons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span>
             <span class="n">polygon</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">continue</span>
+
         <span class="c1"># first try to split on whitespace</span>
         <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
@@ -279,18 +338,48 @@
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span>
                     <span class="s1">&#39;Rupture file </span><span class="si">%s</span><span class="s1"> has unspecified delimiters.&#39;</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Rupture file </span><span class="si">%s</span><span class="s1"> is not in lat,lon,depth format.&#39;</span>
             <span class="k">if</span> <span class="n">new_format</span><span class="p">:</span>
                 <span class="s1">&#39;Rupture file </span><span class="si">%s</span><span class="s1"> is not in lon,lat,depth format.&#39;</span>
             <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span>
+
         <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">new_format</span><span class="p">:</span>
+            <span class="n">old_parts</span> <span class="o">=</span> <span class="n">parts</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">old_parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">polygon</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">polygon</span><span class="p">):</span>
-        <span class="n">polygon</span> <span class="o">=</span> <span class="n">_check_polygon</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">new_format</span><span class="p">)</span>
         <span class="n">polygons</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">polygon</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">isfile</span><span class="p">:</span>
         <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="c1"># Try to fix polygons</span>
+    <span class="n">original_polygons</span> <span class="o">=</span> <span class="n">polygons</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">fixed</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">n_polygons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">polygons</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_polygons</span><span class="p">):</span>
+        <span class="n">n_verts</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">polygons</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_verts</span> <span class="o">-</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">_check_polygon</span><span class="p">(</span><span class="n">polygons</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">continue</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="n">polygons</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_rotate_polygon</span><span class="p">(</span><span class="n">polygons</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
+            <span class="n">fixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">fixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="n">fixed</span><span class="p">):</span>
+        <span class="n">polygons</span> <span class="o">=</span> <span class="n">original_polygons</span>
+
     <span class="n">json_dict</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
         <span class="s2">&quot;metadata&quot;</span><span class="p">:</span> <span class="p">{</span>
@@ -309,107 +398,9 @@
             <span class="p">}</span>
         <span class="p">]</span>
     <span class="p">}</span>
+    <span class="n">validate_json</span><span class="p">(</span><span class="n">json_dict</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">json_dict</span></div>
-
-
-<span class="c1"># def text_to_json(file):</span>
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     Read in textfile rupture format and convert to GeoJSON.</span>
-
-<span class="c1">#     Args:</span>
-<span class="c1">#         rupturefile (srt): Path to rupture file OR file-like object in GMT</span>
-<span class="c1">#             psxy format, where:</span>
-
-<span class="c1">#                 * Rupture vertices are space separated lon, lat, depth triplets</span>
-<span class="c1">#                   on a single line.</span>
-<span class="c1">#                 * Rupture groups are separated by lines containing &quot;&gt;&quot;</span>
-<span class="c1">#                 * Rupture groups must be closed.</span>
-<span class="c1">#                 * Vertices within a rupture group must start along the top</span>
-<span class="c1">#                   edge and move in the strike direction then move to the bottom</span>
-<span class="c1">#                   edge and move back in the opposite direction.</span>
-
-<span class="c1">#     Returns:</span>
-<span class="c1">#         dict: GeoJSON rupture dictionary.</span>
-
-<span class="c1">#     &quot;&quot;&quot;</span>
-<span class="c1">#     msg = &#39;&#39;&#39;In ShakeMap 4.0, the order of coordinates in fault.txt files</span>
-<span class="c1"># has changed from lat,lon,depth to lon, lat, depth.  If you have specified</span>
-<span class="c1"># your vertices in the older-style, your results will likely not be what you</span>
-<span class="c1"># expected.&#39;&#39;&#39;</span>
-<span class="c1">#     logging.warn(msg)</span>
-<span class="c1">#     # -------------------------------------------------------------------------</span>
-<span class="c1">#     # First read in the data</span>
-<span class="c1">#     # -------------------------------------------------------------------------</span>
-<span class="c1">#     x = []</span>
-<span class="c1">#     y = []</span>
-<span class="c1">#     z = []</span>
-<span class="c1">#     isFile = False</span>
-<span class="c1">#     if isinstance(file, str):</span>
-<span class="c1">#         isFile = True</span>
-<span class="c1">#         file = open(file, &#39;rt&#39;)</span>
-<span class="c1">#         lines = file.readlines()</span>
-<span class="c1">#     else:</span>
-<span class="c1">#         lines = file.readlines()</span>
-<span class="c1">#     reference = &#39;&#39;</span>
-<span class="c1">#     for line in lines:</span>
-<span class="c1">#         sline = line.strip()</span>
-<span class="c1">#         if sline.startswith(&#39;#&#39;):</span>
-<span class="c1">#             reference += sline</span>
-<span class="c1">#             continue</span>
-<span class="c1">#         if sline.startswith(&#39;&gt;&#39;):</span>
-<span class="c1">#             if len(x):  # start of new line segment</span>
-<span class="c1">#                 x.append(np.nan)</span>
-<span class="c1">#                 y.append(np.nan)</span>
-<span class="c1">#                 z.append(np.nan)</span>
-<span class="c1">#                 continue</span>
-<span class="c1">#             else:  # start of file</span>
-<span class="c1">#                 continue</span>
-<span class="c1">#         if not len(sline.strip()):</span>
-<span class="c1">#             continue</span>
-<span class="c1">#         parts = sline.split()</span>
-<span class="c1">#         if len(parts) &lt; 3:</span>
-<span class="c1">#             parts = sline.split(&#39;,&#39;)</span>
-<span class="c1">#             if len(parts) &lt; 3:</span>
-<span class="c1">#                 raise ShakeLibException(</span>
-<span class="c1">#                     &#39;Rupture file %s has no depth values.&#39; % file)</span>
-<span class="c1">#         y.append(float(parts[0]))</span>
-<span class="c1">#         x.append(float(parts[1]))</span>
-<span class="c1">#         z.append(float(parts[2]))</span>
-<span class="c1">#     if isFile:</span>
-<span class="c1">#         file.close()</span>
-
-<span class="c1">#     # Construct GeoJSON dictionary</span>
-
-<span class="c1">#     coords = []</span>
-<span class="c1">#     poly = []</span>
-<span class="c1">#     for lon, lat, dep in zip(x, y, z):</span>
-<span class="c1">#         if np.isnan(lon):</span>
-<span class="c1">#             coords.append(poly)</span>
-<span class="c1">#             poly = []</span>
-<span class="c1">#         else:</span>
-<span class="c1">#             poly.append([lon, lat, dep])</span>
-<span class="c1">#     if poly != []:</span>
-<span class="c1">#         coords.append(poly)</span>
-
-<span class="c1">#     d = {</span>
-<span class="c1">#         &quot;type&quot;: &quot;FeatureCollection&quot;,</span>
-<span class="c1">#         &quot;metadata&quot;: {</span>
-<span class="c1">#             &#39;reference&#39;: reference</span>
-<span class="c1">#         },</span>
-<span class="c1">#         &quot;features&quot;: [</span>
-<span class="c1">#             {</span>
-<span class="c1">#                 &quot;type&quot;: &quot;Feature&quot;,</span>
-<span class="c1">#                 &quot;properties&quot;: {</span>
-<span class="c1">#                     &quot;rupture type&quot;: &quot;rupture extent&quot;</span>
-<span class="c1">#                 },</span>
-<span class="c1">#                 &quot;geometry&quot;: {</span>
-<span class="c1">#                     &quot;type&quot;: &quot;MultiPolygon&quot;,</span>
-<span class="c1">#                     &quot;coordinates&quot;: [coords]</span>
-<span class="c1">#                 }</span>
-<span class="c1">#             }</span>
-<span class="c1">#         ]</span>
-<span class="c1">#     }</span>
-<span class="c1">#     return d</span>
 
 
 <div class="viewcode-block" id="validate_json"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.validate_json">[docs]</a><span class="k">def</span> <span class="nf">validate_json</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
@@ -451,32 +442,7 @@
     <span class="k">if</span> <span class="n">geom</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;MultiPolygon&#39;</span><span class="p">:</span>
         <span class="n">n_polygons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">polygons</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_polygons</span><span class="p">):</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">polygons</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-            <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">n_points</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Number of points in polyon must be odd.&#39;</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;First and last points in polygon must be &#39;</span>
-                                <span class="s1">&#39;identical.&#39;</span><span class="p">)</span>
-
-            <span class="n">n_pairs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">n_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_pairs</span><span class="p">):</span>
-                <span class="c1"># -------------------------------------------------------------</span>
-                <span class="c1"># Points are paired and in each pair the top is first, as in:</span>
-                <span class="c1">#</span>
-                <span class="c1">#      _.-P1-._</span>
-                <span class="c1">#   P0&#39;        &#39;P2---P3</span>
-                <span class="c1">#   |                  \</span>
-                <span class="c1">#   P7---P6----P5-------P4</span>
-                <span class="c1">#</span>
-                <span class="c1"># Pairs: P0-P7, P1-P6, P2-P5, P3-P4</span>
-                <span class="c1"># -------------------------------------------------------------</span>
-                <span class="n">top_depth</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
-                <span class="n">bot_depth</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)][</span><span class="mi">2</span><span class="p">]</span>
-                <span class="k">if</span> <span class="n">top_depth</span> <span class="o">&gt;=</span> <span class="n">bot_depth</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                        <span class="s1">&#39;Top points must be ordered before bottom points.&#39;</span><span class="p">)</span></div>
+            <span class="n">_check_polygon</span><span class="p">(</span><span class="n">polygons</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
 
 
 <div class="viewcode-block" id="is_quadrupture_class"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.is_quadrupture_class">[docs]</a><span class="k">def</span> <span class="nf">is_quadrupture_class</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
