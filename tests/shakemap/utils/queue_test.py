@@ -68,12 +68,12 @@ def test_get_config():
     assert config['minmag'] == 4.0
     p1 = Polygon([(-116.75, 33.50), (-118.25, 33.50), (-120.25, 34.33),
                   (-120.25, 34.75), (-116.75, 34.75), (-116.75, 33.50)])
-    assert config['boxes']['my_box']['mag'] == 3.5
-    assert config['boxes']['my_box']['poly'] == p1
-    p2 = Polygon([(-117.75, 34.50), (-119.25, 34.50), (-121.25, 35.33),
-                  (-121.25, 35.75), (-117.75, 35.75), (-117.75, 34.50)])
-    assert config['boxes']['my_box2']['mag'] == 3.8
-    assert config['boxes']['my_box2']['poly'] == p2
+    assert config['boxes']['01_my_box']['mag'] == 3.5
+    assert config['boxes']['01_my_box']['poly'] == p1
+    p2 = Polygon([(-117.75, 34.50), (-119.25, 34.50), (-121.25, 34.33),
+                  (-121.25, 34.75), (-117.75, 34.75), (-117.75, 34.50)])
+    assert config['boxes']['02_my_box2']['mag'] == 3.8
+    assert config['boxes']['02_my_box2']['poly'] == p2
     assert len(set(config['repeats'][0.0]) ^ set([60, 120])) == 0
     assert len(set(config['repeats'][5.0]) ^ set([60, 120, 180])) == 0
 
@@ -84,7 +84,7 @@ def test_magnitude_too_small():
     assert queue.magnitude_too_small(2.0, -118.25, 34.0, config) is True
     assert queue.magnitude_too_small(3.6, -118.25, 34.0, config) is False
     assert queue.magnitude_too_small(2.0, -119.25, 35.0, config) is True
-    assert queue.magnitude_too_small(3.9, -119.25, 35.0, config) is False
+    assert queue.magnitude_too_small(3.9, -119.25, 34.6, config) is False
     assert queue.magnitude_too_small(2.0, -129.25, 39.0, config) is True
     assert queue.magnitude_too_small(4.1, -129.25, 39.0, config) is False
 
