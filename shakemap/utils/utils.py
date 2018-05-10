@@ -32,10 +32,10 @@ def migrate_gmpe(old_gmpe, config=None):
         tuple: New GMPE string, and GMPE reference string.
     """
     if config is None:
-        install_path, data_path = get_config_paths()
-        if not os.path.isdir(data_path):
-            raise OSError('%s is not a valid directory.' % data_path)
-        config_file = os.path.join(install_path, 'data', 'migrate.conf')
+        install_path, _ = get_config_paths()
+        if not os.path.isdir(install_path):
+            raise OSError('%s is not a valid directory.' % install_path)
+        config_file = os.path.join(install_path, 'config', 'migrate.conf')
         if os.path.isfile(config_file):
             config = ConfigObj(config_file)
         else:
