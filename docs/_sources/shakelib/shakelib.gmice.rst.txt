@@ -6,6 +6,7 @@ Submodules
 .. toctree::
 
    shakelib.gmice.ak07
+   shakelib.gmice.gmice
    shakelib.gmice.wald99
    shakelib.gmice.wgrw12
 

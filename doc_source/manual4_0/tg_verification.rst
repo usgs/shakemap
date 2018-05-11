@@ -238,6 +238,36 @@ has only one observation).
    :num:`Figure #verification-test-three`.
 
 
+Test 0004b
+====================
+
+Test 0004b uses an identical set up to Test 0004, except that the
+two observations (of amplitude +1.0) have been separated by 1
+degree of longitude. Thus, they are no longer highly correlated
+and, consequently, the event bias has increased. 
+The result is visualized in
+:num:`Figure #verification-test-four-b` which may be compared with
+:num:`Figure #verification-test-four`. Note that in Test 0004, the
+conditional mean far from the observations was less than 0.5, 
+whereas, in Test 4b, it is greater than 0.5; this consequence is
+a result of the greater bias of Test 0004b.
+
+
+.. _verification-test-four-b:
+
+.. figure:: _static/verification_test_0004b_PGA.*
+   :width: 700
+   :align: left
+
+   Verification Test 0004b. Two observations at different
+   locations along a line, both with amplitudes of +1.0.
+   The black line shows the conditional mean, the blue lines
+   show the conditional mean +/-- the conditional standard
+   deviation (upper plot), and the red line shows the conditional
+   standard deviation (lower plot). Compare with 
+   :num:`Figure #verification-test-four`.
+   
+
 Test 0005
 ====================
 
