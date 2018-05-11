@@ -40,6 +40,32 @@
 <div><p>This program takes one required file, a tarball of one or more ShakeMap 3.5
 event directories.  To create this file, run a command like this:</p>
 <p>find . -name “<em>_dat.xml” -o -name “*_fault.txt” -o -name “source.txt” -o -name “info.json” -o -name “</em>.conf” | tar -czvf ~/sm35_inputs.tgz -T -</p>
+<p>This program takes a subset of the ShakeMap 3.5 input data and the info.json file
+and uses those files to create the corresponding ShakeMap 4.0 input data.</p>
+<dl class="docutils">
+<dt>Files used:</dt>
+<dd><ul class="first last simple">
+<li><a href="#id2"><span class="problematic" id="id3">*</span></a>_dat.xml data files in XML format. These are unchanged in ShakeMap 4.0.</li>
+<li><a href="#id4"><span class="problematic" id="id5">*</span></a>_fault.txt fault files in text format. These will be converted to GeoJSON.</li>
+<li>source.txt Text file possibly containing mechanism and ??</li>
+<li>info.json Metadata file from which we extract:
+- Origin information for new event.xml file.
+- bias settings (see -s option)</li>
+<li><dl class="first docutils">
+<dt><a href="#id6"><span class="problematic" id="id7">*</span></a>.conf Config files, of which generally speaking only grind.conf is supported:</dt>
+<dd><ul class="first last">
+<li>IPEs are currently not supported.</li>
+<li>A smaller subset of GMICE are supported in ShakeMap 4.0 at the time of this writing.</li>
+<li>GMPE selections will be converted to the closest matching GEM equivalent (see -m).</li>
+<li>outlier max_deviation and max_mag values will be converted.</li>
+<li></li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</dd>
+</dl>
 </div></blockquote>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">sm_migrate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">MIGRATE_FILE</span><span class="p">]</span> <span class="n">tarfile</span>

@@ -32,12 +32,15 @@
           <div class="body" role="main">
             
   <h1>Source code for shakelib.gmice.wald99</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span></span><span class="c1"># third party imports</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="c1"># stdlib imports</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.imt</span> <span class="k">import</span> <span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span>
+<span class="kn">from</span> <span class="nn">shakelib.gmice.gmice</span> <span class="k">import</span> <span class="n">GMICE</span>
 
 
-<div class="viewcode-block" id="Wald99"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99">[docs]</a><span class="k">class</span> <span class="nc">Wald99</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Wald99"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99">[docs]</a><span class="k">class</span> <span class="nc">Wald99</span><span class="p">(</span><span class="n">GMICE</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implements the ground motion intensity conversion equations (GMICE) of</span>
 <span class="sd">    Wald et al. (1999). This module implements a simplified version in that</span>
@@ -60,22 +63,23 @@
     <span class="c1"># Imm = 2.10 * log10(PGV) + 3.40  for Imm &lt; 5</span>
     <span class="c1">#</span>
     <span class="c1"># -----------------------------------------------------------------------</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Wald et al. (1999)&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scale</span> <span class="o">=</span> <span class="s1">&#39;scale_wald99.ps&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;C1&#39;</span><span class="p">:</span>  <span class="mf">3.66</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.66</span><span class="p">,</span> <span class="s1">&#39;C3&#39;</span><span class="p">:</span>  <span class="mf">2.20</span><span class="p">,</span> <span class="s1">&#39;C4&#39;</span><span class="p">:</span> <span class="mf">1.00</span><span class="p">,</span>
+                    <span class="s1">&#39;T1&#39;</span><span class="p">:</span>  <span class="mf">1.82</span><span class="p">,</span> <span class="s1">&#39;T2&#39;</span><span class="p">:</span> <span class="mf">5.00</span><span class="p">,</span> <span class="s1">&#39;SMMI&#39;</span><span class="p">:</span> <span class="mf">1.08</span><span class="p">,</span> <span class="s1">&#39;SPGM&#39;</span><span class="p">:</span> <span class="mf">0.295</span><span class="p">},</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;C1&#39;</span><span class="p">:</span>  <span class="mf">3.47</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">:</span>  <span class="mf">2.35</span><span class="p">,</span> <span class="s1">&#39;C3&#39;</span><span class="p">:</span>  <span class="mf">2.10</span><span class="p">,</span> <span class="s1">&#39;C4&#39;</span><span class="p">:</span> <span class="mf">3.40</span><span class="p">,</span>
+                    <span class="s1">&#39;T1&#39;</span><span class="p">:</span>  <span class="mf">0.76</span><span class="p">,</span> <span class="s1">&#39;T2&#39;</span><span class="p">:</span> <span class="mf">5.00</span><span class="p">,</span> <span class="s1">&#39;SMMI&#39;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span> <span class="s1">&#39;SPGM&#39;</span><span class="p">:</span> <span class="mf">0.282</span><span class="p">},</span>
+        <span class="p">}</span>
 
-    <span class="n">__pga</span> <span class="o">=</span> <span class="n">PGA</span><span class="p">()</span>
-    <span class="n">__pgv</span> <span class="o">=</span> <span class="n">PGV</span><span class="p">()</span>
-    <span class="n">__constants</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">__pga</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;C1&#39;</span><span class="p">:</span>  <span class="mf">3.66</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">:</span> <span class="o">-</span><span class="mf">1.66</span><span class="p">,</span> <span class="s1">&#39;C3&#39;</span><span class="p">:</span>  <span class="mf">2.20</span><span class="p">,</span> <span class="s1">&#39;C4&#39;</span><span class="p">:</span> <span class="mf">1.00</span><span class="p">,</span>
-                <span class="s1">&#39;T1&#39;</span><span class="p">:</span>  <span class="mf">1.82</span><span class="p">,</span> <span class="s1">&#39;T2&#39;</span><span class="p">:</span> <span class="mf">5.00</span><span class="p">,</span> <span class="s1">&#39;SMMI&#39;</span><span class="p">:</span> <span class="mf">1.08</span><span class="p">,</span> <span class="s1">&#39;SPGM&#39;</span><span class="p">:</span> <span class="mf">0.295</span><span class="p">},</span>
-        <span class="n">__pgv</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;C1&#39;</span><span class="p">:</span>  <span class="mf">3.47</span><span class="p">,</span> <span class="s1">&#39;C2&#39;</span><span class="p">:</span>  <span class="mf">2.35</span><span class="p">,</span> <span class="s1">&#39;C3&#39;</span><span class="p">:</span>  <span class="mf">2.10</span><span class="p">,</span> <span class="s1">&#39;C4&#39;</span><span class="p">:</span> <span class="mf">3.40</span><span class="p">,</span>
-                <span class="s1">&#39;T1&#39;</span><span class="p">:</span>  <span class="mf">0.76</span><span class="p">,</span> <span class="s1">&#39;T2&#39;</span><span class="p">:</span> <span class="mf">5.00</span><span class="p">,</span> <span class="s1">&#39;SMMI&#39;</span><span class="p">:</span> <span class="mf">0.98</span><span class="p">,</span> <span class="s1">&#39;SPGM&#39;</span><span class="p">:</span> <span class="mf">0.282</span><span class="p">},</span>
-    <span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
+            <span class="n">PGA</span><span class="p">,</span>
+            <span class="n">PGV</span>
+        <span class="p">])</span>
 
-    <span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span>
-        <span class="n">PGA</span><span class="p">,</span>
-        <span class="n">PGV</span>
-    <span class="p">])</span>
-
-    <span class="n">DEFINED_FOR_SA_PERIODS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_SA_PERIODS</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([])</span>
 
 <div class="viewcode-block" id="Wald99.getMIfromGM"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getMIfromGM">[docs]</a>    <span class="k">def</span> <span class="nf">getMIfromGM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">dists</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -102,13 +106,13 @@
 <span class="sd">            point in question).</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
         <span class="n">lfact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">e</span><span class="p">)</span>
-        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getConsts</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getConsts</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
 
         <span class="c1">#</span>
         <span class="c1"># Convert (for accelerations) from ln(g) to cm/s^2</span>
         <span class="c1"># then take the log10</span>
         <span class="c1">#</span>
-        <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">:</span>
             <span class="n">units</span> <span class="o">=</span> <span class="mf">981.0</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">units</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -162,7 +166,7 @@
 <span class="sd">            (i.e., the slope of the relationship at the point in question).</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
         <span class="n">lfact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">e</span><span class="p">)</span>
-        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__getConsts</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getConsts</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
         <span class="n">mmi</span> <span class="o">=</span> <span class="n">mmi</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">ix_nan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">mmi</span><span class="p">)</span>
         <span class="n">mmi</span><span class="p">[</span><span class="n">ix_nan</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -183,7 +187,7 @@
         <span class="n">pgm</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="p">(</span><span class="n">mmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">-</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C4&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;C3&#39;</span><span class="p">])</span>
         <span class="n">dpgm_dmmi</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="s1">&#39;C3&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">lfact</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">imt</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">imt</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span>
             <span class="n">units</span> <span class="o">=</span> <span class="mf">981.0</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">units</span> <span class="o">=</span> <span class="mf">1.0</span>
@@ -202,8 +206,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Dictionary of GM to MI sigmas (in MMI units).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">][</span><span class="s1">&#39;SMMI&#39;</span><span class="p">],</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">][</span><span class="s1">&#39;SMMI&#39;</span><span class="p">]}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">][</span><span class="s1">&#39;SMMI&#39;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">][</span><span class="s1">&#39;SMMI&#39;</span><span class="p">]}</span></div>
 
 <div class="viewcode-block" id="Wald99.getMI2GMsd"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getMI2GMsd">[docs]</a>    <span class="k">def</span> <span class="nf">getMI2GMsd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -218,50 +222,15 @@
         <span class="c1"># Need to convert log10 to ln units</span>
         <span class="c1">#</span>
         <span class="n">lfact</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.0</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga</span><span class="p">][</span><span class="s1">&#39;SPGM&#39;</span><span class="p">],</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">][</span><span class="s1">&#39;SPGM&#39;</span><span class="p">]}</span></div>
+        <span class="k">return</span> <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pga</span><span class="p">][</span><span class="s1">&#39;SPGM&#39;</span><span class="p">],</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span> <span class="n">lfact</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">][</span><span class="s1">&#39;SPGM&#39;</span><span class="p">]}</span></div>
 
-<div class="viewcode-block" id="Wald99.getName"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getName">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">getName</span><span class="p">():</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the name of this GMICE.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            String containing name of this GMICE.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;Wald et al. (1999)&#39;</span></div>
-
-<div class="viewcode-block" id="Wald99.getScale"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getScale">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">getScale</span><span class="p">():</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the name of the PostScript file containing this GMICE&#39;s</span>
-<span class="sd">        scale.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Name of GMICE scale file.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="s1">&#39;scale_wald99.ps&#39;</span></div>
-
-<div class="viewcode-block" id="Wald99.getMinMax"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getMinMax">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">getMinMax</span><span class="p">():</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Get the minimum and maximum MMI values produced by this GMICE.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Tuple of min and max values of GMICE.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="Wald99.getDistanceType"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.wald99.html#shakelib.gmice.wald99.Wald99.getDistanceType">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">getDistanceType</span><span class="p">():</span>
-        <span class="k">return</span> <span class="s1">&#39;rrup&#39;</span></div>
-
-    <span class="k">def</span> <span class="nf">__getConsts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_getConsts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to get the constants.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">if</span> <span class="n">imt</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pga</span> <span class="ow">and</span> <span class="n">imt</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pgv</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">imt</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pga</span> <span class="ow">and</span> <span class="n">imt</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pgv</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid IMT &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">imt</span><span class="p">))</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span></div>
 </pre></div>
