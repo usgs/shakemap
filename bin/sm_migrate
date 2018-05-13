@@ -15,6 +15,7 @@ import json
 import pytz
 from lxml import etree
 from configobj import ConfigObj
+import numpy as np
 
 # local imports
 from shakemap.utils.config import get_config_paths, get_configspec
@@ -152,6 +153,9 @@ def main(args):
             _extract_file(member, tarball, filename, event_dir)
         elif filename.endswith('_fault.txt'):
             _extract_file(member, tarball, filename, event_dir)
+        elif filename.startswith('RUN'):
+            run_errors = parse_run(member, tarball, filename, event_dir)
+            errors += run_errors
         elif filename in ['info.json']:
             if 'download' in member:
                 continue
@@ -171,6 +175,15 @@ def main(args):
     tarball.close()
     sys.stdout.write('\n')
 
+    # go back through the data, convert fault.txt files into json rupture format,
+    # also make sure we have all required components
+    for eventid in alleventids:
+        event_dir = os.path.join(data_path, eventid, 'current')
+        rupt_error = make_rupture(event_dir)
+        parse_options(event_dir)
+        if rupt_error is not None:
+            errors.append(rupt_error)
+    
     print('%i event directories written.' % len(alleventids))
     print('The following errors or warnings were detected:')
     for error in errors:
@@ -182,14 +195,91 @@ def main(args):
         print('\t"%s" (%s) was converted to new GMPE "%s".' %
               (old_gmpe, ref, new_gmpe))
 
-    # go back through the data, convert fault.txt files into json rupture format,
-    # also make sure we have all required components
-    for eventid in alleventids:
-        event_dir = os.path.join(data_path, eventid, 'current')
-        make_rupture(event_dir)
+def parse_options(event_dir):
+    optfile = os.path.join(event_dir,'options.json')
+    if not os.path.isfile(optfile):
+        return
+    eventfile = os.path.join(event_dir,'event.xml')
+    edict = read_event_file(eventfile)
+    options = json.load(open(optfile,'rt'))
+    model = ConfigObj()
+    if 'nobias' in options:
+        model['modeling'] = {'bias':{'do_bias':False}}
+    if 'nooutlier' in options:
+        model['data'] = {'outlier':{'do_outlier':False}}
+    bounds_options = set(['latoff','lonoff','lonspan','llratio'])
+    opt_keys = set(options.keys())
+    if len(bounds_options.intersection(opt_keys)):
+        lat = edict['lat']
+        lon = edict['lon']
+        if 'lonoff' in options:
+            lon = lon + options['lonoff']
+        if 'latoff' in options:
+            lat = lat + options['latoff']
+        if 'lonspan' in options:
+            xmin = lon - options['lonspan']/2.0
+            xmax = lon + options['lonspan']/2.0
+            if 'llratio' in options:
+                latspan = options['llratio'] * lonspan
+            else:
+                latspan = lonspan * np.cos(np.degrees(lat))
+            ymin = lat - latspan/2.0
+            ymax = lat + latspan/2.0
+        else:
+            # create a rupture
+            edict['lat'] = lat
+            edict['lon'] = lon
+            # use get_rupture function?
+            origin = Origin(edict)
+            rfile = os.path.join(event_dir,'rupture.json')
+            if not os.path.isfile(rfile):
+                rfile = None
+            rupture = get_rupture(origin,file=rfile)
+            xmin,xmax,ymin,ymax = get_extent(rupture)
+        model['extent'] = {'bounds': {}}
+        model['extent']['bounds']['extent'] = [xmin, ymin, xmax, ymax]
+        if len(model):
+            model_file = os.path.join(event_dir, 'model.conf')
+            if os.path.isfile(model_file):
+                existing_model = ConfigObj(model_file)
+                model.merge(existing_model)
+        model.filename = model_file
+        model.write()
+            
+            
+def parse_run(member, tarball, filename, event_dir):
+    errors = []
+    options = {}
+    float_options = ['lonspan','latspan','lonoff','latoff','llratio']
+    bool_options = ['nooutlier','nobias']
+    for line in open(runfile,'rt').readlines():
+            if line.find('grind') > -1:
+                parts = line.split()[1:]
+                for i in range(0,len(parts)):
+                    part = parts[i].strip()
+                    isfloat = re.search(r"[+-]?\d+(?:\.\d+)?",part) is not None
+                    if part.startswith('-') and not isfloat:
+                        part = part.replace('-','')
+                        if part == '-directivity':
+                            fmt = 'Unsupported directivity flag set for event %s.'
+                            errors.append(fmt % eventid)
+                        elif part in float_options:
+                            options[part] = float(parts[i+1])
+                        elif part in bool_options:
+                            options[part] = True
+                        else:
+                            continue
+    # Since we don't know hypocenter information at this stage, we're going to
+    # stash this dictionary in the event directory as JSON and parse it at the end.
+    optionfile = os.path.join(event_dir,'options.json')
+    with open(optionfile,'wt') as opt:
+        json.dump(options,opt)
 
-
+    return errors
+                            
+        
 def make_rupture(event_dir):
+    error = None
     fault_files = glob.glob(os.path.join(event_dir, '*_fault.txt'))
     if not len(fault_files):
         return
@@ -201,10 +291,8 @@ def make_rupture(event_dir):
     try:
         rupt = rupture_from_dict_and_origin(jdict, origin)
     except Exception as e:
-        x = 1
-    _, ffile = os.path.split(fault_file)
-    fbase, _ = os.path.splitext(ffile)
-    jsonfile = os.path.join(event_dir, fbase+'.geojson')
+        return 'Error parsing fault file from %s. "%s"' % (event_dir, str(e))
+    jsonfile = os.path.join(event_dir, 'rupture.json')
     rupt.writeGeoJson(jsonfile)
     for ffile in fault_files:
         os.remove(ffile)
@@ -337,10 +425,14 @@ def parse_info(event_dir, tarball, member, netid, networks,
         # get the GMPE information
         gmm_dict = jsondict['processing']['ground_motion_modules']
         old_gmpe = gmm_dict['gmpe']['module']
-        new_gmpe, reference = migrate_gmpe(old_gmpe, config=migrate_conf)
-        model = set_gmpe(new_gmpe, model, edict['id'])
-        if old_gmpe not in conversions:
-            conversions[old_gmpe] = (new_gmpe,reference)
+        try:
+            new_gmpe, reference = migrate_gmpe(old_gmpe, config=migrate_conf)
+            model = set_gmpe(new_gmpe, model, edict['id'])
+            if old_gmpe not in conversions:
+                conversions[old_gmpe] = (new_gmpe,reference)
+        except Exception as e:
+            msg = 'Unable to convert %s, error "%s"' % (old_gmpe,str(e))
+            errors.append(msg)
         
 
     # work on map extent/resolution data

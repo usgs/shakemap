@@ -232,9 +232,7 @@ def main(args):
                     jdict = text_to_json(fault_file, new_format=False)
                     origin = Origin(edict)
                     rupt = rupture_from_dict_and_origin(jdict, origin)
-                    _, ffile = os.path.split(fault_file)
-                    fbase, _ = os.path.splitext(ffile)
-                    jsonfile = os.path.join(event_dir, fbase+'.geojson')
+                    jsonfile = os.path.join(event_dir, 'rupture.json')
                     rupt.writeGeoJson(jsonfile)
                     os.remove(fault_file)
                 except Exception as e:

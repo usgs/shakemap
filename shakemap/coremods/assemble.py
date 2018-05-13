@@ -187,11 +187,8 @@ class AssembleModule(CoreModule):
 
         self.logger.debug('Looking for rupture files...')
         # look for geojson versions of rupture files
-        rupturefiles = glob.glob(os.path.join(datadir, '*_fault.geojson'))
-        rupturefile = None
-        if len(rupturefiles):
-            rupturefile = rupturefiles[0]
-        else:
+        rupturefile = os.path.join(datadir, 'rupture.json')
+        if not os.path.isfile(rupturefile):
             # failing any of those, look for text file versions
             rupturefiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
             rupturefile = None

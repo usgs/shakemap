@@ -196,14 +196,15 @@ class AugmentModule(CoreModule):
         #
         # Look for a rupture file and replace the existing one if found
         #
-        rupturefiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
+        rupturefile = os.path.join(datadir, 'rupture.json')
         eventxml = os.path.join(datadir, 'event.xml')
-        rupturefile = None
-        if len(rupturefiles):
-            rupturefile = rupturefiles[0]
         if not os.path.isfile(eventxml):
             eventxml = None
-        if rupturefile is not None or eventxml is not None:
+        if not os.path.isfile(rupturefile):
+            faultfiles = glob.glob(os.path.join(datadir,'*_fault.txt'))
+            if len(faultfiles):
+                rupturefile = faultfiles[0]
+        if os.path.isfile(rupturefile) or eventxml is not None:
             self.logger.debug('Updating rupture/origin information.')
             shake_data.updateRupture(
                 eventxml=eventxml, rupturefile=rupturefile)
