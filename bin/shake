@@ -22,9 +22,6 @@ from shakemap.utils.config import (get_config_paths,
                                    get_configspec,
                                    config_error)
 
-#import matplotlib
-#matplotlib.use('Agg')
-
 
 def _get_config():
     """
