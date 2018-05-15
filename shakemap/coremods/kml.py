@@ -177,3 +177,66 @@ def create_overlay_image(container, oceanfile, filename):
     img = Image.fromarray(rgba)
     img.save(filename)
     return gd
+
+
+def create_station_kml()
+
+
+def create_styles(document):
+    triangle = 'triangle.png'
+    circle = 'icon18.png'
+    add_icon_style(document, 'stationIconNormal', triangle, 0.6, 0.0)
+    add_icon_style(document, 'stationIconHighLight', triangle, 0.8, 1.0)
+    add_icon_style(document, 'dyfiIconNormal', circle, 0.4, 0.0)
+    add_icon_style(document, 'stationIconHighLight', circle, 0.6, 1.0)
+
+    add_style_map(document, 'station')
+    add_style_map(document, 'dyfi')
+
+
+def add_icon_style(document, id, icon, icon_scale, label_scale):
+    normal_station_style = etree.SubElement(document, 'Style', id=id)
+    icon_style = etree.SubElement(normal_station_style, 'IconStyle')
+    scale1 = etree.SubElement(icon_style1, 'scale')
+    scale1.text = '%.1f' % icon_scale
+    icon = etree.SubElement(icon_style, 'Icon')
+    icon.text = icon
+    label_style = etree.SubElement(normal_station_style, 'LabelStyle')
+    scale2 = etree.SubElement(label_style, 'scale')
+    scale2.text = '%.1f' % label_scale
+    list_style = etree.SubElement(normal_station_style, 'ListStyle')
+    item_type = etree.SubElement(list_style, 'listItemType')
+    item_type.text = 'checkHideChildren'
+    balloon_style = etree.SubElement(normal_station_style, 'BalloonStyle')
+    text = etree.SubElement(balloon_style, 'text')
+    text.text = '$[description]'
+
+
+def add_style_map(document, style_type):
+    style_map = etree.SubElement(document,
+                                 'StyleMap',
+                                 id='%sIconMap' % style_type)
+
+    pair1 = etree.SubElement(style_map, 'Pair')
+    key1 = etree.SubElement(pair1, 'key')
+    key1.text = 'normal'
+    style_url = etree.SubElement(pair, 'styleUrl')
+    style_url.text = '#%sIconNormal' % style_type
+
+    pair2 = etree.SubElement(style_map, 'Pair')
+    key2 = etree.SubElement(pair2, 'key')
+    key2.text = 'highlight'
+    style_url = etree.SubElement(pair, 'styleUrl')
+    style_url.text = '#%sIconHighlight' % style_type
+
+
+def create_styles(document):
+    triangle = 'triangle.png'
+    circle = 'icon18.png'
+    add_icon_style(document, 'stationIconNormal', triangle, 0.6, 0.0)
+    add_icon_style(document, 'stationIconHighLight', triangle, 0.8, 1.0)
+    add_icon_style(document, 'dyfiIconNormal', circle, 0.4, 0.0)
+    add_icon_style(document, 'stationIconHighLight', circle, 0.6, 1.0)
+
+    add_style_map(document, 'station')
+    add_style_map(document, 'dyfi')
