@@ -31,6 +31,7 @@ class Wald99(GMICE):
     # -----------------------------------------------------------------------
     def __init__(self):
         super().__init__()
+        self.min_max = (1.0, 10.0)
         self.name = 'Wald et al. (1999)'
         self.scale = 'scale_wald99.ps'
         self.__constants = {
