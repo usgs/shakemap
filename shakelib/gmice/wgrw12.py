@@ -38,6 +38,7 @@ class WGRW12(GMICE):
     # -----------------------------------------------------------------------
     def __init__(self):
         super().__init__()
+        self.min_max = (1.0, 10.0)
         self.name = 'Worden et al. (2012)'
         self.scale = 'scale_wgrw12.ps'
         self._constants = {

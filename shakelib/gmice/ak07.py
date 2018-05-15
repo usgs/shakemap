@@ -41,6 +41,7 @@ class AK07(GMICE):
     # -----------------------------------------------------------------------
     def __init__(self):
         super().__init__()
+        self.min_max = (1.0, 10.0)
         self.name = 'Atkinson and Kaka (2007)'
         self.scale = 'scale_ak07.ps'
         self._constants = {

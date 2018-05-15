@@ -22,15 +22,14 @@ class GMICE(ABC):
     def getDistanceType():
         return 'rrup'
 
-    @staticmethod
-    def getMinMax():
+    def getMinMax(self):
         """
         Get the minimum and maximum MMI values produced by this GMICE.
 
         Returns:
             Tuple of min and max values of GMICE.
         """
-        return (1.0, 10.0)
+        return self.min_max
 
     def getName(self):
         """
