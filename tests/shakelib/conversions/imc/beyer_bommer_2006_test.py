@@ -162,19 +162,34 @@ def test_bb06():
     sigs_out = np.empty([0, 6])
     for imt in imt_in:
         for i in range(len(imc_in)):
-            bb06 = BeyerBommer2006()
-            tmp = bb06.ampIMCtoIMC(amps_in, imc_in[i], imc_out[i], imt)
+            bb06 = BeyerBommer2006(imc_in[i], imc_out[i])
+            tmp = bb06.convertAmps(imt, amps_in)
             amps_out = np.vstack((amps_out, tmp))
-            tmp = bb06.sigmaIMCtoIMC(sigmas_in, imc_in[i], imc_out[i], imt)
+            tmp = bb06.convertSigmas(imt, sigmas_in)
             sigs_out = np.vstack((sigs_out, tmp))
     np.testing.assert_allclose(amps_out, amps_target, atol=1e-5)
     np.testing.assert_allclose(sigs_out, sigs_target, atol=1e-5)
+
+    # Test that an invalid parameter raises an exception
     with pytest.raises(Exception) as a:
-        tmp = bb06.ampIMCtoIMC(amps_in, imc_in[0], 'a', imt_in[0])
+        bb06 = BeyerBommer2006('wrong', imc_out[0])
+        tmp = bb06.convertAmps(imt_in[0], amps_in)
     with pytest.raises(Exception) as a:
-        tmp = bb06.ampIMCtoIMC(amps_in, 'a', imc_out[0], imt_in[0])
-    with pytest.raises(Exception) as a:  # noqa
-        tmp = bb06.ampIMCtoIMC(amps_in, imc_in[0], imc_out[0], 'a')
+        bb06 = BeyerBommer2006(imc_out[0], 'wrong')
+        tmp = bb06.convertAmps(imt_in[0], amps_in)
+    with pytest.raises(Exception) as a:
+        bb06 = BeyerBommer2006(imc_in[0], imc_out[0])
+        tmp = bb06.convertAmps(imt_in[0], 'wrong')
+
+    # Test that the correct input/output imc returns the right path
+    bb06 = BeyerBommer2006('Median horizontal', 'Random horizontal')
+    assert len(bb06.path) == 2
+    assert bb06.path[0] == 'Median horizontal'
+    assert bb06.path[-1] == 'Random horizontal'
+    bb06 = BeyerBommer2006('Average Horizontal (RotD50)', 'Horizontal')
+    assert len(bb06.path) == 2
+    assert bb06.path[0] == 'Average Horizontal (RotD50)'
+    assert bb06.path[-1] == 'Horizontal'
 
 
 if __name__ == '__main__':
