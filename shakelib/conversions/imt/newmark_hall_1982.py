@@ -1,10 +1,14 @@
-
+# Standard library imports
 import copy
+
+# Third party imports
 import numpy as np
 
+# Local imports
+from shakelib.conversions.convert_imt import TypeConverter
 
-class NewmarkHall1982(object):
 
+class NewmarkHall1982(TypeConverter):
     """
     Class for conversion between PGA and PSA10 by Newmark and Hall (1982).
 
@@ -25,57 +29,95 @@ class NewmarkHall1982(object):
     by plotting PGV/PSA10 versus Distance for earthquakes with magnitudes
     greater than or equal to 5.0.
 
-    To do
-        - Inherit from ConvertIMT class.
-
     References:
         Newmark, N. M., & Hall, W. J. (1982). Earthquake spectra and design.
         Earthquake Engineering Research Institute, El Cerrito, California.
     """
+    def __init__(self):
+        super().__init__()
+        # output_input dictionary where the key is the output
+        # and the value is a list of the possible inputs
+        self.output_input = {
+            'PGV': ['PSA10']
+        }
+        self._lnfact = np.log(37.27 * 2.54)
+        self.conversion_factor = np.exp(self._lnfact)
+        self._lnsigma = 0.5146578
 
-    __lnfact = np.log(37.27 * 2.54)
-    __lnsigma = 0.5146578
+    def convertAmps(self, imt_in, imt_out, imt):
+        """
+        Returns an array of converted IMT amplitude values.
+
+        Args:
+            imt_in (str): OQ intensity measure type. Same as type as the input
+                values defined by the imt variable.
+            imt_out (str): OQ intensity measure type that the values will
+                be converted to.
+            imt (OpenQuake IMT): The intensity measure type of the input
+                ground motions. Valid IMTs are PGV, and SA.
+
+        Returns:
+            array: Numpy array of amps converted from imt_in to imt_out.
+
+        Raises:
+            ValueError: If not a valid conversion.
+        """
+        self._verifyConversion(imt_in, imt_out)
+        imt_in = imt_in.upper().strip()
+        imt_out = imt_out.upper().strip()
+        conversion_factor = self._lnfact
+        if imt_in == 'PSA10' and imt_out == 'PGV':
+            new_imt = self._convertToPGV(imt,
+                    conversion_factor)
+        else:
+            raise ValueError('No conversion available from %r to %r' % (imt_in,
+                    imt_out))
+        return new_imt
+
+    def convertSigmas(self, imt_in, imt_out, sigma):
+        """
+        Convert standard deviation to natural log units.
+
+        Args:
+            imt_in (str): OQ intensity measure type. Same as type as the input
+                values defined by the imt variable.
+            imt_out (str): OQ intensity measure type that the values will
+                be converted to.
+            sigma (array): Numpy array or float of standard deviation of PGV from a GMPE;
+                units must be natural log.
+
+        Returns:
+            array: Converted standard deviations with natural log units.
+        """
+        self._verifyConversion(imt_in, imt_out)
+        lnsigma = self._lnsigma
+        sigmaTot = np.sqrt((sigma ** 2) +
+                           (lnsigma ** 2))
+        return sigmaTot
+
+    def getLnSigma(self):
+        """
+        Returns:
+            float: The the estimate of the logarithmic standard deviation of the PGV
+                predicted by Newmark and Hall (1982).
+        """
+        return copy.copy(self._lnsigma)
 
     @staticmethod
-    def psa102pgv(psa10, sigma):
+    def _convertToPGV(psa10, lnfact):
         """
         Convert PSA10 (spectral acceleration with oscillator period of 1.0 sec)
         to PGV.
 
         **Important:** PSA10 and sigma must be logarithmic units.
 
-        :param psa10:
-            Numpy array or float of PSA10 values; units must be natural log
-            of g.
-        :param sigma:
-            Numpy array or float of standard deviation of PGV from a GMPE;
-            units must be natural log.
-        :returns:
-            Two arrays
-                - Array of PGV iwth natural log of cm/s units.
-                - Array of its standard deviation with natural log units.
-        """
-        pgv = psa10 + NewmarkHall1982.__lnfact
+        Args:
+            psa10 (array): OQ intensity measure type. Same as type as the input
+                values defined by the imt variable.
+            lnfact (float): Conversion factor.
 
-        sigmaTot = np.sqrt((sigma ** 2) +
-                           (NewmarkHall1982.__lnsigma ** 2))
-
-        return pgv, sigmaTot
-
-    @staticmethod
-    def getConversionFactor():
+        Returns:
+            array: Converted PGV values with natural log of cm/s units.
         """
-        :returns:
-            The Newmark and Hall (1982) multiplicative conversion factor for
-            convering Sa(1.0) to PGV (cm/s).
-        """
-        return np.exp(NewmarkHall1982.__lnfact)
-
-    @staticmethod
-    def getLnSigma():
-        """
-        :returns:
-            The the estimate of the logarithmic standard deviation of the PGV
-            predicted by Newmark and Hall (1982).
-        """
-        return copy.copy(NewmarkHall1982.__lnsigma)
+        pgv = psa10 + lnfact
+        return pgv
