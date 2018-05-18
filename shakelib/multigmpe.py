@@ -163,7 +163,7 @@ class MultiGMPE(GMPE):
             for j in range(len(lnsd2)):
                 if stddev_types[j] == const.StdDev.INTER_EVENT:
                     continue
-                lsd[j] = bk17.convertStddevs(imt, lsd[j], dists.rrup, rup.mag)
+                lsd[j] = bk17.convertSigmas(imt, lsd[j])
 
             # -----------------------------------------------------------------
             # Compute weighted mean and sd

@@ -1,10 +1,16 @@
-
+"""
+Module implements BeyerBommer2006 class to convert between various
+horizontal intensity measure components.
+"""
+# Third party imports
 from openquake.hazardlib import const
-
 import numpy as np
 
+# Local imports
+from shakelib.conversions.convert_imc import ComponentConverter
 
-class BeyerBommer2006(object):
+
+class BeyerBommer2006(ComponentConverter):
     """
     Implements conversion for various "Intensity Measure
     Components" (IMCs) per Beyer and Bommer (2006).
@@ -38,10 +44,6 @@ class BeyerBommer2006(object):
           may be ambiguous. In these cases, we are assuming that it is a
           random horizontal component as a default.
 
-    To do
-
-        - Inherit from ConvertIMC class.
-
     References
 
         Beyer, K., & Bommer, J. J. (2006). Relationships between median values
@@ -51,54 +53,110 @@ class BeyerBommer2006(object):
         `[link] <http://www.bssaonline.org/content/96/4A/1512.short>`__
 
     """
+    def __init__(self, imc_in, imc_out):
+        super().__init__()
+        self.imc_in = imc_in
+        self.imc_out = imc_out
+        # c12 = median ratio
+        # c34 = std. of log ratio
+        # R = ratio of sigma_pga values
+        self.__pga_pgv_col_names = ['c12', 'c34', 'R']
+        self.__sa_col_names = ['c1', 'c2', 'c3', 'c4', 'R']
+        # Possible conversions
+        self.conversion_graph = {'Greater of two horizontal': set([
+                'Median horizontal',
+                'Average Horizontal (GMRotI50)',
+                'Average Horizontal (RotD50)',
+                'Random horizontal',
+                'Horizontal',
+                'Average horizontal']),
+         'Median horizontal': set([
+                'Greater of two horizontal',
+                'Average Horizontal (GMRotI50)',
+                'Average Horizontal (RotD50)',
+                'Random horizontal',
+                'Horizontal',
+                'Average horizontal']),
+         'Average Horizontal (GMRotI50)': set([
+                'Greater of two horizontal',
+                'Median horizontal',
+                'Average Horizontal (RotD50)',
+                'Random horizontal',
+                'Horizontal',
+                'Average horizontal']),
+         'Average Horizontal (RotD50)': set([
+                'Greater of two horizontal',
+                'Median horizontal',
+                'Average Horizontal (GMRotI50)',
+                'Random horizontal',
+                'Horizontal',
+                'Average horizontal']),
+         'Random horizontal': set([
+                'Greater of two horizontal',
+                'Median horizontal',
+                'Average Horizontal (GMRotI50)',
+                'Average Horizontal (RotD50)',
+                'Horizontal',
+                'Average horizontal']),
+        'Horizontal': set([
+               'Greater of two horizontal',
+               'Median horizontal',
+               'Average Horizontal (GMRotI50)',
+               'Average Horizontal (RotD50)',
+               'Random horizontal',
+               'Average horizontal']),
+        'Average horizontal': set([
+               'Greater of two horizontal',
+               'Median horizontal',
+               'Average Horizontal (GMRotI50)',
+               'Average Horizontal (RotD50)',
+               'Random horizontal',
+               'Horizontal']),}
+        # Get shortest conversion "path" between imc_in and imc_out
+        self.path = self.getShortestPath(self.conversion_graph,
+                self.imc_in, self.imc_out)
+        # Set dictionaries of constants
+        self.__pga_dict = {
+            const.IMC.MEDIAN_HORIZONTAL:
+                dict(list(zip(self.__pga_pgv_col_names, [1.0, 0.01, 1.00]))),
+            const.IMC.GMRotI50:
+                dict(list(zip(self.__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
+            const.IMC.RotD50:
+                dict(list(zip(self.__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
+            const.IMC.RANDOM_HORIZONTAL:
+                dict(list(zip(self.__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
+            const.IMC.HORIZONTAL:
+                dict(list(zip(self.__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
+            const.IMC.GREATER_OF_TWO_HORIZONTAL:
+                dict(list(zip(self.__pga_pgv_col_names, [1.1, 0.05, 1.02])))}
+        self.__pgv_dict = {
+            const.IMC.MEDIAN_HORIZONTAL:
+                dict(list(zip(self.__pga_pgv_col_names, [1.0, 0.01, 1.00]))),
+            const.IMC.GMRotI50:
+                dict(list(zip(self.__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
+            const.IMC.RotD50:
+                dict(list(zip(self.__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
+            const.IMC.RANDOM_HORIZONTAL:
+                dict(list(zip(self.__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
+            const.IMC.HORIZONTAL:
+                dict(list(zip(self.__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
+            const.IMC.GREATER_OF_TWO_HORIZONTAL:
+                dict(list(zip(self.__pga_pgv_col_names, [1.1, 0.05, 1.02])))}
+        self.__sa_dict = {
+            const.IMC.MEDIAN_HORIZONTAL:
+                dict(list(zip(self.__sa_col_names, [1.0, 1.0, 0.01, 0.02, 1.00]))),
+            const.IMC.GMRotI50:
+                dict(list(zip(self.__sa_col_names, [1.0, 1.0, 0.03, 0.04, 1.00]))),
+            const.IMC.RotD50:
+                dict(list(zip(self.__sa_col_names, [1.0, 1.0, 0.02, 0.03, 1.00]))),
+            const.IMC.RANDOM_HORIZONTAL:
+                dict(list(zip(self.__sa_col_names, [1.0, 1.0, 0.07, 0.11, 1.05]))),
+            const.IMC.HORIZONTAL:
+                dict(list(zip(self.__sa_col_names, [1.0, 1.0, 0.07, 0.11, 1.05]))),
+            const.IMC.GREATER_OF_TWO_HORIZONTAL:
+                dict(list(zip(self.__sa_col_names, [1.1, 1.2, 0.04, 0.07, 1.02])))}
 
-    # c12 = median ratio
-    # c34 = std. of log ratio
-    # R = ratio of sigma_pga values
-    __pga_pgv_col_names = ['c12', 'c34', 'R']
-    __sa_col_names = ['c1', 'c2', 'c3', 'c4', 'R']
-    __pga_dict = {
-        const.IMC.MEDIAN_HORIZONTAL:
-            dict(list(zip(__pga_pgv_col_names, [1.0, 0.01, 1.00]))),
-        const.IMC.GMRotI50:
-            dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
-        const.IMC.RotD50:
-            dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
-        const.IMC.RANDOM_HORIZONTAL:
-            dict(list(zip(__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
-        const.IMC.HORIZONTAL:
-            dict(list(zip(__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
-        const.IMC.GREATER_OF_TWO_HORIZONTAL:
-            dict(list(zip(__pga_pgv_col_names, [1.1, 0.05, 1.02])))}
-    __pgv_dict = {
-        const.IMC.MEDIAN_HORIZONTAL:
-            dict(list(zip(__pga_pgv_col_names, [1.0, 0.01, 1.00]))),
-        const.IMC.GMRotI50:
-            dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
-        const.IMC.RotD50:
-            dict(list(zip(__pga_pgv_col_names, [1.0, 0.02, 1.00]))),
-        const.IMC.RANDOM_HORIZONTAL:
-            dict(list(zip(__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
-        const.IMC.HORIZONTAL:
-            dict(list(zip(__pga_pgv_col_names, [1.0, 0.07, 1.03]))),
-        const.IMC.GREATER_OF_TWO_HORIZONTAL:
-            dict(list(zip(__pga_pgv_col_names, [1.1, 0.05, 1.02])))}
-    __sa_dict = {
-        const.IMC.MEDIAN_HORIZONTAL:
-            dict(list(zip(__sa_col_names, [1.0, 1.0, 0.01, 0.02, 1.00]))),
-        const.IMC.GMRotI50:
-            dict(list(zip(__sa_col_names, [1.0, 1.0, 0.03, 0.04, 1.00]))),
-        const.IMC.RotD50:
-            dict(list(zip(__sa_col_names, [1.0, 1.0, 0.02, 0.03, 1.00]))),
-        const.IMC.RANDOM_HORIZONTAL:
-            dict(list(zip(__sa_col_names, [1.0, 1.0, 0.07, 0.11, 1.05]))),
-        const.IMC.HORIZONTAL:
-            dict(list(zip(__sa_col_names, [1.0, 1.0, 0.07, 0.11, 1.05]))),
-        const.IMC.GREATER_OF_TWO_HORIZONTAL:
-            dict(list(zip(__sa_col_names, [1.1, 1.2, 0.04, 0.07, 1.02])))}
-
-    @staticmethod
-    def ampIMCtoIMC(amps, imc_in, imc_out, imt):
+    def convertAmpsOnce(self, imt, amps, rrups, mag):
         """
         Returns amps converted from one IMC to another.
 
@@ -120,15 +178,14 @@ class BeyerBommer2006(object):
         Returns:
             array: Numpy array of amps converted from imc_in to imc_out.
 
-        """  # noqa
+        """
 
-        denom = BeyerBommer2006.__GM2other(imt, imc_in)
-        numer = BeyerBommer2006.__GM2other(imt, imc_out)
+        denom = self.__GM2other(imt, self.imc_in)
+        numer = self.__GM2other(imt, self.imc_out)
 
         return amps + np.log(numer / denom)
 
-    @staticmethod
-    def sigmaIMCtoIMC(sigmas, imc_in, imc_out, imt):
+    def convertSigmasOnce(self, imt, sigmas):
         """
         Returns standard deviations converted from one IMC to another.
 
@@ -150,40 +207,25 @@ class BeyerBommer2006(object):
             array: Numpy array of standard deviations converted from imc_in to
                 imc_out.
 
-        """  # noqa
-
+        """
         # ---------------------------------------------------------------------
         # Take input sigma to geometric mean sigma.
         # Solve eqn 8 for sigma_GM2, which is sigma_logSa_GM
         # This is the sigma converted to geometric mean
         # (i.e., reference component).
         # ---------------------------------------------------------------------
-        R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_in)
+        R, sig_log_ratio = self.__GM2otherSigma(imt, self.imc_in)
         sigma_GM2 = (sigmas**2 - sig_log_ratio**2) / R**2
 
         # ---------------------------------------------------------------------
         # Evaluate equation 8 to go from GM to requested IMC
         # ---------------------------------------------------------------------
-        R, sig_log_ratio = BeyerBommer2006.__GM2otherSigma(imt, imc_out)
+        R, sig_log_ratio = self.__GM2otherSigma(imt, self.imc_out)
         sigma_out = np.sqrt(sigma_GM2 * R**2 + sig_log_ratio**2)
 
         return sigma_out
 
-    @staticmethod
-    def __checkIMC(imc):
-        """
-        Check that the requested IMC is available.
-        """
-        if imc != const.IMC.GREATER_OF_TWO_HORIZONTAL and \
-           imc != const.IMC.MEDIAN_HORIZONTAL and \
-           imc != const.IMC.GMRotI50 and \
-           imc != const.IMC.RotD50 and \
-           imc != const.IMC.RANDOM_HORIZONTAL and \
-           imc != const.IMC.HORIZONTAL:
-            raise ValueError('unknown IMC %r' % imc)
-
-    @staticmethod
-    def __GM2other(imt, imc):
+    def __GM2other(self, imt, imc):
         """
         Helper function to extract coefficients from the parameters for
         converting the median ground motions.
@@ -197,38 +239,38 @@ class BeyerBommer2006(object):
                 PGV, and computed from coefficients in Table 3 along with
                 eqn 10 for Sa.
 
+        Raises:
+            ValueError if unknown IMT specified.
         """
-
         if imc == const.IMC.AVERAGE_HORIZONTAL:
             # The amps are already in the B&B "reference" type ("GM", i.e.,
             # geometric mean)
             return 1.
 
-        BeyerBommer2006.__checkIMC(imc)
+        self._verifyConversion(imc)
 
         if 'PGA' in imt:
-            return BeyerBommer2006.__pga_dict[imc]['c12']
+            return self.__pga_dict[imc]['c12']
         elif 'PGV' in imt:
-            return BeyerBommer2006.__pgv_dict[imc]['c12']
+            return self.__pgv_dict[imc]['c12']
         elif 'SA' in imt:
             pp = imt.period
             if pp <= 0.15:
-                return BeyerBommer2006.__sa_dict[imc]['c1']
+                return self.__sa_dict[imc]['c1']
             elif pp < 0.8:
-                c1 = BeyerBommer2006.__sa_dict[imc]['c1']
-                c2 = BeyerBommer2006.__sa_dict[imc]['c2']
+                c1 = self.__sa_dict[imc]['c1']
+                c2 = self.__sa_dict[imc]['c2']
                 return c1 + (c2 - c1) * np.log(pp / 0.15) / np.log(0.8 / 0.15)
             elif pp <= 5.0:
-                return BeyerBommer2006.__sa_dict[imc]['c2']
+                return self.__sa_dict[imc]['c2']
             else:
                 # Not sure what's right here; should probably raise an error
                 # but for now let's just use c2
-                return BeyerBommer2006.__sa_dict[imc]['c2']
+                return self.__sa_dict[imc]['c2']
         else:
             raise ValueError('unknown IMT %r' % imt)
 
-    @staticmethod
-    def __GM2otherSigma(imt, imc):
+    def __GM2otherSigma(self, imt, imc):
         """
         Helper function to extract coefficients from the parameters for
         converting standard deviations.
@@ -240,6 +282,9 @@ class BeyerBommer2006(object):
         Returns:
             tuple: Coefficients: R (ratio of sigma values), standard deviation
             of sigma ratios.
+
+        Raises:
+            ValueError if unknown IMT specified.
         """
 
         if imc == const.IMC.AVERAGE_HORIZONTAL:
@@ -247,29 +292,49 @@ class BeyerBommer2006(object):
             # geometric mean)
             return 1., 0.
 
-        BeyerBommer2006.__checkIMC(imc)
+        self._verifyConversion(imc)
 
         if 'PGA' in imt:
-            return BeyerBommer2006.__pga_dict[imc]['R'],\
-                BeyerBommer2006.__pga_dict[imc]['c34']
+            return self.__pga_dict[imc]['R'],\
+                self.__pga_dict[imc]['c34']
         elif 'PGV' in imt:
-            return BeyerBommer2006.__pgv_dict[imc]['R'],\
-                BeyerBommer2006.__pgv_dict[imc]['c34']
+            return self.__pgv_dict[imc]['R'],\
+                self.__pgv_dict[imc]['c34']
         elif 'SA' in imt:
-            R = BeyerBommer2006.__sa_dict[imc]['R']
+            R = self.__sa_dict[imc]['R']
             pp = imt.period
             if pp <= 0.15:
-                return R, BeyerBommer2006.__sa_dict[imc]['c3']
+                return R, self.__sa_dict[imc]['c3']
             elif pp < 0.8:
-                c3 = BeyerBommer2006.__sa_dict[imc]['c3']
-                c4 = BeyerBommer2006.__sa_dict[imc]['c4']
+                c3 = self.__sa_dict[imc]['c3']
+                c4 = self.__sa_dict[imc]['c4']
                 return R, c3 + (c4 - c3) * np.log(pp / 0.15) /\
                     np.log(0.8 / 0.15)
             elif pp <= 5.0:
-                return R, BeyerBommer2006.__sa_dict[imc]['c4']
+                return R, self.__sa_dict[imc]['c4']
             else:
                 # Not sure what's right here; should probably raise an error
                 # but for now let's just use c4
-                return R, BeyerBommer2006.__sa_dict[imc]['c4']
+                return R, self.__sa_dict[imc]['c4']
         else:
             raise ValueError('unknown IMT %r' % imt)
+
+    def _verifyConversion(self, imc_in, imc_out=None):
+        """
+        Helper method to ensure that the conversion is possible.
+
+        Args:
+            imc_in (IMC): OpenQuake IMC type of the input amp array.
+            imc_out (IMC): Desired OpenQuake IMC type of the output amps.
+                Default is None. Ignored by this method.
+
+        Raises:
+            ValueError if imc_in is not valid.
+        """
+        if imc_in != const.IMC.GREATER_OF_TWO_HORIZONTAL and \
+           imc_in != const.IMC.MEDIAN_HORIZONTAL and \
+           imc_in != const.IMC.GMRotI50 and \
+           imc_in != const.IMC.RotD50 and \
+           imc_in != const.IMC.RANDOM_HORIZONTAL and \
+           imc_in != const.IMC.HORIZONTAL:
+            raise ValueError('unknown IMC %r' % imc_in)

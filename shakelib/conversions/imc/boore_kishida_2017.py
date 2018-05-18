@@ -2,18 +2,23 @@
 Module implements BooreKishida2017 class to convert between various
 horizontal intensity measure components.
 """
-import logging
-import pkg_resources
+# Standard imports
 import glob
+import logging
 import os.path
+import pkg_resources
 
+# Third party imports
 import numpy as np
-import pandas as pd
 from openquake.hazardlib.const import IMC
 from openquake.hazardlib.imt import PGA, PGV
+import pandas as pd
+
+# Local imports
+from shakelib.conversions.convert_imc import ComponentConverter
 
 
-class BooreKishida2017(object):
+class BooreKishida2017(ComponentConverter):
     """
     This class implements the Boore and Kishida (2017) conversions for
     horizontal intensity measure components.
@@ -30,12 +35,10 @@ class BooreKishida2017(object):
         - AVERAGE_HORIZONTAL <=> GREATER_OF_TWO_HORIZONTAL
 
     Not supported are IMCs for which there is no OpenQuake equivalent;
-    also not supported are chained conversions (that is, we do not
-    support conversions from A to C when conversions from A to B and
-    B to C are available; these must be done in two steps. For IMCs
-    not explicitly
-    supported by B&K, we assume the IMC is equivalent to the geometric
-    mean (which B&K call GM_AR), based on our reading of
+    chain conversions are supported when using `convertAmps`. Otherwise
+    conversions must be done in two+ steps using `convertAmpsOnce`. For IMCs
+    not explicitly supported by B&K, we assume the IMC is equivalent
+    to the geometric mean (which B&K call GM_AR), based on our reading of
     Beyer & Bommer (2006).
 
     References
@@ -50,29 +53,50 @@ class BooreKishida2017(object):
         horizontal component of motion. Bulletin of the Seismological Society
         of America, 96(4A), 1512-1522.
     """
-
     def __init__(self, imc_in, imc_out):
-        """
-        Args:
-            imc_in (OpenQuake IMC): The IMC of the ground motions to be
-                converted.
-            imc_out (OpenQuake IMC): The IMC to which the ground motions
-                are to be converted.
-        """
+        super().__init__()
+        self.imc_in = imc_in
+        self.imc_out = imc_out
+        # Possible conversions
+        self.conversion_graph = {'Average Horizontal (RotD50)': set([
+                'Average Horizontal (GMRotI50)',
+                'Average horizontal',
+                'Horizontal Maximum Direction (RotD100)',
+                'Greater of two horizontal',
+                'Random horizontal',
+                'Horizontal',
+                'Median horizontal']),
+         'Average Horizontal (GMRotI50)': set([
+                'Average Horizontal (RotD50)',
+                'Greater of two horizontal']),
+         'Average horizontal': set([
+                'Average Horizontal (RotD50)',
+                'Greater of two horizontal']),
+         'Horizontal Maximum Direction (RotD100)': set([
+                'Average Horizontal (RotD50)',
+                'Greater of two horizontal']),
+         'Greater of two horizontal': set([
+                'Average Horizontal (RotD50)',
+                'Average Horizontal (GMRotI50)',
+                'Average horizontal',
+                'Horizontal Maximum Direction (RotD100)',
+                'Random horizontal',
+                'Horizontal',
+                'Median horizontal']),
+        'Horizontal': set([
+               'Greater of two horizontal',
+               'Average Horizontal (RotD50)']),
+        'Median horizontal': set([
+               'Greater of two horizontal',
+               'Average Horizontal (RotD50)']),
+        'Random horizontal': set([
+               'Greater of two horizontal',
+               'Average Horizontal (RotD50)'])}
+        # Get shortest conversion "path" between imc_in and imc_out
+        self.path = self.getShortestPath(self.conversion_graph,
+                self.imc_in, self.imc_out)
 
-        filename, forward = self._imcPairToFile(imc_in, imc_out)
-        if filename is None:
-            raise ValueError("Can't find a conversion file for %s and %s" %
-                             (imc_in, imc_out))
-        self.forward = forward
-        if filename == 'Null':
-            # Null conversion -- imc_in and imc_out are either identical
-            # or at least functionally equivalent
-            self.pars = None
-        else:
-            self.pars = pd.read_csv(filename)
-
-    def convertAmps(self, imt, amps, rrups, mag):
+    def convertAmpsOnce(self, imt, amps, rrups, mag):
         """
         Return an array of amps converted from one IMC to another.
 
@@ -89,20 +113,26 @@ class BooreKishida2017(object):
             array: A numpy array of converted ground motions (logged).
 
         Raises:
-            ValueError: If the IMT is not an allowed type.
+            ValueError: If mag and rrup are none or the IMT
+            is not an allowed type.
         """
-
+        # Check if mag and rrups are real values
+        if mag is None or rrups is None:
+            raise ValueError('No magnitude or rupture distances specified.')
+        # Verify that the conversion is possible
+        self._verifyConversion(self.imc_in, self.imc_out)
+        # Return original amps if imc_in and imc_out are the same
         if self.pars is None:
-            # imc_in and imc_out are the same
             return amps.copy()
-
+        # Get coeffecients
         (sigma, c0, r1, m1, m2) = self._getParamsFromIMT(imt)
-
+        # Limit magnitude and rupture distances
         rrups_clipped = np.clip(rrups, 1e-2, 400)
         if mag < 2:
             mag = 2.0
         elif mag > 9:
             mag = 9.0
+        # Calculate conversion variable
         ln_ratio = c0 + r1 * np.log(rrups_clipped / 50) + \
             m1 * (mag - 5.5) + m2 * (mag - 5.5)**2
         #
@@ -119,7 +149,7 @@ class BooreKishida2017(object):
 
         return amps
 
-    def convertStddevs(self, imt, stddevs, rrups, mag):
+    def convertSigmasOnce(self, imt, sigmas):
         """
         Return an array of standard deviations converted from one IMC
         to another.
@@ -133,34 +163,40 @@ class BooreKishida2017(object):
         Args:
             imt (OpenQuake IMT): The intensity measure type of the input
                 ground motions. Valid IMTs are PGA, PGV, and SA.
-            stddevs (array): A numpy array of the standard deviations of
+            sigmas (array): A numpy array of the standard deviations of
                 the logged ground motions.
-            rrups (array): Ignored by this method.
-            mag (float): Ignored by this method.
 
         Returns:
             array: A numpy array of converted standard deviations.
 
         Raises:
-            ValueError: If the IMT is not an allowed type.
+            ValueError: If mag and rrup are none or the IMT
+            is not an allowed type.
         """
-
+        # Verify that the conversion is possible
+        self._verifyConversion(self.imc_in, self.imc_out)
+        # Return original sigmas if imc_in and imc_out are the same
         if self.pars is None:
-            # imc_in and imc_out are the same
-            return stddevs.copy()
-
+            return sigmas.copy()
+        # Get coeffecients
         (sigma, c0, r1, m1, m2) = self._getParamsFromIMT(imt)
+        # Calculate conversion
+        sigmas = np.sqrt(sigmas**2 + sigma**2)
 
-        stddevs = np.sqrt(stddevs**2 + sigma**2)
-
-        return stddevs
+        return sigmas
 
     def _getParamsFromIMT(self, imt):
         """
         Helper function to return (possibly interpolated) conversion
         parameters for a given IMT.
-        """
 
+        Args:
+            imt (OpenQuake IMT): The intensity measure type of the input
+                ground motions. Valid IMTs are PGA, PGV, and SA.
+
+        Returns:
+            (float, float, float, float, float): Coeffients for conversion.
+        """
         if imt == PGA():
             sigma = self.pars['sigma'][0]
             c0 = self.pars['c0smooth'][0]
@@ -183,7 +219,6 @@ class BooreKishida2017(object):
             m2 = np.interp(imt_per, pa, self.pars['m2smooth'][2:])
         else:
             raise ValueError("Unknown IMT: %s" % str(imt))
-
         return (sigma, c0, r1, m1, m2)
 
     @staticmethod
@@ -200,7 +235,6 @@ class BooreKishida2017(object):
             string 'Null', then imc_in and imc_out evaluated to be the
             same.
         """
-
         datadir = pkg_resources.resource_filename('shakelib.conversions.imc',
                                                   'data')
         conv_files = glob.glob(os.path.join(datadir, '*.csv'))
@@ -255,3 +289,27 @@ class BooreKishida2017(object):
             #
             logging.warn("Can't handle IMC %s, using GMAR" % oq_imc)
             return 'GMAR'
+
+    def _verifyConversion(self, imc_in, imc_out=None):
+        """
+        Helper method to ensure that the conversion is possible.
+
+        Args:
+            imc_in (IMC): OpenQuake IMC type of the input amp array.
+            imc_out (IMC): Desired OpenQuake IMC type of the output amps.
+                Default is None.
+
+        Raises:
+            ValueError if imc_in or imc_out are not valid..
+        """
+        filename, forward = self._imcPairToFile(imc_in, imc_out)
+        if filename is None:
+            raise ValueError("Can't find a conversion file for %s and %s" %
+                             (imc_in, imc_out))
+        self.forward = forward
+        if filename == 'Null':
+            # Null conversion -- imc_in and imc_out are either identical
+            # or at least functionally equivalent
+            self.pars = None
+        else:
+            self.pars = pd.read_csv(filename)
