@@ -186,7 +186,7 @@ def test_bk17():
         for imt in imt_in:
             tmp = bk17.convertAmps(imt, amps_in, rrup_in, mags_in[i])
             amps_out = np.vstack((amps_out, tmp))
-            tmp = bk17.convertStddevs(imt, sigmas_in, rrup_in, mags_in[i])
+            tmp = bk17.convertSigmas(imt, sigmas_in)
             sigs_out = np.vstack((sigs_out, tmp))
 
     if do_test is True:
@@ -202,6 +202,61 @@ def test_bk17():
     else:
         print(repr(amps_out))
         print(repr(sigs_out))
+
+    # Test that an invalid parameter raises an exception
+    with pytest.raises(Exception) as a:
+        bk17 = BooreKishida2017('wrong', imc_out[0])
+        tmp = bk17.convertAmps(imt_in[0], amps_in)
+    with pytest.raises(Exception) as a:
+        bk17 = BooreKishida2017(imc_out[0], 'wrong')
+        tmp = bk17.convertAmps(imt_in[0], amps_in)
+    with pytest.raises(Exception) as a:
+        bk17 = BooreKishida2017(imc_in[0], imc_out[0])
+        tmp = bk17.convertAmps(imt_in[0], 'wrong')
+
+    # Test that the correct input/output imc returns the right path
+    bk17 = BooreKishida2017('Average horizontal',
+            'Average Horizontal (RotD50)')
+    assert len(bk17.path) == 2
+    assert bk17.path[0] == 'Average horizontal'
+    assert bk17.path[-1] == 'Average Horizontal (RotD50)'
+    bk17 = BooreKishida2017('Average horizontal',
+            'Horizontal Maximum Direction (RotD100)')
+    assert len(bk17.path) == 3
+    assert bk17.path[0] == 'Average horizontal'
+    assert bk17.path[-1] == 'Horizontal Maximum Direction (RotD100)'
+    if bk17.path[1] == 'Greater of two horizontal':
+        correct = True
+    elif bk17.path[1] == 'Average Horizontal (RotD50)':
+        correct = True
+    else:
+        correct = False
+    assert correct == True
+    bk17 = BooreKishida2017('Horizontal',
+            'Random horizontal')
+    assert len(bk17.path) == 3
+    assert bk17.path[0] == 'Horizontal'
+    assert bk17.path[-1] == 'Random horizontal'
+    if bk17.path[1] == 'Greater of two horizontal':
+        correct = True
+    elif bk17.path[1] == 'Average Horizontal (RotD50)':
+        correct = True
+    else:
+        correct = False
+    assert correct == True
+
+    # Check output amps for chained conversion is the same as two seperate
+    # conversions as suggested in the original class docstring
+    bk17 = BooreKishida2017('Horizontal Maximum Direction (RotD100)',
+            'Average Horizontal (RotD50)')
+    mid = bk17.convertAmps(imt_in[0], amps_in, rrup_in, mags_in[0])
+    bk17 = BooreKishida2017('Average Horizontal (RotD50)',
+            'Average Horizontal (GMRotI50)')
+    last = bk17.convertAmps(imt_in[0], mid, rrup_in, mags_in[0])
+    bk17 = BooreKishida2017('Horizontal Maximum Direction (RotD100)',
+            'Average Horizontal (GMRotI50)')
+    full = bk17.convertAmps(imt_in[0],amps_in, rrup_in, mags_in[0])
+    np.testing.assert_allclose(full, last, atol=1e-5)
 
 
 if __name__ == '__main__':
