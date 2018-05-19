@@ -133,8 +133,9 @@ class MultiGMPE(GMPE):
                     psa10, psa10sd = gmpe.get_mean_and_stddevs(
                         sites, rup, dists, SA(1.0), stddev_types)
                     psa10 = psa10 + lamps
-
-                lmean, lsd = NewmarkHall1982.psa102pgv(psa10, psa10sd[0])
+                nh82 = NewmarkHall1982()
+                lmean = nh82.convertAmps('PSA10', 'PGV', psa10)
+                lsd = nh82.convertSigmas('PSA10', 'PGV', psa10sd[0])
             else:
                 if self.HAS_SITE[i] is True:
                     lmean, lsd = gmpe.get_mean_and_stddevs(
