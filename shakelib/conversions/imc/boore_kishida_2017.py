@@ -38,8 +38,7 @@ class BooreKishida2017(ComponentConverter):
     chain conversions are supported when using `convertAmps`. Otherwise
     conversions must be done in two+ steps using `convertAmpsOnce`. For IMCs
     not explicitly supported by B&K, we assume the IMC is equivalent
-    to the geometric mean (which B&K call GM_AR), based on our reading of
-    Beyer & Bommer (2006).
+    to the geometric mean (which B&K call GM_AR).
 
     References
 
@@ -58,7 +57,8 @@ class BooreKishida2017(ComponentConverter):
         self.imc_in = imc_in
         self.imc_out = imc_out
         # Possible conversions
-        self.conversion_graph = {'Average Horizontal (RotD50)': set([
+        self.conversion_graph = {
+            'Average Horizontal (RotD50)': set([
                 'Average Horizontal (GMRotI50)',
                 'Average horizontal',
                 'Horizontal Maximum Direction (RotD100)',
@@ -66,16 +66,16 @@ class BooreKishida2017(ComponentConverter):
                 'Random horizontal',
                 'Horizontal',
                 'Median horizontal']),
-         'Average Horizontal (GMRotI50)': set([
+            'Average Horizontal (GMRotI50)': set([
                 'Average Horizontal (RotD50)',
                 'Greater of two horizontal']),
-         'Average horizontal': set([
+            'Average horizontal': set([
                 'Average Horizontal (RotD50)',
                 'Greater of two horizontal']),
-         'Horizontal Maximum Direction (RotD100)': set([
+            'Horizontal Maximum Direction (RotD100)': set([
                 'Average Horizontal (RotD50)',
                 'Greater of two horizontal']),
-         'Greater of two horizontal': set([
+            'Greater of two horizontal': set([
                 'Average Horizontal (RotD50)',
                 'Average Horizontal (GMRotI50)',
                 'Average horizontal',
@@ -83,15 +83,16 @@ class BooreKishida2017(ComponentConverter):
                 'Random horizontal',
                 'Horizontal',
                 'Median horizontal']),
-        'Horizontal': set([
-               'Greater of two horizontal',
-               'Average Horizontal (RotD50)']),
-        'Median horizontal': set([
-               'Greater of two horizontal',
-               'Average Horizontal (RotD50)']),
-        'Random horizontal': set([
-               'Greater of two horizontal',
-               'Average Horizontal (RotD50)'])}
+            'Horizontal': set([
+                'Greater of two horizontal',
+                'Average Horizontal (RotD50)']),
+            'Median horizontal': set([
+                'Greater of two horizontal',
+                'Average Horizontal (RotD50)']),
+            'Random horizontal': set([
+                'Greater of two horizontal',
+                'Average Horizontal (RotD50)'])
+        }
         # Get shortest conversion "path" between imc_in and imc_out
         self.path = self.getShortestPath(self.conversion_graph,
                 self.imc_in, self.imc_out)
