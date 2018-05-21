@@ -43,7 +43,7 @@ if [ $? -ne 0 ]; then
     elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
 	mini_conda_url=https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh
     else
-	echo "Unsupported envirnoment. Existing."
+	echo "Unsupported environment. Exiting."
 	exit
     fi
 
@@ -71,7 +71,7 @@ elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     env_file=environment_osx.yml
     echo ". $HOME/miniconda/etc/profile.d/conda.sh" >> ~/.bash_profile
 else
-    echo "Unsupported envirnoment. Existing."
+    echo "Unsupported environment. Exiting."
     exit
 fi
 
