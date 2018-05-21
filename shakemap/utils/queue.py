@@ -109,6 +109,7 @@ def parse_config(config):
     config['old_event_age'] = str_to_seconds(config['old_event_age'])
     config['future_event_age'] = str_to_seconds(config['future_event_age'])
     config['associate_interval'] = str_to_seconds(config['associate_interval'])
+    config['max_trigger_wait'] = str_to_seconds(config['max_trigger_wait'])
 
     boxes = OrderedDict()
     for key, value in config['boxes'].items():
