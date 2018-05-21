@@ -41,7 +41,7 @@ from shakelib.rupture.origin import Origin
 from shakelib.rupture.point_rupture import PointRupture
 from shakelib.rupture.factory import rupture_from_dict_and_origin
 from shakelib.utils.imt_string import oq_to_file
-from shakemap.coremods.contour import getContourLevels
+from shakelib.plotting.contour import getContourLevels
 from shakemap.utils.config import get_config_paths
 from .base import CoreModule
 from shakemap.utils.utils import path_macro_sub
