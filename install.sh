@@ -23,6 +23,10 @@ while getopts r FLAG; do
   esac
 done
 
+# Get uname to determine OS
+unamestr=`uname`
+
+
 # create a matplotlibrc file with the non-interactive backend "Agg" in it.
 if [ ! -d ~/.config/matplotlib ]; then
     mkdir -p ~/.config/matplotlib
@@ -34,10 +38,20 @@ fi
 conda --version
 if [ $? -ne 0 ]; then
     echo "No conda detected, installing miniconda..."
-    curl https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-         -o miniconda.sh;
+    if [ "$unamestr" == 'Linux' ]; then
+	mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
+	mini_conda_url=https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh
+    else
+	echo "Unsupported envirnoment. Existing."
+	exit
+    fi
+
+    curl $mini_conda_url -o miniconda.sh;
     echo "Install directory: $HOME/miniconda"
+
     bash miniconda.sh -f -b -p $HOME/miniconda
+
     # Need this to get conda into path
     . $HOME/miniconda/etc/profile.d/conda.sh
 else
@@ -50,11 +64,15 @@ echo ""
 
 
 # Choose an environment file based on platform
-unamestr=`uname`
 if [ "$unamestr" == 'Linux' ]; then
     env_file=environment_linux.yml
+    echo ". $HOME/miniconda/etc/profile.d/conda.sh" >> ~/.bashrc
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     env_file=environment_osx.yml
+    echo ". $HOME/miniconda/etc/profile.d/conda.sh" >> ~/.bash_profile
+else
+    echo "Unsupported envirnoment. Existing."
+    exit
 fi
 
 # If the user has specified the -r (reset) flag, then create an
