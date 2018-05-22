@@ -31,6 +31,7 @@ CONTOUR_KML = 'mmi_contour.kml'
 KMZ_FILE = 'shakemap.kmz'
 KML_FILE = 'shakemap.kml'
 EPICENTER_URL = 'http://maps.google.com/mapfiles/kml/shapes/capital_big_highlight.png'
+LEGEND = 'intensity_legend.png'
 
 LOOKAT_ALTITUDE = 500000  # meters
 
@@ -55,32 +56,16 @@ class KMLModule(CoreModule):
 
     # supply here a data structure with information about files that
     # can be created by this module.
-    kml_page = {'title': 'Ground Motion KML Files', 'slug': 'kml'}
-    contents = OrderedDict.fromkeys(['intensity_overlay',
-                                     'intensity_contours',
-                                     'stations'])
+    kml_page = {'title': 'Ground Motion KMZ File', 'slug': 'kml'}
+    contents = OrderedDict.fromkeys(['shakemap_kmz'])
     ftype = 'application/vnd.google-earth.kml+xml'
-    contents['intensity_overlay'] = {'title': 'Intensity Overlay',
-                                     'caption': 'Intensity Overlay.',
-                                     'page': kml_page,
-                                     'formats': [{'filename': 'overlay.kmz',
-                                                  'type': ftype}
-                                                 ]
-                                     }
-    contents['intensity_contours'] = {'title': 'Intensity Contours',
-                                      'caption': 'Intensity Contours.',
-                                      'page': kml_page,
-                                      'formats': [{'filename': 'mmi_contour.kml',
-                                                   'type': ftype}
-                                                  ]
-                                      }
-    contents['stations'] = {'title': 'Stations',
-                            'caption': 'Stations.',
-                            'page': kml_page,
-                            'formats': [{'filename': 'stations.kmz',
-                                         'type': ftype}
-                                        ]
-                            }
+    contents['shakemap_kmz'] = {'title': 'ShakeMap Overview KMZ',
+                                'caption': 'ShakeMap Overview.',
+                                'page': kml_page,
+                                'formats': [{'filename': 'shakemap.kmz',
+                                             'type': ftype}
+                                            ]
+                                }
 
     def __init__(self, eventid):
         """
@@ -122,62 +107,126 @@ class KMLModule(CoreModule):
         oceanfile = pconfig['products']['mapping']['layers']['lowres_oceans']
         oceanfile = path_macro_sub(oceanfile, install_path, data_path)
 
-        # we're going to combine all these layers into one KMZ file.
-        kmz_contents = []
+        # call create_kmz function
+        create_kmz(container, datadir, oceanfile, self.logger)
 
-        # create the kml text
-        root = etree.Element("kml")
-        nlink = etree.SubElement(root, "NetworkLinkControl")
-        nperiod = etree.SubElement(nlink, "minRefreshPeriod")
-        nperiod.text = '300'
-        document = etree.SubElement(root, 'Document')
-        set_look(document, container)
 
-        # create intensity overlay
-        self.logger.debug('Creating intensity overlay...')
-        overlay_image = create_overlay(container, oceanfile, datadir, document)
-        kmz_contents += [overlay_image]
-        self.logger.debug('Created intensity overlay image %s' % overlay_image)
+def create_kmz(container, datadir, oceanfile, logger):
+    # we're going to combine all these layers into one KMZ file.
+    kmz_contents = []
 
-        # create station kml
-        self.logger.debug('Creating station KML...')
-        triangle_file, circle_file = create_stations(container,
-                                                     datadir,
-                                                     document)
-        kmz_contents += [triangle_file, circle_file]
-        self.logger.debug('Created station KML')
+    # create the kml text
+    root = etree.Element("kml")
+    nlink = etree.SubElement(root, "NetworkLinkControl")
+    nperiod = etree.SubElement(nlink, "minRefreshPeriod")
+    nperiod.text = '300'
+    document = etree.SubElement(root, 'Document')
+    name = etree.SubElement(document, 'name')
+    info = container.getMetadata()
+    eid = info['input']['event_information']['event_id']
+    mag = info['input']['event_information']['magnitude']
+    timestr = info['input']['event_information']['origin_time']
+    namestr = 'ShakeMap %s M%s %s' % (eid, mag, timestr)
+    name.text = namestr
+    set_look(document, container)
 
-        # create contour kml
-        self.logger.debug('Creating contour KML...')
-        create_contours(container, document)
-        self.logger.debug('Created contour KML')
+    # create intensity overlay
+    logger.debug('Creating intensity overlay...')
+    overlay_image = create_overlay(container, oceanfile, datadir, document)
+    kmz_contents += [overlay_image]
+    logger.debug('Created intensity overlay image %s' % overlay_image)
 
-        # create epicenter KML
-        self.logger.debug('Creating epicenter KML...')
-        create_epicenter(container, document)
-        self.logger.debug('Created epicenter KML')
+    # create station kml
+    logger.debug('Creating station KML...')
+    triangle_file, circle_file = create_stations(container,
+                                                 datadir,
+                                                 document)
+    kmz_contents += [triangle_file, circle_file]
+    logger.debug('Created station KML')
 
-        # Write the uber-kml file
-        tree = etree.ElementTree(root)
-        kmlfile = os.path.join(datadir, KML_FILE)
-        tree.write(kmlfile, encoding='utf-8', xml_declaration=True)
-        kmz_contents.append(kmlfile)
+    # create contour kml
+    logger.debug('Creating contour KML...')
+    create_contours(container, document)
+    logger.debug('Created contour KML')
 
-        # assemble all the pieces into a KMZ file, and delete source files
-        # as we go
-        kmzfile = os.path.join(datadir, KMZ_FILE)
-        kmzip = zipfile.ZipFile(kmzfile, mode='w',
-                                compression=zipfile.ZIP_DEFLATED)
-        for kfile in kmz_contents:
-            _, arcname = os.path.split(kfile)
-            kmzip.write(kfile, arcname=arcname)
-            os.remove(kfile)
-        kmzip.close()
+    # create epicenter KML
+    logger.debug('Creating epicenter KML...')
+    create_epicenter(container, document)
+    logger.debug('Created epicenter KML')
 
-        self.logger.debug('Wrote KMZ container file %s' % kmzfile)
+    # place ShakeMap legend on the screen
+    legend_file = place_legend(datadir, document)
+    kmz_contents.append(legend_file)
+
+    # Write the uber-kml file
+    tree = etree.ElementTree(root)
+    kmlfile = os.path.join(datadir, KML_FILE)
+    tree.write(kmlfile, encoding='utf-8', xml_declaration=True)
+    kmz_contents.append(kmlfile)
+
+    # assemble all the pieces into a KMZ file, and delete source files
+    # as we go
+    kmzfile = os.path.join(datadir, KMZ_FILE)
+    kmzip = zipfile.ZipFile(kmzfile, mode='w',
+                            compression=zipfile.ZIP_DEFLATED)
+    for kfile in kmz_contents:
+        _, arcname = os.path.split(kfile)
+        kmzip.write(kfile, arcname=arcname)
+        os.remove(kfile)
+    kmzip.close()
+
+    logger.debug('Wrote KMZ container file %s' % kmzfile)
+    return kmzfile
+
+
+def place_legend(datadir, document):
+    """Place the ShakeMap intensity legend in the upper left corner of the viewer's map.
+
+    Args:
+        datadir (str): Path to data directory where output KMZ will be written.
+        document (Element): LXML KML Document element.
+
+    Returns:
+        str: Path to output intensity legend file.
+    """
+    overlay = etree.SubElement(document, 'ScreenOverlay')
+    name = etree.SubElement(overlay, 'name')
+    name.text = 'Intensity Legend'
+    icon = etree.SubElement(overlay, 'Icon')
+    href = etree.SubElement(icon, 'href')
+    href.text = LEGEND
+    overlay_xy = etree.SubElement(overlay, 'overlayXY',
+                                  x="0", y="90",
+                                  xunits="pixels", yunits="pixels")
+    screen_xy = etree.SubElement(overlay, 'screenXY',
+                                 x="5",
+                                 y="1",
+                                 xunits="pixels",
+                                 yunits="fraction")
+    size = etree.SubElement(overlay, 'size',
+                            x="0",
+                            y="0",
+                            xunits="pixels",
+                            yunits="pixels")
+
+    # we need to find the legend file and copy it to
+    # the output directory
+    this_dir, _ = os.path.split(__file__)
+    data_path = os.path.join(this_dir, '..', 'data')
+    legend_file = os.path.join(data_path, LEGEND)
+    legdest = os.path.join(datadir, LEGEND)
+    shutil.copyfile(legend_file, legdest)
+    return legdest
 
 
 def create_epicenter(container, document):
+    """Place a star marker at earthquake epicenter.
+
+    Args:
+        container (ShakeMapOutputContainer): Results of model.conf.
+        document (Element): LXML KML Document element.
+
+    """
     style = etree.SubElement(document, 'Style', id="epicenterIcon")
     iconstyle = etree.SubElement(style, 'IconStyle')
     icon = etree.SubElement(iconstyle, 'Icon')
@@ -371,8 +420,9 @@ def create_overlay_image(container, oceanfile, filename):
         shapes = []
         for tshp in tshapes:
             shapes.append(shape(tshp[1]['geometry']))
-        oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd, fillValue=0.0)
-        rgba[oceangrid.getData() == 1] = 0
+        if len(shapes):
+            oceangrid = Grid2D.rasterizeFromGeometry(shapes, gd, fillValue=0.0)
+            rgba[oceangrid.getData() == 1] = 0
 
     # save rgba image as png
     img = Image.fromarray(rgba)
@@ -386,6 +436,7 @@ def create_stations(container, datadir, document):
     Args:
         container (ShakeMapOutputContainer): Results of model.conf.
         datadir (str): Path to data directory where output KMZ will be written.
+        document (Element): LXML KML Document element.
     Returns:
         str: Path to output KMZ file.
     """
@@ -402,10 +453,14 @@ def create_stations(container, datadir, document):
     mmi_folder = etree.SubElement(document, 'Folder')
     mmi_name = etree.SubElement(mmi_folder, 'name')
     mmi_name.text = 'Macroseismic Stations'
+    mmi_vis = etree.SubElement(mmi_folder, 'visibility')
+    mmi_vis.text = '0'
 
     ins_folder = etree.SubElement(document, 'Folder')
     ins_name = etree.SubElement(ins_folder, 'name')
     ins_name.text = 'Instrumented Stations'
+    ins_vis = etree.SubElement(ins_folder, 'visibility')
+    ins_vis.text = '0'
     for station in station_dict['features']:
         if station['properties']['station_type'] == 'seismic':
             make_placemark(ins_folder, station, cpalette)
@@ -652,6 +707,9 @@ def get_imt_text(station, imt):
             if amplitude['name'] != imt:
                 continue
             imt_value = amplitude['value']
+            if imt_value == 'null':
+                continue
+
             if imt_value > imt_max:
                 imt_max = imt_value
 
