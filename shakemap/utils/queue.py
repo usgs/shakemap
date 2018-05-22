@@ -259,7 +259,7 @@ def dispatch_event(eventid, logger, children, action, config):
         logger.info('Canceling event %s' % eventid)
         cmd = config['cancel_command'].replace('shake', config['shake_path'])
         cmd = cmd.replace('<EVID>', eventid)
-        cmd = ' '.split(cmd)
+        cmd = cmd.split()
         p = subprocess.Popen(cmd)
     elif action == 'test':
         logger.info('Testing event %s' % eventid)
@@ -268,7 +268,7 @@ def dispatch_event(eventid, logger, children, action, config):
         logger.info('Running event %s due to action %s' % (eventid, action))
         cmd = config['shake_command'].replace('shake', config['shake_path'])
         cmd = cmd.replace('<EVID>', eventid)
-        cmd = ' '.split(cmd)
+        cmd = cmd.split()
         p = subprocess.Popen(cmd)
 
     children[eventid] = {'popen': p, 'start_time': time.time()}
