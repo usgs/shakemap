@@ -27,18 +27,19 @@ function [dmean,mean_metadata,dstd,std_metadata] = read_shake_data(fname,imt,com
     for i=1:length(info.Groups)
         group = info.Groups(i);
         gname = group.Name;
-        if contains(gname,imt,'IgnoreCase',1) && contains(gname,component,'IgnoreCase',1)
-            for j=1:length(group.Datasets)
-                dataset = group.Datasets(j);
-                dname = dataset.Name;
-                parts = strsplit(dname,'_');
-                quantity = parts(2);
-                %compstr = parts(4);
-                if strcmpi(quantity,'mean')
-                    [dmean,mean_metadata] = get_quantity(fname,dataset,gname);
-                elseif strcmpi(quantity,'std')
-                    [dstd,std_metadata] = get_quantity(fname,dataset,gname);
+        if contains(gname,'__imts__')
+            for j=1:length(group.Groups)
+                imtgroup= group.Groups(j);
+                cname = imtgroup.Name;
+                if strcmpi(imtgroup.Datasets(1).Name,'mean')
+                    mean_dset = imtgroup.Datasets(1);
+                    std_dset = imtgroup.Datasets(2);
+                else
+                    mean_dset = imtgroup.Datasets(2);
+                    std_dset = imtgroup.Datasets(1);
                 end
+                [dmean,mean_metadata] = get_quantity(fname,mean_dset,cname);
+                [dstd,std_metadata] = get_quantity(fname,std_dset,cname);
             end
         end
     end    
