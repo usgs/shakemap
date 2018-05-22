@@ -1,14 +1,34 @@
-|Travis| |CodeCov|
+Hello
+
+
++---------------+----------------------+ 
+| Linux build   | |Travis|             | 
++---------------+----------------------+ 
+| Mac build     | |Circleci|           | 
++---------------+----------------------+ 
+| Code quality  | |Codacy|             | 
++---------------+----------------------+ 
+| Code coverage | |CodeCov|            | 
++---------------+----------------------+ 
+| Manage issues | |Waffle|             | 
++---------------+----------------------+ 
+
 
 .. |Travis| image:: https://travis-ci.org/usgs/shakemap.svg?branch=master
     :target: https://travis-ci.org/usgs/shakemap
     :alt: Travis Build Status
+
+.. |Circleci| image:: https://circleci.com/gh/usgs/shakemap.svg?style=svg
+    :target: https://circleci.com/gh/usgs/shakemap
+
 .. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/usgs/shakemap
     :alt: Code Coverage Status
-.. image:: https://api.codacy.com/project/badge/Grade/1f771008e85041b89b97b6d12d85298a
+
+.. |Codacy| image:: https://api.codacy.com/project/badge/Grade/1f771008e85041b89b97b6d12d85298a
     :target: https://www.codacy.com/app/emthompson_2/shakemap?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=usgs/shakemap&amp;utm_campaign=Badge_Grade
-.. image:: https://badge.waffle.io/usgs/shakemap.svg?columns=all
+
+.. |Waffle| image:: https://badge.waffle.io/usgs/shakemap.svg?columns=all
     :target: https://waffle.io/usgs/shakemap
     :alt: 'Waffle.io - Columns and their card count'
 
