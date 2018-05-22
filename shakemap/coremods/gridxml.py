@@ -4,6 +4,7 @@ import json
 import logging
 from datetime import datetime
 import re
+from collections import OrderedDict
 
 # third party imports
 import numpy as np
@@ -22,7 +23,7 @@ import shakemap
 # we'll hard code this here until grid.xml files experience their heat death.
 COMPONENT = 'GREATER_OF_TWO_HORIZONTAL'
 
-TIMEFMT = '%Y-%m-%d %H:%M:%S'
+TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def _oq_to_gridxml(oqimt):
@@ -81,7 +82,13 @@ class GridXMLModule(CoreModule):
                              'formats': [{'filename': 'grid.xml',
                                           'type': 'text/xml'}
                                          ]
-                             }
+                             },
+                'uncertaintyGrid': {'title': 'Uncertainty Grid',
+                                    'caption': 'XML grid of uncertainties',
+                                    'formats': [{'filename': 'uncertainty.xml',
+                                                 'type': 'text/xml'}
+                                                ]
+                                    }
                 }
 
     def execute(self):
@@ -109,10 +116,10 @@ class GridXMLModule(CoreModule):
             raise NotImplementedError('gridxml module can only function on '
                                       'gridded data, not sets of points')
         gridnames = container.getIMTs(COMPONENT)
-        layers = {}
-        field_keys = {}
         xml_types = ['grid', 'uncertainty']
         for xml_type in xml_types:
+            layers = OrderedDict()
+            field_keys = OrderedDict()
             for gridname in gridnames:
                 imt_field = _oq_to_gridxml(gridname)
                 imtdict = container.getIMTGrids(gridname, COMPONENT)
@@ -120,24 +127,30 @@ class GridXMLModule(CoreModule):
                     grid = imtdict['mean']
                     metadata = imtdict['mean_metadata']
                 elif xml_type == 'uncertainty':
-                    grid = imtdict['mean']
-                    metadata = imtdict['mean_metadata']
+                    grid = imtdict['std']
+                    metadata = imtdict['std_metadata']
 
                 units = metadata['units']
                 digits = metadata['digits']
                 grid_data = grid.getData()
                 # convert from HDF units to legacy grid.xml units
-                if units == 'ln(cm/s)':
-                    grid_data = np.exp(grid_data)
-                    units = 'cm/s'
-                elif units == 'ln(g)':
-                    grid_data = np.exp(grid_data) * 100
-                    units = '%g'
-                else:
-                    pass
-                layers[imt_field] = grid_data
+                if xml_type == 'grid':
+                    if units == 'ln(cm/s)':
+                        grid_data = np.exp(grid_data)
+                        units = 'cm/s'
+                    elif units == 'ln(g)':
+                        grid_data = np.exp(grid_data) * 100
+                        units = '%g'
+                    else:
+                        pass
 
-                field_keys[imt_field] = (units, digits)
+                if xml_type == 'grid':
+                    layers[imt_field] = grid_data
+                    field_keys[imt_field] = (units, digits)
+                else:
+                    layers['STD' + imt_field] = grid_data
+                    field_keys['STD' + imt_field] = (units, digits)
+
             geodict = grid.getGeoDict()
 
             config = container.getConfig()
@@ -155,18 +168,18 @@ class GridXMLModule(CoreModule):
             event_dict['event_timestamp'] = datetime.strptime(
                 event_info['origin_time'], TIMEFMT)
             event_dict['event_description'] = event_info['location']
-            # TODO the following is SUPER-SKETCHY - we need to save the event
-            # network info!!!
-            event_dict['event_network'] = event_dict['event_id'][0:2]
+            event_dict['event_network'] = \
+                info['input']['event_information']['eventsource']
 
             # shake dictionary
             shake_dict = {}
             shake_dict['event_id'] = event_dict['event_id']
             shake_dict['shakemap_id'] = event_dict['event_id']
-            # TODO - where are we supposed to get shakemap version
-            shake_dict['shakemap_version'] = 1
+            shake_dict['shakemap_version'] = \
+                info['processing']['shakemap_versions']['map_version']
             shake_dict['code_version'] = shakemap.__version__
-            shake_dict['process_timestamp'] = datetime.utcnow()
+            ptime = info['processing']['shakemap_versions']['process_time']
+            shake_dict['process_timestamp'] = datetime.strptime(ptime, TIMEFMT)
             shake_dict['shakemap_originator'] = \
                 config['system']['source_network']
             shake_dict['map_status'] = config['system']['map_status']
@@ -174,9 +187,10 @@ class GridXMLModule(CoreModule):
             if event_dict['event_id'].endswith('_se'):
                 shake_dict['shakemap_event_type'] = 'SCENARIO'
 
+            print(field_keys)
             shake_grid = ShakeGrid(
                 layers, geodict, event_dict,
                 shake_dict, {}, field_keys=field_keys)
             fname = os.path.join(datadir, '%s.xml' % xml_type)
-            logger.info('Saving IMT grids to %s' % fname)
+            logger.debug('Saving IMT grids to %s' % fname)
             shake_grid.save(fname)  # TODO - set grid version number

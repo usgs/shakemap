@@ -62,6 +62,8 @@ SM_CONSTS = {'default_mmi_stddev': 0.3,
              'min_mmi_convert': 4.0,
              'default_stddev_inter': 0.35}
 
+TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
+
 
 class DataFrame:
     def __init__(self):
@@ -1097,7 +1099,7 @@ class ModelModule(CoreModule):
         info[ip][ei]['location'] = self.rupture_obj._origin.locstring
         info[ip][ei]['magnitude'] = str(self.rx.mag)
         info[ip][ei]['origin_time'] = \
-            self.rupture_obj._origin.time.strftime('%Y-%m-%d %H:%M:%S')
+            self.rupture_obj._origin.time.strftime(TIMEFMT)
         if 'df1' in self.dataframes:
             info[ip][ei]['seismic_stations'] = \
                 str(np.size(self.df1.df['lon']))
@@ -1203,7 +1205,7 @@ class ModelModule(CoreModule):
         info[pp][sv]['shakemap_revision_id'] = \
             get_versions()['full-revisionid']
         info[pp][sv]['process_time'] = \
-            strftime("%Y-%m-%d %H:%M:%S%Z", gmtime())
+            strftime(TIMEFMT, gmtime())
         info[pp][sv]['map_version'] = \
             self.ic.getVersionHistory()['history'][-1][2]
         info[pp][sv]['map_comment'] = \
