@@ -1,0 +1,169 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakelib.conversions.convert_imt &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../../../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for shakelib.conversions.convert_imt</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Standard library imports</span>
+<span class="kn">from</span> <span class="nn">abc</span> <span class="k">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
+
+<div class="viewcode-block" id="TypeConverter"><a class="viewcode-back" href="../../../shakelib/shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.TypeConverter">[docs]</a><span class="k">class</span> <span class="nc">TypeConverter</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for implementing conversions between intensity</span>
+<span class="sd">    measurement types (IMT).&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TypeConverter.convertAmps"><a class="viewcode-back" href="../../../shakelib/shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.TypeConverter.convertAmps">[docs]</a>    <span class="nd">@abstractmethod</span>
+    <span class="k">def</span> <span class="nf">convertAmps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_in</span><span class="p">,</span> <span class="n">imt_out</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns an array of converted IMT amplitude values.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imt_in (str): OQ intensity measure type. Same as type as the input</span>
+<span class="sd">                values defined by the imt variable.</span>
+<span class="sd">            imt_out (str): OQ intensity measure type that the values will</span>
+<span class="sd">                be converted to.</span>
+<span class="sd">            imt (OpenQuake IMT): The intensity measure type of the input</span>
+<span class="sd">                ground motions. Valid IMTs are PGV, and SA.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            array: Numpy array of amps converted from imt_in to imt_out.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If not a valid conversion.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">pass</span></div>
+
+<div class="viewcode-block" id="TypeConverter.getConversionFactor"><a class="viewcode-back" href="../../../shakelib/shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.TypeConverter.getConversionFactor">[docs]</a>    <span class="k">def</span> <span class="nf">getConversionFactor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method that returns the conversion factor.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Conversion factor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">factor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">conversion_factor</span>
+        <span class="k">return</span> <span class="n">factor</span></div>
+
+<div class="viewcode-block" id="TypeConverter.getInputIMT"><a class="viewcode-back" href="../../../shakelib/shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.TypeConverter.getInputIMT">[docs]</a>    <span class="k">def</span> <span class="nf">getInputIMT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_out</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get valid input IMT types that can be converted to the specified imt_out.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imt (str): OQ intensity measure type.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: List of valid input IMT types. If not available types</span>
+<span class="sd">                None is returned.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">imt_out</span> <span class="o">=</span> <span class="n">imt_out</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">imt_in</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">output_input</span><span class="p">[</span><span class="n">imt_out</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">imt_in</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;No available conversion to </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">imt_out</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+    <span class="k">def</span> <span class="nf">_verifyConversion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt_in</span><span class="p">,</span> <span class="n">imt_out</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method used to verify that a conversion is valid.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imt_in (str): OQ intensity measure type. Same as type as the input</span>
+<span class="sd">                values defined by the imt variable.</span>
+<span class="sd">            imt_out (str): OQ intensity measure type that the values will</span>
+<span class="sd">                be converted to.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the conversion is not valid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">valid_inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getInputIMT</span><span class="p">(</span><span class="n">imt_out</span><span class="p">)</span>
+        <span class="n">imt_in</span> <span class="o">=</span> <span class="n">imt_in</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">imt_out</span> <span class="o">=</span> <span class="n">imt_out</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">imt_in</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">valid_inputs</span> <span class="ow">and</span> <span class="n">imt_in</span> <span class="o">!=</span> <span class="n">imt_out</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;No conversion available from </span><span class="si">%r</span><span class="s1"> to </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_in</span><span class="p">,</span>
+                    <span class="n">imt_out</span><span class="p">))</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../../../index.html">
+    <img class="logo" src="../../../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

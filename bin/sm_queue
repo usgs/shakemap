@@ -67,7 +67,8 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
             logger.info('Running repeat of event %s' % eventid)
             # Update the XML because the DB may have newer information
             write_event_xml(data_path, event, logger)
-            queue.dispatch_event(eventid, logger, children, 'run', config)
+            queue.dispatch_event(eventid, logger, children,
+                                 'scheduled_repeat', config)
             rep_list.pop(0)
             if len(rep_list) == 0:
                 rep_list = None
@@ -121,7 +122,7 @@ def associate_all(handler, data_path, logger, config, children):
     event_list = handler.associateAll(pretty_print=True)
     for eventid in event_list:
         event = handler.getEvent(eventid)
-        process_origin(event, handler, data_path,
+        process_origin(event, 'data_association', handler, data_path,
                        logger, config, children)
 
     return
@@ -166,12 +167,15 @@ def write_event_xml(data_path, event, logger):
     return
 
 
-def process_origin(event, handler, data_path, logger, config, children):
+def process_origin(event, action, handler, data_path, logger, config,
+                   children):
     """ Determine if an event should be processed (or reprocessed) and
     dispatch it for processing.
 
     Args:
         event (dict): The event data structure.
+        action (str): The "type" of the trigger that caused this function
+                      to be called.
         handler (AmplitudeHandler object): An instance of the
                                            AmplitudeHandler object.
         data_path (str): The path where the ShakeMap data directories
@@ -282,18 +286,21 @@ def process_origin(event, handler, data_path, logger, config, children):
 
     write_event_xml(data_path, event, logger)
 
-    queue.dispatch_event(event['id'], logger, children, 'run', config)
+    queue.dispatch_event(event['id'], logger, children, action, config)
 
     return
 
 
-def process_other(eventid, handler, data_path, logger, config, children):
+def process_other(eventid, action, handler, data_path, logger, config,
+                  children):
     """A trigger has been issued for an event. Treat this as
     an origin update. If the event in question is not in our
     database, ignore the message.
 
     Args:
         eventid (str): The event ID of the triggered event.
+        action (str): The "type" of the trigger that caused this function
+                      to be called.
         handler (AmplitudeHandler object): An instance of the
                                            AmplitudeHandler object.
         data_path (str): The path where the ShakeMap data directories
@@ -306,7 +313,8 @@ def process_other(eventid, handler, data_path, logger, config, children):
     """
     existing = handler.getEvent(eventid)
     if existing:
-        process_origin(existing, handler, data_path, logger, config, children)
+        process_origin(existing, action, handler, data_path, logger, config,
+                       children)
     else:
         logger.info('Trigger is for unprocessed event %s: ignoring' % eventid)
     return
@@ -481,8 +489,8 @@ def main(pargs):
             if cmd['type'] == 'origin':
                 logger.info('Received "origin" for event %s' %
                             cmd['data']['id'])
-                process_origin(cmd['data'], handler, data_path, logger,
-                               config, children)
+                process_origin(cmd['data'], 'origin', handler, data_path,
+                               logger, config, children)
             elif cmd['type'] == 'cancel':
                 logger.info('Received "cancel" for event %s' %
                             cmd['data']['id'])
@@ -491,8 +499,8 @@ def main(pargs):
             else:
                 logger.info('Received "%s" for event %s' %
                             cmd['type'], cmd['data']['id'])
-                process_other(cmd['data']['id'], handler, data_path, logger,
-                              config, children)
+                process_other(cmd['data']['id'], cmd['type'], handler,
+                              data_path, logger, config, children)
 
 
 if __name__ == '__main__':
