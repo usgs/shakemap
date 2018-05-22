@@ -31,9 +31,7 @@ def test_create_kmz():
         pconfig = configobj.ConfigObj(product_config_file)
         oceanfile = pconfig['products']['mapping']['layers']['lowres_oceans']
         oceanfile = path_macro_sub(oceanfile, install_path, data_path)
-
-        logger = logging.getLogger()
-
+        logger = logging.getLogger(__name__)
         kmzfile = create_kmz(container, tempdir, oceanfile, logger)
         myzip = zipfile.ZipFile(kmzfile, mode='r')
         kmlstr = myzip.read('shakemap.kml').decode('utf-8')
@@ -58,10 +56,12 @@ def test_create_kmz():
         myzip.close()
 
     except Exception as e:
+        print(str(e))
         assert 1 == 2
     finally:
         shutil.rmtree(tempdir)
 
 
 if __name__ == '__main__':
+    os.environ['CALLED_FROM_PYTEST'] = 'True'
     test_create_kmz()
