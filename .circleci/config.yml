@@ -46,7 +46,7 @@ jobs:
       - run:
           name: run tests
           command: |
- 	    conda activate shakemap
+            conda activate shakemap
             py.test .
 
       #- store_artifacts:
