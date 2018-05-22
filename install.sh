@@ -2,10 +2,21 @@
 
 unamestr=`uname`
 if [ "$unamestr" == 'Linux' ]; then
-    source ~/.bashrc
+    prof=~/.bashrc
+    mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
+    matplotlibdir=~/.config/matplotlib
+    env_file=environment_linux.yml
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
-    source ~/.bash_profile
+    prof=~/.bash_profile
+    mini_conda_url=https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh
+    matplotlibdir=~/.matplotlib
+    env_file=environment_osx.yml
+else
+    echo "Unsupported environment. Exiting."
+    exit
 fi
+
+source $prof
 
 echo "Path:"
 echo $PATH
@@ -23,29 +34,32 @@ while getopts r FLAG; do
   esac
 done
 
-# Get uname to determine OS
-unamestr=`uname`
-
 
 # create a matplotlibrc file with the non-interactive backend "Agg" in it.
-if [ ! -d ~/.config/matplotlib ]; then
-    mkdir -p ~/.config/matplotlib
-    echo "backend : Agg" > ~/.config/matplotlib/matplotlibrc
-    echo "NOTE: A non-interactive matplotlib backend (Agg) has been set for this user."
+if [ ! -d "$matplotlibdir" ]; then
+    mkdir -p $matplotlibdir
 fi
+matplotlibrc=$matplotlibdir/matplotlibrc
+if [ ! -e "$matplotlibrc" ]; then
+    echo "backend : Agg" > "$matplotlibrc"
+    echo "NOTE: A non-interactive matplotlib backend (Agg) has been set for this user."
+elif grep -Fxq "backend : Agg" $matplotlibrc ; then
+    :
+elif [ ! grep -Fxq "backend" $matplotlibrc ]; then
+    echo "backend : Agg" >> $matplotlibrc
+    echo "NOTE: A non-interactive matplotlib backend (Agg) has been set for this user."
+else
+    sed -i '' 's/backend.*/backend : Agg/' $matplotlibrc
+    echo "###############"
+    echo "NOTE: $matplotlibrc has been changed to set 'backend : Agg'"
+    echo "###############"
+fi
+
 
 # Is conda installed?
 conda --version
 if [ $? -ne 0 ]; then
     echo "No conda detected, installing miniconda..."
-    if [ "$unamestr" == 'Linux' ]; then
-	mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
-    elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
-	mini_conda_url=https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh
-    else
-	echo "Unsupported environment. Exiting."
-	exit
-    fi
 
     curl $mini_conda_url -o miniconda.sh;
     echo "Install directory: $HOME/miniconda"
@@ -64,16 +78,7 @@ echo ""
 
 
 # Choose an environment file based on platform
-if [ "$unamestr" == 'Linux' ]; then
-    env_file=environment_linux.yml
-    echo ". $HOME/miniconda/etc/profile.d/conda.sh" >> ~/.bashrc
-elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
-    env_file=environment_osx.yml
-    echo ". $HOME/miniconda/etc/profile.d/conda.sh" >> ~/.bash_profile
-else
-    echo "Unsupported environment. Exiting."
-    exit
-fi
+echo ". $HOME/miniconda/etc/profile.d/conda.sh" >> $prof
 
 # If the user has specified the -r (reset) flag, then create an
 # environment based on only the named dependencies, without
