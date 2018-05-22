@@ -42,6 +42,7 @@ jobs:
       - run:
           name: run tests
           command: |
+            . $HOME/miniconda/etc/profile.d/conda.sh
             conda activate shakemap
             py.test .
 
