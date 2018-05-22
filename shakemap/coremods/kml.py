@@ -2,7 +2,6 @@
 import os.path
 from collections import OrderedDict
 import logging
-import time
 import zipfile
 import shutil
 import re
@@ -195,19 +194,19 @@ def place_legend(datadir, document):
     icon = etree.SubElement(overlay, 'Icon')
     href = etree.SubElement(icon, 'href')
     href.text = LEGEND
-    overlay_xy = etree.SubElement(overlay, 'overlayXY',
-                                  x="0", y="90",
-                                  xunits="pixels", yunits="pixels")
-    screen_xy = etree.SubElement(overlay, 'screenXY',
-                                 x="5",
-                                 y="1",
-                                 xunits="pixels",
-                                 yunits="fraction")
-    size = etree.SubElement(overlay, 'size',
-                            x="0",
-                            y="0",
-                            xunits="pixels",
-                            yunits="pixels")
+    _ = etree.SubElement(overlay, 'overlayXY',
+                         x="0", y="90",
+                         xunits="pixels", yunits="pixels")
+    _ = etree.SubElement(overlay, 'screenXY',
+                         x="5",
+                         y="1",
+                         xunits="pixels",
+                         yunits="fraction")
+    _ = etree.SubElement(overlay, 'size',
+                         x="0",
+                         y="0",
+                         xunits="pixels",
+                         yunits="pixels")
 
     # we need to find the legend file and copy it to
     # the output directory
@@ -735,17 +734,17 @@ def create_styles(document):
     add_style_map(document, 'dyfi')
 
 
-def add_icon_style(document, id, icon_text, icon_scale, label_scale):
+def add_icon_style(document, icon_id, icon_text, icon_scale, label_scale):
     """Create Style tag around Icon in KML.
 
     Args:
         document (Element): LXML KML Document element.
-        id (str): Id field in Style tag.
+        icon_id (str): Id field in Style tag.
         icon_text (str): The name of the icon file.
         icon_scale (float): The icon scale.
         label_scale (float): The label scale.
     """
-    normal_station_style = etree.SubElement(document, 'Style', id=id)
+    normal_station_style = etree.SubElement(document, 'Style', id=icon_id)
     icon_style = etree.SubElement(normal_station_style, 'IconStyle')
     scale1 = etree.SubElement(icon_style, 'scale')
     scale1.text = '%.1f' % icon_scale
