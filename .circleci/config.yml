@@ -30,8 +30,8 @@ jobs:
       - run:
           name: install dependencies
           command: |
-	    bash install.sh
-	    . $HOME/miniconda/etc/profile.d/conda.sh
+            bash install.sh
+            . $HOME/miniconda/etc/profile.d/conda.sh
 
       #- save_cache:
       #    paths:
