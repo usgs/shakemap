@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import numpy as np
-from shakemap.coremods.contour import getContourLevels
+from shakelib.plotting.contour import getContourLevels
 
 
 def test_intervals():
