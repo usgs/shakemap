@@ -32,13 +32,19 @@
           <div class="body" role="main">
             
   <h1>Source code for shakelib.conversions.imc.beyer_bommer_2006</h1><div class="highlight"><pre>
-<span></span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module implements BeyerBommer2006 class to convert between various</span>
+<span class="sd">horizontal intensity measure components.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="c1"># Third party imports</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
-
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
+<span class="c1"># Local imports</span>
+<span class="kn">from</span> <span class="nn">shakelib.conversions.convert_imc</span> <span class="k">import</span> <span class="n">ComponentConverter</span>
 
-<div class="viewcode-block" id="BeyerBommer2006"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006">[docs]</a><span class="k">class</span> <span class="nc">BeyerBommer2006</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+
+<div class="viewcode-block" id="BeyerBommer2006"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006">[docs]</a><span class="k">class</span> <span class="nc">BeyerBommer2006</span><span class="p">(</span><span class="n">ComponentConverter</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Implements conversion for various &quot;Intensity Measure</span>
 <span class="sd">    Components&quot; (IMCs) per Beyer and Bommer (2006).</span>
@@ -72,10 +78,6 @@
 <span class="sd">          may be ambiguous. In these cases, we are assuming that it is a</span>
 <span class="sd">          random horizontal component as a default.</span>
 
-<span class="sd">    To do</span>
-
-<span class="sd">        - Inherit from ConvertIMC class.</span>
-
 <span class="sd">    References</span>
 
 <span class="sd">        Beyer, K., &amp; Bommer, J. J. (2006). Relationships between median values</span>
@@ -85,54 +87,110 @@
 <span class="sd">        `[link] &lt;http://www.bssaonline.org/content/96/4A/1512.short&gt;`__</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imc_in</span> <span class="o">=</span> <span class="n">imc_in</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">imc_out</span> <span class="o">=</span> <span class="n">imc_out</span>
+        <span class="c1"># c12 = median ratio</span>
+        <span class="c1"># c34 = std. of log ratio</span>
+        <span class="c1"># R = ratio of sigma_pga values</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c12&#39;</span><span class="p">,</span> <span class="s1">&#39;c34&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sa_col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c1&#39;</span><span class="p">,</span> <span class="s1">&#39;c2&#39;</span><span class="p">,</span> <span class="s1">&#39;c3&#39;</span><span class="p">,</span> <span class="s1">&#39;c4&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">]</span>
+        <span class="c1"># Possible conversions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">conversion_graph</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Greater of two horizontal&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">([</span>
+                <span class="s1">&#39;Median horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average Horizontal (GMRotI50)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average Horizontal (RotD50)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Random horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average horizontal&#39;</span><span class="p">]),</span>
+         <span class="s1">&#39;Median horizontal&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">([</span>
+                <span class="s1">&#39;Greater of two horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average Horizontal (GMRotI50)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average Horizontal (RotD50)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Random horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average horizontal&#39;</span><span class="p">]),</span>
+         <span class="s1">&#39;Average Horizontal (GMRotI50)&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">([</span>
+                <span class="s1">&#39;Greater of two horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Median horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average Horizontal (RotD50)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Random horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average horizontal&#39;</span><span class="p">]),</span>
+         <span class="s1">&#39;Average Horizontal (RotD50)&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">([</span>
+                <span class="s1">&#39;Greater of two horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Median horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average Horizontal (GMRotI50)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Random horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average horizontal&#39;</span><span class="p">]),</span>
+         <span class="s1">&#39;Random horizontal&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">([</span>
+                <span class="s1">&#39;Greater of two horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Median horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average Horizontal (GMRotI50)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average Horizontal (RotD50)&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Horizontal&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;Average horizontal&#39;</span><span class="p">]),</span>
+        <span class="s1">&#39;Horizontal&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">([</span>
+               <span class="s1">&#39;Greater of two horizontal&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Median horizontal&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Average Horizontal (GMRotI50)&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Average Horizontal (RotD50)&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Random horizontal&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Average horizontal&#39;</span><span class="p">]),</span>
+        <span class="s1">&#39;Average horizontal&#39;</span><span class="p">:</span> <span class="nb">set</span><span class="p">([</span>
+               <span class="s1">&#39;Greater of two horizontal&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Median horizontal&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Average Horizontal (GMRotI50)&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Average Horizontal (RotD50)&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Random horizontal&#39;</span><span class="p">,</span>
+               <span class="s1">&#39;Horizontal&#39;</span><span class="p">]),}</span>
+        <span class="c1"># Get shortest conversion &quot;path&quot; between imc_in and imc_out</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getShortestPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conversion_graph</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">imc_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_out</span><span class="p">)</span>
+        <span class="c1"># Set dictionaries of constants</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pga_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">MEDIAN_HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GMRotI50</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RotD50</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RANDOM_HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">])))}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__pgv_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">MEDIAN_HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GMRotI50</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RotD50</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RANDOM_HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">])))}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">MEDIAN_HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GMRotI50</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RotD50</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RANDOM_HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">]))),</span>
+            <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span><span class="p">:</span>
+                <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">])))}</span>
 
-    <span class="c1"># c12 = median ratio</span>
-    <span class="c1"># c34 = std. of log ratio</span>
-    <span class="c1"># R = ratio of sigma_pga values</span>
-    <span class="n">__pga_pgv_col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c12&#39;</span><span class="p">,</span> <span class="s1">&#39;c34&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">]</span>
-    <span class="n">__sa_col_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;c1&#39;</span><span class="p">,</span> <span class="s1">&#39;c2&#39;</span><span class="p">,</span> <span class="s1">&#39;c3&#39;</span><span class="p">,</span> <span class="s1">&#39;c4&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">]</span>
-    <span class="n">__pga_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">MEDIAN_HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GMRotI50</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RotD50</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RANDOM_HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">])))}</span>
-    <span class="n">__pgv_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">MEDIAN_HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GMRotI50</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RotD50</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RANDOM_HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">1.03</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__pga_pgv_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">])))}</span>
-    <span class="n">__sa_dict</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">MEDIAN_HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GMRotI50</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RotD50</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.02</span><span class="p">,</span> <span class="mf">0.03</span><span class="p">,</span> <span class="mf">1.00</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RANDOM_HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">]))),</span>
-        <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span><span class="p">:</span>
-            <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">])))}</span>
-
-<div class="viewcode-block" id="BeyerBommer2006.ampIMCtoIMC"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.ampIMCtoIMC">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">ampIMCtoIMC</span><span class="p">(</span><span class="n">amps</span><span class="p">,</span> <span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
+<div class="viewcode-block" id="BeyerBommer2006.convertAmpsOnce"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertAmpsOnce">[docs]</a>    <span class="k">def</span> <span class="nf">convertAmpsOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">rrups</span><span class="p">,</span> <span class="n">mag</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns amps converted from one IMC to another.</span>
 
@@ -154,15 +212,14 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            array: Numpy array of amps converted from imc_in to imc_out.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+<span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">denom</span> <span class="o">=</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__GM2other</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">imc_in</span><span class="p">)</span>
-        <span class="n">numer</span> <span class="o">=</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__GM2other</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">)</span>
+        <span class="n">denom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GM2other</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_in</span><span class="p">)</span>
+        <span class="n">numer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GM2other</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_out</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">amps</span> <span class="o">+</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">numer</span> <span class="o">/</span> <span class="n">denom</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="BeyerBommer2006.sigmaIMCtoIMC"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.sigmaIMCtoIMC">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">sigmaIMCtoIMC</span><span class="p">(</span><span class="n">sigmas</span><span class="p">,</span> <span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
+<div class="viewcode-block" id="BeyerBommer2006.convertSigmasOnce"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertSigmasOnce">[docs]</a>    <span class="k">def</span> <span class="nf">convertSigmasOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">sigmas</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns standard deviations converted from one IMC to another.</span>
 
@@ -184,40 +241,25 @@
 <span class="sd">            array: Numpy array of standard deviations converted from imc_in to</span>
 <span class="sd">                imc_out.</span>
 
-<span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
-
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Take input sigma to geometric mean sigma.</span>
         <span class="c1"># Solve eqn 8 for sigma_GM2, which is sigma_logSa_GM</span>
         <span class="c1"># This is the sigma converted to geometric mean</span>
         <span class="c1"># (i.e., reference component).</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="n">R</span><span class="p">,</span> <span class="n">sig_log_ratio</span> <span class="o">=</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__GM2otherSigma</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">imc_in</span><span class="p">)</span>
+        <span class="n">R</span><span class="p">,</span> <span class="n">sig_log_ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GM2otherSigma</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_in</span><span class="p">)</span>
         <span class="n">sigma_GM2</span> <span class="o">=</span> <span class="p">(</span><span class="n">sigmas</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">sig_log_ratio</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="n">R</span><span class="o">**</span><span class="mi">2</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Evaluate equation 8 to go from GM to requested IMC</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="n">R</span><span class="p">,</span> <span class="n">sig_log_ratio</span> <span class="o">=</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__GM2otherSigma</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">)</span>
+        <span class="n">R</span><span class="p">,</span> <span class="n">sig_log_ratio</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GM2otherSigma</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_out</span><span class="p">)</span>
         <span class="n">sigma_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">sigma_GM2</span> <span class="o">*</span> <span class="n">R</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">sig_log_ratio</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">sigma_out</span></div>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__checkIMC</span><span class="p">(</span><span class="n">imc</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Check that the requested IMC is available.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">imc</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span> <span class="ow">and</span> \
-           <span class="n">imc</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">MEDIAN_HORIZONTAL</span> <span class="ow">and</span> \
-           <span class="n">imc</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GMRotI50</span> <span class="ow">and</span> \
-           <span class="n">imc</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RotD50</span> <span class="ow">and</span> \
-           <span class="n">imc</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RANDOM_HORIZONTAL</span> <span class="ow">and</span> \
-           <span class="n">imc</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown IMC </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">imc</span><span class="p">)</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__GM2other</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">imc</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__GM2other</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">imc</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to extract coefficients from the parameters for</span>
 <span class="sd">        converting the median ground motions.</span>
@@ -231,38 +273,38 @@
 <span class="sd">                PGV, and computed from coefficients in Table 3 along with</span>
 <span class="sd">                eqn 10 for Sa.</span>
 
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError if unknown IMT specified.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-
         <span class="k">if</span> <span class="n">imc</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">AVERAGE_HORIZONTAL</span><span class="p">:</span>
             <span class="c1"># The amps are already in the B&amp;B &quot;reference&quot; type (&quot;GM&quot;, i.e.,</span>
             <span class="c1"># geometric mean)</span>
             <span class="k">return</span> <span class="mf">1.</span>
 
-        <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__checkIMC</span><span class="p">(</span><span class="n">imc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verifyConversion</span><span class="p">(</span><span class="n">imc</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">in</span> <span class="n">imt</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__pga_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c12&#39;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pga_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c12&#39;</span><span class="p">]</span>
         <span class="k">elif</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">in</span> <span class="n">imt</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__pgv_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c12&#39;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pgv_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c12&#39;</span><span class="p">]</span>
         <span class="k">elif</span> <span class="s1">&#39;SA&#39;</span> <span class="ow">in</span> <span class="n">imt</span><span class="p">:</span>
             <span class="n">pp</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">period</span>
             <span class="k">if</span> <span class="n">pp</span> <span class="o">&lt;=</span> <span class="mf">0.15</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c1&#39;</span><span class="p">]</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c1&#39;</span><span class="p">]</span>
             <span class="k">elif</span> <span class="n">pp</span> <span class="o">&lt;</span> <span class="mf">0.8</span><span class="p">:</span>
-                <span class="n">c1</span> <span class="o">=</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c1&#39;</span><span class="p">]</span>
-                <span class="n">c2</span> <span class="o">=</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c2&#39;</span><span class="p">]</span>
+                <span class="n">c1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c1&#39;</span><span class="p">]</span>
+                <span class="n">c2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c2&#39;</span><span class="p">]</span>
                 <span class="k">return</span> <span class="n">c1</span> <span class="o">+</span> <span class="p">(</span><span class="n">c2</span> <span class="o">-</span> <span class="n">c1</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pp</span> <span class="o">/</span> <span class="mf">0.15</span><span class="p">)</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">0.8</span> <span class="o">/</span> <span class="mf">0.15</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">pp</span> <span class="o">&lt;=</span> <span class="mf">5.0</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c2&#39;</span><span class="p">]</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c2&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Not sure what&#39;s right here; should probably raise an error</span>
                 <span class="c1"># but for now let&#39;s just use c2</span>
-                <span class="k">return</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c2&#39;</span><span class="p">]</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c2&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown IMT </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">imt</span><span class="p">)</span>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">__GM2otherSigma</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">imc</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__GM2otherSigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">imc</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to extract coefficients from the parameters for</span>
 <span class="sd">        converting standard deviations.</span>
@@ -274,6 +316,9 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            tuple: Coefficients: R (ratio of sigma values), standard deviation</span>
 <span class="sd">            of sigma ratios.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError if unknown IMT specified.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">if</span> <span class="n">imc</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">AVERAGE_HORIZONTAL</span><span class="p">:</span>
@@ -281,32 +326,52 @@
             <span class="c1"># geometric mean)</span>
             <span class="k">return</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span>
 
-        <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__checkIMC</span><span class="p">(</span><span class="n">imc</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verifyConversion</span><span class="p">(</span><span class="n">imc</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">in</span> <span class="n">imt</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__pga_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;R&#39;</span><span class="p">],</span>\
-                <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__pga_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c34&#39;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pga_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;R&#39;</span><span class="p">],</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">__pga_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c34&#39;</span><span class="p">]</span>
         <span class="k">elif</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">in</span> <span class="n">imt</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__pgv_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;R&#39;</span><span class="p">],</span>\
-                <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__pgv_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c34&#39;</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__pgv_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;R&#39;</span><span class="p">],</span>\
+                <span class="bp">self</span><span class="o">.</span><span class="n">__pgv_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c34&#39;</span><span class="p">]</span>
         <span class="k">elif</span> <span class="s1">&#39;SA&#39;</span> <span class="ow">in</span> <span class="n">imt</span><span class="p">:</span>
-            <span class="n">R</span> <span class="o">=</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
+            <span class="n">R</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;R&#39;</span><span class="p">]</span>
             <span class="n">pp</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">period</span>
             <span class="k">if</span> <span class="n">pp</span> <span class="o">&lt;=</span> <span class="mf">0.15</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c3&#39;</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c3&#39;</span><span class="p">]</span>
             <span class="k">elif</span> <span class="n">pp</span> <span class="o">&lt;</span> <span class="mf">0.8</span><span class="p">:</span>
-                <span class="n">c3</span> <span class="o">=</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c3&#39;</span><span class="p">]</span>
-                <span class="n">c4</span> <span class="o">=</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c4&#39;</span><span class="p">]</span>
+                <span class="n">c3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c3&#39;</span><span class="p">]</span>
+                <span class="n">c4</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c4&#39;</span><span class="p">]</span>
                 <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="n">c3</span> <span class="o">+</span> <span class="p">(</span><span class="n">c4</span> <span class="o">-</span> <span class="n">c3</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">pp</span> <span class="o">/</span> <span class="mf">0.15</span><span class="p">)</span> <span class="o">/</span>\
                     <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">0.8</span> <span class="o">/</span> <span class="mf">0.15</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">pp</span> <span class="o">&lt;=</span> <span class="mf">5.0</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c4&#39;</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c4&#39;</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Not sure what&#39;s right here; should probably raise an error</span>
                 <span class="c1"># but for now let&#39;s just use c4</span>
-                <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="n">BeyerBommer2006</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c4&#39;</span><span class="p">]</span>
+                <span class="k">return</span> <span class="n">R</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__sa_dict</span><span class="p">[</span><span class="n">imc</span><span class="p">][</span><span class="s1">&#39;c4&#39;</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown IMT </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">imt</span><span class="p">)</span></div>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown IMT </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">imt</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_verifyConversion</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper method to ensure that the conversion is possible.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            imc_in (IMC): OpenQuake IMC type of the input amp array.</span>
+<span class="sd">            imc_out (IMC): Desired OpenQuake IMC type of the output amps.</span>
+<span class="sd">                Default is None. Ignored by this method.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError if imc_in is not valid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">imc_in</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span> <span class="ow">and</span> \
+           <span class="n">imc_in</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">MEDIAN_HORIZONTAL</span> <span class="ow">and</span> \
+           <span class="n">imc_in</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GMRotI50</span> <span class="ow">and</span> \
+           <span class="n">imc_in</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RotD50</span> <span class="ow">and</span> \
+           <span class="n">imc_in</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">RANDOM_HORIZONTAL</span> <span class="ow">and</span> \
+           <span class="n">imc_in</span> <span class="o">!=</span> <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">HORIZONTAL</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown IMC </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">imc_in</span><span class="p">)</span></div>
 </pre></div>
 
           </div>

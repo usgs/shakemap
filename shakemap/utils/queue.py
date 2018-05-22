@@ -109,6 +109,7 @@ def parse_config(config):
     config['old_event_age'] = str_to_seconds(config['old_event_age'])
     config['future_event_age'] = str_to_seconds(config['future_event_age'])
     config['associate_interval'] = str_to_seconds(config['associate_interval'])
+    config['max_trigger_wait'] = str_to_seconds(config['max_trigger_wait'])
 
     boxes = OrderedDict()
     for key, value in config['boxes'].items():
@@ -244,31 +245,31 @@ def dispatch_event(eventid, logger, children, action, config):
         eventid (str): The event ID to process.
         logger (logger): The process logger.
         children (dict): The structure holding info on the child processes.
-        action (str): One of 'run', 'cancel', or 'test'. 'run' starts the
-                      process 'shake --autorun eventid', 'cancel' starts
-                      the process 'shake eventid cancel', and 'test' starts
-                      the process 'echo eventid'.
+        action (str): 'cancel', 'test', or some other string. 'cancel' starts
+                      the cancel process, 'test' starts the process
+                      'echo eventid'.  And any other string starts the
+                      shake process. See the configuration file 'queue.conf'
+                      for the exact commands that will be run.
         config (dict): The configuration dictionary.
 
     Returns:
         nothing: Nothing.
-
-    Raises:
-        ValueError: if action is not one of 'run', 'cance', or 'test'.
     """
-    if action == 'run':
-        logger.info('Running event %s' % eventid)
-        p = subprocess.Popen([config['shake_path'], '--log',
-                              '--autorun', eventid])
-    elif action == 'cancel':
+    if action == 'cancel':
         logger.info('Canceling event %s' % eventid)
-        p = subprocess.Popen([config['shake_path'], '--log',
-                              eventid, 'cancel'])
+        cmd = config['cancel_command'].replace('shake', config['shake_path'])
+        cmd = cmd.replace('<EVID>', eventid)
+        cmd = ' '.split(cmd)
+        p = subprocess.Popen(cmd)
     elif action == 'test':
         logger.info('Testing event %s' % eventid)
         p = subprocess.Popen(['echo', eventid])
     else:
-        raise ValueError('Unknown action "%s"' % action)
+        logger.info('Running event %s due to action %s' % (eventid, action))
+        cmd = config['shake_command'].replace('shake', config['shake_path'])
+        cmd = cmd.replace('<EVID>', eventid)
+        cmd = ' '.split(cmd)
+        p = subprocess.Popen(cmd)
 
     children[eventid] = {'popen': p, 'start_time': time.time()}
 

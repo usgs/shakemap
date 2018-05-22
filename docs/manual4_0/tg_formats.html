@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>2.3. Data Formats &#8212; ShakeMap Documentation  documentation</title>
+    <title>2.4. Data Formats &#8212; ShakeMap Documentation  documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
@@ -17,8 +17,8 @@
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="2.4. Verification" href="tg_verification.html" />
-    <link rel="prev" title="2.2. Data Processing" href="tg_processing.html" />
+    <link rel="next" title="2.5. Verification" href="tg_verification.html" />
+    <link rel="prev" title="2.3. Data Processing" href="tg_processing.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -34,9 +34,9 @@
           <div class="body" role="main">
             
   <div class="section" id="data-formats">
-<span id="sec-formats-4"></span><h1>2.3. Data Formats<a class="headerlink" href="#data-formats" title="Permalink to this headline">¶</a></h1>
+<span id="sec-formats-4"></span><h1>2.4. Data Formats<a class="headerlink" href="#data-formats" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="about-the-hdf5-file-format">
-<h2>2.3.1. About the HDF5 File Format<a class="headerlink" href="#about-the-hdf5-file-format" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.1. About the HDF5 File Format<a class="headerlink" href="#about-the-hdf5-file-format" title="Permalink to this headline">¶</a></h2>
 <p>HDF5 files are an efficient and flexible way to store large sets of
 structured data.  HDF stands for Hierachical Data Format and is an
 open-source project . The data
@@ -61,7 +61,7 @@ shakelib classes <strong>ShakeMapInputContainer</strong> and <strong>ShakeMapOut
 For documentation see the <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">shakelib container module</a>.</p>
 </div>
 <div class="section" id="shake-data-hdf">
-<h2>2.3.2. shake_data.hdf<a class="headerlink" href="#shake-data-hdf" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.2. shake_data.hdf<a class="headerlink" href="#shake-data-hdf" title="Permalink to this headline">¶</a></h2>
 <p><em>shake_data.hdf</em> is the input to the <strong>model</strong> module. It is built by
 bringing
 together the various ShakeMap configuration files (found in both the
@@ -76,7 +76,7 @@ developers, the file
 is accessed through the shakelib <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">ShakeMapInputContainer interface</a>.</p>
 </div>
 <div class="section" id="shake-result-hdf">
-<h2>2.3.3. shake_result.hdf<a class="headerlink" href="#shake-result-hdf" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.3. shake_result.hdf<a class="headerlink" href="#shake-result-hdf" title="Permalink to this headline">¶</a></h2>
 <p>The primary output product of the <strong>model</strong> module is the HDF5 file
 <em>shake_result.hdf</em>. There are some differences depending on whether
 <strong>model</strong> produces output grids or lists of points.  HDF5 files
@@ -268,7 +268,7 @@ the repository for ShakeMap
 <a class="reference external" href="https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m">here</a>.</p>
 </div>
 <div class="section" id="generic-amplification-factors">
-<h2>2.3.4. Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.4. Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h2>
 <p>The ShakeMap generic amplification factor facility supports the inclusion
 of linear amplifications that are not otherwise supported (by, for example,
 Vs30-based
@@ -352,7 +352,7 @@ between periods is undesirable, then grids matching the output IMTs should be
 provided. Etc.</p>
 </div>
 <div class="section" id="stationlist-geojson">
-<h2>2.3.5. Stationlist GeoJSON<a class="headerlink" href="#stationlist-geojson" title="Permalink to this headline">¶</a></h2>
+<h2>2.4.5. Stationlist GeoJSON<a class="headerlink" href="#stationlist-geojson" title="Permalink to this headline">¶</a></h2>
 <p>The <em>stationlist.json</em> file is a GeoJSON file describing the seismic station and
 macroseismic data that comprised the input to the ShakeMap. In addition, the file
 will contain predicted values and uncertainties for the station location from the
@@ -810,17 +810,18 @@ PGM (i.e., they will have the value ‘null’).</li>
 <li class="toctree-l3"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
 <li class="toctree-l4"><a class="reference internal" href="tg_architecture.html">2.1. Software Architecture</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_processing.html">2.2. Data Processing</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">2.3. Data Formats</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#about-the-hdf5-file-format">2.3.1. About the HDF5 File Format</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#shake-data-hdf">2.3.2. shake_data.hdf</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#shake-result-hdf">2.3.3. shake_result.hdf</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#generic-amplification-factors">2.3.4. Generic Amplification Factors</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#stationlist-geojson">2.3.5. Stationlist GeoJSON</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_queue.html">2.2. Queueing Events</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html">2.3. Data Processing</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">2.4. Data Formats</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#about-the-hdf5-file-format">2.4.1. About the HDF5 File Format</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shake-data-hdf">2.4.2. shake_data.hdf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shake-result-hdf">2.4.3. shake_result.hdf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#generic-amplification-factors">2.4.4. Generic Amplification Factors</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#stationlist-geojson">2.4.5. Stationlist GeoJSON</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="tg_verification.html">2.4. Verification</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.5. Guidelines for Contributors</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_verification.html">2.5. Verification</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.6. Guidelines for Contributors</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>

@@ -67,7 +67,8 @@ def do_periodic_tasks(handler, logger, data_path, config, children):
             logger.info('Running repeat of event %s' % eventid)
             # Update the XML because the DB may have newer information
             write_event_xml(data_path, event, logger)
-            queue.dispatch_event(eventid, logger, children, 'run', config)
+            queue.dispatch_event(eventid, logger, children,
+                                 'scheduled_repeat', config)
             rep_list.pop(0)
             if len(rep_list) == 0:
                 rep_list = None
@@ -121,7 +122,7 @@ def associate_all(handler, data_path, logger, config, children):
     event_list = handler.associateAll(pretty_print=True)
     for eventid in event_list:
         event = handler.getEvent(eventid)
-        process_origin(event, handler, data_path,
+        process_origin(event, 'data_association', handler, data_path,
                        logger, config, children)
 
     return
@@ -166,12 +167,15 @@ def write_event_xml(data_path, event, logger):
     return
 
 
-def process_origin(event, handler, data_path, logger, config, children):
+def process_origin(event, action, handler, data_path, logger, config,
+                   children):
     """ Determine if an event should be processed (or reprocessed) and
     dispatch it for processing.
 
     Args:
         event (dict): The event data structure.
+        action (str): The "type" of the trigger that caused this function
+                      to be called.
         handler (AmplitudeHandler object): An instance of the
                                            AmplitudeHandler object.
         data_path (str): The path where the ShakeMap data directories
@@ -229,6 +233,7 @@ def process_origin(event, handler, data_path, logger, config, children):
         # We've run this event before
         #
         update = True
+        mtw = config['max_trigger_wait']
         #
         # Whatever we decide below, we want to update the event
         # info in the database
@@ -241,33 +246,33 @@ def process_origin(event, handler, data_path, logger, config, children):
             # there's a repeat pretty soon
             #
             if event['repeats']:
-                if event['repeats'][0] > current_time + 300:
-                    event['repeats'].insert(0, current_time + 300)
+                if event['repeats'][0] > current_time + mtw:
+                    event['repeats'].insert(0, current_time + mtw)
             else:
-                event['repeats'] = [current_time + 300]
+                event['repeats'] = [current_time + mtw]
             handler.insertEvent(event, update=update)
             logger.info('Event %s is currently running, shelving this '
                         'update' % event['id'])
             return
         if event['repeats']:
             delta_t = current_time - event['repeats'][0]
-            if delta_t > -300:
+            if delta_t > -mtw:
                 # We're due for a rerun anyway, so just insert the
                 # new data in the database and return
                 handler.insertEvent(event, update=update)
                 logger.info('Event %s will repeat soon, shelving this '
                             'update' % event['id'])
                 return
-        if current_time - event['lastrun'] < 300:
+        if current_time - event['lastrun'] < mtw:
             #
             # We ran this event very recently, but don't have a repeat
             # scheduled in the near future, so let's skip this one
             # but make sure something happens relatively soon
             #
             if event['repeats']:
-                event['repeats'].insert(0, current_time + 300)
+                event['repeats'].insert(0, current_time + mtw)
             else:
-                event['repeats'] = [current_time + 300]
+                event['repeats'] = [current_time + mtw]
             handler.insertEvent(event, update=update)
             logger.info('Event %s ran recently, shelving this update' %
                         event['id'])
@@ -281,19 +286,21 @@ def process_origin(event, handler, data_path, logger, config, children):
 
     write_event_xml(data_path, event, logger)
 
-    queue.dispatch_event(event['id'], logger, children, 'run', config)
+    queue.dispatch_event(event['id'], logger, children, action, config)
 
     return
 
 
-def process_rupture(data, handler, data_path, logger, config, children):
-    """ A rupture model is available for an event. Treat this as
+def process_other(eventid, action, handler, data_path, logger, config,
+                  children):
+    """A trigger has been issued for an event. Treat this as
     an origin update. If the event in question is not in our
     database, ignore the message.
 
     Args:
-        data (dict): The dictionary must have an event ID
-                     under the 'id' key.
+        eventid (str): The event ID of the triggered event.
+        action (str): The "type" of the trigger that caused this function
+                      to be called.
         handler (AmplitudeHandler object): An instance of the
                                            AmplitudeHandler object.
         data_path (str): The path where the ShakeMap data directories
@@ -304,39 +311,12 @@ def process_rupture(data, handler, data_path, logger, config, children):
     Returns:
         nothing: Nothing.
     """
-    existing = handler.getEvent(data['id'])
+    existing = handler.getEvent(eventid)
     if existing:
-        process_origin(existing, handler, data_path, logger, config, children)
+        process_origin(existing, action, handler, data_path, logger, config,
+                       children)
     else:
-        logger.info('Rupture is for unprocessed event %s: ignoring' %
-                    data['id'])
-    return
-
-
-def process_moment_tensor(data, handler, data_path, logger, config, children):
-    """ A moment tensor is available for an event. Treat this as
-    an origin update. If the event in question is not in our
-    database, ignore the message.
-
-    Args:
-        data (dict): The dictionary must have an event ID
-                     under the 'id' key.
-        handler (AmplitudeHandler object): An instance of the
-                                           AmplitudeHandler object.
-        data_path (str): The path where the ShakeMap data directories
-                         live.
-        logger (object): The process logging object.
-        config (dict): The (cleaned-up) configuration object.
-
-    Returns:
-        nothing: Nothing.
-    """
-    existing = handler.getEvent(data['id'])
-    if existing:
-        process_origin(existing, handler, data_path, logger, config, children)
-    else:
-        logger.info('Moment tensor is for unprocessed event %s: ignoring' %
-                    data['id'])
+        logger.info('Trigger is for unprocessed event %s: ignoring' % eventid)
     return
 
 
@@ -509,26 +489,18 @@ def main(pargs):
             if cmd['type'] == 'origin':
                 logger.info('Received "origin" for event %s' %
                             cmd['data']['id'])
-                process_origin(cmd['data'], handler, data_path, logger,
-                               config, children)
-            elif cmd['type'] == 'rupture':
-                logger.info('Received "rupture" for event %s' %
-                            cmd['data']['id'])
-                process_rupture(cmd['data'], handler, data_path, logger,
-                                config, children)
-            elif cmd['type'] == 'moment-tensor':
-                logger.info('Received "moment-tensor" for event %s' %
-                            cmd['data']['id'])
-                process_moment_tensor(cmd['data'], handler, data_path, logger,
-                                      config, children)
+                process_origin(cmd['data'], 'origin', handler, data_path,
+                               logger, config, children)
             elif cmd['type'] == 'cancel':
                 logger.info('Received "cancel" for event %s' %
                             cmd['data']['id'])
                 process_cancel(cmd['data'], handler,  logger,
                                config, children)
             else:
-                logger.warning('Unknown trigger type: %s; ignoring' %
-                               cmd['type'])
+                logger.info('Received "%s" for event %s' %
+                            cmd['type'], cmd['data']['id'])
+                process_other(cmd['data']['id'], cmd['type'], handler,
+                              data_path, logger, config, children)
 
 
 if __name__ == '__main__':

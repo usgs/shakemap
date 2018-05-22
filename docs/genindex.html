@@ -69,8 +69,6 @@
 </li>
       <li><a href="shakelib/shakelib.gmice.ak07.html#shakelib.gmice.ak07.AK07">AK07 (class in shakelib.gmice.ak07)</a>
 </li>
-      <li><a href="shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.ampIMCtoIMC">ampIMCtoIMC() (shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006 static method)</a>
-</li>
       <li><a href="apidoc/shakemap.utils.amps.html#shakemap.utils.amps.AmplitudeHandler">AmplitudeHandler (class in shakemap.utils.amps)</a>
 </li>
       <li><a href="apidoc/shakemap.utils.config.html#shakemap.utils.config.annotatedfloat_type">annotatedfloat_type() (in module shakemap.utils.config)</a>
@@ -179,6 +177,8 @@
       </ul></li>
       <li><a href="apidoc/shakemap.utils.amps.html#shakemap.utils.amps.AmplitudeHandler.commit">commit() (shakemap.utils.amps.AmplitudeHandler method)</a>
 </li>
+      <li><a href="shakelib/shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter">ComponentConverter (class in shakelib.conversions.convert_imc)</a>
+</li>
       <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.computeGC2">computeGC2() (shakelib.rupture.base.Rupture method)</a>
 
       <ul>
@@ -189,12 +189,12 @@
         <li><a href="shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.computeGC2">(shakelib.rupture.quad_rupture.QuadRupture method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.computeRepi">computeRepi() (shakelib.rupture.base.Rupture method)</a>
 </li>
       <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.computeRhyp">computeRhyp() (shakelib.rupture.base.Rupture method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.computeRjb">computeRjb() (shakelib.rupture.base.Rupture method)</a>
 
       <ul>
@@ -247,10 +247,38 @@
 </li>
       <li><a href="apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.ContourModule">ContourModule (class in shakemap.coremods.contour)</a>
 </li>
-      <li><a href="shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmps">convertAmps() (shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017 method)</a>
+      <li><a href="shakelib/shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter.convertAmps">convertAmps() (shakelib.conversions.convert_imc.ComponentConverter method)</a>
+
+      <ul>
+        <li><a href="shakelib/shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.TypeConverter.convertAmps">(shakelib.conversions.convert_imt.TypeConverter method)</a>
 </li>
-      <li><a href="shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertStddevs">convertStddevs() (shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017 method)</a>
+        <li><a href="shakelib/shakelib.conversions.imt.bommer_alarcon_2006.html#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.convertAmps">(shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006 method)</a>
 </li>
+        <li><a href="shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.convertAmps">(shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982 method)</a>
+</li>
+      </ul></li>
+      <li><a href="shakelib/shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter.convertAmpsOnce">convertAmpsOnce() (shakelib.conversions.convert_imc.ComponentConverter method)</a>
+
+      <ul>
+        <li><a href="shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertAmpsOnce">(shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006 method)</a>
+</li>
+        <li><a href="shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce">(shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017 method)</a>
+</li>
+      </ul></li>
+      <li><a href="shakelib/shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter.convertSigmas">convertSigmas() (shakelib.conversions.convert_imc.ComponentConverter method)</a>
+
+      <ul>
+        <li><a href="shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.convertSigmas">(shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982 method)</a>
+</li>
+      </ul></li>
+      <li><a href="shakelib/shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter.convertSigmasOnce">convertSigmasOnce() (shakelib.conversions.convert_imc.ComponentConverter method)</a>
+
+      <ul>
+        <li><a href="shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertSigmasOnce">(shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006 method)</a>
+</li>
+        <li><a href="shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertSigmasOnce">(shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017 method)</a>
+</li>
+      </ul></li>
       <li><a href="apidoc/shakemap.coremods.base.html#shakemap.coremods.base.CoreModule">CoreModule (class in shakemap.coremods.base)</a>
 </li>
       <li><a href="apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_overlay_image">create_overlay_image() (in module shakemap.coremods.kml)</a>
@@ -547,7 +575,7 @@
 </li>
       <li><a href="apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.getContourLevels">getContourLevels() (in module shakemap.coremods.contour)</a>
 </li>
-      <li><a href="shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.getConversionFactor">getConversionFactor() (shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982 static method)</a>
+      <li><a href="shakelib/shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.TypeConverter.getConversionFactor">getConversionFactor() (shakelib.conversions.convert_imt.TypeConverter method)</a>
 </li>
       <li><a href="shakelib/shakelib.correlation.dummy.html#shakelib.correlation.dummy.DummyCorrelation.getCorrelation">getCorrelation() (shakelib.correlation.dummy.DummyCorrelation method)</a>
 
@@ -633,6 +661,8 @@
 </li>
       <li><a href="shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getIndividualWidths">getIndividualWidths() (shakelib.rupture.quad_rupture.QuadRupture method)</a>
 </li>
+      <li><a href="shakelib/shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.TypeConverter.getInputIMT">getInputIMT() (shakelib.conversions.convert_imt.TypeConverter method)</a>
+</li>
       <li><a href="shakelib/shakelib.directivity.rowshandel2013.html#shakelib.directivity.rowshandel2013.Rowshandel2013.getLD">getLD() (shakelib.directivity.rowshandel2013.Rowshandel2013 method)</a>
 </li>
       <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.getLength">getLength() (shakelib.rupture.base.Rupture method)</a>
@@ -645,7 +675,7 @@
         <li><a href="shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.getLength">(shakelib.rupture.quad_rupture.QuadRupture method)</a>
 </li>
       </ul></li>
-      <li><a href="shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.getLnSigma">getLnSigma() (shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982 static method)</a>
+      <li><a href="shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.getLnSigma">getLnSigma() (shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982 method)</a>
 </li>
       <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.getMetadata">getMetadata() (shakelib.utils.containers.ShakeMapOutputContainer method)</a>
 </li>
@@ -669,7 +699,7 @@
         <li><a href="shakelib/shakelib.gmice.wgrw12.html#shakelib.gmice.wgrw12.WGRW12.getMIfromGM">(shakelib.gmice.wgrw12.WGRW12 method)</a>
 </li>
       </ul></li>
-      <li><a href="shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getMinMax">getMinMax() (shakelib.gmice.gmice.GMICE static method)</a>
+      <li><a href="shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getMinMax">getMinMax() (shakelib.gmice.gmice.GMICE method)</a>
 </li>
       <li><a href="shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getName">getName() (shakelib.gmice.gmice.GMICE method)</a>
 </li>
@@ -711,6 +741,8 @@
 </li>
       <li><a href="shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getScale">getScale() (shakelib.gmice.gmice.GMICE method)</a>
 </li>
+      <li><a href="shakelib/shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter.getShortestPath">getShortestPath() (shakelib.conversions.convert_imc.ComponentConverter method)</a>
+</li>
       <li><a href="shakelib/shakelib.sites.html#shakelib.sites.Sites.getSitesContext">getSitesContext() (shakelib.sites.Sites method)</a>
 </li>
       <li><a href="shakelib/shakelib.correlation.boore_2003.html#shakelib.correlation.boore_2003.Boore2003.getSpatialCorrelation">getSpatialCorrelation() (shakelib.correlation.boore_2003.Boore2003 static method)</a>
@@ -738,8 +770,6 @@
 </li>
       </ul></li>
       <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getVersionHistory">getVersionHistory() (shakelib.utils.containers.ShakeMapContainer method)</a>
-</li>
-      <li><a href="shakelib/shakelib.conversions.imt.bommer_alarcon_2006.html#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.getVfact">getVfact() (shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006 static method)</a>
 </li>
       <li><a href="shakelib/shakelib.sites.html#shakelib.sites.Sites.getVs30Grid">getVs30Grid() (shakelib.sites.Sites method)</a>
 </li>
@@ -903,12 +933,12 @@
       </ul></li>
       <li><a href="apidoc/shakemap.utils.utils.html#shakemap.utils.utils.path_macro_sub">path_macro_sub() (in module shakemap.utils.utils)</a>
 </li>
-      <li><a href="shakelib/shakelib.conversions.imt.bommer_alarcon_2006.html#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.pgv2psa05">pgv2psa05() (shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006 static method)</a>
-</li>
-      <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.plot3d">plot3d() (shakelib.rupture.base.Rupture method)</a>
+      <li><a href="shakelib/shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter.pathSearch">pathSearch() (shakelib.conversions.convert_imc.ComponentConverter static method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.plot3d">plot3d() (shakelib.rupture.base.Rupture method)</a>
+</li>
       <li><a href="shakelib/shakelib.plotting.plotrupture.html#shakelib.plotting.plotrupture.plot_rupture_wire3d">plot_rupture_wire3d() (in module shakelib.plotting.plotrupture)</a>
 </li>
       <li><a href="apidoc/shakemap.coremods.plotregr.html#shakemap.coremods.plotregr.PlotRegr">PlotRegr (class in shakemap.coremods.plotregr)</a>
@@ -916,10 +946,6 @@
       <li><a href="shakelib/shakelib.rupture.point_rupture.html#shakelib.rupture.point_rupture.PointRupture">PointRupture (class in shakelib.rupture.point_rupture)</a>
 </li>
       <li><a href="apidoc/shakemap.utils.amps.html#shakemap.utils.amps.prettify">prettify() (in module shakemap.utils.amps)</a>
-</li>
-      <li><a href="shakelib/shakelib.conversions.imt.bommer_alarcon_2006.html#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.psa052pgv">psa052pgv() (shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006 static method)</a>
-</li>
-      <li><a href="shakelib/shakelib.conversions.imt.newmark_hall_1982.html#shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982.psa102pgv">psa102pgv() (shakelib.conversions.imt.newmark_hall_1982.NewmarkHall1982 static method)</a>
 </li>
       <li><a href="apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.ContourModule.psacap">psacap (shakemap.coremods.contour.ContourModule attribute)</a>
 
@@ -1045,6 +1071,10 @@
 </li>
       <li><a href="shakelib/shakelib.conversions.html#module-shakelib.conversions">shakelib.conversions (module)</a>
 </li>
+      <li><a href="shakelib/shakelib.conversions.convert_imc.html#module-shakelib.conversions.convert_imc">shakelib.conversions.convert_imc (module)</a>
+</li>
+      <li><a href="shakelib/shakelib.conversions.convert_imt.html#module-shakelib.conversions.convert_imt">shakelib.conversions.convert_imt (module)</a>
+</li>
       <li><a href="shakelib/shakelib.conversions.imc.html#module-shakelib.conversions.imc">shakelib.conversions.imc (module)</a>
 </li>
       <li><a href="shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#module-shakelib.conversions.imc.beyer_bommer_2006">shakelib.conversions.imc.beyer_bommer_2006 (module)</a>
@@ -1109,10 +1139,10 @@
 </li>
       <li><a href="shakelib/shakelib.rupture.origin.html#module-shakelib.rupture.origin">shakelib.rupture.origin (module)</a>
 </li>
-      <li><a href="shakelib/shakelib.rupture.point_rupture.html#module-shakelib.rupture.point_rupture">shakelib.rupture.point_rupture (module)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="shakelib/shakelib.rupture.point_rupture.html#module-shakelib.rupture.point_rupture">shakelib.rupture.point_rupture (module)</a>
+</li>
       <li><a href="shakelib/shakelib.rupture.quad_rupture.html#module-shakelib.rupture.quad_rupture">shakelib.rupture.quad_rupture (module)</a>
 </li>
       <li><a href="shakelib/shakelib.rupture.utils.html#module-shakelib.rupture.utils">shakelib.rupture.utils (module)</a>
@@ -1207,8 +1237,6 @@
 </li>
       <li><a href="shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer">ShakeMapOutputContainer (class in shakelib.utils.containers)</a>
 </li>
-      <li><a href="shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.sigmaIMCtoIMC">sigmaIMCtoIMC() (shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006 static method)</a>
-</li>
       <li><a href="shakelib/shakelib.sites.html#shakelib.sites.Sites">Sites (class in shakelib.sites)</a>
 </li>
       <li><a href="shakelib/shakelib.station.html#shakelib.station.StationList">StationList (class in shakelib.station)</a>
@@ -1227,11 +1255,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.text_to_json">text_to_json() (in module shakelib.rupture.factory)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/shakemap.utils.amps.html#shakemap.utils.amps.timestr_to_timestamp">timestr_to_timestamp() (in module shakemap.utils.amps)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="apidoc/shakemap.coremods.transfer.html#shakemap.coremods.transfer.TransferModule">TransferModule (class in shakemap.coremods.transfer)</a>
+</li>
+      <li><a href="shakelib/shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.TypeConverter">TypeConverter (class in shakelib.conversions.convert_imt)</a>
 </li>
   </ul></td>
 </tr></table>

@@ -221,11 +221,8 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Looking for rupture files...&#39;</span><span class="p">)</span>
         <span class="c1"># look for geojson versions of rupture files</span>
-        <span class="n">rupturefiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_fault.geojson&#39;</span><span class="p">))</span>
-        <span class="n">rupturefile</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">rupturefiles</span><span class="p">):</span>
-            <span class="n">rupturefile</span> <span class="o">=</span> <span class="n">rupturefiles</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="n">rupturefile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;rupture.json&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">rupturefile</span><span class="p">):</span>
             <span class="c1"># failing any of those, look for text file versions</span>
             <span class="n">rupturefiles</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;*_fault.txt&#39;</span><span class="p">))</span>
             <span class="n">rupturefile</span> <span class="o">=</span> <span class="kc">None</span>

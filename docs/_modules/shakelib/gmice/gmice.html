@@ -56,15 +56,14 @@
     <span class="k">def</span> <span class="nf">getDistanceType</span><span class="p">():</span>
         <span class="k">return</span> <span class="s1">&#39;rrup&#39;</span></div>
 
-<div class="viewcode-block" id="GMICE.getMinMax"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getMinMax">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">getMinMax</span><span class="p">():</span>
+<div class="viewcode-block" id="GMICE.getMinMax"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getMinMax">[docs]</a>    <span class="k">def</span> <span class="nf">getMinMax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Get the minimum and maximum MMI values produced by this GMICE.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Tuple of min and max values of GMICE.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">10.0</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_max</span></div>
 
 <div class="viewcode-block" id="GMICE.getName"><a class="viewcode-back" href="../../../shakelib/shakelib.gmice.gmice.html#shakelib.gmice.gmice.GMICE.getName">[docs]</a>    <span class="k">def</span> <span class="nf">getName</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

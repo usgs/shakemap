@@ -40,7 +40,7 @@ horizontal intensity measure components.</p>
 <dl class="class">
 <dt id="shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017">
 <em class="property">class </em><code class="descclassname">shakelib.conversions.imc.boore_kishida_2017.</code><code class="descname">BooreKishida2017</code><span class="sig-paren">(</span><em>imc_in</em>, <em>imc_out</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter" title="shakelib.conversions.convert_imc.ComponentConverter"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.conversions.convert_imc.ComponentConverter</span></code></a></p>
 <p>This class implements the Boore and Kishida (2017) conversions for
 horizontal intensity measure components.</p>
 <p>This class explicitly supports the following subset of the conversions
@@ -57,13 +57,10 @@ provided by B&amp;K (specified as OpenQuake IMCs):</p>
 </ul>
 </div></blockquote>
 <p>Not supported are IMCs for which there is no OpenQuake equivalent;
-also not supported are chained conversions (that is, we do not
-support conversions from A to C when conversions from A to B and
-B to C are available; these must be done in two steps. For IMCs
-not explicitly
-supported by B&amp;K, we assume the IMC is equivalent to the geometric
-mean (which B&amp;K call GM_AR), based on our reading of
-Beyer &amp; Bommer (2006).</p>
+chain conversions are supported when using <cite>convertAmps</cite>. Otherwise
+conversions must be done in two+ steps using <cite>convertAmpsOnce</cite>. For IMCs
+not explicitly supported by B&amp;K, we assume the IMC is equivalent
+to the geometric mean (which B&amp;K call GM_AR).</p>
 <p>References</p>
 <blockquote>
 <div><p>Boore, D.M. and T. Kishida (2017). Relations between some
@@ -75,23 +72,9 @@ and between aleatory variabilities for different definitions of the
 horizontal component of motion. Bulletin of the Seismological Society
 of America, 96(4A), 1512-1522.</p>
 </div></blockquote>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>imc_in</strong> (<em>OpenQuake IMC</em>) – The IMC of the ground motions to be
-converted.</li>
-<li><strong>imc_out</strong> (<em>OpenQuake IMC</em>) – The IMC to which the ground motions
-are to be converted.</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
 <dl class="method">
-<dt id="shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmps">
-<code class="descname">convertAmps</code><span class="sig-paren">(</span><em>imt</em>, <em>amps</em>, <em>rrups</em>, <em>mag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017.convertAmps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmps" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce">
+<code class="descname">convertAmpsOnce</code><span class="sig-paren">(</span><em>imt</em>, <em>amps</em>, <em>rrups</em>, <em>mag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017.convertAmpsOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of amps converted from one IMC to another.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -114,7 +97,10 @@ containing the rupture distances of the ground motions.</li>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">array</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the IMT is not an allowed type.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If mag and rrup are none or the IMT</li>
+<li>is not an allowed type.</li>
+</ul>
 </td>
 </tr>
 </tbody>
@@ -122,8 +108,8 @@ containing the rupture distances of the ground motions.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertStddevs">
-<code class="descname">convertStddevs</code><span class="sig-paren">(</span><em>imt</em>, <em>stddevs</em>, <em>rrups</em>, <em>mag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017.convertStddevs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertStddevs" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertSigmasOnce">
+<code class="descname">convertSigmasOnce</code><span class="sig-paren">(</span><em>imt</em>, <em>sigmas</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017.convertSigmasOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertSigmasOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of standard deviations converted from one IMC
 to another.</p>
 <p>Note that the action of this method is to always increase the
@@ -138,10 +124,8 @@ inflated by both conversions via this method.</p>
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
 <li><strong>imt</strong> (<em>OpenQuake IMT</em>) – The intensity measure type of the input
 ground motions. Valid IMTs are PGA, PGV, and SA.</li>
-<li><strong>stddevs</strong> (<em>array</em>) – A numpy array of the standard deviations of
+<li><strong>sigmas</strong> (<em>array</em>) – A numpy array of the standard deviations of
 the logged ground motions.</li>
-<li><strong>rrups</strong> (<em>array</em>) – Ignored by this method.</li>
-<li><strong>mag</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Ignored by this method.</li>
 </ul>
 </td>
 </tr>
@@ -151,7 +135,10 @@ the logged ground motions.</li>
 <tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">array</p>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If the IMT is not an allowed type.</p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><ul class="first last simple">
+<li><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If mag and rrup are none or the IMT</li>
+<li>is not an allowed type.</li>
+</ul>
 </td>
 </tr>
 </tbody>
@@ -198,6 +185,8 @@ the logged ground motions.</li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.imt.html">shakelib.conversions.imt</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.convert_imc.html">shakelib.conversions.convert_imc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.convert_imt.html">shakelib.conversions.convert_imt</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>

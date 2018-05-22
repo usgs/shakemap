@@ -38,68 +38,43 @@
 <dl class="class">
 <dt id="shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006">
 <em class="property">class </em><code class="descclassname">shakelib.conversions.imt.bommer_alarcon_2006.</code><code class="descname">BommerAlarcon2006</code><a class="reference internal" href="../_modules/shakelib/conversions/imt/bommer_alarcon_2006.html#BommerAlarcon2006"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="shakelib.conversions.convert_imt.html#shakelib.conversions.convert_imt.TypeConverter" title="shakelib.conversions.convert_imt.TypeConverter"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.conversions.convert_imt.TypeConverter</span></code></a></p>
 <p>Class for conversion between PGV (units of cm/s) and PSA05 (units of g)
 by Bommer and Alarcon (2006).</p>
 <ul class="simple">
 <li>PSA05 stands for spectral acceleration with oscillator period of 0.5 sec</li>
 <li>PGV is peak ground velocity.</li>
 </ul>
-<dl class="docutils">
-<dt>To do</dt>
-<dd><ul class="first last simple">
-<li>Inherit from ConvertIMT class.</li>
-</ul>
-</dd>
-</dl>
 <p class="rubric">References</p>
 <p>Bommer, J. J., &amp; Alarcon, J. E. (2006). The prediction and use of peak
 ground velocity. Journal of Earthquake Engineering, 10(01), 1-31.
 <a class="reference external" href="http://www.worldscientific.com/doi/abs/10.1142/S1363246906002463">[link]</a></p>
-<dl class="staticmethod">
-<dt id="shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.pgv2psa05">
-<em class="property">static </em><code class="descname">pgv2psa05</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/bommer_alarcon_2006.html#BommerAlarcon2006.pgv2psa05"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.pgv2psa05" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert PGV in cm/s to PSA05 in g.
-<strong>Important:</strong> PGV must be linear units.</p>
+<dl class="method">
+<dt id="shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.convertAmps">
+<code class="descname">convertAmps</code><span class="sig-paren">(</span><em>imt_in</em>, <em>imt_out</em>, <em>imt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/bommer_alarcon_2006.html#BommerAlarcon2006.convertAmps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.convertAmps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an array of converted IMT amplitude values.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>pgv</strong> – Numpy array or float of PGV values; linear units.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>imt_in</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – OQ intensity measure type. Same as type as the input
+values defined by the imt variable.</li>
+<li><strong>imt_out</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – OQ intensity measure type that the values will
+be converted to.</li>
+<li><strong>imt</strong> (<em>OpenQuake IMT</em>) – The intensity measure type of the input
+ground motions. Valid IMTs are PGV, and SA.</li>
+</ul>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Numpy array or float of PSA05 (spectral acceleration with
-oscillator period of 0.5 sec) converted from PGV.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Numpy array of amps converted from imt_in to imt_out.</p>
+</td>
 </tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.psa052pgv">
-<em class="property">static </em><code class="descname">psa052pgv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/bommer_alarcon_2006.html#BommerAlarcon2006.psa052pgv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.psa052pgv" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert PSA05 (spectral acceleration with oscillator period of 0.5 sec)
-in g to PGV cm/s.
-<strong>Important:</strong> PSA10 must be linear units.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>psa05</strong> – Numpy array or float of PSA05 values; linear units.</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first">array</p>
+</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">Numpy array or float of PGV converted from psa05.</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="staticmethod">
-<dt id="shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.getVfact">
-<em class="property">static </em><code class="descname">getVfact</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imt/bommer_alarcon_2006.html#BommerAlarcon2006.getVfact"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imt.bommer_alarcon_2006.BommerAlarcon2006.getVfact" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">The Bommer and Alarcon (2006) conversion factor.</td>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/exceptions.html#ValueError" title="(in Python v3.6)"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ValueError</span></code></a> – If not a valid conversion.</p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -145,6 +120,8 @@ in g to PGV cm/s.
 <li class="toctree-l4"><a class="reference internal" href="shakelib.conversions.imt.newmark_hall_1982.html">shakelib.conversions.imt.newmark_hall_1982</a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.convert_imc.html">shakelib.conversions.convert_imc</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.conversions.convert_imt.html">shakelib.conversions.convert_imt</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a></li>

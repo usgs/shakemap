@@ -17,6 +17,7 @@ ShakeMap software are indicated in parentheses.
    :maxdepth: 1
 
    tg_architecture.rst
+   tg_queue.rst
    tg_processing.rst
    tg_formats.rst
    tg_verification.rst
