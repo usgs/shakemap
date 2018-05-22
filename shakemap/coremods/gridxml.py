@@ -187,7 +187,6 @@ class GridXMLModule(CoreModule):
             if event_dict['event_id'].endswith('_se'):
                 shake_dict['shakemap_event_type'] = 'SCENARIO'
 
-            print(field_keys)
             shake_grid = ShakeGrid(
                 layers, geodict, event_dict,
                 shake_dict, {}, field_keys=field_keys)

@@ -245,7 +245,7 @@ def getProjectedPolygon(polygon, m):
     for interior in polygon.interiors:
         try:
             intlon, intlat = zip(*interior.coords[:])
-        except:
+        except Exception:
             pass
         intx, inty = m(intlon, intlat)
         ints.append(list(zip(intx, inty)))
@@ -747,7 +747,7 @@ class MapMaker(object):
             'info.json'))['input']['event_information']
         eloc = edict['event_description']
         etime = datetime.strptime(
-            edict['origin_time'], '%Y-%m-%d %H:%M:%S')
+            edict['origin_time'], '%Y-%m-%dT%H:%M:%SZ')
         timestr = etime.strftime('%b %d, %Y %H:%M:%S')
         mag = origin.mag
         if hlon < 0:
@@ -1008,7 +1008,8 @@ class MapMaker(object):
                     y = xyz[:, 1]
                     m.plot(x, y, 'k', latlon=True, zorder=SCALE_ZORDER)
 
-        # if event is a scenario, make watermark of the word scenario diagonally across map
+        # if event is a scenario, make watermark of the word scenario
+        # diagonally across map
         metadata = self.container.getMetadata()
         eventid = metadata['input']['event_information']['event_id']
         if eventid.endswith('_se'):
@@ -1281,7 +1282,8 @@ class MapMaker(object):
         # draw title and supertitle
         self._drawTitle(imt)
 
-        # if event is a scenario, make watermark of the word scenario diagonally across map
+        # if event is a scenario, make watermark of the word scenario
+        # diagonally across map
         metadata = self.container.getMetadata()
         eventid = metadata['input']['event_information']['event_id']
         if eventid.endswith('_se'):
