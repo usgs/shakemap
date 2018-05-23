@@ -36,14 +36,14 @@
   <div class="section" id="module-shakelib.conversions.convert_imt">
 <span id="shakelib-conversions-convert-imt"></span><h1>shakelib.conversions.convert_imt<a class="headerlink" href="#module-shakelib.conversions.convert_imt" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="shakelib.conversions.convert_imt.TypeConverter">
-<em class="property">class </em><code class="descclassname">shakelib.conversions.convert_imt.</code><code class="descname">TypeConverter</code><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#TypeConverter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.TypeConverter" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.conversions.convert_imt.IMTConverter">
+<em class="property">class </em><code class="descclassname">shakelib.conversions.convert_imt.</code><code class="descname">IMTConverter</code><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/abc.html#abc.ABC" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></a></p>
 <p>Base class for implementing conversions between intensity
 measurement types (IMT).</p>
 <dl class="method">
-<dt id="shakelib.conversions.convert_imt.TypeConverter.convertAmps">
-<code class="descname">convertAmps</code><span class="sig-paren">(</span><em>imt_in</em>, <em>imt_out</em>, <em>imt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#TypeConverter.convertAmps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.TypeConverter.convertAmps" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.conversions.convert_imt.IMTConverter.convertAmps">
+<code class="descname">convertAmps</code><span class="sig-paren">(</span><em>imt_in</em>, <em>imt_out</em>, <em>imt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter.convertAmps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter.convertAmps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns an array of converted IMT amplitude values.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -73,8 +73,8 @@ ground motions. Valid IMTs are PGV, and SA.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="shakelib.conversions.convert_imt.TypeConverter.getConversionFactor">
-<code class="descname">getConversionFactor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#TypeConverter.getConversionFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.TypeConverter.getConversionFactor" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.conversions.convert_imt.IMTConverter.getConversionFactor">
+<code class="descname">getConversionFactor</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter.getConversionFactor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter.getConversionFactor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper method that returns the conversion factor.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -89,8 +89,8 @@ ground motions. Valid IMTs are PGV, and SA.</li>
 </dd></dl>
 
 <dl class="method">
-<dt id="shakelib.conversions.convert_imt.TypeConverter.getInputIMT">
-<code class="descname">getInputIMT</code><span class="sig-paren">(</span><em>imt_out</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#TypeConverter.getInputIMT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.TypeConverter.getInputIMT" title="Permalink to this definition">¶</a></dt>
+<dt id="shakelib.conversions.convert_imt.IMTConverter.getInputIMT">
+<code class="descname">getInputIMT</code><span class="sig-paren">(</span><em>imt_out</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/convert_imt.html#IMTConverter.getInputIMT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.convert_imt.IMTConverter.getInputIMT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get valid input IMT types that can be converted to the specified imt_out.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
