@@ -34,11 +34,13 @@ class BooreKishida2017(ComponentConverter):
         - GMRotI50 <=> GREATER_OF_TWO_HORIZONTAL
         - AVERAGE_HORIZONTAL <=> GREATER_OF_TWO_HORIZONTAL
 
-    Not supported are IMCs for which there is no OpenQuake equivalent;
-    chain conversions are supported when using `convertAmps`. Otherwise
+    Chain conversions are supported when using `convertAmps`. Otherwise
     conversions must be done in two+ steps using `convertAmpsOnce`. For IMCs
     not explicitly supported by B&K, we assume the IMC is equivalent
     to the geometric mean (which B&K call GM_AR).
+
+    Notes
+        - Assumes ALL unknown IMC types are AVERAGE_HORIZONTAL.
 
     References
 
@@ -93,6 +95,9 @@ class BooreKishida2017(ComponentConverter):
                 'Greater of two horizontal',
                 'Average Horizontal (RotD50)'])
         }
+        # Check if any imc values are unknown. If they are, convert
+        # to AVERAGE_HORIZONTAL
+        self.checkUnknown()
         # Get shortest conversion "path" between imc_in and imc_out
         self.path = self.getShortestPath(self.conversion_graph,
                 self.imc_in, self.imc_out)
@@ -314,3 +319,5 @@ class BooreKishida2017(ComponentConverter):
             self.pars = None
         else:
             self.pars = pd.read_csv(filename)
+
+BooreKishida2017('blerg', 'blerg')

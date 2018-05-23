@@ -170,16 +170,17 @@ def test_bb06():
     np.testing.assert_allclose(amps_out, amps_target, atol=1e-5)
     np.testing.assert_allclose(sigs_out, sigs_target, atol=1e-5)
 
-    # Test that an invalid parameter raises an exception
-    with pytest.raises(Exception) as a:
-        bb06 = BeyerBommer2006('wrong', imc_out[0])
-        tmp = bb06.convertAmps(imt_in[0], amps_in)
-    with pytest.raises(Exception) as a:
-        bb06 = BeyerBommer2006(imc_out[0], 'wrong')
-        tmp = bb06.convertAmps(imt_in[0], amps_in)
-    with pytest.raises(Exception) as a:
-        bb06 = BeyerBommer2006(imc_in[0], imc_out[0])
-        tmp = bb06.convertAmps(imt_in[0], 'wrong')
+    # Test that an invalid/unknown parameter is changed to AVERAGE_HORIZONTAL
+    bb06 = BeyerBommer2006('wrong', imc_out[0])
+    assert bb06.imc_in == 'Average horizontal'
+    assert bb06.imc_out == imc_out[0]
+    bb06 = BeyerBommer2006(imc_out[0], 'wrong')
+    assert bb06.imc_in == imc_out[0]
+    assert bb06.imc_out == 'Average horizontal'
+    bb06 = BeyerBommer2006('wrong', 'wrong')
+    assert bb06.imc_in == 'Average horizontal'
+    assert bb06.imc_out == 'Average horizontal'
+
 
     # Test that the correct input/output imc returns the right path
     bb06 = BeyerBommer2006('Median horizontal', 'Random horizontal')
