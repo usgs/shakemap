@@ -829,9 +829,9 @@ class ModelModule(CoreModule):
                 #
                 # Compute the bias denominator and numerator terms
                 #
-                self.bias_den[imtstr] = Z.T.dot(sigma22inv.dot(Z))
-                self.bias_num[imtstr] = \
-                    Z.T.dot(sigma22inv.dot(Z * sta_resids_dl))
+                ztmp = Z.T.dot(sigma22inv)
+                self.bias_num[imtstr] = ztmp.dot(Z * sta_resids_dl)[0][0]
+                self.bias_den[imtstr] = ztmp.dot(Z)[0][0]
             else:
                 self.bias_num[imtstr] = 0.0
                 self.bias_den[imtstr] = 0.0

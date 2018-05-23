@@ -12,19 +12,20 @@ from mapio.grid2d import Grid2D
 def get_period_from_imt(imtstr):
     return float(imtstr.replace('SA(', '').replace(')', ''))
 
+
 def get_generic_amp_factors(sx, myimt):
     """
     Returns an array of generic amplification factors the same shape
     as the lons and lats members of sx. The amplification factors are
     pulled from the grids in the operator's configured directory:
     '<install>/data/GenericAmpFactors'. Any HDF files in that directory
-    will be considerd amplification files and will be examined for 
+    will be considerd amplification files and will be examined for
     factors that apply to the coordinates in sx. The factors are
     assumed to be in natural log units and will be added to the output
     of the GMPE (or IPE). For coordinates outside the available grids,
     zero will be returned. If more than one file contains amplifications
-    for any of the coordinates (i.e., overlapping grids), then the 
-    factors will be summed together. It is the operator's responsibility 
+    for any of the coordinates (i.e., overlapping grids), then the
+    factors will be summed together. It is the operator's responsibility
     to ensure the proper behavior is observed for the selected output
     IMTs considering:
 
@@ -35,7 +36,7 @@ def get_generic_amp_factors(sx, myimt):
         - If 'myimt' is spectral acceleration (i.e., 'SA(x)' where
           'x' is the period), and SA of that period is not found in the
           HDF file, the function will first attempt to interpolate the
-          grids of the next lower and next greater periods found in 
+          grids of the next lower and next greater periods found in
           the file. The interpolation is done as a weighted average
           of the grids with the weights being defined assigned by
           the log difference in periods. If the period of 'myimt' is
@@ -65,7 +66,7 @@ def get_generic_amp_factors(sx, myimt):
         return None
     gaf_files = glob.glob(os.path.join(gaf_dir, '*.hdf'))
     if len(gaf_files) == 0:
-        logging.warn("No generic amplification files founs.")
+        logging.warn("No generic amplification files found.")
         return None
 
     gaf = np.zeros_like(sx.lats)
@@ -89,10 +90,10 @@ def get_generic_amp_factors(sx, myimt):
             mygrid, _ = gc.getGrid(thisimt)
         elif not thisimt.startswith('SA('):
             logging.warn("Generic Amp Factors: IMT %s not found in file %s"
-                    % (myimt, gfile))
+                         % (myimt, gfile))
             mygrid = None
         else:
-            # Get the weighted average grid based on the 
+            # Get the weighted average grid based on the
             # periods bracketing the input IMT
             mygrid, metadata = _get_average_grid(gc, contents, thisimt)
 
@@ -103,6 +104,7 @@ def get_generic_amp_factors(sx, myimt):
         # Sum into output array
         gaf += amp_factors
     return gaf
+
 
 def _get_average_grid(gc, contents, myimt):
     """
@@ -154,4 +156,3 @@ def _get_average_grid(gc, contents, myimt):
         w2 = 1.0 - w1
         gmean = g1.getData() * w1 + g2.getData() * w2
         return Grid2D(gmean, g1.getGeoDict()), md1
-
