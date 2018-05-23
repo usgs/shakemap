@@ -725,6 +725,70 @@ depth="25.00" locstring="280km SE of Kodiak, Alaska" netid="us" network=""/>
         shutil.rmtree(tempdir)
 
 
+def test_fromOrientation():
+    py = [0, 0.5]
+    px = [0, 0.5]
+    pz = [10, 20]
+    dx = [5, 7]
+    dy = [8, 5]
+    width = [10, 40]
+    length = [20, 50]
+    strike = [0, 90]
+    dip = [30, 20]
+
+    # Rupture requires an origin even when not used:
+    origin = Origin({'id': 'test',
+                     'lon': 0, 'lat': 0,
+                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                     'network': '', 'locstring': '',
+                     'time': HistoricTime.utcfromtimestamp(time.time())})
+    rupture = QuadRupture.fromOrientation(px, py, pz, dx, dy, length, width,
+                        strike, dip, origin)
+    p1 = rupture._geojson['features'][0]['geometry']['coordinates'][0][0][0]
+    p2 = rupture._geojson['features'][0]['geometry']['coordinates'][0][0][1]
+    p3 = rupture._geojson['features'][0]['geometry']['coordinates'][0][0][2]
+    p4 = rupture._geojson['features'][0]['geometry']['coordinates'][0][0][3]
+    p5 = rupture._geojson['features'][0]['geometry']['coordinates'][0][1][0]
+    p6 = rupture._geojson['features'][0]['geometry']['coordinates'][0][1][1]
+    p7 = rupture._geojson['features'][0]['geometry']['coordinates'][0][1][2]
+    p8 = rupture._geojson['features'][0]['geometry']['coordinates'][0][1][3]
+
+    # Check depths
+    np.testing.assert_allclose(p1[2], 6)
+    np.testing.assert_allclose(p2[2], 6)
+    np.testing.assert_allclose(p3[2], 11)
+    np.testing.assert_allclose(p4[2], 11)
+    np.testing.assert_allclose(p5[2], 18.2898992834)
+    np.testing.assert_allclose(p6[2], 18.2898992834)
+    np.testing.assert_allclose(p7[2], 31.9707050164)
+    np.testing.assert_allclose(p8[2], 31.9707050164)
+
+    # Exception raised if no origin
+    with pytest.raises(Exception) as a:
+        rupture = QuadRupture.fromOrientation(px, py, pz, dx, dy, length, width,
+                            strike, dip, None)
+
+    # Exception raised if different lengths of arrays
+    with pytest.raises(Exception) as a:
+        py = [0, 2]
+        px = [0]
+        pz = [10]
+        dx = [5]
+        dy = [8]
+        width = [10]
+        length = [20]
+        strike = [0]
+        dip = [30]
+
+        origin = Origin({'id': 'test',
+                         'lon': 0, 'lat': 0,
+                         'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+                         'network': '', 'locstring': '',
+                         'time': HistoricTime.utcfromtimestamp(time.time())})
+        rupture = QuadRupture.fromOrientation(px, py, pz, dx, dy, length, width,
+                            strike, dip, origin)
+
+
 if __name__ == "__main__":
     test_text_to_json()
     test_rupture_from_dict()
@@ -737,3 +801,4 @@ if __name__ == "__main__":
     test_incorrect()
     test_fromTrace()
     test_with_quakeml()
+    test_fromOrientation()

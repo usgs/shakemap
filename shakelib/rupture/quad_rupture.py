@@ -7,6 +7,7 @@ from datetime import datetime
 # third party imports
 import numpy as np
 from openquake.hazardlib.geo.mesh import Mesh
+from openquake.hazardlib.geo.geodetic import point_at
 from openquake.hazardlib.geo.point import Point
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 
@@ -414,6 +415,107 @@ class QuadRupture(Rupture):
             f.write(u'>\n')
         if not hasattr(rupturefile, 'read'):
             f.close()
+
+    @classmethod
+    def fromOrientation(cls, px, py, pz, dx, dy, length, width,
+                        strike, dip, origin):
+        """
+        Create a QuadRupture instance from a known point, shape, and orientation.
+
+        A point is defined as a set of latitude, longitude, and depth, which
+        is located in the corner between the tail of the vector pointing in
+        the strike direction and the dip direction (nearest to the surface).
+        The shape is defined by length, width, dx, and dy. The length is the
+        measurement of the quadrilateral in the direction of strike, and
+        width is the measurement of quadrilateral in the direction of dip.
+        Dx is the measurement on the plane in the strike direction between
+        the known point and the corner between the tail of the vector pointing
+        in the strike direction and the dip direction (nearest to the surface).
+        Dy is the measurement on the plane in the dip direction between
+        the known point and the corner between the tail of the vector pointing
+        in the strike direction and the dip direction (nearest to the surface).
+        The orientation is defined by azimuth and angle from
+        horizontal, strike and dip respectively. For example in plane view:
+            ::
+                            strike direction
+                        p1*------------------->>p2
+                        *        | dy           |
+                 dip    |--------o              |
+              direction |   dx    known point   | Width
+                        V                       |
+                        V                       |
+                        p4----------------------p3
+                                Length
+
+        Args:
+            px (array): Array or list of longitudes (floats) of the known point.
+            py (array): Array or list of latitudes (floats) of the known point.
+            pz (array): Array or list of depths (floats) of the known point.
+            dx (array): Array or list of distances (floats), in the strike
+                direction, between the known point and P1. dx must be less than
+                length.
+            dy (array): Array or list of distances (floats), in the dip
+                direction, between the known point and P1. dy must be less than
+                width.
+            length (array): Array or list of widths (floats) of the plane in
+                the strike direction.
+            width (array): Array or list of widths (floats) of the plane in the
+                dip direction.
+            strike (array): Array or list of strike angles (floats).
+            dip (array): Array or list of dip angles (floats).
+            origin (Origin): Reference to a ShakeMap Origin object.
+        Returns:
+            QuadRupture instance.
+        """
+        # Verify that arrays are of equal length
+        if len(px) == len(py) == len(pz) == len(
+                dx) == len(dy) == len(length) == len(width) == len(
+                strike) == len(dip):
+            pass
+        else:
+            raise ShakeLibException(
+                'Number of px, py, pz, dx, dy, length, width, '
+                'strike, dip points must be '
+                'equal.')
+
+        # Verify that all are numpy arrays
+        px = np.array(px, dtype='d')
+        py = np.array(py, dtype='d')
+        pz = np.array(pz, dtype='d')
+        dx = np.array(dx, dtype='d')
+        dy = np.array(dy, dtype='d')
+        length = np.array(length, dtype='d')
+        width = np.array(width, dtype='d')
+        strike = np.array(strike, dtype='d')
+        dip = np.array(dip, dtype='d')
+
+        # Get P1 and P2 (top horizontal points)
+        theta = np.rad2deg(np.arctan((dy * np.cos(np.deg2rad(dip))) / dx))
+        P1_direction = strike + 180 + theta
+        P1_distance = np.sqrt( dx**2 + (dy * np.cos(np.deg2rad(dip)))**2)
+        P2_direction = strike
+        P2_distance = length
+        P1_lon = []
+        P1_lat = []
+        P2_lon = []
+        P2_lat = []
+        for idx, value in enumerate(px):
+            P1_points = point_at(px[idx], py[idx],
+                    P1_direction[idx], P1_distance[idx])
+            P1_lon += [P1_points[0]]
+            P1_lat += [P1_points[1]]
+            P2_points = point_at(P1_points[0], P1_points[1],
+                    P2_direction[idx], P2_distance[idx])
+            P2_lon += [P2_points[0]]
+            P2_lat += [P2_points[1]]
+
+        # Get top depth
+        top_horizontal_depth = pz - np.abs(dy * np.sin(np.deg2rad(dip)))
+
+        # Get QuadRupture object
+        quad = QuadRupture.fromTrace(P1_lon, P1_lat, P2_lon, P2_lat,
+                top_horizontal_depth, width, dip, origin, strike=strike)
+        return quad
 
     @classmethod
     def fromVertices(cls,
