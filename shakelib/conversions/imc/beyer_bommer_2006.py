@@ -43,6 +43,7 @@ class BeyerBommer2006(ComponentConverter):
         - The OQ IMC "HORIZONAL" indicates that the horizontal IMC category
           may be ambiguous. In these cases, we are assuming that it is a
           random horizontal component as a default.
+        - Assumes ALL unknown IMC types are AVERAGE_HORIZONTAL
 
     References
 
@@ -112,6 +113,9 @@ class BeyerBommer2006(ComponentConverter):
                'Average Horizontal (RotD50)',
                'Random horizontal',
                'Horizontal']),}
+        # Check if any imc values are unknown. If they are, convert
+        # to AVERAGE_HORIZONTAL
+        self.checkUnknown()
         # Get shortest conversion "path" between imc_in and imc_out
         self.path = self.getShortestPath(self.conversion_graph,
                 self.imc_in, self.imc_out)

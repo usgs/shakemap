@@ -1,7 +1,7 @@
 # Standard library imports
 from abc import ABC, abstractmethod
 
-class TypeConverter(ABC):
+class IMTConverter(ABC):
     """Base class for implementing conversions between intensity
     measurement types (IMT)."""
 
@@ -15,7 +15,7 @@ class TypeConverter(ABC):
                 values defined by the imt variable.
             imt_out (str): OQ intensity measure type that the values will
                 be converted to.
-            imt (OpenQuake IMT): The intensity measure type of the input
+            imt (OpenQuake IMT): The intensity measurements of the input
                 ground motions. Valid IMTs are PGV, and SA.
 
         Returns:
@@ -41,7 +41,7 @@ class TypeConverter(ABC):
         Get valid input IMT types that can be converted to the specified imt_out.
 
         Args:
-            imt (str): OQ intensity measure type.
+            imt_out (str): OQ intensity measure type.
 
         Returns:
             list: List of valid input IMT types. If not available types

@@ -5,10 +5,10 @@ import copy
 import numpy as np
 
 # Local imports
-from shakelib.conversions.convert_imt import TypeConverter
+from shakelib.conversions.convert_imt import IMTConverter
 
 
-class NewmarkHall1982(TypeConverter):
+class NewmarkHall1982(IMTConverter):
     """
     Class for conversion between PGA and PSA10 by Newmark and Hall (1982).
 
@@ -53,7 +53,7 @@ class NewmarkHall1982(TypeConverter):
                 values defined by the imt variable.
             imt_out (str): OQ intensity measure type that the values will
                 be converted to.
-            imt (OpenQuake IMT): The intensity measure type of the input
+            imt (OpenQuake IMT): The intensity measurements of the input
                 ground motions. Valid IMTs are PGV, and SA.
 
         Returns:

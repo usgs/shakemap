@@ -203,16 +203,16 @@ def test_bk17():
         print(repr(amps_out))
         print(repr(sigs_out))
 
-    # Test that an invalid parameter raises an exception
-    with pytest.raises(Exception) as a:
-        bk17 = BooreKishida2017('wrong', imc_out[0])
-        tmp = bk17.convertAmps(imt_in[0], amps_in)
-    with pytest.raises(Exception) as a:
-        bk17 = BooreKishida2017(imc_out[0], 'wrong')
-        tmp = bk17.convertAmps(imt_in[0], amps_in)
-    with pytest.raises(Exception) as a:
-        bk17 = BooreKishida2017(imc_in[0], imc_out[0])
-        tmp = bk17.convertAmps(imt_in[0], 'wrong')
+    # Test that an invalid/unknown parameter is changed to AVERAGE_HORIZONTAL
+    bk17 = BooreKishida2017('wrong', imc_out[0])
+    assert bk17.imc_in == 'Average horizontal'
+    assert bk17.imc_out == imc_out[0]
+    bk17 = BooreKishida2017(imc_out[0], 'wrong')
+    assert bk17.imc_in == imc_out[0]
+    assert bk17.imc_out == 'Average horizontal'
+    bk17 = BooreKishida2017('wrong', 'wrong')
+    assert bk17.imc_in == 'Average horizontal'
+    assert bk17.imc_out == 'Average horizontal'
 
     # Test that the correct input/output imc returns the right path
     bk17 = BooreKishida2017('Average horizontal',
