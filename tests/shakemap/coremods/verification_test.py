@@ -8,6 +8,7 @@ from shakemap.coremods.assemble import AssembleModule
 from shakemap.coremods.xtestplot import XTestPlot
 from shakemap.coremods.xtestplot_spectra import XTestPlotSpectra
 from shakemap.coremods.xtestimage import XTestImage
+from shakemap.coremods.xtestplot_multi import XTestPlotMulti
 from shakemap.coremods.plotregr import PlotRegr
 
 ########################################################################
@@ -54,6 +55,19 @@ def test_verification():
         plot.execute()
         regr = PlotRegr('verification_test_0011')
         regr.execute()
+
+        #
+        # Test xtestplot_multi on event 0008x
+        #
+        for vt in ('8a', '8b', '8c', '8d', '8e'):
+            assemble = AssembleModule('verification_test_000%s' % vt,
+                                      comment='Test comment.')
+            assemble.execute()
+            model = ModelModule('verification_test_000%s' % vt)
+            model.execute()
+        plot = XTestPlotMulti('verification_test_0008')
+        plot.execute()
+
     finally:
         data_file = os.path.join(datapath, 'verification_test_0006', 'current',
                                  'shake_data.hdf')
@@ -79,6 +93,16 @@ def test_verification():
                                 'products', 'shake_results.hdf')
         if os.path.isfile(res_file):
             os.remove(res_file)
+        for vt in ('8a', '8b', '8c', '8d', '8e'):
+            evid = 'verification_test_000%s' % vt
+            data_file = os.path.join(datapath, evid, 'current',
+                                     'shake_data.hdf')
+            if os.path.isfile(data_file):
+                os.remove(data_file)
+            res_file = os.path.join(datapath, evid, 'current',
+                                    'products', 'shake_results.hdf')
+            if os.path.isfile(res_file):
+                os.remove(res_file)
 
 
 if __name__ == '__main__':
