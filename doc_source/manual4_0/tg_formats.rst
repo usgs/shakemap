@@ -49,7 +49,7 @@ It is generally not necessary for operators to access this file other
 than through the interfaces of **assemble** and **augment**. For
 developers, the file
 is accessed through the shakelib `ShakeMapInputContainer interface 
-<https://usgs.github.io/shakelib/shakelib.utils.container.html>`_.
+<https://usgs.github.io/shakemap/shakelib/shakelib.utils.containers.html>`.
 
 shake_result.hdf
 ================
@@ -66,7 +66,7 @@ the HDF5 data format can be found
 
 *shake_result.hdf* consists of a number of groups and datasets. Our
 implementation of HDF5 uses groups to contain Python dictionaries,
-strings, and numpy arrays.  Dictionaries are stored as recursive groups.
+strings, and numpy arrays.  Dictionaries are stored as JSON strings.
 For example, a Python *config* dictionary consisting of the following information:
 
 .. code-block:: python
@@ -79,20 +79,23 @@ For example, a Python *config* dictionary consisting of the following informatio
         'depth': 34.0,
     }
 
-would be stored in a group called ``__dictionary_config__``, with attributes
-'name' and 'depth'.  There will be a sub-group called 'gmpe_set', with an attribute
-called 'Active_Crustal'.  Groups like this can contain any number (within reason)
-of dictionaries, which can consist of a number of Python data types (strings, numbers,
-numpy arrays, etc.) *shake_result.hdf* contains the following elements:  
+would be stored as a JSON string in a dataset called ``__config__``,
+under a group called ``__dictionaries__``. In languages that support
+JSON, these strings can be easily converted into a data
+structure. Developers can access these properties using the
+`ShakeMapInputContainer interface
+<https://usgs.github.io/shakemap/shakelib/shakelib.utils.containers.html>`.
+
+*shake_result.hdf* contains the following elements:
 
 +-----------------------+---------+-------------+-----------------------------------------+
 | Name                  | HDF Type| Python Type | Contents                                |
 +=======================+=========+=============+=========================================+
-| config                | group   | dictionary  | ShakeMap configuration                  |
+| config                | dataset   | dictionary  | ShakeMap configuration                  |
 +-----------------------+---------+-------------+-----------------------------------------+
-| info.json             | group   | string      | ShakeMap metadata in JSON format        |
+| info.json             | dataset   | string      | ShakeMap metadata in JSON format        |
 +-----------------------+---------+-------------+-----------------------------------------+
-| rupture.json          | group   | string      | GeoJSON representation of the           |
+| rupture.json          | dataset   | string      | GeoJSON representation of the           |
 |                       |         |             | finite fault                            |
 +-----------------------+---------+-------------+-----------------------------------------+
 | stationlist.json      | dataset | string      | GeoJSON stationlist                     |
