@@ -119,7 +119,7 @@ def test_profile():
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
                               shell=False)
-        ipath = os.path.join(os.path.abspath(os.sep), 'zzx?*@yzzskx') + '\n'
+        ipath = os.path.join(os.path.abspath(os.sep), 'zzx/yzzskx') + '\n'
         op.communicate((ipath + ipath + ipath).encode('ascii'))
         assert op.returncode
 
@@ -129,7 +129,7 @@ def test_profile():
                               stderr=subprocess.PIPE,
                               shell=False)
         ipath = os.path.join(shakedir, 'junkprofile', 'install') + '\n'
-        dpath = os.path.join(os.path.abspath(os.sep), 'zzxyzzskx') + '\n'
+        dpath = os.path.join(os.path.abspath(os.sep), 'zzxy/zzskx') + '\n'
         op.communicate((ipath + dpath + dpath + dpath).encode('ascii'))
         assert op.returncode
 
