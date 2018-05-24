@@ -1011,7 +1011,7 @@ def test_chichi_with_get_distance():
     i1 = i0 + 10
     cs = list(zip(i0, i1))
     df = pd.read_fwf(f, cs, skiprows=2, nrows=5, header=None)
-    mat = df.as_matrix()
+    mat = df.values
     ix = np.arange(0, 9 * 3, 3)
     iy = ix + 1
     iz = ix + 2
@@ -1050,16 +1050,16 @@ def test_chichi_with_get_distance():
     distfile = os.path.join(homedir, 'distance_data/NGAW2_distances.csv')
     df = pd.read_csv(distfile)
     df2 = df.loc[df['EQID'] == 137]
-    slat = df2['Station Latitude'].as_matrix()
-    slon = df2['Station Longitude'].as_matrix()
+    slat = df2['Station Latitude'].values
+    slon = df2['Station Longitude'].values
     sdep = np.zeros(slat.shape)
-    nga_repi = df2['EpiD (km)'].as_matrix()
-    nga_rhypo = df2['HypD (km)'].as_matrix()
-    nga_rrup = df2['ClstD (km)'].as_matrix()
-    nga_rjb = df2['Joyner-Boore Dist. (km)'].as_matrix()
-    nga_rx = df2['T'].as_matrix()
-    nga_T = df2['T'].as_matrix()
-    nga_U = df2['U'].as_matrix()
+    nga_repi = df2['EpiD (km)'].values
+    nga_rhypo = df2['HypD (km)'].values
+    nga_rrup = df2['ClstD (km)'].values
+    nga_rjb = df2['Joyner-Boore Dist. (km)'].values
+    nga_rx = df2['T'].values
+    nga_T = df2['T'].values
+    nga_U = df2['U'].values
     test_ry = np.array([
         -49.25445446, -76.26871272, -37.1288192, -53.47792996,
         -50.30711637, -63.96322125, -61.01988704, -81.2001781,

@@ -156,8 +156,7 @@ class GridXMLModule(CoreModule):
             config = container.getConfig()
 
             # event dictionary
-            info_data = container.getString('info.json')
-            info = json.loads(info_data)
+            info = container.getMetadata()
             event_info = info['input']['event_information']
             event_dict = {}
             event_dict['event_id'] = event_info['event_id']
