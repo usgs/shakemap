@@ -334,8 +334,7 @@ class MapMaker(object):
         station_dict = container.getStationDict()
         self.stations = station_dict
         rupture_dict = container.getRuptureDict()
-        info_dict = json.loads(
-            container.getString('info.json'))['input']['event_information']
+        info_dict = container.getMetadata()['input']['event_information']
         event_dict = {
             'id': info_dict['event_id'],
             'netid': info_dict['eventsource'],
@@ -743,8 +742,7 @@ class MapMaker(object):
         origin = self.fault.getOrigin()
         hlon = origin.lon
         hlat = origin.lat
-        edict = json.loads(self.container.getString(
-            'info.json'))['input']['event_information']
+        edict = self.container.getMetadata()['input']['event_information']
         eloc = edict['event_description']
         etime = datetime.strptime(
             edict['origin_time'], '%Y-%m-%dT%H:%M:%SZ')
