@@ -4,12 +4,14 @@
 import sys
 import os.path
 
+# third party imports
 import numpy as np
 import pytest
 
 # local imports
 from shakelib.sites import Sites
 import shakelib.sites as sites
+
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
@@ -328,6 +330,24 @@ def test_sites(vs30file=None):
          [686.,  686.,  686.,  686.,  686.,  686.,  686.,  686.,  686.,
           686.,  686.]])
     np.testing.assert_allclose(grd, grd_target)
+
+    # Test bounds
+    nx, ny = mysite.getNxNy()
+    assert nx == len(grd_target[0])
+    assert ny == len(grd_target)
+
+    # Check exception for invalid lat/lon shapes
+    with pytest.raises(Exception) as a:
+        sample_dict = {'lats': np.array(['0','0']),
+                'lons': np.array(['0'])}
+        sc = mysite.getSitesContext(lldict=sample_dict, rock_vs30=None)
+
+    # Check invalid file
+    with pytest.raises(Exception) as a:
+        vs30file = os.path.join(homedir, 'sites_data/Wrong.grd')
+        mysite = Sites.fromCenter(cx, cy, xspan, yspan, dx, dy,
+                                  vs30File=vs30file, padding=True,
+                                  resample=False)
 
 
 if __name__ == '__main__':

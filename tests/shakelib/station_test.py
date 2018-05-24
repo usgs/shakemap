@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 
 # stdlib modules
-import sys
 import os.path
 import pickle
+import sys
 
 # third party modules
 import numpy as np
 
 # local imports
 from shakelib.station import StationList
+
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
@@ -76,9 +77,13 @@ def test_station():
 
     inputfile = os.path.join(datadir, 'hist_dat.xml')
     dyfifile = os.path.join(datadir, 'dyfi_dat.xml')
+    len_stat1 = len(stations.getStationDictionary(instrumented=True)[0]['id'])
     xmlfiles = [inputfile, dyfifile]
-
     stations = stations.addData(xmlfiles)
+    len_stat2 = len(stations.getStationDictionary(instrumented=True)[0]['id'])
+
+    # Check that more stations were added
+    assert len_stat2 > len_stat1
 
     df1, _ = stations.getStationDictionary(instrumented=True)
     df2, _ = stations.getStationDictionary(instrumented=False)
@@ -118,8 +123,21 @@ def test_station2():
     stations = StationList.loadFromXML(xmlfiles, ":memory:")
 
     df1, _ = stations.getStationDictionary(instrumented=True)
+    # Check Keys pressent
+    assert 'PGA' in _
+    assert 'PGV' in _
+    assert 'SA(0.3)' in _
+    assert 'SA(1.0)' in _
+    assert 'SA(3.0)' in _
+    assert 'PGV_sd' in df1
+    assert 'PGV' in df1
+    assert 'SA(0.3)' in df1
+    assert 'SA(1.0)' in df1
+    assert 'SA(3.0)' in df1
+    assert 'id' in df1
     df2, _ = stations.getStationDictionary(instrumented=False)
-
+    # Check Keys pressent
+    assert 'MMI' in _
     ppath = os.path.abspath(os.path.join(datadir, '..', 'database',
                                          'test3.pickle'))
     if SAVE:
