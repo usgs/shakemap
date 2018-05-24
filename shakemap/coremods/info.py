@@ -1,6 +1,7 @@
 # stdlib imports
 import os.path
 from collections import OrderedDict
+import json
 
 # third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
@@ -21,12 +22,12 @@ class InfoModule(CoreModule):
     # can be created by this module.
     contents = OrderedDict.fromkeys(['supplementalInformation'])
     cap = 'ShakeMap processing parameters and map summary information.'
-    contents['supplementalInformation'] = {'title':'Supplemental Information',
-                             'caption':cap,
-                             'formats':[{'filename':'info.json',
-                                         'type':'application/json'}
-                                       ]
-                            }
+    contents['supplementalInformation'] = {'title': 'Supplemental Information',
+                                           'caption': cap,
+                                           'formats': [{'filename': 'info.json',
+                                                        'type': 'application/json'}
+                                                       ]
+                                           }
 
     def execute(self):
         """
@@ -50,9 +51,9 @@ class InfoModule(CoreModule):
 
         # create ShakeMap metadata file
         self.logger.debug('Writing info.json file...')
-        infostring = container.getString('info.json')
+        info = container.getMetadata()
+        infostring = json.dumps(info)
         info_file = os.path.join(datadir, 'info.json')
         f = open(info_file, 'wt')
         f.write(infostring)
         f.close()
-

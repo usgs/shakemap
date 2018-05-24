@@ -267,7 +267,7 @@ class ModelModule(CoreModule):
         # store it in the output container
         #
         info = self._getInfo(moutgrid)
-        oc.setString('info.json', json.dumps(info))
+        oc.setDictionary('info.json', info)
 
         # ------------------------------------------------------------------
         # Add the rupture JSON as a text string

@@ -16,7 +16,7 @@ from shakelib.rupture.origin import Origin
 from shakelib.station import StationList
 import shakemap.utils.queue as queue
 
-GROUPS = {'imt': '__imts__'}
+GROUPS = {'imt': 'imts'}
 
 
 class ShakeMapContainer(GridHDFContainer):
@@ -151,10 +151,9 @@ class ShakeMapContainer(GridHDFContainer):
         if not isinstance(stationdict, dict):
             fmt = 'Input object is not a dictionary.'
             raise TypeError(fmt)
-        if 'stations_dict' in self.getStrings():
-            self.dropStrings('stations_dict')
-        stationstring = json.dumps(stationdict)
-        self.setString('stations_dict', stationstring)
+        if 'stations_dict' in self.getDictionaries():
+            self.dropDictionary('stations_dict')
+        self.setDictionary('stations_dict', stationdict)
 
     def getStationDict(self):
         """
@@ -166,9 +165,9 @@ class ShakeMapContainer(GridHDFContainer):
             AttributeError: If station dictionary has not been set in
                 the container.
         """
-        if 'stations_dict' not in self.getStrings():
+        if 'stations_dict' not in self.getDictionaries():
             raise AttributeError('Station dictionary not set in container.')
-        stations = json.loads(self.getString('stations_dict'))
+        stations = self.getDictionary('stations_dict')
         return stations
 
     def setVersionHistory(self, history_dict):
@@ -331,7 +330,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             str or None: Either 'grid' or 'points' or None.
         """
 
-        group_name = '__file_data_type__'
+        group_name = 'file_data_type'
         if group_name in self._hdfobj:
             data_type_group = self._hdfobj[group_name]
             return data_type_group.attrs['data_type']
@@ -392,8 +391,8 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         Returns:
             dict: Metadata dictionary.
         """
-        info_str = self.getString('info.json')
-        return json.loads(info_str)
+        info = self.getDictionary('info.json')
+        return info
 
     def setDataType(self, datatype):
         """
@@ -411,7 +410,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         if datatype != 'points' and datatype != 'grid':
             raise TypeError('Trying to set unknown data type: %s' %
                             (datatype))
-        group_name = '__file_data_type__'
+        group_name = 'file_data_type'
         if group_name in self._hdfobj:
             data_type_group = self._hdfobj[group_name]
             current_data_type = data_type_group.attrs['data_type']
@@ -455,7 +454,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         self.setDataType('grid')
 
         # create name of group containing IMT datasets
-        imt_name = '__%s_%s__' % (imt_name, component)
+        imt_name = '%s_%s' % (imt_name, component)
         if GROUPS['imt'] not in self._hdfobj:
             imt_group = self._hdfobj.create_group(GROUPS['imt'])
         else:
@@ -508,7 +507,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         if self.getDataType() != 'grid':
             raise TypeError('Requesting grid data from file containing points')
 
-        group_name = '__%s_%s__' % (imt_name, component)
+        group_name = '%s_%s' % (imt_name, component)
         if GROUPS['imt'] not in self._hdfobj:
             raise LookupError('No IMTs stored in HDF file %s'
                               % (self.getFileName()))
@@ -585,7 +584,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             raise ValueError('All input arrays must be the same shape')
 
         # set up the name of the group holding all the information for the IMT
-        sub_group_name = '__%s_%s__' % (imt_name, component)
+        sub_group_name = '%s_%s' % (imt_name, component)
         if GROUPS['imt'] not in self._hdfobj:
             imt_group = self._hdfobj.create_group(GROUPS['imt'])
         else:
@@ -639,7 +638,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         if self.getDataType() != 'points':
             raise TypeError('Requesting point data from file containing grids')
 
-        sub_group_name = '__%s_%s__' % (imt_name, component)
+        sub_group_name = '%s_%s' % (imt_name, component)
         if GROUPS['imt'] not in self._hdfobj:
             imt_group = self._hdfobj.create_group(GROUPS['imt'])
         else:
@@ -701,7 +700,6 @@ class ShakeMapOutputContainer(ShakeMapContainer):
 
         imt_groups = list(self._hdfobj[GROUPS['imt']].keys())
         for imt_group in imt_groups:
-            imt_group = imt_group.replace('__', '')
             parts = imt_group.split('_')
             imt = parts[0]
             comp = '_'.join(parts[1:])
@@ -728,7 +726,6 @@ class ShakeMapOutputContainer(ShakeMapContainer):
 
         imt_groups = list(self._hdfobj[GROUPS['imt']].keys())
         for imt_group in imt_groups:
-            imt_group = imt_group.replace('__', '')
             parts = imt_group.split('_')
             imt = parts[0]
             comp = '_'.join(parts[1:])
@@ -753,7 +750,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         imt_group = self._hdfobj[GROUPS['imt']]
         components = self.getComponents(imt_name)
         for component in components:
-            group_name = '__%s_%s__' % (imt_name, component)
+            group_name = '%s_%s' % (imt_name, component)
             if group_name not in imt_group:
                 raise LookupError('No group called %s in HDF file %s'
                                   % (imt_name, self.getFileName()))
