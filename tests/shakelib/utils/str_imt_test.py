@@ -32,6 +32,12 @@ def test_imt():
     except ValueError as ve:
         assert 1 == 1
 
+    # Test that a fileimt that is the same as ['PGA', 'PGV', 'MMI']
+    # is simply returned
+    assert file_to_oq('PGA') == 'PGA'
+    assert file_to_oq('PGV') == 'PGV'
+    assert file_to_oq('MMI') == 'MMI'
+
 
 if __name__ == '__main__':
     test_imt()

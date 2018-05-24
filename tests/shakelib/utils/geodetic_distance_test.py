@@ -1,7 +1,9 @@
 #!/usr/bin/env python
 
+# third party imports
 import numpy as np
 
+# local imports
 from shakelib.utils.distance import (geodetic_distance_fast,
                                      geodetic_distance_haversine)
 

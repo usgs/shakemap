@@ -1,13 +1,19 @@
 #!/usr/bin/env python
+
+# stdlib imports
 import io
 import os.path
+
+# third party imports
+import numpy as np
 import pytest
 
-from shakelib.rupture.origin import Origin
-from shakelib.rupture.factory import get_rupture
+# local imports
+from shakelib.utils.exception import ShakeLibException
 from shakelib.utils.utils import get_extent, is_stable
+from shakelib.rupture.factory import get_rupture
+from shakelib.rupture.origin import Origin
 
-import numpy as np
 
 homedir = os.path.dirname(os.path.abspath(__file__))
 datadir = os.path.join(homedir, 'utils_data')
@@ -157,6 +163,11 @@ def test_extent_config():
     cmp_extent = [-100, -95, 32, 37]
     np.testing.assert_almost_equal(extent, cmp_extent)
 
+def test_exception():
+    exception = ShakeLibException('Test exception')
+    # Check __str__ override is correct
+    assert str(exception) == "'Test exception'"
+
 
 if __name__ == '__main__':
     test_get_extent_small_point()
@@ -167,3 +178,4 @@ if __name__ == '__main__':
     test_get_extent_stable_large()
     test_is_stable()
     test_extent_config()
+    test_exception()
