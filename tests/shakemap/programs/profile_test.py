@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
 import os
-import shutil
 import subprocess
 import tempfile
 
-from shakemap.utils.config import get_config_paths
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..', '..'))
@@ -121,7 +119,7 @@ def test_profile():
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
                               shell=False)
-        ipath = os.path.join(os.path.abspath(os.sep), 'zzxyzzskx') + '\n'
+        ipath = os.path.join(os.path.abspath(os.sep), 'zzx?*@yzzskx') + '\n'
         op.communicate((ipath + ipath + ipath).encode('ascii'))
         assert op.returncode
 
