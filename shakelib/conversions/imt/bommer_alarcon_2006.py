@@ -1,7 +1,7 @@
 # Local imports
-from shakelib.conversions.convert_imt import TypeConverter
+from shakelib.conversions.convert_imt import IMTConverter
 
-class BommerAlarcon2006(TypeConverter):
+class BommerAlarcon2006(IMTConverter):
     """
     Class for conversion between PGV (units of cm/s) and PSA05 (units of g)
     by Bommer and Alarcon (2006).
@@ -33,7 +33,7 @@ class BommerAlarcon2006(TypeConverter):
                 values defined by the imt variable.
             imt_out (str): OQ intensity measure type that the values will
                 be converted to.
-            imt (OpenQuake IMT): The intensity measure type of the input
+            imt (OpenQuake IMT): The intensity measurements of the input
                 ground motions. Valid IMTs are PGV, and SA.
 
         Returns:

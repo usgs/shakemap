@@ -5,6 +5,18 @@ from abc import ABC, abstractmethod
 class ComponentConverter(ABC):
     """Base class for implementing conversions between components."""
 
+    def checkUnknown(self):
+        """
+        Checks if imc_in or imc_out is an unknown type.
+
+        If of an unknown type, it is automatically set
+        to AVERAGE_HORIZONTAL.
+        """
+        if self.imc_in not in self.conversion_graph:
+            self.imc_in = 'Average horizontal'
+        if self.imc_out not in self.conversion_graph:
+            self.imc_out = 'Average horizontal'
+
     def convertAmps(self, imt, amps, rrups=None, mag=None):
         """
         Return an array of amps converted from one IMC to another.
