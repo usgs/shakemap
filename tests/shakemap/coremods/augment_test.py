@@ -10,7 +10,7 @@ from shakemap.coremods.augment import AugmentModule
 from shakemap.coremods.assemble import AssembleModule
 
 ########################################################################
-# Test sm_augment
+# Test augment coremod
 ########################################################################
 
 
@@ -153,6 +153,22 @@ def test_augment():
             os.remove(data_file)
 
 
+def test_augment_command_line():
+    installpath, datapath = get_config_paths()
+
+    cp = subprocess.run(['shake', 'integration_test_0001', 'assemble', '-c',
+                         'Assemble comment'], shell=False)
+    assert not cp.returncode
+    cp = subprocess.run(['shake', 'integration_test_0001', 'augment', '-c',
+                         'Augment comment'], shell=False)
+    assert not cp.returncode
+    data_file = os.path.join(datapath, 'integration_test_0001', 'current',
+                             'shake_data.hdf')
+    if os.path.isfile(data_file):
+        os.remove(data_file)
+
+
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'
     test_augment()
+    test_augment_command_line()

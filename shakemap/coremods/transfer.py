@@ -16,7 +16,7 @@ from impactutils.transfer.factory import get_sender_class
 from .base import CoreModule
 from shakemap.utils.config import get_config_paths, get_data_path
 
-TIMEFMT = '%Y-%m-%d %H:%M:%S'
+TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
 NO_TRANSFER = 'NO_TRANSFER'
 
@@ -185,29 +185,35 @@ def _get_properties(info):
     product_properties['event-description'] = origin['event_description']
 
     # other metadata
-    mmi_info = info['output']['ground_motions']['MMI']
-    product_properties['maxmmi'] = mmi_info['max']
-    product_properties['maxmmi-grid'] = mmi_info['max_grid']
+    if 'MMI' in info['output']['ground_motions']:
+        mmi_info = info['output']['ground_motions']['MMI']
+        product_properties['maxmmi'] = mmi_info['max']
+        product_properties['maxmmi-grid'] = mmi_info['max_grid']
 
-    pgv_info = info['output']['ground_motions']['PGV']
-    product_properties['maxpgv'] = pgv_info['max']
-    product_properties['maxpgv-grid'] = pgv_info['max_grid']
+    if 'PGV' in info['output']['ground_motions']:
+        pgv_info = info['output']['ground_motions']['PGV']
+        product_properties['maxpgv'] = pgv_info['max']
+        product_properties['maxpgv-grid'] = pgv_info['max_grid']
 
-    pga_info = info['output']['ground_motions']['PGA']
-    product_properties['maxpga'] = pga_info['max']
-    product_properties['maxpga-grid'] = pga_info['max_grid']
+    if 'PGA' in info['output']['ground_motions']:
+        pga_info = info['output']['ground_motions']['PGA']
+        product_properties['maxpga'] = pga_info['max']
+        product_properties['maxpga-grid'] = pga_info['max_grid']
 
-    psa03_info = info['output']['ground_motions']['SA(0.3)']
-    product_properties['maxpsa03'] = psa03_info['max']
-    product_properties['maxpsa03-grid'] = psa03_info['max_grid']
+    if 'SA(0.3)' in info['output']['ground_motions']:
+        psa03_info = info['output']['ground_motions']['SA(0.3)']
+        product_properties['maxpsa03'] = psa03_info['max']
+        product_properties['maxpsa03-grid'] = psa03_info['max_grid']
 
-    psa10_info = info['output']['ground_motions']['SA(1.0)']
-    product_properties['maxpsa10'] = psa10_info['max']
-    product_properties['maxpsa10-grid'] = psa10_info['max_grid']
+    if 'SA(1.0)' in info['output']['ground_motions']:
+        psa10_info = info['output']['ground_motions']['SA(1.0)']
+        product_properties['maxpsa10'] = psa10_info['max']
+        product_properties['maxpsa10-grid'] = psa10_info['max_grid']
 
-    psa30_info = info['output']['ground_motions']['SA(3.0)']
-    product_properties['maxpsa30'] = psa30_info['max']
-    product_properties['maxpsa30-grid'] = psa30_info['max_grid']
+    if 'SA(3.0)' in info['output']['ground_motions']:
+        psa30_info = info['output']['ground_motions']['SA(3.0)']
+        product_properties['maxpsa30'] = psa30_info['max']
+        product_properties['maxpsa30-grid'] = psa30_info['max_grid']
 
     product_properties['minimum-longitude'] = \
         info['output']['map_information']['min']['longitude']

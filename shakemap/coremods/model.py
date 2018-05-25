@@ -359,6 +359,7 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         # Outlier parameters
         # ------------------------------------------------------------------
+        self.do_outliers = self.config['data']['outlier']['do_outliers']
         self.outlier_deviation_level = \
             self.config['data']['outlier']['max_deviation']
         self.outlier_max_mag = self.config['data']['outlier']['max_mag']
@@ -545,8 +546,9 @@ class ModelModule(CoreModule):
                 # Do the outlier flagging if we have a fault, or we don't
                 # have a fault but the event magnitude is under the limit
                 # ----------------------------------------------------------
-                if not isinstance(self.rupture_obj, PointRupture) or \
-                   self.rx.mag <= self.outlier_max_mag:
+                if self.do_outliers and \
+                        (not isinstance(self.rupture_obj, PointRupture) or
+                         self.rx.mag <= self.outlier_max_mag):
                     #
                     # turn off nan warnings for this statement
                     #
@@ -1082,7 +1084,10 @@ class ModelModule(CoreModule):
 
         # the following items are primarily useful for PDL
         info[ip][ei]['eventsource'] = self.rupture_obj._origin.netid
+        info[ip][ei]['netid'] = self.rupture_obj._origin.netid
         info[ip][ei]['eventsourcecode'] = \
+            self.rupture_obj._origin.id
+        info[ip][ei]['id'] = \
             self.rupture_obj._origin.id
         info[ip][ei]['productcode'] = self.rupture_obj._origin.productcode
         info[ip][ei]['productsource'] = self.config['system']['source_network']
@@ -1197,6 +1202,7 @@ class ModelModule(CoreModule):
         info[pp][ms]['bias_max_mag'] = str(self.bias_max_mag)
         info[pp][ms]['bias_max_range'] = str(self.bias_max_range)
         info[pp][ms]['median_dist'] = 'True'
+        info[pp][ms]['do_outliers'] = self.do_outliers
         info[pp][ms]['outlier_deviation_level'] = str(
             self.outlier_deviation_level)
         info[pp][ms]['outlier_max_mag'] = str(self.outlier_max_mag)
@@ -1777,7 +1783,8 @@ def _get_map_grade(do_grid, outsd, psd, moutgrid):
     """
     mean_rat = '-'
     mygrade = '-'
-    if not do_grid or 'PGA' not in outsd or 'PGA' not in psd:
+    if not do_grid or 'PGA' not in outsd or 'PGA' not in psd \
+            or 'MMI' not in moutgrid:
         return mean_rat, mygrade
     sd_rat = outsd['PGA'] / psd['PGA']
     mmimasked = ma.masked_less(moutgrid['MMI'], 6.0)

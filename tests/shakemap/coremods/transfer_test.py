@@ -16,7 +16,7 @@ def pdl_test(java,jarfile,keyfile,configfile):
     products_dir = os.path.join(homedir,'..','..','data',
                                 'eventdata','northridge','current')
     eventid = 'ci3144585'
-    
+
     container = ShakeMapOutputContainer.load(cfile)
     config = {'pdl':{'dest1':{'java':java,
                               'jarfile':jarfile,
@@ -33,7 +33,7 @@ def scp_test(remote_host,remote_directory,private_key):
     products_dir = os.path.join(homedir,'..','..','data',
                                 'eventdata','northridge','current')
     eventid = 'ci3144585'
-    
+
     container = ShakeMapOutputContainer.load(cfile)
     config = {'ssh':{'dest1':{'remote_host':remote_host,
                               'remote_directory':remote_directory,
@@ -48,7 +48,7 @@ def test_transfer():
     products_dir = os.path.join(homedir,'..','..','data',
                                 'eventdata','northridge','current')
     eventid = 'ci3144585'
-    
+
     container = ShakeMapOutputContainer.load(cfile)
     try:
         tdir = tempfile.mkdtemp()
@@ -71,21 +71,21 @@ if __name__ == '__main__':
                         help='Transfer method to test. Default does unit tests')
 
     # pdl options
-    parser.add_argument('--java', 
+    parser.add_argument('--java',
                         help='Path to java binary on this system (with pdl method).')
-    parser.add_argument('--jarfile', 
+    parser.add_argument('--jarfile',
                         help='Path to PDL jar file on this system (with pdl method).')
-    parser.add_argument('--keyfile', 
+    parser.add_argument('--keyfile',
                         help='Path to PDL private key on this system (with pdl method).')
-    parser.add_argument('--configfile', 
+    parser.add_argument('--configfile',
                         help='Path to PDL config file on this system (with pdl method).')
 
     # scp options
-    parser.add_argument('--remote-host', 
+    parser.add_argument('--remote-host',
                         help='Remote host (with scp method).')
-    parser.add_argument('--remote-directory', 
+    parser.add_argument('--remote-directory',
                         help='Remote directory (with scp method).')
-    parser.add_argument('--private-key', 
+    parser.add_argument('--private-key',
                         help='Path to local private SSH key file (with scp method).')
     args = parser.parse_args()
 
@@ -103,4 +103,4 @@ if __name__ == '__main__':
           print('--remote-host, --remote-directory, --private-key options must be supplied for scp.')
           sys.exit(1)
         scp_test(args.remote_host,args.remote_directory,args.private_key)
-    
+
