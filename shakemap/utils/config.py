@@ -1,6 +1,7 @@
 # stdlib imports
 import os
 import os.path
+import sys
 import pkg_resources
 import logging
 import logging.config
@@ -99,12 +100,18 @@ def get_config_paths():
         install = os.path.join(base_path, 'install')
         data = os.path.join(base_path, 'eventdata')
     else:
-        config_file = os.path.join(os.path.expanduser('~'), '.shakemap',
-                                   'profiles.conf')
+        config_file = os.path.join(
+            os.path.expanduser('~'),
+            '.shakemap',
+            'profiles.conf')
+
         if not os.path.isfile(config_file):
             raise FileNotFoundError("Can't find a profile file: "
                                     "have you run sm_profile?")
         config = ConfigObj(config_file)
+
+        config = check_profile_config(config)
+
         profile_name = config['profile']
         if not profile_name or profile_name == 'None':
             raise ValueError("No profile set in the profiles.conf file")
@@ -586,6 +593,39 @@ def get_logging_config():
     log_config['loggers'][''] = log_config['loggers'][log_name]
     del log_config['loggers'][log_name]
     return log_config
+
+
+def check_profile_config(config):
+    """
+    Validation checks on the profile config. At least one profile must exist
+    (otherwise exit) and the paths for each profile should exist, otherwise the
+    profile entry is removed.
+
+    Args:
+        config (ConfigObj): The ConfigObj instance.
+    """
+    # Check that at least one profile exists
+    if 'profiles' not in config:
+        print('There are currently no profiles. Use "sm_profile '
+              '-c <profile>" to create one.')
+        sys.exit(1)
+    # Check that the paths for each profile exist
+    for profile in config['profiles'].keys():
+        data_exists = os.path.isdir(config['profiles'][profile]['data_path'])
+        delete_profile = False
+        if not data_exists:
+            print('Data path for profile %s does not exist.' % profile)
+            delete_profile = True
+        install_exists = os.path.isdir(
+            config['profiles'][profile]['install_path'])
+        if not install_exists:
+            print('Install path for profile %s does not exist.' % profile)
+            delete_profile = True
+        if delete_profile:
+            print('    Deleting profile %s.' % profile)
+            del config['profiles'][profile]
+            config.write()
+        return config
 
 
 def _clean_log_dict(config):

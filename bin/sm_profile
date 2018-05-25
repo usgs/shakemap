@@ -21,6 +21,7 @@ import glob
 
 # shakemap imports
 from shakemap.utils.config import get_data_path
+from shakemap.utils.config import check_profile_config
 from shakemap.utils.utils import query_yes_no
 
 
@@ -70,37 +71,6 @@ class ShakeProfile(object):
         tpl = (self.name, self.current_marker, self.install_path,
                self.data_path)
         return fmt % tpl
-
-
-def check_config(config):
-    """
-    Validation checks on the profile config. At least one profile must exist
-    (otherwise exit) and the paths for each profile should exist, otherwise the
-    profile entry is removed.
-
-    Args:
-        config (ConfigObj): The ConfigObj instance.
-    """
-    # Check that at least one profile exists
-    if 'profiles' not in config:
-        print('There are currently no profiles. Use "sm_profile '
-              '-c <profile>" to create one.')
-        sys.exit(1)
-    # Check that the paths for each profile exist
-    for profile in config['profiles'].keys():
-        data_exists = os.path.isdir(config['profiles'][profile]['data_path'])
-        delete_profile = False
-        if not data_exists:
-            print('Data path for profile %s does not exist.' % profile)
-            delete_profile = True
-        install_exists = os.path.isdir(
-            config['profiles'][profile]['install_path'])
-        if not install_exists:
-            print('Install path for profile %s does not exist.' % profile)
-            delete_profile = True
-        if delete_profile:
-            print('    Deleting profile %s.' % profile)
-            del config['profiles'][profile]
 
 
 def make_dir(pathstr, default, accept):
@@ -204,7 +174,7 @@ def create(config, profile, accept, ppath):
     install_data_dir = os.path.join(install_path, 'data')
     mapping_data_dir = os.path.join(install_data_dir, 'mapping')
     generic_amps_dir = os.path.join(install_data_dir, 'GenericAmpFactors')
-    
+
     if not os.path.isdir(install_layer_dir):
         shutil.copytree(layer_dir, install_layer_dir)
 
@@ -267,7 +237,7 @@ def main(pparser, args):
         create(config, profile, args.accept, ppath)
         sys.exit(0)
 
-    check_config(config)
+    config = check_profile_config(config)
 
     if args.list:
         profiles = config['profiles']
