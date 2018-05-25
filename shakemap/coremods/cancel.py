@@ -1,10 +1,6 @@
 # stdlib imports
 import os.path
-import json
 from datetime import datetime
-import glob
-import re
-import shutil
 
 # third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
@@ -17,7 +13,7 @@ from .transfer import _transfer
 from shakemap.utils.config import get_config_paths, get_data_path
 from shakemap.utils.amps import AmplitudeHandler
 
-TIMEFMT = '%Y-%m-%d %H:%M:%S'
+TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 class CancelModule(CoreModule):

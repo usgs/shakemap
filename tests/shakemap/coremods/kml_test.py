@@ -8,14 +8,11 @@ import logging
 from xml.dom import minidom
 
 import configobj
-from PIL import Image
-from lxml import etree
 
 from shakemap.utils.config import get_config_paths
 from shakemap.coremods.kml import (create_kmz)
 from shakelib.utils.containers import ShakeMapOutputContainer
 from shakemap.utils.utils import path_macro_sub
-from impactutils.colors.cpalette import ColorPalette
 
 
 def test_create_kmz():

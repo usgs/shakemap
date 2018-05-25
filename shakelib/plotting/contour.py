@@ -142,6 +142,8 @@ def getContourLevels(dmin, dmax, itype='log'):
         # Construct levels
         levels = np.concatenate([np.power(10, d) * dec_inc for d in decades])
         levels = levels[(levels < dmax) & (levels > dmin)]
+        if np.size(levels) == 0:
+            levels = np.array([(dmin + dmax) / 2])
     else:
         # MMI contours are every 0.5 units
         levels = np.arange(

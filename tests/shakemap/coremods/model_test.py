@@ -2,13 +2,13 @@
 
 import os
 import os.path
-import shutil
 
 import pytest
 
 from shakemap.utils.config import get_config_paths
 from shakemap.coremods.model import ModelModule
 from shakemap.coremods.assemble import AssembleModule
+from shakemap.coremods.plotregr import PlotRegr
 
 ########################################################################
 # Test sm_model
@@ -20,15 +20,9 @@ def test_model_1():
     installpath, datapath = get_config_paths()
     #
     # This is Northridge for a set of output points (not a grid)
-    # Remove the products directory to hit the code that makes it
-    # (should succeed)
     #
     assemble = AssembleModule('northridge_points', comment='Test comment.')
     assemble.execute()
-    products_dir = os.path.join(datapath, 'northridge_points', 'current',
-                                'products')
-    if os.path.isdir(products_dir):
-        shutil.rmtree(products_dir)
     model = ModelModule('northridge_points')
     model.execute()
 
@@ -38,13 +32,16 @@ def test_model_2():
     #
     # This is a small grid with station data and dyfi data (should succeed)
     #
-    # Removing this test because we effectively run it when
-    # testing the other product modules.
+    assemble = AssembleModule('nc72282711', comment='Test comment.')
+    assemble.execute()
+    model = ModelModule('nc72282711')
+    model.execute()
     #
-    #    assemble = AssembleModule('nc72282711', comment='Test comment.')
-    #    assemble.execute()
-    #    model = ModelModule('nc72282711')
-    #    model.execute()
+    # Since we've done this, we might as well run plotregr, too
+    #
+    plotregr = PlotRegr('nc72282711')
+    plotregr.execute()
+    plotregr.writeContents()
     pass
 
 
