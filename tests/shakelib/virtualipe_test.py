@@ -6,21 +6,22 @@ import os.path
 
 # third party modules
 import numpy as np
-from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
+from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
 import openquake.hazardlib.const as oqconst
 from openquake.hazardlib.imt import MMI, PGA, PGV, SA
 import pytest
 
 # local imports
-from shakelib.virtualipe import VirtualIPE
+from shakelib.distance import Distance
 from shakelib.gmice.wgrw12 import WGRW12
 from shakelib.multigmpe import MultiGMPE
-from shakelib.distance import Distance
-from shakelib.sites import Sites
 from shakelib.rupture.origin import Origin
 from shakelib.rupture.factory import get_rupture
+from shakelib.sites import Sites
 from shakelib.utils.exception import ShakeLibException
+from shakelib.virtualipe import VirtualIPE
+
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
@@ -210,6 +211,13 @@ def test_virtualipe():
     tot = np.sqrt(
         mmi_sd_variable_vs30_intra[1]**2 + mmi_sd_variable_vs30_intra[2]**2)
     assert(np.allclose(tot, mmi_sd_variable_vs30_intra[0], rtol=1e-2))
+
+    # Run through mgm = mgm + fd if fd is available
+    # In this case fd = 0, so the ouput is still the same values
+    mmi_fd, mmi_fdsd = ipe.get_mean_and_stddevs(sx, rx, dx, MMI(),
+            sd_types, fd=0)
+    assert(np.allclose(mmi_fd, mmi_rjb))
+    assert(np.allclose(mmi_fdsd, mmi_sd_rjb))
 
 
 if __name__ == '__main__':

@@ -4,26 +4,28 @@
 import os.path
 import sys
 
-# third party
-import numpy as np
-import pandas as pd
-import pytest
-import time
-
+# third party imports
 from openquake.hazardlib.geo.utils import get_orthographic_projection
 from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
 from openquake.hazardlib.gsim.berge_thierry_2003 \
     import BergeThierryEtAl2003SIGMA
 import openquake.hazardlib.geo as geo
+import numpy as np
+import pandas as pd
+import pytest
+import time
 
-from shakelib.rupture.quad_rupture import QuadRupture
-from shakelib.rupture.point_rupture import PointRupture
-from shakelib.rupture.origin import Origin
-from shakelib.rupture.gc2 import _computeGC2
-from shakelib.sites import Sites
+# local imports
 from shakelib.distance import Distance
 from shakelib.distance import get_distance
+from shakelib.rupture.edge_rupture import EdgeRupture
+from shakelib.rupture.gc2 import _computeGC2
+from shakelib.rupture.origin import Origin
+from shakelib.rupture.point_rupture import PointRupture
+from shakelib.rupture.quad_rupture import QuadRupture
+from shakelib.sites import Sites
 from impactutils.time.ancient_time import HistoricTime
+
 
 do_tests = True
 
@@ -63,6 +65,7 @@ def test_san_fernando():
                      'depth': 5.0, 'mag': 7.0, 'netid': '',
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(int(time.time()))})
+
     rup = QuadRupture.fromVertices(
         lon0, lat0, z0, lon1, lat1, z1, lon2, lat2, z2, lon3, lat3, z3,
         origin)
@@ -208,6 +211,9 @@ def test_exceptions():
     with pytest.raises(Exception) as e:  # noqa
         get_distance(dist_types, sctx.lats, sctx.lons[0:4, ],
                      np.zeros_like(sctx.lons), rup)
+    # Exception when not a GMPE subclass
+    with pytest.raises(Exception) as e:  # noqa
+        Distance([None], [-118.2], [34.1], [1], rupture=None)
 
 
 def test_distance_no_rupture():

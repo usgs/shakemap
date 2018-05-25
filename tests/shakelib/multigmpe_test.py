@@ -1,41 +1,43 @@
 #!/usr/bin/env python
 
+# stdlib imports
+import copy
 import os
 import sys
 import time as time
-import copy
 
+# third party imports
+from impactutils.time.ancient_time import HistoricTime
 import numpy as np
-import pytest
-
-from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
-from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
-from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import \
-    CampbellBozorgnia2014
-from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
-from openquake.hazardlib.gsim.campbell_2003 import Campbell2003
-from openquake.hazardlib.gsim.campbell_2003 import Campbell2003MwNSHMP2008
-from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006
-from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011NEHRPBC
-from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006Asc
-from openquake.hazardlib.gsim.campbell_bozorgnia_2008 import \
-    CampbellBozorgnia2008
-from openquake.hazardlib.gsim.chiou_youngs_2008 import ChiouYoungs2008
 from openquake.hazardlib import imt, const
+from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
+from openquake.hazardlib.gsim.atkinson_boore_2006 import AtkinsonBoore2006
 from openquake.hazardlib.gsim.base import RuptureContext
 from openquake.hazardlib.gsim.base import DistancesContext
 from openquake.hazardlib.gsim.base import SitesContext
-from impactutils.time.ancient_time import HistoricTime
+from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
+from openquake.hazardlib.gsim.campbell_bozorgnia_2008 import \
+    CampbellBozorgnia2008
+from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import \
+    CampbellBozorgnia2014
+from openquake.hazardlib.gsim.campbell_2003 import Campbell2003
+from openquake.hazardlib.gsim.campbell_2003 import Campbell2003MwNSHMP2008
+from openquake.hazardlib.gsim.chiou_youngs_2008 import ChiouYoungs2008
+from openquake.hazardlib.gsim.chiou_youngs_2014 import ChiouYoungs2014
+from openquake.hazardlib.gsim.pezeshk_2011 import PezeshkEtAl2011NEHRPBC
+from openquake.hazardlib.gsim.zhao_2006 import ZhaoEtAl2006Asc
+import pytest
 
-
-from shakelib.multigmpe import MultiGMPE
-import shakelib.sites as sites
-from shakelib.sites import Sites
-from shakelib.rupture.origin import Origin
-from shakelib.rupture.quad_rupture import QuadRupture
+# local imports
+from shakelib.conversions.imc.boore_kishida_2017 import BooreKishida2017
 from shakelib.distance import Distance
 from shakelib.multigmpe import filter_gmpe_list
-from shakelib.conversions.imc.boore_kishida_2017 import BooreKishida2017
+from shakelib.multigmpe import MultiGMPE
+from shakelib.rupture.origin import Origin
+from shakelib.rupture.quad_rupture import QuadRupture
+import shakelib.sites as sites
+from shakelib.sites import Sites
+
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
@@ -1399,6 +1401,32 @@ def test_multigmpe_exceptions():
     sctx.vs30 = np.ones_like(dctx.rjb) * 275.0
     sctx.vs30measured = np.full_like(dctx.rjb, False, dtype='bool')
     sctx = MultiGMPE.set_sites_depth_parameters(sctx, ASK14)
+
+    # Check for exception on unequal site/dist lengths
+    with pytest.raises(Exception) as a:
+        rx = rctx
+        mgmpe = MultiGMPE.from_list(gmpes, wts)
+        stddev_types = [const.StdDev.TOTAL]
+        testsc = sctx.copy()
+        testsc.z1pt0_ask14_cal = testsc.z1pt0_ask14_cal[0:3]
+        lnmu, lnsd = mgmpe.get_mean_and_stddevs(
+            testsc, rx, dctx, iimt, stddev_types)
+
+    # Check for exception on unavailable standard deviation types
+    with pytest.raises(Exception) as a:
+        rx = rctx
+        stddev_types = ['Blerg']
+        mgmpe = MultiGMPE.from_list(gmpes, wts)
+        lnmu, lnsd = mgmpe.get_mean_and_stddevs(
+            sctx, rx, dctx, iimt, stddev_types)
+
+    # Check for invalid conf
+    with pytest.raises(Exception) as a:
+        gmpelist = ['']
+        wts = [0.5, 0.5]
+        fgmpes, fwts = filter_gmpe_list(gmpelist, wts, imt=imt.SA(1.0))
+        per = imt.SA(1.0).period
+
 
     # Check for exception due to weights:
     with pytest.raises(Exception) as a:
