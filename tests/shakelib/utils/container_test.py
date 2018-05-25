@@ -1,22 +1,25 @@
 #!/usr/bin/env python
 
 # stdlib imports
-import os.path
-import sys
+import datetime
 import io
 import numpy as np
-import datetime
-import tempfile
-import pytest
 import random
 import string
+import sys
+import tempfile
+import os.path
 
+# third party imports
+from mapio.geodict import GeoDict
+from mapio.grid2d import Grid2D
+import pytest
+
+# local imports
 from shakelib.utils.containers import ShakeMapInputContainer
 from shakelib.utils.containers import ShakeMapOutputContainer
 from shakelib.rupture.point_rupture import PointRupture
 
-from mapio.geodict import GeoDict
-from mapio.grid2d import Grid2D
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..', '..'))
@@ -199,8 +202,14 @@ def test_output_container():
 
     f, datafile = tempfile.mkstemp()
     os.close(f)
+
     try:
         container = ShakeMapOutputContainer.create(datafile)
+        # LookupError raised if trying to dropIMTs if there are none
+        with pytest.raises(LookupError):
+            container.dropIMT('mmi')
+
+        # Add imts
         container.setIMTGrids('mmi',
                               mean_mmi_maximum_grid, mean_mmi_maximum_metadata,
                               std_mmi_maximum_grid, std_mmi_maximum_metadata,
