@@ -44,7 +44,7 @@ class ComponentConverter(ABC):
         return amps
 
     @abstractmethod
-    def convertAmpsOnce(self, imt, amps, rrups, mag):
+    def convertAmpsOnce(self, imt, amps, rrups=None, mag=None):
         """
         Return an array of amps converted from one IMC to another.
 

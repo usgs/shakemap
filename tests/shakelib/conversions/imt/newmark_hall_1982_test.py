@@ -5,11 +5,12 @@ import os.path
 import sys
 
 # Third party imports
-import pytest
 import numpy as np
+import pytest
 
 # Local imports
 from shakelib.conversions.imt.newmark_hall_1982 import NewmarkHall1982
+
 
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..', '..', '..'))

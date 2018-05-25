@@ -160,7 +160,7 @@ class BeyerBommer2006(ComponentConverter):
             const.IMC.GREATER_OF_TWO_HORIZONTAL:
                 dict(list(zip(self.__sa_col_names, [1.1, 1.2, 0.04, 0.07, 1.02])))}
 
-    def convertAmpsOnce(self, imt, amps, rrups, mag):
+    def convertAmpsOnce(self, imt, amps, rrups=None, mag=None):
         """
         Returns amps converted from one IMC to another.
 
@@ -170,18 +170,19 @@ class BeyerBommer2006(ComponentConverter):
             - IMC type 'VERTICAL' is not supported
 
         Args:
-            amps (array): Numpy array of ground motion amplitudes.
-            imc_in (IMC): OpenQuake IMC type of the input amp array.
-                `[link] <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__
-            imc_out (IMC): Desired OpenQuake IMC type of the output amps.
-                `[link] <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__
             imt (IMT): OpenQuake IMT of the input amps (must be one of PGA,
                 PGV, or SA).
                 `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`
 
+            amps (array): Numpy array of ground motion amplitudes.
+            rrups (array): A numpy array of the same shape as amps,
+                containing the rupture distances of the ground motions.
+                Ignored by this method.
+            mag (float): The earthquake magnitude. Default is None.
+                 Ignored by this method.
+
         Returns:
             array: Numpy array of amps converted from imc_in to imc_out.
-
         """
 
         denom = self.__GM2other(imt, self.imc_in)
@@ -199,13 +200,9 @@ class BeyerBommer2006(ComponentConverter):
             - IMC types 'VERTICAL' and 'HORIZONTAL' are not supported
 
         Args:
-            sigmas (array): Numpy array of standard deviations.
-            imc_in (IMC): OpenQuake IMC type of the input sigmas array.
-                `[link] <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__
-            imc_out (IMC): Desired OpenQuake IMC type of the output sigmas.
-                `[link] <http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC>`__
             imt (IMT): OpenQuake IMT of the input sigmas (must be one of PGA,
                  PGV, or SA) `[link] <http://docs.openquake.org/oq-hazardlib/master/imt.html>`__
+            sigmas (array): Numpy array of standard deviations.
 
         Returns:
             array: Numpy array of standard deviations converted from imc_in to

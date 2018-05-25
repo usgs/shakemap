@@ -1,12 +1,16 @@
 #!/usr/bin/env python
 
-import pytest
-from openquake.hazardlib import const
-from openquake.hazardlib.imt import PGA, PGV, SA
-import numpy as np
+# stdlib imports
 import os.path
 import sys
 
+# third party imports
+import numpy as np
+from openquake.hazardlib import const
+from openquake.hazardlib.imt import PGA, PGV, SA
+import pytest
+
+# local imports
 from shakelib.conversions.imc.boore_kishida_2017 import BooreKishida2017
 
 
@@ -257,6 +261,30 @@ def test_bk17():
             'Average Horizontal (GMRotI50)')
     full = bk17.convertAmps(imt_in[0],amps_in, rrup_in, mags_in[0])
     np.testing.assert_allclose(full, last, atol=1e-5)
+
+    # Test exception for missing magnitude/rupture
+    with pytest.raises(ValueError) as e:
+        bk17.convertAmps(imt_in[0],amps_in, None, mags_in[0])
+    with pytest.raises(ValueError) as e:
+        bk17.convertAmps(imt_in[0],amps_in, rrup_in, None)
+    with pytest.raises(ValueError) as e:
+        bk17.convertAmps(imt_in[0],amps_in, None, None)
+    # Test exception for unknown imt
+    with pytest.raises(ValueError) as e:
+        bk17.convertAmpsOnce('wrong', [10.0], rrup_in, mags_in[0])
+    # Test amp conversion for unknown imc
+    bk17 = BooreKishida2017('Average Horizontal',
+            'Average Horizontal')
+    a = [-2.99573227, -2.30258509, -1.60943791, -0.91629073,
+            -0.22314355, 0.47000363]
+    mag = 8.0
+    # Average => Average
+    target = bk17.convertAmpsOnce(PGA(), a, rrup_in, mag)
+    # Average => wrong. The incorrect imc should use GMAR and be the same as
+    # the above result
+    bk17.imc_out = 'wrong'
+    result = bk17.convertAmpsOnce(PGA(), a, rrup_in, mag)
+    np.testing.assert_allclose(target, result, atol=1e-5)
 
 
 if __name__ == '__main__':

@@ -44,14 +44,13 @@ def test_bommeralarcon2006():
     assert abs(PGVout - 4.905000) < 0.001
     assert abs(vfact - 49.050000) < 0.001
 
-    # Test invalid conversions
+    # Test invalid conversions types
     with pytest.raises(Exception) as a:
         tmp = ba06.convertAmps('INVALID', 'PSA05', PGVin)
     with pytest.raises(Exception) as a:
         tmp = ba06.convertAmps('PGV', 'INVALID', PGVin)
     with pytest.raises(Exception) as a:
         tmp = ba06.convertAmps('INVALID', 'INVALID', PGVin)
-
 
 if __name__ == '__main__':
     test_bommeralarcon2006()

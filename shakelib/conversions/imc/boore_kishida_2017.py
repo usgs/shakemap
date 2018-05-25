@@ -102,7 +102,7 @@ class BooreKishida2017(ComponentConverter):
         self.path = self.getShortestPath(self.conversion_graph,
                 self.imc_in, self.imc_out)
 
-    def convertAmpsOnce(self, imt, amps, rrups, mag):
+    def convertAmpsOnce(self, imt, amps, rrups=None, mag=None):
         """
         Return an array of amps converted from one IMC to another.
 
@@ -152,7 +152,6 @@ class BooreKishida2017(ComponentConverter):
             amps = amps - ln_ratio
         else:
             amps = amps + ln_ratio
-
         return amps
 
     def convertSigmasOnce(self, imt, sigmas):
@@ -319,5 +318,3 @@ class BooreKishida2017(ComponentConverter):
             self.pars = None
         else:
             self.pars = pd.read_csv(filename)
-
-BooreKishida2017('blerg', 'blerg')
