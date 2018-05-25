@@ -1,14 +1,20 @@
 #!/usr/bin/env python
 
-import pytest
-from openquake.hazardlib import const
-from openquake.hazardlib.imt import PGA, PGV, SA
-import numpy as np
+# stdlib imports
 import os.path
 import sys
 
+# third party imports
+import numpy as np
+from openquake.hazardlib import const
+from openquake.hazardlib.imt import PGA, PGV, SA
+import pytest
+
+# local imports
 from shakelib.conversions.imc.beyer_bommer_2006 import BeyerBommer2006
 
+
+# important constants
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..', '..', '..'))
 sys.path.insert(0, shakedir)
@@ -28,7 +34,6 @@ imc_out = [const.IMC.GREATER_OF_TWO_HORIZONTAL,
            const.IMC.MEDIAN_HORIZONTAL,
            const.IMC.MEDIAN_HORIZONTAL]
 imt_in = [PGA(), PGV(), SA(0.3), SA(1.0), SA(3.0)]
-
 
 amps_target = np.array(
     [[-2.90042209, -2.20727491, -1.51412773, -0.82098055, -0.12783337,
@@ -191,6 +196,39 @@ def test_bb06():
     assert len(bb06.path) == 2
     assert bb06.path[0] == 'Average Horizontal (RotD50)'
     assert bb06.path[-1] == 'Horizontal'
+
+    # Test exception for unknown imt
+    with pytest.raises(ValueError) as e:
+        bb06.convertSigmasOnce('wrong', 0)
+    with pytest.raises(ValueError) as e:
+        bb06.convertAmpsOnce('wrong', [10.0], None, None)
+    # Test exception for unknown imc
+    with pytest.raises(ValueError) as e:
+        bb06._verifyConversion('Wrong', imc_out=None)
+    bb06.imc_out = 'wrong'
+    with pytest.raises(ValueError) as e:
+        bb06.convertAmpsOnce(PGA(), [10.0], None, None)
+
+    # Test that AVERAGE_HORIZONTAL returns 1 regardless of imt
+    bb06 = BeyerBommer2006('Average horizontal', 'Average Horizontal (RotD50)')
+    denom = 1
+    numer = 1
+    result = np.asarray([10.0]) + np.log(numer / denom)
+    returned1 = bb06.convertAmpsOnce(PGA(), [10.0], None, None)
+    returned2 = bb06.convertAmpsOnce(PGV(), [10.0], None, None)
+    returned3 = bb06.convertAmpsOnce(SA(0.3), [10.0], None, None)
+    returned4 = bb06.convertAmpsOnce(SA(1.0), [10.0], None, None)
+    assert result == returned1 == returned2 == returned3 == returned4
+    ss = np.asarray([10])
+    R1, C1 = 1, 0
+    s1 = (ss**2 - C1**2) / R1**2
+    R2 = np.asarray([1, 1, 1, 1])
+    C2 = np.asarray([0.02, 0.02, 0.0241407224538, 0.03])
+    imt_list = [PGA(), PGV(), SA(0.3), SA(1.0)]
+    for idx, imt in enumerate(imt_list):
+        target = np.sqrt(s1 * R2[idx]**2 + C2[idx]**2)
+        returned = bb06.convertSigmasOnce(imt, ss)
+        assert target == returned
 
 
 if __name__ == '__main__':
