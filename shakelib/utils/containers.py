@@ -62,18 +62,18 @@ class ShakeMapContainer(GridHDFContainer):
             TypeError: If input object or dictionary does not
                 represent a Rupture object.
         """
-        if 'rupture' in self.getStrings():
-            self.dropString('rupture')
+        if 'rupture' in self.getDictionaries():
+            self.dropDictionary('rupture')
         if isinstance(rupture, dict):
             try:
                 rupture_from_dict(rupture)
             except Exception:
                 fmt = 'Input dict does not represent a rupture object.'
                 raise TypeError(fmt)
-            json_str = json.dumps(rupture)
+            rupdict = rupture
         else:
-            json_str = json.dumps(rupture._geojson)
-        self.setString('rupture', json_str)
+            rupdict = rupture._geojson
+        self.setDictionary('rupture', rupdict)
 
     def getRuptureObject(self):
         """
@@ -100,9 +100,9 @@ class ShakeMapContainer(GridHDFContainer):
             AttributeError: If rupture object has not been set in
                 the container.
         """
-        if 'rupture' not in self.getStrings():
+        if 'rupture' not in self.getDictionaries():
             raise AttributeError('Rupture object not set in container.')
-        rupture_dict = json.loads(self.getString('rupture'))
+        rupture_dict = self.getDictionary('rupture')
         return rupture_dict
 
     def setStationList(self, stationlist):
@@ -342,10 +342,10 @@ class ShakeMapOutputContainer(ShakeMapContainer):
         out = 'Data type: %s\n' % self.getDataType()
         if self.getDataType() == 'grid':
             out = out + '    use "getIMTGrids" method to access '\
-                        'interpolated IMTs\n'
+                'interpolated IMTs\n'
         else:
             out = out + '    use "getIMTArrays" method to access '\
-                        'interpolated IMTs\n'
+                'interpolated IMTs\n'
         try:
             rupt = self.getRuptureDict()
             rupt_obj = rupture_from_dict(rupt)
