@@ -27,7 +27,7 @@ function [dmean,mean_metadata,dstd,std_metadata] = read_shake_data(fname,imt,com
     for i=1:length(info.Groups)
         group = info.Groups(i);
         gname = group.Name;
-        if contains(gname,'__imts__')
+        if contains(gname,'imts')
             for j=1:length(group.Groups)
                 imtgroup= group.Groups(j);
                 cname = imtgroup.Name;
