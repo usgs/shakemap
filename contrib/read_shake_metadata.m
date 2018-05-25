@@ -16,27 +16,22 @@ function [config,info,rupture,stations] = read_shake_metadata(fname)
     for i=1:length(hdfinfo.Groups)
         group = hdfinfo.Groups(i);
         gname = group.Name;
-        if contains(gname,'__strings__')
+        if contains(gname,'dictionaries')
             for j=1:length(group.Datasets)
                 dataset = group.Datasets(j);
-                if strcmpi(dataset.Name,'__info.json__')
+                if strcmpi(dataset.Name,'info.json')
                     dsetname = sprintf('%s/%s',gname,dataset.Name);
                     info_string = h5read(fname,dsetname);
                     info = jsondecode(info_string{1});
-                elseif strcmpi(dataset.Name,'__rupture__')
+                elseif strcmpi(dataset.Name,'rupture')
                     dsetname = sprintf('%s/%s',gname,dataset.Name);
                     rupture_string = h5read(fname,dsetname);
                     rupture = jsondecode(rupture_string{1});
-                elseif strcmpi(dataset.Name,'__stations_dict__')
+                elseif strcmpi(dataset.Name,'stations_dict')
                     dsetname = sprintf('%s/%s',gname,dataset.Name);
                     stations_string = h5read(fname,dsetname);
                     stations = jsondecode(stations_string{1});
-                end
-            end
-        elseif contains(gname,'__dictionaries__')
-            for j=1:length(group.Datasets)
-                dataset = group.Datasets(j);
-                if strcmpi(dataset.Name,'__config__')
+                elseif strcmpi(dataset.Name,'config')
                     dsetname = sprintf('%s/%s',gname,dataset.Name);
                     config_string = h5read(fname,dsetname);
                     config = jsondecode(config_string{1});
