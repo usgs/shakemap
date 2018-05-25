@@ -6,6 +6,7 @@ import zipfile
 import json
 import glob
 import subprocess
+import shutil
 
 import numpy as np
 from osgeo import gdal
@@ -122,8 +123,8 @@ def do_info(evid, datapath, oc):
 
     ifile = os.path.join(datapath, evid, 'current', 'products', 'info.json')
     with open(ifile, 'r') as infile:
-        fjson = infile.read()
-        cjson = oc.getString('info.json')
+        fjson = json.loads(infile.read())
+        cjson = oc.getDictionary('info.json')
         assert fjson == cjson
 
 
@@ -351,6 +352,9 @@ def test_products():
         check_failures(evid, datapath, TransferModule)
         mod = TransferModule(evid)
         mod.execute()
+        bufiles = glob.glob(os.path.join(datapath, evid, 'backup*'))
+        for bufile in bufiles:
+            shutil.rmtree(bufile)
 
     finally:
         pass

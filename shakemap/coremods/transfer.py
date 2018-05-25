@@ -113,7 +113,7 @@ class TransferModule(CoreModule):
 
 def _transfer(config, container, products_dir, cancel=False):
     # extract the info.json object from the container
-    info = json.loads(container.getString('info.json'))
+    info = container.getDictionary('info.json')
     properties, product_properties = _get_properties(info)
 
     # get the config information:
