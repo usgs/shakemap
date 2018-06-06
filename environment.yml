@@ -39,11 +39,11 @@ dependencies:
 - strec
 - versioneer
 - pip:
-  - et-xmlfile==1.0.1
-  - ipython-genutils==0.2.0
-  - jupyter-client==5.1.0
-  - jupyter-console==5.2.0
-  - jupyter-core==4.4.0
-  - prompt-toolkit==1.0.15
-  - sphinx-argparse==0.2.1
+  - et-xmlfile
+  - ipython-genutils
+  - jupyter-client
+  - jupyter-console
+  - jupyter-core
+  - prompt-toolkit
+  - sphinx-argparse
 

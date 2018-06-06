@@ -8,7 +8,7 @@ if [ "$unamestr" == 'Linux' ]; then
     env_file=environment_linux.yml
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     prof=~/.bash_profile
-    mini_conda_url=https://repo.continuum.io/miniconda/Miniconda2-latest-MacOSX-x86_64.sh
+    mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
     matplotlibdir=~/.matplotlib
     env_file=environment_osx.yml
 else
