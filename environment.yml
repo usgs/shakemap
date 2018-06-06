@@ -2,16 +2,11 @@ name: shakemap
 channels:
 - conda-forge
 - defaults
-- digitalglobe
-- ioos
 dependencies:
-- affine
 - amptools
 - basemap
-- beautifulsoup4
 - cartopy
 - configobj
-- decorator
 - defusedxml
 - descartes
 - docutils
@@ -33,22 +28,16 @@ dependencies:
 - ps2ff
 - psutil
 - pyproj
-- pyshp
 - pytest
 - pytest-cov
 - python=3.5
 - python-daemon
-- pyyaml
-- pyzmq
-- rasterio
-- requests
 - scikit-image
 - scipy
 - shapely
 - sphinx
 - strec
 - versioneer
-- paramiko
 - pip:
   - et-xmlfile==1.0.1
   - ipython-genutils==0.2.0
