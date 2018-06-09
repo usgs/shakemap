@@ -1,8 +1,6 @@
 +---------------+----------------------+ 
 | Linux build   | |Travis|             | 
 +---------------+----------------------+ 
-| Mac build     | |Circleci|           | 
-+---------------+----------------------+ 
 | Code quality  | |Codacy|             | 
 +---------------+----------------------+ 
 | Code coverage | |CodeCov|            | 
@@ -14,9 +12,6 @@
 .. |Travis| image:: https://travis-ci.org/usgs/shakemap.svg?branch=master
     :target: https://travis-ci.org/usgs/shakemap
     :alt: Travis Build Status
-
-.. |Circleci| image:: https://circleci.com/gh/usgs/shakemap.svg?style=svg
-    :target: https://circleci.com/gh/usgs/shakemap
 
 .. |CodeCov| image:: https://codecov.io/gh/usgs/shakemap/branch/master/graph/badge.svg
     :target: https://codecov.io/gh/usgs/shakemap
