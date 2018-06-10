@@ -4,10 +4,15 @@ os:
   - linux
   - osx
 
+osx_image: xcode6.4
+
 sudo: false
 
-python:
-    - "3.5"
+env:
+  matrix:
+    
+    - CONDA_PY=35
+    - CONDA_PY=36
 
 install:
     # Install shakemap and requirements
