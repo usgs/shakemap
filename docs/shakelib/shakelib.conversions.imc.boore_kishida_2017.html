@@ -56,11 +56,17 @@ provided by B&amp;K (specified as OpenQuake IMCs):</p>
 <li>AVERAGE_HORIZONTAL &lt;=&gt; GREATER_OF_TWO_HORIZONTAL</li>
 </ul>
 </div></blockquote>
-<p>Not supported are IMCs for which there is no OpenQuake equivalent;
-chain conversions are supported when using <cite>convertAmps</cite>. Otherwise
+<p>Chain conversions are supported when using <cite>convertAmps</cite>. Otherwise
 conversions must be done in two+ steps using <cite>convertAmpsOnce</cite>. For IMCs
 not explicitly supported by B&amp;K, we assume the IMC is equivalent
 to the geometric mean (which B&amp;K call GM_AR).</p>
+<dl class="docutils">
+<dt>Notes</dt>
+<dd><ul class="first last simple">
+<li>Assumes ALL unknown IMC types are AVERAGE_HORIZONTAL.</li>
+</ul>
+</dd>
+</dl>
 <p>References</p>
 <blockquote>
 <div><p>Boore, D.M. and T. Kishida (2017). Relations between some
@@ -74,7 +80,7 @@ of America, 96(4A), 1512-1522.</p>
 </div></blockquote>
 <dl class="method">
 <dt id="shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce">
-<code class="descname">convertAmpsOnce</code><span class="sig-paren">(</span><em>imt</em>, <em>amps</em>, <em>rrups</em>, <em>mag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017.convertAmpsOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
+<code class="descname">convertAmpsOnce</code><span class="sig-paren">(</span><em>imt</em>, <em>amps</em>, <em>rrups=None</em>, <em>mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/boore_kishida_2017.html#BooreKishida2017.convertAmpsOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return an array of amps converted from one IMC to another.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />

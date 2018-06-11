@@ -34,37 +34,49 @@
   <h1>Source code for shakemap.coremods.kml</h1><div class="highlight"><pre>
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">import</span> <span class="nn">inspect</span>
+<span class="kn">import</span> <span class="nn">zipfile</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">re</span>
 
 <span class="c1"># third party imports</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">MultiLineString</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">mapping</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">shape</span>
 <span class="kn">import</span> <span class="nn">fiona</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">skimage</span> <span class="k">import</span> <span class="n">measure</span>
-<span class="kn">from</span> <span class="nn">scipy.ndimage.filters</span> <span class="k">import</span> <span class="n">median_filter</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
-<span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="k">import</span> <span class="n">Image</span>
 <span class="kn">import</span> <span class="nn">configobj</span>
 <span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span> <span class="n">get_logging_config</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">path_macro_sub</span>
+<span class="kn">from</span> <span class="nn">shakelib.plotting.contour</span> <span class="k">import</span> <span class="n">contour</span>
 <span class="kn">from</span> <span class="nn">impactutils.colors.cpalette</span> <span class="k">import</span> <span class="n">ColorPalette</span>
-<span class="kn">from</span> <span class="nn">mapio.gmt</span> <span class="k">import</span> <span class="n">GMTGrid</span>
+<span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
 
-<span class="n">FORMATS</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;geojson&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;GeoJSON&#39;</span><span class="p">,</span> <span class="s1">&#39;json&#39;</span><span class="p">)</span>
-<span class="p">}</span>
+<span class="n">OVERLAY_IMG</span> <span class="o">=</span> <span class="s1">&#39;ii_overlay.png&#39;</span>
+<span class="n">OVERLAY_KML</span> <span class="o">=</span> <span class="s1">&#39;overlay.kml&#39;</span>
+<span class="n">STATION_KML</span> <span class="o">=</span> <span class="s1">&#39;stations.kml&#39;</span>
+<span class="n">CONTOUR_KML</span> <span class="o">=</span> <span class="s1">&#39;mmi_contour.kml&#39;</span>
+<span class="n">KMZ_FILE</span> <span class="o">=</span> <span class="s1">&#39;shakemap.kmz&#39;</span>
+<span class="n">KML_FILE</span> <span class="o">=</span> <span class="s1">&#39;shakemap.kml&#39;</span>
+<span class="n">EPICENTER_URL</span> <span class="o">=</span> \
+    <span class="s1">&#39;http://maps.google.com/mapfiles/kml/shapes/capital_big_highlight.png&#39;</span>
+<span class="n">LEGEND</span> <span class="o">=</span> <span class="s1">&#39;intensity_legend.png&#39;</span>
+
+<span class="n">LOOKAT_ALTITUDE</span> <span class="o">=</span> <span class="mi">500000</span>  <span class="c1"># meters</span>
+
+<span class="n">TRIANGLE</span> <span class="o">=</span> <span class="s1">&#39;triangle.png&#39;</span>
+<span class="n">CIRCLE</span> <span class="o">=</span> <span class="s1">&#39;circle.png&#39;</span>
+
+<span class="n">IMT_UNITS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pga&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;pgv&#39;</span><span class="p">:</span> <span class="s1">&#39;cm/sec&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;sa(0.3)&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;sa(1.0)&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;sa(3.0)&#39;</span><span class="p">:</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">}</span>
 
 <span class="n">DEFAULT_FILTER_SIZE</span> <span class="o">=</span> <span class="mi">10</span>
 
@@ -75,20 +87,23 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;kml&#39;</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/shakemap\.kmz&#39;</span><span class="p">]</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
     <span class="c1"># supply here a data structure with information about files that</span>
     <span class="c1"># can be created by this module.</span>
-    <span class="n">kml_page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Ground Motion KML Files&#39;</span><span class="p">,</span> <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="s1">&#39;kml&#39;</span><span class="p">}</span>
-    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;intensity_overlay&#39;</span><span class="p">])</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;intensity_overlay&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Intensity Overlay&#39;</span><span class="p">,</span>
-                                     <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Intensity Overlay.&#39;</span><span class="p">,</span>
-                                     <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">kml_page</span><span class="p">,</span>
-                                     <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;overlay.kmz&#39;</span><span class="p">,</span>
-                                                  <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/vnd.google-earth.kml+xml&#39;</span><span class="p">}</span>
-                                                 <span class="p">]</span>
-                                     <span class="p">}</span>
+    <span class="n">kml_page</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Ground Motion KMZ File&#39;</span><span class="p">,</span> <span class="s1">&#39;slug&#39;</span><span class="p">:</span> <span class="s1">&#39;kml&#39;</span><span class="p">}</span>
+    <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;shakemap_kmz&#39;</span><span class="p">])</span>
+    <span class="n">ftype</span> <span class="o">=</span> <span class="s1">&#39;application/vnd.google-earth.kml+xml&#39;</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;shakemap_kmz&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;ShakeMap Overview KMZ&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;ShakeMap Overview.&#39;</span><span class="p">,</span>
+                                <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">kml_page</span><span class="p">,</span>
+                                <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;shakemap.kmz&#39;</span><span class="p">,</span>
+                                             <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="n">ftype</span><span class="p">}</span>
+                                            <span class="p">]</span>
+                                <span class="p">}</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Instantiate a KMLModule class with an event ID.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -96,10 +111,6 @@
         <span class="n">log_config</span> <span class="o">=</span> <span class="n">get_logging_config</span><span class="p">()</span>
         <span class="n">log_name</span> <span class="o">=</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">log_name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">filter</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span> <span class="o">=</span> <span class="nb">filter</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span> <span class="o">=</span> <span class="n">DEFAULT_FILTER_SIZE</span>
 
 <div class="viewcode-block" id="KMLModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.KMLModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -125,28 +136,304 @@
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;kml module can only contour &#39;</span>
                                       <span class="s1">&#39;gridded data, not sets of points&#39;</span><span class="p">)</span>
 
-        <span class="c1"># find the topography grid configured for the system</span>
+        <span class="c1"># find the low res ocean vector dataset</span>
         <span class="n">product_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
         <span class="n">pconfig</span> <span class="o">=</span> <span class="n">configobj</span><span class="o">.</span><span class="n">ConfigObj</span><span class="p">(</span><span class="n">product_config_file</span><span class="p">)</span>
-        <span class="n">topofile</span> <span class="o">=</span> <span class="n">pconfig</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="s1">&#39;topography&#39;</span><span class="p">]</span>
-        <span class="n">topofile</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">topofile</span><span class="p">,</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
+        <span class="n">oceanfile</span> <span class="o">=</span> <span class="n">pconfig</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="s1">&#39;lowres_oceans&#39;</span><span class="p">]</span>
+        <span class="n">oceanfile</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">oceanfile</span><span class="p">,</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
 
-        <span class="c1"># create intensity overlay</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating intensity overlay...&#39;</span><span class="p">)</span>
-        <span class="n">overlay_file</span> <span class="o">=</span> <span class="n">create_overlay_kml</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">topofile</span><span class="p">,</span> <span class="n">datadir</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Wrote intensity overlay file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">overlay_file</span><span class="p">)</span></div></div>
+        <span class="c1"># call create_kmz function</span>
+        <span class="n">create_kmz</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+
+        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 
 
-<div class="viewcode-block" id="create_overlay_kml"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_overlay_kml">[docs]</a><span class="k">def</span> <span class="nf">create_overlay_kml</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">topofile</span><span class="p">,</span> <span class="n">datadir</span><span class="p">):</span>
-    <span class="n">overlay_img_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;ii_overlay.png&#39;</span><span class="p">)</span>
-    <span class="n">create_overlay_image</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">topofile</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+<div class="viewcode-block" id="create_kmz"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_kmz">[docs]</a><span class="k">def</span> <span class="nf">create_kmz</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="n">logger</span><span class="p">):</span>
+    <span class="c1"># we&#39;re going to combine all these layers into one KMZ file.</span>
+    <span class="n">kmz_contents</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># create the kml text</span>
     <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;kml&quot;</span><span class="p">)</span>
     <span class="n">nlink</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;NetworkLinkControl&quot;</span><span class="p">)</span>
-    <span class="n">nperiod</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">nlink</span><span class="p">,</span> <span class="s2">&quot;minRefreshPeriod&quot;</span><span class="p">)</span></div>
+    <span class="n">nperiod</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">nlink</span><span class="p">,</span> <span class="s2">&quot;minRefreshPeriod&quot;</span><span class="p">)</span>
+    <span class="n">nperiod</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;300&#39;</span>
+    <span class="n">document</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s1">&#39;Document&#39;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
+    <span class="n">eid</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
+    <span class="n">mag</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;magnitude&#39;</span><span class="p">]</span>
+    <span class="n">timestr</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;origin_time&#39;</span><span class="p">]</span>
+    <span class="n">namestr</span> <span class="o">=</span> <span class="s1">&#39;ShakeMap </span><span class="si">%s</span><span class="s1"> M</span><span class="si">%s</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">eid</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">timestr</span><span class="p">)</span>
+    <span class="n">name</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">namestr</span>
+    <span class="n">set_look</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">container</span><span class="p">)</span>
+
+    <span class="c1"># create intensity overlay</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating intensity overlay...&#39;</span><span class="p">)</span>
+    <span class="n">overlay_image</span> <span class="o">=</span> <span class="n">create_overlay</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
+    <span class="n">kmz_contents</span> <span class="o">+=</span> <span class="p">[</span><span class="n">overlay_image</span><span class="p">]</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created intensity overlay image </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">overlay_image</span><span class="p">)</span>
+
+    <span class="c1"># create station kml</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating station KML...&#39;</span><span class="p">)</span>
+    <span class="n">triangle_file</span><span class="p">,</span> <span class="n">circle_file</span> <span class="o">=</span> <span class="n">create_stations</span><span class="p">(</span><span class="n">container</span><span class="p">,</span>
+                                                 <span class="n">datadir</span><span class="p">,</span>
+                                                 <span class="n">document</span><span class="p">)</span>
+    <span class="n">kmz_contents</span> <span class="o">+=</span> <span class="p">[</span><span class="n">triangle_file</span><span class="p">,</span> <span class="n">circle_file</span><span class="p">]</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created station KML&#39;</span><span class="p">)</span>
+
+    <span class="c1"># create contour kml</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating contour KML...&#39;</span><span class="p">)</span>
+    <span class="n">create_contours</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created contour KML&#39;</span><span class="p">)</span>
+
+    <span class="c1"># create epicenter KML</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Creating epicenter KML...&#39;</span><span class="p">)</span>
+    <span class="n">create_epicenter</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created epicenter KML&#39;</span><span class="p">)</span>
+
+    <span class="c1"># place ShakeMap legend on the screen</span>
+    <span class="n">legend_file</span> <span class="o">=</span> <span class="n">place_legend</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">)</span>
+    <span class="n">kmz_contents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">legend_file</span><span class="p">)</span>
+
+    <span class="c1"># Write the uber-kml file</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">ElementTree</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+    <span class="n">kmlfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">KML_FILE</span><span class="p">)</span>
+    <span class="n">tree</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">kmlfile</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">kmz_contents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">kmlfile</span><span class="p">)</span>
+
+    <span class="c1"># assemble all the pieces into a KMZ file, and delete source files</span>
+    <span class="c1"># as we go</span>
+    <span class="n">kmzfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">KMZ_FILE</span><span class="p">)</span>
+    <span class="n">kmzip</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">kmzfile</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span>
+                            <span class="n">compression</span><span class="o">=</span><span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">kfile</span> <span class="ow">in</span> <span class="n">kmz_contents</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">arcname</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">kfile</span><span class="p">)</span>
+        <span class="n">kmzip</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">kfile</span><span class="p">,</span> <span class="n">arcname</span><span class="o">=</span><span class="n">arcname</span><span class="p">)</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">kfile</span><span class="p">)</span>
+    <span class="n">kmzip</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Wrote KMZ container file </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">kmzfile</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">kmzfile</span></div>
 
 
-<div class="viewcode-block" id="create_overlay_image"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_overlay_image">[docs]</a><span class="k">def</span> <span class="nf">create_overlay_image</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">topofile</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="place_legend"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.place_legend">[docs]</a><span class="k">def</span> <span class="nf">place_legend</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Place the ShakeMap intensity legend in the upper left corner of</span>
+<span class="sd">    the viewer&#39;s map.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        datadir (str): Path to data directory where output KMZ will be written.</span>
+<span class="sd">        document (Element): LXML KML Document element.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Path to output intensity legend file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">overlay</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;ScreenOverlay&#39;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">name</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Intensity Legend&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="s1">&#39;Icon&#39;</span><span class="p">)</span>
+    <span class="n">href</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">icon</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">)</span>
+    <span class="n">href</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">LEGEND</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="s1">&#39;overlayXY&#39;</span><span class="p">,</span>
+                         <span class="n">x</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;90&quot;</span><span class="p">,</span>
+                         <span class="n">xunits</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">,</span> <span class="n">yunits</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">)</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="s1">&#39;screenXY&#39;</span><span class="p">,</span>
+                         <span class="n">x</span><span class="o">=</span><span class="s2">&quot;5&quot;</span><span class="p">,</span>
+                         <span class="n">y</span><span class="o">=</span><span class="s2">&quot;1&quot;</span><span class="p">,</span>
+                         <span class="n">xunits</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">,</span>
+                         <span class="n">yunits</span><span class="o">=</span><span class="s2">&quot;fraction&quot;</span><span class="p">)</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="s1">&#39;size&#39;</span><span class="p">,</span>
+                         <span class="n">x</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                         <span class="n">y</span><span class="o">=</span><span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                         <span class="n">xunits</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">,</span>
+                         <span class="n">yunits</span><span class="o">=</span><span class="s2">&quot;pixels&quot;</span><span class="p">)</span>
+
+    <span class="c1"># we need to find the legend file and copy it to</span>
+    <span class="c1"># the output directory</span>
+    <span class="n">this_dir</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+    <span class="n">legend_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">LEGEND</span><span class="p">)</span>
+    <span class="n">legdest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">LEGEND</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">legend_file</span><span class="p">,</span> <span class="n">legdest</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">legdest</span></div>
+
+
+<div class="viewcode-block" id="create_epicenter"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_epicenter">[docs]</a><span class="k">def</span> <span class="nf">create_epicenter</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">document</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Place a star marker at earthquake epicenter.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        container (ShakeMapOutputContainer): Results of model.conf.</span>
+<span class="sd">        document (Element): LXML KML Document element.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;Style&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;epicenterIcon&quot;</span><span class="p">)</span>
+    <span class="n">iconstyle</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="s1">&#39;IconStyle&#39;</span><span class="p">)</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">iconstyle</span><span class="p">,</span> <span class="s1">&#39;Icon&#39;</span><span class="p">)</span>
+    <span class="n">href</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">icon</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">)</span>
+    <span class="n">href</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">EPICENTER_URL</span>
+    <span class="n">placemark</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;Placemark&#39;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">name</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Earthquake Epicenter&#39;</span>
+    <span class="n">point</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;Point&#39;</span><span class="p">)</span>
+    <span class="n">coordinates</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="s1">&#39;coordinates&#39;</span><span class="p">)</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
+    <span class="n">lon</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
+    <span class="n">coordinates</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">,</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">)</span>
+    <span class="n">styleurl</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;styleUrl&#39;</span><span class="p">)</span>
+    <span class="n">styleurl</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;#epicenterIcon&#39;</span>
+    <span class="n">visibility</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;visibility&#39;</span><span class="p">)</span>
+    <span class="n">visibility</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span></div>
+
+
+<div class="viewcode-block" id="create_contours"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_contours">[docs]</a><span class="k">def</span> <span class="nf">create_contours</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">document</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a KML file containing MMI contour lines.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        container (ShakeMapOutputContainer): Results of model.conf.</span>
+<span class="sd">        datadir (str): Path to data directory where output KMZ will be written.</span>
+<span class="sd">        document (Element): LXML KML Document element.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># TODO - label contours? gx:labelVisibility doesn&#39;t seem to be working...</span>
+    <span class="n">imts</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTs</span><span class="p">()</span>
+    <span class="k">if</span> <span class="s1">&#39;MMI&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imts</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="n">component</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">DEFAULT_FILTER_SIZE</span><span class="p">)</span>
+
+    <span class="c1"># make a folder for the contours</span>
+    <span class="n">folder</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;Folder&#39;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">name</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Contours&#39;</span>
+    <span class="n">visibility</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s1">&#39;visibility&#39;</span><span class="p">)</span>
+    <span class="n">visibility</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+
+    <span class="n">create_line_styles</span><span class="p">(</span><span class="n">folder</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line_string</span> <span class="ow">in</span> <span class="n">line_strings</span><span class="p">:</span>
+        <span class="n">placemark</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">folder</span><span class="p">,</span> <span class="s1">&#39;Placemark&#39;</span><span class="p">)</span>
+        <span class="n">visibility</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;visibility&#39;</span><span class="p">)</span>
+        <span class="n">visibility</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+        <span class="n">styleurl</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;styleUrl&#39;</span><span class="p">)</span>
+        <span class="n">mmi</span> <span class="o">=</span> <span class="n">line_string</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="n">styleurl</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;#style_mi_</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mmi</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+        <span class="n">name</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;MMI </span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">mmi</span><span class="p">)</span>
+        <span class="n">geometry</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;MultiGeometry&#39;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">segment</span> <span class="ow">in</span> <span class="n">line_string</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">]:</span>
+            <span class="n">linestring</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">geometry</span><span class="p">,</span> <span class="s1">&#39;LineString&#39;</span><span class="p">)</span>
+            <span class="n">coordinates</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">linestring</span><span class="p">,</span> <span class="s1">&#39;coordinates&#39;</span><span class="p">)</span>
+            <span class="n">ctext</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+            <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">segment</span><span class="p">:</span>
+                <span class="n">lon</span> <span class="o">=</span> <span class="n">vertex</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">lat</span> <span class="o">=</span> <span class="n">vertex</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">ctext</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">,</span><span class="si">%.4f</span><span class="s1">,0</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">)</span>
+            <span class="n">coordinates</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">ctext</span></div>
+
+
+<div class="viewcode-block" id="set_look"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.set_look">[docs]</a><span class="k">def</span> <span class="nf">set_look</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">container</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Set the view location, altitude, and angle.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        document (Element): LXML KML Document element.</span>
+<span class="sd">        container (ShakeMapOutputContainer): Results of model.conf.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># set the view so that we&#39;re looking straight down</span>
+    <span class="n">lookat</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;LookAt&#39;</span><span class="p">)</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
+    <span class="n">lon</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>
+    <span class="n">lat</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span>
+    <span class="n">longitude</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">lookat</span><span class="p">,</span> <span class="s1">&#39;longitude&#39;</span><span class="p">)</span>
+    <span class="n">longitude</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">lon</span>
+    <span class="n">latitude</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">lookat</span><span class="p">,</span> <span class="s1">&#39;latitude&#39;</span><span class="p">)</span>
+    <span class="n">latitude</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">lat</span>
+    <span class="n">altitude</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">lookat</span><span class="p">,</span> <span class="s1">&#39;altitude&#39;</span><span class="p">)</span>
+    <span class="n">altitude</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">LOOKAT_ALTITUDE</span>
+    <span class="n">tilt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">lookat</span><span class="p">,</span> <span class="s1">&#39;tilt&#39;</span><span class="p">)</span>
+    <span class="n">tilt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+    <span class="n">altmode</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">lookat</span><span class="p">,</span> <span class="s1">&#39;altitudeMode&#39;</span><span class="p">)</span>
+    <span class="n">altmode</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;absolute&#39;</span></div>
+
+
+<div class="viewcode-block" id="create_line_styles"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_line_styles">[docs]</a><span class="k">def</span> <span class="nf">create_line_styles</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create line styles for contour KML.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        document (Element): LXML KML Document element.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">gxns</span> <span class="o">=</span> <span class="s1">&#39;http://www.google.com/kml/ext/2.2&#39;</span>
+    <span class="n">nsmap</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gx&#39;</span><span class="p">:</span> <span class="n">gxns</span><span class="p">}</span>
+    <span class="n">cpalette</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">mmi</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">):</span>
+        <span class="n">pid</span> <span class="o">=</span> <span class="s1">&#39;style_mi_</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">mmi</span>
+        <span class="n">style</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;Style&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">pid</span><span class="p">)</span>
+        <span class="n">linestyle</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="s1">&#39;LineStyle&#39;</span><span class="p">)</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">linestyle</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">)</span>
+        <span class="n">rgb</span> <span class="o">=</span> <span class="n">cpalette</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">mmi</span><span class="p">,</span> <span class="n">color_format</span><span class="o">=</span><span class="s1">&#39;hex&#39;</span><span class="p">)</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">flip_rgb</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">linestyle</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">)</span>
+        <span class="n">width</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;2.0&#39;</span>
+        <span class="c1"># TODO: this doesn&#39;t work!</span>
+        <span class="n">vis</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">linestyle</span><span class="p">,</span>
+                               <span class="s1">&#39;{</span><span class="si">%s</span><span class="s1">}labelVisibility&#39;</span> <span class="o">%</span> <span class="n">gxns</span><span class="p">,</span>
+                               <span class="n">nsmap</span><span class="o">=</span><span class="n">nsmap</span><span class="p">)</span>
+        <span class="n">vis</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span></div>
+
+
+<div class="viewcode-block" id="create_overlay"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_overlay">[docs]</a><span class="k">def</span> <span class="nf">create_overlay</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a KML file and intensity map.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        container (ShakeMapOutputContainer): Results of model.conf.</span>
+<span class="sd">        oceanfile (str): Path to shapefile containing ocean polygons.</span>
+<span class="sd">        datadir (str): Path to data directory where output KMZ will be written.</span>
+<span class="sd">        document (SubElement): KML document where the overlay tags should go.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: (Path to output KMZ file, Path to output overlay image)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># create the overlay image file</span>
+    <span class="n">overlay_img_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">OVERLAY_IMG</span><span class="p">)</span>
+    <span class="n">geodict</span> <span class="o">=</span> <span class="n">create_overlay_image</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="n">overlay_img_file</span><span class="p">)</span>
+
+    <span class="n">overlay</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;GroundOverlay&#39;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">name</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Intensity Overlay&#39;</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">)</span>
+    <span class="n">color</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;ffffffff&#39;</span>
+    <span class="n">draw_order</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="s1">&#39;drawOrder&#39;</span><span class="p">)</span>
+    <span class="n">draw_order</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="s1">&#39;Icon&#39;</span><span class="p">)</span>
+    <span class="n">interval</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">icon</span><span class="p">,</span> <span class="s1">&#39;refreshInterval&#39;</span><span class="p">)</span>
+    <span class="n">interval</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;300&#39;</span>
+    <span class="n">mode</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">icon</span><span class="p">,</span> <span class="s1">&#39;refreshMode&#39;</span><span class="p">)</span>
+    <span class="n">mode</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;onInterval&#39;</span>
+    <span class="n">href</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">icon</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">)</span>
+    <span class="n">href</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">OVERLAY_IMG</span>
+    <span class="n">box</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">overlay</span><span class="p">,</span> <span class="s1">&#39;LatLonBox&#39;</span><span class="p">)</span>
+    <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span> <span class="o">=</span> <span class="p">(</span><span class="n">geodict</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">geodict</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span>
+                              <span class="n">geodict</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">geodict</span><span class="o">.</span><span class="n">ymax</span><span class="p">)</span>
+    <span class="n">north</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="s1">&#39;north&#39;</span><span class="p">)</span>
+    <span class="n">north</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ymax</span>
+    <span class="n">south</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="s1">&#39;south&#39;</span><span class="p">)</span>
+    <span class="n">south</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ymin</span>
+    <span class="n">east</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="s1">&#39;east&#39;</span><span class="p">)</span>
+    <span class="n">east</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">xmax</span>
+    <span class="n">west</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">box</span><span class="p">,</span> <span class="s1">&#39;west&#39;</span><span class="p">)</span>
+    <span class="n">west</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">xmin</span>
+
+    <span class="k">return</span> <span class="n">overlay_img_file</span></div>
+
+
+<div class="viewcode-block" id="create_overlay_image"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_overlay_image">[docs]</a><span class="k">def</span> <span class="nf">create_overlay_image</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a semi-transparent PNG image of intensity.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        container (ShakeMapOutputContainer): Results of model.conf.</span>
+<span class="sd">        oceanfile (str): Path to shapefile containing ocean polygons.</span>
+<span class="sd">        filename (str): Path to desired output PNG file.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        GeoDict: GeoDict object for the intensity grid.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># extract the intensity data from the container</span>
     <span class="n">comp</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">,</span> <span class="n">comp</span><span class="p">)</span>
@@ -165,15 +452,399 @@
     <span class="c1"># set the alpha value to 255 wherever we have MMI 0</span>
     <span class="n">rgba</span><span class="p">[</span><span class="n">imtdata</span> <span class="o">&lt;=</span> <span class="mf">1.5</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="c1"># we need to mask off the areas covered by water</span>
-    <span class="c1"># get topo layer and project it</span>
-    <span class="n">topogrid</span> <span class="o">=</span> <span class="n">GMTGrid</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">topofile</span><span class="p">,</span> <span class="n">samplegeodict</span><span class="o">=</span><span class="n">gd</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">topodata</span> <span class="o">=</span> <span class="n">topogrid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-    <span class="n">rgba</span><span class="p">[</span><span class="n">topodata</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="c1"># mask off the areas covered by ocean</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="p">(</span><span class="n">gd</span><span class="o">.</span><span class="n">xmin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymin</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">xmax</span><span class="p">,</span> <span class="n">gd</span><span class="o">.</span><span class="n">ymax</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">oceanfile</span><span class="p">)</span> <span class="k">as</span> <span class="n">c</span><span class="p">:</span>
+        <span class="n">tshapes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">c</span><span class="o">.</span><span class="n">items</span><span class="p">(</span><span class="n">bbox</span><span class="o">=</span><span class="n">bbox</span><span class="p">))</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">tshp</span> <span class="ow">in</span> <span class="n">tshapes</span><span class="p">:</span>
+            <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">shape</span><span class="p">(</span><span class="n">tshp</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">]))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapes</span><span class="p">):</span>
+            <span class="n">oceangrid</span> <span class="o">=</span> <span class="n">Grid2D</span><span class="o">.</span><span class="n">rasterizeFromGeometry</span><span class="p">(</span><span class="n">shapes</span><span class="p">,</span> <span class="n">gd</span><span class="p">,</span> <span class="n">fillValue</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
+            <span class="n">rgba</span><span class="p">[</span><span class="n">oceangrid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
 
     <span class="c1"># save rgba image as png</span>
     <span class="n">img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">rgba</span><span class="p">)</span>
-    <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
+    <span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gd</span></div>
+
+
+<div class="viewcode-block" id="create_stations"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_stations">[docs]</a><span class="k">def</span> <span class="nf">create_stations</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">document</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a KMZ file containing station KML and necessary icons files.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        container (ShakeMapOutputContainer): Results of model.conf.</span>
+<span class="sd">        datadir (str): Path to data directory where output KMZ will be written.</span>
+<span class="sd">        document (Element): LXML KML Document element.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str: Path to output KMZ file.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">create_styles</span><span class="p">(</span><span class="n">document</span><span class="p">)</span>
+
+    <span class="c1"># get a color palette object to convert intensity values to</span>
+    <span class="c1"># html colors</span>
+    <span class="n">cpalette</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
+
+    <span class="c1"># get the station data from the container</span>
+    <span class="n">station_dict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getStationDict</span><span class="p">()</span>
+
+    <span class="c1"># Group the MMI and instrumented stations separately</span>
+    <span class="n">mmi_folder</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;Folder&#39;</span><span class="p">)</span>
+    <span class="n">mmi_name</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">mmi_folder</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">mmi_name</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Macroseismic Stations&#39;</span>
+    <span class="n">mmi_vis</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">mmi_folder</span><span class="p">,</span> <span class="s1">&#39;visibility&#39;</span><span class="p">)</span>
+    <span class="n">mmi_vis</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+
+    <span class="n">ins_folder</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;Folder&#39;</span><span class="p">)</span>
+    <span class="n">ins_name</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">ins_folder</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">ins_name</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Instrumented Stations&#39;</span>
+    <span class="n">ins_vis</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">ins_folder</span><span class="p">,</span> <span class="s1">&#39;visibility&#39;</span><span class="p">)</span>
+    <span class="n">ins_vis</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+    <span class="k">for</span> <span class="n">station</span> <span class="ow">in</span> <span class="n">station_dict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;station_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;seismic&#39;</span><span class="p">:</span>
+            <span class="n">make_placemark</span><span class="p">(</span><span class="n">ins_folder</span><span class="p">,</span> <span class="n">station</span><span class="p">,</span> <span class="n">cpalette</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">make_placemark</span><span class="p">(</span><span class="n">mmi_folder</span><span class="p">,</span> <span class="n">station</span><span class="p">,</span> <span class="n">cpalette</span><span class="p">)</span>
+
+    <span class="c1"># we need to find the triangle and circle icons and copy them to</span>
+    <span class="c1"># the output directory</span>
+    <span class="n">this_dir</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span>
+    <span class="n">data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">this_dir</span><span class="p">,</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">)</span>
+    <span class="n">triangle_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">TRIANGLE</span><span class="p">)</span>
+    <span class="n">circle_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="n">CIRCLE</span><span class="p">)</span>
+    <span class="n">tridest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">TRIANGLE</span><span class="p">)</span>
+    <span class="n">cirdest</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="n">CIRCLE</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">triangle_file</span><span class="p">,</span> <span class="n">tridest</span><span class="p">)</span>
+    <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">circle_file</span><span class="p">,</span> <span class="n">cirdest</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">tridest</span><span class="p">,</span> <span class="n">cirdest</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="make_placemark"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.make_placemark">[docs]</a><span class="k">def</span> <span class="nf">make_placemark</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">station</span><span class="p">,</span> <span class="n">cpalette</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a placemark element in station KML.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        document (Element): LXML KML Document element.</span>
+<span class="sd">        station (dict): Dictionary containing station data.</span>
+<span class="sd">        cpalette (ColorPalette): Object allowing user to convert MMI to color.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">placemark</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;Placemark&#39;</span><span class="p">)</span>
+    <span class="n">style_url</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;styleUrl&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;network&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;INTENSITY&#39;</span><span class="p">,</span> <span class="s1">&#39;DYFI&#39;</span><span class="p">,</span> <span class="s1">&#39;CIIM&#39;</span><span class="p">]:</span>
+        <span class="n">style_url</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;#dyfiIconMap&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">style_url</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;#stationIconMap&#39;</span>
+    <span class="n">style</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;Style&#39;</span><span class="p">)</span>
+    <span class="n">icon_style</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">style</span><span class="p">,</span> <span class="s1">&#39;IconStyle&#39;</span><span class="p">)</span>
+    <span class="n">color</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">icon_style</span><span class="p">,</span> <span class="s1">&#39;color&#39;</span><span class="p">)</span>
+    <span class="n">intensity</span> <span class="o">=</span> <span class="n">get_intensity</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
+    <span class="n">rgb</span> <span class="o">=</span> <span class="n">cpalette</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">intensity</span><span class="p">,</span> <span class="n">color_format</span><span class="o">=</span><span class="s1">&#39;hex&#39;</span><span class="p">)</span>
+    <span class="n">color</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">flip_rgb</span><span class="p">(</span><span class="n">rgb</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;name&#39;</span><span class="p">)</span>
+    <span class="n">name</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+    <span class="n">visibility</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;visibility&#39;</span><span class="p">)</span>
+    <span class="n">visibility</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+    <span class="n">description</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;description&#39;</span><span class="p">)</span>
+    <span class="n">description</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">CDATA</span><span class="p">(</span><span class="n">get_description_table</span><span class="p">(</span><span class="n">station</span><span class="p">))</span>
+    <span class="n">point</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">placemark</span><span class="p">,</span> <span class="s1">&#39;Point&#39;</span><span class="p">)</span>
+    <span class="n">alt_model</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="s1">&#39;altitudeModel&#39;</span><span class="p">)</span>
+    <span class="n">alt_model</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;clampToGround&#39;</span>
+    <span class="n">coordinates</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="s1">&#39;coordinates&#39;</span><span class="p">)</span>
+    <span class="n">coordinates</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">,</span><span class="si">%.4f</span><span class="s1">,0&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="nb">tuple</span><span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">]))</span></div>
+
+
+<div class="viewcode-block" id="get_intensity"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.get_intensity">[docs]</a><span class="k">def</span> <span class="nf">get_intensity</span><span class="p">(</span><span class="n">station</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Retrieve the intensity value from a station dictionary.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        station (dict): Dictionary containing station data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        float: Intensity value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">intensity</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">intensity</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
+        <span class="n">channels</span> <span class="o">=</span> <span class="p">[</span><span class="n">channel</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="s1">&#39;mmi&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
+            <span class="n">intensity</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mmi_idx</span> <span class="o">=</span> <span class="n">channels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
+            <span class="n">mmid</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">][</span><span class="n">mmi_idx</span><span class="p">]</span>
+            <span class="n">intensity</span> <span class="o">=</span> <span class="n">mmid</span><span class="p">[</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">intensity</span></div>
+
+
+<div class="viewcode-block" id="get_description_table"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.get_description_table">[docs]</a><span class="k">def</span> <span class="nf">get_description_table</span><span class="p">(</span><span class="n">station</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get station description as HTML table.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        station (dict): Dictionary containing station data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: String containing HTML table describing station.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">table</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">,</span> <span class="n">border</span><span class="o">=</span><span class="s1">&#39;1&#39;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;network&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;INTENSITY&#39;</span><span class="p">,</span> <span class="s1">&#39;DYFI&#39;</span><span class="p">,</span> <span class="s1">&#39;CIIM&#39;</span><span class="p">]:</span>
+        <span class="n">network</span> <span class="o">=</span> <span class="s1">&#39;DYFI&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">network</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;network&#39;</span><span class="p">]</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s1">&#39;Network&#39;</span><span class="p">,</span> <span class="n">network</span><span class="p">)</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s1">&#39;Station ID&#39;</span><span class="p">,</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s1">&#39;Location&#39;</span><span class="p">,</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;location&#39;</span><span class="p">])</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span>
+             <span class="s1">&#39;Lat&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span>
+             <span class="s1">&#39;Lon&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span>
+             <span class="s1">&#39;Distance to source&#39;</span><span class="p">,</span>
+             <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">])</span>
+
+    <span class="n">intensity_string</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">get_intensity</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
+    <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s1">&#39;Intensity&#39;</span><span class="p">,</span> <span class="n">intensity_string</span><span class="p">)</span>
+
+    <span class="c1"># get the list of IMTs in the station tag</span>
+    <span class="n">imt_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]:</span>
+        <span class="k">for</span> <span class="n">amplitude</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">[</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">amplitude</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;mmi&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">imt_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">amplitude</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+
+    <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">imt_list</span><span class="p">:</span>
+        <span class="n">imt_str</span> <span class="o">=</span> <span class="n">imt_to_string</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
+        <span class="n">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">imt_str</span><span class="p">,</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">imt</span><span class="p">))</span>
+
+    <span class="n">desc_xml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">table</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">desc_xml</span></div>
+
+
+<div class="viewcode-block" id="imt_to_string"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.imt_to_string">[docs]</a><span class="k">def</span> <span class="nf">imt_to_string</span><span class="p">(</span><span class="n">imt</span><span class="p">):</span>
+    <span class="n">non_spectrals</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;pga&#39;</span><span class="p">:</span> <span class="s1">&#39;PGA&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;pgv&#39;</span><span class="p">:</span> <span class="s1">&#39;PGV&#39;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">non_spectrals</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">non_spectrals</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
+    <span class="n">period</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;\d+\.\d+&quot;</span><span class="p">,</span> <span class="n">imt</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">()</span>  <span class="c1"># noqa</span>
+    <span class="n">imt_string</span> <span class="o">=</span> <span class="s1">&#39;PSA </span><span class="si">%s</span><span class="s1"> sec&#39;</span> <span class="o">%</span> <span class="n">period</span>
+    <span class="k">return</span> <span class="n">imt_string</span></div>
+
+
+<div class="viewcode-block" id="make_row"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.make_row">[docs]</a><span class="k">def</span> <span class="nf">make_row</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a row in the description table.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        table (Element): LXML Element for table tag.</span>
+<span class="sd">        key (str): Text for left hand column of row.</span>
+<span class="sd">        value (str): Text for right hand column of row.</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="s1">&#39;tr&#39;</span><span class="p">)</span>
+    <span class="n">row_col1</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;td&#39;</span><span class="p">)</span>
+    <span class="n">row_col1</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">key</span>
+    <span class="n">row_col2</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">row</span><span class="p">,</span> <span class="s1">&#39;td&#39;</span><span class="p">)</span>
+    <span class="n">row_col2</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">value</span></div>
+
+
+<div class="viewcode-block" id="get_description"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.get_description">[docs]</a><span class="k">def</span> <span class="nf">get_description</span><span class="p">(</span><span class="n">station</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get station description as HTML definition list.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        station (dict): Dictionary containing station data.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: String containing HTML definition list describing station.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">dl</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;dl&quot;</span><span class="p">)</span>
+    <span class="n">network_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">network_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;NETWORK:&#39;</span>
+    <span class="n">network_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;network&#39;</span><span class="p">]</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;INTENSITY&#39;</span><span class="p">,</span> <span class="s1">&#39;DYFI&#39;</span><span class="p">,</span> <span class="s1">&#39;CIIM&#39;</span><span class="p">]:</span>
+        <span class="n">network_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;DYFI&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">network_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;network&#39;</span><span class="p">]</span>
+
+    <span class="n">station_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">station_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Station ID:&#39;</span>
+    <span class="n">station_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="n">station_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+
+    <span class="n">location_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">location_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Location:&#39;</span>
+    <span class="n">location_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="n">location_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;location&#39;</span><span class="p">]</span>
+
+    <span class="n">lat_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">lat_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Lat:&#39;</span>
+    <span class="n">lat_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="n">lat_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">lon_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">lon_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Lon:&#39;</span>
+    <span class="n">lon_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="n">lon_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.4f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="n">distance_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">distance_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Distance to source:&#39;</span>
+    <span class="n">distance_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="n">distance_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.2f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;distance&#39;</span><span class="p">]</span>
+
+    <span class="n">intensity_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">intensity_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;Intensity:&#39;</span>
+    <span class="n">intensity_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="n">intensity_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">get_intensity</span><span class="p">(</span><span class="n">station</span><span class="p">)</span>
+
+    <span class="c1"># get the names of all the IMTs</span>
+    <span class="c1"># TODO: Get list of IMTs dynamically from the data.</span>
+    <span class="n">pga_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">pga_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;PGA:&#39;</span>
+    <span class="n">pga_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="n">pga_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s1">&#39;pga&#39;</span><span class="p">)</span>
+
+    <span class="n">pgv_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">pgv_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;PGV:&#39;</span>
+    <span class="n">pgv_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="n">pgv_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s1">&#39;pgv&#39;</span><span class="p">)</span>
+
+    <span class="n">psa03_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">psa03_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;PSA 0.3 sec:&#39;</span>
+    <span class="n">psa03_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="n">psa03_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s1">&#39;sa(0.3)&#39;</span><span class="p">)</span>
+
+    <span class="n">psa10_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">psa10_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;PSA 1.0 sec:&#39;</span>
+    <span class="n">psa10_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="n">psa10_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s1">&#39;sa(1.0)&#39;</span><span class="p">)</span>
+
+    <span class="n">psa30_dt</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dt&#39;</span><span class="p">)</span>
+    <span class="n">psa30_dt</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;PSA 3.0 sec:&#39;</span>
+    <span class="n">psa30_dd</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dl</span><span class="p">,</span> <span class="s1">&#39;dd&#39;</span><span class="p">)</span>
+    <span class="n">psa30_dd</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="s1">&#39;sa(3.0)&#39;</span><span class="p">)</span>
+
+    <span class="n">desc_xml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">dl</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf8&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">desc_xml</span></div>
+
+
+<div class="viewcode-block" id="get_imt_text"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.get_imt_text">[docs]</a><span class="k">def</span> <span class="nf">get_imt_text</span><span class="p">(</span><span class="n">station</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get a text string describing the value of input IMT.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        station (dict): Dictionary containing station data.</span>
+<span class="sd">        imt (str): IMT string (pga,pgv, sa(0.3), etc.)</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        str: IMT text string (i.e., &quot;7.1 cm/sec&quot;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">imt_max</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+    <span class="n">units</span> <span class="o">=</span> <span class="n">IMT_UNITS</span><span class="p">[</span><span class="n">imt</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">channel</span> <span class="ow">in</span> <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">channel</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;Z&#39;</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">for</span> <span class="n">amplitude</span> <span class="ow">in</span> <span class="n">channel</span><span class="p">[</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">amplitude</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">imt</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">imt_value</span> <span class="o">=</span> <span class="n">amplitude</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">imt_value</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">imt_value</span> <span class="o">&gt;</span> <span class="n">imt_max</span><span class="p">:</span>
+                <span class="n">imt_max</span> <span class="o">=</span> <span class="n">imt_value</span>
+
+    <span class="k">if</span> <span class="n">imt_max</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">imt_text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1"> </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_max</span><span class="p">,</span> <span class="n">units</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">imt_text</span> <span class="o">=</span> <span class="s1">&#39;nan </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">units</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">imt_text</span></div>
+
+
+<div class="viewcode-block" id="create_styles"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.create_styles">[docs]</a><span class="k">def</span> <span class="nf">create_styles</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create styles/style maps for station KML.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        document (Element): LXML KML Document element.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">add_icon_style</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;stationIconNormal&#39;</span><span class="p">,</span> <span class="n">TRIANGLE</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">add_icon_style</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;stationIconHighlight&#39;</span><span class="p">,</span> <span class="n">TRIANGLE</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+    <span class="n">add_icon_style</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;dyfiIconNormal&#39;</span><span class="p">,</span> <span class="n">CIRCLE</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">)</span>
+    <span class="n">add_icon_style</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;dyfiIconHighlight&#39;</span><span class="p">,</span> <span class="n">CIRCLE</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="n">add_style_map</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;station&#39;</span><span class="p">)</span>
+    <span class="n">add_style_map</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;dyfi&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="add_icon_style"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.add_icon_style">[docs]</a><span class="k">def</span> <span class="nf">add_icon_style</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">icon_id</span><span class="p">,</span> <span class="n">icon_text</span><span class="p">,</span> <span class="n">icon_scale</span><span class="p">,</span> <span class="n">label_scale</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create Style tag around Icon in KML.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        document (Element): LXML KML Document element.</span>
+<span class="sd">        icon_id (str): Id field in Style tag.</span>
+<span class="sd">        icon_text (str): The name of the icon file.</span>
+<span class="sd">        icon_scale (float): The icon scale.</span>
+<span class="sd">        label_scale (float): The label scale.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">normal_station_style</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;Style&#39;</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="n">icon_id</span><span class="p">)</span>
+    <span class="n">icon_style</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">normal_station_style</span><span class="p">,</span> <span class="s1">&#39;IconStyle&#39;</span><span class="p">)</span>
+    <span class="n">scale1</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">icon_style</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">)</span>
+    <span class="n">scale1</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">icon_scale</span>
+    <span class="n">icon</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">icon_style</span><span class="p">,</span> <span class="s1">&#39;Icon&#39;</span><span class="p">)</span>
+    <span class="n">href</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">icon</span><span class="p">,</span> <span class="s1">&#39;href&#39;</span><span class="p">)</span>
+    <span class="n">href</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">icon_text</span>
+    <span class="n">label_style</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">normal_station_style</span><span class="p">,</span> <span class="s1">&#39;LabelStyle&#39;</span><span class="p">)</span>
+    <span class="n">scale2</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">label_style</span><span class="p">,</span> <span class="s1">&#39;scale&#39;</span><span class="p">)</span>
+    <span class="n">scale2</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%.1f</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">label_scale</span>
+    <span class="n">list_style</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">normal_station_style</span><span class="p">,</span> <span class="s1">&#39;ListStyle&#39;</span><span class="p">)</span>
+    <span class="n">item_type</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">list_style</span><span class="p">,</span> <span class="s1">&#39;listItemType&#39;</span><span class="p">)</span>
+    <span class="n">item_type</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;checkHideChildren&#39;</span>
+    <span class="n">balloon_style</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">normal_station_style</span><span class="p">,</span> <span class="s1">&#39;BalloonStyle&#39;</span><span class="p">)</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">balloon_style</span><span class="p">,</span> <span class="s1">&#39;text&#39;</span><span class="p">)</span>
+    <span class="n">text</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;$[description]&#39;</span></div>
+
+
+<div class="viewcode-block" id="add_style_map"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.add_style_map">[docs]</a><span class="k">def</span> <span class="nf">add_style_map</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">style_type</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create the StyleMap tags used by the placemark elements.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        document (Element): LXML KML Document element.</span>
+<span class="sd">        style_type (str): &quot;station&quot; or &quot;dyfi&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">style_map</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span>
+                                 <span class="s1">&#39;StyleMap&#39;</span><span class="p">,</span>
+                                 <span class="nb">id</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">IconMap&#39;</span> <span class="o">%</span> <span class="n">style_type</span><span class="p">)</span>
+
+    <span class="n">pair1</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">style_map</span><span class="p">,</span> <span class="s1">&#39;Pair&#39;</span><span class="p">)</span>
+    <span class="n">key1</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">pair1</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">)</span>
+    <span class="n">key1</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;normal&#39;</span>
+    <span class="n">style_url</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">pair1</span><span class="p">,</span> <span class="s1">&#39;styleUrl&#39;</span><span class="p">)</span>
+    <span class="n">style_url</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;#</span><span class="si">%s</span><span class="s1">IconNormal&#39;</span> <span class="o">%</span> <span class="n">style_type</span>
+
+    <span class="n">pair2</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">style_map</span><span class="p">,</span> <span class="s1">&#39;Pair&#39;</span><span class="p">)</span>
+    <span class="n">key2</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">pair2</span><span class="p">,</span> <span class="s1">&#39;key&#39;</span><span class="p">)</span>
+    <span class="n">key2</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;highlight&#39;</span>
+    <span class="n">style_url</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">pair2</span><span class="p">,</span> <span class="s1">&#39;styleUrl&#39;</span><span class="p">)</span>
+    <span class="n">style_url</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;#</span><span class="si">%s</span><span class="s1">IconHighlight&#39;</span> <span class="o">%</span> <span class="n">style_type</span></div>
+
+
+<div class="viewcode-block" id="flip_rgb"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.kml.html#shakemap.coremods.kml.flip_rgb">[docs]</a><span class="k">def</span> <span class="nf">flip_rgb</span><span class="p">(</span><span class="n">rgb</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reverse order of RGB hex string, prepend &#39;ff&#39; for transparency.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        rgb: RGB hex string (#E1C2D3)</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        str: ABGR hex string (#ffd3c2e1).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># because Google decided that colors in KML should be</span>
+    <span class="c1"># specified as ABGR instead of RGBA, we have to reverse the</span>
+    <span class="c1"># sense of our color.</span>
+    <span class="c1"># so given #E1C2D3, (red E1, green C2, blue D3) convert to #ffd3c2e1</span>
+    <span class="c1"># where the first hex pair is transparency and the others are in</span>
+    <span class="c1"># reverse order.</span>
+    <span class="n">abgr</span> <span class="o">=</span> <span class="n">rgb</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">abgr</span> <span class="o">=</span> <span class="s1">&#39;#FF&#39;</span> <span class="o">+</span> <span class="n">abgr</span><span class="p">[</span><span class="mi">4</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span> <span class="o">+</span> <span class="n">abgr</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="n">abgr</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+    <span class="n">abgr</span> <span class="o">=</span> <span class="n">abgr</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">abgr</span></div>
 </pre></div>
 
           </div>

@@ -157,7 +157,6 @@ def create(config, profile, accept, ppath):
                   'select.conf',
                   'products.conf',
                   'shake.conf',
-                  'extent.conf',
                   'logging.conf',
                   'transfer.conf',
                   'migrate.conf']

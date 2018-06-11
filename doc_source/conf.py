@@ -134,7 +134,7 @@ html_theme_options = {
     'show_related': False,
     'fixed_sidebar': False,
     'sidebar_includehidden': True,
-    'sidebar_width': '250px',
+    'sidebar_width': '270px',
 }
 
 # Add any paths that contain custom themes here, relative to this directory.

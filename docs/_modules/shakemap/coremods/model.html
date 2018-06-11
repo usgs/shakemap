@@ -41,7 +41,6 @@
 <span class="kn">import</span> <span class="nn">time</span> <span class="k">as</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="k">import</span> <span class="n">gmtime</span><span class="p">,</span> <span class="n">strftime</span>
-<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 
@@ -96,6 +95,8 @@
              <span class="s1">&#39;min_mmi_convert&#39;</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span>
              <span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">:</span> <span class="mf">0.35</span><span class="p">}</span>
 
+<span class="n">TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span>
+
 
 <div class="viewcode-block" id="DataFrame"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.model.html#shakemap.coremods.model.DataFrame">[docs]</a><span class="k">class</span> <span class="nc">DataFrame</span><span class="p">:</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -111,6 +112,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;model&#39;</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/shake_result\.hdf&#39;</span><span class="p">]</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;shake_data.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
     <span class="c1"># supply here a data structure with information about files that</span>
     <span class="c1"># can be created by this module.</span>
@@ -299,7 +302,7 @@
         <span class="c1"># store it in the output container</span>
         <span class="c1">#</span>
         <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getInfo</span><span class="p">(</span><span class="n">moutgrid</span><span class="p">)</span>
-        <span class="n">oc</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">info</span><span class="p">))</span>
+        <span class="n">oc</span><span class="o">.</span><span class="n">setDictionary</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">,</span> <span class="n">info</span><span class="p">)</span>
 
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Add the rupture JSON as a text string</span>
@@ -325,7 +328,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_grid</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_storeRegressionData</span><span class="p">(</span><span class="n">oc</span><span class="p">)</span>
 
-        <span class="n">oc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        <span class="n">oc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ic</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
     <span class="c1"># ------------------------------------------------------------------</span>
     <span class="c1"># End execute()</span>
     <span class="c1"># ------------------------------------------------------------------</span>
@@ -391,6 +395,7 @@
         <span class="c1"># ------------------------------------------------------------------</span>
         <span class="c1"># Outlier parameters</span>
         <span class="c1"># ------------------------------------------------------------------</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">do_outliers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;outlier&#39;</span><span class="p">][</span><span class="s1">&#39;do_outliers&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outlier_deviation_level</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;outlier&#39;</span><span class="p">][</span><span class="s1">&#39;max_deviation&#39;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">outlier_max_mag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;outlier&#39;</span><span class="p">][</span><span class="s1">&#39;max_mag&#39;</span><span class="p">]</span>
@@ -577,8 +582,9 @@
                 <span class="c1"># Do the outlier flagging if we have a fault, or we don&#39;t</span>
                 <span class="c1"># have a fault but the event magnitude is under the limit</span>
                 <span class="c1"># ----------------------------------------------------------</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="p">,</span> <span class="n">PointRupture</span><span class="p">)</span> <span class="ow">or</span> \
-                   <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">mag</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outlier_max_mag</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_outliers</span> <span class="ow">and</span> \
+                        <span class="p">(</span><span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="p">,</span> <span class="n">PointRupture</span><span class="p">)</span> <span class="ow">or</span>
+                         <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">mag</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">outlier_max_mag</span><span class="p">):</span>
                     <span class="c1">#</span>
                     <span class="c1"># turn off nan warnings for this statement</span>
                     <span class="c1">#</span>
@@ -861,9 +867,9 @@
                 <span class="c1">#</span>
                 <span class="c1"># Compute the bias denominator and numerator terms</span>
                 <span class="c1">#</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">bias_den</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma22inv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Z</span><span class="p">))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">bias_num</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> \
-                    <span class="n">Z</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma22inv</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Z</span> <span class="o">*</span> <span class="n">sta_resids_dl</span><span class="p">))</span>
+                <span class="n">ztmp</span> <span class="o">=</span> <span class="n">Z</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">sigma22inv</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias_num</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">ztmp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Z</span> <span class="o">*</span> <span class="n">sta_resids_dl</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">bias_den</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">ztmp</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">Z</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bias_num</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">bias_den</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -1114,7 +1120,10 @@
 
         <span class="c1"># the following items are primarily useful for PDL</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">netid</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">netid</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">id</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">productcode</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;productsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;source_network&#39;</span><span class="p">]</span>
@@ -1131,7 +1140,7 @@
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">locstring</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;magnitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;origin_time&#39;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">TIMEFMT</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;df1&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframes</span><span class="p">:</span>
             <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;seismic_stations&#39;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]))</span>
@@ -1229,6 +1238,7 @@
         <span class="n">info</span><span class="p">[</span><span class="n">pp</span><span class="p">][</span><span class="n">ms</span><span class="p">][</span><span class="s1">&#39;bias_max_mag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias_max_mag</span><span class="p">)</span>
         <span class="n">info</span><span class="p">[</span><span class="n">pp</span><span class="p">][</span><span class="n">ms</span><span class="p">][</span><span class="s1">&#39;bias_max_range&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">bias_max_range</span><span class="p">)</span>
         <span class="n">info</span><span class="p">[</span><span class="n">pp</span><span class="p">][</span><span class="n">ms</span><span class="p">][</span><span class="s1">&#39;median_dist&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;True&#39;</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">pp</span><span class="p">][</span><span class="n">ms</span><span class="p">][</span><span class="s1">&#39;do_outliers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_outliers</span>
         <span class="n">info</span><span class="p">[</span><span class="n">pp</span><span class="p">][</span><span class="n">ms</span><span class="p">][</span><span class="s1">&#39;outlier_deviation_level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">outlier_deviation_level</span><span class="p">)</span>
         <span class="n">info</span><span class="p">[</span><span class="n">pp</span><span class="p">][</span><span class="n">ms</span><span class="p">][</span><span class="s1">&#39;outlier_max_mag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">outlier_max_mag</span><span class="p">)</span>
@@ -1237,7 +1247,7 @@
         <span class="n">info</span><span class="p">[</span><span class="n">pp</span><span class="p">][</span><span class="n">sv</span><span class="p">][</span><span class="s1">&#39;shakemap_revision_id&#39;</span><span class="p">]</span> <span class="o">=</span> \
             <span class="n">get_versions</span><span class="p">()[</span><span class="s1">&#39;full-revisionid&#39;</span><span class="p">]</span>
         <span class="n">info</span><span class="p">[</span><span class="n">pp</span><span class="p">][</span><span class="n">sv</span><span class="p">][</span><span class="s1">&#39;process_time&#39;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2"> %H:%M:%S%Z&quot;</span><span class="p">,</span> <span class="n">gmtime</span><span class="p">())</span>
+            <span class="n">strftime</span><span class="p">(</span><span class="n">TIMEFMT</span><span class="p">,</span> <span class="n">gmtime</span><span class="p">())</span>
         <span class="n">info</span><span class="p">[</span><span class="n">pp</span><span class="p">][</span><span class="n">sv</span><span class="p">][</span><span class="s1">&#39;map_version&#39;</span><span class="p">]</span> <span class="o">=</span> \
             <span class="bp">self</span><span class="o">.</span><span class="n">ic</span><span class="o">.</span><span class="n">getVersionHistory</span><span class="p">()[</span><span class="s1">&#39;history&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">info</span><span class="p">[</span><span class="n">pp</span><span class="p">][</span><span class="n">sv</span><span class="p">][</span><span class="s1">&#39;map_comment&#39;</span><span class="p">]</span> <span class="o">=</span> \
@@ -1809,7 +1819,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">mean_rat</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
     <span class="n">mygrade</span> <span class="o">=</span> <span class="s1">&#39;-&#39;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">do_grid</span> <span class="ow">or</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">outsd</span> <span class="ow">or</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">psd</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">do_grid</span> <span class="ow">or</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">outsd</span> <span class="ow">or</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">psd</span> \
+            <span class="ow">or</span> <span class="s1">&#39;MMI&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">moutgrid</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">mean_rat</span><span class="p">,</span> <span class="n">mygrade</span>
     <span class="n">sd_rat</span> <span class="o">=</span> <span class="n">outsd</span><span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">]</span> <span class="o">/</span> <span class="n">psd</span><span class="p">[</span><span class="s1">&#39;PGA&#39;</span><span class="p">]</span>
     <span class="n">mmimasked</span> <span class="o">=</span> <span class="n">ma</span><span class="o">.</span><span class="n">masked_less</span><span class="p">(</span><span class="n">moutgrid</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">],</span> <span class="mf">6.0</span><span class="p">)</span>

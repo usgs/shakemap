@@ -77,6 +77,7 @@
 <span class="sd">        - The OQ IMC &quot;HORIZONAL&quot; indicates that the horizontal IMC category</span>
 <span class="sd">          may be ambiguous. In these cases, we are assuming that it is a</span>
 <span class="sd">          random horizontal component as a default.</span>
+<span class="sd">        - Assumes ALL unknown IMC types are AVERAGE_HORIZONTAL</span>
 
 <span class="sd">    References</span>
 
@@ -146,6 +147,9 @@
                <span class="s1">&#39;Average Horizontal (RotD50)&#39;</span><span class="p">,</span>
                <span class="s1">&#39;Random horizontal&#39;</span><span class="p">,</span>
                <span class="s1">&#39;Horizontal&#39;</span><span class="p">]),}</span>
+        <span class="c1"># Check if any imc values are unknown. If they are, convert</span>
+        <span class="c1"># to AVERAGE_HORIZONTAL</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkUnknown</span><span class="p">()</span>
         <span class="c1"># Get shortest conversion &quot;path&quot; between imc_in and imc_out</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getShortestPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conversion_graph</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">imc_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_out</span><span class="p">)</span>
@@ -190,7 +194,7 @@
             <span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="o">.</span><span class="n">GREATER_OF_TWO_HORIZONTAL</span><span class="p">:</span>
                 <span class="nb">dict</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__sa_col_names</span><span class="p">,</span> <span class="p">[</span><span class="mf">1.1</span><span class="p">,</span> <span class="mf">1.2</span><span class="p">,</span> <span class="mf">0.04</span><span class="p">,</span> <span class="mf">0.07</span><span class="p">,</span> <span class="mf">1.02</span><span class="p">])))}</span>
 
-<div class="viewcode-block" id="BeyerBommer2006.convertAmpsOnce"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertAmpsOnce">[docs]</a>    <span class="k">def</span> <span class="nf">convertAmpsOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">rrups</span><span class="p">,</span> <span class="n">mag</span><span class="p">):</span>
+<div class="viewcode-block" id="BeyerBommer2006.convertAmpsOnce"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.beyer_bommer_2006.html#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertAmpsOnce">[docs]</a>    <span class="k">def</span> <span class="nf">convertAmpsOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">rrups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns amps converted from one IMC to another.</span>
 
@@ -200,18 +204,19 @@
 <span class="sd">            - IMC type &#39;VERTICAL&#39; is not supported</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            amps (array): Numpy array of ground motion amplitudes.</span>
-<span class="sd">            imc_in (IMC): OpenQuake IMC type of the input amp array.</span>
-<span class="sd">                `[link] &lt;http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC&gt;`__</span>
-<span class="sd">            imc_out (IMC): Desired OpenQuake IMC type of the output amps.</span>
-<span class="sd">                `[link] &lt;http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC&gt;`__</span>
 <span class="sd">            imt (IMT): OpenQuake IMT of the input amps (must be one of PGA,</span>
 <span class="sd">                PGV, or SA).</span>
 <span class="sd">                `[link] &lt;http://docs.openquake.org/oq-hazardlib/master/imt.html&gt;`</span>
 
+<span class="sd">            amps (array): Numpy array of ground motion amplitudes.</span>
+<span class="sd">            rrups (array): A numpy array of the same shape as amps,</span>
+<span class="sd">                containing the rupture distances of the ground motions.</span>
+<span class="sd">                Ignored by this method.</span>
+<span class="sd">            mag (float): The earthquake magnitude. Default is None.</span>
+<span class="sd">                 Ignored by this method.</span>
+
 <span class="sd">        Returns:</span>
 <span class="sd">            array: Numpy array of amps converted from imc_in to imc_out.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">denom</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__GM2other</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_in</span><span class="p">)</span>
@@ -229,13 +234,9 @@
 <span class="sd">            - IMC types &#39;VERTICAL&#39; and &#39;HORIZONTAL&#39; are not supported</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            sigmas (array): Numpy array of standard deviations.</span>
-<span class="sd">            imc_in (IMC): OpenQuake IMC type of the input sigmas array.</span>
-<span class="sd">                `[link] &lt;http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC&gt;`__</span>
-<span class="sd">            imc_out (IMC): Desired OpenQuake IMC type of the output sigmas.</span>
-<span class="sd">                `[link] &lt;http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC&gt;`__</span>
 <span class="sd">            imt (IMT): OpenQuake IMT of the input sigmas (must be one of PGA,</span>
 <span class="sd">                 PGV, or SA) `[link] &lt;http://docs.openquake.org/oq-hazardlib/master/imt.html&gt;`__</span>
+<span class="sd">            sigmas (array): Numpy array of standard deviations.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            array: Numpy array of standard deviations converted from imc_in to</span>

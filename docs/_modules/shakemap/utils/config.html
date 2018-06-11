@@ -35,6 +35,7 @@
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">pkg_resources</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">logging.config</span>
@@ -133,12 +134,18 @@
         <span class="n">install</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;install&#39;</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_path</span><span class="p">,</span> <span class="s1">&#39;eventdata&#39;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span> <span class="s1">&#39;.shakemap&#39;</span><span class="p">,</span>
-                                   <span class="s1">&#39;profiles.conf&#39;</span><span class="p">)</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span>
+            <span class="s1">&#39;.shakemap&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;profiles.conf&#39;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t find a profile file: &quot;</span>
                                     <span class="s2">&quot;have you run sm_profile?&quot;</span><span class="p">)</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
+
+        <span class="n">config</span> <span class="o">=</span> <span class="n">check_profile_config</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+
         <span class="n">profile_name</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profile&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">profile_name</span> <span class="ow">or</span> <span class="n">profile_name</span> <span class="o">==</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No profile set in the profiles.conf file&quot;</span><span class="p">)</span>
@@ -620,6 +627,39 @@
     <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="n">log_name</span><span class="p">]</span>
     <span class="k">del</span> <span class="n">log_config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="n">log_name</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">log_config</span></div>
+
+
+<div class="viewcode-block" id="check_profile_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.check_profile_config">[docs]</a><span class="k">def</span> <span class="nf">check_profile_config</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validation checks on the profile config. At least one profile must exist</span>
+<span class="sd">    (otherwise exit) and the paths for each profile should exist, otherwise the</span>
+<span class="sd">    profile entry is removed.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        config (ConfigObj): The ConfigObj instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check that at least one profile exists</span>
+    <span class="k">if</span> <span class="s1">&#39;profiles&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;There are currently no profiles. Use &quot;sm_profile &#39;</span>
+              <span class="s1">&#39;-c &lt;profile&gt;&quot; to create one.&#39;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Check that the paths for each profile exist</span>
+    <span class="k">for</span> <span class="n">profile</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profiles&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">data_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;profiles&#39;</span><span class="p">][</span><span class="n">profile</span><span class="p">][</span><span class="s1">&#39;data_path&#39;</span><span class="p">])</span>
+        <span class="n">delete_profile</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">data_exists</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Data path for profile </span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">profile</span><span class="p">)</span>
+            <span class="n">delete_profile</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">install_exists</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profiles&#39;</span><span class="p">][</span><span class="n">profile</span><span class="p">][</span><span class="s1">&#39;install_path&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">install_exists</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Install path for profile </span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">profile</span><span class="p">)</span>
+            <span class="n">delete_profile</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">delete_profile</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    Deleting profile </span><span class="si">%s</span><span class="s1">.&#39;</span> <span class="o">%</span> <span class="n">profile</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;profiles&#39;</span><span class="p">][</span><span class="n">profile</span><span class="p">]</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">write</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">config</span></div>
 
 
 <span class="k">def</span> <span class="nf">_clean_log_dict</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>

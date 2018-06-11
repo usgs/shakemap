@@ -42,88 +42,112 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
 <li class="toctree-l1"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="tg_architecture.html">2.1. Software Architecture</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tg_architecture.html#overview">2.1.1. Overview</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_architecture.html#programs">2.1.2. Programs</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#sm-profile">2.1.2.1. sm_profile</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#shake">2.1.2.2. shake</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#shake-modules">2.1.2.3. shake Modules</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#select">2.1.2.3.1. select</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#dyfi">2.1.2.3.2. dyfi</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#assemble">2.1.2.3.3. assemble</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#augment">2.1.2.3.4. augment</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#model">2.1.2.3.5. model</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#contour">2.1.2.3.6. contour</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#gridxml">2.1.2.3.7. gridxml</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#info">2.1.2.3.8. info</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#mapping">2.1.2.3.9. mapping</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#plotregr">2.1.2.3.10. plotregr</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#raster">2.1.2.3.11. raster</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#rupture">2.1.2.3.12. rupture</a></li>
-<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#stations">2.1.2.3.13. stations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_installation.html">2.1. Installation and Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tg_installation.html#installation">2.1.1. Installation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_installation.html#configuration">2.1.2. Configuration</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tg_installation.html#model-conf">2.1.2.1. model.conf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_installation.html#select-conf">2.1.2.2. select.conf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_installation.html#products-conf">2.1.2.3. products.conf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_installation.html#gmpe-sets-conf">2.1.2.4. gmpe_sets.conf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_installation.html#modules-conf">2.1.2.5. modules.conf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_installation.html#shake-conf">2.1.2.6. shake.conf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_installation.html#logging-conf">2.1.2.7. logging.conf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_installation.html#transfer-conf">2.1.2.8. transfer.conf</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_installation.html#migrate-conf">2.1.2.9. migrate.conf</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tg_installation.html#downloading-and-configuring-vs30-and-topography">2.1.3. Downloading and Configuring Vs30 and Topography</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="tg_architecture.html">2.2. Software Architecture</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tg_architecture.html#overview">2.2.1. Overview</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_architecture.html#programs">2.2.2. Programs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#sm-profile">2.2.2.1. sm_profile</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#shake">2.2.2.2. shake</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#shake-modules">2.2.2.3. shake Modules</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#select">2.2.2.3.1. select</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#dyfi">2.2.2.3.2. dyfi</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#assemble">2.2.2.3.3. assemble</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#augment">2.2.2.3.4. augment</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#model">2.2.2.3.5. model</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#contour">2.2.2.3.6. contour</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#gridxml">2.2.2.3.7. gridxml</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#info">2.2.2.3.8. info</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#kml">2.2.2.3.9. kml</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#mapping">2.2.2.3.10. mapping</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#plotregr">2.2.2.3.11. plotregr</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#raster">2.2.2.3.12. raster</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#rupture">2.2.2.3.13. rupture</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#stations">2.2.2.3.14. stations</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html#transfer">2.2.2.3.15. transfer</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="tg_architecture.html#additional-programs">2.1.3. Additional Programs</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#getdyfi">2.1.3.1. getdyfi</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#sm-create">2.1.3.2. sm_create</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_architecture.html#additional-programs">2.2.3. Additional Programs</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#getdyfi">2.2.3.1. getdyfi</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#sm-compare">2.2.3.2. sm_compare</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#sm-create">2.2.3.3. sm_create</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#sm-migrate">2.2.3.4. sm_migrate</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#sm-queue">2.2.3.5. sm_queue</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#receive-amps-receive-origins-and-associate-amps">2.2.3.6. receive_amps, receive_origins, and associate_amps</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html#run-verification">2.2.3.7. run_verification</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="tg_queue.html">2.2. Queueing Events</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tg_queue.html#aqms">2.2.1. AQMS</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_queue.html">2.3. Queueing Events</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tg_queue.html#aqms">2.3.1. AQMS</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="tg_processing.html">2.3. Data Processing</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#ground-motion-prediction">2.3.1. Ground-Motion Prediction</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#ground-motion-to-intensity-conversions">2.3.2. Ground Motion to Intensity Conversions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#intensity-prediction-equations">2.3.3. Intensity Prediction Equations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#cross-correlation-functions">2.3.4. Cross-correlation Functions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#data-handling-and-outliers">2.3.5. Data Handling and Outliers</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#interpolation">2.3.6. Interpolation</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#computation">2.3.6.1. Computation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#imt-selection">2.3.6.2. IMT Selection</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#event-bias">2.3.6.3. Event Bias</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#updating-the-within-event-standard-deviation">2.3.6.4. Updating the Within-Event Standard Deviation</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#weighting-of-residuals">2.3.6.5. Weighting of Residuals</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#summary">2.3.6.6. Summary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_processing.html">2.4. Data Processing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#ground-motion-prediction">2.4.1. Ground-Motion Prediction</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#ground-motion-to-intensity-conversions">2.4.2. Ground Motion to Intensity Conversions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#intensity-prediction-equations">2.4.3. Intensity Prediction Equations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#cross-correlation-functions">2.4.4. Cross-correlation Functions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#data-handling-and-outliers">2.4.5. Data Handling and Outliers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#interpolation">2.4.6. Interpolation</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#computation">2.4.6.1. Computation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#imt-selection">2.4.6.2. IMT Selection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#event-bias">2.4.6.3. Event Bias</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#updating-the-within-event-standard-deviation">2.4.6.4. Updating the Within-Event Standard Deviation</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#weighting-of-residuals">2.4.6.5. Weighting of Residuals</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html#summary">2.4.6.6. Summary</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#finite-rupture-approximations">2.3.7. Finite-rupture Approximations</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#output-points-vs-grids">2.3.8. Output: Points vs. Grids</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#performance-considerations">2.3.9. Performance Considerations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#finite-rupture-approximations">2.4.7. Finite-rupture Approximations</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#output-points-vs-grids">2.4.8. Output: Points vs. Grids</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_processing.html#performance-considerations">2.4.9. Performance Considerations</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="tg_formats.html">2.4. Data Formats</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tg_formats.html#about-the-hdf5-file-format">2.4.1. About the HDF5 File Format</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_formats.html#shake-data-hdf">2.4.2. shake_data.hdf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_formats.html#shake-result-hdf">2.4.3. shake_result.hdf</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_formats.html#generic-amplification-factors">2.4.4. Generic Amplification Factors</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_formats.html#stationlist-geojson">2.4.5. Stationlist GeoJSON</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_formats.html">2.5. Data Formats</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tg_formats.html#about-the-hdf5-file-format">2.5.1. About the HDF5 File Format</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_formats.html#shake-data-hdf">2.5.2. shake_data.hdf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_formats.html#shake-result-hdf">2.5.3. shake_result.hdf</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_formats.html#generic-amplification-factors">2.5.4. Generic Amplification Factors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_formats.html#stationlist-geojson">2.5.5. Stationlist GeoJSON</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="tg_verification.html">2.5. Verification</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0001">2.5.1. Test 0001</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0002">2.5.2. Test 0002</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0003">2.5.3. Test 0003</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0004">2.5.4. Test 0004</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0004b">2.5.5. Test 0004b</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0005">2.5.6. Test 0005</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0006">2.5.7. Test 0006</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0007">2.5.8. Test 0007</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0008">2.5.9. Test 0008</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0009">2.5.10. Test 0009</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0010">2.5.11. Test 0010</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0011">2.5.12. Test 0011</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_verification.html">2.6. Verification</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0001">2.6.1. Test 0001</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0002">2.6.2. Test 0002</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0003">2.6.3. Test 0003</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0004">2.6.4. Test 0004</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0004b">2.6.5. Test 0004b</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0005">2.6.6. Test 0005</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0006">2.6.7. Test 0006</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0007">2.6.8. Test 0007</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0008">2.6.9. Test 0008</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0009">2.6.10. Test 0009</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0010">2.6.11. Test 0010</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_verification.html#test-0011">2.6.12. Test 0011</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="tg_contributing.html">2.6. Guidelines for Contributors</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="tg_contributing.html#coding-style">2.6.1. Coding Style</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_contributing.html#workflow">2.6.2. Workflow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_contributing.html#core-modules">2.6.3. Core Modules</a></li>
-<li class="toctree-l3"><a class="reference internal" href="tg_contributing.html#logging">2.6.4. Logging</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tg_contributing.html">2.7. Guidelines for Contributors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="tg_contributing.html#coding-style">2.7.1. Coding Style</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_contributing.html#workflow">2.7.2. Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_contributing.html#core-modules">2.7.3. Core Modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="tg_contributing.html#logging">2.7.4. Logging</a></li>
 </ul>
 </li>
 </ul>

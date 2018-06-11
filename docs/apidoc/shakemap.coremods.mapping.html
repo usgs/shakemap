@@ -47,13 +47,28 @@
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="shakemap.coremods.mapping.MappingModule.targets">
+<code class="descname">targets</code><em class="property"> = ['products/intensity\\.jpg', 'products/intensity\\.pdf', 'products/.*_contour\\.jpg', 'products/.*_contour\\.pdf', 'products/psa.*\\.jpg']</em><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.targets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakemap.coremods.mapping.MappingModule.dependencies">
+<code class="descname">dependencies</code><em class="property"> = [('products/shake_result.hdf', True)]</em><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakemap.coremods.mapping.MappingModule.configs">
+<code class="descname">configs</code><em class="property"> = ['products.conf']</em><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.configs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="shakemap.coremods.mapping.MappingModule.mapping_page">
 <code class="descname">mapping_page</code><em class="property"> = {'slug': 'maps', 'title': 'Ground Motion Maps'}</em><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.mapping_page" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="shakemap.coremods.mapping.MappingModule.contents">
-<code class="descname">contents</code><em class="property"> = {'intensityMap': {'caption': 'Map of macroseismic intensity.', 'formats': [{'type': 'image/jpeg', 'filename': 'intensity.jpg'}, {'type': 'application/pdf', 'filename': 'intensity.pdf'}], 'page': {'slug': 'maps', 'title': 'Ground Motion Maps'}, 'title': 'Intensity Map'}, 'pgaMap': {'caption': 'Map of peak ground acceleration (%g).', 'formats': [{'type': 'image/jpeg', 'filename': 'pga.jpg'}, {'type': 'image/jpeg', 'filename': 'PGA_contour.pdf'}], 'page': {'slug': 'maps', 'title': 'Ground Motion Maps'}, 'title': 'PGA Map'}, 'pgvMap': {'caption': 'Map of peak ground velocity (cm/s).', 'formats': [{'type': 'image/jpeg', 'filename': 'pgv.jpg'}, {'type': 'application/pdf', 'filename': 'PGV_contour.pdf'}], 'page': {'slug': 'maps', 'title': 'Ground Motion Maps'}, 'title': 'PGV Map'}, 'psa[PERIOD]Map': {'caption': 'Map of [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).', 'formats': [{'type': 'image/jpeg', 'filename': 'psa[0-9][0-9].jpg'}, {'type': 'application/pdf', 'filename': 'PSA[0-9]p[0-9]_contour.pdf'}], 'page': {'slug': 'maps', 'title': 'Ground Motion Maps'}, 'title': 'PSA[PERIOD] Map'}}</em><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.contents" title="Permalink to this definition">¶</a></dt>
+<code class="descname">contents</code><em class="property"> = {'intensityMap': {'formats': [{'type': 'image/jpeg', 'filename': 'intensity.jpg'}, {'type': 'application/pdf', 'filename': 'intensity.pdf'}], 'title': 'Intensity Map', 'caption': 'Map of macroseismic intensity.', 'page': {'title': 'Ground Motion Maps', 'slug': 'maps'}}, 'pgaMap': {'formats': [{'type': 'image/jpeg', 'filename': 'pga.jpg'}, {'type': 'image/jpeg', 'filename': 'PGA_contour.pdf'}], 'title': 'PGA Map', 'caption': 'Map of peak ground acceleration (%g).', 'page': {'title': 'Ground Motion Maps', 'slug': 'maps'}}, 'pgvMap': {'formats': [{'type': 'image/jpeg', 'filename': 'pgv.jpg'}, {'type': 'application/pdf', 'filename': 'PGV_contour.pdf'}], 'title': 'PGV Map', 'caption': 'Map of peak ground velocity (cm/s).', 'page': {'title': 'Ground Motion Maps', 'slug': 'maps'}}, 'psa[PERIOD]Map': {'formats': [{'type': 'image/jpeg', 'filename': 'psa[0-9][0-9].jpg'}, {'type': 'application/pdf', 'filename': 'PSA[0-9]p[0-9]_contour.pdf'}], 'title': 'PSA[PERIOD] Map', 'caption': 'Map of [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).', 'page': {'title': 'Ground Motion Maps', 'slug': 'maps'}}}</em><a class="headerlink" href="#shakemap.coremods.mapping.MappingModule.contents" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

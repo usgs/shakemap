@@ -47,13 +47,23 @@
 <dd></dd></dl>
 
 <dl class="attribute">
+<dt id="shakemap.coremods.plotregr.PlotRegr.targets">
+<code class="descname">targets</code><em class="property"> = ['products/.*_regr\\.png']</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.targets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakemap.coremods.plotregr.PlotRegr.dependencies">
+<code class="descname">dependencies</code><em class="property"> = [('products/shake_result.hdf', True)]</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
 <dt id="shakemap.coremods.plotregr.PlotRegr.regr_page">
 <code class="descname">regr_page</code><em class="property"> = {'slug': 'regression', 'title': 'Regression Plots'}</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.regr_page" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
 <dt id="shakemap.coremods.plotregr.PlotRegr.contents">
-<code class="descname">contents</code><em class="property"> = {'miRegr': {'caption': 'Regression plot of macroseismic intensity.', 'formats': [{'type': 'image/png', 'filename': 'MMI_regr.png'}], 'page': {'slug': 'regression', 'title': 'Regression Plots'}, 'title': 'Intensity Regression'}, 'pgaRegr': {'caption': 'Regression plot of [COMPONENT] peak ground acceleration (%g).', 'formats': [{'type': 'image/png', 'filename': 'PGA_regr.png'}], 'page': {'slug': 'regression', 'title': 'Regression Plots'}, 'title': 'PGA Regression'}, 'pgvRegr': {'caption': 'Regression plot of [COMPONENT] peak ground velocity (cm/s).', 'formats': [{'type': 'image/png', 'filename': 'PGV_regr.png'}], 'page': {'slug': 'regression', 'title': 'Regression Plots'}, 'title': 'PGV Regression'}, 'psa[PERIOD]Regr': {'caption': 'Regression plot of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).', 'formats': [{'type': 'image/png', 'filename': 'PSA[0-9]p[0-9]_regr.png'}], 'page': {'slug': 'regression', 'title': 'Regression Plots'}, 'title': 'PSA[PERIOD] Regression'}}</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.contents" title="Permalink to this definition">¶</a></dt>
+<code class="descname">contents</code><em class="property"> = {'miRegr': {'formats': [{'type': 'image/png', 'filename': 'MMI_regr.png'}], 'title': 'Intensity Regression', 'caption': 'Regression plot of macroseismic intensity.', 'page': {'title': 'Regression Plots', 'slug': 'regression'}}, 'pgaRegr': {'formats': [{'type': 'image/png', 'filename': 'PGA_regr.png'}], 'title': 'PGA Regression', 'caption': 'Regression plot of [COMPONENT] peak ground acceleration (%g).', 'page': {'title': 'Regression Plots', 'slug': 'regression'}}, 'pgvRegr': {'formats': [{'type': 'image/png', 'filename': 'PGV_regr.png'}], 'title': 'PGV Regression', 'caption': 'Regression plot of [COMPONENT] peak ground velocity (cm/s).', 'page': {'title': 'Regression Plots', 'slug': 'regression'}}, 'psa[PERIOD]Regr': {'formats': [{'type': 'image/png', 'filename': 'PSA[0-9]p[0-9]_regr.png'}], 'title': 'PSA[PERIOD] Regression', 'caption': 'Regression plot of [COMPONENT] [FPERIOD] sec 5% damped pseudo-spectral acceleration(%g).', 'page': {'title': 'Regression Plots', 'slug': 'regression'}}}</em><a class="headerlink" href="#shakemap.coremods.plotregr.PlotRegr.contents" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">

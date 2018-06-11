@@ -5,6 +5,7 @@ ShakeMap Programs
    :maxdepth: 1
 
    shake
+   sm_compare
    sm_create
    sm_migrate
    sm_profile
