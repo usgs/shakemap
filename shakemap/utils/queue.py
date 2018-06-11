@@ -17,13 +17,12 @@ from shapely.geometry import (Polygon,
 from shakemap.utils.config import (config_error,
                                    get_configspec)
 
-PORT = 9755
 MAX_SIZE = 4096
 TIMEFMT = '%Y-%m-%dT%H:%M:%S.%fZ'
 ALT_TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
-def send_queue(command, data):
+def send_queue(command, data, port=9755):
     """
     Send a command and its data to the queue process.
 
@@ -48,7 +47,7 @@ def send_queue(command, data):
         raise RuntimeError('Data portion too large')
 
     csocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    csocket.connect(('127.0.0.1', PORT))
+    csocket.connect(('127.0.0.1', port))
     csocket.send(qstr)
     csocket.close()
     return

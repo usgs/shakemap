@@ -416,7 +416,7 @@ def main(pargs):
         # Create the socket
         #
         qsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        qsocket.bind(('', queue.PORT))
+        qsocket.bind(('', config['port']))
         # Set a timeout so that we can occasionally look for other
         # things to do
         qsocket.settimeout(30)

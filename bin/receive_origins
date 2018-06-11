@@ -84,6 +84,8 @@ def main(args):
         print('%s is not a valid directory.' % data_path)
         sys.exit(1)
 
+    config = queue.get_config(install_path)
+
     # set up a daily rotating file handler logger
     logfile = os.path.join(install_path, 'logs', LOGFILE)
     log_cfg = LOG_CFG.copy()
@@ -143,7 +145,7 @@ def main(args):
     logger.info('Sending event %s to queue.' % args.preferred_eventid)
 
     # Poke the queue to run shake on this event.
-    queue.send_queue('origin', event)
+    queue.send_queue('origin', event, config['port'])
 
 
 if __name__ == '__main__':

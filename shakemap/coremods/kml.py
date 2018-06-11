@@ -217,7 +217,7 @@ def place_legend(datadir, document):
     # we need to find the legend file and copy it to
     # the output directory
     this_dir, _ = os.path.split(__file__)
-    data_path = os.path.join(this_dir, '..', 'data')
+    data_path = os.path.join(this_dir, '..', 'data', 'mapping')
     legend_file = os.path.join(data_path, LEGEND)
     legdest = os.path.join(datadir, LEGEND)
     shutil.copyfile(legend_file, legdest)
@@ -475,7 +475,7 @@ def create_stations(container, datadir, document):
     # we need to find the triangle and circle icons and copy them to
     # the output directory
     this_dir, _ = os.path.split(__file__)
-    data_path = os.path.join(this_dir, '..', 'data')
+    data_path = os.path.join(this_dir, '..', 'data', 'mapping')
     triangle_file = os.path.join(data_path, TRIANGLE)
     circle_file = os.path.join(data_path, CIRCLE)
     tridest = os.path.join(datadir, TRIANGLE)

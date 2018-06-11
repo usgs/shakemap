@@ -28,11 +28,13 @@ def get_dummy_logger(name):
 
 
 def test_send_queue():
+    install_path, _ = get_config_paths()
+    config = queue.get_config(install_path)
     rsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    rsocket.bind(('', queue.PORT))
+    rsocket.bind(('', config['port']))
     rsocket.listen(1)
 
-    queue.send_queue('test', {'id': 'testid'})
+    queue.send_queue('test', {'id': 'testid'}, config['port'])
 
     (clientsocket, address) = rsocket.accept()
     data = clientsocket.recv(queue.MAX_SIZE)
@@ -76,6 +78,7 @@ def test_get_config():
     assert config['boxes']['02_my_box2']['poly'] == p2
     assert len(set(config['repeats'][0.0]) ^ set([60, 120])) == 0
     assert len(set(config['repeats'][5.0]) ^ set([60, 120, 180])) == 0
+    assert config['port'] == 8796
 
 
 def test_magnitude_too_small():

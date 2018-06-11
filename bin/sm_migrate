@@ -6,25 +6,25 @@ import os.path
 import sys
 import re
 import glob
-import logging
 import tarfile
-from xml.dom import minidom
 import json
 
 # third party imports
-import pytz
-from lxml import etree
 from configobj import ConfigObj
 import numpy as np
 
 # local imports
-from shakemap.utils.config import get_config_paths, get_configspec
-from shakemap.utils.utils import get_network_name, migrate_gmpe, set_gmpe
+from shakemap.utils.config import get_config_paths
+from shakemap.utils.utils import (get_network_name,
+                                  migrate_gmpe,
+                                  set_gmpe,
+                                  get_extent)
 from shakemap.utils.amps import AmplitudeHandler
 from shakelib.rupture.origin import read_event_file, write_event_file, Origin
-from shakelib.rupture.factory import text_to_json, rupture_from_dict_and_origin
+from shakelib.rupture.factory import (text_to_json,
+                                      rupture_from_dict_and_origin,
+                                      get_rupture)
 from impactutils.time.ancient_time import HistoricTime
-import shakemap.utils.queue as queue
 from shakemap.coremods import transfer
 
 KM2SEC = 3600.0/111  # seconds per kilometer
@@ -37,41 +37,49 @@ def get_parser():
     This program takes one required file, a tarball of one or more ShakeMap 3.5
     event directories.  To create this file, run a command like this:
 
-    find . -name "*_dat.xml" -o -name "*_fault.txt" -o -name "source.txt" -o -name "info.json" -o -name "*.conf" | tar -czvf ~/sm35_inputs.tgz -T -
+    find . -name "*_dat.xml" -o -name "*_fault.txt" -o -name "source.txt" -o
+    -name "info.json" -o -name "*.conf" | tar -czvf ~/sm35_inputs.tgz -T -
 
-    This program takes a subset of the ShakeMap 3.5 input data and the info.json file
+    This program takes a subset of the ShakeMap 3.5 input data and the
+    info.json file
     and uses those files to create the corresponding ShakeMap 4.0 input data.
 
     Files used:
-      - *_dat.xml data files in XML format. These are unchanged in ShakeMap 4.0.
-      - *_fault.txt fault files in text format. These will be converted to GeoJSON.
+      - *_dat.xml data files in XML format. These are unchanged in
+        ShakeMap 4.0.
+      - *_fault.txt fault files in text format. These will be converted
+        to GeoJSON.
       - source.txt Text file possibly containing mechanism and ??
       - info.json Metadata file from which we extract:
         - Origin information for new event.xml file.
-        - bias settings (see -s option) 
+        - bias settings (see -s option)
 
-      - *.conf Config files, of which generally speaking only grind.conf is supported:
+      - *.conf Config files, of which generally speaking only grind.conf
+        is supported:
                - IPEs are currently not supported.
-               - A smaller subset of GMICE are supported in ShakeMap 4.0 at the time of this writing.
-               - GMPE selections will be converted to the closest matching GEM equivalent (see -m).
+               - A smaller subset of GMICE are supported in ShakeMap 4.0 at
+                 the time of this writing.
+               - GMPE selections will be converted to the closest matching
+                 GEM equivalent (see -m).
                - outlier max_deviation and max_mag values will be converted.
-               - 
+               -
 
     '''
-    parser = argparse.ArgumentParser(description=description,
-                                     formatter_class=argparse.RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(
+        description=description,
+        formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('tarfile',
                         help='Input root data tarfile')
     hlptxt = '''Ignore directories where event_source (from model.conf)
 does not prepend eventid'''
-    parser.add_argument('-i', '--ignore-naked-ids', action='store_true', default=False,
-                        help=hlptxt)
+    parser.add_argument('-i', '--ignore-naked-ids', action='store_true',
+                        default=False, help=hlptxt)
     hlptxt2 = '''Ignore previous bounds/resolution settings discovered
 in input data.'''
-    parser.add_argument('-b', '--skip-bounds', action='store_true', default=False,
-                        help=hlptxt2)
-    parser.add_argument('-s', '--skip-settings', action='store_true', default=False,
-                        help=hlptxt2)
+    parser.add_argument('-b', '--skip-bounds', action='store_true',
+                        default=False, help=hlptxt2)
+    parser.add_argument('-s', '--skip-settings', action='store_true',
+                        default=False, help=hlptxt2)
     parser.add_argument('-m', '--migrate-file',
                         help='Supply custom migrate.conf')
     return parser
@@ -159,10 +167,11 @@ def main(args):
         elif filename in ['info.json']:
             if 'download' in member:
                 continue
-            edict, info_errors, info_conversions = parse_info(event_dir, tarball, member,
-                                            netid, networks, module_conf,
-                                            skip_bounds=args.skip_bounds,
-                                            skip_settings=args.skip_settings)
+            edict, info_errors, info_conversions = parse_info(
+                event_dir, tarball, member,
+                netid, networks, module_conf,
+                skip_bounds=args.skip_bounds,
+                skip_settings=args.skip_settings)
             errors += info_errors
             conversions.update(info_conversions)
             handler.insertEvent(edict)
@@ -175,15 +184,15 @@ def main(args):
     tarball.close()
     sys.stdout.write('\n')
 
-    # go back through the data, convert fault.txt files into json rupture format,
-    # also make sure we have all required components
+    # go back through the data, convert fault.txt files into json rupture
+    # format, also make sure we have all required components
     for eventid in alleventids:
         event_dir = os.path.join(data_path, eventid, 'current')
         rupt_error = make_rupture(event_dir)
         parse_options(event_dir)
         if rupt_error is not None:
             errors.append(rupt_error)
-    
+
     print('%i event directories written.' % len(alleventids))
     print('The following errors or warnings were detected:')
     for error in errors:
@@ -195,19 +204,20 @@ def main(args):
         print('\t"%s" (%s) was converted to new GMPE "%s".' %
               (old_gmpe, ref, new_gmpe))
 
+
 def parse_options(event_dir):
-    optfile = os.path.join(event_dir,'options.json')
+    optfile = os.path.join(event_dir, 'options.json')
     if not os.path.isfile(optfile):
         return
-    eventfile = os.path.join(event_dir,'event.xml')
+    eventfile = os.path.join(event_dir, 'event.xml')
     edict = read_event_file(eventfile)
-    options = json.load(open(optfile,'rt'))
+    options = json.load(open(optfile, 'rt'))
     model = ConfigObj()
     if 'nobias' in options:
-        model['modeling'] = {'bias':{'do_bias':False}}
+        model['modeling'] = {'bias': {'do_bias': False}}
     if 'nooutlier' in options:
-        model['data'] = {'outlier':{'do_outlier':False}}
-    bounds_options = set(['latoff','lonoff','lonspan','llratio'])
+        model['data'] = {'outlier': {'do_outlier': False}}
+    bounds_options = set(['latoff', 'lonoff', 'lonspan', 'llratio'])
     opt_keys = set(options.keys())
     if len(bounds_options.intersection(opt_keys)):
         lat = edict['lat']
@@ -220,9 +230,9 @@ def parse_options(event_dir):
             xmin = lon - options['lonspan']/2.0
             xmax = lon + options['lonspan']/2.0
             if 'llratio' in options:
-                latspan = options['llratio'] * lonspan
+                latspan = options['llratio'] * options['lonspan']
             else:
-                latspan = lonspan * np.cos(np.degrees(lat))
+                latspan = options['lonspan'] * np.cos(np.degrees(lat))
             ymin = lat - latspan/2.0
             ymax = lat + latspan/2.0
         else:
@@ -231,11 +241,11 @@ def parse_options(event_dir):
             edict['lon'] = lon
             # use get_rupture function?
             origin = Origin(edict)
-            rfile = os.path.join(event_dir,'rupture.json')
+            rfile = os.path.join(event_dir, 'rupture.json')
             if not os.path.isfile(rfile):
                 rfile = None
-            rupture = get_rupture(origin,file=rfile)
-            xmin,xmax,ymin,ymax = get_extent(rupture)
+            rupture = get_rupture(origin, file=rfile)
+            xmin, xmax, ymin, ymax = get_extent(rupture)
         model['extent'] = {'bounds': {}}
         model['extent']['bounds']['extent'] = [xmin, ymin, xmax, ymax]
         if len(model):
@@ -245,24 +255,26 @@ def parse_options(event_dir):
                 model.merge(existing_model)
         model.filename = model_file
         model.write()
-            
-            
+
+
 def parse_run(member, tarball, filename, event_dir):
     errors = []
     options = {}
-    float_options = ['lonspan','latspan','lonoff','latoff','llratio']
-    bool_options = ['nooutlier','nobias']
-    for line in open(runfile,'rt').readlines():
+    float_options = ['lonspan', 'latspan', 'lonoff', 'latoff', 'llratio']
+    bool_options = ['nooutlier', 'nobias']
+    for line in open(filename, 'rt').readlines():
             if line.find('grind') > -1:
                 parts = line.split()[1:]
-                for i in range(0,len(parts)):
+                for i in range(0, len(parts)):
                     part = parts[i].strip()
-                    isfloat = re.search(r"[+-]?\d+(?:\.\d+)?",part) is not None
+                    isfloat = re.search(r"[+-]?\d+(?:\.\d+)?", part) \
+                        is not None
                     if part.startswith('-') and not isfloat:
-                        part = part.replace('-','')
+                        part = part.replace('-', '')
                         if part == '-directivity':
-                            fmt = 'Unsupported directivity flag set for event %s.'
-                            errors.append(fmt % eventid)
+                            fmt = 'Unsupported directivity flag set for ' \
+                                  'event %s.'
+                            errors.append(fmt % event_dir)
                         elif part in float_options:
                             options[part] = float(parts[i+1])
                         elif part in bool_options:
@@ -270,16 +282,16 @@ def parse_run(member, tarball, filename, event_dir):
                         else:
                             continue
     # Since we don't know hypocenter information at this stage, we're going to
-    # stash this dictionary in the event directory as JSON and parse it at the end.
-    optionfile = os.path.join(event_dir,'options.json')
-    with open(optionfile,'wt') as opt:
-        json.dump(options,opt)
+    # stash this dictionary in the event directory as JSON and parse it at
+    # the end.
+    optionfile = os.path.join(event_dir, 'options.json')
+    with open(optionfile, 'wt') as opt:
+        json.dump(options, opt)
 
     return errors
-                            
-        
+
+
 def make_rupture(event_dir):
-    error = None
     fault_files = glob.glob(os.path.join(event_dir, '*_fault.txt'))
     if not len(fault_files):
         return
@@ -299,8 +311,6 @@ def make_rupture(event_dir):
 
 
 def parse_transfer(event_dir, tarball, member):
-    parts = member.split('/')
-    eventid = parts[-3]
     grindfile = tarball.extractfile(member)
     lines = grindfile.readlines()
     for line in lines:
@@ -341,7 +351,8 @@ def parse_config(event_dir, tarball, member, migrate_conf=None):
 
 
 def parse_info(event_dir, tarball, member, netid, networks,
-               module_conf, skip_bounds=False, skip_settings=False, migrate_conf=None):
+               module_conf, skip_bounds=False, skip_settings=False,
+               migrate_conf=None):
     jsonfile = tarball.extractfile(member)
     jsonstring = jsonfile.read().decode('utf-8')
     jsondict = json.loads(jsonstring)
@@ -417,8 +428,8 @@ def parse_info(event_dir, tarball, member, netid, networks,
         if gmice == 'WGRW11':
             gmice = 'WGRW12'
         if gmice not in allowed_gmice:
-            errors.append('GMICE %s (event %s) not yet supported in ShakeMap 4.' % (
-                gmice, edict['id']))
+            errors.append('GMICE %s (event %s) not yet supported in '
+                          'ShakeMap 4.' % (gmice, edict['id']))
         else:
             model['modeling']['gmice'] = gmice
 
@@ -429,11 +440,10 @@ def parse_info(event_dir, tarball, member, netid, networks,
             new_gmpe, reference = migrate_gmpe(old_gmpe, config=migrate_conf)
             model = set_gmpe(new_gmpe, model, edict['id'])
             if old_gmpe not in conversions:
-                conversions[old_gmpe] = (new_gmpe,reference)
+                conversions[old_gmpe] = (new_gmpe, reference)
         except Exception as e:
-            msg = 'Unable to convert %s, error "%s"' % (old_gmpe,str(e))
+            msg = 'Unable to convert %s, error "%s"' % (old_gmpe, str(e))
             errors.append(msg)
-        
 
     # work on map extent/resolution data
     if not skip_bounds:
