@@ -68,11 +68,13 @@
 <span class="sd">        - GMRotI50 &lt;=&gt; GREATER_OF_TWO_HORIZONTAL</span>
 <span class="sd">        - AVERAGE_HORIZONTAL &lt;=&gt; GREATER_OF_TWO_HORIZONTAL</span>
 
-<span class="sd">    Not supported are IMCs for which there is no OpenQuake equivalent;</span>
-<span class="sd">    chain conversions are supported when using `convertAmps`. Otherwise</span>
+<span class="sd">    Chain conversions are supported when using `convertAmps`. Otherwise</span>
 <span class="sd">    conversions must be done in two+ steps using `convertAmpsOnce`. For IMCs</span>
 <span class="sd">    not explicitly supported by B&amp;K, we assume the IMC is equivalent</span>
 <span class="sd">    to the geometric mean (which B&amp;K call GM_AR).</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">        - Assumes ALL unknown IMC types are AVERAGE_HORIZONTAL.</span>
 
 <span class="sd">    References</span>
 
@@ -127,11 +129,14 @@
                 <span class="s1">&#39;Greater of two horizontal&#39;</span><span class="p">,</span>
                 <span class="s1">&#39;Average Horizontal (RotD50)&#39;</span><span class="p">])</span>
         <span class="p">}</span>
+        <span class="c1"># Check if any imc values are unknown. If they are, convert</span>
+        <span class="c1"># to AVERAGE_HORIZONTAL</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">checkUnknown</span><span class="p">()</span>
         <span class="c1"># Get shortest conversion &quot;path&quot; between imc_in and imc_out</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getShortestPath</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">conversion_graph</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">imc_in</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_out</span><span class="p">)</span>
 
-<div class="viewcode-block" id="BooreKishida2017.convertAmpsOnce"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce">[docs]</a>    <span class="k">def</span> <span class="nf">convertAmpsOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">rrups</span><span class="p">,</span> <span class="n">mag</span><span class="p">):</span>
+<div class="viewcode-block" id="BooreKishida2017.convertAmpsOnce"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertAmpsOnce">[docs]</a>    <span class="k">def</span> <span class="nf">convertAmpsOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">rrups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return an array of amps converted from one IMC to another.</span>
 
@@ -181,7 +186,6 @@
             <span class="n">amps</span> <span class="o">=</span> <span class="n">amps</span> <span class="o">-</span> <span class="n">ln_ratio</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">amps</span> <span class="o">=</span> <span class="n">amps</span> <span class="o">+</span> <span class="n">ln_ratio</span>
-
         <span class="k">return</span> <span class="n">amps</span></div>
 
 <div class="viewcode-block" id="BooreKishida2017.convertSigmasOnce"><a class="viewcode-back" href="../../../../shakelib/shakelib.conversions.imc.boore_kishida_2017.html#shakelib.conversions.imc.boore_kishida_2017.BooreKishida2017.convertSigmasOnce">[docs]</a>    <span class="k">def</span> <span class="nf">convertSigmasOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">sigmas</span><span class="p">):</span>

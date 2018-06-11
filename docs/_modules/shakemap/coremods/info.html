@@ -35,6 +35,7 @@
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">json</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
@@ -50,17 +51,19 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;info&#39;</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/info\.json&#39;</span><span class="p">]</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
     <span class="c1"># supply here a data structure with information about files that</span>
     <span class="c1"># can be created by this module.</span>
     <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;supplementalInformation&#39;</span><span class="p">])</span>
     <span class="n">cap</span> <span class="o">=</span> <span class="s1">&#39;ShakeMap processing parameters and map summary information.&#39;</span>
-    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;supplementalInformation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span><span class="s1">&#39;Supplemental Information&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;caption&#39;</span><span class="p">:</span><span class="n">cap</span><span class="p">,</span>
-                             <span class="s1">&#39;formats&#39;</span><span class="p">:[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;info.json&#39;</span><span class="p">,</span>
-                                         <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
-                                       <span class="p">]</span>
-                            <span class="p">}</span>
+    <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;supplementalInformation&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Supplemental Information&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">cap</span><span class="p">,</span>
+        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;info.json&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}]</span>
+    <span class="p">}</span>
 
 <div class="viewcode-block" id="InfoModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.info.html#shakemap.coremods.info.InfoModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -84,12 +87,13 @@
 
         <span class="c1"># create ShakeMap metadata file</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Writing info.json file...&#39;</span><span class="p">)</span>
-        <span class="n">infostring</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()</span>
+        <span class="n">infostring</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
         <span class="n">info_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
         <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">info_file</span><span class="p">,</span> <span class="s1">&#39;wt&#39;</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">infostring</span><span class="p">)</span>
-        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
-
+        <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
 </pre></div>
 
           </div>

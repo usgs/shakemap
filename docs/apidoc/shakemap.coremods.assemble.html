@@ -51,6 +51,21 @@ an InputContainer and write it out as shake_data.hdf.</p>
 <code class="descname">command_name</code><em class="property"> = 'assemble'</em><a class="headerlink" href="#shakemap.coremods.assemble.AssembleModule.command_name" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
+<dl class="attribute">
+<dt id="shakemap.coremods.assemble.AssembleModule.targets">
+<code class="descname">targets</code><em class="property"> = ['shake_data\\.hdf']</em><a class="headerlink" href="#shakemap.coremods.assemble.AssembleModule.targets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakemap.coremods.assemble.AssembleModule.dependencies">
+<code class="descname">dependencies</code><em class="property"> = [('event.xml', True), ('*_dat.xml', False), ('*_fault.txt', False), ('rupture.json', False), ('source.txt', False), ('model.conf', False), ('model_zc.conf', False)]</em><a class="headerlink" href="#shakemap.coremods.assemble.AssembleModule.dependencies" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="shakemap.coremods.assemble.AssembleModule.configs">
+<code class="descname">configs</code><em class="property"> = ['gmpe_sets.conf', 'model.conf', 'modules.conf']</em><a class="headerlink" href="#shakemap.coremods.assemble.AssembleModule.configs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="method">
 <dt id="shakemap.coremods.assemble.AssembleModule.execute">
 <code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/assemble.html#AssembleModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.assemble.AssembleModule.execute" title="Permalink to this definition">¶</a></dt>

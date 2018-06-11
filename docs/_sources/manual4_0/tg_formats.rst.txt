@@ -49,7 +49,7 @@ It is generally not necessary for operators to access this file other
 than through the interfaces of **assemble** and **augment**. For
 developers, the file
 is accessed through the shakelib `ShakeMapInputContainer interface 
-<https://usgs.github.io/shakelib/shakelib.utils.container.html>`_.
+<https://usgs.github.io/shakemap/shakelib/shakelib.utils.containers.html>`.
 
 shake_result.hdf
 ================
@@ -66,7 +66,7 @@ the HDF5 data format can be found
 
 *shake_result.hdf* consists of a number of groups and datasets. Our
 implementation of HDF5 uses groups to contain Python dictionaries,
-strings, and numpy arrays.  Dictionaries are stored as recursive groups.
+strings, and numpy arrays.  Dictionaries are stored as JSON strings.
 For example, a Python *config* dictionary consisting of the following information:
 
 .. code-block:: python
@@ -79,38 +79,53 @@ For example, a Python *config* dictionary consisting of the following informatio
         'depth': 34.0,
     }
 
-would be stored in a group called ``__dictionary_config__``, with attributes
-'name' and 'depth'.  There will be a sub-group called 'gmpe_set', with an attribute
-called 'Active_Crustal'.  Groups like this can contain any number (within reason)
-of dictionaries, which can consist of a number of Python data types (strings, numbers,
-numpy arrays, etc.) *shake_result.hdf* contains the following elements:  
+would be stored as a JSON string in a dataset called ``__config__``,
+under a group called ``__dictionaries__``. In languages that support
+JSON, these strings can be easily converted into a data
+structure. Developers can access these properties using the
+`ShakeMapInputContainer interface
+<https://usgs.github.io/shakemap/shakelib/shakelib.utils.containers.html>`.
 
-+-----------------------+---------+-------------+-----------------------------------------+
-| Name                  | HDF Type| Python Type | Contents                                |
-+=======================+=========+=============+=========================================+
-| config                | group   | dictionary  | ShakeMap configuration                  |
-+-----------------------+---------+-------------+-----------------------------------------+
-| info.json             | group   | string      | ShakeMap metadata in JSON format        |
-+-----------------------+---------+-------------+-----------------------------------------+
-| rupture.json          | group   | string      | GeoJSON representation of the           |
-|                       |         |             | finite fault                            |
-+-----------------------+---------+-------------+-----------------------------------------+
-| stationlist.json      | dataset | string      | GeoJSON stationlist                     |
-+-----------------------+---------+-------------+----------------------+------------------+
-| vs30                  | dataset | ndarray     | Vs30 values at output grid/points       | 
-+-----------------------+---------+-------------+----------------------+------------------+
-| IMT (multiple)        | group   | dictionary  | Interpolated data for IMT               |
-+-----------------------+---------+-------------+----------------------+------------------+
+*shake_result.hdf* contains the following metadata elements:
+
++-----------------------+----------------------------+-------------+----------------------------------------------+
+| Name                  | Location                   | Python Type | Contents                                     |
++=======================+============================+=============+==============================================+
+| config                | /dictionaries/config       | dictionary  | ShakeMap configuration                       |
++-----------------------+----------------------------+-------------+----------------------------------------------+
+| info.json             | /dictionaries/info.json    | string      | ShakeMap metadata in JSON format             |
++-----------------------+----------------------------+-------------+----------------------------------------------+
+| stations_dict         | /dictionaries/stations_dict| string      | Dictionary representation of the finite fault|
++-----------------------+----------------------------+-------------+----------------------------------------------+
+
+It also will contain a number of grids, which, when read with the HDFContainer getGrid() method, return
+a Grid2D object which is a Python representation of a North-up 2D array of data, whose upper-left corner
+coordinate and cell dimensions are known.  The definition of this object can be found 
+
+`here
+<https://github.com/usgs/MapIO/blob/master/mapio/grid2d.py>`
+
+
+Sampling of grids contained in the HDF:
+
++-----------------------+----------------------------+-------------+----------------------------------------------+
+| Name                  | Location                   | Python Type | Contents                                     |
++=======================+============================+=============+==============================================+
+| vs30                  | /grids/vs30                | Grid2D      | Vs30 values at output grid/points            | 
++-----------------------+----------------------------+-------------+----------------------------------------------+
+| distance_rhypo        | /grids/distance_rhypo      | Grid2D      | Hypocentral distance                         |
++-----------------------+----------------------------+-------------+----------------------------------------------+
+| distance_rjb          | /grids/distance_rjb        | Grid2D      | RJB distance                                 |
++-----------------------+----------------------------+-------------+----------------------------------------------+
+
 
 Each IMT dataset (MMI, PGA, etc.) is stored as a group containing two 
 datasets, the mean values for each cell and the standard deviations.  
 MMI data for the component 'Larger' will be stored under a group called 
-``__imt_MMI_GREATER_OF_TWO_HORIZONTAL__``. The mean array will be stored as
+``imt_MMI_GREATER_OF_TWO_HORIZONTAL``. The mean array will be stored as
 ``mean``, and the standard deviation array will be stored as
 ``std``.  All IMT grid datasets will be accompanied by a dictionary of
 attributes:
-
-For grids, the attributes are:
 
 +-----------+------------------------------------------------------+
 | Attr name | Contents                                             |
@@ -136,6 +151,20 @@ For grids, the attributes are:
 | dy        | The grid interval in the y dimension                 |
 +-----------+------------------------------------------------------+
 
+Sampling of IMTs in the HDF file:
+
++-----------------------+----------------------------------------------+----------------------------------------------+
+| Name                  | Location                                     | Python Type | Contents                       |
++=======================+==============================================+=============+================================+
+| MMI Mean              | /imts/MMI_GREATER_OF_TWO_HORIZONTAL/mean     | Grid2D      | MMI Mean Values                | 
++-----------------------+----------------------------+-----------------+----------------------------------------------+
+| MMI Std               | /imts/MMI_GREATER_OF_TWO_HORIZONTAL/std      | Grid2D      | MMI Std                        | 
++-----------------------+----------------------------+-----------------+----------------------------------------------+
+| Sa(0.3) Mean          | /imts/SA(0.3)_GREATER_OF_TWO_HORIZONTAL/mean | Grid2D      | SA(0.3) Mean Values            | 
++-----------------------+----------------------------+-----------------+----------------------------------------------+
+| Sa(0.3) Std           | /imts/SA(0.3)_GREATER_OF_TWO_HORIZONTAL/std  | Grid2D      | SA(0.3) Std                    | 
++-----------------------+----------------------------+-------------+--------------------------------------------------+
+
 For datasets that are lists of points, the storage of IMTS is the same
 as for grids, except that the data are stored as one-dimensional arrays.
 Each IMT group wll also contains datasets ``lons``, ``lats``, 
@@ -151,21 +180,21 @@ attributes are:
 | digits       | Number of significant digits to use for the values   |
 +--------------+------------------------------------------------------+
 
-All *shake_result.hdf* files will have a group ``__file_data_type__`` 
+All *shake_result.hdf* files will have a group ``file_data_type`` 
 which will have a single attribute ``data_type`` that will be one of
 'points' or 'grid'. This way the user can distinguish between the two
 types of storage.
 
 For grid files, there will also be sets of regression curves stored
 as one-dimensional arrays. These
-will be labeled like ``__array_regression_<IMT>_<site>_<type>`` Where
+will be labeled like ``array_regression_<IMT>_<site>_<type>`` Where
 ``<IMT>`` will be one of the output IMTs (e.g., ``SA(3.0)``), 
 ``<site>`` will be one of ``rock`` or ``soil`` (for which ``rock``
 means a Vs30 of 760 m/s, and ``soil`` means a Vs30 of 180 m/s), and
 ``<type>`` is one of ``mean`` (for the mean values) or ``sd`` (for
 the standard deviations). All units are in natural log space (except
 for MMI). There will also be an array called 
-``__array_regression_distances__`` which will contain the distances
+``array_regression_distances`` which will contain the distances
 (in km) corresponding to the points in the data arrays.
 
 Regardless of whether the file stores grids or arrays of points, it will
@@ -178,7 +207,7 @@ etc.)
 Similarly, the Vs30 data are found in a dataset named ``vs30``.
 The metadata for distances and Vs30 consists of 'units' and 'digits'.
 
-JSON datasets are stored as continuous strings.
+Dictionary datasets are stored as JSON strings.
 
 There will typically be multiple *IMT* (Intensity Measure Type) datasets
 (each containing the mean and standard deviation of the IMT). For instance
@@ -194,7 +223,7 @@ for some basic access patterns.
 
 Matlab developers can use the function *read_shake_data.m*, which is included in
 the repository for ShakeMap
-`here <https://github.com/usgs/shakemap/blob/master/read_shakemap_data.m>`_.
+`here <https://github.com/usgs/shakemap/blob/master/contrib/read_shakemap_data.m>`_.
 
 
 Generic Amplification Factors

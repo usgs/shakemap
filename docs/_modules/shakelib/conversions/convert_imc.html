@@ -39,6 +39,18 @@
 <div class="viewcode-block" id="ComponentConverter"><a class="viewcode-back" href="../../../shakelib/shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter">[docs]</a><span class="k">class</span> <span class="nc">ComponentConverter</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Base class for implementing conversions between components.&quot;&quot;&quot;</span>
 
+<div class="viewcode-block" id="ComponentConverter.checkUnknown"><a class="viewcode-back" href="../../../shakelib/shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter.checkUnknown">[docs]</a>    <span class="k">def</span> <span class="nf">checkUnknown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Checks if imc_in or imc_out is an unknown type.</span>
+
+<span class="sd">        If of an unknown type, it is automatically set</span>
+<span class="sd">        to AVERAGE_HORIZONTAL.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_in</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conversion_graph</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">imc_in</span> <span class="o">=</span> <span class="s1">&#39;Average horizontal&#39;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">imc_out</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">conversion_graph</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">imc_out</span> <span class="o">=</span> <span class="s1">&#39;Average horizontal&#39;</span></div>
+
 <div class="viewcode-block" id="ComponentConverter.convertAmps"><a class="viewcode-back" href="../../../shakelib/shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter.convertAmps">[docs]</a>    <span class="k">def</span> <span class="nf">convertAmps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">rrups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return an array of amps converted from one IMC to another.</span>
@@ -66,7 +78,7 @@
         <span class="k">return</span> <span class="n">amps</span></div>
 
 <div class="viewcode-block" id="ComponentConverter.convertAmpsOnce"><a class="viewcode-back" href="../../../shakelib/shakelib.conversions.convert_imc.html#shakelib.conversions.convert_imc.ComponentConverter.convertAmpsOnce">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">convertAmpsOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">rrups</span><span class="p">,</span> <span class="n">mag</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">convertAmpsOnce</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">amps</span><span class="p">,</span> <span class="n">rrups</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mag</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Return an array of amps converted from one IMC to another.</span>
 

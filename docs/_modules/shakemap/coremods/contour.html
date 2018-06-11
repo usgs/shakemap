@@ -43,19 +43,14 @@
 <span class="kn">import</span> <span class="nn">inspect</span>
 
 <span class="c1"># third party imports</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">MultiLineString</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">mapping</span>
 <span class="kn">import</span> <span class="nn">fiona</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">skimage</span> <span class="k">import</span> <span class="n">measure</span>
-<span class="kn">from</span> <span class="nn">scipy.ndimage.filters</span> <span class="k">import</span> <span class="n">median_filter</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span>
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span> <span class="n">get_logging_config</span>
-<span class="kn">from</span> <span class="nn">impactutils.colors.cpalette</span> <span class="k">import</span> <span class="n">ColorPalette</span>
+<span class="kn">from</span> <span class="nn">shakelib.plotting.contour</span> <span class="k">import</span> <span class="n">contour</span>
 
 <span class="n">FORMATS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s1">&#39;geojson&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;GeoJSON&#39;</span><span class="p">,</span> <span class="s1">&#39;json&#39;</span><span class="p">)</span>
@@ -71,6 +66,8 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;contour&#39;</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/cont_.*\.json&#39;</span><span class="p">]</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
     <span class="c1"># supply here a data structure with information about files that</span>
     <span class="c1"># can be created by this module.</span>
@@ -81,36 +78,35 @@
                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Contours of macroseismic intensity.&#39;</span><span class="p">,</span>
                              <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
                              <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*MMI.json&#39;</span><span class="p">,</span>
-                                         <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
-                                        <span class="p">]</span>
-    <span class="p">}</span>
+                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+                                         <span class="p">]</span>
+                             <span class="p">}</span>
     <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgaContour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PGA Contours&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Contours of [COMPONENT] peak &#39;</span>\
+                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Contours of [COMPONENT] peak &#39;</span>
                                          <span class="s1">&#39;ground acceleration (</span><span class="si">%g</span><span class="s1">).&#39;</span><span class="p">,</span>
                               <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
                               <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*PGA.json&#39;</span><span class="p">,</span>
-                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
-                                         <span class="p">]</span>
-    <span class="p">}</span>
+                                           <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+                                          <span class="p">]</span>
+                              <span class="p">}</span>
     <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;pgvContour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PGV Contours&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Contours of [COMPONENT] peak &#39;</span>\
+                              <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Contours of [COMPONENT] peak &#39;</span>
                                          <span class="s1">&#39;ground velocity (cm/s).&#39;</span><span class="p">,</span>
                               <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
                               <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*PGV.json&#39;</span><span class="p">,</span>
-                                          <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
-                                         <span class="p">]</span>
-    <span class="p">}</span>
+                                           <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+                                          <span class="p">]</span>
+                              <span class="p">}</span>
     <span class="n">psacap</span> <span class="o">=</span> <span class="s1">&#39;Contours of [COMPONENT] [FPERIOD] sec 5</span><span class="si">% d</span><span class="s1">amped &#39;</span>\
              <span class="s1">&#39;pseudo-spectral acceleration(</span><span class="si">%g</span><span class="s1">).&#39;</span>
     <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;psa[PERIOD]Contour&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PSA[PERIOD] Contour&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
-            <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">psacap</span><span class="p">,</span>
-            <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span><span class="s1">&#39;cont_*PSA[0-9]p[0-9].json&#39;</span><span class="p">,</span>
-                         <span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
-                       <span class="p">]</span>
+        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PSA[PERIOD] Contour&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">contour_page</span><span class="p">,</span>
+        <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">psacap</span><span class="p">,</span>
+        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;cont_*PSA[0-9]p[0-9].json&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">}</span>
+                    <span class="p">]</span>
     <span class="p">}</span>
-
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -151,14 +147,16 @@
 
         <span class="c1"># create contour files</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Contouring to files...&#39;</span><span class="p">)</span>
-        <span class="n">contour_to_files</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span><span class="p">)</span></div>
+        <span class="n">contour_to_files</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="ContourModule.parseArgs"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.ContourModule.parseArgs">[docs]</a>    <span class="k">def</span> <span class="nf">parseArgs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arglist</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set up the object to accept the --filter flag.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span><span class="n">prog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">command_name</span><span class="p">,</span>
-                    <span class="n">description</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">))</span>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
+            <span class="n">prog</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">command_name</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="n">inspect</span><span class="o">.</span><span class="n">getdoc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">))</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-f&#39;</span><span class="p">,</span> <span class="s1">&#39;--filter&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Specify the filter &#39;</span>
                             <span class="s1">&#39;size (in grid points) for smoothing the &#39;</span>
                             <span class="s1">&#39;grids before contouring. Must be a positive&#39;</span>
@@ -180,108 +178,6 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">filter_size</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">filter</span>
         <span class="k">return</span> <span class="n">args</span><span class="o">.</span><span class="n">rem</span></div></div>
-
-
-<div class="viewcode-block" id="contour"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.contour">[docs]</a><span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate contours of a specific IMT and return as a Shapely</span>
-<span class="sd">    MultiLineString object.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        container (ShakeMapOutputContainer): ShakeMapOutputContainer</span>
-<span class="sd">            with ShakeMap output data.</span>
-<span class="sd">        imtype (str): String containing the name of an Intensity</span>
-<span class="sd">            Measure Type found in container.</span>
-<span class="sd">        component (str): Intensity Measure component found in container.</span>
-<span class="sd">        filter_size (int): Integer filter (see</span>
-<span class="sd">            https://docs.scipy.org/doc/scipy-0.16.1/reference/generated/scipy.ndimage.filters.median_filter.html)</span>
-<span class="sd">    Returns:</span>
-<span class="sd">        list: List of dictionaries containing two fields</span>
-
-<span class="sd">                - geometry: GeoJSON-like representation of one of the objects</span>
-<span class="sd">                  in https://toblerity.org/fiona/manual.html#geometry-types</span>
-<span class="sd">                - properties: Dictionary of properties describing that</span>
-<span class="sd">                  feature.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        NotImplementedError -- if the user attempts to contour a data file</span>
-<span class="sd">            with sets of points rather than grids.</span>
-<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
-    <span class="n">intensity_colormap</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
-    <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
-    <span class="n">gridobj</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
-    <span class="n">grid</span> <span class="o">=</span> <span class="n">gridobj</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
-    <span class="n">metadata</span> <span class="o">=</span> <span class="n">gridobj</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span><span class="o">.</span><span class="n">asDict</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-        <span class="n">sgrid</span> <span class="o">=</span> <span class="n">grid</span>
-        <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;mmi&#39;</span>
-    <span class="k">elif</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
-        <span class="n">sgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span>
-        <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;cms&#39;</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">sgrid</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">grid</span><span class="p">)</span> <span class="o">*</span> <span class="mf">100.0</span>
-        <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;pctg&#39;</span>
-    <span class="k">if</span> <span class="n">filter_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">fgrid</span> <span class="o">=</span> <span class="n">median_filter</span><span class="p">(</span><span class="n">sgrid</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">filter_size</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">fgrid</span> <span class="o">=</span> <span class="n">sgrid</span>
-
-    <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;log&#39;</span>
-    <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-        <span class="n">interval_type</span> <span class="o">=</span> <span class="s1">&#39;linear&#39;</span>
-    <span class="n">intervals</span> <span class="o">=</span> <span class="n">getContourLevels</span><span class="p">(</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">fgrid</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">fgrid</span><span class="p">),</span> <span class="n">itype</span><span class="o">=</span><span class="n">interval_type</span><span class="p">)</span>
-
-    <span class="n">lonstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmin&#39;</span><span class="p">]</span>
-    <span class="n">latstart</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ymin&#39;</span><span class="p">]</span>
-    <span class="n">lonspan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;xmax&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">lonstart</span><span class="p">)</span>
-    <span class="n">latspan</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ymax&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="n">latstart</span><span class="p">)</span>
-    <span class="n">nlon</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx&#39;</span><span class="p">]</span>
-    <span class="n">nlat</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ny&#39;</span><span class="p">]</span>
-
-    <span class="n">line_strings</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># dictionary of MultiLineStrings and props</span>
-
-    <span class="k">for</span> <span class="n">cval</span> <span class="ow">in</span> <span class="n">intervals</span><span class="p">:</span>
-        <span class="n">contours</span> <span class="o">=</span> <span class="n">measure</span><span class="o">.</span><span class="n">find_contours</span><span class="p">(</span><span class="n">fgrid</span><span class="p">,</span> <span class="n">cval</span><span class="p">)</span>
-        <span class="c1">#</span>
-        <span class="c1"># Convert coords to geographic coordinates; the coordinates</span>
-        <span class="c1"># are returned in row, column order (i.e., (y, x))</span>
-        <span class="c1">#</span>
-        <span class="n">new_contours</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">plot_contours</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">ic</span><span class="p">,</span> <span class="n">coords</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">contours</span><span class="p">):</span>  <span class="c1"># coords is a line segment</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">20</span><span class="p">:</span>  <span class="c1"># skipping little contour islands?</span>
-                <span class="k">continue</span>
-
-            <span class="n">mylons</span> <span class="o">=</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">lonspan</span> <span class="o">/</span> <span class="n">nlon</span> <span class="o">+</span> <span class="n">lonstart</span>
-            <span class="n">mylats</span> <span class="o">=</span> <span class="p">(</span><span class="n">nlat</span> <span class="o">-</span> <span class="n">coords</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">latspan</span> <span class="o">/</span> <span class="n">nlat</span> <span class="o">+</span> <span class="n">latstart</span>
-            <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">][:,</span> <span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">mylons</span><span class="p">[:]</span>
-            <span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">][:,</span> <span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">mylats</span><span class="p">[:]</span>
-            <span class="n">plot_contours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">])</span>
-            <span class="n">new_contours</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contours</span><span class="p">[</span><span class="n">ic</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_contours</span><span class="p">):</span>
-            <span class="n">mls</span> <span class="o">=</span> <span class="n">MultiLineString</span><span class="p">(</span><span class="n">new_contours</span><span class="p">)</span>
-            <span class="n">props</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">cval</span><span class="p">,</span>
-                <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span>
-            <span class="p">}</span>
-            <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-                <span class="n">color_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">intensity_colormap</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">cval</span><span class="p">))</span>
-                <span class="n">color_rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                    <span class="n">color_array</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-                <span class="n">props</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;#</span><span class="si">%02x%02x%02x</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">color_rgb</span><span class="p">)</span>
-                <span class="k">if</span> <span class="p">(</span><span class="n">cval</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">props</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">props</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-            <span class="n">line_strings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="n">mapping</span><span class="p">(</span><span class="n">mls</span><span class="p">),</span>
-                    <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">props</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
-    <span class="k">return</span> <span class="n">line_strings</span></div>
 
 
 <div class="viewcode-block" id="contour_to_files"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.contour_to_files">[docs]</a><span class="k">def</span> <span class="nf">contour_to_files</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="n">logger</span><span class="p">,</span>
@@ -408,47 +304,6 @@
                 <span class="n">old_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="s1">&#39;cont_mi.json&#39;</span><span class="p">)</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">old_file</span><span class="p">)</span></div>
             <span class="c1">#####################################</span>
-
-<div class="viewcode-block" id="getContourLevels"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.contour.html#shakemap.coremods.contour.getContourLevels">[docs]</a><span class="k">def</span> <span class="nf">getContourLevels</span><span class="p">(</span><span class="n">dmin</span><span class="p">,</span> <span class="n">dmax</span><span class="p">,</span> <span class="n">itype</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get contour levels given min/max values and desired IMT.</span>
-
-<span class="sd">    Use itype=&#39;log&#39; for any IMT that is logarithmically distributed, such as</span>
-<span class="sd">    PGA, PGV, and Sa. Linear for MMI.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        dmin (float): Minimum value of data to contour.</span>
-<span class="sd">        dmax (float): Maximum value of data to contour.</span>
-<span class="sd">        itype (str): Interval type; default is &#39;log&#39;, anythign else</span>
-<span class="sd">            indicates linear intervals.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        ndarray: Numpy array of contour levels.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">itype</span> <span class="o">==</span> <span class="s1">&#39;log&#39;</span><span class="p">:</span>
-        <span class="c1"># Within-decade label values</span>
-        <span class="n">dec_inc</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-
-        <span class="c1"># Upper and lower decades</span>
-        <span class="n">lower_dec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dmin</span><span class="p">))</span>
-        <span class="n">upper_dec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dmax</span><span class="p">))</span>
-
-        <span class="c1"># Array of decades</span>
-        <span class="n">decades</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lower_dec</span><span class="p">,</span> <span class="n">upper_dec</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
-
-        <span class="c1"># Construct levels</span>
-        <span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">power</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span> <span class="o">*</span> <span class="n">dec_inc</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">decades</span><span class="p">])</span>
-        <span class="n">levels</span> <span class="o">=</span> <span class="n">levels</span><span class="p">[(</span><span class="n">levels</span> <span class="o">&lt;</span> <span class="n">dmax</span><span class="p">)</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">levels</span> <span class="o">&gt;</span> <span class="n">dmin</span><span class="p">)]</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># MMI contours are every 0.5 units</span>
-        <span class="n">levels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">dmin</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">dmax</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">,</span>
-            <span class="mf">0.5</span>
-        <span class="p">)</span>
-    <span class="k">return</span> <span class="n">levels</span></div>
-
 </pre></div>
 
           </div>

@@ -88,6 +88,7 @@ Components” (IMCs) per Beyer and Bommer (2006).</p>
 <li>The OQ IMC “HORIZONAL” indicates that the horizontal IMC category
 may be ambiguous. In these cases, we are assuming that it is a
 random horizontal component as a default.</li>
+<li>Assumes ALL unknown IMC types are AVERAGE_HORIZONTAL</li>
 </ul>
 </div></blockquote>
 <p>References</p>
@@ -99,7 +100,7 @@ of America, 96(4A), 1512-1522.
 <a class="reference external" href="http://www.bssaonline.org/content/96/4A/1512.short">[link]</a></div></blockquote>
 <dl class="method">
 <dt id="shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertAmpsOnce">
-<code class="descname">convertAmpsOnce</code><span class="sig-paren">(</span><em>imt</em>, <em>amps</em>, <em>rrups</em>, <em>mag</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/beyer_bommer_2006.html#BeyerBommer2006.convertAmpsOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
+<code class="descname">convertAmpsOnce</code><span class="sig-paren">(</span><em>imt</em>, <em>amps</em>, <em>rrups=None</em>, <em>mag=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/conversions/imc/beyer_bommer_2006.html#BeyerBommer2006.convertAmpsOnce"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.conversions.imc.beyer_bommer_2006.BeyerBommer2006.convertAmpsOnce" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns amps converted from one IMC to another.</p>
 <p><strong>Important</strong>:</p>
 <blockquote>
@@ -113,14 +114,15 @@ of America, 96(4A), 1512-1522.
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>amps</strong> (<em>array</em>) – Numpy array of ground motion amplitudes.</li>
-<li><strong>imc_in</strong> (<em>IMC</em>) – OpenQuake IMC type of the input amp array.
-<a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC">[link]</a></li>
-<li><strong>imc_out</strong> (<em>IMC</em>) – Desired OpenQuake IMC type of the output amps.
-<a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC">[link]</a></li>
 <li><strong>imt</strong> (<em>IMT</em>) – OpenQuake IMT of the input amps (must be one of PGA,
 PGV, or SA).
 <cite>[link] &lt;http://docs.openquake.org/oq-hazardlib/master/imt.html&gt;</cite></li>
+<li><strong>amps</strong> (<em>array</em>) – Numpy array of ground motion amplitudes.</li>
+<li><strong>rrups</strong> (<em>array</em>) – A numpy array of the same shape as amps,
+containing the rupture distances of the ground motions.
+Ignored by this method.</li>
+<li><strong>mag</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – The earthquake magnitude. Default is None.
+Ignored by this method.</li>
 </ul>
 </td>
 </tr>
@@ -150,13 +152,9 @@ PGV, or SA).
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>sigmas</strong> (<em>array</em>) – Numpy array of standard deviations.</li>
-<li><strong>imc_in</strong> (<em>IMC</em>) – OpenQuake IMC type of the input sigmas array.
-<a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC">[link]</a></li>
-<li><strong>imc_out</strong> (<em>IMC</em>) – Desired OpenQuake IMC type of the output sigmas.
-<a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/const.html?highlight=imc#openquake.hazardlib.const.IMC">[link]</a></li>
 <li><strong>imt</strong> (<em>IMT</em>) – OpenQuake IMT of the input sigmas (must be one of PGA,
 PGV, or SA) <a class="reference external" href="http://docs.openquake.org/oq-hazardlib/master/imt.html">[link]</a></li>
+<li><strong>sigmas</strong> (<em>array</em>) – Numpy array of standard deviations.</li>
 </ul>
 </td>
 </tr>

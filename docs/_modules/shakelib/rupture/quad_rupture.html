@@ -41,6 +41,7 @@
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.mesh</span> <span class="k">import</span> <span class="n">Mesh</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="k">import</span> <span class="n">point_at</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.point</span> <span class="k">import</span> <span class="n">Point</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="k">import</span> <span class="n">get_orthographic_projection</span>
 
@@ -448,6 +449,107 @@
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">rupturefile</span><span class="p">,</span> <span class="s1">&#39;read&#39;</span><span class="p">):</span>
             <span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="QuadRupture.fromOrientation"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.fromOrientation">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">fromOrientation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">pz</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span>
+                        <span class="n">strike</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a QuadRupture instance from a known point, shape, and orientation.</span>
+
+<span class="sd">        A point is defined as a set of latitude, longitude, and depth, which</span>
+<span class="sd">        is located in the corner between the tail of the vector pointing in</span>
+<span class="sd">        the strike direction and the dip direction (nearest to the surface).</span>
+<span class="sd">        The shape is defined by length, width, dx, and dy. The length is the</span>
+<span class="sd">        measurement of the quadrilateral in the direction of strike, and</span>
+<span class="sd">        width is the measurement of quadrilateral in the direction of dip.</span>
+<span class="sd">        Dx is the measurement on the plane in the strike direction between</span>
+<span class="sd">        the known point and the corner between the tail of the vector pointing</span>
+<span class="sd">        in the strike direction and the dip direction (nearest to the surface).</span>
+<span class="sd">        Dy is the measurement on the plane in the dip direction between</span>
+<span class="sd">        the known point and the corner between the tail of the vector pointing</span>
+<span class="sd">        in the strike direction and the dip direction (nearest to the surface).</span>
+<span class="sd">        The orientation is defined by azimuth and angle from</span>
+<span class="sd">        horizontal, strike and dip respectively. For example in plane view:</span>
+<span class="sd">            ::</span>
+<span class="sd">                            strike direction</span>
+<span class="sd">                        p1*-------------------&gt;&gt;p2</span>
+<span class="sd">                        *        | dy           |</span>
+<span class="sd">                 dip    |--------o              |</span>
+<span class="sd">              direction |   dx    known point   | Width</span>
+<span class="sd">                        V                       |</span>
+<span class="sd">                        V                       |</span>
+<span class="sd">                        p4----------------------p3</span>
+<span class="sd">                                Length</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            px (array): Array or list of longitudes (floats) of the known point.</span>
+<span class="sd">            py (array): Array or list of latitudes (floats) of the known point.</span>
+<span class="sd">            pz (array): Array or list of depths (floats) of the known point.</span>
+<span class="sd">            dx (array): Array or list of distances (floats), in the strike</span>
+<span class="sd">                direction, between the known point and P1. dx must be less than</span>
+<span class="sd">                length.</span>
+<span class="sd">            dy (array): Array or list of distances (floats), in the dip</span>
+<span class="sd">                direction, between the known point and P1. dy must be less than</span>
+<span class="sd">                width.</span>
+<span class="sd">            length (array): Array or list of widths (floats) of the plane in</span>
+<span class="sd">                the strike direction.</span>
+<span class="sd">            width (array): Array or list of widths (floats) of the plane in the</span>
+<span class="sd">                dip direction.</span>
+<span class="sd">            strike (array): Array or list of strike angles (floats).</span>
+<span class="sd">            dip (array): Array or list of dip angles (floats).</span>
+<span class="sd">            origin (Origin): Reference to a ShakeMap Origin object.</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            QuadRupture instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Verify that arrays are of equal length</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">px</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">py</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">pz</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">dx</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dy</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">length</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">width</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
+                <span class="n">strike</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dip</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span>
+                <span class="s1">&#39;Number of px, py, pz, dx, dy, length, width, &#39;</span>
+                <span class="s1">&#39;strike, dip points must be &#39;</span>
+                <span class="s1">&#39;equal.&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Verify that all are numpy arrays</span>
+        <span class="n">px</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">px</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        <span class="n">py</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">py</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        <span class="n">pz</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">pz</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        <span class="n">dx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        <span class="n">dy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dy</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        <span class="n">length</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">length</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        <span class="n">width</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        <span class="n">strike</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">strike</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+        <span class="n">dip</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">dip</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="s1">&#39;d&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Get P1 and P2 (top horizontal points)</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">((</span><span class="n">dy</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">dip</span><span class="p">)))</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
+        <span class="n">P1_direction</span> <span class="o">=</span> <span class="n">strike</span> <span class="o">+</span> <span class="mi">180</span> <span class="o">+</span> <span class="n">theta</span>
+        <span class="n">P1_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">dy</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">dip</span><span class="p">)))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">P2_direction</span> <span class="o">=</span> <span class="n">strike</span>
+        <span class="n">P2_distance</span> <span class="o">=</span> <span class="n">length</span>
+        <span class="n">P1_lon</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">P1_lat</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">P2_lon</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">P2_lat</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">px</span><span class="p">):</span>
+            <span class="n">P1_points</span> <span class="o">=</span> <span class="n">point_at</span><span class="p">(</span><span class="n">px</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">py</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
+                    <span class="n">P1_direction</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">P1_distance</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+            <span class="n">P1_lon</span> <span class="o">+=</span> <span class="p">[</span><span class="n">P1_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">P1_lat</span> <span class="o">+=</span> <span class="p">[</span><span class="n">P1_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+            <span class="n">P2_points</span> <span class="o">=</span> <span class="n">point_at</span><span class="p">(</span><span class="n">P1_points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">P1_points</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                    <span class="n">P2_direction</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">P2_distance</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+            <span class="n">P2_lon</span> <span class="o">+=</span> <span class="p">[</span><span class="n">P2_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+            <span class="n">P2_lat</span> <span class="o">+=</span> <span class="p">[</span><span class="n">P2_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="c1"># Get top depth</span>
+        <span class="n">top_horizontal_depth</span> <span class="o">=</span> <span class="n">pz</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">dy</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">dip</span><span class="p">)))</span>
+
+        <span class="c1"># Get QuadRupture object</span>
+        <span class="n">quad</span> <span class="o">=</span> <span class="n">QuadRupture</span><span class="o">.</span><span class="n">fromTrace</span><span class="p">(</span><span class="n">P1_lon</span><span class="p">,</span> <span class="n">P1_lat</span><span class="p">,</span> <span class="n">P2_lon</span><span class="p">,</span> <span class="n">P2_lat</span><span class="p">,</span>
+                <span class="n">top_horizontal_depth</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">strike</span><span class="o">=</span><span class="n">strike</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">quad</span></div>
 
 <div class="viewcode-block" id="QuadRupture.fromVertices"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.fromVertices">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">fromVertices</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span>

@@ -1,3 +1,4 @@
+.. _sec-queue-4:
 
 ===================
 Queueing Events

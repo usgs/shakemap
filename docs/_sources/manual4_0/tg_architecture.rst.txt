@@ -1,4 +1,4 @@
-.. _sec-architecute-4:
+.. _sec-architecture-4:
 
 ****************************
 Software Architecture
@@ -146,8 +146,9 @@ user supplied geographic or other system specific data::
             modules.conf
             gmpe_sets.conf
             ...
-        site_data/
-            vs30.grid
+        mapping/
+            global_vs30.grd
+            global_topo.grd
         logs/
             shake.log
             shake.log.<timestamp>
@@ -179,12 +180,24 @@ its own command-line options; run "shake help MODULE" to see the help
 for a given module. 
 
 The behavior of **shake** and some of its modules are controlled by
-the configuration files *shake.conf* and *products.conf*. *shake.conf*
-is largely concerned with the way logging is handled. See *shake.conf*
-for details. *products.conf* controls the behavior of some of the
+the configuration files *shake.conf*, *logging.conf* and
+*products.conf*. *logging.conf*
+is largely concerned with the way logging is handled, it has 
+relatively few parameters that the users will want to change. 
+*shake.conf* allows the user to specify alternative locations to
+search for ShakeMap modules, and to configure the modules that will
+be run when **shake** is called with the **-a** option.. *products.conf*
+controls the behavior of some of the
 core modules that produce ShakeMap products. See the documentation
-within the file for more information. Both files should be in the
+within the file for more information. All three files should be in the
 user's current profile's *INSTALL_DIR/config* directory.
+
+**shake** will attempt to assess if a module is being run out of sequence
+or if its dependencies are out of date. For instance, if a new data file
+has been added, and the user tries to run the **model** module before
+re-running the **assemble** module, **shake** will warn the user and 
+quit without running **model**. The user can override this behavior by
+calling **shake** with the **--force** option.
 
 shake Modules
 -------------
@@ -192,15 +205,16 @@ shake Modules
 Below is a description of many of the modules available to **shake**.
 They are ordered in more or less the order they would be called. The
 module **select** would be run first if the operator wanted to have
-the ShakeMap system determine the GMPE sets to use based on the
+the ShakeMap system determine the GMPE set to use based on the
 event's location and depth. Many operators will have a fixed
 configuration for their GMPEs, and will therefore not use **select**.
-The operator will then typically run **assemble** or **augment**, to
+The operator will then typically run **assemble** (or possibly
+**augment**) to
 create (or update) the *shake_data.hdf* input file,
-followed by **model**. The order of modules after **model** is
-usually not important as they typically depend upon the output of
+followed by running **model**. The order of modules after **model** is
+usually not as important as they typically depend upon the output of
 **model** (i.e., *shake_result.hdf*) and not upon the results of
-other modules.
+other modules. **transfer**, however, will typically be run last.
 
 select
 ```````
@@ -324,7 +338,8 @@ data structure. **sm_assemble** then reads the configuration files
     <install_dir>/model.conf
 
 
-and assembles them into a single configuration. It then reads
+and assembles them into a single configuration. It then reads and 
+incorporates
 
 .. code-block:: python
 
@@ -378,7 +393,8 @@ documentation.
 augment
 ```````
 
-The **augment** module behaves very similarly to **assemble** except that it
+The **augment** module behaves in a manner similar to **assemble** except
+that it
 will first read *shake_data.hdf* from the event's *current* directory.
 If *exven.xml* exists in the event's *current* directory, its data will
 replace the data in the existing *shake_data.hdf*.
@@ -476,6 +492,14 @@ which contains metadata about the ShakeMap.
 See :meth:`shakemap.coremods.info` for the module's API
 documentation.
 
+kml
+````
+
+**kml** reads *shake_result.hdf* and produces a file, *shakemap.kmz*
+which is a self-contained file of geographic layers suitable for 
+reading into Google Earth. The layers include an MMI overlay, MMI
+contours, station locations and data, and the event's epicenter.
+
 mapping
 ```````
 
@@ -541,6 +565,16 @@ JSON file, *stationlist.json*, of the input station data.
 See :meth:`shakemap.coremods.stations` for the module's API
 documentation.
 
+transfer
+`````````
+
+**transfer** allows the operator to transfer ShakeMap products to
+other system via PDL or ssh. See the documentation in *transfer.conf*
+for details on configuring **transfer**.
+
+See :meth:`shakemap.coremods.transfer` for the module's API
+documentation.
+
 
 Additional Programs
 ===================
@@ -555,6 +589,15 @@ getdyfi
 functionality.  See the :ref:`getdyfi man page <getdyfi>` for usage and a 
 list of options.
 
+sm_compare
+-----------
+
+Allows the user to compare two ShakeMaps by making images of their
+difference and ratio. 
+
+See the :ref:`sm_compare man page <sm-compare>` for usage and a 
+list of options.
+
 
 sm_create
 ---------
@@ -566,6 +609,58 @@ local processing.
 
 See the :ref:`sm_create man page <sm-create>` for usage and a 
 list of options.
+
+
+sm_migrate
+-----------
+
+Migrates a directory of ShakeMap 3.5 data files into ShakeMap 4.0 inputs.
+The migration of GMPEs is configurable via the *migrate.conf* configuration
+file.
+
+See the :ref:`sm_migrate man page <sm-migrate>` for usage and a 
+list of options.
+
+
+sm_queue
+-----------
+
+A daemon process to receive messages from external systems for the
+triggering and cancellation of ShakeMap runs. See the section
+:ref:`Queueing Events <sec-queue-4>` for more detail. The behavior
+of **sm_queue** is controlled by the *queue.conf* configuration
+file. This file is not copied to new profiles by default, so it 
+may be retrieved from the source directory 
+*<shake_install_dir>/shakemap/data*.
+
+See the :ref:`sm_queue man page <sm-queue>` for usage and a 
+list of options.
+
+
+receive_amps, receive_origins, and associate_amps
+-------------------------------------------------
+
+**receive_amps** and **receive_origins** are intended to be run 
+by a configured instance of the USGS's Product
+Distribution system to inform **sm_queue** of new origins and
+unassociated amplitudes. They are, therefore, of limited utility
+to most users, however they may serve as guides as to writing
+similar programs for other systems.
+
+**associate_amps** is a utility program to associate the 
+unassociated amplitudes with origins, and to create ShakeMap
+input files with those that associate. Again, this will be of
+limited utility to users not running PDL.
+
+
+run_verification
+----------------
+
+Runs a set of simple verification tests and displays the results.
+The resulting plots may be compared to those found in the 
+documentation section :ref:`Verification <sec-verification-4>`.
+**run_verification** is a shell script. See the source file for
+usage and notes.
 
 
 .. rubric:: Footnotes

@@ -34,7 +34,6 @@
   <h1>Source code for shakemap.coremods.transfer</h1><div class="highlight"><pre>
 <span></span><span class="c1"># stdlib imports</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
-<span class="kn">import</span> <span class="nn">json</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="k">import</span> <span class="n">datetime</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -50,7 +49,7 @@
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span> <span class="n">get_data_path</span>
 
-<span class="n">TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1"> %H:%M:%S&#39;</span>
+<span class="n">TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span>
 
 <span class="n">NO_TRANSFER</span> <span class="o">=</span> <span class="s1">&#39;NO_TRANSFER&#39;</span>
 
@@ -68,6 +67,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;transfer&#39;</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/*&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]</span>
 
 <div class="viewcode-block" id="TransferModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.transfer.html#shakemap.coremods.transfer.TransferModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -121,7 +121,9 @@
         <span class="n">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">)</span>
 
         <span class="c1"># copy the current folder to a new backup directory</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_make_backup</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_backup</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
+
+        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">_make_backup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_path</span><span class="p">):</span>
         <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
@@ -147,7 +149,7 @@
 
 <span class="k">def</span> <span class="nf">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">,</span> <span class="n">cancel</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="c1"># extract the info.json object from the container</span>
-    <span class="n">info</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">container</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">))</span>
+    <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
     <span class="n">properties</span><span class="p">,</span> <span class="n">product_properties</span> <span class="o">=</span> <span class="n">_get_properties</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
 
     <span class="c1"># get the config information:</span>
@@ -219,29 +221,35 @@
     <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;event-description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span>
 
     <span class="c1"># other metadata</span>
-    <span class="n">mmi_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;MMI&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxmmi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmi_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxmmi-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmi_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;MMI&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">]:</span>
+        <span class="n">mmi_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;MMI&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxmmi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmi_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxmmi-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mmi_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
 
-    <span class="n">pgv_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;PGV&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpgv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pgv_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpgv-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pgv_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;PGV&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">]:</span>
+        <span class="n">pgv_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;PGV&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpgv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pgv_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpgv-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pgv_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
 
-    <span class="n">pga_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;PGA&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpga&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pga_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpga-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pga_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;PGA&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">]:</span>
+        <span class="n">pga_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;PGA&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpga&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pga_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpga-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pga_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
 
-    <span class="n">psa03_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;SA(0.3)&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa03&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa03_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa03-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa03_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;SA(0.3)&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">]:</span>
+        <span class="n">psa03_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;SA(0.3)&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa03&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa03_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa03-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa03_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
 
-    <span class="n">psa10_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;SA(1.0)&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa10&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa10_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa10-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa10_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;SA(1.0)&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">]:</span>
+        <span class="n">psa10_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;SA(1.0)&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa10&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa10_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa10-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa10_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
 
-    <span class="n">psa30_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;SA(3.0)&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa30&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa30_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
-    <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa30-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa30_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;SA(3.0)&#39;</span> <span class="ow">in</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">]:</span>
+        <span class="n">psa30_info</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;ground_motions&#39;</span><span class="p">][</span><span class="s1">&#39;SA(3.0)&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa30&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa30_info</span><span class="p">[</span><span class="s1">&#39;max&#39;</span><span class="p">]</span>
+        <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;maxpsa30-grid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">psa30_info</span><span class="p">[</span><span class="s1">&#39;max_grid&#39;</span><span class="p">]</span>
 
     <span class="n">product_properties</span><span class="p">[</span><span class="s1">&#39;minimum-longitude&#39;</span><span class="p">]</span> <span class="o">=</span> \
         <span class="n">info</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;map_information&#39;</span><span class="p">][</span><span class="s1">&#39;min&#39;</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span>

@@ -279,31 +279,31 @@
 <span class="sd">        eventid (str): The event ID to process.</span>
 <span class="sd">        logger (logger): The process logger.</span>
 <span class="sd">        children (dict): The structure holding info on the child processes.</span>
-<span class="sd">        action (str): One of &#39;run&#39;, &#39;cancel&#39;, or &#39;test&#39;. &#39;run&#39; starts the</span>
-<span class="sd">                      process &#39;shake --autorun eventid&#39;, &#39;cancel&#39; starts</span>
-<span class="sd">                      the process &#39;shake eventid cancel&#39;, and &#39;test&#39; starts</span>
-<span class="sd">                      the process &#39;echo eventid&#39;.</span>
+<span class="sd">        action (str): &#39;cancel&#39;, &#39;test&#39;, or some other string. &#39;cancel&#39; starts</span>
+<span class="sd">                      the cancel process, &#39;test&#39; starts the process</span>
+<span class="sd">                      &#39;echo eventid&#39;.  And any other string starts the</span>
+<span class="sd">                      shake process. See the configuration file &#39;queue.conf&#39;</span>
+<span class="sd">                      for the exact commands that will be run.</span>
 <span class="sd">        config (dict): The configuration dictionary.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        nothing: Nothing.</span>
-
-<span class="sd">    Raises:</span>
-<span class="sd">        ValueError: if action is not one of &#39;run&#39;, &#39;cance&#39;, or &#39;test&#39;.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;run&#39;</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running event </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">eventid</span><span class="p">)</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;shake_path&#39;</span><span class="p">],</span> <span class="s1">&#39;--log&#39;</span><span class="p">,</span>
-                              <span class="s1">&#39;--autorun&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">])</span>
-    <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;cancel&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;cancel&#39;</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Canceling event </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">eventid</span><span class="p">)</span>
-        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;shake_path&#39;</span><span class="p">],</span> <span class="s1">&#39;--log&#39;</span><span class="p">,</span>
-                              <span class="n">eventid</span><span class="p">,</span> <span class="s1">&#39;cancel&#39;</span><span class="p">])</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;cancel_command&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;shake&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;shake_path&#39;</span><span class="p">])</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;EVID&gt;&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
     <span class="k">elif</span> <span class="n">action</span> <span class="o">==</span> <span class="s1">&#39;test&#39;</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Testing event </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">eventid</span><span class="p">)</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s1">&#39;echo&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown action &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">action</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running event </span><span class="si">%s</span><span class="s1"> due to action </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">eventid</span><span class="p">,</span> <span class="n">action</span><span class="p">))</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;shake_command&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;shake&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;shake_path&#39;</span><span class="p">])</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;EVID&gt;&#39;</span><span class="p">,</span> <span class="n">eventid</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
 
     <span class="n">children</span><span class="p">[</span><span class="n">eventid</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;popen&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">,</span> <span class="s1">&#39;start_time&#39;</span><span class="p">:</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()}</span>
 

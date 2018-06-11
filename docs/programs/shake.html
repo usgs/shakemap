@@ -17,7 +17,7 @@
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sm_create" href="sm_create.html" />
+    <link rel="next" title="sm_compare" href="sm_compare.html" />
     <link rel="prev" title="ShakeMap Programs" href="programs.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -38,7 +38,7 @@
 <p><blockquote>
 <div>Run specified ShakeMap modules.</div></blockquote>
 </p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">shake</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">q</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="n">eventid</span> <span class="o">...</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">shake</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">d</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">q</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">a</span><span class="p">]</span> <span class="n">eventid</span> <span class="o">...</span>
 </pre></div>
 </div>
 <div class="section" id="Positional Arguments">
@@ -71,6 +71,9 @@
 <tr><td class="option-group">
 <kbd>-l, --log</kbd></td>
 <td>Log all output.</td></tr>
+<tr><td class="option-group">
+<kbd>-f, --force</kbd></td>
+<td>Force the command(s) to run regardless of out of date dependencies.</td></tr>
 <tr><td class="option-group">
 <kbd>-a, --autorun</kbd></td>
 <td>Run the modules defined in shake.conf with the autorun_modules parameter rather than any found on the command line.</td></tr>
@@ -156,6 +159,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#Named Arguments">Named Arguments</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="sm_compare.html">sm_compare</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sm_create.html">sm_create</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sm_migrate.html">sm_migrate</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sm_profile.html">sm_profile</a></li>

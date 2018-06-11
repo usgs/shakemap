@@ -1,4 +1,4 @@
-.. _sm_migrate:
+.. _sm-migrate:
 
 sm_migrate
 ==========

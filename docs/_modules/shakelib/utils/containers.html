@@ -50,7 +50,7 @@
 <span class="kn">from</span> <span class="nn">shakelib.station</span> <span class="k">import</span> <span class="n">StationList</span>
 <span class="kn">import</span> <span class="nn">shakemap.utils.queue</span> <span class="k">as</span> <span class="nn">queue</span>
 
-<span class="n">GROUPS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;imt&#39;</span><span class="p">:</span> <span class="s1">&#39;__imts__&#39;</span><span class="p">}</span>
+<span class="n">GROUPS</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;imt&#39;</span><span class="p">:</span> <span class="s1">&#39;imts&#39;</span><span class="p">}</span>
 
 
 <div class="viewcode-block" id="ShakeMapContainer"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer">[docs]</a><span class="k">class</span> <span class="nc">ShakeMapContainer</span><span class="p">(</span><span class="n">GridHDFContainer</span><span class="p">):</span>
@@ -96,18 +96,18 @@
 <span class="sd">            TypeError: If input object or dictionary does not</span>
 <span class="sd">                represent a Rupture object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s1">&#39;rupture&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dropString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;rupture&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropDictionary</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">rupture_from_dict</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input dict does not represent a rupture object.&#39;</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
-            <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
+            <span class="n">rupdict</span> <span class="o">=</span> <span class="n">rupture</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">json_str</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">rupture</span><span class="o">.</span><span class="n">_geojson</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">,</span> <span class="n">json_str</span><span class="p">)</span></div>
+            <span class="n">rupdict</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">_geojson</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDictionary</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">,</span> <span class="n">rupdict</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ShakeMapContainer.getRuptureObject"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getRuptureObject">[docs]</a>    <span class="k">def</span> <span class="nf">getRuptureObject</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -134,9 +134,9 @@
 <span class="sd">            AttributeError: If rupture object has not been set in</span>
 <span class="sd">                the container.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s1">&#39;rupture&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s1">&#39;rupture&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Rupture object not set in container.&#39;</span><span class="p">)</span>
-        <span class="n">rupture_dict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">))</span>
+        <span class="n">rupture_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;rupture&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">rupture_dict</span></div>
 
 <div class="viewcode-block" id="ShakeMapContainer.setStationList"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setStationList">[docs]</a>    <span class="k">def</span> <span class="nf">setStationList</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stationlist</span><span class="p">):</span>
@@ -185,10 +185,9 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stationdict</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Input object is not a dictionary.&#39;</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="n">fmt</span><span class="p">)</span>
-        <span class="k">if</span> <span class="s1">&#39;stations_dict&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dropStrings</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">)</span>
-        <span class="n">stationstring</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">stationdict</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">,</span> <span class="n">stationstring</span><span class="p">)</span></div>
+        <span class="k">if</span> <span class="s1">&#39;stations_dict&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropDictionary</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">setDictionary</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">,</span> <span class="n">stationdict</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="ShakeMapContainer.getStationDict"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.getStationDict">[docs]</a>    <span class="k">def</span> <span class="nf">getStationDict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -200,9 +199,9 @@
 <span class="sd">            AttributeError: If station dictionary has not been set in</span>
 <span class="sd">                the container.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s1">&#39;stations_dict&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getStrings</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s1">&#39;stations_dict&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionaries</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s1">&#39;Station dictionary not set in container.&#39;</span><span class="p">)</span>
-        <span class="n">stations</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">))</span>
+        <span class="n">stations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;stations_dict&#39;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">stations</span></div>
 
 <div class="viewcode-block" id="ShakeMapContainer.setVersionHistory"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapContainer.setVersionHistory">[docs]</a>    <span class="k">def</span> <span class="nf">setVersionHistory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">history_dict</span><span class="p">):</span>
@@ -365,7 +364,7 @@
 <span class="sd">            str or None: Either &#39;grid&#39; or &#39;points&#39; or None.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__file_data_type__&#39;</span>
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;file_data_type&#39;</span>
         <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
             <span class="n">data_type_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
             <span class="k">return</span> <span class="n">data_type_group</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span>
@@ -377,10 +376,10 @@
         <span class="n">out</span> <span class="o">=</span> <span class="s1">&#39;Data type: </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;    use &quot;getIMTGrids&quot; method to access &#39;</span>\
-                        <span class="s1">&#39;interpolated IMTs</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="s1">&#39;interpolated IMTs</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">out</span> <span class="o">+</span> <span class="s1">&#39;    use &quot;getIMTArrays&quot; method to access &#39;</span>\
-                        <span class="s1">&#39;interpolated IMTs</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="s1">&#39;interpolated IMTs</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">rupt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getRuptureDict</span><span class="p">()</span>
             <span class="n">rupt_obj</span> <span class="o">=</span> <span class="n">rupture_from_dict</span><span class="p">(</span><span class="n">rupt</span><span class="p">)</span>
@@ -426,8 +425,8 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            dict: Metadata dictionary.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">info_str</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getString</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">info_str</span><span class="p">)</span></div>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">info</span></div>
 
 <div class="viewcode-block" id="ShakeMapOutputContainer.setDataType"><a class="viewcode-back" href="../../../shakelib/shakelib.utils.containers.html#shakelib.utils.containers.ShakeMapOutputContainer.setDataType">[docs]</a>    <span class="k">def</span> <span class="nf">setDataType</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datatype</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -445,7 +444,7 @@
         <span class="k">if</span> <span class="n">datatype</span> <span class="o">!=</span> <span class="s1">&#39;points&#39;</span> <span class="ow">and</span> <span class="n">datatype</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Trying to set unknown data type: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span>
                             <span class="p">(</span><span class="n">datatype</span><span class="p">))</span>
-        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__file_data_type__&#39;</span>
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;file_data_type&#39;</span>
         <span class="k">if</span> <span class="n">group_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
             <span class="n">data_type_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">group_name</span><span class="p">]</span>
             <span class="n">current_data_type</span> <span class="o">=</span> <span class="n">data_type_group</span><span class="o">.</span><span class="n">attrs</span><span class="p">[</span><span class="s1">&#39;data_type&#39;</span><span class="p">]</span>
@@ -489,7 +488,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setDataType</span><span class="p">(</span><span class="s1">&#39;grid&#39;</span><span class="p">)</span>
 
         <span class="c1"># create name of group containing IMT datasets</span>
-        <span class="n">imt_name</span> <span class="o">=</span> <span class="s1">&#39;__</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="n">imt_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
             <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
@@ -542,7 +541,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Requesting grid data from file containing points&#39;</span><span class="p">)</span>
 
-        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No IMTs stored in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
                               <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>
@@ -619,7 +618,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;All input arrays must be the same shape&#39;</span><span class="p">)</span>
 
         <span class="c1"># set up the name of the group holding all the information for the IMT</span>
-        <span class="n">sub_group_name</span> <span class="o">=</span> <span class="s1">&#39;__</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="n">sub_group_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
             <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
@@ -673,7 +672,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">getDataType</span><span class="p">()</span> <span class="o">!=</span> <span class="s1">&#39;points&#39;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;Requesting point data from file containing grids&#39;</span><span class="p">)</span>
 
-        <span class="n">sub_group_name</span> <span class="o">=</span> <span class="s1">&#39;__</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+        <span class="n">sub_group_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">:</span>
             <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="o">.</span><span class="n">create_group</span><span class="p">(</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
@@ -735,7 +734,6 @@
 
         <span class="n">imt_groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">imt_group</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">:</span>
-            <span class="n">imt_group</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
             <span class="n">parts</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
             <span class="n">imt</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">comp</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
@@ -762,7 +760,6 @@
 
         <span class="n">imt_groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="k">for</span> <span class="n">imt_group</span> <span class="ow">in</span> <span class="n">imt_groups</span><span class="p">:</span>
-            <span class="n">imt_group</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;__&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
             <span class="n">parts</span> <span class="o">=</span> <span class="n">imt_group</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
             <span class="n">imt</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">comp</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
@@ -787,7 +784,7 @@
         <span class="n">imt_group</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_hdfobj</span><span class="p">[</span><span class="n">GROUPS</span><span class="p">[</span><span class="s1">&#39;imt&#39;</span><span class="p">]]</span>
         <span class="n">components</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="n">imt_name</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="n">components</span><span class="p">:</span>
-            <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;__</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">__&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
+            <span class="n">group_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">group_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imt_group</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s1">&#39;No group called </span><span class="si">%s</span><span class="s1"> in HDF file </span><span class="si">%s</span><span class="s1">&#39;</span>
                                   <span class="o">%</span> <span class="p">(</span><span class="n">imt_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">getFileName</span><span class="p">()))</span>

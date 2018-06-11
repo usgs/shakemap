@@ -1,4 +1,4 @@
-.. _sm_queue:
+.. _sm-queue:
 
 sm_queue
 ==========

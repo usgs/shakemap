@@ -70,6 +70,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;assemble&#39;</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;shake_data\.hdf&#39;</span><span class="p">]</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;event.xml&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;*_dat.xml&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;*_fault.txt&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;rupture.json&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;source.txt&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;model.conf&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+                    <span class="p">(</span><span class="s1">&#39;model_zc.conf&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]</span>
+    <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gmpe_sets.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;model.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;modules.conf&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -147,14 +153,6 @@
             <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;model.conf&#39;</span><span class="p">),</span>
             <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
 
-        <span class="n">extent_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span>
-                                          <span class="s1">&#39;extent.conf&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">extent_config_file</span><span class="p">):</span>
-            <span class="n">extent_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">extent_config_file</span><span class="p">,</span>
-                                      <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">extent_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">()</span>
-
         <span class="c1">#</span>
         <span class="c1"># this is the event specific model.conf (may not be present)</span>
         <span class="c1"># prefer model.conf to model_zc.conf</span>
@@ -176,7 +174,6 @@
         <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">event_config</span><span class="p">)</span>
         <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">modules</span><span class="p">)</span>
         <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">gmpe_sets</span><span class="p">)</span>
-        <span class="n">global_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">extent_config</span><span class="p">)</span>
 
         <span class="n">results</span> <span class="o">=</span> <span class="n">global_config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>

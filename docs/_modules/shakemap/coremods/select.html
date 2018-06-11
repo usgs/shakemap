@@ -58,6 +58,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;select&#39;</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;model_zc\.conf&#39;</span><span class="p">]</span>
+    <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;event.xml&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;source.text&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]</span>
+    <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;select.conf&#39;</span><span class="p">]</span>
 
 <div class="viewcode-block" id="SelectModule.execute"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.select.html#shakemap.coremods.select.SelectModule.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&#39;&#39;&#39;</span>
