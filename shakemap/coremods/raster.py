@@ -27,6 +27,8 @@ class RasterModule(CoreModule):
     """
 
     command_name = 'raster'
+    targets = [r'products/rasters\.zip']
+    dependencies = [('products/shake_result.hdf', True)]
 
     contents = OrderedDict.fromkeys(['rasterData'])
     contents['rasterData'] = {
@@ -100,6 +102,7 @@ class RasterModule(CoreModule):
             zfile.write(std_hdr, '%s_std.hdr' % fileimt)
 
         zfile.close()
+        container.close()
 
         # nuke all of the copies of the files we just put in the zipfile
         for file_written in files_written:

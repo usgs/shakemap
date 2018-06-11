@@ -112,6 +112,10 @@ def main(args):
         logger.info('No event ID, skipping')
         sys.exit(0)
 
+    if args.preferred_eventsource in ('pt', 'at', 'dr'):
+        logger.info('Undesirable eventsource: %s' % args.preferred_eventsource)
+        sys.exit(0)
+
     if not args.preferred_eventtime or not args.preferred_latitude \
        or not args.preferred_longitude or not args.preferred_depth \
        or not args.preferred_magnitude:

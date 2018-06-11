@@ -64,6 +64,7 @@ class XTestPlotMulti(CoreModule):
                     myimt, 'GREATER_OF_TWO_HORIZONTAL')
             datalist.append(datadict)
 
+        container.close()
         #
         # Make plots
         #

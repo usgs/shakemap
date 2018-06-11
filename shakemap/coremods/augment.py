@@ -42,7 +42,6 @@ class AugmentModule(CoreModule):
         if comment is not None:
             self.comment = comment
 
-
     def execute(self):
         """
         Augment a ShakeMap input data file with local configs, data, rupture,
@@ -201,7 +200,7 @@ class AugmentModule(CoreModule):
         if not os.path.isfile(eventxml):
             eventxml = None
         if not os.path.isfile(rupturefile):
-            faultfiles = glob.glob(os.path.join(datadir,'*_fault.txt'))
+            faultfiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
             if len(faultfiles):
                 rupturefile = faultfiles[0]
         if os.path.isfile(rupturefile) or eventxml is not None:
@@ -241,8 +240,9 @@ class AugmentModule(CoreModule):
         """
         Set up the object to accept the --comment flag.
         """
-        parser = argparse.ArgumentParser(prog=self.__class__.command_name,
-                    description=inspect.getdoc(self.__class__))
+        parser = argparse.ArgumentParser(
+            prog=self.__class__.command_name,
+            description=inspect.getdoc(self.__class__))
         parser.add_argument('-c', '--comment', help='Provide a comment for '
                             'this version of the ShakeMap. If the comment '
                             'has spaces, the string should be quoted (e.g., '
@@ -260,4 +260,3 @@ class AugmentModule(CoreModule):
         args = parser.parse_args(arglist)
         self.comment = args.comment
         return args.rem
-

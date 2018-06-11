@@ -60,6 +60,8 @@ class XTestPlotSpectra(CoreModule):
         periodlist = np.array(periodlist)
         indxx = np.argsort(periodlist)
 
+        container.close()
+
         #
         # Make plots
         #

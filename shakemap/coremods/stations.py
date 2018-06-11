@@ -19,16 +19,18 @@ class StationModule(CoreModule):
     """
 
     command_name = 'stations'
+    targets = [r'products/stationlist\.json']
+    dependencies = [('products/shake_result.hdf', True)]
 
     # supply here a data structure with information about files that
     # can be created by this module.
     contents = OrderedDict.fromkeys(['stationJSON'])
-    contents['stationJSON'] = {'title':'Station Lists',
-                                'caption':'Lists of ShakeMap input data.',
-                                'formats':[{'filename':'stationlist.json',
-                                         'type':'application/json'}
-                                          ]
-                                }
+    contents['stationJSON'] = {
+        'title': 'Station Lists',
+        'caption': 'Lists of ShakeMap input data.',
+        'formats': [{'filename': 'stationlist.json',
+                     'type': 'application/json'}]
+    }
 
     def execute(self):
         """Write stationlist.json file.
@@ -58,3 +60,5 @@ class StationModule(CoreModule):
                 f = open(station_file, 'w')
                 json.dump(station_dict, f)
                 f.close()
+
+        container.close()

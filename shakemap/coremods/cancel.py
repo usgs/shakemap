@@ -78,3 +78,4 @@ class CancelModule(CoreModule):
         # delete the event from the database
         handler = AmplitudeHandler(install_path, data_path)
         handler.deleteEvent(self._eventid)
+        container.close()

@@ -1,7 +1,6 @@
 # stdlib
 import os.path
 import time
-import json
 from datetime import datetime
 from collections import OrderedDict
 
@@ -96,6 +95,11 @@ class MappingModule(CoreModule):
     """
 
     command_name = 'mapping'
+    targets = [r'products/intensity\.jpg', r'products/intensity\.pdf',
+               r'products/.*_contour\.jpg', r'products/.*_contour\.pdf',
+               r'products/psa.*\.jpg']
+    dependencies = [('products/shake_result.hdf', True)]
+    configs = ['products.conf']
 
     # supply here a data structure with information about files that
     # can be created by this module.
@@ -225,6 +229,8 @@ class MappingModule(CoreModule):
         fig = plt.gcf()
         _save_jpg(fig, sd_file)
         ###########################
+
+        container.close()
 
 
 def getProjectedPolygon(polygon, m):

@@ -16,6 +16,10 @@ def test_associate():
 
     installpath, datapath = get_config_paths()
 
+    amp_file = os.path.join(installpath, 'data', 'amps.db')
+    if os.path.isfile(amp_file):
+        os.remove(amp_file)
+
     # Process a non-existent event (should fail)
     amod = AssociateModule('not_an_event')
     with pytest.raises(NotADirectoryError):

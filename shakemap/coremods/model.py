@@ -7,7 +7,6 @@ import os.path
 import time as time
 import copy
 from time import gmtime, strftime
-import json
 import shutil
 from collections import OrderedDict
 
@@ -79,6 +78,8 @@ class ModelModule(CoreModule):
     """
 
     command_name = 'model'
+    targets = [r'products/shake_result\.hdf']
+    dependencies = [('shake_data.hdf', True)]
 
     # supply here a data structure with information about files that
     # can be created by this module.
@@ -294,6 +295,7 @@ class ModelModule(CoreModule):
             self._storeRegressionData(oc)
 
         oc.close()
+        self.ic.close()
     # ------------------------------------------------------------------
     # End execute()
     # ------------------------------------------------------------------
