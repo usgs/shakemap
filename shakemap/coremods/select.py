@@ -24,6 +24,9 @@ class SelectModule(CoreModule):
     """
 
     command_name = 'select'
+    targets = [r'model_zc\.conf']
+    dependencies = [('event.xml', True), ('source.text', False)]
+    configs = ['select.conf']
 
     def execute(self):
         '''

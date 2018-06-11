@@ -17,17 +17,19 @@ class InfoModule(CoreModule):
     """
 
     command_name = 'info'
+    targets = [r'products/info\.json']
+    dependencies = [('products/shake_result.hdf', True)]
 
     # supply here a data structure with information about files that
     # can be created by this module.
     contents = OrderedDict.fromkeys(['supplementalInformation'])
     cap = 'ShakeMap processing parameters and map summary information.'
-    contents['supplementalInformation'] = {'title': 'Supplemental Information',
-                                           'caption': cap,
-                                           'formats': [{'filename': 'info.json',
-                                                        'type': 'application/json'}
-                                                       ]
-                                           }
+    contents['supplementalInformation'] = {
+        'title': 'Supplemental Information',
+        'caption': cap,
+        'formats': [{'filename': 'info.json',
+                     'type': 'application/json'}]
+    }
 
     def execute(self):
         """
@@ -57,3 +59,4 @@ class InfoModule(CoreModule):
         f = open(info_file, 'wt')
         f.write(infostring)
         f.close()
+        container.close()

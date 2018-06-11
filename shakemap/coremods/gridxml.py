@@ -1,6 +1,5 @@
 # stdlib imports
 import os.path
-import json
 import logging
 from datetime import datetime
 import re
@@ -76,6 +75,8 @@ class GridXMLModule(CoreModule):
     """
 
     command_name = 'gridxml'
+    targets = [r'products/grid\.xml', r'products/uncertainty\.xml']
+    dependencies = [('products/shake_result.hdf', True)]
 
     contents = {'xmlGrids': {'title': 'XML Grid',
                              'caption': 'XML grid of ground motions',
@@ -192,3 +193,5 @@ class GridXMLModule(CoreModule):
             fname = os.path.join(datadir, '%s.xml' % xml_type)
             logger.debug('Saving IMT grids to %s' % fname)
             shake_grid.save(fname)  # TODO - set grid version number
+
+        container.close()

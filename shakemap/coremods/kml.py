@@ -29,7 +29,8 @@ STATION_KML = 'stations.kml'
 CONTOUR_KML = 'mmi_contour.kml'
 KMZ_FILE = 'shakemap.kmz'
 KML_FILE = 'shakemap.kml'
-EPICENTER_URL = 'http://maps.google.com/mapfiles/kml/shapes/capital_big_highlight.png'
+EPICENTER_URL = \
+    'http://maps.google.com/mapfiles/kml/shapes/capital_big_highlight.png'
 LEGEND = 'intensity_legend.png'
 
 LOOKAT_ALTITUDE = 500000  # meters
@@ -52,6 +53,8 @@ class KMLModule(CoreModule):
     """
 
     command_name = 'kml'
+    targets = [r'products/shakemap\.kmz']
+    dependencies = [('products/shake_result.hdf', True)]
 
     # supply here a data structure with information about files that
     # can be created by this module.
@@ -108,6 +111,8 @@ class KMLModule(CoreModule):
 
         # call create_kmz function
         create_kmz(container, datadir, oceanfile, self.logger)
+
+        container.close()
 
 
 def create_kmz(container, datadir, oceanfile, logger):
@@ -179,7 +184,8 @@ def create_kmz(container, datadir, oceanfile, logger):
 
 
 def place_legend(datadir, document):
-    """Place the ShakeMap intensity legend in the upper left corner of the viewer's map.
+    """Place the ShakeMap intensity legend in the upper left corner of
+    the viewer's map.
 
     Args:
         datadir (str): Path to data directory where output KMZ will be written.
@@ -531,7 +537,8 @@ def get_intensity(station):
             intensity = 0
         else:
             mmi_idx = channels.index('mmi')
-            intensity = station['properties']['channels'][mmi_idx]['amplitudes'][0]['value']
+            mmid = station['properties']['channels'][mmi_idx]
+            intensity = mmid['amplitudes'][0]['value']
     return intensity
 
 
@@ -587,7 +594,7 @@ def imt_to_string(imt):
                      'pgv': 'PGV'}
     if imt in non_spectrals:
         return non_spectrals[imt]
-    period = re.search("\d+\.\d+", imt).group()
+    period = re.search("\d+\.\d+", imt).group()  # noqa
     imt_string = 'PSA %s sec' % period
     return imt_string
 

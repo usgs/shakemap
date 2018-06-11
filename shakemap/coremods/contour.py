@@ -9,12 +9,7 @@ import argparse
 import inspect
 
 # third party imports
-from shapely.geometry import MultiLineString
-from shapely.geometry import mapping
 import fiona
-import numpy as np
-from skimage import measure
-from scipy.ndimage.filters import median_filter
 from shakelib.utils.containers import ShakeMapOutputContainer
 from shakelib.utils.imt_string import oq_to_file
 
@@ -22,7 +17,6 @@ from shakelib.utils.imt_string import oq_to_file
 from .base import CoreModule
 from shakemap.utils.config import get_config_paths, get_logging_config
 from shakelib.plotting.contour import contour
-from impactutils.colors.cpalette import ColorPalette
 
 FORMATS = {
     'geojson': ('GeoJSON', 'json')
@@ -38,6 +32,8 @@ class ContourModule(CoreModule):
     """
 
     command_name = 'contour'
+    targets = [r'products/cont_.*\.json']
+    dependencies = [('products/shake_result.hdf', True)]
 
     # supply here a data structure with information about files that
     # can be created by this module.
@@ -118,13 +114,15 @@ class ContourModule(CoreModule):
         # create contour files
         self.logger.debug('Contouring to files...')
         contour_to_files(container, datadir, self.logger, self.filter_size)
+        container.close()
 
     def parseArgs(self, arglist):
         """
         Set up the object to accept the --filter flag.
         """
-        parser = argparse.ArgumentParser(prog=self.__class__.command_name,
-                                         description=inspect.getdoc(self.__class__))
+        parser = argparse.ArgumentParser(
+            prog=self.__class__.command_name,
+            description=inspect.getdoc(self.__class__))
         parser.add_argument('-f', '--filter', help='Specify the filter '
                             'size (in grid points) for smoothing the '
                             'grids before contouring. Must be a positive'

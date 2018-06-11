@@ -265,7 +265,8 @@ def do_contour_command_line(evid, datapath):
     #
     # Now run from the command line to exercise the argument parsing
     #
-    cp = subprocess.run(['shake', evid, 'contour', '-f', '10'], shell=False)
+    cp = subprocess.run(['shake', '--force', evid, 'contour', '-f', '10'],
+                        shell=False)
     assert not cp.returncode
 
 

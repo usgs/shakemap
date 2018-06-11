@@ -19,16 +19,18 @@ class RuptureModule(CoreModule):
     """
 
     command_name = 'rupture'
+    targets = [r'products/rupture\.json']
+    dependencies = [('products/shake_result.hdf', True)]
 
     # supply here a data structure with information about files that
     # can be created by this module.
     contents = OrderedDict.fromkeys(['ruptureJSON'])
-    contents['ruptureJSON'] = {'title':'Fault Rupture',
-                                'caption':'JSON Representation of Fault Rupture.',
-                                'formats':[{'filename':'rupture.json',
-                                         'type':'application/json'}
-                                          ]
-                                }
+    contents['ruptureJSON'] = {
+        'title': 'Fault Rupture',
+        'caption': 'JSON Representation of Fault Rupture.',
+        'formats': [{'filename': 'rupture.json',
+                     'type': 'application/json'}]
+    }
 
     def execute(self):
         """
@@ -59,3 +61,5 @@ class RuptureModule(CoreModule):
                 f = open(rupture_file, 'w')
                 json.dump(rupture_dict, f)
                 f.close()
+
+        container.close()

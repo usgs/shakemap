@@ -156,11 +156,11 @@ def test_augment():
 def test_augment_command_line():
     installpath, datapath = get_config_paths()
 
-    cp = subprocess.run(['shake', 'integration_test_0001', 'assemble', '-c',
-                         'Assemble comment'], shell=False)
+    cp = subprocess.run(['shake', '--force', 'integration_test_0001',
+                         'assemble', '-c', 'Assemble comment'], shell=False)
     assert not cp.returncode
-    cp = subprocess.run(['shake', 'integration_test_0001', 'augment', '-c',
-                         'Augment comment'], shell=False)
+    cp = subprocess.run(['shake', '--force', 'integration_test_0001',
+                         'augment', '-c', 'Augment comment'], shell=False)
     assert not cp.returncode
     data_file = os.path.join(datapath, 'integration_test_0001', 'current',
                              'shake_data.hdf')

@@ -47,6 +47,7 @@ class XTestPlot(CoreModule):
         for myimt in imtlist:
             datadict[myimt] = container.getIMTArrays(
                 myimt, 'GREATER_OF_TWO_HORIZONTAL')
+        container.close()
 
         #
         # Make plots

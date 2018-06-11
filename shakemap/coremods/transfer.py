@@ -1,6 +1,5 @@
 # stdlib imports
 import os.path
-import json
 from datetime import datetime
 import glob
 import re
@@ -34,6 +33,7 @@ class TransferModule(CoreModule):
     """
 
     command_name = 'transfer'
+    dependencies = [('products/*', False)]
 
     def execute(self):
         """
@@ -88,6 +88,8 @@ class TransferModule(CoreModule):
 
         # copy the current folder to a new backup directory
         self._make_backup(data_path)
+
+        container.close()
 
     def _make_backup(self, data_path):
         data_dir = os.path.join(data_path, self._eventid)

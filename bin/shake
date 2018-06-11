@@ -21,8 +21,8 @@ from shakemap.utils.config import (
     get_config_paths,
     get_logger,
     get_configspec,
-    config_error,
-    check_profile_config)
+    config_error)
+from shakemap.utils.dependencies import CommandDatabase
 
 
 def _get_config():
@@ -69,11 +69,11 @@ def _get_command_classes(config):
 
                 if not cmd:
                     continue
-                classes[cmd] = core_class
+                classes[cmd] = {'class': core_class, 'module': module,
+                                'mfile': module.__file__}
 
     ordered_classes = OrderedDict()
-    keys = sorted(classes.keys())
-    for k in keys:
+    for k in sorted(classes.keys()):
         ordered_classes[k] = classes[k]
 
     return ordered_classes
@@ -122,7 +122,7 @@ def get_parser():
     for key, core_class in _classes_.items():
         if key.startswith('xtest'):
             continue
-        epilog += '    - %s\n' % inspect.getdoc(core_class)
+        epilog += '    - %s\n' % inspect.getdoc(core_class['class'])
 
     epilog += '\nUse "shake help command" to see the options for a '\
               'specific command.\n'
@@ -141,6 +141,9 @@ def get_parser():
                         help='Print only errors.')
     parser.add_argument('-l', '--log', action='store_true',
                         help='Log all output.')
+    parser.add_argument('-f', '--force', action='store_true',
+                        help='Force the command(s) to run regardless of '
+                             'out of date dependencies.')
     parser.add_argument('-a', '--autorun', action='store_true',
                         help='Run the modules defined in shake.conf with the '
                              'autorun_modules parameter rather than any '
@@ -169,11 +172,17 @@ def main(args):
 
     logger = get_logger(args.eventid, log_option=log_option)
 
-    cancel_file = os.path.join(data_path, args.eventid, 'current', 'CANCELED')
+    event_path = os.path.join(data_path, args.eventid, 'current')
+    cancel_file = os.path.join(event_path, 'CANCELED')
     if os.path.isfile(cancel_file):
         logger.error('Event %s has been canceled: aborting run' %
                      args.eventid)
         return
+
+    #
+    # Build the database of commands, targets, and dependencies
+    #
+    cdb = CommandDatabase(_classes_, args.eventid)
 
     try:
         cmd_list = OrderedDict()
@@ -189,7 +198,7 @@ def main(args):
             if cmd not in _classes_:
                 raise KeyError('Command "%s" not found in ShakeMap.' % cmd)
 
-            cmd_class = _classes_[cmd]
+            cmd_class = _classes_[cmd]['class']
             cmd_obj = cmd_class(args.eventid)
             cmd_list[cmd] = cmd_obj
 
@@ -201,6 +210,31 @@ def main(args):
 
         for cmd, obj in cmd_list.items():
             logger.info('Running command %s' % cmd)
+            status = cdb.getDependencyStatus(cmd)
+            if len(status) == 1 and status[0] == cmd:
+                pass
+            elif len(status) > 0:
+                logger.warn("Out of date dependencies. The following commands "
+                            "should be rerun before '%s' (use --force to "
+                            "ignore this warning and attempt to run the "
+                            "module anyway):" % cmd)
+                if cmd in status:
+                    status.remove(cmd)
+                logger.warn(", ".join(status))
+                if not args.force:
+                    sys.exit(0)
+                else:
+                    logger.warn('Running "%s" because of --force option.'
+                                % cmd)
+            else:
+                logger.warn("No dependencies are out of date, '%s' does not "
+                            "need to be run (use --force to force the module "
+                            "to run). Continuing..." % cmd)
+                if not args.force:
+                    continue
+                else:
+                    logger.warn('Running "%s" because of --force option.'
+                                % cmd)
             t1 = time.time()
             obj.execute()
             t2 = time.time()
@@ -209,6 +243,7 @@ def main(args):
                         % (cmd, elapsed))
             # create/update the contents.xml file
             obj.writeContents()
+            cdb.updateCommand(cmd)
 
     except Exception as e:
         error_msg = _format_error_info(e, args.eventid)

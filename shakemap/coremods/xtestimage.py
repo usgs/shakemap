@@ -4,7 +4,6 @@ import os.path
 # third party
 
 import matplotlib.pyplot as plt
-from matplotlib import gridspec
 import numpy as np
 
 # neic imports
@@ -47,8 +46,10 @@ class XTestImage(CoreModule):
         datadict = {}
         imtlist = container.getIMTs('GREATER_OF_TWO_HORIZONTAL')
         for myimt in imtlist:
-            datadict[myimt] = container.getIMTGrids(myimt,
-                                                    'GREATER_OF_TWO_HORIZONTAL')
+            datadict[myimt] = container.getIMTGrids(
+                myimt, 'GREATER_OF_TWO_HORIZONTAL')
+
+        container.close()
 
         #
         # Make plots
@@ -76,8 +77,8 @@ class XTestImage(CoreModule):
             ax0 = fig.add_subplot(gs[:-1, 1:])
             plt.title(self._eventid + ': ' + myimt + ' mean')
             im1 = ax0.imshow(grddata,
-                       extent=(metadata['xmin'], metadata['xmax'],
-                               metadata['ymin'], metadata['ymax']))
+                             extent=(metadata['xmin'], metadata['xmax'],
+                                     metadata['ymin'], metadata['ymax']))
             cbax = fig.add_axes([0.915, .34, .02, .5])
             plt.colorbar(im1, ax=ax0, cax=cbax)
             ycut = fig.add_subplot(gs[:-1, 0], sharey=ax0)
@@ -95,7 +96,8 @@ class XTestImage(CoreModule):
             xcut.set_xlim((metadata['xmin'], metadata['xmax']))
             ax0.label_outer()
 
-            pfile = os.path.join(datadir, self._eventid + '_' + fileimt + '.pdf')
+            pfile = os.path.join(datadir,
+                                 self._eventid + '_' + fileimt + '.pdf')
             plt.savefig(pfile, bbox_inches='tight')
             plt.close()
 
@@ -110,8 +112,8 @@ class XTestImage(CoreModule):
             ax0 = fig.add_subplot(gs[:-1, 1:])
             plt.title(self._eventid + ': ' + myimt + ' stddev')
             im1 = ax0.imshow(grddata,
-                       extent=(metadata['xmin'], metadata['xmax'],
-                               metadata['ymin'], metadata['ymax']))
+                             extent=(metadata['xmin'], metadata['xmax'],
+                                     metadata['ymin'], metadata['ymax']))
             cbax = fig.add_axes([0.915, .34, .02, .5])
             plt.colorbar(im1, ax=ax0, cax=cbax)
             ycut = fig.add_subplot(gs[:-1, 0], sharey=ax0)
@@ -131,6 +133,7 @@ class XTestImage(CoreModule):
             ycut.set_ylim((metadata['ymin'], metadata['ymax']))
             ax0.label_outer()
 
-            pfile = os.path.join(datadir, self._eventid + '_' + fileimt + '_sd.pdf')
+            pfile = os.path.join(datadir,
+                                 self._eventid + '_' + fileimt + '_sd.pdf')
             plt.savefig(pfile, bbox_inches='tight')
             plt.close()
