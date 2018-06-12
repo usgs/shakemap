@@ -154,7 +154,7 @@ data, modify the topo file name below to topo_15sec.grd.
 
 To download the files, do::
 
-    > cd [home]/ShakeMap/[profile]/install/data/mapping
+    > cd [home]/shakemap_profiles/[profile]/install/data/mapping
 
     > curl ftp://hazards.cr.usgs.gov/shakemap/global_vs30.grd -o global_vs30.grd
 
@@ -164,7 +164,7 @@ By default, the system is configured to find the Vs30 and topography files in
 the locations described above. To set the paths to other locations or file
 names::
 
-    > cd [home]/ShakeMap/[profile]/install/config
+    > cd [home]/shakemap_profiles/[profile]/install/config
 
 Modify `model.conf` to change the line::
 

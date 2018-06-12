@@ -14,18 +14,18 @@ from configobj import ConfigObj
 import numpy as np
 
 # local imports
+from shakemap.coremods import transfer
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.utils import (get_network_name,
                                   migrate_gmpe,
-                                  set_gmpe,
-                                  get_extent)
+                                  set_gmpe)
 from shakemap.utils.amps import AmplitudeHandler
 from shakelib.rupture.origin import read_event_file, write_event_file, Origin
 from shakelib.rupture.factory import (text_to_json,
                                       rupture_from_dict_and_origin,
                                       get_rupture)
+from shakelib.utils.utils import get_extent
 from impactutils.time.ancient_time import HistoricTime
-from shakemap.coremods import transfer
 
 KM2SEC = 3600.0/111  # seconds per kilometer
 TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
@@ -412,8 +412,9 @@ def parse_info(event_dir, tarball, member, netid, networks,
 
         # get the outlier information
         model['data'] = {'outlier': {}}
-        max_deviation = jsondict['processing']['miscellaneous']['outlier_deviation_level']
-        outlier_max_mag = jsondict['processing']['miscellaneous']['outlier_max_mag']
+        jpm = jsondict['processing']['miscellaneous']
+        max_deviation = jpm['outlier_deviation_level']
+        outlier_max_mag = jpm['outlier_max_mag']
         if outlier_max_mag > 0 and max_deviation > 0:
             model['data']['outlier']['do_outlier'] = True
             model['data']['outlier']['max_deviation'] = max_deviation
@@ -423,7 +424,8 @@ def parse_info(event_dir, tarball, member, netid, networks,
 
         # get the gmice information
         allowed_gmice = module_conf['gmice_modules'].keys()
-        gmice = jsondict['processing']['ground_motion_modules']['mi2pgm']['module']
+        jpg = jsondict['processing']['ground_motion_modules']
+        gmice = jpg['mi2pgm']['module']
         # WGRW11 in SM3.5 is WGRW12 in SM4.0
         if gmice == 'WGRW11':
             gmice = 'WGRW12'
@@ -448,7 +450,8 @@ def parse_info(event_dir, tarball, member, netid, networks,
     # work on map extent/resolution data
     if not skip_bounds:
         model['interp'] = {'prediction_location': {}}
-        yres_km = jsondict['output']['map_information']['grid_spacing']['latitude']
+        jom = jsondict['output']['map_information']
+        yres_km = jom['grid_spacing']['latitude']
         yres_sec = int(round(yres_km * KM2SEC))
         model['interp']['prediction_location']['xres'] = '%ic' % yres_sec
         model['interp']['prediction_location']['yres'] = '%ic' % yres_sec

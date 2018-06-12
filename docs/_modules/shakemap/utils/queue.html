@@ -51,13 +51,12 @@
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">config_error</span><span class="p">,</span>
                                    <span class="n">get_configspec</span><span class="p">)</span>
 
-<span class="n">PORT</span> <span class="o">=</span> <span class="mi">9755</span>
 <span class="n">MAX_SIZE</span> <span class="o">=</span> <span class="mi">4096</span>
 <span class="n">TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S.</span><span class="si">%f</span><span class="s1">Z&#39;</span>
 <span class="n">ALT_TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span>
 
 
-<div class="viewcode-block" id="send_queue"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.queue.html#shakemap.utils.queue.send_queue">[docs]</a><span class="k">def</span> <span class="nf">send_queue</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+<div class="viewcode-block" id="send_queue"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.queue.html#shakemap.utils.queue.send_queue">[docs]</a><span class="k">def</span> <span class="nf">send_queue</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">9755</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Send a command and its data to the queue process.</span>
 
@@ -82,7 +81,7 @@
         <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;Data portion too large&#39;</span><span class="p">)</span>
 
     <span class="n">csocket</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">socket</span><span class="o">.</span><span class="n">AF_INET</span><span class="p">,</span> <span class="n">socket</span><span class="o">.</span><span class="n">SOCK_STREAM</span><span class="p">)</span>
-    <span class="n">csocket</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">PORT</span><span class="p">))</span>
+    <span class="n">csocket</span><span class="o">.</span><span class="n">connect</span><span class="p">((</span><span class="s1">&#39;127.0.0.1&#39;</span><span class="p">,</span> <span class="n">port</span><span class="p">))</span>
     <span class="n">csocket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="n">qstr</span><span class="p">)</span>
     <span class="n">csocket</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     <span class="k">return</span></div>

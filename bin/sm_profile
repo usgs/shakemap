@@ -88,7 +88,7 @@ def make_dir(pathstr, default, accept):
         try:
             os.makedirs(ppath, exist_ok=True)
             make_ok = True
-        except OSError as error:
+        except OSError:
             msg = ('Cannot make install_folder %s.  Please try again (%d '
                    'of %d tries).')
             print(msg % (ppath, ntries, max_tries))
@@ -113,7 +113,7 @@ def create(config, profile, accept, ppath):
         profile_path = os.path.join(ppath, profile)
     else:
         profile_path = os.path.join(
-            os.path.expanduser('~'), 'ShakeMap', profile)
+            os.path.expanduser('~'), 'shakemap_profiles', profile)
     default_install = os.path.join(profile_path, 'install')
     default_data = os.path.join(profile_path, 'data')
     if not accept:
@@ -188,7 +188,8 @@ def create(config, profile, accept, ppath):
 
     # copy mapping data into data install directory
     test_mapping_dir = os.path.join(shakeconfig_data_path, '..', '..',
-                                    'tests', 'data', 'install', 'data', 'mapping')
+                                    'tests', 'data', 'install', 'data',
+                                    'mapping')
     allfiles = glob.glob(os.path.join(test_mapping_dir, '*.*'))
     for fname in allfiles:
         shutil.copy(fname, mapping_data_dir)
@@ -251,7 +252,6 @@ def main(pparser, args):
 
     if args.switch:
         newprofile = args.switch
-        oldprofile = config['profile']
         if newprofile not in config['profiles']:
             msg = ('Profile %s not in %s.  Run %s -l to see '
                    'available profiles.')
