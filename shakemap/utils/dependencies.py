@@ -322,6 +322,8 @@ class CommandDatabase(object):
                 for exp in explist:
                     found_target = False
                     files = glob.glob(os.path.join(self.event_path, '*'))
+                    files += glob.glob(os.path.join(self.event_path,
+                                                    'products', '*'))
                     for filename in files:
                         if exp.fullmatch(filename):
                             found_target = True
