@@ -125,7 +125,8 @@ def clear_files(datadir):
     t1 = os.path.join(datadir, 'dummy_event', 'current', 'module1_target.txt')
     if os.path.isfile(t1):
         os.remove(t1)
-    t2 = os.path.join(datadir, 'dummy_event', 'current', 'module2_target.txt')
+    t2 = os.path.join(datadir, 'dummy_event', 'current', 'products',
+                      'module2_target.txt')
     if os.path.isfile(t2):
         os.remove(t2)
 
@@ -141,7 +142,7 @@ def test_command_database():
 
     eventdir = os.path.join(datadir, 'dummy_event', 'current')
     mod1_target = os.path.join(eventdir, 'module1_target.txt')
-    mod2_target = os.path.join(eventdir, 'module2_target.txt')
+    mod2_target = os.path.join(eventdir, 'products', 'module2_target.txt')
 
     # Import the modules
     moddir = os.path.join(datadir, 'modules')

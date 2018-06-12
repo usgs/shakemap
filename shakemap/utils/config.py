@@ -239,7 +239,7 @@ def annotatedfloat_type(value):
                 out = float(value.replace('d', ''))
             else:
                 raise ValidateError(value)
-        except:
+        except Exception:
             raise ValidateError(value)
     return out
 
@@ -284,7 +284,7 @@ def weight_list(value, min):
         raise ValidateError()
     try:
         out = [float(a) for a in value]
-    except:
+    except ValueError:
         print("%s is not a list of floats" % value)
         raise ValidateError()
     np_out = np.array(out)
@@ -355,7 +355,7 @@ def extent_list(value):
         raise ValidateError()
     try:
         out = [float(a) for a in value]
-    except:
+    except ValueError:
         print("%s is not a list of 4 floats" % value)
         raise ValidateError()
     if out[0] < -360.0 or out[0] > 360.0 or \
@@ -488,7 +488,7 @@ def cfg_float(value):
     return fval
 
 
-def get_logger(eventid, log_option=None):
+def get_logger(eventid, log_option=None, log_file=None):
     """Return the logger instance for ShakeMap.  Only use once!
 
     Args:
@@ -500,7 +500,7 @@ def get_logger(eventid, log_option=None):
     """
     install_path, data_path = get_config_paths()
     config = get_logging_config()
-    if log_option == 'debug' or log_option == 'quiet' or log_option is None:
+    if log_file is None:
         format = config['formatters']['standard']['format']
         datefmt = config['formatters']['standard']['datefmt']
         # create a console handler, with verbosity setting chosen by user
@@ -508,7 +508,7 @@ def get_logger(eventid, log_option=None):
             level = logging.DEBUG
         elif log_option == 'quiet':
             level = logging.ERROR
-        elif log_option is None:  # default interactive
+        else:  # default interactive
             level = logging.INFO
 
         logdict = {
@@ -543,11 +543,24 @@ def get_logger(eventid, log_option=None):
                                      "not found" % eventid)
         event_log_file = os.path.join(event_log_dir, 'shake.log')
         config['handlers']['event_file']['filename'] = event_log_file
+        if log_option == 'debug':
+            config['handlers']['event_file']['level'] = logging.DEBUG
+        elif log_option == 'quiet':
+            config['handlers']['event_file']['level'] = logging.ERROR
         global_log_dir = os.path.join(install_path, 'logs')
         if not os.path.isdir(global_log_dir):
             os.makedirs(global_log_dir, exist_ok=True)
         global_log_file = os.path.join(global_log_dir, 'shake.log')
         config['handlers']['global_file']['filename'] = global_log_file
+        if log_option == 'debug':
+            config['handlers']['global_file']['level'] = logging.DEBUG
+        elif log_option == 'quiet':
+            config['handlers']['global_file']['level'] = logging.ERROR
+        if log_option == 'debug':
+            config['loggers']['']['level'] = logging.DEBUG
+        elif log_option == 'quiet':
+            config['loggers']['']['level'] = logging.ERROR
+
         logging.config.dictConfig(config)
     # get the root logger, otherwise we can't log in sub-libraries
     logger = logging.getLogger()
@@ -629,7 +642,8 @@ def check_profile_config(config):
 
 
 def _clean_log_dict(config):
-    """Clean up dictionary returned by ConfigObj into form suitable for logging.
+    """Clean up dictionary returned by ConfigObj into form suitable for
+    logging.
 
     Basically, ConfigObj.validate wants all sections that are Handlers (for
     example) to have the same fields, so it fills them in with default values.
