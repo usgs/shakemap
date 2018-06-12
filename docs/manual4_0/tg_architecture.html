@@ -120,7 +120,13 @@ file that points to them. The profile data resides in a file called
 directory. The user may choose another location for the profile file
 by using the <code class="docutils literal notranslate"><span class="pre">-f</span></code> option to <strong>sm_profile</strong>. Other ShakeMap programs
 read the profile information and use it to find event and
-configuration information.</p>
+configuration information. By default, the install and data paths
+are located in a directory <cite>/[home]/shake_profiles/[profile]</cite> where
+<cite>[home]</cite> is the user’s home directory, and <cite>[profile]</cite> is the name of
+the newly-created profile (often “default”). It is advisable, however
+to make the data path point to a disk with a large amount of free space
+(via either directly setting it when creating the profile, or through the
+use of symbolic links).</p>
 <p>The data directory (‘&lt;data_dir&gt;’) contains event subdirectories (named
 with their event IDs) and their associated subdirectories:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">data_dir</span><span class="o">&gt;/</span>
