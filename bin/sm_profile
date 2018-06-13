@@ -18,11 +18,30 @@ import sys
 import shutil
 import pathlib
 import glob
+import textwrap
+import ftplib
+from tempfile import mkstemp
+import re
 
 # shakemap imports
 from shakemap.utils.config import get_data_path
 from shakemap.utils.config import check_profile_config
 from shakemap.utils.utils import query_yes_no
+
+
+def replace(file_path, pattern, subst):
+    """Function I found on stackoverflow to replace a pattern in a file
+    """
+    # Create temp file
+    fh, abs_path = mkstemp()
+    with os.fdopen(fh, 'w') as new_file:
+        with open(file_path) as old_file:
+            for line in old_file:
+                new_file.write(re.sub(pattern, subst, line))
+    # Remove original file
+    os.remove(file_path)
+    # Move new file
+    shutil.move(abs_path, file_path)
 
 
 def get_parser():
@@ -45,6 +64,9 @@ differently, if desired. By default the profiles reside in the file
     parser.add_argument('-a', '--accept', action='store_true',
                         help='Accept the defaults when creating or '
                              'deleting a profile.')
+    parser.add_argument('-n', '--nogrids', action='store_true',
+                        help='Do not attempt to download the topo or vs30 '
+                             'grids.')
     parser.add_argument('-p', '--preserve', action='store_true',
                         help='Preserve data when deleting a profile')
     parser.add_argument('-f', '--file', type=str,
@@ -91,14 +113,15 @@ def make_dir(pathstr, default, accept):
         except OSError:
             msg = ('Cannot make install_folder %s.  Please try again (%d '
                    'of %d tries).')
-            print(msg % (ppath, ntries, max_tries))
+            print('\n'.join(textwrap.wrap(msg % (ppath, ntries,
+                                                    max_tries))))
             ntries += 1
         if ntries > max_tries:
             break
     return (ppath, make_ok)
 
 
-def create(config, profile, accept, ppath):
+def create(config, profile, accept, ppath, nogrids):
     """
     Args:
         config (ConfigObj): ConfigObj instance representing the
@@ -106,6 +129,8 @@ def create(config, profile, accept, ppath):
         profile (str): Profile name.
         accept (bool): Should defaults be accepted?
         ppath (str): Path to an alternative profile location (optional).
+        nogrids (bool): If true, will skip the step of downloading topo
+            and Vs30 grids.
     """
     shakeconfig_data_path = get_data_path()
 
@@ -117,26 +142,29 @@ def create(config, profile, accept, ppath):
     default_install = os.path.join(profile_path, 'install')
     default_data = os.path.join(profile_path, 'data')
     if not accept:
-        print('You will be prompted to supply two directories for this '
-              'ShakeMap profile:')
-        print(' - An *installation* path, under which will be created '
-              'directories for system')
-        print('   configuration, (cfg), logging (log), and support data '
-              '(lib).')
-        print(' - A *data* path, under which will be created directories '
-              'for each')
-        print('   event processed.\n')
+        print('\n'.join(textwrap.wrap(
+            'You will be prompted to supply two directories for this '
+            'ShakeMap profile:')))
+        print('\n   '.join(textwrap.wrap(
+            ' - An *installation* path, under which will be created '
+            'directories for system configuration, (config), logging '
+            '(logs), and support data (data).')))
+        print('\n   '.join(textwrap.wrap(
+            ' - A *data* path, under which will be created directories for '
+            'each event processed.\n')))
 
     install_path, install_ok = make_dir('install path', default_install,
                                         accept)
     if not install_ok:
-        print('Please try to find a path that can be created on this '
-              'system and then try again.  Exiting.')
+        print('\n'.join(textwrap.wrap(
+            'Please try to find a path that can be created on this '
+            'system and then try again.  Exiting.')))
         sys.exit(1)
     new_data_path, data_ok = make_dir('data path', default_data, accept)
     if not data_ok:
-        print('Please try to find a path that can be created on this '
-              'system and then try again.  Exiting.')
+        print('\n'.join(textwrap.wrap(
+            'Please try to find a path that can be created on this '
+            'system and then try again.  Exiting.')))
         shutil.rmtree(install_path)
         sys.exit(1)
 
@@ -165,14 +193,14 @@ def create(config, profile, accept, ppath):
     # directory, copy them from the repository into the install directory.
     for conf_name in conf_names:
         config_file = os.path.join(shakeconfig_data_path, conf_name)
-        if os.path.isfile(os.path.join(config_path, config_file)):
+        if not os.path.isfile(os.path.join(config_path, conf_name)):
             shutil.copy(config_file, config_path)
 
     layer_dir = os.path.join(shakeconfig_data_path, 'layers')
-    install_layer_dir = os.path.join(install_path, 'layers')
     install_data_dir = os.path.join(install_path, 'data')
     mapping_data_dir = os.path.join(install_data_dir, 'mapping')
     generic_amps_dir = os.path.join(install_data_dir, 'GenericAmpFactors')
+    install_layer_dir = os.path.join(install_data_dir, 'layers')
 
     if not os.path.isdir(install_layer_dir):
         shutil.copytree(layer_dir, install_layer_dir)
@@ -206,6 +234,76 @@ def create(config, profile, accept, ppath):
     sprofile = ShakeProfile(profile, config['profiles'][profile])
     print('\nCreated profile: %s' % (sprofile))
 
+    if nogrids:
+        return
+
+    do_vs30 = True
+    if not accept:
+        do_vs30 = query_yes_no('Do you want to download the global '
+                               'topography and Vs30 files?')
+        if do_vs30:
+            print('\n'.join(textwrap.wrap(
+                'You will be prompted for a path where the topo and Vs30 data '
+                'will reside.')))
+
+    if do_vs30 is False:
+        return
+
+    gdata_default = os.path.join(os.path.expanduser('~'), 'shakemap_data')
+    gdata_path, install_ok = make_dir('data path', gdata_default, accept)
+    if not install_ok:
+        print('\n'.join(textwrap.wrap(
+            'Please try to find a path that can be created on this '
+            'system and then try again.  Exiting.')))
+        sys.exit(1)
+    topo_path = os.path.join(gdata_path, 'topo')
+    if not os.path.isdir(topo_path):
+        os.mkdir(topo_path)
+    vs30_path = os.path.join(gdata_path, 'vs30')
+    if not os.path.isdir(vs30_path):
+        os.mkdir(vs30_path)
+    #
+    # FTP info
+    #
+    ftp_machine = 'hazards.cr.usgs.gov'
+    ftp_dir = '/shakemap'
+    ftp_topo = 'topo_30sec.grd'
+    ftp_vs30 = 'global_vs30.grd'
+
+    print('Retrieving global topo and Vs30 files. This may take a minute...')
+    ftp = ftplib.FTP(ftp_machine)
+    ftp.login("anonymous", 'shakemap')
+    ftp.cwd(ftp_dir)
+    fd = open(os.path.join(topo_path, ftp_topo), 'wb')
+    ftp.retrbinary('RETR ' + ftp_topo, fd.write)
+    fd.close()
+    fd = open(os.path.join(vs30_path, ftp_vs30), 'wb')
+    ftp.retrbinary('RETR ' + ftp_vs30, fd.write)
+    fd.close()
+    ftp.close()
+    print('Done.')
+
+    do_config = True
+    if not accept:
+        do_config = query_yes_no('Do you want to configure your system to '
+                                 'use these files?')
+    if do_config is False:
+        return
+
+    print('Configuring profile to use downloaded topo and vs30 files...')
+
+    my_config = os.path.join(config_path, 'products.conf')
+    old_line = r'topography\s*=\s*.*'
+    new_line = 'topography = %s' % os.path.join(topo_path, ftp_topo)
+    replace(my_config, old_line, new_line)
+
+    my_config = os.path.join(config_path, 'model.conf')
+    old_line = r'vs30file\s*=\s*.*'
+    new_line = 'vs30file = %s' % os.path.join(vs30_path, ftp_vs30)
+    replace(my_config, old_line, new_line)
+
+    print('Done.')
+
 
 def main(pparser, args):
     """
@@ -234,7 +332,7 @@ def main(pparser, args):
                    'profiles.')
             print(msg % (profile, configfile, pparser.prog))
             sys.exit(1)
-        create(config, profile, args.accept, ppath)
+        create(config, profile, args.accept, ppath, args.nogrids)
         sys.exit(0)
 
     config = check_profile_config(config)
