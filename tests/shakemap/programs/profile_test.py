@@ -37,7 +37,7 @@ def test_profile():
         # but that's a lot of monkeying around for not much benefit
         #
         cp = subprocess.run([program, '-f', pfile, '-c',
-                             'test_profile1', '-a'], shell=False)
+                             'test_profile1', '-a', '-n'], shell=False)
         assert not cp.returncode
         # No args program run (should succeed)
         cp = subprocess.run([program, '-f', pfile], shell=False)
@@ -45,19 +45,19 @@ def test_profile():
         # -a by itself (should fail)
         cp = subprocess.run([program, '-f', pfile, '-a'], shell=False)
         assert cp.returncode
-        # Create the same profile a second time
+        # Create the same profile a second time (should fail
         cp = subprocess.run([program, '-f', pfile, '-c',
-                             'test_profile1', '-a'], shell=False)
+                             'test_profile1', '-a', '-n'], shell=False)
         assert cp.returncode
         # List should now work
         cp = subprocess.run([program, '-f', pfile, '-l'], shell=False)
         assert not cp.returncode
         # Make a couple more profiles
         cp = subprocess.run([program, '-f', pfile, '-c',
-                             'test_profile2', '-a'], shell=False)
+                             'test_profile2', '-a', '-n'], shell=False)
         assert not cp.returncode
         cp = subprocess.run([program, '-f', pfile, '-c',
-                             'test_profile3', '-a'], shell=False)
+                             'test_profile3', '-a', '-n'], shell=False)
         assert not cp.returncode
         # List should still work
         cp = subprocess.run([program, '-f', pfile, '-l'], shell=False)
@@ -86,7 +86,7 @@ def test_profile():
         assert not cp.returncode
         # Create a profile and accept the defaults (should succeed)
         # Making the 'test' profile, so it will copy Northridge
-        op = subprocess.Popen([program, '-f', pfile, '-c', 'test'],
+        op = subprocess.Popen([program, '-f', pfile, '-c', 'test', '-n'],
                               stdin=subprocess.PIPE,
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
@@ -94,7 +94,7 @@ def test_profile():
         op.communicate('\n\n'.encode('ascii'))
         assert not op.returncode
         # delete it, but change your mind (should succeed)
-        op = subprocess.Popen([program, '-f', pfile, '-d', 'test'],
+        op = subprocess.Popen([program, '-f', pfile, '-d', 'test', '-n'],
                               stdin=subprocess.PIPE,
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
@@ -102,7 +102,7 @@ def test_profile():
         op.communicate('n\n'.encode('ascii'))
         assert not op.returncode
         # now delete it for real (should succeed)
-        op = subprocess.Popen([program, '-f', pfile, '-d', 'test'],
+        op = subprocess.Popen([program, '-f', pfile, '-d', 'test', '-n'],
                               stdin=subprocess.PIPE,
                               stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE,
@@ -123,7 +123,8 @@ def test_profile():
             jenkins = False
 
         if not jenkins:
-            op = subprocess.Popen([program, '-f', pfile, '-c', 'junk_profile'],
+            op = subprocess.Popen([program, '-f', pfile, '-c',
+                                   'junk_profile', '-n'],
                                   stdin=subprocess.PIPE,
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE,
@@ -132,7 +133,8 @@ def test_profile():
             op.communicate((ipath + ipath + ipath).encode('ascii'))
             assert op.returncode
 
-            op = subprocess.Popen([program, '-f', pfile, '-c', 'junk_profile'],
+            op = subprocess.Popen([program, '-f', pfile, '-c',
+                                   'junk_profile', '-n'],
                                   stdin=subprocess.PIPE,
                                   stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE,
