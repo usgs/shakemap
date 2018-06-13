@@ -123,13 +123,16 @@ library.</p>
 <div class="section" id="shake-conf">
 <h3>2.1.2.6. shake.conf<a class="headerlink" href="#shake-conf" title="Permalink to this headline">¶</a></h3>
 <p>This config file is only for very general configuration options relating
-to the operation of <strong>shake</strong>.</p>
+to the operation of <strong>shake</strong>. It allows the operator to configure  additional
+repositories of ShakeMap modules (“plugins,” if you will). It also allows
+the user to set the modules for automatic runs (i.e., those where
+<strong>shake -a</strong> is used).</p>
 </div>
 <div class="section" id="logging-conf">
 <h3>2.1.2.7. logging.conf<a class="headerlink" href="#logging-conf" title="Permalink to this headline">¶</a></h3>
 <p>Contains options for logging. Most users will likely not need to modify
-this file unless they wish to change the format of the messages or other
-logging behavior.</p>
+this file unless they wish to change the format of the messages,
+date/time stamps, or other logging behavior.</p>
 </div>
 <div class="section" id="transfer-conf">
 <h3>2.1.2.8. transfer.conf<a class="headerlink" href="#transfer-conf" title="Permalink to this headline">¶</a></h3>
@@ -157,16 +160,25 @@ for each event.</p>
 <li><cite>topo_15sec.grd</cite> – The 15 arcsecond resolution topography data for the entire globe.</li>
 </ul>
 <p>By ‘entire globe’ we mean from 56 degrees south to 84 degrees north latitude.</p>
-<p>You have a choice of 15 or 30 second resolution topography. 15 second data shows
+<p>Note that <strong>sm_profile</strong> allows the user to download the 30-arcsecond topo and
+Vs30 files as part of the creation of a profile. If <strong>sm_profile</strong> is called
+with the <strong>-a</strong> option, these files will be downloaded automatically and the
+profile will be configured to use them.</p>
+<p>If you have not had <strong>sm_profile</strong> download the grids, you have a choice of 15 or
+30 second resolution topography. 15 second data shows
 more detail at small scales, but causes ShakeMap to take <em>significantly</em> longer
 to make the various output maps. The ShakeMap system at the National Earthquake
 Information Center uses the 30 second data. If you plan to use the 15 second
 data, modify the topo file name below to topo_15sec.grd.</p>
+<p>Note that these files are somewhat large: the 30-second topo is 238 Mb, the
+30-second Vs30 is 582 Mb, and the 15-second topo is 745 Mb.</p>
 <p>To download the files, do:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">cd</span> <span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_profiles</span><span class="o">/</span><span class="p">[</span><span class="n">profile</span><span class="p">]</span><span class="o">/</span><span class="n">install</span><span class="o">/</span><span class="n">data</span><span class="o">/</span><span class="n">mapping</span>
-
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&gt;</span> <span class="n">mkdir</span> <span class="o">/</span><span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_data</span>
+<span class="o">&gt;</span> <span class="n">mkdir</span> <span class="o">/</span><span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_data</span><span class="o">/</span><span class="n">vs30</span>
+<span class="o">&gt;</span> <span class="n">mkdir</span> <span class="o">/</span><span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_data</span><span class="o">/</span><span class="n">topo</span>
+<span class="o">&gt;</span> <span class="n">cd</span> <span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_data</span><span class="o">/</span><span class="n">vs30</span>
 <span class="o">&gt;</span> <span class="n">curl</span> <span class="n">ftp</span><span class="p">:</span><span class="o">//</span><span class="n">hazards</span><span class="o">.</span><span class="n">cr</span><span class="o">.</span><span class="n">usgs</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">shakemap</span><span class="o">/</span><span class="n">global_vs30</span><span class="o">.</span><span class="n">grd</span> <span class="o">-</span><span class="n">o</span> <span class="n">global_vs30</span><span class="o">.</span><span class="n">grd</span>
-
+<span class="o">&gt;</span> <span class="n">cd</span> <span class="p">[</span><span class="n">home</span><span class="p">]</span><span class="o">/</span><span class="n">shakemap_data</span><span class="o">/</span><span class="n">topo</span>
 <span class="o">&gt;</span> <span class="n">curl</span> <span class="n">ftp</span><span class="p">:</span><span class="o">//</span><span class="n">hazards</span><span class="o">.</span><span class="n">cr</span><span class="o">.</span><span class="n">usgs</span><span class="o">.</span><span class="n">gov</span><span class="o">/</span><span class="n">shakemap</span><span class="o">/</span><span class="n">topo_30sec</span><span class="o">.</span><span class="n">grd</span> <span class="o">-</span><span class="n">o</span> <span class="n">topo_30sec</span><span class="o">.</span><span class="n">grd</span>
 </pre></div>
 </div>
@@ -177,12 +189,12 @@ names:</p>
 </pre></div>
 </div>
 <p>Modify <cite>model.conf</cite> to change the line:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vs30file</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">INSTALL_DIR</span><span class="o">&gt;/</span><span class="n">data</span><span class="o">/</span><span class="n">mapping</span><span class="o">/</span><span class="n">global_vs30</span><span class="o">.</span><span class="n">grd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">vs30file</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">DATA_DIR</span><span class="o">&gt;/</span><span class="n">vs30</span><span class="o">/</span><span class="n">global_vs30</span><span class="o">.</span><span class="n">grd</span>
 </pre></div>
 </div>
 <p>to the location of your Vs30 data. Similarly, modify products.conf to
 change the line:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">topography</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">INSTALL_DIR</span><span class="o">&gt;/</span><span class="n">data</span><span class="o">/</span><span class="n">mapping</span><span class="o">/</span><span class="n">topo_30sec</span><span class="o">.</span><span class="n">grd</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">topography</span> <span class="o">=</span> <span class="o">&lt;</span><span class="n">DATA_DIR</span><span class="o">&gt;/</span><span class="n">topo</span><span class="o">/</span><span class="n">topo_30sec</span><span class="o">.</span><span class="n">grd</span>
 </pre></div>
 </div>
 <p>to the path to your topography file. Note that ShakeMap completes

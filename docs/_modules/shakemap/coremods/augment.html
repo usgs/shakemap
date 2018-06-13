@@ -53,8 +53,13 @@
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapInputContainer</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span> <span class="n">get_custom_validator</span><span class="p">,</span>\
-    <span class="n">config_error</span><span class="p">,</span> <span class="n">check_config</span><span class="p">,</span> <span class="n">get_configspec</span><span class="p">,</span> <span class="n">get_logging_config</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_config_paths</span><span class="p">,</span>
+                                   <span class="n">get_custom_validator</span><span class="p">,</span>
+                                   <span class="n">config_error</span><span class="p">,</span>
+                                   <span class="n">check_config</span><span class="p">,</span>
+                                   <span class="n">get_configspec</span><span class="p">,</span>
+                                   <span class="n">get_logging_config</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">path_macro_sub</span>
 
 
 <div class="viewcode-block" id="AugmentModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.augment.html#shakemap.coremods.augment.AugmentModule">[docs]</a><span class="k">class</span> <span class="nc">AugmentModule</span><span class="p">(</span><span class="n">CoreModule</span><span class="p">):</span>
@@ -189,10 +194,12 @@
         <span class="c1"># The vs30 file may have macros in it</span>
         <span class="c1">#</span>
         <span class="n">vs30file</span> <span class="o">=</span> <span class="n">shake_config</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">][</span><span class="s1">&#39;vs30file&#39;</span><span class="p">]</span>
+        <span class="n">global_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span>
+                                        <span class="s1">&#39;shakemap_data&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">vs30file</span><span class="p">:</span>
-            <span class="n">vs30file</span> <span class="o">=</span> <span class="n">vs30file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;INSTALL_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">install_path</span><span class="p">)</span>
-            <span class="n">vs30file</span> <span class="o">=</span> <span class="n">vs30file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;DATA_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
-            <span class="n">vs30file</span> <span class="o">=</span> <span class="n">vs30file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;EVENT_ID&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
+            <span class="n">vs30file</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">vs30file</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">,</span>
+                                      <span class="n">dp</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span> <span class="n">gp</span><span class="o">=</span><span class="n">global_data_path</span><span class="p">,</span>
+                                      <span class="n">ei</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">vs30file</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;vs30 file &quot;</span><span class="si">%s</span><span class="s1">&quot; is not a &#39;</span>
                                         <span class="s1">&#39;valid file&#39;</span> <span class="o">%</span> <span class="n">vs30file</span><span class="p">)</span>
@@ -204,9 +211,9 @@
         <span class="k">if</span> <span class="s1">&#39;file&#39;</span> <span class="ow">in</span> <span class="n">shake_config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">]:</span>
             <span class="n">loc_file</span> <span class="o">=</span> <span class="n">shake_config</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;prediction_location&#39;</span><span class="p">][</span><span class="s1">&#39;file&#39;</span><span class="p">]</span>
             <span class="k">if</span> <span class="n">loc_file</span> <span class="ow">and</span> <span class="n">loc_file</span> <span class="o">!=</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>      <span class="c1"># &#39;None&#39; is a string here</span>
-                <span class="n">loc_file</span> <span class="o">=</span> <span class="n">loc_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;INSTALL_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">install_path</span><span class="p">)</span>
-                <span class="n">loc_file</span> <span class="o">=</span> <span class="n">loc_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;DATA_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
-                <span class="n">loc_file</span> <span class="o">=</span> <span class="n">loc_file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;EVENT_ID&gt;&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
+                <span class="n">loc_file</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">loc_file</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">,</span>
+                                          <span class="n">dp</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span> <span class="n">gp</span><span class="o">=</span><span class="n">global_data_path</span><span class="p">,</span>
+                                          <span class="n">ei</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">loc_file</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;prediction file &quot;</span><span class="si">%s</span><span class="s1">&quot; is not a &#39;</span>
                                             <span class="s1">&#39;valid file&#39;</span> <span class="o">%</span> <span class="n">loc_file</span><span class="p">)</span>

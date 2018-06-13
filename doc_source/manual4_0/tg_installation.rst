@@ -106,15 +106,18 @@ shake.conf
 ----------
 
 This config file is only for very general configuration options relating
-to the operation of **shake**.
+to the operation of **shake**. It allows the operator to configure  additional
+repositories of ShakeMap modules ("plugins," if you will). It also allows
+the user to set the modules for automatic runs (i.e., those where
+**shake -a** is used).
 
 
 logging.conf
 ------------
 
 Contains options for logging. Most users will likely not need to modify
-this file unless they wish to change the format of the messages or other
-logging behavior.
+this file unless they wish to change the format of the messages, 
+date/time stamps, or other logging behavior.
 
 transfer.conf
 -------------
@@ -146,18 +149,29 @@ ftp://hazards.cr.usgs.gov/shakemap:
 
 By 'entire globe' we mean from 56 degrees south to 84 degrees north latitude.
 
-You have a choice of 15 or 30 second resolution topography. 15 second data shows
+Note that **sm_profile** allows the user to download the 30-arcsecond topo and
+Vs30 files as part of the creation of a profile. If **sm_profile** is called 
+with the **-a** option, these files will be downloaded automatically and the
+profile will be configured to use them.
+
+If you have not had **sm_profile** download the grids, you have a choice of 15 or
+30 second resolution topography. 15 second data shows
 more detail at small scales, but causes ShakeMap to take *significantly* longer
 to make the various output maps. The ShakeMap system at the National Earthquake
 Information Center uses the 30 second data. If you plan to use the 15 second
 data, modify the topo file name below to topo_15sec.grd. 
 
+Note that these files are somewhat large: the 30-second topo is 238 Mb, the
+30-second Vs30 is 582 Mb, and the 15-second topo is 745 Mb.
+
 To download the files, do::
 
-    > cd [home]/shakemap_profiles/[profile]/install/data/mapping
-
+    > mkdir /[home]/shakemap_data
+    > mkdir /[home]/shakemap_data/vs30
+    > mkdir /[home]/shakemap_data/topo
+    > cd [home]/shakemap_data/vs30
     > curl ftp://hazards.cr.usgs.gov/shakemap/global_vs30.grd -o global_vs30.grd
-
+    > cd [home]/shakemap_data/topo
     > curl ftp://hazards.cr.usgs.gov/shakemap/topo_30sec.grd -o topo_30sec.grd
 
 By default, the system is configured to find the Vs30 and topography files in 
@@ -168,12 +182,12 @@ names::
 
 Modify `model.conf` to change the line::
 
-    vs30file = <INSTALL_DIR>/data/mapping/global_vs30.grd
+    vs30file = <DATA_DIR>/vs30/global_vs30.grd
 
 to the location of your Vs30 data. Similarly, modify products.conf to
 change the line::
 
-    topography = <INSTALL_DIR>/data/mapping/topo_30sec.grd
+    topography = <DATA_DIR>/topo/topo_30sec.grd
 
 to the path to your topography file. Note that ShakeMap completes
 the macro <INSTALL_DIR> for the profile in question, but you may set 

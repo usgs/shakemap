@@ -23,11 +23,14 @@ def test_create_kmz():
                              'northridge', 'shake_result.hdf')
         container = ShakeMapOutputContainer.load(cfile)
         install_path, data_path = get_config_paths()
+        global_data_path = os.path.join(os.path.expanduser('~'),
+                                        'shakemap_data')
         product_config_file = os.path.join(
             install_path, 'config', 'products.conf')
         pconfig = configobj.ConfigObj(product_config_file)
         oceanfile = pconfig['products']['mapping']['layers']['lowres_oceans']
-        oceanfile = path_macro_sub(oceanfile, install_path, data_path)
+        oceanfile = path_macro_sub(oceanfile, install_path, data_path,
+                                   global_data_path)
         logger = logging.getLogger(__name__)
         kmzfile = create_kmz(container, tempdir, oceanfile, logger)
         myzip = zipfile.ZipFile(kmzfile, mode='r')

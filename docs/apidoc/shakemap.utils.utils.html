@@ -150,15 +150,17 @@ an answer is required of the user).</li>
 
 <dl class="function">
 <dt id="shakemap.utils.utils.path_macro_sub">
-<code class="descclassname">shakemap.utils.utils.</code><code class="descname">path_macro_sub</code><span class="sig-paren">(</span><em>s</em>, <em>ip</em>, <em>dp</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#path_macro_sub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.path_macro_sub" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">shakemap.utils.utils.</code><code class="descname">path_macro_sub</code><span class="sig-paren">(</span><em>s</em>, <em>ip=''</em>, <em>dp=''</em>, <em>gp=''</em>, <em>ei=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/utils.html#path_macro_sub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.utils.path_macro_sub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Replace macros with current paths:</p>
 <ul class="simple">
 <li>&lt;INSTALL_DIR&gt; is replaced with the contents of ip</li>
 <li>&lt;DATA_DIR&gt; is replaced with the contents of dp</li>
+<li>&lt;GLOBAL_DATA&gt; is replaced with the contents of gp</li>
+<li>&lt;EVENT_ID&gt; is replaced with the contents of ei</li>
 </ul>
 <p>e.g., path_macro_sub(“&lt;INSTALL_DIR&gt;/&lt;DATA_DIR&gt;”, “hello”, “world”)
 would return “hello/world”. It is not an error if the original string
-does not contain one or both of &lt;INSTALL_DIR&gt; or &lt;DATA_DIR&gt;.</p>
+does not contain one or any of the substitution strings.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -167,6 +169,8 @@ does not contain one or both of &lt;INSTALL_DIR&gt; or &lt;DATA_DIR&gt;.</p>
 <li><strong>s</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string into which the replacements are made.</li>
 <li><strong>ip</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string with which to replace &lt;INSTALL_DIR&gt;.</li>
 <li><strong>dp</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string with which to replace &lt;DATA_DIR&gt;.</li>
+<li><strong>gp</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string with which to replace &lt;GLOBAL_DATA&gt;.</li>
+<li><strong>ei</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string with which to replace &lt;EVENT_ID&gt;.</li>
 </ul>
 </td>
 </tr>
