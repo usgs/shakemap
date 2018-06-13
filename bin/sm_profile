@@ -113,7 +113,8 @@ def make_dir(pathstr, default, accept):
         except OSError:
             msg = ('Cannot make install_folder %s.  Please try again (%d '
                    'of %d tries).')
-            print(*textwrap.wrap(msg % (ppath, ntries, max_tries)))
+            print('\n'.join(textwrap.wrap(msg % (ppath, ntries,
+                                                    max_tries))))
             ntries += 1
         if ntries > max_tries:
             break
@@ -141,29 +142,29 @@ def create(config, profile, accept, ppath, nogrids):
     default_install = os.path.join(profile_path, 'install')
     default_data = os.path.join(profile_path, 'data')
     if not accept:
-        print(*textwrap.wrap(
+        print('\n'.join(textwrap.wrap(
             'You will be prompted to supply two directories for this '
-            'ShakeMap profile:'))
-        print(*textwrap.wrap(
+            'ShakeMap profile:')))
+        print('\n   '.join(textwrap.wrap(
             ' - An *installation* path, under which will be created '
             'directories for system configuration, (config), logging '
-            '(logs), and support data (data).'))
-        print(*textwrap.wrap(
+            '(logs), and support data (data).')))
+        print('\n   '.join(textwrap.wrap(
             ' - A *data* path, under which will be created directories for '
-            'each event processed.\n'))
+            'each event processed.\n')))
 
     install_path, install_ok = make_dir('install path', default_install,
                                         accept)
     if not install_ok:
-        print(*textwrap.wrap(
+        print('\n'.join(textwrap.wrap(
             'Please try to find a path that can be created on this '
-            'system and then try again.  Exiting.'))
+            'system and then try again.  Exiting.')))
         sys.exit(1)
     new_data_path, data_ok = make_dir('data path', default_data, accept)
     if not data_ok:
-        print(*textwrap.wrap(
+        print('\n'.join(textwrap.wrap(
             'Please try to find a path that can be created on this '
-            'system and then try again.  Exiting.'))
+            'system and then try again.  Exiting.')))
         shutil.rmtree(install_path)
         sys.exit(1)
 
@@ -241,9 +242,9 @@ def create(config, profile, accept, ppath, nogrids):
         do_vs30 = query_yes_no('Do you want to download the global '
                                'topography and Vs30 files?')
         if do_vs30:
-            print(*textwrap.wrap(
+            print('\n'.join(textwrap.wrap(
                 'You will be prompted for a path where the topo and Vs30 data '
-                'will reside.'))
+                'will reside.')))
 
     if do_vs30 is False:
         return
@@ -251,9 +252,9 @@ def create(config, profile, accept, ppath, nogrids):
     gdata_default = os.path.join(os.path.expanduser('~'), 'shakemap_data')
     gdata_path, install_ok = make_dir('data path', gdata_default, accept)
     if not install_ok:
-        print(*textwrap.wrap(
+        print('\n'.join(textwrap.wrap(
             'Please try to find a path that can be created on this '
-            'system and then try again.  Exiting.'))
+            'system and then try again.  Exiting.')))
         sys.exit(1)
     topo_path = os.path.join(gdata_path, 'topo')
     if not os.path.isdir(topo_path):
