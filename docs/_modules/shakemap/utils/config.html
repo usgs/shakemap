@@ -273,7 +273,7 @@
                 <span class="n">out</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-        <span class="k">except</span><span class="p">:</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">out</span></div>
 
@@ -318,7 +318,7 @@
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
-    <span class="k">except</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a list of floats&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="n">np_out</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
@@ -389,7 +389,7 @@
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">out</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
-    <span class="k">except</span><span class="p">:</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a list of 4 floats&quot;</span> <span class="o">%</span> <span class="n">value</span><span class="p">)</span>
         <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">360.0</span> <span class="ow">or</span> <span class="n">out</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">360.0</span> <span class="ow">or</span> \
@@ -522,7 +522,7 @@
     <span class="k">return</span> <span class="n">fval</span></div>
 
 
-<div class="viewcode-block" id="get_logger"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_logger">[docs]</a><span class="k">def</span> <span class="nf">get_logger</span><span class="p">(</span><span class="n">eventid</span><span class="p">,</span> <span class="n">log_option</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="get_logger"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.config.html#shakemap.utils.config.get_logger">[docs]</a><span class="k">def</span> <span class="nf">get_logger</span><span class="p">(</span><span class="n">eventid</span><span class="p">,</span> <span class="n">log_option</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">log_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Return the logger instance for ShakeMap.  Only use once!</span>
 
 <span class="sd">    Args:</span>
@@ -534,7 +534,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span> <span class="o">=</span> <span class="n">get_config_paths</span><span class="p">()</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">get_logging_config</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;debug&#39;</span> <span class="ow">or</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;quiet&#39;</span> <span class="ow">or</span> <span class="n">log_option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">log_file</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">format</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;formatters&#39;</span><span class="p">][</span><span class="s1">&#39;standard&#39;</span><span class="p">][</span><span class="s1">&#39;format&#39;</span><span class="p">]</span>
         <span class="n">datefmt</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;formatters&#39;</span><span class="p">][</span><span class="s1">&#39;standard&#39;</span><span class="p">][</span><span class="s1">&#39;datefmt&#39;</span><span class="p">]</span>
         <span class="c1"># create a console handler, with verbosity setting chosen by user</span>
@@ -542,7 +542,7 @@
             <span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
         <span class="k">elif</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;quiet&#39;</span><span class="p">:</span>
             <span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
-        <span class="k">elif</span> <span class="n">log_option</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># default interactive</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># default interactive</span>
             <span class="n">level</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span>
 
         <span class="n">logdict</span> <span class="o">=</span> <span class="p">{</span>
@@ -577,11 +577,24 @@
                                      <span class="s2">&quot;not found&quot;</span> <span class="o">%</span> <span class="n">eventid</span><span class="p">)</span>
         <span class="n">event_log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">event_log_dir</span><span class="p">,</span> <span class="s1">&#39;shake.log&#39;</span><span class="p">)</span>
         <span class="n">config</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;event_file&#39;</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">event_log_file</span>
+        <span class="k">if</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;debug&#39;</span><span class="p">:</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;event_file&#39;</span><span class="p">][</span><span class="s1">&#39;level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+        <span class="k">elif</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;quiet&#39;</span><span class="p">:</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;event_file&#39;</span><span class="p">][</span><span class="s1">&#39;level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
         <span class="n">global_log_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;logs&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">global_log_dir</span><span class="p">):</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">global_log_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="n">global_log_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">global_log_dir</span><span class="p">,</span> <span class="s1">&#39;shake.log&#39;</span><span class="p">)</span>
         <span class="n">config</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;global_file&#39;</span><span class="p">][</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">global_log_file</span>
+        <span class="k">if</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;debug&#39;</span><span class="p">:</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;global_file&#39;</span><span class="p">][</span><span class="s1">&#39;level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+        <span class="k">elif</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;quiet&#39;</span><span class="p">:</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;handlers&#39;</span><span class="p">][</span><span class="s1">&#39;global_file&#39;</span><span class="p">][</span><span class="s1">&#39;level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
+        <span class="k">if</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;debug&#39;</span><span class="p">:</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="s1">&#39;&#39;</span><span class="p">][</span><span class="s1">&#39;level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span>
+        <span class="k">elif</span> <span class="n">log_option</span> <span class="o">==</span> <span class="s1">&#39;quiet&#39;</span><span class="p">:</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;loggers&#39;</span><span class="p">][</span><span class="s1">&#39;&#39;</span><span class="p">][</span><span class="s1">&#39;level&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">ERROR</span>
+
         <span class="n">logging</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">dictConfig</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
     <span class="c1"># get the root logger, otherwise we can&#39;t log in sub-libraries</span>
     <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">()</span>
@@ -663,7 +676,8 @@
 
 
 <span class="k">def</span> <span class="nf">_clean_log_dict</span><span class="p">(</span><span class="n">config</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Clean up dictionary returned by ConfigObj into form suitable for logging.</span>
+    <span class="sd">&quot;&quot;&quot;Clean up dictionary returned by ConfigObj into form suitable for</span>
+<span class="sd">    logging.</span>
 
 <span class="sd">    Basically, ConfigObj.validate wants all sections that are Handlers (for</span>
 <span class="sd">    example) to have the same fields, so it fills them in with default values.</span>

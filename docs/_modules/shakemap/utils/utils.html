@@ -117,7 +117,7 @@
         <span class="n">jdict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
         <span class="n">fh</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="n">network</span> <span class="o">=</span> <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;title&#39;</span><span class="p">]</span>
-    <span class="k">except</span> <span class="n">HTTPError</span> <span class="k">as</span> <span class="n">he</span><span class="p">:</span>
+    <span class="k">except</span> <span class="n">HTTPError</span><span class="p">:</span>
         <span class="n">error_str</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;No network description found for </span><span class="si">%s</span><span class="s1">. You may</span>
 <span class="s1">want to make sure that the pages of the form </span><span class="si">%s</span><span class="s1"> still exist,</span>
 <span class="s1">and contact the ShakeMap developers if they do not.</span>
@@ -197,16 +197,18 @@
                              <span class="s2">&quot;(or &#39;y&#39; or &#39;n&#39;).</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="path_macro_sub"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.utils.html#shakemap.utils.utils.path_macro_sub">[docs]</a><span class="k">def</span> <span class="nf">path_macro_sub</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">ip</span><span class="p">,</span> <span class="n">dp</span><span class="p">):</span>
+<div class="viewcode-block" id="path_macro_sub"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.utils.html#shakemap.utils.utils.path_macro_sub">[docs]</a><span class="k">def</span> <span class="nf">path_macro_sub</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">gp</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">ei</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Replace macros with current paths:</span>
 
 <span class="sd">    - &lt;INSTALL_DIR&gt; is replaced with the contents of ip</span>
 <span class="sd">    - &lt;DATA_DIR&gt; is replaced with the contents of dp</span>
+<span class="sd">    - &lt;GLOBAL_DATA&gt; is replaced with the contents of gp</span>
+<span class="sd">    - &lt;EVENT_ID&gt; is replaced with the contents of ei</span>
 
 <span class="sd">    e.g., path_macro_sub(&quot;&lt;INSTALL_DIR&gt;/&lt;DATA_DIR&gt;&quot;, &quot;hello&quot;, &quot;world&quot;)</span>
 <span class="sd">    would return &quot;hello/world&quot;. It is not an error if the original string</span>
-<span class="sd">    does not contain one or both of &lt;INSTALL_DIR&gt; or &lt;DATA_DIR&gt;.</span>
+<span class="sd">    does not contain one or any of the substitution strings.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        s (str):</span>
@@ -215,12 +217,20 @@
 <span class="sd">            The string with which to replace &lt;INSTALL_DIR&gt;.</span>
 <span class="sd">        dp (str):</span>
 <span class="sd">            The string with which to replace &lt;DATA_DIR&gt;.</span>
+<span class="sd">        gp (str):</span>
+<span class="sd">            The string with which to replace &lt;GLOBAL_DATA&gt;.</span>
+<span class="sd">        ei (str):</span>
+<span class="sd">            The string with which to replace &lt;EVENT_ID&gt;.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        str: A new string with the sub-string replacements.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;INSTALL_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;DATA_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">dp</span><span class="p">)</span></div>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;INSTALL_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">ip</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;DATA_DIR&gt;&#39;</span><span class="p">,</span> <span class="n">dp</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;GLOBAL_DATA&gt;&#39;</span><span class="p">,</span> <span class="n">gp</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&lt;EVENT_ID&gt;&#39;</span><span class="p">,</span> <span class="n">ei</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">s</span></div>
 </pre></div>
 
           </div>
