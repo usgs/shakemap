@@ -16,6 +16,7 @@ import shakemap.utils.config as cfg
 from shakemap.utils.probs import get_weights
 from shakemap.utils.layers import update_config_regions
 from shakelib.rupture.origin import Origin
+from shakemap.utils.utils import path_macro_sub
 
 
 class SelectModule(CoreModule):
@@ -152,7 +153,7 @@ def validate_config(mydict, install_path):
         elif key == 'min_depth' or key == 'max_depth':
             mydict[key] = cfg.cfg_float_list(mydict[key])
         elif key == 'layer_dir':
-            mydict[key] = mydict[key].replace('<INSTALL_DIR>', install_path)
+            mydict[key] = path_macro_sub(mydict[key], ip=install_path)
         elif key in ('x1', 'x2', 'p1', 'p2', 'p_kagan_default',
                      'default_slab_depth'):
             mydict[key] = float(mydict[key])

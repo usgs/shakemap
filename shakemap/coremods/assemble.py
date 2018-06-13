@@ -27,6 +27,7 @@ from shakemap.utils.config import (get_config_paths,
                                    get_logging_config)
 from shakemap.utils.amps import AmplitudeHandler
 import shakemap.utils.queue as queue
+from shakemap.utils.utils import path_macro_sub
 
 
 class AssembleModule(CoreModule):
@@ -151,10 +152,12 @@ class AssembleModule(CoreModule):
         # The vs30 file may have macros in it
         #
         vs30file = global_config['data']['vs30file']
+        global_data_path = os.path.join(os.path.expanduser('~'),
+                                        'shakemap_data')
         if vs30file:
-            vs30file = vs30file.replace('<INSTALL_DIR>', install_path)
-            vs30file = vs30file.replace('<DATA_DIR>', data_path)
-            vs30file = vs30file.replace('<EVENT_ID>', self._eventid)
+            vs30file = path_macro_sub(vs30file, ip=install_path,
+                                      dp=data_path, gp=global_data_path,
+                                      ei=self._eventid)
             if not os.path.isfile(vs30file):
                 raise FileNotFoundError("vs30 file '%s' is not a valid file" %
                                         vs30file)
@@ -166,9 +169,9 @@ class AssembleModule(CoreModule):
         if 'file' in global_config['interp']['prediction_location']:
             loc_file = global_config['interp']['prediction_location']['file']
             if loc_file and loc_file != 'None':      # 'None' is a string here
-                loc_file = loc_file.replace('<INSTALL_DIR>', install_path)
-                loc_file = loc_file.replace('<DATA_DIR>', data_path)
-                loc_file = loc_file.replace('<EVENT_ID>', self._eventid)
+                loc_file = path_macro_sub(loc_file, ip=install_path,
+                                          dp=data_path, gp=global_data_path,
+                                          ei=self._eventid)
                 if not os.path.isfile(loc_file):
                     raise FileNotFoundError("prediction file '%s' is not "
                                             "a valid file" % loc_file)

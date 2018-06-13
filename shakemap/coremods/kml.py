@@ -95,6 +95,9 @@ class KMLModule(CoreModule):
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
 
+        global_data_path = os.path.join(os.path.expanduser('~'),
+                                        'shakemap_data')
+
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
 
@@ -107,7 +110,8 @@ class KMLModule(CoreModule):
             install_path, 'config', 'products.conf')
         pconfig = configobj.ConfigObj(product_config_file)
         oceanfile = pconfig['products']['mapping']['layers']['lowres_oceans']
-        oceanfile = path_macro_sub(oceanfile, install_path, data_path)
+        oceanfile = path_macro_sub(oceanfile, ip=install_path, dp=data_path,
+                                   gp=global_data_path)
 
         # call create_kmz function
         create_kmz(container, datadir, oceanfile, self.logger)

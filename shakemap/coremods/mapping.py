@@ -171,6 +171,9 @@ class MappingModule(CoreModule):
         config_file = os.path.join(install_path, 'config', 'products.conf')
         config = ConfigObj(config_file)
 
+        global_data_path = os.path.join(os.path.expanduser('~'),
+                                        'shakemap_data')
+
         # create contour files
         self.logger.debug('Mapping...')
 
@@ -178,19 +181,26 @@ class MappingModule(CoreModule):
         layerdict = {}
         layers = config['products']['mapping']['layers']
         layerdict['coast'] = path_macro_sub(
-            layers['coasts'], install_path, data_path)
+            layers['coasts'], ip=install_path, dp=data_path,
+            gp=global_data_path)
         layerdict['ocean'] = path_macro_sub(
-            layers['oceans'], install_path, data_path)
+            layers['oceans'], ip=install_path, dp=data_path,
+            gp=global_data_path)
         layerdict['lake'] = path_macro_sub(
-            layers['lakes'], install_path, data_path)
+            layers['lakes'], ip=install_path, dp=data_path,
+            gp=global_data_path)
         layerdict['country'] = path_macro_sub(
-            layers['countries'], install_path, data_path)
+            layers['countries'], ip=install_path, dp=data_path,
+            gp=global_data_path)
         layerdict['state'] = path_macro_sub(
-            layers['states'], install_path, data_path)
+            layers['states'], ip=install_path, dp=data_path,
+            gp=global_data_path)
         topofile = path_macro_sub(
-            layers['topography'], install_path, data_path)
+            layers['topography'], ip=install_path, dp=data_path,
+            gp=global_data_path)
         cities = path_macro_sub(
-            layers['cities'], install_path, data_path)
+            layers['cities'], ip=install_path, dp=data_path,
+            gp=global_data_path)
         mapmaker = MapMaker(container, topofile, layerdict, cities,
                             self.logger,
                             config['products']['mapping']['operator'])
