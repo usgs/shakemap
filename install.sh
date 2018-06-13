@@ -34,6 +34,9 @@ while getopts r FLAG; do
   esac
 done
 
+# this is an experiment to see if we can get away without the platform specific
+# environment files.
+reset=1
 
 # create a matplotlibrc file with the non-interactive backend "Agg" in it.
 if [ ! -d "$matplotlibdir" ]; then
