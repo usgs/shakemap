@@ -130,6 +130,7 @@ def test_get_logger():
 
 
 def test_dispatch_event():
+    # Test 'test'
     logger, logstring = get_dummy_logger('test_dispatch')
     children = {}
     config = {}
@@ -137,6 +138,27 @@ def test_dispatch_event():
     returncode = children['Testing dispatch']['popen'].wait()
     assert returncode == 0
     assert 'Testing event Testing dispatch' in logstring.getvalue()
+
+    # Test 'cancel'
+    children = {}
+    config = {'cancel_command': 'echo "Testing cancel"',
+              'shake_path': '/dev/null'}
+    queue.dispatch_event('Testing dispatch', logger, children, 'cancel',
+                         config)
+    returncode = children['Testing dispatch']['popen'].wait()
+    assert returncode == 0
+    assert 'Canceling event Testing dispatch' in logstring.getvalue()
+
+    # Test 'shake'
+    children = {}
+    config = {'shake_command': 'echo "Testing shake"',
+              'shake_path': '/dev/null'}
+    queue.dispatch_event('Testing dispatch', logger, children, 'shake',
+                         config)
+    returncode = children['Testing dispatch']['popen'].wait()
+    assert returncode == 0
+    assert 'Running event Testing dispatch due to action shake' in \
+        logstring.getvalue()
     logstring.close()
     return
 
