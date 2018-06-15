@@ -638,7 +638,7 @@ def check_profile_config(config):
             print('    Deleting profile %s.' % profile)
             del config['profiles'][profile]
             config.write()
-        return config
+    return config
 
 
 def _clean_log_dict(config):

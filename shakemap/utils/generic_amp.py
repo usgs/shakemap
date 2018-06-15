@@ -97,6 +97,7 @@ def get_generic_amp_factors(sx, myimt):
             # periods bracketing the input IMT
             mygrid, metadata = _get_average_grid(gc, contents, thisimt)
 
+        gc.close()
         if mygrid is None:
             continue
 

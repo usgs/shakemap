@@ -1,28 +1,38 @@
 #!/usr/bin/env python
 
+import os
 import os.path
-import tempfile
-import textwrap
-import sys
 import pytest
 import copy
-import logging
 
 from configobj import ConfigObj
-
-homedir = os.path.dirname(os.path.abspath(__file__))
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
-
 from validate import ValidateError
 
 import shakemap.utils.config as config
 
+homedir = os.path.dirname(os.path.abspath(__file__))
+shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
+
 
 def test_config():
 
+    install_dir, data_dir = config.get_config_paths()
     #
     # get_logger()
     #
+    log_file = os.path.join(data_dir, 'nc72282711', 'shake.log')
+    if os.path.isfile(log_file):
+        os.remove(log_file)
+    logger = config.get_logger('nc72282711', log_file=True,
+                               log_option='debug')
+    logger.debug('xyxyxyzz')
+    with open(log_file, 'r') as log_fd:
+        line = log_fd.readline()
+        assert 'xyxyxyzz' in line
+    os.remove(log_file)
+
+    logger = config.get_logger('nc72282711', log_option='quiet')
+    logger = config.get_logger('nc72282711')
     logger = config.get_logger('nc72282711', log_option='debug')
 
     #
@@ -88,6 +98,17 @@ def test_config():
     with pytest.raises(RuntimeError):
         config.config_error(ctest, results)
 
+    #
+    # Test the profile checker
+    #
+    ctest = ConfigObj()
+    ctest['profiles'] = {'prof1': {'data_path': '/xyz/zzsx/zz',
+                                   'install_path': '/xyz/zzsx/zz'},
+                         'prof2': {'data_path': data_dir,
+                                   'install_path': install_dir}}
+    ct1 = config.check_profile_config(ctest)
+    assert 'prof1' not in list(ct1['profiles'].keys())
+    # os.remove(config_file)
     #
     # annotatedfloat_type()
     #
@@ -222,6 +243,8 @@ def test_config():
     with pytest.raises(ValidateError):
         res = config.cfg_float_list({})
     with pytest.raises(ValidateError):
+        res = config.cfg_float_list({'a': 'b'})
+    with pytest.raises(ValidateError):
         res = config.cfg_float_list([])
     with pytest.raises(ValidateError):
         res = config.cfg_float_list('thing')
@@ -241,4 +264,5 @@ def test_config():
 
 
 if __name__ == '__main__':
+    os.environ['CALLED_FROM_PYTEST'] = 'True'
     test_config()

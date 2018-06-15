@@ -3,16 +3,20 @@
 import os.path
 import pytest
 
+from configobj import ConfigObj
 import numpy as np
 from shapely.geometry import Point
 
+from shakemap.utils.layers import (get_layer_distances,
+                                   dist_to_layer,
+                                   update_config_regions,
+                                   validate_config)
+
+from shakemap.utils.config import (get_data_path,
+                                   get_config_paths)
+
 homedir = os.path.dirname(os.path.abspath(__file__))
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
-
-from shakemap.utils.layers import (get_layer_distances,
-                                   dist_to_layer)
-
-from shakemap.utils.config import get_data_path
 
 
 def layers_equal(layer1, layer2):
@@ -57,7 +61,44 @@ def test_layers():
     #
     p = Point()
     with pytest.raises(TypeError):
-        distance = dist_to_layer(0.0, 0.0, p)
+        dist_to_layer(0.0, 0.0, p)
+
+    #
+    # Test the updates to the config based on being in a layer (or not)
+    #
+    install_path, data_path = get_config_paths()
+    config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
+    validate_config(config, install_path)
+    # Taiwan
+    elon = 121.0
+    elat = 22.5
+
+    config = update_config_regions(elat, elon, config)
+    assert config['tectonic_regions']['acr']['gmpe'] == \
+        ['active_crustal_taiwan', 'active_crustal_taiwan_deep']
+
+    config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
+    validate_config(config, install_path)
+    # Induced
+    elon = -97.5
+    elat = 36.5
+
+    config = update_config_regions(elat, elon, config)
+    assert config['tectonic_regions']['scr']['gmpe'] == \
+        ['stable_continental_induced', 'stable_continental_nshmp2014_rlme',
+         'stable_continental_deep']
+
+    config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
+    validate_config(config, install_path)
+    # Not in a layer
+    elon = -77.5
+    elat = 36.5
+
+    config = update_config_regions(elat, elon, config)
+    assert config['tectonic_regions']['acr']['gmpe'] == \
+        ['active_crustal_nshmp2014', 'active_crustal_deep']
+    assert config['tectonic_regions']['scr']['gmpe'] == \
+        ['stable_continental_nshmp2014_rlme', 'stable_continental_deep']
 
 # def test_get_probability():
 #     x1 = 0.0

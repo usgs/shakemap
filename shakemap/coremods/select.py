@@ -8,15 +8,14 @@ from collections import OrderedDict
 
 # third party imports
 from configobj import ConfigObj
-from validate import ValidateError
 
 # local imports
 from .base import CoreModule
 import shakemap.utils.config as cfg
 from shakemap.utils.probs import get_weights
-from shakemap.utils.layers import update_config_regions
+from shakemap.utils.layers import (validate_config,
+                                   update_config_regions)
 from shakelib.rupture.origin import Origin
-from shakemap.utils.utils import path_macro_sub
 
 
 class SelectModule(CoreModule):
@@ -123,40 +122,3 @@ class SelectModule(CoreModule):
         ])
 
         zc_conf.write()
-
-
-# ##########################################################################
-# We can't use normal ConfigObj validation because there are
-# inconsistent sub-section structures (i.e., acr, scr, and volcanic
-# vs. subduction. There are also optional sections with variable
-# structure (i.e., the layers). So we do our validation and variable
-# conversion here.
-# ##########################################################################
-
-
-def validate_config(mydict, install_path):
-    """Recursively validate select.conf.
-
-    Args:
-        mydict (dict): Full or partial config dictionary.
-        install_path (str):
-
-    """
-    for key in mydict:
-        if isinstance(mydict[key], dict):
-            validate_config(mydict[key], install_path)
-            continue
-        if key == 'horizontal_buffer' or key == 'vertical_buffer':
-            mydict[key] = cfg.cfg_float(mydict[key])
-        elif key == 'gmpe':
-            mydict[key] = cfg.gmpe_list(mydict[key], 1)
-        elif key == 'min_depth' or key == 'max_depth':
-            mydict[key] = cfg.cfg_float_list(mydict[key])
-        elif key == 'layer_dir':
-            mydict[key] = path_macro_sub(mydict[key], ip=install_path)
-        elif key in ('x1', 'x2', 'p1', 'p2', 'p_kagan_default',
-                     'default_slab_depth'):
-            mydict[key] = float(mydict[key])
-        else:
-            raise ValidateError('Invalid entry in config: "%s"' % (key))
-    return

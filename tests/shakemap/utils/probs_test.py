@@ -59,6 +59,41 @@ def test_probs():
     assert gmpe_list[0] == 'subduction_interface_nshmp2014'
     assert gmpe_list[1] == 'subduction_slab_nshmp2014'
 
+    #
+    # Fake event -- subduction, but not within the Slab model
+    #
+    org.lon = -80.0
+    org.lat = 9.0
+    org.depth = 0
+    gmpe_list, weight_list, strec_results = get_weights(org, config)
+    assert weight_list == [1.0]
+    assert gmpe_list == ['subduction_crustal']
+
+    org.depth = 70.0
+    gmpe_list, weight_list, strec_results = get_weights(org, config)
+    assert weight_list == [1.0]
+    assert gmpe_list == ['subduction_slab_nshmp2014']
+
+    org.depth = 30.0
+    gmpe_list, weight_list, strec_results = get_weights(org, config)
+    assert weight_list == [1.0]
+    assert gmpe_list == ['subduction_interface_nshmp2014']
+
+    org.depth = 50.0
+    gmpe_list, weight_list, strec_results = get_weights(org, config)
+    assert weight_list[0] == 0.5 and weight_list[1] == 0.5
+    assert gmpe_list == ['subduction_interface_nshmp2014',
+                         'subduction_slab_nshmp2014']
+
+    org.depth = 20.0
+    gmpe_list, weight_list, strec_results = get_weights(org, config)
+    assert np.allclose(weight_list, [0.63, 0.3, 0.07])
+    assert gmpe_list == ['subduction_crustal',
+                         'subduction_interface_nshmp2014',
+                         'subduction_slab_nshmp2014']
+#    print(weight_list)
+#    print(gmpe_list)
+
 
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'

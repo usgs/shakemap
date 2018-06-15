@@ -89,22 +89,56 @@ def test_amps():
         os.remove(dbfile)
 
         # test global associator
+        event2 = {'id': 'ci0000001',
+                  'netid': 'ci',
+                  'network': '',
+                  'time': datetime(2000, 1, 1, 0, 0, 1).strftime(
+                     queue.TIMEFMT),
+                  'lat': 37.487,
+                  'lon': -122.027,
+                  'depth': 8.0,
+                  'locstring': 'Somewhere in California',
+                  'mag': 4.7}
         handler = AmplitudeHandler(install_path, data_path)
         handler.insertEvent(event)
+        handler.insertEvent(event2)
         handler.insertAmps(xmlfile)
         associated = handler.associateAll(pretty_print=True)
         assert len(associated) == 1
+
+        # Do an association bad event and an old event
+        count = handler.associateOne('kk1234567')
+        assert count == -1
+        count = handler.associateOne('ci0000001')
+        assert count == 0
 
         del handler
         os.remove(dbfile)
         shutil.rmtree(os.path.join(data_path, event['id']))
 
-        # test event associator
+        # test event associator; a lot of this is just for coverage of
+        # various edge cases.
+        xmlfile2 = os.path.join(homedir, '..', '..', 'data', 'ampdata',
+                                'USR_100416_20180307_180450_2.xml')
+        xmlfile3 = os.path.join(homedir, '..', '..', 'data', 'ampdata',
+                                'USR_100416_20180307_180450_3.xml')
+        xmlfile4 = os.path.join(homedir, '..', '..', 'data', 'ampdata',
+                                'USR_100416_20180307_180450_4.xml')
+        xmlfile5 = os.path.join(homedir, '..', '..', 'data', 'ampdata',
+                                'USR_100416_20180307_180450_5.xml')
+        xmlfile6 = os.path.join(homedir, '..', '..', 'data', 'ampdata',
+                                'USR_100416_20180307_180450_6.xml')
         handler = AmplitudeHandler(install_path, data_path)
         handler.insertEvent(event)
+        handler.insertEvent(event2)
         handler.insertAmps(xmlfile)
+        handler.insertAmps(xmlfile2)
+        handler.insertAmps(xmlfile3)
+        handler.insertAmps(xmlfile4)
+        handler.insertAmps(xmlfile5)
+        handler.insertAmps(xmlfile6)
         associated = handler.associateOne(event['id'], pretty_print=False)
-        assert associated == 15
+        assert associated == 30
 
         del handler
         os.remove(dbfile)

@@ -10,6 +10,46 @@ from shapely.ops import transform
 import shapely.wkt
 import numpy as np
 from openquake.hazardlib.geo.geodetic import min_distance_to_segment
+from validate import ValidateError
+
+import shakemap.utils.config as config
+from shakemap.utils.utils import path_macro_sub
+
+
+# ##########################################################################
+# We can't use normal ConfigObj validation because there are
+# inconsistent sub-section structures (i.e., acr, scr, and volcanic
+# vs. subduction. There are also optional sections with variable
+# structure (i.e., the layers). So we do our validation and variable
+# conversion here.
+# ##########################################################################
+
+def validate_config(mydict, install_path):
+    """Recursively validate select.conf.
+
+    Args:
+        mydict (dict): Full or partial config dictionary.
+        install_path (str):
+
+    """
+    for key in mydict:
+        if isinstance(mydict[key], dict):
+            validate_config(mydict[key], install_path)
+            continue
+        if key == 'horizontal_buffer' or key == 'vertical_buffer':
+            mydict[key] = config.cfg_float(mydict[key])
+        elif key == 'gmpe':
+            mydict[key] = config.gmpe_list(mydict[key], 1)
+        elif key == 'min_depth' or key == 'max_depth':
+            mydict[key] = config.cfg_float_list(mydict[key])
+        elif key == 'layer_dir':
+            mydict[key] = path_macro_sub(mydict[key], ip=install_path)
+        elif key in ('x1', 'x2', 'p1', 'p2', 'p_kagan_default',
+                     'default_slab_depth'):
+            mydict[key] = float(mydict[key])
+        else:
+            raise ValidateError('Invalid entry in config: "%s"' % (key))
+    return
 
 
 def nearest_edge(elon, elat, poly):
