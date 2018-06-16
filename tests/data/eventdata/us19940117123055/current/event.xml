@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
-<shakemap-data code_version="4.0" map_version="1">
-<earthquake id="Northridge" lat="34.213" lon="-118.537" mag="6.7" time="1994-01-17T12:30:55Z" depth="18.2" locstring="Northridge, CA" netid="us" network=""/>
-</shakemap-data>

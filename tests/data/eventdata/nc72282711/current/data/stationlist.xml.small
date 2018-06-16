@@ -1,0 +1,1141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE shakemap-data [
+<!ELEMENT shakemap-data (earthquake,stationlist)>
+<!ELEMENT stationlist (station+)>
+<!ATTLIST stationlist
+  created	CDATA	#REQUIRED
+>
+
+<!ELEMENT station (comp+)>
+<!ATTLIST station
+  code		CDATA 			#REQUIRED
+  name		CDATA 			#REQUIRED
+  insttype	CDATA 			#REQUIRED
+  lat		CDATA 			#REQUIRED
+  lon		CDATA 			#REQUIRED
+  source	(SCSN|CGS|NSMP) 	'SCSN'
+  netid		CDATA			#REQUIRED
+  commtype	(DIG|ANA) 		'DIG'
+  dist          CDATA                   '10.0'
+  loc		CDATA			''
+>
+
+<!ELEMENT comp (acc,vel,psa*)>
+<!ATTLIST comp
+  name          CDATA  #REQUIRED
+  originalname  CDATA  #IMPLIED
+>
+
+<!ELEMENT acc EMPTY>
+<!ELEMENT vel EMPTY>
+<!ELEMENT psa03 EMPTY>
+<!ELEMENT psa10 EMPTY>
+<!ELEMENT psa30 EMPTY>
+<!ATTLIST acc
+  value  CDATA         #REQUIRED
+  flag   CDATA        ''
+>
+<!ATTLIST vel
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa03
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa10
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ATTLIST psa30
+  value CDATA          #REQUIRED
+  flag  CDATA         ''
+>
+<!ELEMENT  earthquake EMPTY>
+<!ATTLIST earthquake
+  id 		ID	#REQUIRED
+  lat		CDATA	#REQUIRED
+  lon		CDATA	#REQUIRED
+  mag		CDATA	#REQUIRED
+  year          CDATA   #REQUIRED
+  month         CDATA   #REQUIRED
+  day           CDATA   #REQUIRED
+  hour          CDATA   #REQUIRED
+  minute        CDATA   #REQUIRED
+  second        CDATA   #REQUIRED
+  timezone      CDATA   #REQUIRED
+  depth		CDATA	#REQUIRED
+  type		CDATA	#REQUIRED
+  locstring	CDATA	#REQUIRED
+  pga		CDATA   #REQUIRED
+  pgv		CDATA   #REQUIRED
+  sp03		CDATA   #REQUIRED
+  sp10		CDATA   #REQUIRED
+  sp30		CDATA   #REQUIRED
+  created	CDATA	#REQUIRED
+>
+]>
+<shakemap-data code_version="3.5" map_version="38">
+<earthquake id="72282711" lat="38.21520" lon="-122.31230" mag="6.0" year="2014" month="8" day="24" hour="10" minute="20" second="44" timezone="GMT" depth="11.12" network="nc" locstring="6.4 km (3.9 mi) NW of American Canyon, CA" created="1489641910" />
+<stationlist created="1489641910">
+<station code="BK.CVS" name="Carmenet Vineyards, Sonoma, CA, USA" insttype="" lat="38.34526" lon="-122.4584" dist="11.644532" source="Berkeley Digital Seismic Network (BDSN)" netid="BK" commtype="DIG" loc="" intensity="6.3">
+<comp name="00.HNE">
+<pga value="10.7492" flag="0" />
+<pgv value="18.4501" flag="0" />
+<psa03 value="30.1000" flag="0" />
+<psa10 value="9.8500" flag="0" />
+<psa30 value="7.3100" flag="0" />
+</comp>
+<comp name="00.HNN">
+<pga value="12.2964" flag="0" />
+<pgv value="8.4940" flag="0" />
+<psa03 value="37.3000" flag="0" />
+<psa10 value="6.6300" flag="0" />
+<psa30 value="4.5100" flag="0" />
+</comp>
+<comp name="00.HNZ">
+<pga value="8.1000" flag="0" />
+<pgv value="6.1321" flag="0" />
+<psa03 value="15.1000" flag="0" />
+<psa10 value="10.1000" flag="0" />
+<psa30 value="1.9400" flag="0" />
+</comp>
+</station>
+<station code="CE.58368" name="Pinole - Adobe &amp; Pinole Valley Rd" insttype="" lat="37.9806" lon="-122.271" dist="26.831106" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="6.2">
+<comp name="--.HNZ">
+<pga value="3.9968" flag="0" />
+<pgv value="2.3320" flag="0" />
+<psa03 value="10.2965" flag="0" />
+<psa10 value="2.7466" flag="0" />
+<psa30 value="0.3579" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="20.2903" flag="0" />
+<pgv value="12.1120" flag="0" />
+<psa03 value="57.4304" flag="0" />
+<psa10 value="5.3607" flag="0" />
+<psa30 value="0.5293" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="11.1599" flag="0" />
+<pgv value="6.9450" flag="0" />
+<psa03 value="35.0880" flag="0" />
+<psa10 value="6.7702" flag="0" />
+<psa30 value="0.4943" flag="0" />
+</comp>
+</station>
+<station code="CE.58408" name="San Pablo - Van Ness &amp; San Pablo" insttype="" lat="37.9608" lon="-122.3422" dist="28.888773" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="3.7">
+<comp name="--.HNZ">
+<pga value="0.8470" flag="0" />
+<pgv value="0.5830" flag="0" />
+<psa03 value="2.1818" flag="0" />
+<psa10 value="0.8357" flag="0" />
+<psa30 value="0.2429" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="1.6873" flag="0" />
+<pgv value="1.7920" flag="0" />
+<psa03 value="3.3089" flag="0" />
+<psa10 value="3.6013" flag="0" />
+<psa30 value="0.2477" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="1.4752" flag="0" />
+<pgv value="1.4540" flag="0" />
+<psa03 value="4.1636" flag="0" />
+<psa10 value="4.0961" flag="0" />
+<psa30 value="0.2579" flag="0" />
+</comp>
+</station>
+<station code="CE.58558" name="Richmond - Hilltop Mall Grounds" insttype="" lat="37.9783" lon="-122.3298" dist="26.872695" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="4.2">
+<comp name="--.HNZ">
+<pga value="1.5372" flag="0" />
+<pgv value="1.5180" flag="0" />
+<psa03 value="5.2832" flag="0" />
+<psa10 value="2.6166" flag="0" />
+<psa30 value="0.3481" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="2.3142" flag="0" />
+<pgv value="2.2890" flag="0" />
+<psa03 value="7.7324" flag="0" />
+<psa10 value="4.3885" flag="0" />
+<psa30 value="0.4299" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="2.8464" flag="0" />
+<pgv value="2.0780" flag="0" />
+<psa03 value="8.2522" flag="0" />
+<psa10 value="3.3189" flag="0" />
+<psa30 value="0.4136" flag="0" />
+</comp>
+</station>
+<station code="CE.68034" name="Lake Berryessa - Spanish Flat" insttype="" lat="38.5381" lon="-122.2329" dist="26.790951" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="4.2">
+<comp name="--.HNZ">
+<pga value="1.0568" flag="0" />
+<pgv value="1.6160" flag="0" />
+<psa03 value="2.7266" flag="0" />
+<psa10 value="1.1896" flag="0" />
+<psa30 value="0.8177" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="2.1534" flag="0" />
+<pgv value="1.6110" flag="0" />
+<psa03 value="4.2985" flag="0" />
+<psa10 value="1.3121" flag="0" />
+<psa30 value="0.7203" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="2.9271" flag="0" />
+<pgv value="1.7920" flag="0" />
+<psa03 value="6.3028" flag="0" />
+<psa10 value="1.8494" flag="0" />
+<psa30 value="1.1996" flag="0" />
+</comp>
+</station>
+<station code="CE.68045" name="Fairfield - Pennsylvania &amp; Travis" insttype="" lat="38.2612" lon="-122.0492" dist="23.539972" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="4.5">
+<comp name="--.HN2">
+<pga value="4.1472" flag="0" />
+<pgv value="4.2700" flag="0" />
+<psa03 value="10.4189" flag="0" />
+<psa10 value="3.9586" flag="0" />
+<psa30 value="1.0714" flag="0" />
+</comp>
+<comp name="--.HNZ">
+<pga value="1.4684" flag="0" />
+<pgv value="1.7830" flag="0" />
+<psa03 value="2.7566" flag="0" />
+<psa10 value="2.7266" flag="0" />
+<psa30 value="0.6733" flag="0" />
+</comp>
+<comp name="--.HN3">
+<pga value="3.1248" flag="0" />
+<pgv value="2.9020" flag="0" />
+<psa03 value="10.6464" flag="0" />
+<psa10 value="4.3760" flag="0" />
+<psa30 value="0.5548" flag="0" />
+</comp>
+</station>
+<station code="CE.68150" name="Napa - Napa College" insttype="" lat="38.2704" lon="-122.2774" dist="4.034262" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="8.4">
+<comp name="--.HNZ">
+<pga value="20.9926" flag="0" />
+<pgv value="14.7090" flag="0" />
+<psa03 value="39.1116" flag="0" />
+<psa10 value="20.6679" flag="0" />
+<psa30 value="3.8987" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="33.5104" flag="0" />
+<pgv value="54.7680" flag="0" />
+<psa03 value="71.9754" flag="0" />
+<psa10 value="52.5071" flag="0" />
+<psa30 value="10.1190" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="35.8005" flag="0" />
+<pgv value="41.2110" flag="0" />
+<psa03 value="81.6221" flag="0" />
+<psa10 value="44.9097" flag="0" />
+<psa30 value="9.1344" flag="0" />
+</comp>
+</station>
+<station code="CE.68206" name="Crockett - Carquinez Br Geotech Array #1" insttype="" lat="38.054" lon="-122.225" dist="19.978750" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="7.0">
+<comp name="--.HNZ">
+<pga value="31.5915" flag="0" />
+<pgv value="7.4190" flag="0" />
+<psa03 value="51.8323" flag="0" />
+<psa10 value="2.3592" flag="0" />
+<psa30 value="0.3446" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="97.9024" flag="0" />
+<pgv value="22.2000" flag="0" />
+<psa03 value="132.2048" flag="0" />
+<psa10 value="8.2122" flag="0" />
+<psa30 value="0.9587" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="51.7056" flag="0" />
+<pgv value="10.4340" flag="0" />
+<psa03 value="43.1852" flag="0" />
+<psa10 value="11.4961" flag="0" />
+<psa30 value="1.0274" flag="0" />
+</comp>
+</station>
+<station code="CE.68259" name="Crockett - Carquinez Br Geotech Array #2" insttype="" lat="38.0548" lon="-122.2264" dist="19.849561" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="6.8">
+<comp name="--.HNZ">
+<pga value="17.2515" flag="0" />
+<pgv value="6.3330" flag="0" />
+<psa03 value="35.9627" flag="0" />
+<psa10 value="4.5235" flag="0" />
+<psa30 value="0.4361" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="42.3975" flag="0" />
+<pgv value="19.7790" flag="0" />
+<psa03 value="94.7926" flag="0" />
+<psa10 value="10.2140" flag="0" />
+<psa30 value="1.1971" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="17.7580" flag="0" />
+<pgv value="10.9550" flag="0" />
+<psa03 value="32.3390" flag="0" />
+<psa10 value="12.2458" flag="0" />
+<psa30 value="0.7482" flag="0" />
+</comp>
+</station>
+<station code="CE.68294" name="Vallejo - Broadway &amp; Sereno" insttype="" lat="38.1246" lon="-122.2493" dist="11.972266" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="6.7">
+<comp name="--.HNZ">
+<pga value="9.2133" flag="0" />
+<pgv value="3.9440" flag="0" />
+<psa03 value="19.4434" flag="0" />
+<psa10 value="3.6687" flag="0" />
+<psa30 value="0.6500" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="46.6013" flag="0" />
+<pgv value="12.3760" flag="0" />
+<psa03 value="64.3780" flag="0" />
+<psa10 value="5.9080" flag="0" />
+<psa30 value="0.8954" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="22.3464" flag="0" />
+<pgv value="17.3960" flag="0" />
+<psa03 value="51.2075" flag="0" />
+<psa10 value="10.7163" flag="0" />
+<psa30 value="1.0959" flag="0" />
+</comp>
+</station>
+<station code="CE.68310" name="Vallejo - Hwy 37/Napa River E Geo. Array" insttype="" lat="38.1216" lon="-122.2751" dist="11.417860" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="5.8">
+<comp name="--.HNZ">
+<pga value="7.0001" flag="0" />
+<pgv value="4.4260" flag="0" />
+<psa03 value="22.9422" flag="0" />
+<psa10 value="6.5403" flag="0" />
+<psa30 value="0.5291" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="8.0503" flag="0" />
+<pgv value="4.2290" flag="0" />
+<psa03 value="27.4906" flag="0" />
+<psa10 value="5.2632" flag="0" />
+<psa30 value="0.4766" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="10.5949" flag="0" />
+<pgv value="10.3570" flag="0" />
+<psa03 value="19.4933" flag="0" />
+<psa10 value="11.9534" flag="0" />
+<psa30 value="1.1206" flag="0" />
+</comp>
+</station>
+<station code="CE.68323" name="Benicia - Martinez Br S Geotech Array" insttype="" lat="38.0334" lon="-122.117" dist="26.917695" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="3.8">
+<comp name="--.HNZ">
+<pga value="1.0751" flag="0" />
+<pgv value="0.9660" flag="0" />
+<psa03 value="2.3117" flag="0" />
+<psa10 value="1.9543" flag="0" />
+<psa30 value="0.1382" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="1.4109" flag="0" />
+<pgv value="1.0450" flag="0" />
+<psa03 value="3.2714" flag="0" />
+<psa10 value="1.8469" flag="0" />
+<psa30 value="0.2257" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="1.8633" flag="0" />
+<pgv value="2.1070" flag="0" />
+<psa03 value="4.3885" flag="0" />
+<psa10 value="3.7337" flag="0" />
+<psa30 value="0.1767" flag="0" />
+</comp>
+</station>
+<station code="CE.68367" name="Hercules - Refugio Vly Rd &amp; Partridge" insttype="" lat="38.0043" lon="-122.262" dist="24.360181" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="5.1">
+<comp name="--.HNZ">
+<pga value="3.2957" flag="0" />
+<pgv value="1.8780" flag="0" />
+<psa03 value="10.3715" flag="0" />
+<psa10 value="2.8040" flag="0" />
+<psa30 value="0.2082" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="5.5911" flag="0" />
+<pgv value="3.8900" flag="0" />
+<psa03 value="20.7429" flag="0" />
+<psa10 value="3.3414" flag="0" />
+<psa30 value="0.4988" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="7.3987" flag="0" />
+<pgv value="5.0780" flag="0" />
+<psa03 value="23.2920" flag="0" />
+<psa10 value="5.2382" flag="0" />
+<psa30 value="0.4081" flag="0" />
+</comp>
+</station>
+<station code="CE.68433" name="Novato - Hwy 101 &amp; Rowland Way" insttype="" lat="38.0981" lon="-122.5593" dist="25.480439" source="California Strong Motion Instrumentation Program" netid="CE" commtype="DIG" loc="" intensity="4.6">
+<comp name="--.HNZ">
+<pga value="1.4923" flag="0" />
+<pgv value="0.7890" flag="0" />
+<psa03 value="1.9468" flag="0" />
+<psa10 value="0.7900" flag="0" />
+<psa30 value="0.2217" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="3.9396" flag="0" />
+<pgv value="2.7950" flag="0" />
+<psa03 value="10.9313" flag="0" />
+<psa10 value="2.4092" flag="0" />
+<psa30 value="0.2587" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="4.2945" flag="0" />
+<pgv value="2.7410" flag="0" />
+<psa03 value="7.4100" flag="0" />
+<psa10 value="1.9418" flag="0" />
+<psa30 value="0.3686" flag="0" />
+</comp>
+</station>
+<station code="NC.C040" name="Flannery Rd San Pablo" insttype="" lat="37.989658" lon="-122.314095" dist="25.571558" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="4.9">
+<comp name="01.HNN">
+<pga value="6.3248" flag="0" />
+<pgv value="3.4513" flag="0" />
+<psa03 value="16.4051" flag="0" />
+<psa10 value="5.9211" flag="0" />
+<psa30 value="1.3768" flag="0" />
+</comp>
+<comp name="01.HNE">
+<pga value="4.6208" flag="0" />
+<pgv value="3.9417" flag="0" />
+<psa03 value="15.6836" flag="0" />
+<psa10 value="3.4591" flag="0" />
+<psa30 value="0.8488" flag="0" />
+</comp>
+<comp name="01.HNZ">
+<pga value="3.7478" flag="0" />
+<pgv value="2.4570" flag="0" />
+<psa03 value="12.2609" flag="0" />
+<psa10 value="2.3048" flag="0" />
+<psa30 value="0.6795" flag="0" />
+</comp>
+</station>
+<station code="NC.C067" name="Fleetwood El Sobrante" insttype="" lat="37.976093" lon="-122.289551" dist="27.155284" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="4.8">
+<comp name="01.HNN">
+<pga value="4.9650" flag="0" />
+<pgv value="3.3889" flag="0" />
+<psa03 value="18.4153" flag="0" />
+<psa10 value="3.9289" flag="0" />
+<psa30 value="0.6179" flag="0" />
+</comp>
+<comp name="01.HNE">
+<pga value="5.7961" flag="0" />
+<pgv value="4.5276" flag="0" />
+<psa03 value="11.4024" flag="0" />
+<psa10 value="4.3513" flag="0" />
+<psa30 value="1.1637" flag="0" />
+</comp>
+<comp name="01.HNZ">
+<pga value="2.3766" flag="0" />
+<pgv value="1.8483" flag="0" />
+<psa03 value="5.7766" flag="0" />
+<psa10 value="3.4566" flag="0" />
+<psa30 value="0.5412" flag="0" />
+</comp>
+</station>
+<station code="NC.CPI" name="Pinole Ridge" insttype="" lat="37.988903" lon="-122.215607" dist="27.040316" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="5.0">
+<comp name="--.HNZ">
+<pga value="3.0613" flag="0" />
+<pgv value="2.1586" flag="0" />
+<psa03 value="8.9568" flag="0" />
+<psa10 value="3.7739" flag="0" />
+<psa30 value="0.6027" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="4.3959" flag="0" />
+<pgv value="2.9689" flag="0" />
+<psa03 value="11.5457" flag="0" />
+<psa10 value="6.2406" flag="0" />
+<psa30 value="0.7242" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="6.4926" flag="0" />
+<pgv value="5.3949" flag="0" />
+<psa03 value="23.4215" flag="0" />
+<psa10 value="8.3528" flag="0" />
+<psa30 value="0.8049" flag="0" />
+</comp>
+</station>
+<station code="NC.CSPB" name="San Pablo Ridge #2" insttype="" lat="37.957161" lon="-122.311302" dist="29.179299" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="4.2">
+<comp name="--.HNZ">
+<pga value="1.6038" flag="0" />
+<pgv value="1.1578" flag="0" />
+<psa03 value="3.1958" flag="0" />
+<psa10 value="2.1440" flag="0" />
+<psa30 value="0.4065" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="2.8761" flag="0" />
+<pgv value="2.7519" flag="0" />
+<psa03 value="4.3715" flag="0" />
+<psa10 value="5.8258" flag="0" />
+<psa30 value="0.8435" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="2.4242" flag="0" />
+<pgv value="3.3950" flag="0" />
+<psa03 value="5.5911" flag="0" />
+<psa10 value="4.5439" flag="0" />
+<psa30 value="0.8248" flag="0" />
+</comp>
+</station>
+<station code="NC.N002" name="Lynbrook Dr Fairfield" insttype="" lat="38.182613" lon="-122.140739" dist="15.651421" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="2.2">
+<comp name="01.HNN">
+<pga value="0.3546" flag="0" />
+<pgv value="1.0570" flag="0" />
+<psa03 value="0.5154" flag="0" />
+<psa10 value="0.9397" flag="0" />
+<psa30 value="0.5488" flag="0" />
+</comp>
+<comp name="01.HNE">
+<pga value="0.3690" flag="0" />
+<pgv value="1.1076" flag="0" />
+<psa03 value="0.5895" flag="0" />
+<psa10 value="0.8817" flag="0" />
+<psa30 value="0.5153" flag="0" />
+</comp>
+<comp name="01.HNZ">
+<pga value="0.1499" flag="0" />
+<pgv value="0.5887" flag="0" />
+<psa03 value="0.2002" flag="0" />
+<psa10 value="0.3846" flag="0" />
+<psa30 value="0.2518" flag="0" />
+</comp>
+</station>
+<station code="NC.N003" name="Summers Av Novato" insttype="" lat="38.108955" lon="-122.553757" dist="24.439302" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="1.0">
+<comp name="01.HNN">
+<pga value="0.0740" flag="0" />
+<pgv value="0.2457" flag="0" />
+<psa03 value="0.1452" flag="0" />
+<psa10 value="0.1171" flag="0" />
+<psa30 value="0.1120" flag="0" />
+</comp>
+<comp name="01.HNE">
+<pga value="0.0755" flag="0" />
+<pgv value="0.1357" flag="0" />
+<psa03 value="0.0922" flag="0" />
+<psa10 value="0.0976" flag="0" />
+<psa30 value="0.1015" flag="0" />
+</comp>
+<comp name="01.HNZ">
+<pga value="0.0724" flag="0" />
+<pgv value="0.2280" flag="0" />
+<psa03 value="0.0752" flag="0" />
+<psa10 value="0.1246" flag="0" />
+<psa30 value="0.1607" flag="0" />
+</comp>
+</station>
+<station code="NC.N009" name="Pressley Rd Santa Rosa" insttype="" lat="38.351433" lon="-122.631638" dist="26.518192" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="2.9">
+<comp name="01.HNN">
+<pga value="0.6777" flag="0" />
+<pgv value="1.3483" flag="0" />
+<psa03 value="0.7316" flag="0" />
+<psa10 value="1.5529" flag="0" />
+<psa30 value="0.5317" flag="0" />
+</comp>
+<comp name="01.HNE">
+<pga value="0.7745" flag="0" />
+<pgv value="1.7417" flag="0" />
+<psa03 value="0.9141" flag="0" />
+<psa10 value="2.4783" flag="0" />
+<psa30 value="0.5367" flag="0" />
+</comp>
+<comp name="01.HNZ">
+<pga value="0.3072" flag="0" />
+<pgv value="0.6608" flag="0" />
+<psa03 value="0.3831" flag="0" />
+<psa10 value="0.8326" flag="0" />
+<psa30 value="0.2281" flag="0" />
+</comp>
+</station>
+<station code="NC.N013" name="Mesquite Ct Sonoma" insttype="" lat="38.299305" lon="-122.550179" dist="19.036361" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="1.7">
+<comp name="01.HNN">
+<pga value="0.1436" flag="0" />
+<pgv value="0.4312" flag="0" />
+<psa03 value="0.1739" flag="0" />
+<psa10 value="0.2997" flag="0" />
+<psa30 value="0.3844" flag="0" />
+</comp>
+<comp name="01.HNE">
+<pga value="0.2071" flag="0" />
+<pgv value="0.6394" flag="0" />
+<psa03 value="0.2516" flag="0" />
+<psa10 value="0.3135" flag="0" />
+<psa30 value="0.4506" flag="0" />
+</comp>
+<comp name="01.HNZ">
+<pga value="0.1080" flag="0" />
+<pgv value="0.3131" flag="0" />
+<psa03 value="0.1396" flag="0" />
+<psa10 value="0.2820" flag="0" />
+<psa30 value="0.2219" flag="0" />
+</comp>
+</station>
+<station code="NC.N014" name="Marguerite Wy Petaluma" insttype="" lat="38.247311" lon="-122.609909" dist="25.074934" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="2.8">
+<comp name="01.HNN">
+<pga value="0.4379" flag="0" />
+<pgv value="0.5983" flag="0" />
+<psa03 value="0.6713" flag="0" />
+<psa10 value="1.2721" flag="0" />
+<psa30 value="0.2726" flag="0" />
+</comp>
+<comp name="01.HNE">
+<pga value="0.6429" flag="0" />
+<pgv value="2.2006" flag="0" />
+<psa03 value="0.7227" flag="0" />
+<psa10 value="1.2668" flag="0" />
+<psa30 value="0.7864" flag="0" />
+</comp>
+<comp name="01.HNZ">
+<pga value="0.1771" flag="0" />
+<pgv value="0.3815" flag="0" />
+<psa03 value="0.2698" flag="0" />
+<psa10 value="0.3954" flag="0" />
+<psa30 value="0.1467" flag="0" />
+</comp>
+</station>
+<station code="NC.N016" name="Main St Napa" insttype="" lat="38.298752" lon="-122.284843" dist="3.934480" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="7.7">
+<comp name="01.HNN">
+<pga value="64.6824" flag="0" />
+<pgv value="32.2888" flag="0" />
+<psa03 value="119.7814" flag="0" />
+<psa10 value="29.3269" flag="0" />
+<psa30 value="9.2508" flag="0" />
+</comp>
+<comp name="01.HNE">
+<pga value="31.5399" flag="0" />
+<pgv value="34.4163" flag="0" />
+<psa03 value="68.2089" flag="0" />
+<psa10 value="41.6702" flag="0" />
+<psa30 value="14.6728" flag="0" />
+</comp>
+<comp name="01.HNZ">
+<pga value="23.7778" flag="0" />
+<pgv value="17.0836" flag="0" />
+<psa03 value="56.8638" flag="0" />
+<psa10 value="33.7754" flag="0" />
+<psa30 value="7.0158" flag="0" />
+</comp>
+</station>
+<station code="NC.N019B" name="Lovall Valley Loop Rd" insttype="" lat="38.300953" lon="-122.401543" dist="6.079765" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="2.3">
+<comp name="01.HNN">
+<pga value="0.3086" flag="0" />
+<pgv value="0.6596" flag="0" />
+<psa03 value="0.4972" flag="0" />
+<psa10 value="0.2940" flag="0" />
+<psa30 value="0.3268" flag="0" />
+</comp>
+<comp name="01.HNE">
+<pga value="0.4096" flag="0" />
+<pgv value="0.7244" flag="0" />
+<psa03 value="0.5640" flag="0" />
+<psa10 value="0.2852" flag="0" />
+<psa30 value="0.3598" flag="0" />
+</comp>
+<comp name="01.HNZ">
+<pga value="0.4914" flag="0" />
+<pgv value="0.5799" flag="0" />
+<psa03 value="0.2328" flag="0" />
+<psa10 value="0.2941" flag="0" />
+<psa30 value="0.2497" flag="0" />
+</comp>
+</station>
+<station code="NC.NBRB" name="Beebe Ranch" insttype="" lat="38.260208" lon="-122.551788" dist="19.814633" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="4.6">
+<comp name="--.HNZ">
+<pga value="2.9463" flag="0" />
+<pgv value="6.2643" flag="0" />
+<psa03 value="7.3779" flag="0" />
+<psa10 value="5.2561" flag="0" />
+<psa30 value="3.6734" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="4.3833" flag="0" />
+<pgv value="10.6315" flag="0" />
+<psa03 value="12.4842" flag="0" />
+<psa10 value="6.8293" flag="0" />
+<psa30 value="7.1809" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="3.7889" flag="0" />
+<pgv value="7.5654" flag="0" />
+<psa03 value="8.0815" flag="0" />
+<psa10 value="6.7258" flag="0" />
+<psa30 value="3.3411" flag="0" />
+</comp>
+</station>
+<station code="NC.NCC" name="China Camp" insttype="" lat="38.001984" lon="-122.47467" dist="28.051318" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="3.5">
+<comp name="--.HNZ">
+<pga value="0.7704" flag="0" />
+<pgv value="0.8794" flag="0" />
+<psa03 value="1.2908" flag="0" />
+<psa10 value="0.5537" flag="0" />
+<psa30 value="0.2050" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="1.0643" flag="0" />
+<pgv value="0.8280" flag="0" />
+<psa03 value="2.3511" flag="0" />
+<psa10 value="0.7341" flag="0" />
+<psa30 value="0.2420" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="1.4804" flag="0" />
+<pgv value="0.9738" flag="0" />
+<psa03 value="4.5012" flag="0" />
+<psa10 value="0.9278" flag="0" />
+<psa30 value="0.2804" flag="0" />
+</comp>
+</station>
+<station code="NC.NGVB" name="Green Valley Rd #3" insttype="" lat="38.28043" lon="-122.21582" dist="9.534737" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="5.9">
+<comp name="--.HNZ">
+<pga value="11.3767" flag="0" />
+<pgv value="5.5451" flag="0" />
+<psa03 value="20.3472" flag="0" />
+<psa10 value="6.2145" flag="0" />
+<psa30 value="1.1360" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="8.8890" flag="0" />
+<pgv value="10.3901" flag="0" />
+<psa03 value="26.9484" flag="0" />
+<psa10 value="8.2875" flag="0" />
+<psa30 value="2.9770" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="11.2093" flag="0" />
+<pgv value="11.7432" flag="0" />
+<psa03 value="22.6137" flag="0" />
+<psa10 value="5.9086" flag="0" />
+<psa30 value="2.6074" flag="0" />
+</comp>
+</station>
+<station code="NC.NHC" name="Huichica Creek" insttype="" lat="38.21748" lon="-122.357674" dist="3.902288" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="8.4">
+<comp name="--.HNZ">
+<pga value="20.9452" flag="0" />
+<pgv value="11.1130" flag="0" />
+<psa03 value="15.2340" flag="0" />
+<psa10 value="16.6439" flag="0" />
+<psa30 value="5.9644" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="40.7344" flag="0" />
+<pgv value="54.4347" flag="0" />
+<psa03 value="107.8321" flag="0" />
+<psa10 value="34.5918" flag="0" />
+<psa30 value="16.0139" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="29.1431" flag="0" />
+<pgv value="22.4067" flag="0" />
+<psa03 value="61.4286" flag="0" />
+<psa10 value="21.8045" flag="0" />
+<psa30 value="6.8490" flag="0" />
+</comp>
+</station>
+<station code="NC.NHF" name="Hamilton Field" insttype="" lat="38.049622" lon="-122.523315" dist="26.416839" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="4.5">
+<comp name="--.HNZ">
+<pga value="1.5731" flag="0" />
+<pgv value="0.9373" flag="0" />
+<psa03 value="2.5646" flag="0" />
+<psa10 value="0.5236" flag="0" />
+<psa30 value="0.2302" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="2.9823" flag="0" />
+<pgv value="1.1494" flag="0" />
+<psa03 value="4.7788" flag="0" />
+<psa10 value="0.7723" flag="0" />
+<psa30 value="0.3183" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="3.9178" flag="0" />
+<pgv value="1.8006" flag="0" />
+<psa03 value="6.2688" flag="0" />
+<psa10 value="1.1403" flag="0" />
+<psa30 value="0.3116" flag="0" />
+</comp>
+</station>
+<station code="NC.NLH" name="Lake Herman" insttype="" lat="38.122814" lon="-122.149216" dist="17.956955" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="5.4">
+<comp name="--.HNZ">
+<pga value="3.2732" flag="0" />
+<pgv value="2.3757" flag="0" />
+<psa03 value="12.0029" flag="0" />
+<psa10 value="3.5380" flag="0" />
+<psa30 value="0.8087" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="9.1758" flag="0" />
+<pgv value="6.2485" flag="0" />
+<psa03 value="11.9948" flag="0" />
+<psa10 value="9.6515" flag="0" />
+<psa30 value="0.6873" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="9.3897" flag="0" />
+<pgv value="6.5894" flag="0" />
+<psa03 value="24.0038" flag="0" />
+<psa10 value="5.3111" flag="0" />
+<psa30 value="0.3867" flag="0" />
+</comp>
+</station>
+<station code="NC.NMI" name="Mare Island" insttype="" lat="38.076012" lon="-122.258499" dist="16.683788" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="6.8">
+<comp name="--.HNZ">
+<pga value="7.7206" flag="0" />
+<pgv value="3.7988" flag="0" />
+<psa03 value="16.6490" flag="0" />
+<psa10 value="2.5915" flag="0" />
+<psa30 value="0.4186" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="37.7430" flag="0" />
+<pgv value="19.0246" flag="0" />
+<psa03 value="91.0337" flag="0" />
+<psa10 value="7.4661" flag="0" />
+<psa30 value="1.6968" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="18.2156" flag="0" />
+<pgv value="7.3446" flag="0" />
+<psa03 value="50.2087" flag="0" />
+<psa10 value="9.6071" flag="0" />
+<psa30 value="1.0710" flag="0" />
+</comp>
+</station>
+<station code="NC.NSM" name="Sonoma Mountain" insttype="" lat="38.348785" lon="-122.57795" dist="21.849992" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="5.1">
+<comp name="--.HNZ">
+<pga value="4.2449" flag="0" />
+<pgv value="5.8926" flag="0" />
+<psa03 value="11.5927" flag="0" />
+<psa10 value="6.7520" flag="0" />
+<psa30 value="3.1896" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="7.0832" flag="0" />
+<pgv value="8.4106" flag="0" />
+<psa03 value="11.1283" flag="0" />
+<psa10 value="20.5599" flag="0" />
+<psa30 value="2.7674" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="7.1023" flag="0" />
+<pgv value="9.4269" flag="0" />
+<psa03 value="18.6525" flag="0" />
+<psa10 value="21.4489" flag="0" />
+<psa30 value="4.0656" flag="0" />
+</comp>
+</station>
+<station code="NC.NSP" name="Sears Point #2" insttype="" lat="38.200253" lon="-122.464401" dist="13.441249" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="4.8">
+<comp name="--.HNZ">
+<pga value="2.6353" flag="0" />
+<pgv value="2.3561" flag="0" />
+<psa03 value="4.4804" flag="0" />
+<psa10 value="3.2453" flag="0" />
+<psa30 value="0.8188" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="5.4528" flag="0" />
+<pgv value="6.8858" flag="0" />
+<psa03 value="10.4862" flag="0" />
+<psa10 value="7.0289" flag="0" />
+<psa30 value="2.9889" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="4.0998" flag="0" />
+<pgv value="7.7800" flag="0" />
+<psa03 value="14.2403" flag="0" />
+<psa10 value="4.9694" flag="0" />
+<psa30 value="1.8564" flag="0" />
+</comp>
+</station>
+<station code="NC.NTO" name="Tolay Creek" insttype="" lat="38.143608" lon="-122.449692" dist="14.676528" source="Northern California Seismic Network (NCSN)" netid="NC" commtype="DIG" loc="" intensity="4.5">
+<comp name="--.HNZ">
+<pga value="1.4909" flag="0" />
+<pgv value="2.0020" flag="0" />
+<psa03 value="2.2127" flag="0" />
+<psa10 value="2.3188" flag="0" />
+<psa30 value="0.6269" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="3.8412" flag="0" />
+<pgv value="5.2145" flag="0" />
+<psa03 value="5.3480" flag="0" />
+<psa10 value="7.3466" flag="0" />
+<psa30 value="2.0752" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="3.2119" flag="0" />
+<pgv value="4.2859" flag="0" />
+<psa03 value="4.7592" flag="0" />
+<psa10 value="6.8887" flag="0" />
+<psa30 value="2.0847" flag="0" />
+</comp>
+</station>
+<station code="NP.1743" name="CA:Petaluma;FS 2" insttype="" lat="38.26666" lon="-122.65759" dist="28.806851" source="United States National Strong-Motion Network" netid="NP" commtype="DIG" loc="" intensity="5.2">
+<comp name="--.HNZ">
+<pga value="2.4777" flag="0" />
+<pgv value="2.5097" flag="0" />
+<psa03 value="6.1179" flag="0" />
+<psa10 value="3.0063" flag="0" />
+<psa30 value="1.7155" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="7.5222" flag="0" />
+<pgv value="4.6030" flag="0" />
+<psa03 value="14.9385" flag="0" />
+<psa10 value="6.7233" flag="0" />
+<psa30 value="1.7118" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="3.6135" flag="0" />
+<pgv value="5.9630" flag="0" />
+<psa03 value="8.8590" flag="0" />
+<psa10 value="5.4376" flag="0" />
+<psa30 value="4.4556" flag="0" />
+</comp>
+</station>
+<station code="NP.1759" name="CA:Vallejo;FS 1" insttype="" lat="38.10767" lon="-122.25623" dist="13.426545" source="United States National Strong-Motion Network" netid="NP" commtype="DIG" loc="" intensity="6.6">
+<comp name="--.HNZ">
+<pga value="5.6896" flag="0" />
+<pgv value="3.1588" flag="0" />
+<psa03 value="11.4064" flag="0" />
+<psa10 value="3.1165" flag="0" />
+<psa30 value="0.7306" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="12.7528" flag="0" />
+<pgv value="8.9023" flag="0" />
+<psa03 value="33.8208" flag="0" />
+<psa10 value="4.5068" flag="0" />
+<psa30 value="0.8651" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="34.5500" flag="0" />
+<pgv value="17.0741" flag="0" />
+<psa03 value="69.6978" flag="0" />
+<psa10 value="18.8005" flag="0" />
+<psa30 value="1.6377" flag="0" />
+</comp>
+</station>
+<station code="NP.1760" name="CA:Benicia;FS 1" insttype="" lat="38.05415" lon="-122.15743" dist="22.914380" source="United States National Strong-Motion Network" netid="NP" commtype="DIG" loc="" intensity="4.5">
+<comp name="--.HNZ">
+<pga value="1.6323" flag="0" />
+<pgv value="0.9311" flag="0" />
+<psa03 value="5.0334" flag="0" />
+<psa10 value="2.2191" flag="0" />
+<psa30 value="0.3142" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="2.6327" flag="0" />
+<pgv value="1.6392" flag="0" />
+<psa03 value="6.0297" flag="0" />
+<psa10 value="2.2110" flag="0" />
+<psa30 value="0.4448" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="3.9036" flag="0" />
+<pgv value="3.5607" flag="0" />
+<psa03 value="9.1666" flag="0" />
+<psa10 value="7.0957" flag="0" />
+<psa30 value="0.4676" flag="0" />
+</comp>
+</station>
+<station code="NP.1764" name="CA:St. Helena;FS 17" insttype="" lat="38.5068" lon="-122.4712" dist="24.962824" source="United States National Strong-Motion Network" netid="NP" commtype="DIG" loc="" intensity="5.9">
+<comp name="--.HNZ">
+<pga value="3.3167" flag="0" />
+<pgv value="6.8383" flag="0" />
+<psa03 value="9.9074" flag="0" />
+<psa10 value="5.9904" flag="0" />
+<psa30 value="2.4663" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="10.2277" flag="0" />
+<pgv value="12.3480" flag="0" />
+<psa03 value="24.8409" flag="0" />
+<psa10 value="17.5004" flag="0" />
+<psa30 value="5.2137" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="6.2536" flag="0" />
+<pgv value="15.0885" flag="0" />
+<psa03 value="14.5283" flag="0" />
+<psa10 value="17.4624" flag="0" />
+<psa30 value="4.6499" flag="0" />
+</comp>
+</station>
+<station code="NP.1765" name="CA:Napa;FS 3" insttype="" lat="38.33046" lon="-122.31845" dist="2.603670" source="United States National Strong-Motion Network" netid="NP" commtype="DIG" loc="" intensity="9.1">
+<comp name="--.HNZ">
+<pga value="29.7889" flag="0" />
+<pgv value="45.4651" flag="0" />
+<psa03 value="34.2338" flag="0" />
+<psa10 value="29.0763" flag="0" />
+<psa30 value="19.1565" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="38.7061" flag="0" />
+<pgv value="63.7525" flag="0" />
+<psa03 value="61.0534" flag="0" />
+<psa10 value="99.4780" flag="0" />
+<psa30 value="24.0784" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="45.0651" flag="0" />
+<pgv value="86.8661" flag="0" />
+<psa03 value="57.5136" flag="0" />
+<psa10 value="102.0936" flag="0" />
+<psa30 value="19.4389" flag="0" />
+</comp>
+</station>
+<station code="NP.1768" name="Petaluma FS 1" insttype="" lat="38.233635" lon="-122.636711" dist="27.652009" source="United States National Strong-Motion Network" netid="NP" commtype="DIG" loc="" intensity="1.6">
+<comp name="--.HNZ">
+<pga value="0.1333" flag="0" />
+<pgv value="0.3830" flag="0" />
+<psa03 value="0.2383" flag="0" />
+<psa10 value="0.2248" flag="0" />
+<psa30 value="0.1339" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="0.1551" flag="0" />
+<pgv value="0.4950" flag="0" />
+<psa03 value="0.3597" flag="0" />
+<psa10 value="0.3315" flag="0" />
+<psa30 value="0.2170" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="0.1912" flag="0" />
+<pgv value="0.4072" flag="0" />
+<psa03 value="0.4610" flag="0" />
+<psa10 value="0.4704" flag="0" />
+<psa30 value="0.1838" flag="0" />
+</comp>
+</station>
+<station code="NP.1813" name="Rodeo FS 75 3rd St" insttype="" lat="38.034332" lon="-122.270164" dist="20.951510" source="United States National Strong-Motion Network" netid="NP" commtype="DIG" loc="" intensity="5.7">
+<comp name="--.HNZ">
+<pga value="3.1475" flag="0" />
+<pgv value="1.5071" flag="0" />
+<psa03 value="10.8744" flag="0" />
+<psa10 value="1.1905" flag="0" />
+<psa30 value="0.9342" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="6.7918" flag="0" />
+<pgv value="3.9569" flag="0" />
+<psa03 value="21.7372" flag="0" />
+<psa10 value="4.6075" flag="0" />
+<psa30 value="1.3242" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="12.2951" flag="0" />
+<pgv value="7.8365" flag="0" />
+<psa03 value="37.5060" flag="0" />
+<psa10 value="5.0829" flag="0" />
+<psa30 value="0.6158" flag="0" />
+</comp>
+</station>
+<station code="NP.1829" name="Sonoma FS 1 2nd St W" insttype="" lat="38.290272" lon="-122.46125" dist="11.430087" source="United States National Strong-Motion Network" netid="NP" commtype="DIG" loc="" intensity="6.8">
+<comp name="--.HNZ">
+<pga value="5.7939" flag="0" />
+<pgv value="4.8026" flag="0" />
+<psa03 value="14.9752" flag="0" />
+<psa10 value="6.4473" flag="0" />
+<psa30 value="0.9371" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="14.2655" flag="0" />
+<pgv value="16.8924" flag="0" />
+<psa03 value="26.5991" flag="0" />
+<psa10 value="23.9876" flag="0" />
+<psa30 value="3.3265" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="10.8189" flag="0" />
+<pgv value="24.9296" flag="0" />
+<psa03 value="15.7577" flag="0" />
+<psa10 value="35.4301" flag="0" />
+<psa30 value="5.0286" flag="0" />
+</comp>
+</station>
+<station code="NP.1835" name="Santa Rosa FS 7" insttype="" lat="38.442097" lon="-122.606796" dist="28.065476" source="United States National Strong-Motion Network" netid="NP" commtype="DIG" loc="" intensity="2.5">
+<comp name="--.HNZ">
+<pga value="0.2666" flag="0" />
+<pgv value="0.7252" flag="0" />
+<psa03 value="0.3084" flag="0" />
+<psa10 value="1.0524" flag="0" />
+<psa30 value="0.2630" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="0.3244" flag="0" />
+<pgv value="0.9572" flag="0" />
+<psa03 value="0.4016" flag="0" />
+<psa10 value="0.9663" flag="0" />
+<psa30 value="0.4067" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="0.4852" flag="0" />
+<pgv value="1.6260" flag="0" />
+<psa03 value="0.5875" flag="0" />
+<psa10 value="1.2978" flag="0" />
+<psa30 value="0.8813" flag="0" />
+</comp>
+</station>
+<station code="NP.1847" name="Contra Costa FS 14 Martinez" insttype="" lat="38.01297" lon="-122.134171" dist="27.825219" source="United States National Strong-Motion Network" netid="NP" commtype="DIG" loc="" intensity="5.6">
+<comp name="--.HNZ">
+<pga value="2.9158" flag="0" />
+<pgv value="2.8900" flag="0" />
+<psa03 value="7.6961" flag="0" />
+<psa10 value="4.0413" flag="0" />
+<psa30 value="0.2880" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="10.0495" flag="0" />
+<pgv value="8.7220" flag="0" />
+<psa03 value="16.7823" flag="0" />
+<psa10 value="9.9841" flag="0" />
+<psa30 value="0.6247" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="9.9964" flag="0" />
+<pgv value="7.6284" flag="0" />
+<psa03 value="22.1361" flag="0" />
+<psa10 value="9.1128" flag="0" />
+<psa30 value="0.4582" flag="0" />
+</comp>
+</station>
+<station code="NP.1848" name="Glen Ellen FS Arnold" insttype="" lat="38.367432" lon="-122.524033" dist="17.879750" source="United States National Strong-Motion Network" netid="NP" commtype="DIG" loc="" intensity="2.2">
+<comp name="--.HNZ">
+<pga value="0.1752" flag="0" />
+<pgv value="0.3254" flag="0" />
+<psa03 value="0.1996" flag="0" />
+<psa10 value="0.3245" flag="0" />
+<psa30 value="0.1609" flag="0" />
+</comp>
+<comp name="--.HNN">
+<pga value="0.3239" flag="0" />
+<pgv value="1.0862" flag="0" />
+<psa03 value="0.3577" flag="0" />
+<psa10 value="0.7969" flag="0" />
+<psa30 value="0.6342" flag="0" />
+</comp>
+<comp name="--.HNE">
+<pga value="0.3816" flag="0" />
+<pgv value="0.9872" flag="0" />
+<psa03 value="0.4272" flag="0" />
+<psa10 value="0.6206" flag="0" />
+<psa30 value="0.4763" flag="0" />
+</comp>
+</station>
+
+</stationlist>
+</shakemap-data>
