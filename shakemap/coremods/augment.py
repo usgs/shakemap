@@ -210,7 +210,10 @@ class AugmentModule(CoreModule):
             faultfiles = glob.glob(os.path.join(datadir, '*_fault.txt'))
             if len(faultfiles):
                 rupturefile = faultfiles[0]
-        if os.path.isfile(rupturefile) or eventxml is not None:
+            else:
+                rupturefile = None
+        if (rupturefile and os.path.isfile(rupturefile)) \
+                or eventxml is not None:
             self.logger.debug('Updating rupture/origin information.')
             shake_data.updateRupture(
                 eventxml=eventxml, rupturefile=rupturefile)
