@@ -18,8 +18,8 @@ fi
 
 source $prof
 
-echo "Path:"
-echo $PATH
+# echo "Path:"
+# echo $PATH
 
 VENV=shakemap
 
@@ -41,6 +41,11 @@ reset=1
 # create a matplotlibrc file with the non-interactive backend "Agg" in it.
 if [ ! -d "$matplotlibdir" ]; then
     mkdir -p $matplotlibdir
+    # if mkdir fails, bow out gracefully
+    if [ $? -ne 0 ];then
+        echo "Failed to create matplotlib configuration file. Exiting."
+        exit 1
+    fi
 fi
 matplotlibrc=$matplotlibdir/matplotlibrc
 if [ ! -e "$matplotlibrc" ]; then
@@ -65,19 +70,31 @@ if [ $? -ne 0 ]; then
     echo "No conda detected, installing miniconda..."
 
     curl $mini_conda_url -o miniconda.sh;
+
+    # if curl fails, bow out gracefully
+    if [ $? -ne 0 ];then
+        echo "Failed to create download miniconda installer shell script. Exiting."
+        exit 1
+    fi
+    
     echo "Install directory: $HOME/miniconda"
 
     bash miniconda.sh -f -b -p $HOME/miniconda
 
-    # Need this to get conda into path
+    # if miniconda.sh fails, bow out gracefully
+    if [ $? -ne 0 ];then
+        echo "Failed to run miniconda installer shell script. Exiting."
+        exit 1
+    fi
+    
     . $HOME/miniconda/etc/profile.d/conda.sh
 else
     echo "conda detected, installing $VENV environment..."
 fi
 
-echo "PATH:"
-echo $PATH
-echo ""
+# echo "PATH:"
+# echo $PATH
+# echo ""
 
 
 # Choose an environment file based on platform
@@ -115,12 +132,30 @@ fi
 echo "Activating the $VENV virtual environment"
 conda activate $VENV
 
-# This package
-echo "Installing shakemap..."
-pip install -e .
+# if conda activate fails, bow out gracefully
+if [ $? -ne 0 ];then
+    echo "Failed to activate ${VENV} conda environment. Exiting."
+    exit 1
+fi
 
-# Install default profile
-#python bin/sm_profile -c default -a
+# upgrade pip, mostly so pip doesn't complain about not being new...
+pip install --upgrade pip
+
+# if pip upgrade fails, complain but try to keep going
+if [ $? -ne 0 ];then
+    echo "Failed to upgrade pip, trying to continue..."
+    exit 1
+fi
+
+# This package
+echo "Installing ${VENV}..."
+pip install --no-deps -e .
+
+# if pip install fails, bow out gracefully
+if [ $? -ne 0 ];then
+    echo "Failed to pip install this package. Exiting."
+    exit 1
+fi
 
 # Tell the user they have to activate this environment
 echo "Type 'conda activate $VENV' to use this new virtual environment."
