@@ -16,14 +16,18 @@ import numpy as np
 # local imports
 from shakemap.coremods import transfer
 from shakemap.utils.config import get_config_paths
-from shakemap.utils.utils import (get_network_name,
-                                  migrate_gmpe,
-                                  set_gmpe)
-from shakemap.utils.amps import AmplitudeHandler
+from shakemap.utils.utils import (
+    get_network_name,
+    migrate_gmpe,
+    set_gmpe
+)
+# from shakemap.utils.amps import AmplitudeHandler
 from shakelib.rupture.origin import read_event_file, write_event_file, Origin
-from shakelib.rupture.factory import (text_to_json,
-                                      rupture_from_dict_and_origin,
-                                      get_rupture)
+from shakelib.rupture.factory import (
+    text_to_json,
+    rupture_from_dict_and_origin,
+    get_rupture
+)
 from shakelib.utils.utils import get_extent
 from impactutils.time.ancient_time import HistoricTime
 
@@ -41,8 +45,8 @@ def get_parser():
     -name "info.json" -o -name "*.conf" | tar -czvf ~/sm35_inputs.tgz -T -
 
     This program takes a subset of the ShakeMap 3.5 input data and the
-    info.json file
-    and uses those files to create the corresponding ShakeMap 4.0 input data.
+    info.json file and uses those files to create the corresponding ShakeMap 4
+    input data.
 
     Files used:
       - *_dat.xml data files in XML format. These are unchanged in
@@ -117,9 +121,9 @@ def main(args):
     module_conf = ConfigObj(modulefile)
 
     # We're going to be inserting these events in the database later
-    handler = AmplitudeHandler(install_path, data_path)
+    # handler = AmplitudeHandler(install_path, data_path)
 
-    alleventids = []
+    event_ids = []
     networks = {}
 
     # accumulate a list of errors so we can print them all at the end.
@@ -129,28 +133,33 @@ def main(args):
 
     # loop over events in the input tarball
     tarball = tarfile.open(args.tarfile, mode='r:gz')
+
     for member in tarball.getnames():
+        # .getnames() returns all files in the tarball.
+
         if 'save' in member:
             continue
+
         parts = member.split('/')
         filename = parts[-1]
-        eventid = parts[-3]
-        if eventid not in alleventids:
-            # print('Processing event %s...' % eventid)
-            sys.stdout.write('.')
-            sys.stdout.flush()
-            alleventids.append(eventid)
+        event_id = parts[1]
 
-        if not eventid.startswith(netid):
+        if not event_id.startswith(netid):
             if args.ignore_naked_ids:
-                # print('Skipping naked ID %s.' % eventid)
+                # print('Skipping naked ID %s.' % event_id)
                 continue
             else:
-                eventid = netid + eventid
+                event_id = netid + event_id
 
-        event_dir = os.path.join(data_path, eventid, 'current')
+        if event_id not in event_ids:
+            # print('Processing event %s...' % event_id)
+            sys.stdout.write('.')
+            sys.stdout.flush()
+            event_ids.append(event_id)
+
+        event_dir = os.path.join(data_path, event_id, 'current')
         if not os.path.isdir(event_dir):
-            event_dir = create_event_directory(eventid, data_path)
+            event_dir = create_event_directory(event_id, data_path)
 
         if filename.endswith('.conf'):
             cfg_errors, tconversions = parse_config(
@@ -174,26 +183,28 @@ def main(args):
                 skip_settings=args.skip_settings)
             errors += info_errors
             conversions.update(info_conversions)
-            handler.insertEvent(edict)
+            # handler.insertEvent(edict)
         elif filename == 'source.txt':
             _extract_file(member, tarball, filename, event_dir)
         else:
             errors.append('Unknown input file %s for event %s' %
-                          (filename, eventid))
+                          (filename, event_id))
 
     tarball.close()
     sys.stdout.write('\n')
 
     # go back through the data, convert fault.txt files into json rupture
     # format, also make sure we have all required components
-    for eventid in alleventids:
-        event_dir = os.path.join(data_path, eventid, 'current')
+    print('Converting *_fault.txt files to geojson files...')
+    for event_id in event_ids:
+        print('    %s' % event_id)
+        event_dir = os.path.join(data_path, event_id, 'current')
         rupt_error = make_rupture(event_dir)
         parse_options(event_dir)
         if rupt_error is not None:
             errors.append(rupt_error)
 
-    print('%i event directories written.' % len(alleventids))
+    print('%i event directories written.' % len(event_ids))
     print('The following errors or warnings were detected:')
     for error in errors:
         print('\t"%s"' % error)
@@ -263,24 +274,24 @@ def parse_run(member, tarball, filename, event_dir):
     float_options = ['lonspan', 'latspan', 'lonoff', 'latoff', 'llratio']
     bool_options = ['nooutlier', 'nobias']
     for line in open(filename, 'rt').readlines():
-            if line.find('grind') > -1:
-                parts = line.split()[1:]
-                for i in range(0, len(parts)):
-                    part = parts[i].strip()
-                    isfloat = re.search(r"[+-]?\d+(?:\.\d+)?", part) \
-                        is not None
-                    if part.startswith('-') and not isfloat:
-                        part = part.replace('-', '')
-                        if part == '-directivity':
-                            fmt = 'Unsupported directivity flag set for ' \
-                                  'event %s.'
-                            errors.append(fmt % event_dir)
-                        elif part in float_options:
-                            options[part] = float(parts[i+1])
-                        elif part in bool_options:
-                            options[part] = True
-                        else:
-                            continue
+        if line.find('grind') > -1:
+            parts = line.split()[1:]
+            for i in range(0, len(parts)):
+                part = parts[i].strip()
+                isfloat = re.search(r"[+-]?\d+(?:\.\d+)?", part) \
+                    is not None
+                if part.startswith('-') and not isfloat:
+                    part = part.replace('-', '')
+                    if part == '-directivity':
+                        fmt = 'Unsupported directivity flag set for ' \
+                              'event %s.'
+                        errors.append(fmt % event_dir)
+                    elif part in float_options:
+                        options[part] = float(parts[i+1])
+                    elif part in bool_options:
+                        options[part] = True
+                    else:
+                        continue
     # Since we don't know hypocenter information at this stage, we're going to
     # stash this dictionary in the event directory as JSON and parse it at
     # the end.
@@ -298,9 +309,9 @@ def make_rupture(event_dir):
     fault_file = fault_files[0]
     xmlfile = os.path.join(event_dir, 'event.xml')
     eqdict = read_event_file(xmlfile)
-    jdict = text_to_json(fault_file, new_format=False)
-    origin = Origin(eqdict)
     try:
+        jdict = text_to_json(fault_file, new_format=False)
+        origin = Origin(eqdict)
         rupt = rupture_from_dict_and_origin(jdict, origin)
     except Exception as e:
         return 'Error parsing fault file from %s. "%s"' % (event_dir, str(e))
@@ -387,15 +398,17 @@ def parse_info(event_dir, tarball, member, netid, networks,
     write_event_file(edict, xmlfile)
 
     # get the above info as an amps.db event dictionary
-    eqdict = {'id': edict['id'],
-              'netid': edict['netid'],
-              'network': edict['network'],
-              'time': timestring[0:19]+'.000Z',
-              'lat': edict['lat'],
-              'lon': edict['lon'],
-              'depth': edict['depth'],
-              'mag': edict['mag'],
-              'locstring': edict['locstring']}
+    eqdict = {
+        'id': edict['id'],
+        'netid': edict['netid'],
+        'network': edict['network'],
+        'time': timestring[0:19]+'.000Z',
+        'lat': edict['lat'],
+        'lon': edict['lon'],
+        'depth': edict['depth'],
+        'mag': edict['mag'],
+        'locstring': edict['locstring']
+    }
 
     model = ConfigObj()
     if not skip_settings:
@@ -475,8 +488,8 @@ def parse_info(event_dir, tarball, member, netid, networks,
     return (eqdict, errors, conversions)
 
 
-def create_event_directory(eventid, data_path):
-    event_dir = os.path.join(data_path, eventid, 'current')
+def create_event_directory(event_id, data_path):
+    event_dir = os.path.join(data_path, event_id, 'current')
     if os.path.isdir(event_dir):
         return None
     os.makedirs(event_dir)
