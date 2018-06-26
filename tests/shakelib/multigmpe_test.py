@@ -376,7 +376,6 @@ def test_from_config_set_of_sets_3_sec():
 
     # Compute "by hand"
     ASK14 = AbrahamsonEtAl2014()
-    C03 = Campbell2003MwNSHMP2008()
     Pea11 = PezeshkEtAl2011NEHRPBC()
 
     rctx = RuptureContext()
@@ -1329,7 +1328,9 @@ def test_multigmpe_get_mean_stddevs():
     # Check a GMPE that doens't have PGV but does have site
     # --------------------------------------------------------------------------
     gmpes = [ZhaoEtAl2006Asc()]
-    stddev_types = [const.StdDev.TOTAL]
+    stddev_types = [const.StdDev.TOTAL,
+                    const.StdDev.INTER_EVENT,
+                    const.StdDev.INTRA_EVENT]
     wts = [1.0]
     mgmpe = MultiGMPE.from_list(gmpes, wts)
     lnmu, lnsd = mgmpe.get_mean_and_stddevs(
@@ -1366,11 +1367,39 @@ def test_multigmpe_get_mean_stddevs():
              0.90916004,  0.90916004],
             [0.90916004,  0.90916004,  0.90916004,  0.90916004,  0.90916004,
              0.90916004,  0.90916004]])
+    lnsdd_inter = np.array(
+      [[0.338,  0.338,  0.338,  0.338,  0.338,  0.338,  0.338],
+       [0.338,  0.338,  0.338,  0.338,  0.338,  0.338,  0.338],
+       [0.338,  0.338,  0.338,  0.338,  0.338,  0.338,  0.338],
+       [0.338,  0.338,  0.338,  0.338,  0.338,  0.338,  0.338],
+       [0.338,  0.338,  0.338,  0.338,  0.338,  0.338,  0.338],
+       [0.338,  0.338,  0.338,  0.338,  0.338,  0.338,  0.338],
+       [0.338,  0.338,  0.338,  0.338,  0.338,  0.338,  0.338]])
+    lnsdd_intra = np.array(
+      [[0.84399525,  0.84399525,  0.84399525,  0.84399525,  0.84399525,
+        0.84399525,  0.84399525],
+       [0.84399525,  0.84399525,  0.84399525,  0.84399525,  0.84399525,
+        0.84399525,  0.84399525],
+       [0.84399525,  0.84399525,  0.84399525,  0.84399525,  0.84399525,
+        0.84399525,  0.84399525],
+       [0.84399525,  0.84399525,  0.84399525,  0.84399525,  0.84399525,
+        0.84399525,  0.84399525],
+       [0.84399525,  0.84399525,  0.84399525,  0.84399525,  0.84399525,
+        0.84399525,  0.84399525],
+       [0.84399525,  0.84399525,  0.84399525,  0.84399525,  0.84399525,
+        0.84399525,  0.84399525],
+       [0.84399525,  0.84399525,  0.84399525,  0.84399525,  0.84399525,
+        0.84399525,  0.84399525]])
 
     np.testing.assert_allclose(lnmu, lnmud)
     np.testing.assert_allclose(lnsd[0], lnsdd)
+    np.testing.assert_allclose(lnsd[1], lnsdd_inter)
+    np.testing.assert_allclose(lnsd[2], lnsdd_intra)
+    np.testing.assert_allclose(lnsd[0], np.sqrt(lnsd[1]**2 + lnsd[2]**2))
 #    print(repr(lnmu))
 #    print(repr(lnsd[0]))
+#    print(repr(lnsd[1]))
+#    print(repr(lnsd[2]))
 
 
 def test_multigmpe_exceptions():
@@ -1425,8 +1454,6 @@ def test_multigmpe_exceptions():
         gmpelist = ['']
         wts = [0.5, 0.5]
         fgmpes, fwts = filter_gmpe_list(gmpelist, wts, imt=imt.SA(1.0))
-        per = imt.SA(1.0).period
-
 
     # Check for exception due to weights:
     with pytest.raises(Exception) as a:
