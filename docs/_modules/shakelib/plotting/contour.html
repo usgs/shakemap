@@ -169,6 +169,10 @@
         <span class="c1"># Upper and lower decades</span>
         <span class="n">lower_dec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dmin</span><span class="p">))</span>
         <span class="n">upper_dec</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">log10</span><span class="p">(</span><span class="n">dmax</span><span class="p">))</span>
+        <span class="c1"># Don&#39;t make a crazy number of contours if there are very small</span>
+        <span class="c1"># values in the input</span>
+        <span class="k">if</span> <span class="n">lower_dec</span> <span class="o">&lt;</span> <span class="n">upper_dec</span> <span class="o">-</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">lower_dec</span> <span class="o">=</span> <span class="n">upper_dec</span> <span class="o">-</span> <span class="mi">4</span>
 
         <span class="c1"># Array of decades</span>
         <span class="n">decades</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">lower_dec</span><span class="p">,</span> <span class="n">upper_dec</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>

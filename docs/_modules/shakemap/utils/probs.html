@@ -71,15 +71,27 @@
 
     <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">rdict</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;subduction&#39;</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;crustal&#39;</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;crustal&#39;</span> <span class="ow">in</span> <span class="n">probs</span> <span class="ow">or</span> <span class="s1">&#39;subduction_0&#39;</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;crustal&#39;</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">:</span>
+                    <span class="n">topkey</span> <span class="o">=</span> <span class="s1">&#39;crustal&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">topkey</span> <span class="o">=</span> <span class="s1">&#39;subduction_0&#39;</span>
                 <span class="n">gmpelist</span> <span class="o">+=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;crustal&#39;</span><span class="p">][</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]</span>
-                <span class="n">weightlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="s1">&#39;crustal&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="s1">&#39;interface&#39;</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">:</span>
+                <span class="n">weightlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="n">topkey</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s1">&#39;interface&#39;</span> <span class="ow">in</span> <span class="n">probs</span> <span class="ow">or</span> <span class="s1">&#39;subduction_1&#39;</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;interface&#39;</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">:</span>
+                    <span class="n">midkey</span> <span class="o">=</span> <span class="s1">&#39;interface&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">midkey</span> <span class="o">=</span> <span class="s1">&#39;subduction_1&#39;</span>
                 <span class="n">gmpelist</span> <span class="o">+=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;interface&#39;</span><span class="p">][</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]</span>
-                <span class="n">weightlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="s1">&#39;interface&#39;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="s1">&#39;intraslab&#39;</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">:</span>
+                <span class="n">weightlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="n">midkey</span><span class="p">])</span>
+            <span class="k">if</span> <span class="s1">&#39;intraslab&#39;</span> <span class="ow">in</span> <span class="n">probs</span> <span class="ow">or</span> <span class="s1">&#39;subduction_2&#39;</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;intraslab&#39;</span> <span class="ow">in</span> <span class="n">probs</span><span class="p">:</span>
+                    <span class="n">botkey</span> <span class="o">=</span> <span class="s1">&#39;intraslab&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">botkey</span> <span class="o">=</span> <span class="s1">&#39;subduction_2&#39;</span>
                 <span class="n">gmpelist</span> <span class="o">+=</span> <span class="n">rdict</span><span class="p">[</span><span class="s1">&#39;intraslab&#39;</span><span class="p">][</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]</span>
-                <span class="n">weightlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="s1">&#39;intraslab&#39;</span><span class="p">])</span>
+                <span class="n">weightlist</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">probs</span><span class="p">[</span><span class="n">botkey</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">region</span> <span class="o">+</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span>
             <span class="n">keylist</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="n">pat</span><span class="o">.</span><span class="n">search</span><span class="p">,</span> <span class="n">all_keylist</span><span class="p">)))</span>
@@ -152,12 +164,22 @@
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">subduction_probs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">subduction_probs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction&#39;</span><span class="p">]</span>
+
     <span class="k">else</span><span class="p">:</span>
         <span class="n">subduction_probs</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s1">&#39;crustal&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
             <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
             <span class="s1">&#39;intraslab&#39;</span><span class="p">:</span> <span class="mf">0.0</span>
         <span class="p">}</span>
+
+    <span class="c1"># we may have keys for subduction_0, 1, 2 already - the results</span>
+    <span class="c1"># we just got should override those.</span>
+    <span class="k">if</span> <span class="s1">&#39;subduction_0&#39;</span> <span class="ow">in</span> <span class="n">region_probs</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_0&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;subduction_1&#39;</span> <span class="ow">in</span> <span class="n">region_probs</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_1&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="s1">&#39;subduction_2&#39;</span> <span class="ow">in</span> <span class="n">region_probs</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_2&#39;</span><span class="p">]</span>
 
     <span class="n">region_probs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">subduction_probs</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">region_probs</span><span class="p">,</span> <span class="n">strec_results</span><span class="p">)</span></div>

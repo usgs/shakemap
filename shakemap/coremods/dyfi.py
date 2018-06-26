@@ -14,9 +14,12 @@ import numpy as np
 from .base import CoreModule
 from shakemap.utils.config import get_config_paths
 
-TIMEWINDOW = 60  # number of seconds to search for event matching origin time
-DEGWINDOW = 0.1  # distance in decimal degrees to search for event matching coordinates
-MAGWINDOW = 0.2  # +/- magnitude threshold to search for matching events
+# number of seconds to search for event matching origin time
+TIMEWINDOW = 60
+# distance in decimal degrees to search for event matching coordinates
+DEGWINDOW = 0.1
+# +/- magnitude threshold to search for matching events
+MAGWINDOW = 0.2
 
 required_columns = ['station', 'lat', 'lon', 'network']
 channel_groups = [['[a-z]{2}e', '[a-z]{2}n', '[a-z]{2}z'],
@@ -69,7 +72,8 @@ class DYFIModule(CoreModule):
             detail = get_event_by_id(self._eventid)
         except Exception as e:
             fmt = 'Could not retrieve DYFI data for %s - error "%s"'
-            raise Exception(fmt % (self._eventid, str(e)))
+            self.logger.error(fmt % (self._eventid, str(e)))
+            return
 
         dataframe, msg = _get_dyfi_dataframe(detail)
         if dataframe is None:
@@ -106,14 +110,16 @@ def _get_dyfi_dataframe(detail_or_url):
     # get 10km data set, if exists
     if len(dyfi.getContentsMatching('dyfi_geo_10km.geojson')):
         bytes_10k, _ = dyfi.getContentBytes('dyfi_geo_10km.geojson')
-        df_10k = _parse_geocoded(bytes_10k)
-        df_10k = df_10k[df_10k['nresp'] >= MIN_RESPONSES]
+        tmp_df = _parse_geocoded(bytes_10k)
+        if tmp_df is not None:
+            df_10k = tmp_df[tmp_df['nresp'] >= MIN_RESPONSES]
 
     # get 1km data set, if exists
     if len(dyfi.getContentsMatching('dyfi_geo_1km.geojson')):
         bytes_1k, _ = dyfi.getContentBytes('dyfi_geo_1km.geojson')
-        df_1k = _parse_geocoded(bytes_1k)
-        df_1k = df_1k[df_1k['nresp'] >= MIN_RESPONSES]
+        tmp_df = _parse_geocoded(bytes_1k)
+        if tmp_df is not None:
+            df_1k = tmp_df[tmp_df['nresp'] >= MIN_RESPONSES]
 
     if len(df_1k) >= len(df_10k):
         df = df_1k
@@ -128,7 +134,8 @@ def _get_dyfi_dataframe(detail_or_url):
         # the dataframe we want has columns:
         # 'intensity', 'distance', 'lat', 'lon', 'station', 'nresp'
         # the cdi geo file has:
-        # Geocoded box,CDI,No. of responses,Hypocentral distance,Latitude,Longitude,Suspect?,City,State
+        # Geocoded box, CDI, No. of responses, Hypocentral distance,
+        # Latitude, Longitude, Suspect?, City, State
 
         # download the text file, turn it into a dataframe
         bytes_geo, _ = dyfi.getContentBytes('cdi_geo.txt')
@@ -144,7 +151,7 @@ def _get_dyfi_dataframe(detail_or_url):
             df = df.rename(index=str, columns=DYFI_COLUMNS_REPLACE)
         df = df.drop(['Suspect?', 'City', 'State'], axis=1)
         df = df[df['nresp'] >= MIN_RESPONSES]
-        
+
     df['netid'] = 'DYFI'
     df['source'] = "USGS (Did You Feel It?)"
     return (df, '')
@@ -153,6 +160,8 @@ def _get_dyfi_dataframe(detail_or_url):
 def _parse_geocoded(bytes_data):
     text_data = bytes_data.decode('utf-8')
     jdict = json.loads(text_data)
+    if len(jdict['features']) == 0:
+        return None
     prop_columns = list(jdict['features'][0]['properties'].keys())
     columns = ['lat', 'lon'] + prop_columns
     arrays = [[] for col in columns]

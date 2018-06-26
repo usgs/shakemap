@@ -135,6 +135,10 @@ def getContourLevels(dmin, dmax, itype='log'):
         # Upper and lower decades
         lower_dec = np.floor(np.log10(dmin))
         upper_dec = np.ceil(np.log10(dmax))
+        # Don't make a crazy number of contours if there are very small
+        # values in the input
+        if lower_dec < upper_dec - 4:
+            lower_dec = upper_dec - 4
 
         # Array of decades
         decades = np.arange(lower_dec, upper_dec + 1)

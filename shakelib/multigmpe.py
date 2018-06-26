@@ -135,7 +135,13 @@ class MultiGMPE(GMPE):
                     psa10 = psa10 + lamps
                 nh82 = NewmarkHall1982()
                 lmean = nh82.convertAmps('PSA10', 'PGV', psa10)
-                lsd = nh82.convertSigmas('PSA10', 'PGV', psa10sd[0])
+                # Put the extra sigma from NH82 into intra event and total
+                lsd = []
+                for j in range(len(lnsd2)):
+                    if stddev_types[j] == const.StdDev.INTER_EVENT:
+                        lsd.append(psa10sd[j])
+                        continue
+                    lsd.append(nh82.convertSigmas('PSA10', 'PGV', psa10sd[j]))
             else:
                 if self.HAS_SITE[i] is True:
                     lmean, lsd = gmpe.get_mean_and_stddevs(
