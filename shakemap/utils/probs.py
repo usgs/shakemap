@@ -37,15 +37,27 @@ def get_weights(origin, config):
 
     for region, rdict in config['tectonic_regions'].items():
         if region == 'subduction':
-            if 'crustal' in probs:
+            if 'crustal' in probs or 'subduction_0' in probs:
+                if 'crustal' in probs:
+                    topkey = 'crustal'
+                else:
+                    topkey = 'subduction_0'
                 gmpelist += rdict['crustal']['gmpe']
-                weightlist.append(probs['crustal'])
-            if 'interface' in probs:
+                weightlist.append(probs[topkey])
+            if 'interface' in probs or 'subduction_1' in probs:
+                if 'interface' in probs:
+                    midkey = 'interface'
+                else:
+                    midkey = 'subduction_1'
                 gmpelist += rdict['interface']['gmpe']
-                weightlist.append(probs['interface'])
-            if 'intraslab' in probs:
+                weightlist.append(probs[midkey])
+            if 'intraslab' in probs or 'subduction_2' in probs:
+                if 'intraslab' in probs:
+                    botkey = 'intraslab'
+                else:
+                    botkey = 'subduction_2'
                 gmpelist += rdict['intraslab']['gmpe']
-                weightlist.append(probs['intraslab'])
+                weightlist.append(probs[botkey])
         else:
             pat = re.compile(region + '_')
             keylist = sorted(list(filter(pat.search, all_keylist)))
@@ -118,12 +130,22 @@ def get_probs(origin, config):
         )
         for key, value in subduction_probs.items():
             subduction_probs[key] = value * region_probs['subduction']
+
     else:
         subduction_probs = {
             'crustal': 0.0,
             'interface': 0.0,
             'intraslab': 0.0
         }
+
+    # we may have keys for subduction_0, 1, 2 already - the results
+    # we just got should override those.
+    if 'subduction_0' in region_probs:
+        del region_probs['subduction_0']
+    if 'subduction_1' in region_probs:
+        del region_probs['subduction_1']
+    if 'subduction_2' in region_probs:
+        del region_probs['subduction_2']
 
     region_probs.update(subduction_probs)
     return (region_probs, strec_results)
