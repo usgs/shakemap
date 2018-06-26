@@ -32,7 +32,7 @@
           <div class="body" role="main">
             
   <h1>Source code for shakemap.utils.amps</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span></span><span class="c1"># import sys</span>
 <span class="kn">import</span> <span class="nn">sqlite3</span>
 <span class="kn">import</span> <span class="nn">os.path</span>
 <span class="kn">import</span> <span class="nn">re</span>
@@ -588,7 +588,7 @@
         <span class="sd">&quot;&quot;&quot;Destructor.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_connection&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_disconnect</span><span class="p">()</span>
 
 <div class="viewcode-block" id="AmplitudeHandler.insertAmps"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.amps.html#shakemap.utils.amps.AmplitudeHandler.insertAmps">[docs]</a>    <span class="k">def</span> <span class="nf">insertAmps</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmlfile</span><span class="p">):</span>
@@ -909,31 +909,31 @@
     <span class="k">return</span> <span class="n">timestamp</span></div>
 
 
-<span class="k">def</span> <span class="nf">_invalid_xml_remove</span><span class="p">(</span><span class="n">c</span><span class="p">):</span>
+<span class="c1"># def _invalid_xml_remove(c):</span>
     <span class="c1"># http://stackoverflow.com/questions/1707890/fast-way-to-filter-illegal-xml-unicode-chars-in-python</span>
     <span class="c1"># noqa</span>
-    <span class="n">illegal_unichrs</span> <span class="o">=</span> <span class="p">[(</span><span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x08</span><span class="p">),</span> <span class="p">(</span><span class="mh">0x0B</span><span class="p">,</span> <span class="mh">0x1F</span><span class="p">),</span> <span class="p">(</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x84</span><span class="p">),</span> <span class="p">(</span><span class="mh">0x86</span><span class="p">,</span> <span class="mh">0x9F</span><span class="p">),</span>
-                       <span class="p">(</span><span class="mh">0xD800</span><span class="p">,</span> <span class="mh">0xDFFF</span><span class="p">),</span> <span class="p">(</span><span class="mh">0xFDD0</span><span class="p">,</span> <span class="mh">0xFDDF</span><span class="p">),</span> <span class="p">(</span><span class="mh">0xFFFE</span><span class="p">,</span> <span class="mh">0xFFFF</span><span class="p">),</span>
-                       <span class="p">(</span><span class="mh">0x1FFFE</span><span class="p">,</span> <span class="mh">0x1FFFF</span><span class="p">),</span> <span class="p">(</span><span class="mh">0x2FFFE</span><span class="p">,</span> <span class="mh">0x2FFFF</span><span class="p">),</span>
-                       <span class="p">(</span><span class="mh">0x3FFFE</span><span class="p">,</span> <span class="mh">0x3FFFF</span><span class="p">),</span> <span class="p">(</span><span class="mh">0x4FFFE</span><span class="p">,</span> <span class="mh">0x4FFFF</span><span class="p">),</span>
-                       <span class="p">(</span><span class="mh">0x5FFFE</span><span class="p">,</span> <span class="mh">0x5FFFF</span><span class="p">),</span> <span class="p">(</span><span class="mh">0x6FFFE</span><span class="p">,</span> <span class="mh">0x6FFFF</span><span class="p">),</span>
-                       <span class="p">(</span><span class="mh">0x7FFFE</span><span class="p">,</span> <span class="mh">0x7FFFF</span><span class="p">),</span> <span class="p">(</span><span class="mh">0x8FFFE</span><span class="p">,</span> <span class="mh">0x8FFFF</span><span class="p">),</span>
-                       <span class="p">(</span><span class="mh">0x9FFFE</span><span class="p">,</span> <span class="mh">0x9FFFF</span><span class="p">),</span> <span class="p">(</span><span class="mh">0xAFFFE</span><span class="p">,</span> <span class="mh">0xAFFFF</span><span class="p">),</span>
-                       <span class="p">(</span><span class="mh">0xBFFFE</span><span class="p">,</span> <span class="mh">0xBFFFF</span><span class="p">),</span> <span class="p">(</span><span class="mh">0xCFFFE</span><span class="p">,</span> <span class="mh">0xCFFFF</span><span class="p">),</span>
-                       <span class="p">(</span><span class="mh">0xDFFFE</span><span class="p">,</span> <span class="mh">0xDFFFF</span><span class="p">),</span> <span class="p">(</span><span class="mh">0xEFFFE</span><span class="p">,</span> <span class="mh">0xEFFFF</span><span class="p">),</span>
-                       <span class="p">(</span><span class="mh">0xFFFFE</span><span class="p">,</span> <span class="mh">0xFFFFF</span><span class="p">),</span>
-                       <span class="p">(</span><span class="mh">0x10FFFE</span><span class="p">,</span> <span class="mh">0x10FFFF</span><span class="p">)]</span>
-
-    <span class="n">illegal_ranges</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">-</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">chr</span><span class="p">(</span><span class="n">low</span><span class="p">),</span> <span class="nb">chr</span><span class="p">(</span><span class="n">high</span><span class="p">))</span>
-                      <span class="k">for</span> <span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">)</span> <span class="ow">in</span> <span class="n">illegal_unichrs</span>
-                      <span class="k">if</span> <span class="n">low</span> <span class="o">&lt;</span> <span class="n">sys</span><span class="o">.</span><span class="n">maxunicode</span><span class="p">]</span>
-
-    <span class="n">illegal_xml_re</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">u</span><span class="s1">&#39;[</span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="sa">u</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">illegal_ranges</span><span class="p">))</span>
-    <span class="k">if</span> <span class="n">illegal_xml_re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># Replace with space</span>
-        <span class="k">return</span> <span class="s1">&#39; &#39;</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">c</span>
+<span class="c1">#    illegal_unichrs = [(0x00, 0x08), (0x0B, 0x1F), (0x7F, 0x84), (0x86, 0x9F),</span>
+<span class="c1">#                       (0xD800, 0xDFFF), (0xFDD0, 0xFDDF), (0xFFFE, 0xFFFF),</span>
+<span class="c1">#                       (0x1FFFE, 0x1FFFF), (0x2FFFE, 0x2FFFF),</span>
+<span class="c1">#                       (0x3FFFE, 0x3FFFF), (0x4FFFE, 0x4FFFF),</span>
+<span class="c1">#                       (0x5FFFE, 0x5FFFF), (0x6FFFE, 0x6FFFF),</span>
+<span class="c1">#                       (0x7FFFE, 0x7FFFF), (0x8FFFE, 0x8FFFF),</span>
+<span class="c1">#                       (0x9FFFE, 0x9FFFF), (0xAFFFE, 0xAFFFF),</span>
+<span class="c1">#                       (0xBFFFE, 0xBFFFF), (0xCFFFE, 0xCFFFF),</span>
+<span class="c1">#                       (0xDFFFE, 0xDFFFF), (0xEFFFE, 0xEFFFF),</span>
+<span class="c1">#                       (0xFFFFE, 0xFFFFF),</span>
+<span class="c1">#                       (0x10FFFE, 0x10FFFF)]</span>
+<span class="c1">#</span>
+<span class="c1">#    illegal_ranges = [&quot;%s-%s&quot; % (chr(low), chr(high))</span>
+<span class="c1">#                      for (low, high) in illegal_unichrs</span>
+<span class="c1">#                      if low &lt; sys.maxunicode]</span>
+<span class="c1">#</span>
+<span class="c1">#    illegal_xml_re = re.compile(u&#39;[%s]&#39; % u&#39;&#39;.join(illegal_ranges))</span>
+<span class="c1">#    if illegal_xml_re.search(c) is not None:</span>
+<span class="c1">#        # Replace with space</span>
+<span class="c1">#        return &#39; &#39;</span>
+<span class="c1">#    else:</span>
+<span class="c1">#        return c</span>
 
 
 <div class="viewcode-block" id="prettify"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.amps.html#shakemap.utils.amps.prettify">[docs]</a><span class="k">def</span> <span class="nf">prettify</span><span class="p">(</span><span class="n">elem</span><span class="p">):</span>

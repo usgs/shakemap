@@ -44,6 +44,46 @@
 <span class="kn">import</span> <span class="nn">shapely.wkt</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="k">import</span> <span class="n">min_distance_to_segment</span>
+<span class="kn">from</span> <span class="nn">validate</span> <span class="k">import</span> <span class="n">ValidateError</span>
+
+<span class="kn">import</span> <span class="nn">shakemap.utils.config</span> <span class="k">as</span> <span class="nn">config</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">path_macro_sub</span>
+
+
+<span class="c1"># ##########################################################################</span>
+<span class="c1"># We can&#39;t use normal ConfigObj validation because there are</span>
+<span class="c1"># inconsistent sub-section structures (i.e., acr, scr, and volcanic</span>
+<span class="c1"># vs. subduction. There are also optional sections with variable</span>
+<span class="c1"># structure (i.e., the layers). So we do our validation and variable</span>
+<span class="c1"># conversion here.</span>
+<span class="c1"># ##########################################################################</span>
+
+<div class="viewcode-block" id="validate_config"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.validate_config">[docs]</a><span class="k">def</span> <span class="nf">validate_config</span><span class="p">(</span><span class="n">mydict</span><span class="p">,</span> <span class="n">install_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Recursively validate select.conf.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        mydict (dict): Full or partial config dictionary.</span>
+<span class="sd">        install_path (str):</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">mydict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">validate_config</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">install_path</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;horizontal_buffer&#39;</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;vertical_buffer&#39;</span><span class="p">:</span>
+            <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">cfg_float</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;gmpe&#39;</span><span class="p">:</span>
+            <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">gmpe_list</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;min_depth&#39;</span> <span class="ow">or</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;max_depth&#39;</span><span class="p">:</span>
+            <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">cfg_float_list</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;layer_dir&#39;</span><span class="p">:</span>
+            <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span><span class="p">,</span> <span class="s1">&#39;p1&#39;</span><span class="p">,</span> <span class="s1">&#39;p2&#39;</span><span class="p">,</span> <span class="s1">&#39;p_kagan_default&#39;</span><span class="p">,</span>
+                     <span class="s1">&#39;default_slab_depth&#39;</span><span class="p">):</span>
+            <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="s1">&#39;Invalid entry in config: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">))</span>
+    <span class="k">return</span></div>
 
 
 <div class="viewcode-block" id="nearest_edge"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.layers.html#shakemap.utils.layers.nearest_edge">[docs]</a><span class="k">def</span> <span class="nf">nearest_edge</span><span class="p">(</span><span class="n">elon</span><span class="p">,</span> <span class="n">elat</span><span class="p">,</span> <span class="n">poly</span><span class="p">):</span>

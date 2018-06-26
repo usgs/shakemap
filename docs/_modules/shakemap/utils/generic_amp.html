@@ -131,6 +131,7 @@
             <span class="c1"># periods bracketing the input IMT</span>
             <span class="n">mygrid</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">_get_average_grid</span><span class="p">(</span><span class="n">gc</span><span class="p">,</span> <span class="n">contents</span><span class="p">,</span> <span class="n">thisimt</span><span class="p">)</span>
 
+        <span class="n">gc</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">mygrid</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">continue</span>
 

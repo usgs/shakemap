@@ -48,9 +48,12 @@
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 
-<span class="n">TIMEWINDOW</span> <span class="o">=</span> <span class="mi">60</span>  <span class="c1"># number of seconds to search for event matching origin time</span>
-<span class="n">DEGWINDOW</span> <span class="o">=</span> <span class="mf">0.1</span>  <span class="c1"># distance in decimal degrees to search for event matching coordinates</span>
-<span class="n">MAGWINDOW</span> <span class="o">=</span> <span class="mf">0.2</span>  <span class="c1"># +/- magnitude threshold to search for matching events</span>
+<span class="c1"># number of seconds to search for event matching origin time</span>
+<span class="n">TIMEWINDOW</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="c1"># distance in decimal degrees to search for event matching coordinates</span>
+<span class="n">DEGWINDOW</span> <span class="o">=</span> <span class="mf">0.1</span>
+<span class="c1"># +/- magnitude threshold to search for matching events</span>
+<span class="n">MAGWINDOW</span> <span class="o">=</span> <span class="mf">0.2</span>
 
 <span class="n">required_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;station&#39;</span><span class="p">,</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span> <span class="s1">&#39;network&#39;</span><span class="p">]</span>
 <span class="n">channel_groups</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;[a-z]</span><span class="si">{2}</span><span class="s1">e&#39;</span><span class="p">,</span> <span class="s1">&#39;[a-z]</span><span class="si">{2}</span><span class="s1">n&#39;</span><span class="p">,</span> <span class="s1">&#39;[a-z]</span><span class="si">{2}</span><span class="s1">z&#39;</span><span class="p">],</span>
@@ -103,7 +106,8 @@
             <span class="n">detail</span> <span class="o">=</span> <span class="n">get_event_by_id</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;Could not retrieve DYFI data for </span><span class="si">%s</span><span class="s1"> - error &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span>
+            <span class="k">return</span>
 
         <span class="n">dataframe</span><span class="p">,</span> <span class="n">msg</span> <span class="o">=</span> <span class="n">_get_dyfi_dataframe</span><span class="p">(</span><span class="n">detail</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dataframe</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -140,14 +144,16 @@
     <span class="c1"># get 10km data set, if exists</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dyfi</span><span class="o">.</span><span class="n">getContentsMatching</span><span class="p">(</span><span class="s1">&#39;dyfi_geo_10km.geojson&#39;</span><span class="p">)):</span>
         <span class="n">bytes_10k</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dyfi</span><span class="o">.</span><span class="n">getContentBytes</span><span class="p">(</span><span class="s1">&#39;dyfi_geo_10km.geojson&#39;</span><span class="p">)</span>
-        <span class="n">df_10k</span> <span class="o">=</span> <span class="n">_parse_geocoded</span><span class="p">(</span><span class="n">bytes_10k</span><span class="p">)</span>
-        <span class="n">df_10k</span> <span class="o">=</span> <span class="n">df_10k</span><span class="p">[</span><span class="n">df_10k</span><span class="p">[</span><span class="s1">&#39;nresp&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">MIN_RESPONSES</span><span class="p">]</span>
+        <span class="n">tmp_df</span> <span class="o">=</span> <span class="n">_parse_geocoded</span><span class="p">(</span><span class="n">bytes_10k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tmp_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df_10k</span> <span class="o">=</span> <span class="n">tmp_df</span><span class="p">[</span><span class="n">tmp_df</span><span class="p">[</span><span class="s1">&#39;nresp&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">MIN_RESPONSES</span><span class="p">]</span>
 
     <span class="c1"># get 1km data set, if exists</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dyfi</span><span class="o">.</span><span class="n">getContentsMatching</span><span class="p">(</span><span class="s1">&#39;dyfi_geo_1km.geojson&#39;</span><span class="p">)):</span>
         <span class="n">bytes_1k</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dyfi</span><span class="o">.</span><span class="n">getContentBytes</span><span class="p">(</span><span class="s1">&#39;dyfi_geo_1km.geojson&#39;</span><span class="p">)</span>
-        <span class="n">df_1k</span> <span class="o">=</span> <span class="n">_parse_geocoded</span><span class="p">(</span><span class="n">bytes_1k</span><span class="p">)</span>
-        <span class="n">df_1k</span> <span class="o">=</span> <span class="n">df_1k</span><span class="p">[</span><span class="n">df_1k</span><span class="p">[</span><span class="s1">&#39;nresp&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">MIN_RESPONSES</span><span class="p">]</span>
+        <span class="n">tmp_df</span> <span class="o">=</span> <span class="n">_parse_geocoded</span><span class="p">(</span><span class="n">bytes_1k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">tmp_df</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">df_1k</span> <span class="o">=</span> <span class="n">tmp_df</span><span class="p">[</span><span class="n">tmp_df</span><span class="p">[</span><span class="s1">&#39;nresp&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">MIN_RESPONSES</span><span class="p">]</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_1k</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">df_10k</span><span class="p">):</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df_1k</span>
@@ -162,7 +168,8 @@
         <span class="c1"># the dataframe we want has columns:</span>
         <span class="c1"># &#39;intensity&#39;, &#39;distance&#39;, &#39;lat&#39;, &#39;lon&#39;, &#39;station&#39;, &#39;nresp&#39;</span>
         <span class="c1"># the cdi geo file has:</span>
-        <span class="c1"># Geocoded box,CDI,No. of responses,Hypocentral distance,Latitude,Longitude,Suspect?,City,State</span>
+        <span class="c1"># Geocoded box, CDI, No. of responses, Hypocentral distance,</span>
+        <span class="c1"># Latitude, Longitude, Suspect?, City, State</span>
 
         <span class="c1"># download the text file, turn it into a dataframe</span>
         <span class="n">bytes_geo</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">dyfi</span><span class="o">.</span><span class="n">getContentBytes</span><span class="p">(</span><span class="s1">&#39;cdi_geo.txt&#39;</span><span class="p">)</span>
@@ -178,7 +185,7 @@
             <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="n">DYFI_COLUMNS_REPLACE</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;Suspect?&#39;</span><span class="p">,</span> <span class="s1">&#39;City&#39;</span><span class="p">,</span> <span class="s1">&#39;State&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
         <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;nresp&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">MIN_RESPONSES</span><span class="p">]</span>
-        
+
     <span class="n">df</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;DYFI&#39;</span>
     <span class="n">df</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;USGS (Did You Feel It?)&quot;</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
@@ -187,6 +194,8 @@
 <span class="k">def</span> <span class="nf">_parse_geocoded</span><span class="p">(</span><span class="n">bytes_data</span><span class="p">):</span>
     <span class="n">text_data</span> <span class="o">=</span> <span class="n">bytes_data</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
     <span class="n">jdict</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">text_data</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
     <span class="n">prop_columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
     <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;lat&#39;</span><span class="p">,</span> <span class="s1">&#39;lon&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">prop_columns</span>
     <span class="n">arrays</span> <span class="o">=</span> <span class="p">[[]</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">]</span>

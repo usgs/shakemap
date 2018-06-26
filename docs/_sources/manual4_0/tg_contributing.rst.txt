@@ -337,7 +337,7 @@ branch against the new local master branch::
   $ git checkout master
   $ git pull --rebase upstream master
   $ git checkout branch-name
-  $ git rebase branch-name
+  $ git rebase master
   $ git push origin branch-name
 
 Obviously, if there are conflicts while rebasing, the developer must
