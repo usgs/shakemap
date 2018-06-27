@@ -229,14 +229,9 @@ def main(args):
                     logger.warn('Running "%s" because of --force option.'
                                 % cmd)
             else:
-                logger.warn("No dependencies are out of date, '%s' does not "
-                            "need to be run (use --force to force the module "
-                            "to run). Continuing..." % cmd)
-                if not args.force:
-                    continue
-                else:
-                    logger.warn('Running "%s" because of --force option.'
-                                % cmd)
+                # Command is not out of date, but if the user wants to
+                # run it, we won't stop him/her
+                pass
             t1 = time.time()
             obj.execute()
             t2 = time.time()
