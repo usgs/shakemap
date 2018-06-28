@@ -152,6 +152,14 @@ class GridXMLModule(CoreModule):
                     layers['STD' + imt_field] = grid_data
                     field_keys['STD' + imt_field] = (units, digits)
 
+            if xml_type == 'grid':
+                gridobj, metadata = container.getGrid('vs30')
+                grid_data = gridobj.getData()
+                units = metadata['units']
+                digits = metadata['digits']
+                layers['SVEL'] = grid_data
+                field_keys['SVEL'] = (units, digits)
+
             geodict = grid.getGeoDict()
 
             config = container.getConfig()
