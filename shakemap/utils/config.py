@@ -362,8 +362,9 @@ def extent_list(value):
        out[2] < -360.0 or out[2] > 360.0 or \
        out[1] < -90.0 or out[1] > 90.0 or \
        out[3] < -90.0 or out[3] > 90.0:
-        logging.error("Invalid extent: ", value,
-                      " : -360 <= longitude <= 360, -90 <= latitude <= 90")
+        logging.error("Invalid extent: %s "
+                      "(-360 <= longitude <= 360, -90 <= latitude <= 90)"
+                      % value)
         raise ValidateError()
 
     return out
