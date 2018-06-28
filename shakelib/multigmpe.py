@@ -252,14 +252,13 @@ class MultiGMPE(GMPE):
                 mgmpes = []
                 for s in selected_gmpe_sets:
                     mgmpes.append(cls.__multigmpe_from_gmpe_set(
-                        conf, s, filter_imt=filter_imt, verbose=verbose))
+                        conf, s, filter_imt=filter_imt))
                 out = MultiGMPE.from_list(mgmpes, gmpe_set_weights, imc=IMC)
             elif set_of_gmpes is True:
                 out = cls.__multigmpe_from_gmpe_set(
                     conf,
                     selected_gmpe,
-                    filter_imt=filter_imt,
-                    verbose=verbose)
+                    filter_imt=filter_imt)
             else:
                 raise Exception("%s must consist exclusively of keys in "
                                 "conf['gmpe_modules'] or conf['gmpe_sets']"
@@ -276,8 +275,7 @@ class MultiGMPE(GMPE):
         out.DESCRIPTION = selected_gmpe
         return out
 
-    def __multigmpe_from_gmpe_set(conf, set_name, filter_imt=None,
-                                  verbose=False):
+    def __multigmpe_from_gmpe_set(conf, set_name, filter_imt=None):
         """
         Private method for constructing a MultiGMPE from a set_name.
 
