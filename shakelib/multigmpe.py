@@ -2,6 +2,7 @@
 
 import copy
 from importlib import import_module
+import logging
 
 import numpy as np
 
@@ -206,14 +207,13 @@ class MultiGMPE(GMPE):
         return lnmu, lnsd
 
     @classmethod
-    def from_config(cls, conf, filter_imt=None, verbose=False):
+    def from_config(cls, conf, filter_imt=None):
         """
         Construct a MultiGMPE from a config file.
 
         Args:
             conf (dict): Dictionary of config options.
             filter_imt (IMT): An optional IMT to filter/reweight the GMPE list.
-            verbose (bool): Print verbose output for debugging.
 
         Returns:
             MultiGMPE object.
@@ -222,9 +222,8 @@ class MultiGMPE(GMPE):
         IMC = getattr(const.IMC, conf['interp']['component'])
         selected_gmpe = conf['modeling']['gmpe']
 
-        if verbose is True:
-            print('selected_gmpe: %s' % selected_gmpe)
-            print('IMC: %s' % IMC)
+        logging.debug('selected_gmpe: %s' % selected_gmpe)
+        logging.debug('IMC: %s' % IMC)
 
         # ---------------------------------------------------------------------
         # Allow for selected_gmpe to be found in either conf['gmpe_sets'] or
@@ -237,9 +236,8 @@ class MultiGMPE(GMPE):
             selected_gmpe_sets = conf['gmpe_sets'][selected_gmpe]['gmpes']
             gmpe_set_weights = \
                 [float(w) for w in conf['gmpe_sets'][selected_gmpe]['weights']]
-            if verbose is True:
-                print('selected_gmpe_sets: %s' % selected_gmpe_sets)
-                print('gmpe_set_weights: %s' % gmpe_set_weights)
+            logging.debug('selected_gmpe_sets: %s' % selected_gmpe_sets)
+            logging.debug('gmpe_set_weights: %s' % gmpe_set_weights)
 
             # -----------------------------------------------------------------
             # If it is a GMPE set, does it contain GMPEs or GMPE sets?
@@ -386,9 +384,8 @@ class MultiGMPE(GMPE):
         # ---------------------------------------------------------------------
         # Construct MultiGMPE
         # ---------------------------------------------------------------------
-        if verbose is True:
-            print('    filtered_gmpes: %s' % filtered_gmpes)
-            print('    filtered_wts: %s' % filtered_wts)
+        logging.debug('    filtered_gmpes: %s' % filtered_gmpes)
+        logging.debug('    filtered_wts: %s' % filtered_wts)
 
         mgmpe = MultiGMPE.from_list(
             filtered_gmpes, filtered_wts,

@@ -14,6 +14,9 @@ import numpy as np
 from .base import CoreModule
 from shakemap.utils.config import get_config_paths
 
+# Get rid of stupid pandas warning
+pd.options.mode.chained_assignment = None
+
 # number of seconds to search for event matching origin time
 TIMEWINDOW = 60
 # distance in decimal degrees to search for event matching coordinates
@@ -29,19 +32,23 @@ pgm_cols = ['pga', 'pgv', 'psa03', 'psa10', 'psa30']
 optional = ['location', 'distance', 'reference', 'intensity', 'source']
 
 # what are the DYFI columns and what do we rename them to?
-DYFI_COLUMNS_REPLACE = {'Geocoded box': 'station',
-                        'CDI': 'intensity',
-                        'Latitude': 'lat',
-                        'Longitude': 'lon',
-                        'No. of responses': 'nresp',
-                        'Hypocentral distance': 'distance'}
+DYFI_COLUMNS_REPLACE = {
+    'Geocoded box': 'station',
+    'CDI': 'intensity',
+    'Latitude': 'lat',
+    'Longitude': 'lon',
+    'No. of responses': 'nresp',
+    'Hypocentral distance': 'distance'
+}
 
-OLD_DYFI_COLUMNS_REPLACE = {'ZIP/Location': 'station',
-                            'CDI': 'intensity',
-                            'Latitude': 'lat',
-                            'Longitude': 'lon',
-                            'No. of responses': 'nresp',
-                            'Epicentral distance': 'distance'}
+OLD_DYFI_COLUMNS_REPLACE = {
+    'ZIP/Location': 'station',
+    'CDI': 'intensity',
+    'Latitude': 'lat',
+    'Longitude': 'lon',
+    'No. of responses': 'nresp',
+    'Epicentral distance': 'distance'
+}
 
 MIN_RESPONSES = 3  # minimum number of DYFI responses per grid
 
@@ -184,7 +191,9 @@ def _parse_geocoded(bytes_data):
         df_dict['lon'].append(clon)
 
     df = pd.DataFrame(df_dict)
-    df = df.rename(index=str, columns={'cdi': 'intensity',
-                                       'dist': 'distance',
-                                       'name': 'station'})
+    df = df.rename(index=str, columns={
+        'cdi': 'intensity',
+        'dist': 'distance',
+        'name': 'station'
+    })
     return df

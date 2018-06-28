@@ -113,8 +113,8 @@ def make_dir(pathstr, default, accept):
         except OSError:
             msg = ('Cannot make install_folder %s.  Please try again (%d '
                    'of %d tries).')
-            print('\n'.join(textwrap.wrap(msg % (ppath, ntries,
-                                                    max_tries))))
+            print('\n'.join(textwrap.wrap(msg % (
+                ppath, ntries, max_tries))))
             ntries += 1
         if ntries > max_tries:
             break
@@ -143,15 +143,15 @@ def create(config, profile, accept, ppath, nogrids):
     default_data = os.path.join(profile_path, 'data')
     if not accept:
         print('\n'.join(textwrap.wrap(
-            'You will be prompted to supply two directories for this '
-            'ShakeMap profile:')))
+              'You will be prompted to supply two directories for this '
+              'ShakeMap profile:')))
         print('\n   '.join(textwrap.wrap(
-            ' - An *installation* path, under which will be created '
-            'directories for system configuration, (config), logging '
-            '(logs), and support data (data).')))
+              ' - An *installation* path, under which will be created '
+              'directories for system configuration, (config), logging '
+              '(logs), and support data (data).')))
         print('\n   '.join(textwrap.wrap(
-            ' - A *data* path, under which will be created directories for '
-            'each event processed.\n')))
+              ' - A *data* path, under which will be created directories for '
+              'each event processed.\n')))
 
     install_path, install_ok = make_dir('install path', default_install,
                                         accept)
@@ -163,8 +163,8 @@ def create(config, profile, accept, ppath, nogrids):
     new_data_path, data_ok = make_dir('data path', default_data, accept)
     if not data_ok:
         print('\n'.join(textwrap.wrap(
-            'Please try to find a path that can be created on this '
-            'system and then try again.  Exiting.')))
+              'Please try to find a path that can be created on this '
+              'system and then try again.  Exiting.')))
         shutil.rmtree(install_path)
         sys.exit(1)
 
@@ -179,15 +179,16 @@ def create(config, profile, accept, ppath, nogrids):
         os.mkdir(log_path)
 
     # set up all of the config files
-    conf_names = ['modules.conf',
-                  'gmpe_sets.conf',
-                  'model.conf',
-                  'select.conf',
-                  'products.conf',
-                  'shake.conf',
-                  'logging.conf',
-                  'transfer.conf',
-                  'migrate.conf']
+    conf_names = [
+        'modules.conf',
+        'gmpe_sets.conf',
+        'model.conf',
+        'select.conf',
+        'products.conf',
+        'shake.conf',
+        'logging.conf',
+        'transfer.conf',
+        'migrate.conf']
 
     # if any of these files are not present in the install config
     # directory, copy them from the repository into the install directory.
@@ -215,9 +216,10 @@ def create(config, profile, accept, ppath, nogrids):
         os.mkdir(mapping_data_dir)
 
     # copy mapping data into data install directory
-    test_mapping_dir = os.path.join(shakeconfig_data_path, '..', '..',
-                                    'tests', 'data', 'install', 'data',
-                                    'mapping')
+    test_mapping_dir = os.path.join(
+        shakeconfig_data_path, '..', '..',
+        'tests', 'data', 'install', 'data',
+        'mapping')
     allfiles = glob.glob(os.path.join(test_mapping_dir, '*.*'))
     for fname in allfiles:
         shutil.copy(fname, mapping_data_dir)
@@ -285,8 +287,8 @@ def create(config, profile, accept, ppath, nogrids):
 
     do_config = True
     if not accept:
-        do_config = query_yes_no('Do you want to configure your system to '
-                                 'use these files?')
+        do_config = query_yes_no(
+            'Do you want to configure your system to use these files?')
     if do_config is False:
         return
 
