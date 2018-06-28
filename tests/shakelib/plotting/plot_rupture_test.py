@@ -3,6 +3,7 @@
 import os.path
 import sys
 import time
+import pytest
 
 from openquake.hazardlib.geo.geodetic import azimuth
 import numpy as np
@@ -28,15 +29,17 @@ def test_plot_rupture(interactive=False):
     yp1 = np.array([12.832000])
     zp = [0.0]
     strike = azimuth(yp0[0], xp0[0], yp1[0], xp1[0])
-    origin = Origin({'lat': 0.0,
-                     'lon': 0.0,
-                     'depth': 0.0,
-                     'mag': 5.5,
-                     'id': '',
-                     'netid': 'abcd',
-                     'network': '',
-                     'locstring': '',
-                     'time': HistoricTime.utcfromtimestamp(time.time())})
+    origin = Origin({
+        'lat': 0.0,
+        'lon': 0.0,
+        'depth': 0.0,
+        'mag': 5.5,
+        'id': '',
+        'netid': 'abcd',
+        'network': '',
+        'locstring': '',
+        'time': HistoricTime.utcfromtimestamp(time.time())
+    })
     interface_width = MAX_DEPTH / np.sin(np.radians(DIP))
     widths = np.ones(xp0.shape) * interface_width
     dips = np.ones(xp0.shape) * DIP
@@ -50,6 +53,16 @@ def test_plot_rupture(interactive=False):
         print('Wire 3D plot saved to %s.  Delete this file if you wish.'
               % fname)
 
+    # Need to get tests to check exception for if an axis is handed off
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+    plot_rupture_wire3d(rupture, ax)
+
+    # And raise the exception if it is not a 3d axis
+    with pytest.raises(TypeError):
+        ax = fig.add_subplot(111)
+        plot_rupture_wire3d(rupture, ax)
+
 
 def test_map_rupture(interactive=False):
     xp0 = np.array([-90.898000])
@@ -58,15 +71,17 @@ def test_map_rupture(interactive=False):
     yp1 = np.array([12.832000])
     zp = [0.0]
     strike = azimuth(yp0[0], xp0[0], yp1[0], xp1[0])
-    origin = Origin({'lat': 0.0,
-                     'lon': 0.0,
-                     'depth': 0.0,
-                     'mag': 5.5,
-                     'id': '',
-                     'netid': 'abcd',
-                     'network': '',
-                     'locstring': '',
-                     'time': HistoricTime.utcfromtimestamp(time.time())})
+    origin = Origin({
+        'lat': 0.0,
+        'lon': 0.0,
+        'depth': 0.0,
+        'mag': 5.5,
+        'id': '',
+        'netid': 'abcd',
+        'network': '',
+        'locstring': '',
+        'time': HistoricTime.utcfromtimestamp(time.time())
+    })
     interface_width = MAX_DEPTH / np.sin(np.radians(DIP))
     widths = np.ones(xp0.shape) * interface_width
     dips = np.ones(xp0.shape) * DIP
