@@ -45,7 +45,7 @@ class PlotRegr(CoreModule):
         'caption': 'Regression plot of [COMPONENT] peak ground '
                    'acceleration (%g).',
         'page': regr_page,
-        'formats': [{'filename': 'PGA_regr.png',
+        'formats': [{'filename': 'pga_regr.png',
                      'type': 'image/png'}]
     }
     contents['pgvRegr'] = {
@@ -53,7 +53,7 @@ class PlotRegr(CoreModule):
         'caption': 'Regression plot of [COMPONENT] peak ground '
                    'velocity (cm/s).',
         'page': regr_page,
-        'formats': [{'filename': 'PGV_regr.png',
+        'formats': [{'filename': 'pgv_regr.png',
                      'type': 'image/png'}]
     }
     psacap = 'Regression plot of [COMPONENT] [FPERIOD] sec 5% damped ' \
@@ -62,7 +62,7 @@ class PlotRegr(CoreModule):
         'title': 'PSA[PERIOD] Regression',
         'page': regr_page,
         'caption': psacap,
-        'formats': [{'filename': 'PSA[0-9]p[0-9]_regr.png',
+        'formats': [{'filename': 'psa[0-9]p[0-9]_regr.png',
                      'type': 'image/png'}]
     }
 
