@@ -56,9 +56,10 @@ class TransferModule(CoreModule):
                 'Event has a %s file blocking transfer.' % NO_TRANSFER)
             return
 
-        products_dir = os.path.join(datadir, 'pdl')
-        if not os.path.isdir(products_dir):
-            raise NotADirectoryError('%s does not exist.' % products_dir)
+        pdl_dir = os.path.join(datadir, 'pdl')
+        products_dir = os.path.join(datadir, 'products')
+        if not os.path.isdir(pdl_dir):
+            raise NotADirectoryError('%s does not exist.' % pdl_dir)
 
         # get the path to the transfer.conf spec file
         configspec = os.path.join(get_data_path(), 'transferspec.conf')
@@ -76,20 +77,21 @@ class TransferModule(CoreModule):
         config = ConfigObj(transfer_conf, configspec=configspec)
 
         # get the output container with all the things in it
-        datafile = os.path.join(products_dir, 'downloads', 'shake_result.hdf')
+        datafile = os.path.join(products_dir, 'shake_result.hdf')
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
 
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
+        # extract the info.json object from the container
+        info = container.getDictionary('info.json')
+        container.close()
 
         # call the transfer method
-        _transfer(config, container, products_dir)
+        _transfer(config, info, pdl_dir, products_dir)
 
         # copy the current folder to a new backup directory
         self._make_backup(data_path)
-
-        container.close()
 
     def _make_backup(self, data_path):
         data_dir = os.path.join(data_path, self._eventid)
@@ -113,9 +115,7 @@ class TransferModule(CoreModule):
         self.logger.debug('Created backup directory %s' % backup)
 
 
-def _transfer(config, container, products_dir, cancel=False):
-    # extract the info.json object from the container
-    info = container.getDictionary('info.json')
+def _transfer(config, info, pdl_dir, products_dir, cancel=False):
     properties, product_properties = _get_properties(info)
 
     # get the config information:
@@ -138,9 +138,14 @@ def _transfer(config, container, products_dir, cancel=False):
             # try to send the data
             try:
                 if transfer_method == 'pdl':
+                    downloads_dir = os.path.join(pdl_dir, 'downloads')
+                    if os.path.isdir(downloads_dir):
+                        shutil.rmtree(downloads_dir, ignore_errors=True)
+                    os.makedirs(downloads_dir)
+                    shutil.copytree(products_dir, downloads_dir)
                     sender = sender_class(
                         properties=params,
-                        local_directory=products_dir,
+                        local_directory=pdl_dir,
                         product_properties=product_properties)
                 else:
                     cancelfile = CANCEL_FILES[transfer_method]
@@ -155,6 +160,8 @@ def _transfer(config, container, products_dir, cancel=False):
                 fmt = '%i files sent.  Message from sender: \n"%s"'
                 tpl = (nfiles, msg)
                 logging.info(fmt % tpl)
+                if transfer_method == 'pdl':
+                    shutil.rmtree(downloads_dir, ignore_errors=True)
             except Exception as e:
                 # for the standard config, this should generate an email to
                 # the developer list.

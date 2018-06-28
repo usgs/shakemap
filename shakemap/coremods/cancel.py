@@ -65,7 +65,10 @@ class CancelModule(CoreModule):
 
         # call the transfer method
         self.logger.info('Sending cancel message...')
-        _transfer(config, container, products_dir, cancel=True)
+        pdl_dir = os.path.join(datadir, 'pdl')
+        info = container.getDictionary('info.json')
+        _transfer(config, info, pdl_dir, products_dir, cancel=True)
+        container.close()
 
         # Create a file called CANCEL in the data directory. The
         # shake program will look for this and not run if present.
@@ -78,4 +81,3 @@ class CancelModule(CoreModule):
         # delete the event from the database
         handler = AmplitudeHandler(install_path, data_path)
         handler.deleteEvent(self._eventid)
-        container.close()
