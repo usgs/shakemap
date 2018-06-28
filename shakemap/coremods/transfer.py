@@ -56,7 +56,7 @@ class TransferModule(CoreModule):
                 'Event has a %s file blocking transfer.' % NO_TRANSFER)
             return
 
-        products_dir = os.path.join(datadir, 'products')
+        products_dir = os.path.join(datadir, 'pdl')
         if not os.path.isdir(products_dir):
             raise NotADirectoryError('%s does not exist.' % products_dir)
 
@@ -76,7 +76,7 @@ class TransferModule(CoreModule):
         config = ConfigObj(transfer_conf, configspec=configspec)
 
         # get the output container with all the things in it
-        datafile = os.path.join(products_dir, 'shake_result.hdf')
+        datafile = os.path.join(products_dir, 'downloads', 'shake_result.hdf')
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
 
