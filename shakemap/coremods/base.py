@@ -164,9 +164,6 @@ class CoreModule(ABC):
         pdldir = os.path.join(data_path, self._eventid, 'current', 'pdl')
         if not os.path.isdir(pdldir):
             os.makedirs(pdldir)
-        if not os.path.isdir(os.path.join(pdldir, 'downloads')):
-            os.symlink(datadir, os.path.join(pdldir, 'downloads'),
-                       target_is_directory=True)
         contents_file = os.path.join(pdldir, 'contents.xml')
         if os.path.isfile(contents_file):
             old_contents = _read_contents(contents_file)
