@@ -23,7 +23,6 @@ def get_weights(origin, config):
             - ndarray (float) of GMPE weights.
             - Pandas series containing STREC output.
     """
-    logging.debug('Testing')
     tprobs, strec_results = get_probs(origin, config)
     gmpelist = []
     weightlist = []

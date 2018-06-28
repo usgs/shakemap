@@ -147,7 +147,7 @@ def get_custom_validator():
 
 def config_error(config, results):
     """
-    Parse the results of a ConfigObj validation and print the errors.
+    Parse the results of a ConfigObj validation and log the errors.
     Throws a RuntimeError exception  upon completion if any errors or
     missing sections are encountered.
 
@@ -166,12 +166,12 @@ def config_error(config, results):
     errs = 0
     for (section_list, key, _) in flatten_errors(config, results):
         if key is not None:
-            print('The "%s" key in the section "%s" failed validation'
-                  % (key, ', '.join(section_list)))
+            logging.error('The "%s" key in the section "%s" failed validation'
+                          % (key, ', '.join(section_list)))
             errs += 1
         else:
-            print('The following section was missing:%s '
-                  % ', '.join(section_list))
+            logging.error('The following section was missing:%s '
+                          % ', '.join(section_list))
             errs += 1
     if errs:
         raise RuntimeError('There %s %d %s in configuration.'
@@ -262,8 +262,8 @@ def weight_list(value, min):
         if int(min) == 0:
             return []
         else:
-            print("list must contain at least %d entr%s" %
-                  (min, "ies" if int(min) != 1 else "y"))
+            logging.error("list must contain at least %d entr%s" %
+                          (min, "ies" if int(min) != 1 else "y"))
             raise ValidateError()
     if isinstance(value, str):
         if value.startswith('[') and value.endswith(']'):
@@ -273,26 +273,26 @@ def weight_list(value, min):
             if int(min) == 0:
                 value = []
             else:
-                print("list must contain at least %d entr%s" %
-                      (min, "ies" if int(min) != 1 else "y"))
+                logging.error("list must contain at least %d entr%s" %
+                              (min, "ies" if int(min) != 1 else "y"))
                 raise ValidateError()
         else:
             value = [value]
     if len(value) < int(min):
-        print("list must contain at least %d entr%s" %
-              (min, "ies" if int(min) != 1 else "y"))
+        logging.error("list must contain at least %d entr%s" %
+                      (min, "ies" if int(min) != 1 else "y"))
         raise ValidateError()
     try:
         out = [float(a) for a in value]
     except ValueError:
-        print("%s is not a list of floats" % value)
+        logging.error("%s is not a list of floats" % value)
         raise ValidateError()
     np_out = np.array(out)
     if np.any(np_out < 0):
-        print("all list values must be >= 0: %s" % value)
+        logging.error("all list values must be >= 0: %s" % value)
         raise ValidateError()
     if len(out) > 0 and np.abs(np.sum(np_out) - 1.0) > 0.01:
-        print("weights must sum to 1.0: %s" % value)
+        logging.error("weights must sum to 1.0: %s" % value)
         raise ValidateError()
 
     return out
@@ -317,11 +317,11 @@ def gmpe_list(value, min):
     if isinstance(value, str):
         value = [value]
     if not isinstance(value, list) or len(value) < int(min):
-        print("'%s' is not a list of at least %s gmpes" % (value, min))
+        logging.error("'%s' is not a list of at least %s gmpes" % (value, min))
         raise ValidateError()
     for gmpe in value:
         if not isinstance(gmpe, str):
-            print("'%s' is not a list of strings" % (value))
+            logging.error("'%s' is not a list of strings" % (value))
             raise ValidateError()
 
     return value
@@ -348,22 +348,23 @@ def extent_list(value):
     if isinstance(value, list) and not value:
         return []
     if not isinstance(value, list):
-        print("'%s' is not a list of 4 coordinates" % value)
+        logging.error("'%s' is not a list of 4 coordinates" % value)
         raise ValidateError()
     if len(value) != 4:
-        print("extent list must contain 4 entries")
+        logging.error("extent list must contain 4 entries")
         raise ValidateError()
     try:
         out = [float(a) for a in value]
     except ValueError:
-        print("%s is not a list of 4 floats" % value)
+        logging.error("%s is not a list of 4 floats" % value)
         raise ValidateError()
     if out[0] < -360.0 or out[0] > 360.0 or \
        out[2] < -360.0 or out[2] > 360.0 or \
        out[1] < -90.0 or out[1] > 90.0 or \
        out[3] < -90.0 or out[3] > 90.0:
-        print("Invalid extent: ", value,
-              " : -360 <= longitude <= 360, -90 <= latitude <= 90")
+        logging.error("Invalid extent: %s "
+                      "(-360 <= longitude <= 360, -90 <= latitude <= 90)"
+                      % value)
         raise ValidateError()
 
     return out
@@ -384,7 +385,7 @@ def file_type(value):
     if not value or value == 'None':
         return ''
     if not os.path.isfile(value):
-        print("file '%s' is not a valid file" % value)
+        logging.error("file '%s' is not a valid file" % value)
         raise ValidateError(value)
     return value
 
@@ -445,19 +446,19 @@ def cfg_float_list(value):
         ValidateError
     """
     if not value or value == 'None':
-        print("'%s' is not a list of at least 1 float" % (value))
+        logging.error("'%s' is not a list of at least 1 float" % (value))
         raise ValidateError()
     if isinstance(value, str):
         value = [value]
     if not isinstance(value, list) or len(value) < 1:
-        print("'%s' is not a list of at least 1 float" % (value))
+        logging.error("'%s' is not a list of at least 1 float" % (value))
         raise ValidateError()
     fvalue = []
     for val in value:
         try:
             fval = float(val)
         except ValueError:
-            print("'%s' is not a list of floats" % (value))
+            logging.error("'%s' is not a list of floats" % (value))
             raise ValidateError()
         fvalue.append(fval)
     return fvalue
@@ -478,12 +479,12 @@ def cfg_float(value):
         ValidateError
     """
     if not isinstance(value, (str, float)) or not value or value == 'None':
-        print("'%s' is not a float" % (value))
+        logging.error("'%s' is not a float" % (value))
         raise ValidateError()
     try:
         fval = float(value)
     except ValueError:
-        print("'%s' is not a float" % (value))
+        logging.error("'%s' is not a float" % (value))
         raise ValidateError()
     return fval
 
@@ -619,23 +620,24 @@ def check_profile_config(config):
     """
     # Check that at least one profile exists
     if 'profiles' not in config:
-        print('There are currently no profiles. Use "sm_profile '
-              '-c <profile>" to create one.')
+        logging.error('There are currently no profiles. Use "sm_profile '
+                      '-c <profile>" to create one.')
         sys.exit(1)
     # Check that the paths for each profile exist
     for profile in config['profiles'].keys():
         data_exists = os.path.isdir(config['profiles'][profile]['data_path'])
         delete_profile = False
         if not data_exists:
-            print('Data path for profile %s does not exist.' % profile)
+            logging.error('Data path for profile %s does not exist.' % profile)
             delete_profile = True
         install_exists = os.path.isdir(
             config['profiles'][profile]['install_path'])
         if not install_exists:
-            print('Install path for profile %s does not exist.' % profile)
+            logging.error(
+                'Install path for profile %s does not exist.' % profile)
             delete_profile = True
         if delete_profile:
-            print('    Deleting profile %s.' % profile)
+            logging.error('    Deleting profile %s.' % profile)
             del config['profiles'][profile]
             config.write()
     return config

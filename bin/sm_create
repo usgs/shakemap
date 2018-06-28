@@ -176,7 +176,8 @@ def main(args):
         try:
             detail = get_event_by_id(args.eventid)
         except Exception as e:
-            print('Unable to connect to ComCat server.  Please try again later. "%s"')
+            print('Unable to connect to ComCat server. '
+                  'Please try again later. "%s"')
             sys.exit(1)
         # get input data
         edict = _get_event_dictionary(detail, args.source)
@@ -227,7 +228,6 @@ def main(args):
             if len(fault_files):
                 fault_file = os.path.join(event_dir, fault_files[0])
                 shakemap.getContent(fault_files[0], filename=fault_file)
-                xmlfile = os.path.join(event_dir, 'event.xml')
                 try:
                     jdict = text_to_json(fault_file, new_format=False)
                     origin = Origin(edict)
@@ -236,17 +236,15 @@ def main(args):
                     rupt.writeGeoJson(jsonfile)
                     os.remove(fault_file)
                 except Exception as e:
-                    msg = '''WARNING: UNABLE TO PARSE FAULT TEXT FILE. ERROR: 
+                    msg = (
+                        'WARNING: UNABLE TO PARSE FAULT TEXT FILE. ERROR: \n\n'
+                        '%s\n\n'
+                        'The following text file has been left in place for '
+                        'you to edit manually:\n\n'
+                        '%s\n')
 
-"%s".
-
-The following text file has been left in place for you to edit manually:
-
-%s
-'''
                     errmsg = str(e)
-                    print(msg % (errmsg,fault_file))
-                
+                    print(msg % (errmsg, fault_file))
 
             # if the user wanted to preserve the model parameters found
             # in info.json, set those here

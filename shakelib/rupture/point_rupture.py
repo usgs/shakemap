@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 
-# stdlib modules
-import warnings
-
 # third party imports
 import numpy as np
+import logging
 
 from impactutils.time.ancient_time import HistoricTime
 from shakelib.rupture.base import Rupture
@@ -232,7 +230,7 @@ class PointRupture(Rupture):
             elif mech == 'SS':
                 smech = Mechanism.SS
         else:
-            warnings.warn(
+            logging.warn(
                 'Unsupported tectonic region; using coefficients for unknown'
                 'tectonic region.')
             mscale = MagScaling.WC94
