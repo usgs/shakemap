@@ -27,14 +27,14 @@ class RasterModule(CoreModule):
     """
 
     command_name = 'raster'
-    targets = [r'products/rasters\.zip']
+    targets = [r'products/raster\.zip']
     dependencies = [('products/shake_result.hdf', True)]
 
     contents = OrderedDict.fromkeys(['rasterData'])
     contents['rasterData'] = {
         'title': 'ESRI Raster Files',
         'caption': 'Data and uncertainty grids in ESRI raster format',
-        'formats': [{'filename': 'rasters.zip',
+        'formats': [{'filename': 'raster.zip',
                     'type': 'application/zip'}]
     }
 
@@ -68,7 +68,7 @@ class RasterModule(CoreModule):
         layers = container.getIMTs()
 
         # Package up all of these files into one zip file.
-        zfilename = os.path.join(datadir, 'rasters.zip')
+        zfilename = os.path.join(datadir, 'raster.zip')
         zfile = zipfile.ZipFile(zfilename, mode='w',
                                 compression=zipfile.ZIP_DEFLATED)
 

@@ -43,7 +43,7 @@ class ContourModule(CoreModule):
     contents['miContour'] = {'title': 'Intensity Contours',
                              'caption': 'Contours of macroseismic intensity.',
                              'page': contour_page,
-                             'formats': [{'filename': 'cont_*MMI.json',
+                             'formats': [{'filename': 'cont_*mmi.json',
                                           'type': 'application/json'}
                                          ]
                              }
@@ -51,7 +51,7 @@ class ContourModule(CoreModule):
                               'caption': 'Contours of [COMPONENT] peak '
                                          'ground acceleration (%g).',
                               'page': contour_page,
-                              'formats': [{'filename': 'cont_*PGA.json',
+                              'formats': [{'filename': 'cont_*pga.json',
                                            'type': 'application/json'}
                                           ]
                               }
@@ -59,7 +59,7 @@ class ContourModule(CoreModule):
                               'caption': 'Contours of [COMPONENT] peak '
                                          'ground velocity (cm/s).',
                               'page': contour_page,
-                              'formats': [{'filename': 'cont_*PGV.json',
+                              'formats': [{'filename': 'cont_*pgv.json',
                                            'type': 'application/json'}
                                           ]
                               }
@@ -69,7 +69,7 @@ class ContourModule(CoreModule):
         'title': 'PSA[PERIOD] Contour',
         'page': contour_page,
         'caption': psacap,
-        'formats': [{'filename': 'cont_*PSA[0-9]p[0-9].json',
+        'formats': [{'filename': 'cont_*psa[0-9]p[0-9].json',
                      'type': 'application/json'}
                     ]
     }

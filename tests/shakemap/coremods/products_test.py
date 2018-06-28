@@ -145,7 +145,7 @@ def do_raster(evid, datapath, oc):
 
     imts = oc.getIMTs()
 
-    rzip = os.path.join(datapath, evid, 'current', 'products', 'rasters.zip')
+    rzip = os.path.join(datapath, evid, 'current', 'products', 'raster.zip')
     with tempfile.TemporaryDirectory() as tmpdirname:
         with zipfile.ZipFile(rzip, 'r') as zip_ref:
             zip_ref.extractall(tmpdirname)

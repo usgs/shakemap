@@ -121,7 +121,7 @@ class MappingModule(CoreModule):
                           'page': mapping_page,
                           'formats': [{'filename': 'pga.jpg',
                                        'type': 'image/jpeg'},
-                                      {'filename': 'PGA_contour.pdf',
+                                      {'filename': 'pga.pdf',
                                        'type': 'image/jpeg'}
                                       ]
                           }
@@ -130,7 +130,7 @@ class MappingModule(CoreModule):
                           'page': mapping_page,
                           'formats': [{'filename': 'pgv.jpg',
                                        'type': 'image/jpeg'},
-                                      {'filename': 'PGV_contour.pdf',
+                                      {'filename': 'pgv.pdf',
                                        'type': 'application/pdf'},
                                       ]
                           }
@@ -141,7 +141,7 @@ class MappingModule(CoreModule):
                                   'formats': [{'filename': 'psa[0-9][0-9].jpg',
                                                'type': 'image/jpeg'},
                                               {'filename':
-                                               'PSA[0-9]p[0-9]_contour.pdf',
+                                               'psa[0-9]p[0-9].pdf',
                                                'type': 'application/pdf'},
                                               ]
                                   }

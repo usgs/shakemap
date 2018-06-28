@@ -6,11 +6,11 @@ def oq_to_file(oqimt):
     """Convert openquake IMT nomenclature to filename friendly form.
 
     Examples:
-    SA(1.0) (Spectral Acceleration at 1 second) -> PSA1p0
-    SA(0.3) (Spectral Acceleration at 0.3 second) -> PSA0p3
-    SA(15.0) (Spectral Acceleration at 15 seconds) -> PSA15p0
-    SA(3) (Spectral Acceleration at 3 seconds) -> PSA3p0
-    SA(.5) (Spectral Acceleration at 0.5 seconds) -> PSA0p5
+    SA(1.0) (Spectral Acceleration at 1 second) -> psa1p0
+    SA(0.3) (Spectral Acceleration at 0.3 second) -> psa0p3
+    SA(15.0) (Spectral Acceleration at 15 seconds) -> psa15p0
+    SA(3) (Spectral Acceleration at 3 seconds) -> psa3p0
+    SA(.5) (Spectral Acceleration at 0.5 seconds) -> psa0p5
 
     Args:
         oqimt (str): Openquake IMT nomenclature string.
@@ -21,7 +21,7 @@ def oq_to_file(oqimt):
             IMT representation.
     """
     if oqimt in ['PGA', 'PGV', 'MMI']:
-        return oqimt
+        return oqimt.lower()
     float_pattern = r"[-+]?\d*\.\d+|\d+"
     periods = re.findall(float_pattern, oqimt)
     if not len(periods):
@@ -35,7 +35,7 @@ def oq_to_file(oqimt):
         integer, fraction = period.split('.')
         if not len(integer):
             integer = '0'
-    fileimt = 'PSA%sp%s' % (integer, fraction)
+    fileimt = 'psa%sp%s' % (integer, fraction)
     return fileimt
 
 
@@ -43,21 +43,21 @@ def file_to_oq(fileimt):
     """Convert filename friendly IMT form to openquake form.
 
     Examples:
-    PSA1p0 (Spectral Acceleration at 1 second) -> SA(1.0)
-    PSA0p3 (Spectral Acceleration at 0.3 second) -> SA(0.3)
-    PSA15p0 (Spectral Acceleration at 15 seconds) -> SA(15.0)
+    psa1p0 (Spectral Acceleration at 1 second) -> SA(1.0)
+    psa0p3 (Spectral Acceleration at 0.3 second) -> SA(0.3)
+    psa15p0 (Spectral Acceleration at 15 seconds) -> SA(15.0)
 
     Args:
         fileimt (str): Filename friendly IMT string.
     Returns:
         str: Openquake IMT nomenclature string.
     """
-    if fileimt in ['PGA', 'PGV', 'MMI']:
-        return fileimt
+    if fileimt in ['pga', 'pgv', 'mmi']:
+        return fileimt.upper()
     if 'p' not in fileimt:
         fmt = '%s is not a valid filename-friendly IMT string.'
         raise ValueError(fmt % fileimt)
-    integer, fraction = fileimt.replace('PSA', '').split('p')
+    integer, fraction = fileimt.replace('psa', '').split('p')
     if not len(fraction):
         fmt = '%s is not a valid filename-friendly IMT string.'
         raise ValueError(fmt % fileimt)

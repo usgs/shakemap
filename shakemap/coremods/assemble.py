@@ -103,6 +103,9 @@ class AssembleModule(CoreModule):
         products_path = os.path.join(datadir, 'products')
         if os.path.isdir(products_path):
             shutil.rmtree(products_path, ignore_errors=True)
+        pdl_path = os.path.join(datadir, 'pdl')
+        if os.path.isdir(pdl_path):
+            shutil.rmtree(pdl_path, ignore_errors=True)
 
         #
         # Look for global configs in install_path/config
