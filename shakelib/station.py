@@ -585,11 +585,13 @@ class StationList(object):
             Character representing the channel orientation. One of 'N',
             'E', 'Z', 'H' (for horizontal), or 'U' (for unknown).
         """
-        if orig_channel == 'mmi':
+        if orig_channel == 'mmi' or orig_channel == 'DERIVED':
             orientation = 'H'           # mmi is arbitrarily horizontal
         elif orig_channel[-1] in ('N', 'E', 'Z'):
             orientation = orig_channel[-1]
-        elif orig_channel[-1] == "K":   # Channel is "UNK"; assume horizontal
+        elif orig_channel == "UNK":   # Channel is "UNK"; assume horizontal
+            orientation = 'H'
+        elif orig_channel == 'H1' or orig_channel == 'H2':
             orientation = 'H'
         else:
             orientation = 'U'  # this is unknown
@@ -773,5 +775,5 @@ class StationList(object):
 
 def get_imt_period(imt):
 
-    p = re.search('(?<=psa)\d+', imt)
+    p = re.search(r'(?<=psa)\d+', imt)
     return float(p.group(0)[:-1] + '.' + p.group(0)[-1])
