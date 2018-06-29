@@ -91,8 +91,89 @@ def test_probs():
     assert gmpe_list == ['subduction_crustal',
                          'subduction_interface_nshmp2014',
                          'subduction_slab_nshmp2014']
-#    print(weight_list)
-#    print(gmpe_list)
+
+    # Adding some new events that Bruce identified as being problematic
+    datadir = os.path.join(
+        homedir, '..', '..', 'data', 'eventdata', 'us1000ehd9', 'current')
+    eventxml = os.path.join(datadir, 'event.xml')
+    org = Origin.fromFile(eventxml)
+    gmpe_list, weight_list, strec_results = get_weights(org, config)
+    assert len(gmpe_list) == 5
+    assert len(weight_list) == 5
+    np.testing.assert_allclose(np.sum(weight_list), 1.0, rtol=1e-05)
+    assert gmpe_list[0] == 'active_crustal_nshmp2014'
+    assert gmpe_list[1] == 'active_crustal_deep'
+    assert gmpe_list[2] == 'subduction_crustal'
+    assert gmpe_list[3] == 'subduction_interface_nshmp2014'
+    assert gmpe_list[4] == 'subduction_slab_nshmp2014'
+    weights = np.array(
+        [0.14107929,  0.32063474,  0.00484913,  0.13457149,  0.39886534])
+    np.testing.assert_allclose(weights, weight_list, rtol=1e-05)
+
+    datadir = os.path.join(
+        homedir, '..', '..', 'data', 'eventdata', 'nc73027396', 'current')
+    eventxml = os.path.join(datadir, 'event.xml')
+    org = Origin.fromFile(eventxml)
+    gmpe_list, weight_list, strec_results = get_weights(org, config)
+    assert len(gmpe_list) == 2
+    assert len(weight_list) == 2
+    np.testing.assert_allclose(np.sum(weight_list), 1.0, rtol=1e-05)
+    assert gmpe_list[0] == 'active_crustal_nshmp2014'
+    assert gmpe_list[1] == 'subduction_crustal'
+    weights = np.array([0.56701025, 0.43298975])
+    np.testing.assert_allclose(weights, weight_list, rtol=1e-05)
+
+    datadir = os.path.join(
+        homedir, '..', '..', 'data', 'eventdata', 'nc73027746', 'current')
+    eventxml = os.path.join(datadir, 'event.xml')
+    org = Origin.fromFile(eventxml)
+    gmpe_list, weight_list, strec_results = get_weights(org, config)
+    assert len(gmpe_list) == 2
+    assert len(weight_list) == 2
+    np.testing.assert_allclose(np.sum(weight_list), 1.0, rtol=1e-05)
+    assert gmpe_list[0] == 'active_crustal_nshmp2014'
+    assert gmpe_list[1] == 'subduction_crustal'
+    weights = np.array([0.65862119, 0.34137881])
+    np.testing.assert_allclose(weights, weight_list, rtol=1e-05)
+
+    datadir = os.path.join(
+        homedir, '..', '..', 'data', 'eventdata', 'us1000er8i', 'current')
+    eventxml = os.path.join(datadir, 'event.xml')
+    org = Origin.fromFile(eventxml)
+    gmpe_list, weight_list, strec_results = get_weights(org, config)
+    assert len(gmpe_list) == 2
+    assert len(weight_list) == 2
+    np.testing.assert_allclose(np.sum(weight_list), 1.0, rtol=1e-05)
+    assert gmpe_list[0] == 'active_crustal_nshmp2014'
+    assert gmpe_list[1] == 'subduction_crustal'
+    weights = np.array([0.59252503, 0.40747497])
+    np.testing.assert_allclose(weights, weight_list, rtol=1e-05)
+
+    datadir = os.path.join(
+        homedir, '..', '..', 'data', 'eventdata', 'us1000e0j1', 'current')
+    eventxml = os.path.join(datadir, 'event.xml')
+    org = Origin.fromFile(eventxml)
+    gmpe_list, weight_list, strec_results = get_weights(org, config)
+    assert len(gmpe_list) == 2
+    assert len(weight_list) == 2
+    np.testing.assert_allclose(np.sum(weight_list), 1.0, rtol=1e-05)
+    assert gmpe_list[0] == 'active_crustal_nshmp2014'
+    assert gmpe_list[1] == 'subduction_crustal'
+    weights = np.array([0.86936684, 0.13063316])
+    np.testing.assert_allclose(weights, weight_list, rtol=1e-05)
+
+    datadir = os.path.join(
+        homedir, '..', '..', 'data', 'eventdata', 'us1000db5t', 'current')
+    eventxml = os.path.join(datadir, 'event.xml')
+    org = Origin.fromFile(eventxml)
+    gmpe_list, weight_list, strec_results = get_weights(org, config)
+    assert len(gmpe_list) == 2
+    assert len(weight_list) == 2
+    np.testing.assert_allclose(np.sum(weight_list), 1.0, rtol=1e-05)
+    assert gmpe_list[0] == 'active_crustal_nshmp2014'
+    assert gmpe_list[1] == 'subduction_crustal'
+    weights = np.array([0.89696954,  0.10303046])
+    np.testing.assert_allclose(weights, weight_list, rtol=1e-05)
 
 
 if __name__ == '__main__':
