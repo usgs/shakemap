@@ -35,4 +35,4 @@ dependencies:
 - shapely
 - strec
 - versioneer
-
+- kealib=1.4.7
