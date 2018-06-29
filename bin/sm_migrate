@@ -58,11 +58,10 @@ def get_parser():
         - Origin information for new event.xml file.
         - bias settings (see -s option)
 
-      - *.conf Config files, of which generally speaking only grind.conf
-        is supported:
+      - *.conf Config files, at this time only configs from grind.conf:
                - IPEs are currently not supported.
-               - A smaller subset of GMICE are supported in ShakeMap 4.0 at
-                 the time of this writing.
+               - A partial subset of GMICE are supported in ShakeMap 4.0 at
+                 this time.
                - GMPE selections will be converted to the closest matching
                  GEM equivalent (see -m).
                - outlier max_deviation and max_mag values will be converted.
@@ -80,6 +79,8 @@ does not prepend eventid'''
                         default=False, help=hlptxt)
     hlptxt2 = '''Ignore previous bounds/resolution settings discovered
 in input data.'''
+    hlptxt3 = '''Ignore previous ground motion conversion settings discovered 
+in input data.'''
     parser.add_argument('-b', '--skip-bounds', action='store_true',
                         default=False, help=hlptxt2)
     parser.add_argument('-s', '--skip-settings', action='store_true',
@@ -91,7 +92,10 @@ in input data.'''
 
 def _extract_file(member, tarball, filename, event_dir):
     datafile_object = tarball.extractfile(member)
-    data = datafile_object.read().decode('utf-8')
+    try:
+        data = datafile_object.read().decode('utf-8')
+    except:
+        x = 1
     datafile_object.close()
     datafile = os.path.join(event_dir, filename)
     with open(datafile, 'wt') as dfile:
@@ -160,6 +164,13 @@ def main(args):
         event_dir = os.path.join(data_path, event_id, 'current')
         if not os.path.isdir(event_dir):
             event_dir = create_event_directory(event_id, data_path)
+
+        # if these tarballs are made on a Mac, they may have done what
+        # is described here:
+        # https://superuser.com/a/61188
+        # skip these files!
+        if filename.startswith('._'):
+            continue
 
         if filename.endswith('.conf'):
             cfg_errors, tconversions = parse_config(
