@@ -835,7 +835,10 @@ class MapMaker(object):
 
                 # If dimt is MMI then we have to use the converted value
                 # from an instrumental value
-                mmi_conv = float(feature['properties']['intensity'])
+                try:
+                    mmi_conv = float(feature['properties']['intensity'])
+                except ValueError:
+                    mmi_conv = np.nan
                 if dimt == 'mmi':
                     inst_dict[dimt].append(mmi_conv)
                     inst_dict['lat'].append(lat)
