@@ -141,7 +141,6 @@ def _transfer(config, info, pdl_dir, products_dir, cancel=False):
                     downloads_dir = os.path.join(pdl_dir, 'downloads')
                     if os.path.isdir(downloads_dir):
                         shutil.rmtree(downloads_dir, ignore_errors=True)
-                    os.makedirs(downloads_dir)
                     shutil.copytree(products_dir, downloads_dir)
                     sender = sender_class(
                         properties=params,
