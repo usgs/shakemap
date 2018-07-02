@@ -24,6 +24,7 @@ from shakelib.rupture.quad_rupture import QuadRupture
 from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.factory import get_rupture, text_to_json
 from shakelib.rupture.factory import rupture_from_dict
+from shakelib.rupture.factory import validate_json
 
 from shakelib.rupture.utils import get_local_unit_slip_vector
 from shakelib.rupture.utils import get_quad_slip
@@ -32,6 +33,16 @@ from impactutils.time.ancient_time import HistoricTime
 homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
 shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
 sys.path.insert(0, shakedir)
+
+
+def test_no_origin():
+    # No argument
+    with pytest.raises(Exception):
+        get_rupture()
+
+    # Wrong type
+    with pytest.raises(Exception):
+        get_rupture(7.3)
 
 
 def test_text_to_json():
@@ -270,7 +281,7 @@ def test_QuadRupture():
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(time.time())})
 
-# First with json file
+    # First with json file
     file = os.path.join(homedir, 'rupture_data/izmit.json')
     rupj = get_rupture(origin, file)
     # Then with text file:
@@ -628,6 +639,7 @@ def test_parse_complicated_rupture():
 
 
 def test_incorrect():
+    # Number of points in polyon is even
     rupture_text = """# Source: Ji, C., D. V. Helmberger, D. J. Wald, and K.-F. Ma (2003). Slip history and dynamic implications of the 1999 Chi-Chi, Taiwan, earthquake, J. Geophys. Res. 108, 2412, doi:10.1029/2002JB001764.
     120.72300 24.27980 	0
     121.00000 24.05000	17
@@ -654,10 +666,150 @@ def test_incorrect():
                      'depth': 5.0, 'mag': 7.0, 'netid': 'us',
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(time.time())})
-
     cbuf = io.StringIO(rupture_text)
     with pytest.raises(Exception):
         get_rupture(origin, cbuf)
+
+    # Top points must be first
+    rupture_text = """# Test
+    120.72300 24.27980 	0
+    121.00000 24.05000	17
+    121.09300 24.07190	17
+    121.04300 24.33120	17
+    120.72300 24.27980	0"""  # noqa
+    cbuf = io.StringIO(rupture_text)
+    with pytest.raises(Exception):
+        get_rupture(origin, cbuf)
+
+    # Wrong order of lat/lon
+    rupture_text = """# Test
+    -118.421 34.315  5.000
+    -118.587 34.401  5.000
+    -118.693 34.261 20.427
+    -118.527 34.175 20.427
+    -118.421 34.315 5.000
+    """  # noqa
+    cbuf = io.StringIO(rupture_text)
+    with pytest.raises(Exception):
+        get_rupture(origin, cbuf, new_format=False)
+
+    # Wrong order of lat/lon
+    rupture_text = """# Test
+    34.315 -118.421  5.000
+    34.401 -118.587  5.000
+    34.261 -118.693 20.427
+    34.175 -118.527 20.427
+    34.315 -118.421  5.000
+    """  # noqa
+    cbuf = io.StringIO(rupture_text)
+    with pytest.raises(Exception):
+        get_rupture(origin, cbuf, new_format=True)
+
+    # Unclosed segments
+    rupture_text = """# Test
+    34.315 -118.421  5.000
+    34.401 -118.587  5.000
+    34.261 -118.693 20.427
+    34.175 -118.527 20.427
+    34.315 -118.6    5.000
+    """  # noqa
+    cbuf = io.StringIO(rupture_text)
+    with pytest.raises(Exception):
+        get_rupture(origin, cbuf, new_format=False)
+
+    # incorrect delimiter
+    rupture_text = """#Test
+    34.315;-118.421;5.000
+    34.401;-118.587;5.000
+    34.261;-118.693;20.427
+    34.175;-118.527;20.427
+    34.315;-118.421;5.000
+    """  # noqa
+    cbuf = io.StringIO(rupture_text)
+    with pytest.raises(Exception):
+        get_rupture(origin, cbuf, new_format=False)
+
+    # Not 3 columns
+    rupture_text = """#Test
+    34.315 -118.421;5.000
+    34.401 -118.587;5.000
+    34.261 -118.693;20.427
+    34.175 -118.527;20.427
+    34.315 -118.421;5.000
+    """  # noqa
+    cbuf = io.StringIO(rupture_text)
+    with pytest.raises(Exception):
+        get_rupture(origin, cbuf, new_format=False)
+
+    # Json incorrect
+    test = {
+        "metadata": {
+            "id": "test",
+            "mag": 7.0,
+            "lon": 0,
+            "mech": "ALL",
+            "depth": 5.0,
+            "time": "2018-07-02T22:50:03Z",
+            "netid": "us",
+            "rake": 0.0,
+            "lat": 0,
+            "network": "",
+            "locstring": "",
+            "reference": "Test"
+        },
+        "features": [{
+            "type": "Feature",
+            "geometry": {
+                "coordinates": [[
+                    [[-118.421, 34.315, 5.0],
+                     [-118.587, 34.401, 5.0],
+                     [-118.693, 34.261, 20.427],
+                     [-118.527, 34.175, 20.427],
+                     [-118.421, 34.315, 5.0]]]],
+                "type": "MultiPolygon"
+            },
+            "properties":{
+                "rupture type": "rupture extent"
+            }
+        }],
+        "type": "FeatureCollection"
+    }
+
+    # incorrect type
+    test_incorrect = copy.deepcopy(test)
+    test_incorrect['type'] = 'Feature'
+    with pytest.raises(Exception):
+        validate_json(test_incorrect)
+
+    # Incorrect number of features
+    test_incorrect = copy.deepcopy(test)
+    test_incorrect['features'].append(['wrong'])
+    with pytest.raises(Exception):
+        validate_json(test_incorrect)
+
+    # no reference
+    test_incorrect = copy.deepcopy(test)
+    test_incorrect['metadata'].pop('reference', None)
+    with pytest.raises(Exception):
+        validate_json(test_incorrect)
+
+    # incorrect feature type
+    test_incorrect = copy.deepcopy(test)
+    test_incorrect['features'][0]['type'] = 'fred'
+    with pytest.raises(Exception):
+        validate_json(test_incorrect)
+
+    # incorrect feature geometry type
+    test_incorrect = copy.deepcopy(test)
+    test_incorrect['features'][0]['geometry']['type'] = 'fred'
+    with pytest.raises(Exception):
+        validate_json(test_incorrect)
+
+    # no coordinates
+    test_incorrect = copy.deepcopy(test)
+    test_incorrect['features'][0]['geometry'].pop('coordinates', None)
+    with pytest.raises(Exception):
+        validate_json(test_incorrect)
 
 
 def test_fromTrace():
@@ -670,11 +822,13 @@ def test_fromTrace():
     dips = [45.0]
 
     # Rupture requires an origin even when not used:
-    origin = Origin({'id': 'test',
-                     'lon': 0, 'lat': 0,
-                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
-                     'network': '', 'locstring': '',
-                     'time': HistoricTime.utcfromtimestamp(time.time())})
+    origin = Origin({
+        'id': 'test',
+        'lon': 0, 'lat': 0,
+        'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+        'network': '', 'locstring': '',
+        'time': HistoricTime.utcfromtimestamp(time.time())
+    })
 
     rupture = QuadRupture.fromTrace(
         xp0, yp0, xp1, yp1, zp, widths,
@@ -743,7 +897,7 @@ def test_fromOrientation():
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(time.time())})
     rupture = QuadRupture.fromOrientation(px, py, pz, dx, dy, length, width,
-                        strike, dip, origin)
+                                          strike, dip, origin)
     p1 = rupture._geojson['features'][0]['geometry']['coordinates'][0][0][0]
     p2 = rupture._geojson['features'][0]['geometry']['coordinates'][0][0][1]
     p3 = rupture._geojson['features'][0]['geometry']['coordinates'][0][0][2]
@@ -766,7 +920,7 @@ def test_fromOrientation():
     # Exception raised if no origin
     with pytest.raises(Exception) as a:
         rupture = QuadRupture.fromOrientation(px, py, pz, dx, dy, length, width,
-                            strike, dip, None)
+                                              strike, dip, None)
 
     # Exception raised if different lengths of arrays
     with pytest.raises(Exception) as a:
@@ -786,10 +940,11 @@ def test_fromOrientation():
                          'network': '', 'locstring': '',
                          'time': HistoricTime.utcfromtimestamp(time.time())})
         rupture = QuadRupture.fromOrientation(px, py, pz, dx, dy, length, width,
-                            strike, dip, origin)
+                                              strike, dip, origin)
 
 
 if __name__ == "__main__":
+    test_no_origin()
     test_text_to_json()
     test_rupture_from_dict()
     test_rupture_depth(interactive=True)

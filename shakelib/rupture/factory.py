@@ -19,7 +19,7 @@ from shakelib.utils.exception import ShakeLibException
 from impactutils.time.ancient_time import HistoricTime
 
 
-def get_rupture(origin, file=None, mesh_dx=0.5):
+def get_rupture(origin, file=None, mesh_dx=0.5, new_format=True):
     """
     This is a module-level function to read in a rupture file. This allows for
     the ShakeMap 3 text file specification or the ShakeMap 4 JSON rupture
@@ -32,18 +32,28 @@ def get_rupture(origin, file=None, mesh_dx=0.5):
     If file is None (default) then it returns a PointRupture.
 
     Args:
-        origin (Origin): A ShakeMap origin instance; required because
-            hypocentral/epicentral distances are computed from the Rupture
-            class.
-        file (srt): Path to rupture file (optional).
-        mesh_dx (float): Target spacing (in km) for rupture discretization;
-            default is 0.5 km and it is only used if the rupture file is an
-            EdgeRupture.
+        origin (Origin):
+            A ShakeMap origin instance; required because hypocentral/epicentral
+            distances are computed from the Ruptureclass.
+
+        file (srt):
+            Path to rupture file (optional).
+
+        mesh_dx (float):
+            Target spacing (in km) for rupture discretization; default is
+            0.5 km and it is only used if the rupture file is an EdgeRupture.
+
+        new_format (bool):
+            Indicates whether text rupture format is
+            "old" (lat, lon, depth) or "new" (lon, lat, depth) style.
 
     Returns:
         Rupture subclass instance.
 
     """
+    if not isinstance(origin, Origin):
+        raise TypeError("An Origin is requred.")
+
     if file is not None:
         try:
             # -----------------------------------------------------------------
@@ -62,14 +72,20 @@ def get_rupture(origin, file=None, mesh_dx=0.5):
             # Reading as json failed, so hopefully it is a ShakeMap 3 text file
             # -----------------------------------------------------------------
             try:
-                d = text_to_json(file)
+                d = text_to_json(file, new_format=new_format)
                 rupt = rupture_from_dict_and_origin(d, origin, mesh_dx=mesh_dx)
-            except:
-                raise Exception("Unknown rupture file format.")
+            except ValueError as e:
+                logging.error(e)
+                raise ValueError("Error reading %s. This could have been "
+                                 "because the latitude and longitdue are "
+                                 "reversed. Try changing the 'new_format' "
+                                 "option." % file)
+            except Exception as e:
+                logging.error(e)
+                raise IOError("Unknown rupture file format.")
     else:
-        if origin is None:
-            raise Exception("Origin requred if no rupture file is provided.")
         rupt = PointRupture(origin)
+
     return rupt
 
 
@@ -208,11 +224,11 @@ def _check_polygon(p):
     """
     n_points = len(p)
     if n_points % 2 == 0:
-        raise Exception('Number of points in polyon must be odd.')
+        raise ValueError('Number of points in polyon must be odd.')
 
     if p[0] != p[-1]:
-        raise Exception('First and last points in polygon must be '
-                        'identical.')
+        raise ValueError('First and last points in polygon must be '
+                         'identical.')
 
     n_pairs = int((n_points - 1) / 2)
     for j in range(n_pairs):
@@ -248,7 +264,7 @@ def text_to_json(file, new_format=True):
      - Vertices can be specified in top-edge or bottom-edge first order.
 
     Args:
-        rupturefile (str):
+        file (str):
             Path to rupture file OR file-like object in GMT
             psxy format, where:
 
@@ -306,9 +322,9 @@ def text_to_json(file, new_format=True):
                     'Rupture file %s has unspecified delimiters.' % file)
 
         if len(parts) != 3:
-            msg = 'Rupture file %s is not in lat,lon,depth format.'
+            msg = 'Rupture file %s is not in lat, lon, depth format.'
             if new_format:
-                'Rupture file %s is not in lon,lat,depth format.'
+                'Rupture file %s is not in lon, lat, depth format.'
             raise ShakeLibException(msg % file)
 
         parts = [float(p) for p in parts]
