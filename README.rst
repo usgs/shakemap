@@ -86,8 +86,6 @@ Installation and Dependencies
 - The ``install.sh`` script installs this package and all other dependencies,
   including python 3.5 and the required python libraries. It is regularly tested
   on OSX, CentOS, and Ubuntu.
-- Note that for development, we have found that the ``-e`` for the pip install
-  is useful.
 
 OQ Hazard Library
 -----------------
