@@ -497,12 +497,17 @@ class MapMaker(object):
         Returns:
             Basemap: Basemap instance, Mercator projection.
         """
-        clon = gd.xmin + (gd.xmax - gd.xmin) / 2.0
+        if gd.xmin > gd.xmax:
+            clon = gd.xmin + ((gd.xmax+360) - gd.xmin)/2.0
+            xmin = gd.xmin - 360
+        else:
+            clon = gd.xmin + (gd.xmax - gd.xmin) / 2.0
+            xmin = gd.xmin
         clat = gd.ymin + (gd.ymax - gd.ymin) / 2.0
         f = plt.figure(figsize=(self.fig_width, self.fig_height))
         ax = f.add_axes([0.1, 0.1, 0.8, 0.8])
 
-        m = Basemap(llcrnrlon=gd.xmin, llcrnrlat=gd.ymin, urcrnrlon=gd.xmax,
+        m = Basemap(llcrnrlon=xmin, llcrnrlat=gd.ymin, urcrnrlon=gd.xmax,
                     urcrnrlat=gd.ymax, rsphere=(6378137.00, 6356752.3142),
                     resolution=BASEMAP_RESOLUTION, projection='merc',
                     lat_0=clat, lon_0=clon, lat_ts=clat, ax=ax,
