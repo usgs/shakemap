@@ -79,15 +79,13 @@ mailing list. We also encourage requests, questions, and discussions through
 the Github issues tab associated with this repository.
 
 Installation and Dependencies
-------------
+-----------------------------
 
 - Mac OSX or Linux operating systems
-- Python 3
-- Python libraries: numpy, scipy, rasterio, fiona, xlrd, pandas, basemap,
-  shapely, h5py, gdal, descartes, openquake.engine, neicio,
-  MapIO, matplotlib, pytables, lxml
-- The ``install.sh`` script installs this package and all dependencies. It is
-  regularly tested on OSX and Ubuntu.
+- bash shell, git, curl
+- The ``install.sh`` script installs this package and all other dependencies,
+  including python 3.5 and the required python libraries. It is regularly tested
+  on OSX, CentOS, and Ubuntu.
 - Note that for development, we have found that the ``-e`` for the pip install
   is useful.
 
@@ -102,10 +100,10 @@ The OQ hazard library provided us with a broad range of
 well-tested, high performance, open source global GMPEs. Due to constraints
 imposed by the software architecture of earlier implementations of ShakeMap, the
 development and validation of GMPE modules is time consuming and difficult, which
-restricted the quantity and timeliness of the available modules. The OQ Hazard Library
-provides a broad array of current GMPE and related hazard modules, as well as a
-framework for easily adding new modules (whether by GEM or ShakeMap staff),
-jumpstarting our efforts to re-implement ShakeMap.
+restricted the quantity and timeliness of the available modules. The OQ Hazard
+Library provides a broad array of current GMPE and related hazard modules, as
+well as a framework for easily adding new modules (whether by GEM or ShakeMap
+staff), jumpstarting our efforts to re-implement ShakeMap.
 
 .. _OQ: https://github.com/gem/oq-engine/#openquake-engine
 .. _openquake.hazardlib: http://docs.openquake.org/oq-engine/stable/openquake.hazardlib.html
