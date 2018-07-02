@@ -5,12 +5,10 @@ if [ "$unamestr" == 'Linux' ]; then
     prof=~/.bashrc
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     matplotlibdir=~/.config/matplotlib
-    env_file=environment_linux.yml
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     prof=~/.bash_profile
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
     matplotlibdir=~/.matplotlib
-    env_file=environment_osx.yml
 else
     echo "Unsupported environment. Exiting."
     exit
@@ -23,16 +21,6 @@ source $prof
 
 VENV=shakemap
 
-# Is the reset flag set?
-reset=0
-while getopts r FLAG; do
-  case $FLAG in
-    r)
-        reset=1
-        
-      ;;
-  esac
-done
 
 # this is an experiment to see if we can get away without the platform specific
 # environment files.
@@ -104,13 +92,8 @@ if [ $? -ne 0 ]; then
     echo ". $_CONDA_ROOT/etc/profile.d/conda.sh" >> $prof
 fi
 
-# If the user has specified the -r (reset) flag, then create an
-# environment based on only the named dependencies, without
-# any versions of packages specified.
-if [ $reset == 1 ]; then
-    echo "Ignoring platform, letting conda sort out dependencies..."
-    env_file=environment.yml
-fi
+env_file=environment.yml
+
 
 # Start in conda base environment
 echo "Activate base virtual environment"
