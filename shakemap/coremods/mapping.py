@@ -216,7 +216,7 @@ class MappingModule(CoreModule):
                 contour_file = mapmaker.drawContourMap(imt, datadir)
                 self.logger.debug('Created contour map %s' % contour_file)
 
-        ###########################
+        #######################################################################
         # Make a placeholder plot of standard deviation
         # fill this in later if necessary
         plt.figure(figsize=(FIG_WIDTH, FIG_HEIGHT))
@@ -238,7 +238,7 @@ class MappingModule(CoreModule):
         sd_file = os.path.join(datadir, 'sd.jpg')
         fig = plt.gcf()
         _save_jpg(fig, sd_file)
-        ###########################
+        #######################################################################
 
         container.close()
 
@@ -259,10 +259,7 @@ def getProjectedPolygon(polygon, m):
     extpts = list(zip(extx, exty))
     ints = []
     for interior in polygon.interiors:
-        try:
-            intlon, intlat = zip(*interior.coords[:])
-        except Exception:
-            pass
+        intlon, intlat = zip(*interior.coords[:])
         intx, inty = m(intlon, intlat)
         ints.append(list(zip(intx, inty)))
     ppolygon = sPolygon(extpts, ints)
@@ -345,6 +342,17 @@ class MapMaker(object):
         self.city_cols = CITY_COLS
         self.city_rows = CITY_ROWS
         self.cities_per_grid = CITIES_PER_GRID
+        mapinfo = container.getMetadata()['output']['map_information']
+        bbox = [
+            float(mapinfo['min']['longitude']),
+            float(mapinfo['max']['longitude']),
+            float(mapinfo['min']['latitude']),
+            float(mapinfo['max']['latitude'])
+        ]
+
+        self.roads = None
+        if 'roads' in layerdict.keys():
+            self.roads = self._selectRoads(layerdict['roads'], bbox)
         self.intensity_colormap = ColorPalette.fromPreset('mmi')
         self.contour_colormap = ColorPalette.fromPreset('shaketopo')
         station_dict = container.getStationDict()
@@ -596,28 +604,41 @@ class MapMaker(object):
                         continue
 
     def _drawRoads(self, m):
-        """Draw all roads on the map.
+        """Draw roads on the map.
 
         Args:
             m (Basemap): Basemap instance.
 
         """
-        allshapes = self.vectors['roads']
+        if self.roads is None:
+            return
+
+        allshapes = self.roads
         xmin = 9999999
         ymin = xmin
         xmax = -99999999
         ymax = xmax
         for shape in allshapes:
             # shape is a shapely geometry
-            if isinstance(shape, (MultiLineString, GeometryCollection)):
+            if isinstance(shape, (MultiLineString,
+                                  GeometryCollection)):
                 blon = []
                 blat = []
                 for mshape in shape:
-                    tlon, tlat = zip(*mshape.coords[:])
+                    out_coords = list(zip(*mshape.coords[:]))
+                    if len(out_coords) == 2:
+                        tlon, tlat = out_coords
+                    elif len(out_coords) == 3:
+                        tlon, tlat, _ = out_coords
+
                     blon += tlon
                     blat += tlat
             else:
-                blon, blat = zip(*shape.coords[:])
+                out_coords = list(zip(*shape.coords[:]))
+                if len(out_coords) == 2:
+                    blon, blat = out_coords
+                elif len(out_coords) == 3:
+                    blon, blat, _ = out_coords
 
             if not len(blon):
                 continue
@@ -639,8 +660,7 @@ class MapMaker(object):
             m (Basemap): Basemap instance.
 
         """
-        lakes = self.vectors['lake']
-        for lake in lakes:
+        for lake in self.vectors['lake']:
             ppatches = getProjectedPatches(lake, m, edgecolor='k')
             for ppatch in ppatches:
                 m.ax.add_patch(ppatch)
@@ -964,7 +984,7 @@ class MapMaker(object):
 
         # draw whatever road data is available
         # self.logger.debug('Drawing roads...')
-        # self._drawRoads(m)
+        self._drawRoads(m)
         # self.logger.debug('Done drawing roads...')
 
         # draw lakes

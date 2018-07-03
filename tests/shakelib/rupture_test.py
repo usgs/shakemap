@@ -165,11 +165,13 @@ def test_rupture_from_dict():
     # the origin and both get retained.
 
     # Point rupture
-    origin = Origin({'id': 'test',
-                     'lon': -122.5, 'lat': 37.3,
-                     'depth': 5.0, 'mag': 7.0, 'netid': 'us',
-                     'network': '', 'locstring': '',
-                     'time': HistoricTime.utcfromtimestamp(time.time())})
+    origin = Origin({
+        'id': 'test',
+        'lon': -122.5, 'lat': 37.3,
+        'depth': 5.0, 'mag': 7.0, 'netid': 'us',
+        'network': '', 'locstring': '',
+        'time': HistoricTime.utcfromtimestamp(time.time())
+    })
 
     rup_original = get_rupture(origin)
     d = rup_original._geojson
