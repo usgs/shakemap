@@ -270,6 +270,24 @@ def do_contour_command_line(evid, datapath):
     assert not cp.returncode
 
 
+def test_points():
+    installpath, datapath = get_config_paths()
+
+    # An event with points rather than grid (should raise exception)
+    evid = 'northridge_points'
+    assemble = AssembleModule(evid, comment='Test comment.')
+    assemble.execute()
+    del assemble
+    model = ModelModule(evid)
+    model.execute()
+    del model
+
+    mod = MappingModule(evid)
+    # Mapping should raise exception
+    with pytest.raises(NotImplementedError):
+        mod.execute()
+
+
 def test_products():
 
     installpath, datapath = get_config_paths()
@@ -367,3 +385,4 @@ def test_products():
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'
     test_products()
+    test_points()
