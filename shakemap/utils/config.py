@@ -563,7 +563,12 @@ def get_logger(eventid, log_option=None, log_file=None):
             config['loggers']['']['level'] = logging.ERROR
 
         logging.config.dictConfig(config)
-    # get the root logger, otherwise we can't log in sub-libraries
+
+    # Have the logger capture anything from the 'warnings' package,
+    # which many libraries use.
+    logging.captureWarnings(True)
+
+    # Get the root logger, otherwise we can't log in sub-libraries
     logger = logging.getLogger()
 
     return logger
