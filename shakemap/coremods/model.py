@@ -528,17 +528,16 @@ class ModelModule(CoreModule):
                 gmpe = None
                 if imtstr != 'MMI':
                     gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-                pmean, pstddev = _gmas(self.ipe, gmpe, dfn.sx, self.rx,
-                                       dfn.dx, oqimt, self.stddev_types,
-                                       self.apply_gafs)
+                pmean, pstddev = self._gmas(
+                    gmpe, dfn.sx, dfn.dx, oqimt, self.apply_gafs)
                 df[imtstr + '_pred'] = pmean
                 df[imtstr + '_pred_sigma'] = pstddev[0]
                 if self.total_sd_only:
                     tau_guess = SM_CONSTS['default_stddev_inter']
                     df[imtstr + '_pred_tau'] = np.full_like(
                         df[imtstr + '_pred'], tau_guess)
-                    df[imtstr + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
-                                                       tau_guess**2)
+                    df[imtstr + '_pred_phi'] = np.sqrt(
+                        pstddev[0]**2 - tau_guess**2)
                 else:
                     df[imtstr + '_pred_tau'] = pstddev[1]
                     df[imtstr + '_pred_phi'] = pstddev[2]
@@ -624,9 +623,8 @@ class ModelModule(CoreModule):
                 # Get the predictions and stddevs
                 #
                 gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-                pmean, pstddev = _gmas(self.ipe, gmpe, self.df2.sx, self.rx,
-                                       self.df2.dx, oqimt, self.stddev_types,
-                                       self.apply_gafs)
+                pmean, pstddev = self._gmas(
+                    gmpe, self.df2.sx, self.df2.dx, oqimt, self.apply_gafs)
                 df2[imtstr + '_pred'] = pmean
                 df2[imtstr + '_pred_sigma'] = pstddev[0]
                 if self.total_sd_only:
@@ -689,17 +687,17 @@ class ModelModule(CoreModule):
         # Get the prediction and stddevs
         #
         gmpe = None
-        pmean, pstddev = _gmas(self.ipe, gmpe, self.df1.sx, self.rx,
-                               self.df1.dx, imt.from_string('MMI'),
-                               self.stddev_types, self.apply_gafs)
+        pmean, pstddev = self._gmas(
+            gmpe, self.df1.sx, self.df1.dx, imt.from_string('MMI'),
+            self.apply_gafs)
         df1['MMI' + '_pred'] = pmean
         df1['MMI' + '_pred_sigma'] = pstddev[0]
         if self.total_sd_only:
             tau_guess = SM_CONSTS['default_stddev_inter']
             df1['MMI' + '_pred_tau'] = np.full_like(
                 df1['MMI' + '_pred'], tau_guess)
-            df1['MMI' + '_pred_phi'] = np.sqrt(pstddev[0]**2 -
-                                               tau_guess**2)
+            df1['MMI' + '_pred_phi'] = np.sqrt(
+                pstddev[0]**2 - tau_guess**2)
         else:
             df1['MMI' + '_pred_tau'] = pstddev[1]
             df1['MMI' + '_pred_phi'] = pstddev[2]
@@ -871,21 +869,18 @@ class ModelModule(CoreModule):
         gmpe = None
         if imtstr != 'MMI':
             gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
-        pout_mean, pout_sd = _gmas(self.ipe, gmpe, self.sx_out,
-                                   self.rx, self.dx_out, oqimt,
-                                   self.stddev_types, self.apply_gafs)
+        pout_mean, pout_sd = self._gmas(
+            gmpe, self.sx_out, self.dx_out, oqimt, self.apply_gafs)
         if self.do_grid:
             #
             # Fill the grids for the regression plots
             #
-            x_mean, x_sd = _gmas(self.ipe, gmpe, self.sx_rock,
-                                 self.rx, self.dx_out, oqimt,
-                                 [oqconst.StdDev.TOTAL], False)
+            x_mean, x_sd = self._gmas(
+                gmpe, self.sx_rock, self.dx_out, oqimt, False)
             self.rockgrid[imtstr] = x_mean
             self.rocksd[imtstr] = x_sd[0]
-            x_mean, x_sd = _gmas(self.ipe, gmpe, self.sx_soil,
-                                 self.rx, self.dx_out, oqimt,
-                                 [oqconst.StdDev.TOTAL], False)
+            x_mean, x_sd = self._gmas(
+                gmpe, self.sx_soil, self.dx_out, oqimt, False)
             self.soilgrid[imtstr] = x_mean
             self.soilsd[imtstr] = x_sd[0]
 
@@ -1081,7 +1076,7 @@ class ModelModule(CoreModule):
         ms = 'miscellaneous'
         sv = 'shakemap_versions'
         sr = 'site_response'
-        info = {}
+        info = self._info
         info[ip] = {}
         info[ip][ei] = {}
         info[ip][ei]['depth'] = str(self.rx.hypo_depth)
@@ -1579,6 +1574,69 @@ class ModelModule(CoreModule):
             oc.setArray('regression_' + imtstr + '_soil_sd',
                         soilsd[imtstr])
 
+    #
+    # Helper function to call get_mean_and_stddevs for the
+    # appropriate object given the IMT and describe the
+    # MultiGMPE structure.
+    #
+    def _gmas(self, gmpe, sx, dx, oqimt, apply_gafs):
+        """
+        This is a helper function to call get_mean_and_stddevs for the
+        appropriate object given the IMT.
+
+        Args:
+            gmpe:
+                A GMPE instance.
+            sx:
+                Sites context.
+            dx:
+                Distance context.
+            oqimt:
+                List of OpenQuake IMTs.
+            apply_gafs (boolean):
+                Whether or not to apply the generic
+                amplification factors to the GMPE output.
+
+        Returns:
+            tuple: Tuple of two items:
+
+                - Numpy array of means,
+                - List of numpy array of standard deviations corresponding to
+                  therequested stddev_types.
+
+        """
+        if 'MMI' in oqimt:
+            pe = self.ipe
+        else:
+            pe = gmpe
+
+            # -------------------------------------------------------------------------
+            # Describe the MultiGMPE
+            # -------------------------------------------------------------------------
+            if not hasattr(self, '_info'):
+                self._info = {
+                    'multigmpe': {}
+                }
+            self._info['multigmpe'][str(oqimt)] = gmpe.describe()
+
+        mean, stddevs = pe.get_mean_and_stddevs(
+            copy.deepcopy(sx), self.rx,
+            copy.deepcopy(dx), oqimt,
+            self.stddev_types)
+
+        if apply_gafs:
+            gafs = get_generic_amp_factors(sx, str(oqimt))
+            if gafs is not None:
+                mean += gafs
+
+        return mean, stddevs
+
+
+def _round_float(val, digits):
+    if val == 'null':
+        return val
+    return float(('%.' + str(digits) + 'f') % val)
+
 
 def _get_period_arrays(*args):
     """
@@ -1851,51 +1909,3 @@ def _get_layer_info(layer):
         raise ValueError('Unknown layer type: %s' % layer)
 
     return (layer_out, layer_units, layer_digits)
-
-
-#
-# Helper function to call get_mean_and_stddevs for the
-# appropriate object given the IMT
-#
-def _gmas(ipe, gmpe, sx, rx, dx, oqimt, stddev_types, apply_gafs):
-    """
-    This is a helper function to call get_mean_and_stddevs for the
-    appropriate object given the IMT.
-
-    Args:
-        ipe: An IPE instance.
-        gmpe: A GMPE instance.
-        sx: Sites context.
-        rx: Rupture context.
-        dx: Distance context.
-        oqimt: List of OpenQuake IMTs.
-        stddev_types: list of OpenQuake standard deviation types.
-        apply_gafs (boolean): Whether or not to apply the generic
-            amplification factors to the GMPE output.
-
-    Returns:
-        tuple: Tuple of two items:
-
-            - Numpy array of means,
-            - List of numpy array of standard deviations corresponding to the
-              requested stddev_types.
-
-    """
-    if 'MMI' in oqimt:
-        pe = ipe
-    else:
-        pe = gmpe
-    mean, stddevs = pe.get_mean_and_stddevs(copy.deepcopy(sx), rx,
-                                            copy.deepcopy(dx), oqimt,
-                                            stddev_types)
-    if apply_gafs:
-        gafs = get_generic_amp_factors(sx, str(oqimt))
-        if gafs is not None:
-            mean += gafs
-    return mean, stddevs
-
-
-def _round_float(val, digits):
-    if val == 'null':
-        return val
-    return float(('%.' + str(digits) + 'f') % val)
