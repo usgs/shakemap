@@ -626,19 +626,15 @@ class MapMaker(object):
                 blat = []
                 for mshape in shape:
                     out_coords = list(zip(*mshape.coords[:]))
-                    if len(out_coords) == 2:
-                        tlon, tlat = out_coords
-                    elif len(out_coords) == 3:
-                        tlon, tlat, _ = out_coords
+                    tlon = out_coords[0]
+                    tlat = out_coords[1]
 
                     blon += tlon
                     blat += tlat
             else:
                 out_coords = list(zip(*shape.coords[:]))
-                if len(out_coords) == 2:
-                    blon, blat = out_coords
-                elif len(out_coords) == 3:
-                    blon, blat, _ = out_coords
+                blon = out_coords[0]
+                blat = out_coords[1]
 
             if not len(blon):
                 continue

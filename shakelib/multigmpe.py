@@ -260,17 +260,17 @@ class MultiGMPE(GMPE):
                     selected_gmpe,
                     filter_imt=filter_imt)
             else:
-                raise Exception("%s must consist exclusively of keys in "
-                                "conf['gmpe_modules'] or conf['gmpe_sets']"
-                                % selected_gmpe)
+                raise KeyError("%s must consist exclusively of keys in "
+                               "conf['gmpe_modules'] or conf['gmpe_sets']"
+                               % selected_gmpe)
         elif selected_gmpe in conf['gmpe_modules'].keys():
             modinfo = conf['gmpe_modules'][selected_gmpe]
             mod = import_module(modinfo[1])
             tmpclass = getattr(mod, modinfo[0])
             out = MultiGMPE.from_list([tmpclass()], [1.0], imc=IMC)
         else:
-            raise Exception("conf['modeling']['gmpe'] must be a key in "
-                            "conf['gmpe_modules'] or conf['gmpe_sets']")
+            raise KeyError("conf['modeling']['gmpe'] must be a key in "
+                           "conf['gmpe_modules'] or conf['gmpe_sets']")
 
         out.DESCRIPTION = selected_gmpe
         return out
@@ -403,6 +403,8 @@ class MultiGMPE(GMPE):
 
             mgmpe.CUTOFF_DISTANCE = copy.copy(selected_dist_cutoff)
             mgmpe.WEIGHTS_LARGE_DISTANCE = copy.copy(filtered_wts_ld)
+
+        mgmpe.DESCRIPTION = set_name
 
         return mgmpe
 
@@ -689,6 +691,34 @@ class MultiGMPE(GMPE):
             sites.z2pt5 = sites.z2pt5_cb07
 
         return sites
+
+    def describe(self):
+        """
+        Construct a dictionary that describes the MultiGMPE.
+
+        Note: For simplicity, this method ignores issues related to
+        GMPEs used for the site term and changes in the GMPE with
+        distance. For this level of detail, please see the config files.
+
+        Returns:
+            A dictionary representation of the MultiGMPE.
+        """
+        gmpe_dict = {
+            'gmpes': [],
+            'weights': [],
+            'name': self.DESCRIPTION
+        }
+
+        for i in range(len(self.GMPES)):
+            gmpe_dict['weights'].append(self.WEIGHTS[i])
+            if isinstance(self.GMPES[i], MultiGMPE):
+                gmpe_dict['gmpes'].append(
+                    self.GMPES[i].describe()
+                )
+            else:
+                gmpe_dict['gmpes'].append(str(self.GMPES[i]))
+
+        return gmpe_dict
 
 
 def filter_gmpe_list(gmpes, wts, imt):
