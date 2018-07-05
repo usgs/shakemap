@@ -1124,13 +1124,17 @@ class MapMaker(object):
         correction = 0.5 if n >= 0 else -0.5
         return int(n / precision + correction) * precision
 
-    def drawContourMap(self, imt, outfolder, cmin=None, cmax=None):
+    def drawContourMap(self, imt, outfolder):
         """
         Render IMT data as contours over topography, with oceans, coastlines,
         etc.
 
         Args:
-            outfolder (str): Path to directory where output map should be
+            imt (str):
+                IMT that is being drawn on the map ('MMI', 'PGV',
+                'PGA', 'SA(x.y)').
+            outfolder (str):
+                Path to directory where output map should be
                 saved.
 
         Returns:
