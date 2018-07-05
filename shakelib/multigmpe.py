@@ -38,14 +38,6 @@ class MultiGMPE(GMPE):
         """
         See superclass `method <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs>`__.
         """  # noqa
-        # Log GMPE information
-        if hasattr(self, 'DESCRIPTION'):
-            desc = self.DESCRIPTION
-        else:
-            desc = self.GMPES
-        weights = self.WEIGHTS
-        with open("/Users/emthompson/temp.txt", "a") as f:
-            f.write("    %s %s %s\n" % (imt, desc, weights))
 
         # Evaluate MultiGMPE:
         lnmu, lnsd = self.__get_mean_and_stddevs(
