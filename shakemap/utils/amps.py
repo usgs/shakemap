@@ -122,6 +122,7 @@ class AmplitudeHandler(object):
         self._connection.isolation_level = 'EXCLUSIVE'
         self._cursor = self._connection.cursor()
         self._cursor.execute('PRAGMA foreign_keys = ON')
+        self._cursor.execute('PRAGMA journal_mode = WAL')
 
     def _disconnect(self):
         self.commit()

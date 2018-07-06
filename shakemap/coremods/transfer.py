@@ -138,7 +138,7 @@ def _transfer(config, info, pdl_dir, products_dir, cancel=False):
             # try to send the data
             try:
                 if transfer_method == 'pdl':
-                    downloads_dir = os.path.join(pdl_dir, 'downloads')
+                    downloads_dir = os.path.join(pdl_dir, 'download')
                     if os.path.isdir(downloads_dir):
                         shutil.rmtree(downloads_dir, ignore_errors=True)
                     shutil.copytree(products_dir, downloads_dir)
