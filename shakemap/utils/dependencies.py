@@ -217,6 +217,7 @@ class CommandDatabase(object):
         else:
             self.fconnect = sqlite3.connect(dbfile)
             self.fcursor = self.fconnect.cursor()
+        self.fcursor.execute('PRAGMA journal_mode = WAL')
 
     def close(self):
         """Closes the object and associated databases
