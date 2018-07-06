@@ -455,6 +455,7 @@ class MapMaker(object):
             cities_per_grid (int): Maximum number of cities to plot in each
                 grid cell.
         """
+        print('test')
         self.city_cols = nx
         self.city_rows = ny
         self.cities_per_grid = cities_per_grid
@@ -811,7 +812,7 @@ class MapMaker(object):
         #   r"$\displaystyle\sum_{n=1}^\infty\frac{-e^{i\pi}}{2^n}$!",
         #   fontsize=16, color='gray')
 
-    def _drawStations(self, m, fill=False, imt='PGA'):
+    def _drawStations(self, m, fill=True, imt='PGA'):
         """Draw station locations on the map.
 
         Args:
@@ -928,14 +929,16 @@ class MapMaker(object):
         x, y = m(lons, lats)
         m.plot(x, y, 'k', lw=2, zorder=FAULT_ZORDER)
 
-    def drawIntensityMap(self, outfolder):
+    def drawIntensityMap(self, outfolder, fill=True):
         """
         Render the MMI data as intensity draped over topography, with oceans,
         coastlines, etc.
 
         Args:
-            outfolder (str): Path to directory where output map should be
-                saved.
+            outfolder (str):
+                Path to directory where output map should be saved.
+            fill (bool):
+                Whether or not to fill symbols.
 
         Returns:
             str: Path to output intensity map.
@@ -1033,7 +1036,7 @@ class MapMaker(object):
         self._drawTitle('MMI')
 
         # draw station and macroseismic locations
-        self._drawStations(m)  # need stationlist object
+        self._drawStations(m, fill=fill)  # need stationlist object
 
         # draw surface projection of finite fault
         rdict = self.container.getRuptureDict()
@@ -1121,13 +1124,17 @@ class MapMaker(object):
         correction = 0.5 if n >= 0 else -0.5
         return int(n / precision + correction) * precision
 
-    def drawContourMap(self, imt, outfolder, cmin=None, cmax=None):
+    def drawContourMap(self, imt, outfolder):
         """
         Render IMT data as contours over topography, with oceans, coastlines,
         etc.
 
         Args:
-            outfolder (str): Path to directory where output map should be
+            imt (str):
+                IMT that is being drawn on the map ('MMI', 'PGV',
+                'PGA', 'SA(x.y)').
+            outfolder (str):
+                Path to directory where output map should be
                 saved.
 
         Returns:

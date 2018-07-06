@@ -125,6 +125,14 @@ def test_mapmaker():
     # Need to use a different shakemap that includes a lake to
     # hit the _drawLakes method
 
+    mapmod = MapMaker(container, topofile, layerdict, cities, logger,
+                      config['products']['mapping']['operator'])
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        mapmod.drawIntensityMap(tmpdirname, fill=False)
+
+    with tempfile.TemporaryDirectory() as tmpdirname:
+        mapmod.drawContourMap(imt='MMI', outfolder=tmpdirname)
+
 
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'
