@@ -356,22 +356,10 @@ class StationList(object):
             # the station id
             netid = sta_id[0:sta_id.find('.')]
             network = netid
-            if 'name' in station_attributes:
-                name = station_attributes['name']
-            else:
-                name = None
-            if 'elev' in station_attributes:
-                elev = station_attributes['elev']
-            else:
-                elev = None
-            if 'vs30' in station_attributes:
-                vs30 = station_attributes['vs30']
-            else:
-                vs30 = None
-            if 'stddev' in station_attributes:
-                stddev = station_attributes['stddev']
-            else:
-                stddev = 0
+            name = station_attributes.get('name', None)
+            elev = station_attributes.get('elev', None)
+            vs30 = station_attributes.get('vs30', None)
+            stddev = station_attributes.get('stddev', 0)
 
             instrumented = int(network.lower() not in CIIM_TUPLE)
 
@@ -405,8 +393,11 @@ class StationList(object):
             station_attributes, comp_dict = station_tpl
             instrumented = int(station_attributes['netid'].lower()
                                not in CIIM_TUPLE)
-            for original_channel, pgm_dict in comp_dict.items():
-                orientation = self._getOrientation(original_channel)
+            for original_channel, cdict in comp_dict.items():
+                pgm_dict = cdict['amps']
+                orientation = cdict['attrs'].get('orientation', None)
+                orientation = self._getOrientation(original_channel,
+                                                   orientation)
                 for imt_type, imt_dict in pgm_dict.items():
                     if (instrumented == 0) and (imt_type != 'MMI'):
                         continue
@@ -572,7 +563,7 @@ class StationList(object):
         return df, myimts
 
     @staticmethod
-    def _getOrientation(orig_channel):
+    def _getOrientation(orig_channel, orient):
         """
         Return a character representing the orientation of a channel.
 
@@ -580,6 +571,11 @@ class StationList(object):
             orig_channel (string):
                 String representing the seed channel (e.g. 'HNZ'). The
                 final character is assumed to be the (uppercase) orientation.
+            orient (str or None):
+                Gives the orientation of the channel, overriding channel
+                codes that end in numbers. Must be one of 'h' (horizontal)
+                or 'v' (vertical), or None if the orientation has not been
+                explicitly specified in the "comp" element.
 
         Returns:
             Character representing the channel orientation. One of 'N',
@@ -593,6 +589,13 @@ class StationList(object):
             orientation = 'H'
         elif orig_channel == 'H1' or orig_channel == 'H2':
             orientation = 'H'
+        elif orig_channel[-1].isdigit():
+            if orient == 'h':
+                orientation = 'H'
+            elif orient == 'v':
+                orientation = 'Z'
+            else:
+                orientation = 'U'
         else:
             orientation = 'U'  # this is unknown
         return orientation
@@ -728,27 +731,28 @@ class StationList(object):
                         continue
                     compname = comp.attrib['name']
                     if 'Intensity Questionnaire' in str(compname):
-                        compdict['mmi'] = {}
+                        compdict['mmi'] = {'amps': {}, 'attrs': {}}
                         continue
                     tpgmdict, ims, imt_translate = \
                         self._getGroundMotions(comp, imt_translate)
                     if compname in compdict:
-                        pgmdict = compdict[compname]
+                        pgmdict = compdict[compname]['amps']
                     else:
                         pgmdict = {}
                     pgmdict.update(tpgmdict)
                     # copy the VALUES, not REFERENCES, of the component list
                     # into our growing dictionary
-                    compdict[compname] = copy.copy(pgmdict)
+                    compdict[compname] = {'attrs': copy.copy(comp.attrib),
+                                          'amps': copy.copy(pgmdict)}
                     imtset |= ims
                 if ('intensity' in attributes) and (instrumented == 0):
                     if 'mmi' not in compdict:
-                        compdict['mmi'] = {}
+                        compdict['mmi'] = {'amps': {}, 'attrs': {}}
                     if 'intensity_stddev' in attributes:
                         stddev = float(attributes['intensity_stddev'])
                     else:
                         stddev = 0
-                    compdict['mmi']['MMI'] = \
+                    compdict['mmi']['amps']['MMI'] = \
                         {'value': float(attributes['intensity']),
                          'stddev': stddev,
                          'flag': '0',
