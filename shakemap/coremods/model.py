@@ -678,11 +678,7 @@ class ModelModule(CoreModule):
                 df1['MMI'][ixx] = df1['derived_MMI_from_' + imtstr][ixx]
                 df1['MMI_sd'][ixx] = \
                     df1['derived_MMI_from_' + imtstr + '_sd'][ixx]
-        if np.all(np.isnan(df1['MMI'])):
-            del df1['MMI']
-            del df1['MMI_sd']
-        else:
-            self.df1.imts.add('MMI')
+        self.df1.imts.add('MMI')
         #
         # Get the prediction and stddevs
         #
