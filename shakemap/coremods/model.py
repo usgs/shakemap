@@ -1079,13 +1079,18 @@ class ModelModule(CoreModule):
         info[ip][ei]['event_id'] = self._eventid
 
         # the following items are primarily useful for PDL
-        info[ip][ei]['eventsource'] = self.rupture_obj._origin.netid
-        info[ip][ei]['netid'] = self.rupture_obj._origin.netid
-        info[ip][ei]['eventsourcecode'] = \
-            self.rupture_obj._origin.id
-        info[ip][ei]['id'] = \
-            self.rupture_obj._origin.id
-        info[ip][ei]['productcode'] = self.rupture_obj._origin.productcode
+        origin = self.rupture_obj._origin
+        info[ip][ei]['eventsource'] = origin.netid
+        info[ip][ei]['netid'] = origin.netid
+        # The netid could be a valid part of the eventsourcecode, so we have
+        # to check here if it ***starts with*** the netid
+        if origin.id.startswith(origin.netid):
+            eventsourcecode = origin.id.replace(origin.netid, '', 1)
+        else:
+            eventsourcecode = origin.id
+        info[ip][ei]['eventsourcecode'] = eventsourcecode
+        info[ip][ei]['id'] = origin.id
+        info[ip][ei]['productcode'] = origin.productcode
         info[ip][ei]['productsource'] = self.config['system']['source_network']
         info[ip][ei]['producttype'] = self.config['system']['product_type']
 
@@ -1097,20 +1102,19 @@ class ModelModule(CoreModule):
             info[ip][ei]['intensity_observations'] = '0'
         info[ip][ei]['latitude'] = str(self.rx.hypo_lat)
         info[ip][ei]['longitude'] = str(self.rx.hypo_lon)
-        info[ip][ei]['location'] = self.rupture_obj._origin.locstring
+        info[ip][ei]['location'] = origin.locstring
         info[ip][ei]['magnitude'] = str(self.rx.mag)
-        info[ip][ei]['origin_time'] = \
-            self.rupture_obj._origin.time.strftime(TIMEFMT)
+        info[ip][ei]['origin_time'] = origin.time.strftime(TIMEFMT)
         if 'df1' in self.dataframes:
             info[ip][ei]['seismic_stations'] = \
                 str(np.size(self.df1.df['lon']))
         else:
             info[ip][ei]['seismic_stations'] = '0'
-        info[ip][ei]['src_mech'] = self.rupture_obj._origin.mech
+        info[ip][ei]['src_mech'] = origin.mech
         # This AND locaction?
-        info[ip][ei]['event_description'] = self.rupture_obj._origin.locstring
+        info[ip][ei]['event_description'] = origin.locstring
         # This AND src_mech?
-        info[ip][ei]['event_type'] = self.rupture_obj._origin.mech
+        info[ip][ei]['event_type'] = origin.mech
         info[op] = {}
         info[op][gm] = {}
         for myimt in self.imt_out_set:
