@@ -178,7 +178,16 @@ def _get_properties(info):
     # origin info
     origin = info['input']['event_information']
     properties['eventsource'] = origin['netid']
-    properties['eventsourcecode'] = origin['id']
+    # The netid could be a valid part of the eventsourcecode, so we have to
+    # check here if it ***starts with*** the netid
+    # This fix should already be done by the time we get here, but this
+    # is just an insurance check
+    if origin['eventsourcecode'].startswith(origin['netid']):
+        eventsourcecode = origin['eventsourcecode'].replace(origin['netid'],
+                                                            '', 1)
+    else:
+        eventsourcecode = origin['eventsourcecode']
+    properties['eventsourcecode'] = eventsourcecode
     properties['code'] = origin['productcode']
     properties['source'] = origin['productsource']
     properties['type'] = origin['producttype']
