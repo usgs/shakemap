@@ -116,7 +116,7 @@ class CoreModule(ABC):
                         component = parts[1]
                     else:
                         component = 'greater of two horizontal'
-                    tformat['filename'] = fname
+                    tformat['filename'] = os.path.join('download', fname)
                     cdict['caption'] = cdict['caption'].replace('[COMPONENT]',
                                                                 component)
                 elif len(filenames) == 0:
@@ -150,7 +150,8 @@ class CoreModule(ABC):
                                 component = 'greater of two horizontal'
                             newcap = newcap.replace('[COMPONENT]', component)
                             new_cdict['caption'] = newcap
-                            tformat['filename'] = filename
+                            tformat['filename'] = os.path.join('download',
+                                                               filename)
                             new_contents[newkey] = new_cdict
         # remove the keys we replaced with period specific ones
         for key in nuke_keys:
