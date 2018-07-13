@@ -99,7 +99,10 @@
 
         <span class="c1"># call the transfer method</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Sending cancel message...&#39;</span><span class="p">)</span>
-        <span class="n">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">,</span> <span class="n">cancel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pdl_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;pdl&#39;</span><span class="p">)</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
+        <span class="n">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">pdl_dir</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">,</span> <span class="n">cancel</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="c1"># Create a file called CANCEL in the data directory. The</span>
         <span class="c1"># shake program will look for this and not run if present.</span>
@@ -111,8 +114,7 @@
 
         <span class="c1"># delete the event from the database</span>
         <span class="n">handler</span> <span class="o">=</span> <span class="n">AmplitudeHandler</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">)</span>
-        <span class="n">handler</span><span class="o">.</span><span class="n">deleteEvent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
-        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+        <span class="n">handler</span><span class="o">.</span><span class="n">deleteEvent</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span></div></div>
 </pre></div>
 
           </div>

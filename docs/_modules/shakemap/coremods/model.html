@@ -367,6 +367,9 @@
         <span class="n">products_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">products_path</span><span class="p">):</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">products_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">pdl_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;pdl&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">pdl_path</span><span class="p">):</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">pdl_path</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_setConfigOptions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -559,17 +562,16 @@
                 <span class="n">gmpe</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">if</span> <span class="n">imtstr</span> <span class="o">!=</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
                     <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="n">oqimt</span><span class="p">)</span>
-                <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="n">_gmas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">dfn</span><span class="o">.</span><span class="n">sx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="p">,</span>
-                                       <span class="n">dfn</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stddev_types</span><span class="p">,</span>
-                                       <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+                <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
+                    <span class="n">gmpe</span><span class="p">,</span> <span class="n">dfn</span><span class="o">.</span><span class="n">sx</span><span class="p">,</span> <span class="n">dfn</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
                 <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_sd_only</span><span class="p">:</span>
                     <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
                         <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
-                    <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span>
-                                                       <span class="n">tau_guess</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                    <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+                        <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">tau_guess</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                     <span class="n">df</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
@@ -655,9 +657,8 @@
                 <span class="c1"># Get the predictions and stddevs</span>
                 <span class="c1">#</span>
                 <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="n">oqimt</span><span class="p">)</span>
-                <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="n">_gmas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df2</span><span class="o">.</span><span class="n">sx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="p">,</span>
-                                       <span class="bp">self</span><span class="o">.</span><span class="n">df2</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stddev_types</span><span class="p">,</span>
-                                       <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+                <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
+                    <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df2</span><span class="o">.</span><span class="n">sx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df2</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
                 <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
                 <span class="n">df2</span><span class="p">[</span><span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_sd_only</span><span class="p">:</span>
@@ -711,26 +712,22 @@
                 <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span> <span class="o">=</span> <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;derived_MMI_from_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span>
                 <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI_sd&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span> <span class="o">=</span> \
                     <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;derived_MMI_from_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_sd&#39;</span><span class="p">][</span><span class="n">ixx</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">])):</span>
-            <span class="k">del</span> <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span><span class="p">]</span>
-            <span class="k">del</span> <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI_sd&#39;</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">imts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">imts</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
         <span class="c1">#</span>
         <span class="c1"># Get the prediction and stddevs</span>
         <span class="c1">#</span>
         <span class="n">gmpe</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="n">_gmas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">sx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="p">,</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">),</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">stddev_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+        <span class="n">pmean</span><span class="p">,</span> <span class="n">pstddev</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
+            <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">sx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">dx</span><span class="p">,</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">),</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
         <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pmean</span>
         <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_sigma&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_sd_only</span><span class="p">:</span>
             <span class="n">tau_guess</span> <span class="o">=</span> <span class="n">SM_CONSTS</span><span class="p">[</span><span class="s1">&#39;default_stddev_inter&#39;</span><span class="p">]</span>
             <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span>
                 <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred&#39;</span><span class="p">],</span> <span class="n">tau_guess</span><span class="p">)</span>
-            <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span>
-                                               <span class="n">tau_guess</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span>
+                <span class="n">pstddev</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">-</span> <span class="n">tau_guess</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_tau&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">df1</span><span class="p">[</span><span class="s1">&#39;MMI&#39;</span> <span class="o">+</span> <span class="s1">&#39;_pred_phi&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pstddev</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
@@ -902,21 +899,18 @@
         <span class="n">gmpe</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">imtstr</span> <span class="o">!=</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
             <span class="n">gmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="n">oqimt</span><span class="p">)</span>
-        <span class="n">pout_mean</span><span class="p">,</span> <span class="n">pout_sd</span> <span class="o">=</span> <span class="n">_gmas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="p">,</span>
-                                   <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span>
-                                   <span class="bp">self</span><span class="o">.</span><span class="n">stddev_types</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
+        <span class="n">pout_mean</span><span class="p">,</span> <span class="n">pout_sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
+            <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">apply_gafs</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_grid</span><span class="p">:</span>
             <span class="c1">#</span>
             <span class="c1"># Fill the grids for the regression plots</span>
             <span class="c1">#</span>
-            <span class="n">x_mean</span><span class="p">,</span> <span class="n">x_sd</span> <span class="o">=</span> <span class="n">_gmas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_rock</span><span class="p">,</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span>
-                                 <span class="p">[</span><span class="n">oqconst</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">x_mean</span><span class="p">,</span> <span class="n">x_sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
+                <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_rock</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rockgrid</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_mean</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">x_mean</span><span class="p">,</span> <span class="n">x_sd</span> <span class="o">=</span> <span class="n">_gmas</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_soil</span><span class="p">,</span>
-                                 <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span>
-                                 <span class="p">[</span><span class="n">oqconst</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">],</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">x_mean</span><span class="p">,</span> <span class="n">x_sd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_gmas</span><span class="p">(</span>
+                <span class="n">gmpe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sx_soil</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dx_out</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">soilgrid</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_mean</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">]</span> <span class="o">=</span> <span class="n">x_sd</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
 
@@ -1112,20 +1106,25 @@
         <span class="n">ms</span> <span class="o">=</span> <span class="s1">&#39;miscellaneous&#39;</span>
         <span class="n">sv</span> <span class="o">=</span> <span class="s1">&#39;shakemap_versions&#39;</span>
         <span class="n">sr</span> <span class="o">=</span> <span class="s1">&#39;site_response&#39;</span>
-        <span class="n">info</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_info</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;depth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">hypo_depth</span><span class="p">)</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span>
 
         <span class="c1"># the following items are primarily useful for PDL</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">netid</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">netid</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">id</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">id</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">productcode</span>
+        <span class="n">origin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">netid</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">netid</span>
+        <span class="c1"># The netid could be a valid part of the eventsourcecode, so we have</span>
+        <span class="c1"># to check here if it ***starts with*** the netid</span>
+        <span class="k">if</span> <span class="n">origin</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">origin</span><span class="o">.</span><span class="n">netid</span><span class="p">):</span>
+            <span class="n">eventsourcecode</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">origin</span><span class="o">.</span><span class="n">netid</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">eventsourcecode</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eventsourcecode</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">id</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">productcode</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;productsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;source_network&#39;</span><span class="p">]</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;producttype&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">[</span><span class="s1">&#39;system&#39;</span><span class="p">][</span><span class="s1">&#39;product_type&#39;</span><span class="p">]</span>
 
@@ -1137,20 +1136,19 @@
             <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;intensity_observations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;latitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">hypo_lat</span><span class="p">)</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;longitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">hypo_lon</span><span class="p">)</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">locstring</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;location&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">locstring</span>
         <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;magnitude&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;origin_time&#39;</span><span class="p">]</span> <span class="o">=</span> \
-            <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">TIMEFMT</span><span class="p">)</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;origin_time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">TIMEFMT</span><span class="p">)</span>
         <span class="k">if</span> <span class="s1">&#39;df1&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataframes</span><span class="p">:</span>
             <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;seismic_stations&#39;</span><span class="p">]</span> <span class="o">=</span> \
                 <span class="nb">str</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">df1</span><span class="o">.</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;seismic_stations&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;src_mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">mech</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;src_mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mech</span>
         <span class="c1"># This AND locaction?</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">locstring</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">locstring</span>
         <span class="c1"># This AND src_mech?</span>
-        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rupture_obj</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">mech</span>
+        <span class="n">info</span><span class="p">[</span><span class="n">ip</span><span class="p">][</span><span class="n">ei</span><span class="p">][</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mech</span>
         <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">info</span><span class="p">[</span><span class="n">op</span><span class="p">][</span><span class="n">gm</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">myimt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">imt_out_set</span><span class="p">:</span>
@@ -1608,7 +1606,70 @@
             <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_rock_sd&#39;</span><span class="p">,</span>
                         <span class="n">rocksd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
             <span class="n">oc</span><span class="o">.</span><span class="n">setArray</span><span class="p">(</span><span class="s1">&#39;regression_&#39;</span> <span class="o">+</span> <span class="n">imtstr</span> <span class="o">+</span> <span class="s1">&#39;_soil_sd&#39;</span><span class="p">,</span>
-                        <span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span></div>
+                        <span class="n">soilsd</span><span class="p">[</span><span class="n">imtstr</span><span class="p">])</span>
+
+    <span class="c1">#</span>
+    <span class="c1"># Helper function to call get_mean_and_stddevs for the</span>
+    <span class="c1"># appropriate object given the IMT and describe the</span>
+    <span class="c1"># MultiGMPE structure.</span>
+    <span class="c1">#</span>
+    <span class="k">def</span> <span class="nf">_gmas</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">apply_gafs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This is a helper function to call get_mean_and_stddevs for the</span>
+<span class="sd">        appropriate object given the IMT.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gmpe:</span>
+<span class="sd">                A GMPE instance.</span>
+<span class="sd">            sx:</span>
+<span class="sd">                Sites context.</span>
+<span class="sd">            dx:</span>
+<span class="sd">                Distance context.</span>
+<span class="sd">            oqimt:</span>
+<span class="sd">                List of OpenQuake IMTs.</span>
+<span class="sd">            apply_gafs (boolean):</span>
+<span class="sd">                Whether or not to apply the generic</span>
+<span class="sd">                amplification factors to the GMPE output.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            tuple: Tuple of two items:</span>
+
+<span class="sd">                - Numpy array of means,</span>
+<span class="sd">                - List of numpy array of standard deviations corresponding to</span>
+<span class="sd">                  therequested stddev_types.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="s1">&#39;MMI&#39;</span> <span class="ow">in</span> <span class="n">oqimt</span><span class="p">:</span>
+            <span class="n">pe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipe</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">pe</span> <span class="o">=</span> <span class="n">gmpe</span>
+
+            <span class="c1"># -------------------------------------------------------------------------</span>
+            <span class="c1"># Describe the MultiGMPE</span>
+            <span class="c1"># -------------------------------------------------------------------------</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;_info&#39;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_info</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s1">&#39;multigmpe&#39;</span><span class="p">:</span> <span class="p">{}</span>
+                <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_info</span><span class="p">[</span><span class="s1">&#39;multigmpe&#39;</span><span class="p">][</span><span class="nb">str</span><span class="p">(</span><span class="n">oqimt</span><span class="p">)]</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+
+        <span class="n">mean</span><span class="p">,</span> <span class="n">stddevs</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
+            <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">sx</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">rx</span><span class="p">,</span>
+            <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="n">oqimt</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">stddev_types</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">apply_gafs</span><span class="p">:</span>
+            <span class="n">gafs</span> <span class="o">=</span> <span class="n">get_generic_amp_factors</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">oqimt</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">gafs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">mean</span> <span class="o">+=</span> <span class="n">gafs</span>
+
+        <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">stddevs</span></div>
+
+
+<span class="k">def</span> <span class="nf">_round_float</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">digits</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">val</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">((</span><span class="s1">&#39;%.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;f&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">_get_period_arrays</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">):</span>
@@ -1882,54 +1943,6 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown layer type: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">layer</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">(</span><span class="n">layer_out</span><span class="p">,</span> <span class="n">layer_units</span><span class="p">,</span> <span class="n">layer_digits</span><span class="p">)</span>
-
-
-<span class="c1">#</span>
-<span class="c1"># Helper function to call get_mean_and_stddevs for the</span>
-<span class="c1"># appropriate object given the IMT</span>
-<span class="c1">#</span>
-<span class="k">def</span> <span class="nf">_gmas</span><span class="p">(</span><span class="n">ipe</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">sx</span><span class="p">,</span> <span class="n">rx</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">oqimt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">,</span> <span class="n">apply_gafs</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    This is a helper function to call get_mean_and_stddevs for the</span>
-<span class="sd">    appropriate object given the IMT.</span>
-
-<span class="sd">    Args:</span>
-<span class="sd">        ipe: An IPE instance.</span>
-<span class="sd">        gmpe: A GMPE instance.</span>
-<span class="sd">        sx: Sites context.</span>
-<span class="sd">        rx: Rupture context.</span>
-<span class="sd">        dx: Distance context.</span>
-<span class="sd">        oqimt: List of OpenQuake IMTs.</span>
-<span class="sd">        stddev_types: list of OpenQuake standard deviation types.</span>
-<span class="sd">        apply_gafs (boolean): Whether or not to apply the generic</span>
-<span class="sd">            amplification factors to the GMPE output.</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">        tuple: Tuple of two items:</span>
-
-<span class="sd">            - Numpy array of means,</span>
-<span class="sd">            - List of numpy array of standard deviations corresponding to the</span>
-<span class="sd">              requested stddev_types.</span>
-
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="s1">&#39;MMI&#39;</span> <span class="ow">in</span> <span class="n">oqimt</span><span class="p">:</span>
-        <span class="n">pe</span> <span class="o">=</span> <span class="n">ipe</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">pe</span> <span class="o">=</span> <span class="n">gmpe</span>
-    <span class="n">mean</span><span class="p">,</span> <span class="n">stddevs</span> <span class="o">=</span> <span class="n">pe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">sx</span><span class="p">),</span> <span class="n">rx</span><span class="p">,</span>
-                                            <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">dx</span><span class="p">),</span> <span class="n">oqimt</span><span class="p">,</span>
-                                            <span class="n">stddev_types</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">apply_gafs</span><span class="p">:</span>
-        <span class="n">gafs</span> <span class="o">=</span> <span class="n">get_generic_amp_factors</span><span class="p">(</span><span class="n">sx</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">oqimt</span><span class="p">))</span>
-        <span class="k">if</span> <span class="n">gafs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">mean</span> <span class="o">+=</span> <span class="n">gafs</span>
-    <span class="k">return</span> <span class="n">mean</span><span class="p">,</span> <span class="n">stddevs</span>
-
-
-<span class="k">def</span> <span class="nf">_round_float</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">digits</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">val</span>
-    <span class="k">return</span> <span class="nb">float</span><span class="p">((</span><span class="s1">&#39;%.&#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">digits</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;f&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="n">val</span><span class="p">)</span>
 </pre></div>
 
           </div>

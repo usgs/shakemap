@@ -90,9 +90,10 @@
                 <span class="s1">&#39;Event has a </span><span class="si">%s</span><span class="s1"> file blocking transfer.&#39;</span> <span class="o">%</span> <span class="n">NO_TRANSFER</span><span class="p">)</span>
             <span class="k">return</span>
 
+        <span class="n">pdl_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;pdl&#39;</span><span class="p">)</span>
         <span class="n">products_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;products&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">products_dir</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">products_dir</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">pdl_dir</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">NotADirectoryError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">pdl_dir</span><span class="p">)</span>
 
         <span class="c1"># get the path to the transfer.conf spec file</span>
         <span class="n">configspec</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">get_data_path</span><span class="p">(),</span> <span class="s1">&#39;transferspec.conf&#39;</span><span class="p">)</span>
@@ -116,14 +117,15 @@
 
         <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
+        <span class="c1"># extract the info.json object from the container</span>
+        <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="c1"># call the transfer method</span>
-        <span class="n">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">)</span>
+        <span class="n">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">pdl_dir</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">)</span>
 
         <span class="c1"># copy the current folder to a new backup directory</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_make_backup</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span>
-
-        <span class="n">container</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_backup</span><span class="p">(</span><span class="n">data_path</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_make_backup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_path</span><span class="p">):</span>
         <span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">)</span>
@@ -147,9 +149,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created backup directory </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">backup</span><span class="p">)</span></div>
 
 
-<span class="k">def</span> <span class="nf">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">container</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">,</span> <span class="n">cancel</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="c1"># extract the info.json object from the container</span>
-    <span class="n">info</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getDictionary</span><span class="p">(</span><span class="s1">&#39;info.json&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_transfer</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">info</span><span class="p">,</span> <span class="n">pdl_dir</span><span class="p">,</span> <span class="n">products_dir</span><span class="p">,</span> <span class="n">cancel</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">properties</span><span class="p">,</span> <span class="n">product_properties</span> <span class="o">=</span> <span class="n">_get_properties</span><span class="p">(</span><span class="n">info</span><span class="p">)</span>
 
     <span class="c1"># get the config information:</span>
@@ -172,9 +172,13 @@
             <span class="c1"># try to send the data</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">transfer_method</span> <span class="o">==</span> <span class="s1">&#39;pdl&#39;</span><span class="p">:</span>
+                    <span class="n">downloads_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pdl_dir</span><span class="p">,</span> <span class="s1">&#39;download&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">downloads_dir</span><span class="p">):</span>
+                        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">downloads_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="n">products_dir</span><span class="p">,</span> <span class="n">downloads_dir</span><span class="p">)</span>
                     <span class="n">sender</span> <span class="o">=</span> <span class="n">sender_class</span><span class="p">(</span>
                         <span class="n">properties</span><span class="o">=</span><span class="n">params</span><span class="p">,</span>
-                        <span class="n">local_directory</span><span class="o">=</span><span class="n">products_dir</span><span class="p">,</span>
+                        <span class="n">local_directory</span><span class="o">=</span><span class="n">pdl_dir</span><span class="p">,</span>
                         <span class="n">product_properties</span><span class="o">=</span><span class="n">product_properties</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">cancelfile</span> <span class="o">=</span> <span class="n">CANCEL_FILES</span><span class="p">[</span><span class="n">transfer_method</span><span class="p">]</span>
@@ -189,6 +193,8 @@
                 <span class="n">fmt</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%i</span><span class="s1"> files sent.  Message from sender: </span><span class="se">\n</span><span class="s1">&quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span>
                 <span class="n">tpl</span> <span class="o">=</span> <span class="p">(</span><span class="n">nfiles</span><span class="p">,</span> <span class="n">msg</span><span class="p">)</span>
                 <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">fmt</span> <span class="o">%</span> <span class="n">tpl</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">transfer_method</span> <span class="o">==</span> <span class="s1">&#39;pdl&#39;</span><span class="p">:</span>
+                    <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">downloads_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="c1"># for the standard config, this should generate an email to</span>
                 <span class="c1"># the developer list.</span>
@@ -206,7 +212,16 @@
     <span class="c1"># origin info</span>
     <span class="n">origin</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]</span>
     <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;eventsource&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]</span>
-    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+    <span class="c1"># The netid could be a valid part of the eventsourcecode, so we have to</span>
+    <span class="c1"># check here if it ***starts with*** the netid</span>
+    <span class="c1"># This fix should already be done by the time we get here, but this</span>
+    <span class="c1"># is just an insurance check</span>
+    <span class="k">if</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">]):</span>
+        <span class="n">eventsourcecode</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">origin</span><span class="p">[</span><span class="s1">&#39;netid&#39;</span><span class="p">],</span>
+                                                            <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">eventsourcecode</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span>
+    <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;eventsourcecode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eventsourcecode</span>
     <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;productcode&#39;</span><span class="p">]</span>
     <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;productsource&#39;</span><span class="p">]</span>
     <span class="n">properties</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">origin</span><span class="p">[</span><span class="s1">&#39;producttype&#39;</span><span class="p">]</span>

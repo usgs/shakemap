@@ -53,7 +53,7 @@
 <span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="k">import</span> <span class="n">HistoricTime</span>
 
 
-<div class="viewcode-block" id="get_rupture"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.get_rupture">[docs]</a><span class="k">def</span> <span class="nf">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">):</span>
+<div class="viewcode-block" id="get_rupture"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.factory.html#shakelib.rupture.factory.get_rupture">[docs]</a><span class="k">def</span> <span class="nf">get_rupture</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">new_format</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This is a module-level function to read in a rupture file. This allows for</span>
 <span class="sd">    the ShakeMap 3 text file specification or the ShakeMap 4 JSON rupture</span>
@@ -66,18 +66,28 @@
 <span class="sd">    If file is None (default) then it returns a PointRupture.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        origin (Origin): A ShakeMap origin instance; required because</span>
-<span class="sd">            hypocentral/epicentral distances are computed from the Rupture</span>
-<span class="sd">            class.</span>
-<span class="sd">        file (srt): Path to rupture file (optional).</span>
-<span class="sd">        mesh_dx (float): Target spacing (in km) for rupture discretization;</span>
-<span class="sd">            default is 0.5 km and it is only used if the rupture file is an</span>
-<span class="sd">            EdgeRupture.</span>
+<span class="sd">        origin (Origin):</span>
+<span class="sd">            A ShakeMap origin instance; required because hypocentral/epicentral</span>
+<span class="sd">            distances are computed from the Ruptureclass.</span>
+
+<span class="sd">        file (srt):</span>
+<span class="sd">            Path to rupture file (optional).</span>
+
+<span class="sd">        mesh_dx (float):</span>
+<span class="sd">            Target spacing (in km) for rupture discretization; default is</span>
+<span class="sd">            0.5 km and it is only used if the rupture file is an EdgeRupture.</span>
+
+<span class="sd">        new_format (bool):</span>
+<span class="sd">            Indicates whether text rupture format is</span>
+<span class="sd">            &quot;old&quot; (lat, lon, depth) or &quot;new&quot; (lon, lat, depth) style.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        Rupture subclass instance.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">Origin</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;An Origin is requred.&quot;</span><span class="p">)</span>
+
     <span class="k">if</span> <span class="n">file</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="c1"># -----------------------------------------------------------------</span>
@@ -96,14 +106,20 @@
             <span class="c1"># Reading as json failed, so hopefully it is a ShakeMap 3 text file</span>
             <span class="c1"># -----------------------------------------------------------------</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">d</span> <span class="o">=</span> <span class="n">text_to_json</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                <span class="n">d</span> <span class="o">=</span> <span class="n">text_to_json</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="n">new_format</span><span class="o">=</span><span class="n">new_format</span><span class="p">)</span>
                 <span class="n">rupt</span> <span class="o">=</span> <span class="n">rupture_from_dict_and_origin</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">mesh_dx</span><span class="o">=</span><span class="n">mesh_dx</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Unknown rupture file format.&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Error reading </span><span class="si">%s</span><span class="s2">. This could have been &quot;</span>
+                                 <span class="s2">&quot;because the latitude and longitdue are &quot;</span>
+                                 <span class="s2">&quot;reversed. Try changing the &#39;new_format&#39; &quot;</span>
+                                 <span class="s2">&quot;option.&quot;</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s2">&quot;Unknown rupture file format.&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Origin requred if no rupture file is provided.&quot;</span><span class="p">)</span>
         <span class="n">rupt</span> <span class="o">=</span> <span class="n">PointRupture</span><span class="p">(</span><span class="n">origin</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">rupt</span></div>
 
 
@@ -242,11 +258,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">n_points</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;Number of points in polyon must be odd.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Number of points in polyon must be odd.&#39;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
-        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s1">&#39;First and last points in polygon must be &#39;</span>
-                        <span class="s1">&#39;identical.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;First and last points in polygon must be &#39;</span>
+                         <span class="s1">&#39;identical.&#39;</span><span class="p">)</span>
 
     <span class="n">n_pairs</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">n_points</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_pairs</span><span class="p">):</span>
@@ -282,7 +298,7 @@
 <span class="sd">     - Vertices can be specified in top-edge or bottom-edge first order.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        rupturefile (str):</span>
+<span class="sd">        file (str):</span>
 <span class="sd">            Path to rupture file OR file-like object in GMT</span>
 <span class="sd">            psxy format, where:</span>
 
@@ -340,9 +356,9 @@
                     <span class="s1">&#39;Rupture file </span><span class="si">%s</span><span class="s1"> has unspecified delimiters.&#39;</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Rupture file </span><span class="si">%s</span><span class="s1"> is not in lat,lon,depth format.&#39;</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;Rupture file </span><span class="si">%s</span><span class="s1"> is not in lat, lon, depth format.&#39;</span>
             <span class="k">if</span> <span class="n">new_format</span><span class="p">:</span>
-                <span class="s1">&#39;Rupture file </span><span class="si">%s</span><span class="s1"> is not in lon,lat,depth format.&#39;</span>
+                <span class="s1">&#39;Rupture file </span><span class="si">%s</span><span class="s1"> is not in lon, lat, depth format.&#39;</span>
             <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span><span class="n">msg</span> <span class="o">%</span> <span class="n">file</span><span class="p">)</span>
 
         <span class="n">parts</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">]</span>

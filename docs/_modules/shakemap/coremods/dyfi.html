@@ -48,6 +48,9 @@
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
 
+<span class="c1"># Get rid of stupid pandas warning</span>
+<span class="n">pd</span><span class="o">.</span><span class="n">options</span><span class="o">.</span><span class="n">mode</span><span class="o">.</span><span class="n">chained_assignment</span> <span class="o">=</span> <span class="kc">None</span>
+
 <span class="c1"># number of seconds to search for event matching origin time</span>
 <span class="n">TIMEWINDOW</span> <span class="o">=</span> <span class="mi">60</span>
 <span class="c1"># distance in decimal degrees to search for event matching coordinates</span>
@@ -63,19 +66,23 @@
 <span class="n">optional</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="s1">&#39;distance&#39;</span><span class="p">,</span> <span class="s1">&#39;reference&#39;</span><span class="p">,</span> <span class="s1">&#39;intensity&#39;</span><span class="p">,</span> <span class="s1">&#39;source&#39;</span><span class="p">]</span>
 
 <span class="c1"># what are the DYFI columns and what do we rename them to?</span>
-<span class="n">DYFI_COLUMNS_REPLACE</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Geocoded box&#39;</span><span class="p">:</span> <span class="s1">&#39;station&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;CDI&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;Latitude&#39;</span><span class="p">:</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;Longitude&#39;</span><span class="p">:</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;No. of responses&#39;</span><span class="p">:</span> <span class="s1">&#39;nresp&#39;</span><span class="p">,</span>
-                        <span class="s1">&#39;Hypocentral distance&#39;</span><span class="p">:</span> <span class="s1">&#39;distance&#39;</span><span class="p">}</span>
+<span class="n">DYFI_COLUMNS_REPLACE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;Geocoded box&#39;</span><span class="p">:</span> <span class="s1">&#39;station&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CDI&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Latitude&#39;</span><span class="p">:</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Longitude&#39;</span><span class="p">:</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;No. of responses&#39;</span><span class="p">:</span> <span class="s1">&#39;nresp&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Hypocentral distance&#39;</span><span class="p">:</span> <span class="s1">&#39;distance&#39;</span>
+<span class="p">}</span>
 
-<span class="n">OLD_DYFI_COLUMNS_REPLACE</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ZIP/Location&#39;</span><span class="p">:</span> <span class="s1">&#39;station&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;CDI&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;Latitude&#39;</span><span class="p">:</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;Longitude&#39;</span><span class="p">:</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;No. of responses&#39;</span><span class="p">:</span> <span class="s1">&#39;nresp&#39;</span><span class="p">,</span>
-                            <span class="s1">&#39;Epicentral distance&#39;</span><span class="p">:</span> <span class="s1">&#39;distance&#39;</span><span class="p">}</span>
+<span class="n">OLD_DYFI_COLUMNS_REPLACE</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;ZIP/Location&#39;</span><span class="p">:</span> <span class="s1">&#39;station&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;CDI&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Latitude&#39;</span><span class="p">:</span> <span class="s1">&#39;lat&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Longitude&#39;</span><span class="p">:</span> <span class="s1">&#39;lon&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;No. of responses&#39;</span><span class="p">:</span> <span class="s1">&#39;nresp&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;Epicentral distance&#39;</span><span class="p">:</span> <span class="s1">&#39;distance&#39;</span>
+<span class="p">}</span>
 
 <span class="n">MIN_RESPONSES</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1"># minimum number of DYFI responses per grid</span>
 
@@ -218,9 +225,11 @@
         <span class="n">df_dict</span><span class="p">[</span><span class="s1">&#39;lon&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">clon</span><span class="p">)</span>
 
     <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">df_dict</span><span class="p">)</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;cdi&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity&#39;</span><span class="p">,</span>
-                                       <span class="s1">&#39;dist&#39;</span><span class="p">:</span> <span class="s1">&#39;distance&#39;</span><span class="p">,</span>
-                                       <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;station&#39;</span><span class="p">})</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="p">{</span>
+        <span class="s1">&#39;cdi&#39;</span><span class="p">:</span> <span class="s1">&#39;intensity&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;dist&#39;</span><span class="p">:</span> <span class="s1">&#39;distance&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;station&#39;</span>
+    <span class="p">})</span>
     <span class="k">return</span> <span class="n">df</span>
 </pre></div>
 

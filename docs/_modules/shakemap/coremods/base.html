@@ -150,7 +150,7 @@
                         <span class="n">component</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">component</span> <span class="o">=</span> <span class="s1">&#39;greater of two horizontal&#39;</span>
-                    <span class="n">tformat</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">fname</span>
+                    <span class="n">tformat</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;download&#39;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
                     <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[COMPONENT]&#39;</span><span class="p">,</span>
                                                                 <span class="n">component</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">filenames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
@@ -184,7 +184,8 @@
                                 <span class="n">component</span> <span class="o">=</span> <span class="s1">&#39;greater of two horizontal&#39;</span>
                             <span class="n">newcap</span> <span class="o">=</span> <span class="n">newcap</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;[COMPONENT]&#39;</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
                             <span class="n">new_cdict</span><span class="p">[</span><span class="s1">&#39;caption&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">newcap</span>
-                            <span class="n">tformat</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+                            <span class="n">tformat</span><span class="p">[</span><span class="s1">&#39;filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;download&#39;</span><span class="p">,</span>
+                                                               <span class="n">filename</span><span class="p">)</span>
                             <span class="n">new_contents</span><span class="p">[</span><span class="n">newkey</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_cdict</span>
         <span class="c1"># remove the keys we replaced with period specific ones</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">nuke_keys</span><span class="p">:</span>
@@ -195,7 +196,10 @@
         <span class="n">contents</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_contents</span><span class="p">)</span>
 
         <span class="c1"># create or update the contents.xml file</span>
-        <span class="n">contents_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;contents.xml&#39;</span><span class="p">)</span>
+        <span class="n">pdldir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eventid</span><span class="p">,</span> <span class="s1">&#39;current&#39;</span><span class="p">,</span> <span class="s1">&#39;pdl&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">pdldir</span><span class="p">):</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">pdldir</span><span class="p">)</span>
+        <span class="n">contents_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pdldir</span><span class="p">,</span> <span class="s1">&#39;contents.xml&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">contents_file</span><span class="p">):</span>
             <span class="n">old_contents</span> <span class="o">=</span> <span class="n">_read_contents</span><span class="p">(</span><span class="n">contents_file</span><span class="p">)</span>
             <span class="c1"># TODO: should we ensure that keys are globally unique?</span>

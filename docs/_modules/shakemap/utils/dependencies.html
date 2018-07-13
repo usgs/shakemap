@@ -237,7 +237,7 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">dbfile</span><span class="p">):</span>
             <span class="c1"># It doesn&#39;t exist, so create it</span>
             <span class="c1"># TODO: Better checking would probably be good here</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fconnect</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbfile</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fconnect</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fcursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fconnect</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fcursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
                 <span class="sd">&#39;&#39;&#39;CREATE TABLE file_checksums (command text NOT NULL,</span>
@@ -249,8 +249,9 @@
 <span class="sd">                   checksum text, PRIMARY KEY (command, eventid))&#39;&#39;&#39;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fconnect</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fconnect</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbfile</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fconnect</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fcursor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fconnect</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fcursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s1">&#39;PRAGMA journal_mode = WAL&#39;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="CommandDatabase.close"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.dependencies.html#shakemap.utils.dependencies.CommandDatabase.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Closes the object and associated databases</span>

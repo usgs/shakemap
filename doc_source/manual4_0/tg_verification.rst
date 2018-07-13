@@ -9,13 +9,13 @@ an interpolation scheme based on the statistics of multivariate
 normal distributions (MVN). See :ref:`Worden et al. (2018) <worden2018>`
 for a discussion of this approach. The mathematical complexity of 
 the MVN process makes 
-it difficult to ever fully validate the software against all possible 
+it difficult to ever fully verify the software against all possible 
 inputs, or to even assert with certainty that any particular result is
 objectively correct (at least once the inputs exceed some minimum 
 level of complexity). Here, we discuss a set of simplified verification
 tests that provide some support for the belief that the software is
-producing correct results that are consistent with our intuition. These 
-tests
+producing correct results that are consistent with our hand calculations.
+These tests
 are not designed to fully test all of the features of the software --
 that job is left to our unit tests and integration tests. Here we make
 numerous simplifications in order to more easily interpret the results.
@@ -24,14 +24,14 @@ While the tests discussed in this section are one-dimensional (i.e.,
 the results are computed for a line along which the sources are located), 
 the computational process is agnostic to dimensionality and is only 
 concerned
-with the distances between locations. Again, out other testing considers
+with the distances between locations. Again, our other testing considers
 more complex models, and the results of those tests appear consistent
 with the results presented here.
 
 Various simplifying assumptions were made when producing these tests 
 in order to better illuminate the behavior of the MVN process itself. 
 In particular, the ground-motion prediction equation (GMPE) used
-in these tests always returns 0 (in log space) for all locations, 
+in these tests always returns a mean of 0 (in log space) for all locations, 
 and reports a between-event standard deviation of 0.6 and a 
 within-event standard deviation of 0.8 (making the total 
 standard deviation a convenient 1.0). In addition, the 
@@ -61,8 +61,11 @@ so the computed bias of the event is 0.
 Thus, the conditional mean amplitude evaluates to 0 everywhere. The standard 
 deviation is 0 at the location of the observations, and at great distances
 from the observations it asymptotes to a value somewhat less than 1 (but
-still greater than the GMPE's within-event standard deviaiton of 0.8). 
-These are the expected results, and provide some confidence that the
+still greater than the GMPE's within-event standard deviaiton of 0.8).
+This is because with only two observations, the considerable uncertainty
+of the bias is applied to the within-event uncertainty.
+These are the expected results, are consistent with our hand calculations,
+and provide some confidence that the
 MVN implementation is not introducing a bias or other anomalies.
 
 
@@ -250,7 +253,11 @@ The result is visualized in
 :num:`Figure #verification-test-four`. Note that in Test 0004, the
 conditional mean far from the observations was less than 0.5, 
 whereas, in Test 4b, it is greater than 0.5; this consequence is
-a result of the greater bias of Test 0004b.
+a result of the greater bias of Test 0004b. Similarly, the 
+uncertainty at distance from the observations is slightly less
+in Test 0004b than in Test 0004 because the two essentially
+independent observations have reduced the uncertainty of the
+bias, which lowers the overall uncertainty.
 
 
 .. _verification-test-four-b:
@@ -374,7 +381,7 @@ the adjusted within-event standard deviation for each of the five cases.
     \frac{z \frac{1}{\phi^2} \zeta}  
     {\tau_{i, m}^{-2} + z \frac{1}{\phi^2} z}
 
-Here, however the factors :math:`z` and the residual must be 
+Here, however, the factors :math:`z` and the residual must be 
 mutiplited by the "omega factors" to compensate for the 
 uncertainty in the observation (see Equation 32 of 
 :ref:`Worden et al. (2018) <worden2018>`):
@@ -535,7 +542,7 @@ Like Test 0009, Test 0010 (see
 the central observation has an amplitude of 0.75, while the 
 other four observations have amplitudes of 1.0. All five have 
 a standard 
-deviation of 0.2. Here, though, he spacing of the higher 
+deviation of 0.2. Here, though, the spacing of the higher 
 amplitudes was chosen so that the conditional amplitude at 
 the location of
 the central observation would approach the assigned amplitude

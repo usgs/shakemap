@@ -61,14 +61,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;raster&#39;</span>
-    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/rasters\.zip&#39;</span><span class="p">]</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/raster\.zip&#39;</span><span class="p">]</span>
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
 
     <span class="n">contents</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="o">.</span><span class="n">fromkeys</span><span class="p">([</span><span class="s1">&#39;rasterData&#39;</span><span class="p">])</span>
     <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;rasterData&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;ESRI Raster Files&#39;</span><span class="p">,</span>
         <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="s1">&#39;Data and uncertainty grids in ESRI raster format&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;rasters.zip&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;raster.zip&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/zip&#39;</span><span class="p">}]</span>
     <span class="p">}</span>
 
@@ -102,7 +102,7 @@
         <span class="n">layers</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTs</span><span class="p">()</span>
 
         <span class="c1"># Package up all of these files into one zip file.</span>
-        <span class="n">zfilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;rasters.zip&#39;</span><span class="p">)</span>
+        <span class="n">zfilename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;raster.zip&#39;</span><span class="p">)</span>
         <span class="n">zfile</span> <span class="o">=</span> <span class="n">zipfile</span><span class="o">.</span><span class="n">ZipFile</span><span class="p">(</span><span class="n">zfilename</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span>
                                 <span class="n">compression</span><span class="o">=</span><span class="n">zipfile</span><span class="o">.</span><span class="n">ZIP_DEFLATED</span><span class="p">)</span>
 

@@ -36,6 +36,7 @@
 
 <span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="k">import</span> <span class="n">import_module</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -240,14 +241,13 @@
         <span class="k">return</span> <span class="n">lnmu</span><span class="p">,</span> <span class="n">lnsd</span>
 
 <div class="viewcode-block" id="MultiGMPE.from_config"><a class="viewcode-back" href="../../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE.from_config">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">conf</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Construct a MultiGMPE from a config file.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            conf (dict): Dictionary of config options.</span>
 <span class="sd">            filter_imt (IMT): An optional IMT to filter/reweight the GMPE list.</span>
-<span class="sd">            verbose (bool): Print verbose output for debugging.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            MultiGMPE object.</span>
@@ -256,9 +256,8 @@
         <span class="n">IMC</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">const</span><span class="o">.</span><span class="n">IMC</span><span class="p">,</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;interp&#39;</span><span class="p">][</span><span class="s1">&#39;component&#39;</span><span class="p">])</span>
         <span class="n">selected_gmpe</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;modeling&#39;</span><span class="p">][</span><span class="s1">&#39;gmpe&#39;</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;selected_gmpe: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">selected_gmpe</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;IMC: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">IMC</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;selected_gmpe: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">selected_gmpe</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;IMC: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">IMC</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Allow for selected_gmpe to be found in either conf[&#39;gmpe_sets&#39;] or</span>
@@ -271,9 +270,8 @@
             <span class="n">selected_gmpe_sets</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;gmpe_sets&#39;</span><span class="p">][</span><span class="n">selected_gmpe</span><span class="p">][</span><span class="s1">&#39;gmpes&#39;</span><span class="p">]</span>
             <span class="n">gmpe_set_weights</span> <span class="o">=</span> \
                 <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;gmpe_sets&#39;</span><span class="p">][</span><span class="n">selected_gmpe</span><span class="p">][</span><span class="s1">&#39;weights&#39;</span><span class="p">]]</span>
-            <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;selected_gmpe_sets: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">selected_gmpe_sets</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;gmpe_set_weights: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">gmpe_set_weights</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;selected_gmpe_sets: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">selected_gmpe_sets</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;gmpe_set_weights: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">gmpe_set_weights</span><span class="p">)</span>
 
             <span class="c1"># -----------------------------------------------------------------</span>
             <span class="c1"># If it is a GMPE set, does it contain GMPEs or GMPE sets?</span>
@@ -288,32 +286,30 @@
                 <span class="n">mgmpes</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">selected_gmpe_sets</span><span class="p">:</span>
                     <span class="n">mgmpes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">cls</span><span class="o">.</span><span class="n">__multigmpe_from_gmpe_set</span><span class="p">(</span>
-                        <span class="n">conf</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="n">filter_imt</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">))</span>
+                        <span class="n">conf</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="n">filter_imt</span><span class="p">))</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span><span class="n">mgmpes</span><span class="p">,</span> <span class="n">gmpe_set_weights</span><span class="p">,</span> <span class="n">imc</span><span class="o">=</span><span class="n">IMC</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">set_of_gmpes</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
                 <span class="n">out</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__multigmpe_from_gmpe_set</span><span class="p">(</span>
                     <span class="n">conf</span><span class="p">,</span>
                     <span class="n">selected_gmpe</span><span class="p">,</span>
-                    <span class="n">filter_imt</span><span class="o">=</span><span class="n">filter_imt</span><span class="p">,</span>
-                    <span class="n">verbose</span><span class="o">=</span><span class="n">verbose</span><span class="p">)</span>
+                    <span class="n">filter_imt</span><span class="o">=</span><span class="n">filter_imt</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> must consist exclusively of keys in &quot;</span>
-                                <span class="s2">&quot;conf[&#39;gmpe_modules&#39;] or conf[&#39;gmpe_sets&#39;]&quot;</span>
-                                <span class="o">%</span> <span class="n">selected_gmpe</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> must consist exclusively of keys in &quot;</span>
+                               <span class="s2">&quot;conf[&#39;gmpe_modules&#39;] or conf[&#39;gmpe_sets&#39;]&quot;</span>
+                               <span class="o">%</span> <span class="n">selected_gmpe</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">selected_gmpe</span> <span class="ow">in</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;gmpe_modules&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="n">modinfo</span> <span class="o">=</span> <span class="n">conf</span><span class="p">[</span><span class="s1">&#39;gmpe_modules&#39;</span><span class="p">][</span><span class="n">selected_gmpe</span><span class="p">]</span>
             <span class="n">mod</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span><span class="n">modinfo</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
             <span class="n">tmpclass</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">modinfo</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">out</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_list</span><span class="p">([</span><span class="n">tmpclass</span><span class="p">()],</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">],</span> <span class="n">imc</span><span class="o">=</span><span class="n">IMC</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;conf[&#39;modeling&#39;][&#39;gmpe&#39;] must be a key in &quot;</span>
-                            <span class="s2">&quot;conf[&#39;gmpe_modules&#39;] or conf[&#39;gmpe_sets&#39;]&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;conf[&#39;modeling&#39;][&#39;gmpe&#39;] must be a key in &quot;</span>
+                           <span class="s2">&quot;conf[&#39;gmpe_modules&#39;] or conf[&#39;gmpe_sets&#39;]&quot;</span><span class="p">)</span>
 
         <span class="n">out</span><span class="o">.</span><span class="n">DESCRIPTION</span> <span class="o">=</span> <span class="n">selected_gmpe</span>
         <span class="k">return</span> <span class="n">out</span></div>
 
-    <span class="k">def</span> <span class="nf">__multigmpe_from_gmpe_set</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">set_name</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                  <span class="n">verbose</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__multigmpe_from_gmpe_set</span><span class="p">(</span><span class="n">conf</span><span class="p">,</span> <span class="n">set_name</span><span class="p">,</span> <span class="n">filter_imt</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Private method for constructing a MultiGMPE from a set_name.</span>
 
@@ -420,9 +416,8 @@
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Construct MultiGMPE</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="k">if</span> <span class="n">verbose</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    filtered_gmpes: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">filtered_gmpes</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;    filtered_wts: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">filtered_wts</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;    filtered_gmpes: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">filtered_gmpes</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;    filtered_wts: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">filtered_wts</span><span class="p">)</span>
 
         <span class="n">mgmpe</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">from_list</span><span class="p">(</span>
             <span class="n">filtered_gmpes</span><span class="p">,</span> <span class="n">filtered_wts</span><span class="p">,</span>
@@ -442,6 +437,8 @@
 
             <span class="n">mgmpe</span><span class="o">.</span><span class="n">CUTOFF_DISTANCE</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">selected_dist_cutoff</span><span class="p">)</span>
             <span class="n">mgmpe</span><span class="o">.</span><span class="n">WEIGHTS_LARGE_DISTANCE</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">filtered_wts_ld</span><span class="p">)</span>
+
+        <span class="n">mgmpe</span><span class="o">.</span><span class="n">DESCRIPTION</span> <span class="o">=</span> <span class="n">set_name</span>
 
         <span class="k">return</span> <span class="n">mgmpe</span>
 
@@ -727,7 +724,35 @@
         <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2008()&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5_cb07</span>
 
-        <span class="k">return</span> <span class="n">sites</span></div></div>
+        <span class="k">return</span> <span class="n">sites</span></div>
+
+<div class="viewcode-block" id="MultiGMPE.describe"><a class="viewcode-back" href="../../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE.describe">[docs]</a>    <span class="k">def</span> <span class="nf">describe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Construct a dictionary that describes the MultiGMPE.</span>
+
+<span class="sd">        Note: For simplicity, this method ignores issues related to</span>
+<span class="sd">        GMPEs used for the site term and changes in the GMPE with</span>
+<span class="sd">        distance. For this level of detail, please see the config files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            A dictionary representation of the MultiGMPE.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gmpe_dict</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;gmpes&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;weights&#39;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">DESCRIPTION</span>
+        <span class="p">}</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span><span class="p">)):</span>
+            <span class="n">gmpe_dict</span><span class="p">[</span><span class="s1">&#39;weights&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">WEIGHTS</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">MultiGMPE</span><span class="p">):</span>
+                <span class="n">gmpe_dict</span><span class="p">[</span><span class="s1">&#39;gmpes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">describe</span><span class="p">()</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">gmpe_dict</span><span class="p">[</span><span class="s1">&#39;gmpes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
+
+        <span class="k">return</span> <span class="n">gmpe_dict</span></div></div>
 
 
 <div class="viewcode-block" id="filter_gmpe_list"><a class="viewcode-back" href="../../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.filter_gmpe_list">[docs]</a><span class="k">def</span> <span class="nf">filter_gmpe_list</span><span class="p">(</span><span class="n">gmpes</span><span class="p">,</span> <span class="n">wts</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>

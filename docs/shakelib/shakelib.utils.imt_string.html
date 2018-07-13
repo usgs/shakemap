@@ -40,11 +40,11 @@
 <code class="descclassname">shakelib.utils.imt_string.</code><code class="descname">oq_to_file</code><span class="sig-paren">(</span><em>oqimt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/imt_string.html#oq_to_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.imt_string.oq_to_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert openquake IMT nomenclature to filename friendly form.</p>
 <p>Examples:
-SA(1.0) (Spectral Acceleration at 1 second) -&gt; PSA1p0
-SA(0.3) (Spectral Acceleration at 0.3 second) -&gt; PSA0p3
-SA(15.0) (Spectral Acceleration at 15 seconds) -&gt; PSA15p0
-SA(3) (Spectral Acceleration at 3 seconds) -&gt; PSA3p0
-SA(.5) (Spectral Acceleration at 0.5 seconds) -&gt; PSA0p5</p>
+SA(1.0) (Spectral Acceleration at 1 second) -&gt; psa1p0
+SA(0.3) (Spectral Acceleration at 0.3 second) -&gt; psa0p3
+SA(15.0) (Spectral Acceleration at 15 seconds) -&gt; psa15p0
+SA(3) (Spectral Acceleration at 3 seconds) -&gt; psa3p0
+SA(.5) (Spectral Acceleration at 0.5 seconds) -&gt; psa0p5</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -67,9 +67,9 @@ IMT representation.</td>
 <code class="descclassname">shakelib.utils.imt_string.</code><code class="descname">file_to_oq</code><span class="sig-paren">(</span><em>fileimt</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/utils/imt_string.html#file_to_oq"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.utils.imt_string.file_to_oq" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convert filename friendly IMT form to openquake form.</p>
 <p>Examples:
-PSA1p0 (Spectral Acceleration at 1 second) -&gt; SA(1.0)
-PSA0p3 (Spectral Acceleration at 0.3 second) -&gt; SA(0.3)
-PSA15p0 (Spectral Acceleration at 15 seconds) -&gt; SA(15.0)</p>
+psa1p0 (Spectral Acceleration at 1 second) -&gt; SA(1.0)
+psa0p3 (Spectral Acceleration at 0.3 second) -&gt; SA(0.3)
+psa15p0 (Spectral Acceleration at 15 seconds) -&gt; SA(15.0)</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
