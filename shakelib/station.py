@@ -152,7 +152,7 @@ class StationList(object):
             :class:`Stationlist` object.
         """
 
-        db = sqlite3.connect(dbfile)
+        db = sqlite3.connect(dbfile, timeout=15)
         self = cls(db)
         self.cursor.executescript(sql)
         return self
@@ -189,7 +189,7 @@ class StationList(object):
 
         """
         # Create the database and tables
-        db = sqlite3.connect(dbfile)
+        db = sqlite3.connect(dbfile, timeout=15)
         self = cls(db)
         self._createTables()
         return self.addData(xmlfiles)

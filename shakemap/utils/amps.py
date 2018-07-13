@@ -116,7 +116,7 @@ class AmplitudeHandler(object):
             self._cursor.execute('PRAGMA journal_mode = WAL')
 
     def _connect(self):
-        self._connection = sqlite3.connect(self._dbfile, timeout=10)
+        self._connection = sqlite3.connect(self._dbfile, timeout=15)
         if self._connection is None:
             raise RuntimeError('Could not connect to %s' % self._dbfile)
         self._connection.isolation_level = 'EXCLUSIVE'
