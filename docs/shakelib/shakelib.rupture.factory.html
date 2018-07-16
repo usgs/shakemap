@@ -37,7 +37,7 @@
 <span id="shakelib-rupture-factory"></span><h1>shakelib.rupture.factory<a class="headerlink" href="#module-shakelib.rupture.factory" title="Permalink to this headline">¶</a></h1>
 <dl class="function">
 <dt id="shakelib.rupture.factory.get_rupture">
-<code class="descclassname">shakelib.rupture.factory.</code><code class="descname">get_rupture</code><span class="sig-paren">(</span><em>origin</em>, <em>file=None</em>, <em>mesh_dx=0.5</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#get_rupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.get_rupture" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">shakelib.rupture.factory.</code><code class="descname">get_rupture</code><span class="sig-paren">(</span><em>origin</em>, <em>file=None</em>, <em>mesh_dx=0.5</em>, <em>new_format=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/factory.html#get_rupture"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.factory.get_rupture" title="Permalink to this definition">¶</a></dt>
 <dd><p>This is a module-level function to read in a rupture file. This allows for
 the ShakeMap 3 text file specification or the ShakeMap 4 JSON rupture
 format. The ShakeMap 3 (“.txt” extension) only supports QuadRupture style
@@ -51,13 +51,13 @@ appropriate Rupture subclass instance.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – A ShakeMap origin instance; required because
-hypocentral/epicentral distances are computed from the Rupture
-class.</li>
+<li><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – A ShakeMap origin instance; required because hypocentral/epicentral
+distances are computed from the Ruptureclass.</li>
 <li><strong>file</strong> (<em>srt</em>) – Path to rupture file (optional).</li>
-<li><strong>mesh_dx</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Target spacing (in km) for rupture discretization;
-default is 0.5 km and it is only used if the rupture file is an
-EdgeRupture.</li>
+<li><strong>mesh_dx</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#float" title="(in Python v3.6)"><em>float</em></a>) – Target spacing (in km) for rupture discretization; default is
+0.5 km and it is only used if the rupture file is an EdgeRupture.</li>
+<li><strong>new_format</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Indicates whether text rupture format is
+“old” (lat, lon, depth) or “new” (lon, lat, depth) style.</li>
 </ul>
 </td>
 </tr>
@@ -148,7 +148,7 @@ beginning of another.</li>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>rupturefile</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – <p>Path to rupture file OR file-like object in GMT
+<li><strong>file</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – <p>Path to rupture file OR file-like object in GMT
 psxy format, where:</p>
 <blockquote>
 <div><ul>

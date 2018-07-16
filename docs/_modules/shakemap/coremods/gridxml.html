@@ -186,6 +186,14 @@
                     <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;STD&#39;</span> <span class="o">+</span> <span class="n">imt_field</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid_data</span>
                     <span class="n">field_keys</span><span class="p">[</span><span class="s1">&#39;STD&#39;</span> <span class="o">+</span> <span class="n">imt_field</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">digits</span><span class="p">)</span>
 
+            <span class="k">if</span> <span class="n">xml_type</span> <span class="o">==</span> <span class="s1">&#39;grid&#39;</span><span class="p">:</span>
+                <span class="n">gridobj</span><span class="p">,</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getGrid</span><span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">)</span>
+                <span class="n">grid_data</span> <span class="o">=</span> <span class="n">gridobj</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span>
+                <span class="n">units</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+                <span class="n">digits</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;digits&#39;</span><span class="p">]</span>
+                <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;SVEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">grid_data</span>
+                <span class="n">field_keys</span><span class="p">[</span><span class="s1">&#39;SVEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">units</span><span class="p">,</span> <span class="n">digits</span><span class="p">)</span>
+
             <span class="n">geodict</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span>
 
             <span class="n">config</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getConfig</span><span class="p">()</span>

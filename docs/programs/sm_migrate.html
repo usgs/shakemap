@@ -46,32 +46,28 @@ info.json file and uses those files to create the corresponding ShakeMap 4
 input data.</p>
 <dl class="docutils">
 <dt>Files used:</dt>
-<dd><ul class="first last">
-<li><p class="first"><a href="#id2"><span class="problematic" id="id3">*</span></a>_dat.xml data files in XML format. These are unchanged in
-ShakeMap 4.0.</p>
-</li>
-<li><p class="first"><a href="#id4"><span class="problematic" id="id5">*</span></a>_fault.txt fault files in text format. These will be converted
-to GeoJSON.</p>
-</li>
-<li><p class="first">source.txt Text file possibly containing mechanism and ??</p>
-</li>
-<li><p class="first">info.json Metadata file from which we extract:
+<dd><ul class="first last simple">
+<li><a href="#id2"><span class="problematic" id="id3">*</span></a>_dat.xml data files in XML format. These are unchanged in
+ShakeMap 4.0.</li>
+<li><a href="#id4"><span class="problematic" id="id5">*</span></a>_fault.txt fault files in text format. These will be converted
+to GeoJSON.</li>
+<li>source.txt Text file possibly containing mechanism and ??</li>
+<li>info.json Metadata file from which we extract:
 - Origin information for new event.xml file.
-- bias settings (see -s option)</p>
-</li>
-<li><p class="first"><a href="#id6"><span class="problematic" id="id7">*</span></a>.conf Config files, of which generally speaking only grind.conf
-is supported:</p>
-<blockquote>
-<div><ul class="simple">
+- bias settings (see -s option)</li>
+<li><dl class="first docutils">
+<dt><a href="#id6"><span class="problematic" id="id7">*</span></a>.conf Config files, at this time only configs from grind.conf:</dt>
+<dd><ul class="first last">
 <li>IPEs are currently not supported.</li>
-<li>A smaller subset of GMICE are supported in ShakeMap 4.0 at
-the time of this writing.</li>
+<li>A partial subset of GMICE are supported in ShakeMap 4.0 at
+this time.</li>
 <li>GMPE selections will be converted to the closest matching
 GEM equivalent (see -m).</li>
 <li>outlier max_deviation and max_mag values will be converted.</li>
 <li></li>
 </ul>
-</div></blockquote>
+</dd>
+</dl>
 </li>
 </ul>
 </dd>

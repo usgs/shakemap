@@ -9,7 +9,7 @@ import numpy as np
 from openquake.hazardlib.geo.mesh import Mesh
 from openquake.hazardlib.geo.geodetic import point_at
 from openquake.hazardlib.geo.point import Point
-from openquake.hazardlib.geo.utils import get_orthographic_projection
+from openquake.hazardlib.geo.utils import OrthographicProjection
 
 from impactutils.vectorutils.ecef import latlon2ecef
 from impactutils.vectorutils.ecef import ecef2latlon
@@ -102,7 +102,7 @@ class QuadRupture(Rupture):
         xmax = np.max([P0.x, P1.x, P2.x, P3.x])
         ymin = np.min([P0.y, P1.y, P2.y, P3.y])
         ymax = np.max([P0.y, P1.y, P2.y, P3.y])
-        proj = get_orthographic_projection(xmin, xmax, ymax, ymin)
+        proj = OrthographicProjection(xmin, xmax, ymax, ymin)
 
         # project each vertex of quad (at 0 depth)
         s0x, s0y = proj(P0.x, P0.y)
@@ -267,7 +267,7 @@ class QuadRupture(Rupture):
         north = np.max((yp0.max(), yp1.max()))
 
         # Projected coordinates are in km
-        proj = get_orthographic_projection(west, east, north, south)
+        proj = OrthographicProjection(west, east, north, south)
         xp2 = np.zeros_like(xp0)
         xp3 = np.zeros_like(xp0)
         yp2 = np.zeros_like(xp0)
@@ -420,7 +420,8 @@ class QuadRupture(Rupture):
     def fromOrientation(cls, px, py, pz, dx, dy, length, width,
                         strike, dip, origin):
         """
-        Create a QuadRupture instance from a known point, shape, and orientation.
+        Create a QuadRupture instance from a known point, shape, and
+        orientation.
 
         A point is defined as a set of latitude, longitude, and depth, which
         is located in the corner between the tail of the vector pointing in
@@ -448,7 +449,8 @@ class QuadRupture(Rupture):
                                 Length
 
         Args:
-            px (array): Array or list of longitudes (floats) of the known point.
+            px (array): Array or list of longitudes (floats) of the known
+                point.
             py (array): Array or list of latitudes (floats) of the known point.
             pz (array): Array or list of depths (floats) of the known point.
             dx (array): Array or list of distances (floats), in the strike
@@ -492,7 +494,7 @@ class QuadRupture(Rupture):
         # Get P1 and P2 (top horizontal points)
         theta = np.rad2deg(np.arctan((dy * np.cos(np.deg2rad(dip))) / dx))
         P1_direction = strike + 180 + theta
-        P1_distance = np.sqrt( dx**2 + (dy * np.cos(np.deg2rad(dip)))**2)
+        P1_distance = np.sqrt(dx**2 + (dy * np.cos(np.deg2rad(dip)))**2)
         P2_direction = strike
         P2_distance = length
         P1_lon = []
@@ -501,11 +503,11 @@ class QuadRupture(Rupture):
         P2_lat = []
         for idx, value in enumerate(px):
             P1_points = point_at(px[idx], py[idx],
-                    P1_direction[idx], P1_distance[idx])
+                                 P1_direction[idx], P1_distance[idx])
             P1_lon += [P1_points[0]]
             P1_lat += [P1_points[1]]
             P2_points = point_at(P1_points[0], P1_points[1],
-                    P2_direction[idx], P2_distance[idx])
+                                 P2_direction[idx], P2_distance[idx])
             P2_lon += [P2_points[0]]
             P2_lat += [P2_points[1]]
 
@@ -514,7 +516,8 @@ class QuadRupture(Rupture):
 
         # Get QuadRupture object
         quad = QuadRupture.fromTrace(P1_lon, P1_lat, P2_lon, P2_lat,
-                top_horizontal_depth, width, dip, origin, strike=strike)
+                                     top_horizontal_depth, width, dip,
+                                     origin, strike=strike)
         return quad
 
     @classmethod

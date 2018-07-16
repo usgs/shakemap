@@ -57,7 +57,6 @@
 <span class="sd">            - ndarray (float) of GMPE weights.</span>
 <span class="sd">            - Pandas series containing STREC output.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Testing&#39;</span><span class="p">)</span>
     <span class="n">tprobs</span><span class="p">,</span> <span class="n">strec_results</span> <span class="o">=</span> <span class="n">get_probs</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
     <span class="n">gmpelist</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">weightlist</span> <span class="o">=</span> <span class="p">[]</span>
@@ -155,9 +154,11 @@
 
     <span class="n">strec_results</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">getSubductionType</span><span class="p">(</span>
         <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">eid</span><span class="p">,</span> <span class="n">tensor_params</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
     <span class="n">region_probs</span> <span class="o">=</span> <span class="n">get_region_probs</span><span class="p">(</span><span class="n">eid</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">strec_results</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
     <span class="n">in_subduction</span> <span class="o">=</span> <span class="n">strec_results</span><span class="p">[</span><span class="s1">&#39;TectonicRegion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Subduction&#39;</span>
     <span class="n">above_slab</span> <span class="o">=</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">strec_results</span><span class="p">[</span><span class="s1">&#39;SlabModelDepth&#39;</span><span class="p">])</span>
+
     <span class="k">if</span> <span class="n">in_subduction</span><span class="p">:</span>
         <span class="n">subduction_probs</span> <span class="o">=</span> <span class="n">get_subduction_probs</span><span class="p">(</span>
             <span class="n">strec_results</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">mag</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="n">above_slab</span>
@@ -165,21 +166,27 @@
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">subduction_probs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">subduction_probs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction&#39;</span><span class="p">]</span>
 
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">subduction_probs</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s1">&#39;crustal&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-            <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
-            <span class="s1">&#39;intraslab&#39;</span><span class="p">:</span> <span class="mf">0.0</span>
-        <span class="p">}</span>
+        <span class="c1"># If we are in a subduction zone then we don&#39;t want the</span>
+        <span class="c1"># keys for subduction_0, 1, 2 (which are the generic vertical</span>
+        <span class="c1"># subduction subtypes that are not informed by the slab model because</span>
+        <span class="c1"># it isn&#39;t available)</span>
+        <span class="k">if</span> <span class="s1">&#39;subduction_0&#39;</span> <span class="ow">in</span> <span class="n">region_probs</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_0&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;subduction_1&#39;</span> <span class="ow">in</span> <span class="n">region_probs</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_1&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;subduction_2&#39;</span> <span class="ow">in</span> <span class="n">region_probs</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_2&#39;</span><span class="p">]</span>
 
-    <span class="c1"># we may have keys for subduction_0, 1, 2 already - the results</span>
-    <span class="c1"># we just got should override those.</span>
-    <span class="k">if</span> <span class="s1">&#39;subduction_0&#39;</span> <span class="ow">in</span> <span class="n">region_probs</span><span class="p">:</span>
-        <span class="k">del</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_0&#39;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="s1">&#39;subduction_1&#39;</span> <span class="ow">in</span> <span class="n">region_probs</span><span class="p">:</span>
-        <span class="k">del</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_1&#39;</span><span class="p">]</span>
-    <span class="k">if</span> <span class="s1">&#39;subduction_2&#39;</span> <span class="ow">in</span> <span class="n">region_probs</span><span class="p">:</span>
-        <span class="k">del</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_2&#39;</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># If we are NOT in a subduction zone we may or may not need subcution</span>
+        <span class="c1"># probabilities (depending on distance and the configured taper). But</span>
+        <span class="c1"># either way, we will not have access to the slab model and so we have</span>
+        <span class="c1"># to use the generic vertical subtypes</span>
+        <span class="n">subduction_probs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;crustal&#39;</span><span class="p">:</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_0&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;interface&#39;</span><span class="p">:</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_1&#39;</span><span class="p">],</span>
+            <span class="s1">&#39;intraslab&#39;</span><span class="p">:</span> <span class="n">region_probs</span><span class="p">[</span><span class="s1">&#39;subduction_2&#39;</span><span class="p">]</span>
+        <span class="p">}</span>
 
     <span class="n">region_probs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">subduction_probs</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">(</span><span class="n">region_probs</span><span class="p">,</span> <span class="n">strec_results</span><span class="p">)</span></div>

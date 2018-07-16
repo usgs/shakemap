@@ -8,7 +8,7 @@ import copy
 
 import numpy as np
 
-import openquake.hazardlib.geo as geo
+from openquake.hazardlib.geo.utils import OrthographicProjection
 from openquake.hazardlib.geo import point
 
 from impactutils.time.ancient_time import HistoricTime
@@ -35,7 +35,7 @@ def test_ss3():
     epiy = np.array([0.2 * rupy[1]])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    proj = OrthographicProjection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
@@ -321,7 +321,7 @@ def test_ss3_m6():
     epiy = np.array([0.2 * rupy[1]])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    proj = OrthographicProjection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
@@ -391,7 +391,7 @@ def test_ss3_move_hypo1():
     epiy = np.array([-1.0])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    proj = OrthographicProjection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
@@ -441,7 +441,7 @@ def test_ss3_move_hypo1():
     epiy = np.array([0.])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    proj = OrthographicProjection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
@@ -506,7 +506,7 @@ def test_ss3_m4p5():
     epiy = np.array([0.2 * rupy[1]])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    proj = OrthographicProjection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
@@ -563,7 +563,7 @@ def test_rv4():
     dip = np.array([30])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    proj = OrthographicProjection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
 
     # Dummy Origin
@@ -684,7 +684,7 @@ def test_so6():
     zp = np.array([0])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    proj = OrthographicProjection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
 
     # Dummy origin

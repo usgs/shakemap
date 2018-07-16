@@ -5,11 +5,10 @@ import os.path
 import sys
 
 # third party imports
-from openquake.hazardlib.geo.utils import get_orthographic_projection
+from openquake.hazardlib.geo.utils import OrthographicProjection
 from openquake.hazardlib.gsim.abrahamson_2014 import AbrahamsonEtAl2014
 from openquake.hazardlib.gsim.berge_thierry_2003 \
     import BergeThierryEtAl2003SIGMA
-import openquake.hazardlib.geo as geo
 import numpy as np
 import pandas as pd
 import pytest
@@ -18,7 +17,6 @@ import time
 # local imports
 from shakelib.distance import Distance
 from shakelib.distance import get_distance
-from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.gc2 import _computeGC2
 from shakelib.rupture.origin import Origin
 from shakelib.rupture.point_rupture import PointRupture
@@ -53,7 +51,7 @@ def test_san_fernando():
 
     epilat = 34.44000
     epilon = -118.41000
-    proj = geo.utils.get_orthographic_projection(
+    proj = OrthographicProjection(
         epilon - 1, epilon + 1, epilat + 1, epilat - 1)
     lon0, lat0 = proj(x0, y0, reverse=True)
     lon1, lat1 = proj(x1, y1, reverse=True)
@@ -1036,7 +1034,7 @@ def test_chichi_with_get_distance():
     z3 = np.abs(mat[3, iz])
     epilat = 23.85
     epilon = 120.82
-    proj = get_orthographic_projection(
+    proj = OrthographicProjection(
         epilon - 1, epilon + 1, epilat + 1, epilat - 1)
     lon0, lat0 = proj(x0, y0, reverse=True)
     lon1, lat1 = proj(x1, y1, reverse=True)

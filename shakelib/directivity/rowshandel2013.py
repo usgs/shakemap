@@ -50,7 +50,7 @@ import numpy as np
 import copy
 
 import openquake.hazardlib.geo as geo
-from openquake.hazardlib.geo.utils import get_orthographic_projection
+from openquake.hazardlib.geo.utils import OrthographicProjection
 
 from shakelib.rupture import utils
 from shakelib.distance import get_distance
@@ -438,8 +438,7 @@ class Rowshandel2013(object):
         latmax = self._lat.max()
         lonmin = self._lon.min()
         lonmax = self._lon.max()
-        proj = geo.utils.get_orthographic_projection(
-            lonmin, lonmax, latmax, latmin)
+        proj = OrthographicProjection(lonmin, lonmax, latmax, latmin)
 
         # Get epi projection
         epi_x, epi_y = proj(self._hyp.longitude, self._hyp.latitude)
@@ -607,7 +606,7 @@ def _get_quad_slip_ds_ss(q, rake, cp, p):
     # Define 'local' coordinate system
     qlats = [a.latitude for a in q]
     qlons = [a.longitude for a in q]
-    proj = get_orthographic_projection(
+    proj = OrthographicProjection(
         np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
 
     # Convert p and cp to geographic coords

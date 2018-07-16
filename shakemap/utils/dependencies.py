@@ -203,7 +203,7 @@ class CommandDatabase(object):
         if not os.path.isfile(dbfile):
             # It doesn't exist, so create it
             # TODO: Better checking would probably be good here
-            self.fconnect = sqlite3.connect(dbfile)
+            self.fconnect = sqlite3.connect(dbfile, timeout=15)
             self.fcursor = self.fconnect.cursor()
             self.fcursor.execute(
                 '''CREATE TABLE file_checksums (command text NOT NULL,
@@ -215,7 +215,7 @@ class CommandDatabase(object):
                    checksum text, PRIMARY KEY (command, eventid))''')
             self.fconnect.commit()
         else:
-            self.fconnect = sqlite3.connect(dbfile)
+            self.fconnect = sqlite3.connect(dbfile, timeout=15)
             self.fcursor = self.fconnect.cursor()
         self.fcursor.execute('PRAGMA journal_mode = WAL')
 
