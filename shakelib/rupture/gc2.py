@@ -6,7 +6,7 @@ import copy
 
 # third party imports
 import numpy as np
-from openquake.hazardlib.geo.utils import get_orthographic_projection
+from openquake.hazardlib.geo.utils import OrthographicProjection
 from openquake.hazardlib.geo import geodetic
 
 from impactutils.vectorutils.vector import Vector
@@ -49,7 +49,7 @@ def _computeGC2(rupture, lon, lat, depth):
     east = np.nanmax(all_lon)
     south = np.nanmin(all_lat)
     north = np.nanmax(all_lat)
-    proj = get_orthographic_projection(west, east, north, south)
+    proj = OrthographicProjection(west, east, north, south)
 
     totweight = np.zeros(newshape, dtype=lon.dtype)
     GC2T = np.zeros(newshape, dtype=lon.dtype)
@@ -285,7 +285,7 @@ def __calc_u_i(P0, P1, lat, lon, proj):
         lat (array): A numpy array of latitudes.
         lon (array): A numpy array of longitudes.
         proj (object): An orthographic projection from
-            openquake.hazardlib.geo.utils.get_orthographic_projection.
+            openquake.hazardlib.geo.utils.OrthographicProjection.
 
     Returns:
         array: Array of size N of distances (in km) from input points to
@@ -334,7 +334,7 @@ def __calc_t_i(P0, P1, lat, lon, proj):
         lat (array): A numpy array of latitudes.
         lon (array): A numpy array of longitudes.
         proj (object): An orthographic projection from
-            openquake.hazardlib.geo.utils.get_orthographic_projection.
+            openquake.hazardlib.geo.utils.OrthographicProjection.
 
     Returns:
         array: Array of size N of distances (in km) from input points to

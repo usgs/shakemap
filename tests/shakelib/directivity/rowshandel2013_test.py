@@ -7,7 +7,7 @@ import numpy as np
 import pytest
 import time
 
-import openquake.hazardlib.geo as geo
+from openquake.hazardlib.geo.utils import OrthographicProjection
 from openquake.hazardlib.geo import point
 
 from shakelib.sites import Sites
@@ -35,7 +35,7 @@ def test_exceptions():
     epiy = np.array([0.2 * rupy[1]])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    proj = OrthographicProjection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
@@ -87,8 +87,8 @@ def test_fromSites():
     epiy = np.array([rupy[1]])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-118.23333, -118.1666,
-                                                 34.075, 34.1333)
+    proj = OrthographicProjection(-118.23333, -118.1666,
+                                  34.075, 34.1333)
     tlon, tlat = proj(rupx, rupy, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
@@ -154,7 +154,7 @@ def test_ss3():
     epiy = np.array([0.2 * rupy[1]])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    proj = OrthographicProjection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
     epilon, epilat = proj(epix, epiy, reverse=True)
 
@@ -1882,7 +1882,7 @@ def test_rv4():
     dip = np.array([30])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    proj = OrthographicProjection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
 
     # Dummy Origin
@@ -1994,7 +1994,7 @@ def test_so6():
     zp = np.array([0])
 
     # Convert to lat/lon
-    proj = geo.utils.get_orthographic_projection(-122, -120, 39, 37)
+    proj = OrthographicProjection(-122, -120, 39, 37)
     tlon, tlat = proj(rupx, rupy, reverse=True)
 
     # Dummy Origin

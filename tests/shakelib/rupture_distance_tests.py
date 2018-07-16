@@ -4,7 +4,7 @@ import sys
 import numpy as np
 import time
 
-import openquake.hazardlib.geo as geo
+from openquake.hazardlib.geo.utils import OrthographicProjection
 
 from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.quad_rupture import QuadRupture
@@ -36,7 +36,7 @@ def test_multisegment_discordant():
 
     epilat = 32.15270
     epilon = -115.30500
-    proj = geo.utils.get_orthographic_projection(
+    proj = OrthographicProjection(
         epilon - 1, epilon + 1, epilat + 1, epilat - 1)
     lon0, lat0 = proj(x0, y0, reverse=True)
     lon1, lat1 = proj(x1, y1, reverse=True)

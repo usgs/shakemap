@@ -6,7 +6,7 @@ import copy
 # third party imports
 import numpy as np
 from openquake.hazardlib.geo.point import Point
-from openquake.hazardlib.geo.utils import get_orthographic_projection
+from openquake.hazardlib.geo.utils import OrthographicProjection
 
 from impactutils.vectorutils.ecef import latlon2ecef
 from impactutils.vectorutils.vector import Vector
@@ -289,7 +289,7 @@ def get_quad_slip(q, rake):
     s0_local = Vector(0, 0, 0)
     qlats = [a.latitude for a in q]
     qlons = [a.longitude for a in q]
-    proj = get_orthographic_projection(
+    proj = OrthographicProjection(
         np.min(qlons), np.max(qlons), np.min(qlats), np.max(qlats))
     s1_ll = proj(np.array([s1_local.x]), np.array([s1_local.y]), reverse=True)
     s0_ll = proj(np.array([s0_local.x]), np.array([s0_local.y]), reverse=True)

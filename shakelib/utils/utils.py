@@ -1,6 +1,6 @@
 import numpy as np
 
-from openquake.hazardlib.geo.utils import get_orthographic_projection
+from openquake.hazardlib.geo.utils import OrthographicProjection
 
 from shakelib.rupture.edge_rupture import EdgeRupture
 from shakelib.rupture.quad_rupture import QuadRupture
@@ -113,7 +113,7 @@ def get_extent(rupture, config=None):
         mindist_km = 1000.
 
     # Projection
-    proj = get_orthographic_projection(clon - 4, clon + 4, clat + 4, clat - 4)
+    proj = OrthographicProjection(clon - 4, clon + 4, clat + 4, clat - 4)
     if isinstance(rupture, (QuadRupture, EdgeRupture)):
         ruptx, rupty = proj(lons, lats)
     else:
