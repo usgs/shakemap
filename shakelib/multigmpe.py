@@ -73,9 +73,13 @@ class MultiGMPE(GMPE):
 
         shapes = []
         for k, v in sites.__dict__.items():
+            if k == '_slots_':
+                continue
             if (k is not 'lons') and (k is not 'lats'):
                 shapes.append(v.shape)
         for k, v in dists.__dict__.items():
+            if k == '_slots_':
+                continue
             if (k is not 'lons') and (k is not 'lats'):
                 shapes.append(v.shape)
 
@@ -89,9 +93,13 @@ class MultiGMPE(GMPE):
         # Need to turn all 2D arrays into 1D arrays because of
         # inconsistencies in how arrays are handled in OpenQuake.
         for k, v in dists.__dict__.items():
+            if k == '_slots_':
+                continue
             if (k is not 'lons') and (k is not 'lats'):
                 dists.__dict__[k] = np.reshape(dists.__dict__[k], (-1,))
         for k, v in sites.__dict__.items():
+            if k == '_slots_':
+                continue
             if (k is not 'lons') and (k is not 'lats'):
                 sites.__dict__[k] = np.reshape(sites.__dict__[k], (-1,))
 
@@ -193,9 +201,13 @@ class MultiGMPE(GMPE):
 
         # Undo reshapes of inputs
         for k, v in dists.__dict__.items():
+            if k == '_slots_':
+                continue
             if (k is not 'lons') and (k is not 'lats'):
                 dists.__dict__[k] = np.reshape(dists.__dict__[k], orig_shape)
         for k, v in sites.__dict__.items():
+            if k == '_slots_':
+                continue
             if (k is not 'lons') and (k is not 'lats'):
                 sites.__dict__[k] = np.reshape(sites.__dict__[k], orig_shape)
 
