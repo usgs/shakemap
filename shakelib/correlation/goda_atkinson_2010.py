@@ -83,7 +83,6 @@ class GodaAtkinson2010(object):
             # Variable used within ne.evaluate, not seen by linter
             beta = 0.319  # noqa
             gamma = 5.0
-            pass
         nal = -1.0 * alpha  # noqa
         gm1 = gamma - 1.0  # noqa
 #        cor = 1.0 - np.sqrt(1.0 - np.maximum(
