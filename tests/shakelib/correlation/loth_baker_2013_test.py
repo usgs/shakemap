@@ -3,14 +3,7 @@
 import numpy as np
 import pytest
 
-import os.path
-import sys
-
 from shakelib.correlation.loth_baker_2013 import LothBaker2013
-
-homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..', '..'))
-sys.path.insert(0, shakedir)
 
 
 def test_loth_baker_2012():
