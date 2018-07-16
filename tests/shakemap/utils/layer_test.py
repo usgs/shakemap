@@ -31,28 +31,28 @@ def test_layers():
     elon = -117.0
     elat = 33.0
     layer_distances = get_layer_distances(elon, elat, layer_path)
-    reference = {'induced': 1578.3879076203307,
-                 'japan': 7972.1138613743387,
-                 'taiwan': 11022.339157753582,
-                 'california': 0.0}
+    reference = {'japan': 7462.090628325871,
+                 'california': 0.0,
+                 'induced': 1578.3879076203307,
+                 'taiwan': 9698.206101592557}
     layers_equal(layer_distances, reference)
 
     elon = -97.5
     elat = 36.5
     layer_distances = get_layer_distances(elon, elat, layer_path)
-    reference = {'induced': 0.0,
-                 'japan': 8935.9779110700729,
-                 'taiwan': 11997.837464370788,
-                 'california': 1508.2155746648657}
+    reference = {'california': 1508.2155746648657,
+                 'japan': 8221.294305532281,
+                 'induced': 0.0,
+                 'taiwan': 10301.898766277141}
     layers_equal(layer_distances, reference)
 
     elon = 121.0
     elat = 22.5
     layer_distances = get_layer_distances(elon, elat, layer_path)
-    reference = {'induced': 12041.424518656486,
-                 'japan': 1231.8954391427453,
-                 'taiwan': 0.0,
-                 'california': 10085.281293655946}
+    reference = {'taiwan': 0.0,
+                 'induced': 12041.424518656486,
+                 'california': 9610.549505042432,
+                 'japan': 1231.8954391427453}
     layers_equal(layer_distances, reference)
 
     #
