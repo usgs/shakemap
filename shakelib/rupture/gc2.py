@@ -156,8 +156,7 @@ def _computeGC2(rupture, lon, lat, depth):
             dummy = bhat.dot(ahat)
             if dummy < 0:
                 tmpA0 = copy.deepcopy(A0)
-                tmpA1 = copy.deepcopy(A1)
-                A0 = tmpA1
+                A0 = copy.deepcopy(A1)
                 A1 = tmpA0
 
         # ---------------------------------------------------------------------

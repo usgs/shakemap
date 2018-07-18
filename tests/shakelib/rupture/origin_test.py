@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
 # stdlib imports
-import os.path
-import sys
 import io
+import os
+import tempfile
 
 # third party
 import numpy as np
@@ -11,11 +11,9 @@ import pytest
 
 # local imports
 from shakelib.rupture.origin import Origin
-
-
-homedir = os.path.dirname(os.path.abspath(__file__))  # where is this script?
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
-sys.path.insert(0, shakedir)
+from shakelib.rupture.origin import write_event_file
+from impactutils.time.ancient_time import HistoricTime
+import shakemap.utils.queue as queue
 
 
 def test_origin():
@@ -128,6 +126,77 @@ created="1211173621" otime="1210573681" type="" mech="Strike slip"
 netid="us" network=""/>"""
         efile = io.StringIO(event_text)
         origin = Origin.fromFile(efile)
+
+    # Missing keys
+    with pytest.raises(KeyError):
+        event_text = """<?xml version="1.0" encoding="US-ASCII"
+standalone="yes"?> <earthquake id="2008"
+mag="7.9"
+time="2008-05-12T06:28:01Z"
+depth="19.0" locstring="EASTERN SICHUAN, CHINA"
+created="1211173621" otime="1210573681" type=""
+network=""/>"""
+        efile = io.StringIO(event_text)
+        origin = Origin.fromFile(efile)
+
+    # Use "type" instead of "mech"
+    event_text = """<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
+<earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9"
+time="2008-05-12T06:28:01Z"
+depth="19.0" netid="us" network=""
+locstring="EASTERN SICHUAN, CHINA"
+type="RS" />"""
+    efile = io.StringIO(event_text)
+    origin = Origin.fromFile(efile)
+    assert origin.mech == 'RS'
+
+    # No rake or mech
+    event_text = """<?xml version="1.0" encoding="US-ASCII" standalone="yes"?>
+<earthquake id="2008ryan" lat="30.9858" lon="103.3639" mag="7.9"
+time="2008-05-12T06:28:01Z"
+depth="19.0" netid="us" network=""
+locstring="EASTERN SICHUAN, CHINA"
+reference="Smith, et al. (2019)"
+ />"""
+    efile = io.StringIO(event_text)
+    origin = Origin.fromFile(efile)
+    assert origin.rake == 0.0
+
+    hypo = origin.getHypo()
+    assert hypo.x == origin.lon
+    assert hypo.y == origin.lat
+    assert hypo.z == origin.depth
+
+    # Write the origin to a file
+    event = {}
+    event['id'] = 'us2000ryan'
+    event['netid'] = 'us'
+    event['network'] = 'USGS Network'
+    event['lat'] = 30.9858
+    event['lon'] = 103.3639
+    event['depth'] = 19.0
+    event['mag'] = 7.9
+    event['time'] = HistoricTime.strptime('2008-05-12T06:28:01.0Z',
+                                          queue.TIMEFMT)
+    event['locstring'] = "EASTERN SICHUAN, CHINA"
+    event['mech'] = 'RS'
+    event['reference'] = "Smith, et al. (2019)"
+    event['productcode'] = "us2000ryan"
+
+    tfile = tempfile.NamedTemporaryFile()
+    xmlfile = tfile.name
+    tfile.close()
+    res = write_event_file(event, xmlfile)
+    if res is not None:
+        print(res)
+        assert False
+
+    origin = Origin.fromFile(xmlfile)
+    os.remove(xmlfile)
+    assert origin.id == event['id']
+    assert origin.netid == event['netid']
+    assert origin.network == event['network']
+    assert origin.time == event['time']
 
 
 if __name__ == "__main__":

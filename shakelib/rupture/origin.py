@@ -77,7 +77,7 @@ class Origin(object):
 
         if len(missing):
             raise KeyError('Input event dictionary is missing the following '
-                           'required keys: "%s"' % (','.join(missing)))
+                           'required keys: "%s"' % (', '.join(missing)))
 
         # ---------------------------------------------------------------------
         # Check some types, ranges, and defaults
@@ -113,11 +113,7 @@ class Origin(object):
 
         # What about rake?
         if not hasattr(self, 'rake'):
-            if hasattr(self, 'mech'):
-                mech = self.mech
-                self.rake = constants.RAKEDICT[mech]
-            else:
-                self.rake = constants.RAKEDICT['ALL']
+            self.rake = constants.RAKEDICT[self.mech]
 
         if self.rake is None:
             self.rake = 0.0
@@ -386,6 +382,9 @@ def read_event_file(eventxml):
 
     if 'mech' in xmldict:
         eqdict['mech'] = xmldict['mech']
+    # Older files may have "type" instead of "mech"
+    if 'type' in xmldict:
+        eqdict['type'] = xmldict['type']
     if 'reference' in xmldict:
         eqdict['reference'] = xmldict['reference']
 

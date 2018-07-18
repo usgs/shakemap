@@ -213,7 +213,8 @@ class QuadRupture(Rupture):
             dips (array): Array of dips for each of rectangle (degrees).
             origin (Origin): Reference to a ShakeMap origin object.
             strike (array): If None then strike is computed from verticies of
-                top edge of each quadrilateral. If a scalar, then all
+                top edge of each quadrilateral. If the array has only a
+                single value, then all
                 quadrilaterals are constructed assuming this strike direction.
                 If an array with the same length as the trace coordinates then
                 it specifies the strike for each quadrilateral.
@@ -227,23 +228,21 @@ class QuadRupture(Rupture):
         Returns:
             QuadRupture instance.
 
+        Raises:
+            ShakeLibException: if the input arrays are not all the same
+                length, or if the strike array is not length 1 or the same
+                length as the input arrays.
+
         """
-        if len(xp0) == len(yp0) == len(xp1) == len(
-                yp1) == len(zp) == len(dips) == len(widths):
-            pass
-        else:
+        if not (len(xp0) == len(yp0) == len(xp1) == len(yp1) ==
+                len(zp) == len(dips) == len(widths)):
             raise ShakeLibException(
                 'Number of xp0,yp0,xp1,yp1,zp,widths,dips points must be '
                 'equal.')
-        if strike is None:
-            pass
-        else:
-            if (len(xp0) == len(strike)) | (len(strike) == 1):
-                pass
-            else:
-                raise ShakeLibException(
-                    'Strike must be None, scalar, or same length as '
-                    'trace coordinates.')
+        if strike is not None and len(xp0) != len(strike) and len(strike) != 1:
+            raise ShakeLibException(
+                'Strike must be None or an array of one value or the '
+                'same length as trace coordinates.')
 
         if group_index is None:
             group_index = np.array(range(len(xp0)))
@@ -468,6 +467,10 @@ class QuadRupture(Rupture):
             origin (Origin): Reference to a ShakeMap Origin object.
         Returns:
             QuadRupture instance.
+
+        Raises:
+            ShakeLibException: if the lengths of the points arrays are not
+                all equal.
         """
         # Verify that arrays are of equal length
         if len(px) == len(py) == len(pz) == len(
@@ -564,8 +567,12 @@ class QuadRupture(Rupture):
 
         Returns:
             QuadRupture object, where the rupture is modeled as a series of
-                trapezoids.
+            trapezoids.
 
+        Raises:
+            ShakeLibException: if the lengths of the inptu arrays are not
+                all equal, or if the length of the group_index is not the
+                same as the arrays (if group_index is supplied)..
         """
         if len(xp0) == len(yp0) == len(zp0) == len(xp1) == len(yp1) == \
            len(zp1) == len(xp2) == len(yp2) == len(zp2) == len(xp3) == \
@@ -578,7 +585,7 @@ class QuadRupture(Rupture):
         nq = len(xp0)
         if group_index is not None:
             if len(group_index) != nq:
-                raise Exception(
+                raise ShakeLibException(
                     "group_index must have same length as vertices.")
         else:
             group_index = np.array(range(nq))

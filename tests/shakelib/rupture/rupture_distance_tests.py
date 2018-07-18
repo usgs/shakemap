@@ -3,6 +3,7 @@ import os
 import sys
 import numpy as np
 import time
+import pytest
 
 from openquake.hazardlib.geo.utils import OrthographicProjection
 
@@ -342,7 +343,11 @@ def test_EdgeRupture_vs_QuadRupture():
                      'network': '', 'locstring': '',
                      'time': HistoricTime.utcfromtimestamp(time.time())})
     qrup = QuadRupture.fromTrace(xp0, yp0, xp1, yp1, zp, widths, dips, origin)
+    with pytest.raises(ValueError):
+        rrup_q = qrup.computeRrup(lon, lat, dep, var=True)
     rrup_q = qrup.computeRrup(lon, lat, dep)
+    with pytest.raises(ValueError):
+        rjb_q = qrup.computeRjb(lon, lat, dep, var=True)
     rjb_q = qrup.computeRjb(lon, lat, dep)
 
     # Construct equivalent EdgeRupture
@@ -357,7 +362,11 @@ def test_EdgeRupture_vs_QuadRupture():
     erup = EdgeRupture.fromArrays(
         toplons, toplats, topdeps, botlons, botlats, botdeps,
         origin, group_index)
+    with pytest.raises(ValueError):
+        rrup_e = erup.computeRrup(lon, lat, dep, var=True)
     rrup_e = erup.computeRrup(lon, lat, dep)
+    with pytest.raises(ValueError):
+        rjb_e = erup.computeRjb(lon, lat, dep, var=True)
     rjb_e = erup.computeRjb(lon, lat, dep)
 
     # Check that QuadRupture and EdgeRupture give the same result
