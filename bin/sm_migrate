@@ -41,8 +41,8 @@ def get_parser():
     This program takes one required file, a tarball of one or more ShakeMap 3.5
     event directories.  To create this file, run a command like this:
 
-    find . -name "*_dat.xml" -o -name "*_fault.txt" -o -name "source.txt" -o
-    -name "info.json" -o -name "*.conf" | tar -czvf ~/sm35_inputs.tgz -T -
+    find . -maxdepth 3 -name "*_dat.xml" -o -name "*_fault.txt" -o -name "source.txt"
+    -o -name "info.json" -o -name "*.conf" | tar -czvf ~/sm35_inputs.tgz -T -
 
     This program takes a subset of the ShakeMap 3.5 input data and the
     info.json file and uses those files to create the corresponding ShakeMap 4
@@ -57,7 +57,6 @@ def get_parser():
       - info.json Metadata file from which we extract:
         - Origin information for new event.xml file.
         - bias settings (see -s option)
-
       - *.conf Config files, at this time only configs from grind.conf:
                - IPEs are currently not supported.
                - A partial subset of GMICE are supported in ShakeMap 4.0 at
@@ -65,7 +64,11 @@ def get_parser():
                - GMPE selections will be converted to the closest matching
                  GEM equivalent (see -m).
                - outlier max_deviation and max_mag values will be converted.
-               -
+
+    NOTE: if the -b option is used without -s, ShakeMap 4 will create a model.conf
+    file for the event that does not specify a GMPE. To use a GMPE other than the
+    default when running the event, make sure you update each event's model.conf
+    file to include your chosen GMPE.
 
     '''
     parser = argparse.ArgumentParser(
@@ -84,7 +87,7 @@ in input data.'''
     parser.add_argument('-b', '--skip-bounds', action='store_true',
                         default=False, help=hlptxt2)
     parser.add_argument('-s', '--skip-settings', action='store_true',
-                        default=False, help=hlptxt2)
+                        default=False, help=hlptxt3)
     parser.add_argument('-m', '--migrate-file',
                         help='Supply custom migrate.conf')
     return parser
