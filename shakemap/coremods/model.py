@@ -1281,7 +1281,8 @@ class ModelModule(CoreModule):
             else:
                 raise ValueError('Unknown station %s in stationlist' %
                                  (station['id']))
-            sdf = getattr(self, ndf).df
+            dfx = getattr(self, ndf)
+            sdf = dfx.df
             six = sta_ix[ndf][station['id']]
             #
             # Set the 'intensity', 'pga', and 'pga' peak properties
@@ -1309,6 +1310,10 @@ class ModelModule(CoreModule):
                     _round_float(np.exp(sdf['PGV'][six]), 4)
             else:
                 station['properties']['pgv'] = 'null'
+            #
+            # Add vs30
+            #
+            station['properties']['vs30'] = _round_float(dfx.sx.vs30[six], 2)
             #
             # Add the predictions so we can plot residuals
             #
