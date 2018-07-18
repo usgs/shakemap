@@ -1055,12 +1055,13 @@ class MapMaker(object):
         eventid = metadata['input']['event_information']['event_id']
         if eventid.endswith('_se'):
             cx, cy = m(hlon, hlat)
-            plt.text(cx, cy, 'SCENARIO', fontsize=64,
+            plt.text(cx, cy, 'SCENARIO', fontsize=72,
                      zorder=SCENARIO_ZORDER, rotation=45,
-                     alpha=0.2, color='red',
+                     alpha=0.3, color='grey',
                      horizontalalignment='center',
-                     verticalalignment='center')
-
+                     verticalalignment='center',
+                     path_effects=[path_effects.Stroke(linewidth=1, foreground='black')])
+        
         # save plot to file
         plt.draw()
         outfile = os.path.join(outfolder, 'intensity.pdf')
@@ -1333,11 +1334,12 @@ class MapMaker(object):
         eventid = metadata['input']['event_information']['event_id']
         if eventid.endswith('_se'):
             cx, cy = m(hlon, hlat)
-            plt.text(cx, cy, 'SCENARIO', fontsize=64,
+            plt.text(cx, cy, 'SCENARIO', fontsize=72,
                      zorder=SCENARIO_ZORDER, rotation=45,
-                     alpha=0.2, color='red',
+                     alpha=0.3, color='grey',
                      horizontalalignment='center',
-                     verticalalignment='center')
+                     verticalalignment='center',
+                     path_effects=[path_effects.Stroke(linewidth=1, foreground='black')])
 
         # save plot to file
         fileimt = oq_to_file(imt)
