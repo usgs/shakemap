@@ -50,7 +50,7 @@ class Rupture(ABC):
             json.dump(self._geojson, f)
 
     @abstractmethod
-    def getLength(self):
+    def getLength(self):  # pragma: no cover
         """
         Returns:
             float: Rupture length in km.
@@ -58,7 +58,7 @@ class Rupture(ABC):
         pass
 
     @abstractmethod
-    def getWidth(self):
+    def getWidth(self):  # pragma: no cover
         """
         Returns:
             float: Rupture width in km.
@@ -66,7 +66,7 @@ class Rupture(ABC):
         pass
 
     @abstractmethod
-    def getArea(self):
+    def getArea(self):  # pragma: no cover
         """
         Returns:
             float: Rupture area in square km.
@@ -74,7 +74,7 @@ class Rupture(ABC):
         pass
 
     @abstractmethod
-    def getStrike(self):
+    def getStrike(self):  # pragma: no cover
         """
         Return strike angle. If rupture consists of multiple quadrilaterals,
         the average strike angle, weighted by quad length, is returned.
@@ -89,11 +89,11 @@ class Rupture(ABC):
         pass
 
     @abstractmethod
-    def getDip(self):
+    def getDip(self):  # pragma: no cover
         pass
 
     @abstractmethod
-    def getDepthToTop(self):
+    def getDepthToTop(self):  # pragma: no cover
         """
         Returns:
            float: Average dip in degrees.
@@ -102,7 +102,7 @@ class Rupture(ABC):
         pass
 
     @abstractmethod
-    def getQuadrilaterals(self):
+    def getQuadrilaterals(self):  # pragma: no cover
         """
         Method to return rupture quadrilaterals. Returns None for
         PointRupture.
@@ -126,15 +126,15 @@ class Rupture(ABC):
         return self._origin
 
     @abstractproperty
-    def lats(self):
+    def lats(self):  # pragma: no cover
         pass
 
     @abstractproperty
-    def lons(self):
+    def lons(self):  # pragma: no cover
         pass
 
     @abstractproperty
-    def depths(self):
+    def depths(self):  # pragma: no cover
         pass
 
     def getRuptureContext(self, gmpelist):
@@ -165,8 +165,7 @@ class Rupture(ABC):
         if hasattr(origin, 'rake'):
             rx.rake = origin.rake
         elif hasattr(origin, 'mech'):
-            mech = origin.mech
-            rx.rake = constants.RAKEDICT[mech]
+            rx.rake = constants.RAKEDICT[origin.mech]
         else:
             rx.rake = constants.RAKEDICT['ALL']
 
@@ -217,7 +216,7 @@ class Rupture(ABC):
         return repi
 
     @abstractmethod
-    def computeRjb(self, lon, lat, depth, var=False):
+    def computeRjb(self, lon, lat, depth, var=False):  # pragma: no cover
         """
         Method for computing Joyner-Boore distance.
 
@@ -235,7 +234,7 @@ class Rupture(ABC):
         pass
 
     @abstractmethod
-    def computeRrup(self, lon, lat, depth, var=False):
+    def computeRrup(self, lon, lat, depth, var=False):  # pragma: no cover
         """
         Method for computing rupture distance.
 
@@ -253,7 +252,7 @@ class Rupture(ABC):
         pass
 
     @abstractmethod
-    def computeGC2(self, lon, lat, depth):
+    def computeGC2(self, lon, lat, depth):  # pragma: no cover
         """
         Method for computing version 2 of the Generalized Coordinate system
         (GC2) by Spudich and Chiou OFR 2015-1028.
@@ -269,13 +268,13 @@ class Rupture(ABC):
         """
         pass
 
-    def plot3d(self):
+    def plot3d(self):  # pragma: no cover
         """
         Method for making a quick 3D wireframe plot of rupture.
         """
         plot_rupture_wire3d(self)
 
-    def map(self):
+    def map(self):  # pragma: no cover
         """
         Method for making a quick map of the fault.
         """

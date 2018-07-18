@@ -219,7 +219,7 @@ def _check_polygon(p):
             A list of five lon/lat/depth lists.
 
     Raises:
-        Exception: Incorrectly specified polygon.
+        ValueError: incorrectly specified polygon.
 
     """
     n_points = len(p)
@@ -245,7 +245,7 @@ def _check_polygon(p):
         top_depth = p[j][2]
         bot_depth = p[-(j + 2)][2]
         if top_depth >= bot_depth:
-            raise Exception(
+            raise ValueError(
                 'Top points must be ordered before bottom points.')
 
 
@@ -351,8 +351,8 @@ def text_to_json(file, new_format=True):
             try:
                 _check_polygon(polygons[i])
                 success = True
-                continue
-            except:
+                break
+            except ValueError:
                 polygons[i] = _rotate_polygon(polygons[i])
         if success:
             fixed.append(True)
@@ -440,10 +440,10 @@ def is_quadrupture_class(d):
     Returns:
         bool: Can the rupture be represented in the QuadRupture class?
     """
-    isQuad = True
-
     f = d['features'][0]
     geom = f['geometry']
+    if geom['type'] == 'Point':
+        return False
     polygons = geom['coordinates'][0]
     try:
         len(polygons)
@@ -464,16 +464,16 @@ def is_quadrupture_class(d):
                     Point(p[-(k + 2)][0], p[-(k + 2)][1], p[-(k + 2)][2])]
             test = utils.is_quad(quad)
             if test[0] is False:
-                isQuad = False
+                return False
 
             # Within each quad, top and bottom edges must be horizontal
             tops = np.array([quad[0].depth, quad[1].depth])
             if not np.isclose(tops[0], tops, rtol=0,
                               atol=constants.DEPTH_TOL).all():
-                isQuad = False
+                return False
             bots = np.array([quad[2].depth, quad[3].depth])
             if not np.isclose(bots[0], bots, rtol=0,
                               atol=constants.DEPTH_TOL).all():
-                isQuad = False
+                return False
 
-    return isQuad
+    return True

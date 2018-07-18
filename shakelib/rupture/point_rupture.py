@@ -194,7 +194,7 @@ class PointRupture(Rupture):
         # Sort out ps2ff parameters
         # ----------------------------
         origin = self._origin
-        mech = origin.mech
+        mech = getattr(origin, 'mech', 'ALL')
         if not hasattr(origin, '_tectonic_region'):
             mscale = MagScaling.WC94
             smech = Mechanism.A

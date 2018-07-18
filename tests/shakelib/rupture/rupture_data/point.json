@@ -1,0 +1,20 @@
+{ "type": "FeatureCollection",
+  "metadata": {
+      "magnitude": 7.4,
+      "eventtime": "1999-08-17T00:01:39Z",
+      "eventid": "usp0009d4z",
+      "title": "1999 Izmit Earthquake",
+      "reference": "Barka, A., H. S. Akyz, E. Altunel, G. Sunal, Z. Akir, A. Dikbas, B. Yerli, R. Armijo, B. Meyer, J. B. d. Chabalier, T. Rockwell, J. R. Dolan, R. Hartleb, T. Dawson, S. Christofferson, A. Tucker, T. Fumal, R. Langridge, H. Stenner, W. Lettis, J. Bachhuber, and W. Page (2002). The Surface Rupture and Slip Distribution of the 17 August 1999 Izmit Earthquake (M 7.4), North Anatolian Fault, Bull. Seism. Soc. Am. 92, 43-60."
+  },
+  "features":[
+      { "type": "Feature",
+        "properties": {"rupture type": "rupture extent" },
+        "geometry": {
+	    "type": "Point",
+	    "coordinates":[[
+		 [29.51528, 40.72933, 20]
+	    ]]
+	}
+      }
+  ]
+}
