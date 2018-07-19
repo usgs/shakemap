@@ -269,7 +269,8 @@ def create_contours(container, document):
     if 'MMI' not in imts:
         return
     component = container.getComponents('MMI')[0]
-    line_strings = contour(container, 'MMI', component, DEFAULT_FILTER_SIZE)
+    line_strings = contour(container, 'MMI', component, DEFAULT_FILTER_SIZE,
+                           None)
 
     # make a folder for the contours
     folder = etree.SubElement(document, 'Folder')

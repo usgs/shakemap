@@ -31,6 +31,8 @@ import numpy as np
 from descartes import PolygonPatch
 from scipy.ndimage import gaussian_filter
 
+from openquake.hazardlib import imt
+
 # local imports
 from mapio.gmt import GMTGrid
 from impactutils.colors.cpalette import ColorPalette
@@ -45,6 +47,7 @@ from shakemap.utils.config import get_config_paths
 from .base import CoreModule
 from shakemap.utils.utils import path_macro_sub
 from impactutils.time.ancient_time import HistoricTime
+from shakemap.utils.utils import get_object_from_config
 
 
 CITY_COLS = 2
@@ -96,8 +99,9 @@ class MappingModule(CoreModule):
 
     command_name = 'mapping'
     targets = [r'products/intensity\.jpg', r'products/intensity\.pdf',
-               r'products/.*_contour\.jpg', r'products/.*_contour\.pdf',
-               r'products/psa.*\.jpg']
+               r'products/pga\.jpg', r'products/pga\.pdf',
+               r'products/pgv\.jpg', r'products/pgv\.pdf',
+               r'products/psa.*p.*\.jpg', r'products/psa.*p.*\.pdf']
     dependencies = [('products/shake_result.hdf', True)]
     configs = ['products.conf']
 
@@ -138,7 +142,8 @@ class MappingModule(CoreModule):
     contents['psa[PERIOD]Map'] = {'title': 'PSA[PERIOD] Map',
                                   'page': mapping_page,
                                   'caption': psacap,
-                                  'formats': [{'filename': 'psa[0-9][0-9].jpg',
+                                  'formats': [{'filename':
+                                               'psa[0-9]p[0-9].jpg',
                                                'type': 'image/jpeg'},
                                               {'filename':
                                                'psa[0-9]p[0-9].pdf',
@@ -206,14 +211,14 @@ class MappingModule(CoreModule):
                             config['products']['mapping']['operator'])
 
         imtlist = container.getIMTs()
-        for imt in imtlist:
-            if imt == 'MMI':
+        for imtype in imtlist:
+            if imtype == 'MMI':
                 self.logger.debug('Drawing intensity map...')
                 intensity_map = mapmaker.drawIntensityMap(datadir)
                 self.logger.debug('Created intensity map %s' % intensity_map)
             else:
-                self.logger.debug('Drawing %s contour map...' % imt)
-                contour_file = mapmaker.drawContourMap(imt, datadir)
+                self.logger.debug('Drawing %s contour map...' % imtype)
+                contour_file = mapmaker.drawContourMap(imtype, datadir)
                 self.logger.debug('Created contour map %s' % contour_file)
 
         #######################################################################
@@ -1060,8 +1065,9 @@ class MapMaker(object):
                      alpha=0.3, color='grey',
                      horizontalalignment='center',
                      verticalalignment='center',
-                     path_effects=[path_effects.Stroke(linewidth=1, foreground='black')])
-        
+                     path_effects=[path_effects.Stroke(linewidth=1,
+                                   foreground='black')])
+
         # save plot to file
         plt.draw()
         outfile = os.path.join(outfolder, 'intensity.pdf')
@@ -1125,13 +1131,13 @@ class MapMaker(object):
         correction = 0.5 if n >= 0 else -0.5
         return int(n / precision + correction) * precision
 
-    def drawContourMap(self, imt, outfolder):
+    def drawContourMap(self, imtype, outfolder):
         """
         Render IMT data as contours over topography, with oceans, coastlines,
         etc.
 
         Args:
-            imt (str):
+            imtype (str):
                 IMT that is being drawn on the map ('MMI', 'PGV',
                 'PGA', 'SA(x.y)').
             outfolder (str):
@@ -1148,8 +1154,8 @@ class MapMaker(object):
         # get the geodict for the topo file
         topodict = GMTGrid.getFileGeoDict(self.topofile)[0]
         # get the geodict for the ShakeMap
-        comp = self.container.getComponents(imt)[0]
-        imtdict = self.container.getIMTGrids(imt, comp)
+        comp = self.container.getComponents(imtype)[0]
+        imtdict = self.container.getIMTGrids(imtype, comp)
         imtgrid = imtdict['mean']
         smdict = imtgrid.getGeoDict()
         # get a geodict that is aligned with topo, but inside shakemap
@@ -1172,9 +1178,9 @@ class MapMaker(object):
         imtdata = imtgrid.getData().copy()
 
         # convert units if necessary
-        if imt == 'MMI':
+        if imtype == 'MMI':
             pass
-        elif imt == 'PGV':
+        elif imtype == 'PGV':
             imtdata = np.exp(imtdata)
         else:
             imtdata = np.exp(imtdata) * 100
@@ -1198,9 +1204,9 @@ class MapMaker(object):
         pimt = gaussian_filter(pimt, 5.0)
         dmin = pimt.min()
         dmax = pimt.max()
-        if imt == 'MMI':
+        mmimap = ColorPalette.fromPreset('mmi')
+        if imtype == 'MMI':
             levels = getContourLevels(dmin, dmax, itype='linear')
-            mmimap = ColorPalette.fromPreset('mmi')
 
             for level in levels:
                 # First, draw contours at half unit locations
@@ -1250,17 +1256,44 @@ class MapMaker(object):
                              path_effects.Normal()])
 
         else:
+            config = self.container.getConfig()
+            gmice = get_object_from_config('gmice', 'modeling', config)
+            gmice_imts = gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+            gmice_pers = gmice.DEFINED_FOR_SA_PERIODS
+            oqimt = imt.from_string(imtype)
+            if imtype == 'MMI' or not isinstance(oqimt, tuple(gmice_imts)) \
+               or (isinstance(oqimt, imt.SA) and
+                   oqimt.period not in gmice_pers):
+                my_gmice = None
+            else:
+                my_gmice = gmice
+
             levels = getContourLevels(dmin, dmax)
+            if my_gmice:
+                if imtype == 'PGV':
+                    lnlevels = np.log(levels)
+                else:
+                    lnlevels = np.log(levels / 100)
+                mmi_levels = my_gmice.getMIfromGM(np.array(lnlevels),
+                                                  oqimt)[0]
+                colors = []
+                for ml in mmi_levels:
+                    color_array = np.array(mmimap.getDataColor(ml))
+                    color_rgb = np.array(
+                        color_array[0:3] * 255, dtype=int).tolist()
+                    colors.append('#%02x%02x%02x' % tuple(color_rgb))
+            else:
+                colors = 'w'
 
             # Show dashed contours everywhere
-            m.contour(x, y, np.flipud(pimt), colors='w',
+            m.contour(x, y, np.flipud(pimt), colors=colors,
                       linestyles='dashed',
                       cmap=None,
                       levels=levels,
                       zorder=DASHED_CONTOUR_ZORDER)
 
             # Solid contours on land
-            cs = m.contour(x, y, np.flipud(pimt), colors='w',
+            cs = m.contour(x, y, np.flipud(pimt), colors=colors,
                            cmap=None,
                            levels=levels,
                            zorder=CONTOUR_ZORDER)
@@ -1294,7 +1327,7 @@ class MapMaker(object):
         self._drawGraticules(m, gd)
 
         # draw filled symbols for MMI and instrumented measures
-        self._drawStations(m, fill=True, imt=imt)
+        self._drawStations(m, fill=True, imt=imtype)
 
         # draw map scale
         self._drawMapScale(m, gd)
@@ -1326,7 +1359,7 @@ class MapMaker(object):
         self.cities.renderToMap(m.ax, zorder=CITIES_ZORDER)
 
         # draw title and supertitle
-        self._drawTitle(imt)
+        self._drawTitle(imtype)
 
         # if event is a scenario, make watermark of the word scenario
         # diagonally across map
@@ -1339,10 +1372,11 @@ class MapMaker(object):
                      alpha=0.3, color='grey',
                      horizontalalignment='center',
                      verticalalignment='center',
-                     path_effects=[path_effects.Stroke(linewidth=1, foreground='black')])
+                     path_effects=[path_effects.Stroke(linewidth=1,
+                                   foreground='black')])
 
         # save plot to file
-        fileimt = oq_to_file(imt)
+        fileimt = oq_to_file(imtype)
         plt.draw()
         outfile = os.path.join(outfolder, '%s_contour.pdf' %
                                (fileimt))

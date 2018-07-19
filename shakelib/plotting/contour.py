@@ -7,9 +7,10 @@ from shapely.geometry import mapping
 from scipy.ndimage.filters import median_filter
 from skimage import measure
 import numpy as np
+from openquake.hazardlib import imt
 
 
-def contour(container, imtype, component, filter_size):
+def contour(container, imtype, component, filter_size, gmice):
     """
     Generate contours of a specific IMT and return as a Shapely
     MultiLineString object.
@@ -34,6 +35,8 @@ def contour(container, imtype, component, filter_size):
         NotImplementedError -- if the user attempts to contour a data file
             with sets of points rather than grids.
     """  # noqa
+    oqimt = imt.from_string(imtype)
+
     intensity_colormap = ColorPalette.fromPreset('mmi')
     imtdict = container.getIMTGrids(imtype, component)
     gridobj = imtdict['mean']
@@ -94,10 +97,21 @@ def contour(container, imtype, component, filter_size):
                 'units': units
             }
             if imtype == 'MMI':
-                color_array = np.array(intensity_colormap.getDataColor(cval))
-                color_rgb = np.array(
-                    color_array[0:3] * 255, dtype=int).tolist()
-                props['color'] = '#%02x%02x%02x' % tuple(color_rgb)
+                pass
+            elif imtype == 'PGV':
+                lcval = np.log(cval)
+            else:
+                lcval = np.log(cval / 100)
+            if gmice:
+                mmival = gmice.getMIfromGM(np.array([lcval]), oqimt)[0][0]
+            elif imtype == 'MMI':
+                mmival = cval
+            else:
+                mmival = 1
+            color_array = np.array(intensity_colormap.getDataColor(mmival))
+            color_rgb = np.array(color_array[0:3] * 255, dtype=int).tolist()
+            props['color'] = '#%02x%02x%02x' % tuple(color_rgb)
+            if imtype == 'MMI':
                 if (cval * 2) % 2 == 1:
                     props['weight'] = 4
                 else:

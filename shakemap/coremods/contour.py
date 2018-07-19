@@ -10,13 +10,15 @@ import inspect
 
 # third party imports
 import fiona
-from shakelib.utils.containers import ShakeMapOutputContainer
-from shakelib.utils.imt_string import oq_to_file
+from openquake.hazardlib import imt
 
 # local imports
 from .base import CoreModule
 from shakemap.utils.config import get_config_paths, get_logging_config
 from shakelib.plotting.contour import contour
+from shakemap.utils.utils import get_object_from_config
+from shakelib.utils.containers import ShakeMapOutputContainer
+from shakelib.utils.imt_string import oq_to_file
 
 FORMATS = {
     'geojson': ('GeoJSON', 'json')
@@ -172,7 +174,8 @@ def contour_to_files(container, output_dir, logger,
         'geometry': 'MultiLineString',
         'properties': {
             'value': 'float',
-            'units': 'str'
+            'units': 'str',
+            'color': 'str'
         }
     }
     mmi_schema = {
@@ -191,8 +194,14 @@ def contour_to_files(container, output_dir, logger,
         'proj': 'longlat'
     }
 
+    config = container.getConfig()
+    gmice = get_object_from_config('gmice', 'modeling', config)
+    gmice_imts = gmice.DEFINED_FOR_INTENSITY_MEASURE_TYPES
+    gmice_pers = gmice.DEFINED_FOR_SA_PERIODS
+
     for imtype in imtlist:
         fileimt = oq_to_file(imtype)
+        oqimt = imt.from_string(imtype)
         component = container.getComponents(imtype)[0]
         if component == 'GREATER_OF_TWO_HORIZONTAL':
             fname = 'cont_%s.%s' % (fileimt, extension)
@@ -204,6 +213,12 @@ def contour_to_files(container, output_dir, logger,
             flist = glob.glob(fpath + '.*')
             for fname in flist:
                 os.remove(fname)
+
+        if imtype == 'MMI' or not isinstance(oqimt, tuple(gmice_imts)) or \
+           (isinstance(oqimt, imt.SA) and oqimt.period not in gmice_pers):
+            my_gmice = None
+        else:
+            my_gmice = gmice
 
         # fiona spews a warning here when driver is geojson
         # this warning appears to be un-catchable using
@@ -226,12 +241,8 @@ def contour_to_files(container, output_dir, logger,
                 crs=crs
             )
 
-            line_strings = contour(
-                container,
-                imtype,
-                component,
-                filter_size
-            )
+            line_strings = contour(container, imtype, component, filter_size,
+                                   my_gmice)
 
             for feature in line_strings:
                 vector_file.write(feature)
