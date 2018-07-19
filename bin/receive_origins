@@ -54,7 +54,7 @@ def get_parser():
     parser.add_argument('--status', help='Event status')
     parser.add_argument('--action', help='Event action type')
     parser.add_argument('--property-title', nargs='*', help='Event location')
-    parser.add_argument('--property-event-type',
+    parser.add_argument('--property-event-type', nargs='*',
                         help='Event type (earthquake, explosion, etc.)')
 
     parser.add_argument('--preferred-eventid',
@@ -105,6 +105,9 @@ def main(args):
         logger.info('No action on action %s' % args.action)
         sys.exit(0)
 
+    if not args.property_event_type:
+        args.property_event_type = ''
+    args.property_event_type = ' '.join(args.property_event_type)
     if args.property_event_type != 'earthquake':
         logger.info('No action on event types of %s' %
                     args.property_event_type)
@@ -129,8 +132,7 @@ def main(args):
     # dictionary and send it to the queue
     if not args.property_title:
         args.property_title = ''
-    elif isinstance(args.property_title, list):
-        args.property_title = ' '.join(args.property_title)
+    args.property_title = ' '.join(args.property_title)
     if not args.preferred_eventsource:
         args.preferred_eventsource = ''
     event = {'id': args.preferred_eventid,
