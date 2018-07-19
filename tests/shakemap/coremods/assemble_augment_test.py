@@ -15,21 +15,6 @@ from common import clear_files, set_files
 ########################################################################
 # Test assemble and augment
 ########################################################################
-#def clear_files(event_path):
-#    files = ['boat_fault.txt', 'dyfi_dat.xml', 'event.xml', 'model.conf',
-#             'model_zc.conf', 'moment.xml', 'stationlist.xml']
-#    for fname in files:
-#        try:
-#            os.remove(os.path.join(event_path, fname))
-#        except OSError:
-#            pass
-#
-#
-#def set_files(event_path, files):
-#    for src, dst in files.items():
-#        shutil.copy(os.path.join(event_path, 'data', src),
-#                    os.path.join(event_path, dst))
-
 
 def test_assemble_augment():
 
