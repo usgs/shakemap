@@ -131,7 +131,7 @@ def test_mapmaker():
         mapmod.drawIntensityMap(tmpdirname, fill=False)
 
     with tempfile.TemporaryDirectory() as tmpdirname:
-        mapmod.drawContourMap(imt='MMI', outfolder=tmpdirname)
+        mapmod.drawContourMap('MMI', tmpdirname)
 
 
 if __name__ == '__main__':
