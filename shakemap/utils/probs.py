@@ -69,7 +69,42 @@ def get_weights(origin, config):
     weightlist = np.array(weightlist)
     logging.debug('gmpelist: %s' % gmpelist)
     logging.debug('weightlist: %s' % weightlist)
-    return gmpelist, weightlist, strec_results
+    gmmdict = {'gmpelist': gmpelist,
+               'weightlist': weightlist}
+    #
+    # Here we get the region-specific ipe, gmice, and ccf. If they are
+    # not specified in the config, we use None, and let the value
+    # fall back to whatever is specified in the system config.
+    #
+    if strec_results['TectonicRegion'] == 'Active':
+        gmmdict['ipe'] = config['tectonic_regions']['acr'].get(
+            'ipe', None)
+        gmmdict['gmice'] = config['tectonic_regions']['acr'].get(
+            'gmice', None)
+        gmmdict['ccf'] = config['tectonic_regions']['acr'].get(
+            'ccf', None)
+    elif strec_results['TectonicRegion'] == 'Stable':
+        gmmdict['ipe'] = config['tectonic_regions']['scr'].get(
+            'ipe', None)
+        gmmdict['gmice'] = config['tectonic_regions']['scr'].get(
+            'gmice', None)
+        gmmdict['ccf'] = config['tectonic_regions']['scr'].get(
+            'ccf', None)
+    elif strec_results['TectonicRegion'] == 'Subduction':
+        gmmdict['ipe'] = config['tectonic_regions']['subduction'].get(
+            'ipe', None)
+        gmmdict['gmice'] = config['tectonic_regions']['subduction'].get(
+            'gmice', None)
+        gmmdict['ccf'] = config['tectonic_regions']['subduction'].get(
+            'ccf', None)
+    elif strec_results['TectonicRegion'] == 'Volcanic':
+        gmmdict['ipe'] = config['tectonic_regions']['volcanic'].get(
+            'ipe', None)
+        gmmdict['gmice'] = config['tectonic_regions']['volcanic'].get(
+            'gmice', None)
+        gmmdict['ccf'] = config['tectonic_regions']['volcanic'].get(
+            'ccf', None)
+    return gmmdict, strec_results
 
 
 def get_probs(origin, config):
@@ -90,7 +125,8 @@ def get_probs(origin, config):
             type.
 
     Returns:
-        dict: Probabilities for each earthquake type, with fields:
+        (dict, dict):
+            Probabilities for each earthquake type, with fields:
               - acr Probability that the earthquake is in an active region.
               - acr_X Probability that the earthquake is in a depth layer of
                 ACR, starting from the top.
@@ -108,6 +144,7 @@ def get_probs(origin, config):
               - interface Probability that the earthquake is on the interface.
               - intraslab Probability that the earthquake is in the slab below
                 interface.
+            STREC results
 
     """
     selector = SubductionSelector()

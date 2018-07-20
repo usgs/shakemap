@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import shutil
 import subprocess
 
 import pytest
@@ -75,7 +74,7 @@ def test_assemble_augment():
         if os.path.isfile(data_file):
             os.remove(data_file)
 
-    # Do an event with model.conf (not model_zc.conf) and no zoneinfo
+    # Do an event with model.conf (not model_select.conf) and no zoneinfo
     # (should succeed)
     event_path = os.path.join(datapath, 'nc72282711', 'current')
     set_files(event_path, {'event.xml': 'event.xml',
@@ -130,7 +129,7 @@ def test_assemble_augment():
     #
     # Should fail validation
     set_files(event_path, {'event.xml': 'event.xml',
-                           'model_zc.conf.bad0': 'model_zc.conf'})
+                           'model_select.conf.bad0': 'model_select.conf'})
     try:
         amod = AssembleModule('nc72282711', comment='Test comment.')
         with pytest.raises(RuntimeError):
@@ -140,7 +139,7 @@ def test_assemble_augment():
 
     # Should fail vs30 filename check
     set_files(event_path, {'event.xml': 'event.xml',
-                           'model_zc.conf.bad1': 'model_zc.conf'})
+                           'model_select.conf.bad1': 'model_select.conf'})
     try:
         amod = AssembleModule('nc72282711', comment='Test comment.')
         with pytest.raises(FileNotFoundError):
@@ -150,7 +149,7 @@ def test_assemble_augment():
 
     # Should fail prediction locations filename check
     set_files(event_path, {'event.xml': 'event.xml',
-                           'model_zc.conf.bad2': 'model_zc.conf'})
+                           'model_select.conf.bad2': 'model_select.conf'})
     try:
         amod = AssembleModule('nc72282711', comment='Test comment.')
         with pytest.raises(FileNotFoundError):
@@ -183,7 +182,7 @@ def test_assemble_augment():
         assemble = AssembleModule('nc72282711', comment='Test comment.')
         assemble.execute()
         # Should fail validation
-        set_files(event_path, {'model_zc.conf.bad0': 'model_zc.conf'})
+        set_files(event_path, {'model_select.conf.bad0': 'model_select.conf'})
         augment = AugmentModule('nc72282711', comment='Test comment.')
         with pytest.raises(RuntimeError):
             augment.execute()
@@ -191,7 +190,7 @@ def test_assemble_augment():
 
         # Should fail vs30 filename check
         set_files(event_path, {'event.xml': 'event.xml',
-                               'model_zc.conf.bad1': 'model_zc.conf'})
+                               'model_select.conf.bad1': 'model_select.conf'})
         augment = AugmentModule('nc72282711', comment='Test comment.')
         with pytest.raises(FileNotFoundError):
             augment.execute()
@@ -199,7 +198,7 @@ def test_assemble_augment():
 
         # Should fail prediction locations filename check
         set_files(event_path, {'event.xml': 'event.xml',
-                               'model_zc.conf.bad2': 'model_zc.conf'})
+                               'model_select.conf.bad2': 'model_select.conf'})
         augment = AugmentModule('nc72282711', comment='Test comment.')
         with pytest.raises(FileNotFoundError):
             augment.execute()

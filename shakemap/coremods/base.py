@@ -27,7 +27,7 @@ class CoreModule(ABC):
     # directory (and must therefore be prefixed with 'products/' if they
     # are found in the products directory); configs are assumed to be
     # found in the profile's config directory (and, thus, event-specific
-    # configs like model_zc.conf should be listed in dependencies, not
+    # configs like model_select.conf should be listed in dependencies, not
     # configs.
     #
     # targets should be regexp strings, e.g.:

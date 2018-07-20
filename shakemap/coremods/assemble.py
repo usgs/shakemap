@@ -41,7 +41,7 @@ class AssembleModule(CoreModule):
     dependencies = [('event.xml', True), ('*_dat.xml', False),
                     ('*_fault.txt', False), ('rupture.json', False),
                     ('source.txt', False), ('model.conf', False),
-                    ('model_zc.conf', False)]
+                    ('model_select.conf', False)]
     configs = ['gmpe_sets.conf', 'model.conf', 'modules.conf']
 
     def __init__(self, eventid, comment=None):
@@ -125,10 +125,10 @@ class AssembleModule(CoreModule):
 
         #
         # this is the event specific model.conf (may not be present)
-        # prefer model.conf to model_zc.conf
+        # prefer model.conf to model_select.conf
         #
         event_config_file = os.path.join(datadir, 'model.conf')
-        event_config_zc_file = os.path.join(datadir, 'model_zc.conf')
+        event_config_zc_file = os.path.join(datadir, 'model_select.conf')
         if os.path.isfile(event_config_file):
             event_config = ConfigObj(event_config_file,
                                      configspec=spec_file)

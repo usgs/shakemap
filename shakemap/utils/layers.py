@@ -47,6 +47,8 @@ def validate_config(mydict, install_path):
         elif key in ('x1', 'x2', 'p1', 'p2', 'p_kagan_default',
                      'default_slab_depth'):
             mydict[key] = float(mydict[key])
+        elif key in ('ipe', 'gmice', 'ccf'):
+            pass
         else:
             raise ValidateError('Invalid entry in config: "%s"' % (key))
     return
@@ -163,7 +165,7 @@ def update_config_regions(lat, lon, config):
     inside_layer_name = None
     if 'layers' in config and 'layer_dir' in config['layers']:
         layer_dir = config['layers']['layer_dir']
-        if layer_dir and layer_dir != 'None':
+        if layer_dir:
             geo_layers = get_layer_distances(lon, lat, layer_dir)
         else:
             geo_layers = {}
@@ -187,5 +189,5 @@ def update_config_regions(lat, lon, config):
         for region, rdict in layer_config.items():
             if region == 'horizontal_buffer':
                 continue
-            config['tectonic_regions'][region] = rdict
+            config['tectonic_regions'][region].update(rdict)
     return config
