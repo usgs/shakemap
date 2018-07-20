@@ -25,7 +25,7 @@ def test_select():
     event_path = os.path.join(datapath, 'nc72282711', 'current')
     set_files(event_path, {'event.xml': 'event.xml'})
     conf_file = os.path.join(datapath, 'nc72282711', 'current',
-                             'model_zc.conf')
+                             'model_select.conf')
     smod = SelectModule('nc72282711')
     smod.execute()
     failed = False
@@ -37,7 +37,7 @@ def test_select():
 
     # Subduction event (not over slab)
     conf_file = os.path.join(datapath, 'usp0004bxs', 'current',
-                             'model_zc.conf')
+                             'model_select.conf')
     if os.path.isfile(conf_file):
         os.remove(conf_file)
     try:

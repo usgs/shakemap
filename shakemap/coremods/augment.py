@@ -138,17 +138,17 @@ class AugmentModule(CoreModule):
         shake_config.merge(extent_config)
         #
         # this is the event specific model.conf (may not be present)
-        # prefer model.conf to model_zc.conf
+        # prefer model.conf to model_select.conf
         #
         event_config_file = os.path.join(datadir, 'model.conf')
-        event_config_zc_file = os.path.join(datadir, 'model_zc.conf')
+        event_config_zc_file = os.path.join(datadir, 'model_select.conf')
         if os.path.isfile(event_config_file):
             self.logger.debug('Found an event specific model.conf file.')
             event_config = ConfigObj(event_config_file,
                                      configspec=spec_file)
             shake_config.merge(event_config)
         elif os.path.isfile(event_config_zc_file):
-            self.logger.debug('Found an event specific model_zc file.')
+            self.logger.debug('Found an event specific model_select file.')
             event_config = ConfigObj(event_config_zc_file,
                                      configspec=spec_file)
             shake_config.merge(event_config)

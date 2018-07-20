@@ -259,8 +259,8 @@ class CommandDatabase(object):
             fp_exists = len(glob.glob(fp[0]))
             # If a file is optional and does not exist, we don't want to
             # force the system to make it. (E.g., we don't want to force
-            # 'select' to run if model_zc.conf isn't already there -- that's
-            # the user's choice.
+            # 'select' to run if model_select.conf isn't already there --
+            # that's the user's choice.
             if fp[1] == 0 and not fp_exists:
                 continue
             parent_cmd = self.__findCmd(fp[0])

@@ -16,7 +16,7 @@ shakedir = os.path.abspath(os.path.join(homedir, '..', '..', '..'))
 
 def clear_files(event_path):
     files = ['boat_fault.txt', 'dyfi_dat.xml', 'event.xml', 'model.conf',
-             'model_zc.conf', 'moment.xml', 'stationlist.xml',
+             'model_select.conf', 'moment.xml', 'stationlist.xml',
              'shake_data.hdf']
     for fname in files:
         try:
