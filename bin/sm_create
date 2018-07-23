@@ -64,6 +64,9 @@ def get_parser():
                  'DEP', 'MAG', 'LOCSTR'),
         help='Specify the event parameters (locstr should '
              'be in quotes)')
+    parser.add_argument('--network',
+                        help=('Specify network name '
+                              'to be filled in event.xml file'))
     parser.add_argument(
         '-b', '--skip-bounds', action='store_true',
         default=False,
@@ -147,7 +150,10 @@ def main(args):
             print('You seem to have flipped your lon/lat values. Exiting.')
             sys.exit(1)
 
-        network = get_network_name(netid)
+        if not args.network:
+            network = get_network_name(netid)
+        else:
+            network = args.network
         if network == 'unknown':
             network = ''
 
