@@ -43,7 +43,7 @@
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.mesh</span> <span class="k">import</span> <span class="n">Mesh</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.geodetic</span> <span class="k">import</span> <span class="n">point_at</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.point</span> <span class="k">import</span> <span class="n">Point</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="k">import</span> <span class="n">get_orthographic_projection</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.geo.utils</span> <span class="k">import</span> <span class="n">OrthographicProjection</span>
 
 <span class="kn">from</span> <span class="nn">impactutils.vectorutils.ecef</span> <span class="k">import</span> <span class="n">latlon2ecef</span>
 <span class="kn">from</span> <span class="nn">impactutils.vectorutils.ecef</span> <span class="k">import</span> <span class="n">ecef2latlon</span>
@@ -136,7 +136,7 @@
         <span class="n">xmax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">P0</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">P1</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">P2</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">P3</span><span class="o">.</span><span class="n">x</span><span class="p">])</span>
         <span class="n">ymin</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">([</span><span class="n">P0</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">P1</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">P2</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">P3</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
         <span class="n">ymax</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">([</span><span class="n">P0</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">P1</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">P2</span><span class="o">.</span><span class="n">y</span><span class="p">,</span> <span class="n">P3</span><span class="o">.</span><span class="n">y</span><span class="p">])</span>
-        <span class="n">proj</span> <span class="o">=</span> <span class="n">get_orthographic_projection</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">)</span>
+        <span class="n">proj</span> <span class="o">=</span> <span class="n">OrthographicProjection</span><span class="p">(</span><span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">)</span>
 
         <span class="c1"># project each vertex of quad (at 0 depth)</span>
         <span class="n">s0x</span><span class="p">,</span> <span class="n">s0y</span> <span class="o">=</span> <span class="n">proj</span><span class="p">(</span><span class="n">P0</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="n">P0</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
@@ -247,7 +247,8 @@
 <span class="sd">            dips (array): Array of dips for each of rectangle (degrees).</span>
 <span class="sd">            origin (Origin): Reference to a ShakeMap origin object.</span>
 <span class="sd">            strike (array): If None then strike is computed from verticies of</span>
-<span class="sd">                top edge of each quadrilateral. If a scalar, then all</span>
+<span class="sd">                top edge of each quadrilateral. If the array has only a</span>
+<span class="sd">                single value, then all</span>
 <span class="sd">                quadrilaterals are constructed assuming this strike direction.</span>
 <span class="sd">                If an array with the same length as the trace coordinates then</span>
 <span class="sd">                it specifies the strike for each quadrilateral.</span>
@@ -261,23 +262,21 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            QuadRupture instance.</span>
 
+<span class="sd">        Raises:</span>
+<span class="sd">            ShakeLibException: if the input arrays are not all the same</span>
+<span class="sd">                length, or if the strike array is not length 1 or the same</span>
+<span class="sd">                length as the input arrays.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xp0</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">yp0</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">xp1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
-                <span class="n">yp1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">zp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dips</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">widths</span><span class="p">):</span>
-            <span class="k">pass</span>
-        <span class="k">else</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xp0</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">yp0</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">xp1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">yp1</span><span class="p">)</span> <span class="o">==</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">zp</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">dips</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">widths</span><span class="p">)):</span>
             <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span>
                 <span class="s1">&#39;Number of xp0,yp0,xp1,yp1,zp,widths,dips points must be &#39;</span>
                 <span class="s1">&#39;equal.&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">strike</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xp0</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">strike</span><span class="p">))</span> <span class="o">|</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">):</span>
-                <span class="k">pass</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span>
-                    <span class="s1">&#39;Strike must be None, scalar, or same length as &#39;</span>
-                    <span class="s1">&#39;trace coordinates.&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">strike</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">xp0</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">strike</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span>
+                <span class="s1">&#39;Strike must be None or an array of one value or the &#39;</span>
+                <span class="s1">&#39;same length as trace coordinates.&#39;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">group_index</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">group_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xp0</span><span class="p">)))</span>
@@ -301,7 +300,7 @@
         <span class="n">north</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">((</span><span class="n">yp0</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">yp1</span><span class="o">.</span><span class="n">max</span><span class="p">()))</span>
 
         <span class="c1"># Projected coordinates are in km</span>
-        <span class="n">proj</span> <span class="o">=</span> <span class="n">get_orthographic_projection</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="p">,</span> <span class="n">south</span><span class="p">)</span>
+        <span class="n">proj</span> <span class="o">=</span> <span class="n">OrthographicProjection</span><span class="p">(</span><span class="n">west</span><span class="p">,</span> <span class="n">east</span><span class="p">,</span> <span class="n">north</span><span class="p">,</span> <span class="n">south</span><span class="p">)</span>
         <span class="n">xp2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">xp0</span><span class="p">)</span>
         <span class="n">xp3</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">xp0</span><span class="p">)</span>
         <span class="n">yp2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">xp0</span><span class="p">)</span>
@@ -454,7 +453,8 @@
     <span class="k">def</span> <span class="nf">fromOrientation</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">px</span><span class="p">,</span> <span class="n">py</span><span class="p">,</span> <span class="n">pz</span><span class="p">,</span> <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span><span class="p">,</span> <span class="n">length</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span>
                         <span class="n">strike</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">origin</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a QuadRupture instance from a known point, shape, and orientation.</span>
+<span class="sd">        Create a QuadRupture instance from a known point, shape, and</span>
+<span class="sd">        orientation.</span>
 
 <span class="sd">        A point is defined as a set of latitude, longitude, and depth, which</span>
 <span class="sd">        is located in the corner between the tail of the vector pointing in</span>
@@ -482,7 +482,8 @@
 <span class="sd">                                Length</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            px (array): Array or list of longitudes (floats) of the known point.</span>
+<span class="sd">            px (array): Array or list of longitudes (floats) of the known</span>
+<span class="sd">                point.</span>
 <span class="sd">            py (array): Array or list of latitudes (floats) of the known point.</span>
 <span class="sd">            pz (array): Array or list of depths (floats) of the known point.</span>
 <span class="sd">            dx (array): Array or list of distances (floats), in the strike</span>
@@ -500,6 +501,10 @@
 <span class="sd">            origin (Origin): Reference to a ShakeMap Origin object.</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            QuadRupture instance.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ShakeLibException: if the lengths of the points arrays are not</span>
+<span class="sd">                all equal.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Verify that arrays are of equal length</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">px</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">py</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">pz</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span>
@@ -526,7 +531,7 @@
         <span class="c1"># Get P1 and P2 (top horizontal points)</span>
         <span class="n">theta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rad2deg</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arctan</span><span class="p">((</span><span class="n">dy</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">dip</span><span class="p">)))</span> <span class="o">/</span> <span class="n">dx</span><span class="p">))</span>
         <span class="n">P1_direction</span> <span class="o">=</span> <span class="n">strike</span> <span class="o">+</span> <span class="mi">180</span> <span class="o">+</span> <span class="n">theta</span>
-        <span class="n">P1_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span> <span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">dy</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">dip</span><span class="p">)))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+        <span class="n">P1_distance</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">dx</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">dy</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">deg2rad</span><span class="p">(</span><span class="n">dip</span><span class="p">)))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
         <span class="n">P2_direction</span> <span class="o">=</span> <span class="n">strike</span>
         <span class="n">P2_distance</span> <span class="o">=</span> <span class="n">length</span>
         <span class="n">P1_lon</span> <span class="o">=</span> <span class="p">[]</span>
@@ -535,11 +540,11 @@
         <span class="n">P2_lat</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">px</span><span class="p">):</span>
             <span class="n">P1_points</span> <span class="o">=</span> <span class="n">point_at</span><span class="p">(</span><span class="n">px</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">py</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span>
-                    <span class="n">P1_direction</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">P1_distance</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+                                 <span class="n">P1_direction</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">P1_distance</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
             <span class="n">P1_lon</span> <span class="o">+=</span> <span class="p">[</span><span class="n">P1_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
             <span class="n">P1_lat</span> <span class="o">+=</span> <span class="p">[</span><span class="n">P1_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
             <span class="n">P2_points</span> <span class="o">=</span> <span class="n">point_at</span><span class="p">(</span><span class="n">P1_points</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">P1_points</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-                    <span class="n">P2_direction</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">P2_distance</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+                                 <span class="n">P2_direction</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="n">P2_distance</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
             <span class="n">P2_lon</span> <span class="o">+=</span> <span class="p">[</span><span class="n">P2_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
             <span class="n">P2_lat</span> <span class="o">+=</span> <span class="p">[</span><span class="n">P2_points</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
 
@@ -548,7 +553,8 @@
 
         <span class="c1"># Get QuadRupture object</span>
         <span class="n">quad</span> <span class="o">=</span> <span class="n">QuadRupture</span><span class="o">.</span><span class="n">fromTrace</span><span class="p">(</span><span class="n">P1_lon</span><span class="p">,</span> <span class="n">P1_lat</span><span class="p">,</span> <span class="n">P2_lon</span><span class="p">,</span> <span class="n">P2_lat</span><span class="p">,</span>
-                <span class="n">top_horizontal_depth</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span> <span class="n">origin</span><span class="p">,</span> <span class="n">strike</span><span class="o">=</span><span class="n">strike</span><span class="p">)</span>
+                                     <span class="n">top_horizontal_depth</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">dip</span><span class="p">,</span>
+                                     <span class="n">origin</span><span class="p">,</span> <span class="n">strike</span><span class="o">=</span><span class="n">strike</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">quad</span></div>
 
 <div class="viewcode-block" id="QuadRupture.fromVertices"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.quad_rupture.html#shakelib.rupture.quad_rupture.QuadRupture.fromVertices">[docs]</a>    <span class="nd">@classmethod</span>
@@ -595,8 +601,12 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            QuadRupture object, where the rupture is modeled as a series of</span>
-<span class="sd">                trapezoids.</span>
+<span class="sd">            trapezoids.</span>
 
+<span class="sd">        Raises:</span>
+<span class="sd">            ShakeLibException: if the lengths of the inptu arrays are not</span>
+<span class="sd">                all equal, or if the length of the group_index is not the</span>
+<span class="sd">                same as the arrays (if group_index is supplied)..</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xp0</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">yp0</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">zp0</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">xp1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">yp1</span><span class="p">)</span> <span class="o">==</span> \
            <span class="nb">len</span><span class="p">(</span><span class="n">zp1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">xp2</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">yp2</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">zp2</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">xp3</span><span class="p">)</span> <span class="o">==</span> \
@@ -609,7 +619,7 @@
         <span class="n">nq</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">xp0</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">group_index</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_index</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nq</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">ShakeLibException</span><span class="p">(</span>
                     <span class="s2">&quot;group_index must have same length as vertices.&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">group_index</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">nq</span><span class="p">))</span>

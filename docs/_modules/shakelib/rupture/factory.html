@@ -253,7 +253,7 @@
 <span class="sd">            A list of five lon/lat/depth lists.</span>
 
 <span class="sd">    Raises:</span>
-<span class="sd">        Exception: Incorrectly specified polygon.</span>
+<span class="sd">        ValueError: incorrectly specified polygon.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">n_points</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
@@ -279,7 +279,7 @@
         <span class="n">top_depth</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">bot_depth</span> <span class="o">=</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">j</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)][</span><span class="mi">2</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">top_depth</span> <span class="o">&gt;=</span> <span class="n">bot_depth</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s1">&#39;Top points must be ordered before bottom points.&#39;</span><span class="p">)</span>
 
 
@@ -385,8 +385,8 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">_check_polygon</span><span class="p">(</span><span class="n">polygons</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
                 <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">continue</span>
-            <span class="k">except</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
                 <span class="n">polygons</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">_rotate_polygon</span><span class="p">(</span><span class="n">polygons</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
         <span class="k">if</span> <span class="n">success</span><span class="p">:</span>
             <span class="n">fixed</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
@@ -474,10 +474,10 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        bool: Can the rupture be represented in the QuadRupture class?</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">isQuad</span> <span class="o">=</span> <span class="kc">True</span>
-
     <span class="n">f</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">geom</span> <span class="o">=</span> <span class="n">f</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">geom</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Point&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
     <span class="n">polygons</span> <span class="o">=</span> <span class="n">geom</span><span class="p">[</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="nb">len</span><span class="p">(</span><span class="n">polygons</span><span class="p">)</span>
@@ -498,19 +498,19 @@
                     <span class="n">Point</span><span class="p">(</span><span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)][</span><span class="mi">0</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)][</span><span class="mi">1</span><span class="p">],</span> <span class="n">p</span><span class="p">[</span><span class="o">-</span><span class="p">(</span><span class="n">k</span> <span class="o">+</span> <span class="mi">2</span><span class="p">)][</span><span class="mi">2</span><span class="p">])]</span>
             <span class="n">test</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">is_quad</span><span class="p">(</span><span class="n">quad</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">test</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
-                <span class="n">isQuad</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
 
             <span class="c1"># Within each quad, top and bottom edges must be horizontal</span>
             <span class="n">tops</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">quad</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">quad</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span><span class="p">])</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">tops</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">tops</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                               <span class="n">atol</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">DEPTH_TOL</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
-                <span class="n">isQuad</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
             <span class="n">bots</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">quad</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span><span class="p">,</span> <span class="n">quad</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">depth</span><span class="p">])</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">bots</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">bots</span><span class="p">,</span> <span class="n">rtol</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
                               <span class="n">atol</span><span class="o">=</span><span class="n">constants</span><span class="o">.</span><span class="n">DEPTH_TOL</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
-                <span class="n">isQuad</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">return</span> <span class="n">isQuad</span></div>
+    <span class="k">return</span> <span class="kc">True</span></div>
 </pre></div>
 
           </div>
