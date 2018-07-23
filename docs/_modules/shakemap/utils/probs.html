@@ -103,7 +103,42 @@
     <span class="n">weightlist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">weightlist</span><span class="p">)</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;gmpelist: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">gmpelist</span><span class="p">)</span>
     <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;weightlist: </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">weightlist</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">gmpelist</span><span class="p">,</span> <span class="n">weightlist</span><span class="p">,</span> <span class="n">strec_results</span></div>
+    <span class="n">gmmdict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;gmpelist&#39;</span><span class="p">:</span> <span class="n">gmpelist</span><span class="p">,</span>
+               <span class="s1">&#39;weightlist&#39;</span><span class="p">:</span> <span class="n">weightlist</span><span class="p">}</span>
+    <span class="c1">#</span>
+    <span class="c1"># Here we get the region-specific ipe, gmice, and ccf. If they are</span>
+    <span class="c1"># not specified in the config, we use None, and let the value</span>
+    <span class="c1"># fall back to whatever is specified in the system config.</span>
+    <span class="c1">#</span>
+    <span class="k">if</span> <span class="n">strec_results</span><span class="p">[</span><span class="s1">&#39;TectonicRegion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Active&#39;</span><span class="p">:</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;ipe&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;acr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;ipe&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;gmice&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;acr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;gmice&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;ccf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;acr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;ccf&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">strec_results</span><span class="p">[</span><span class="s1">&#39;TectonicRegion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Stable&#39;</span><span class="p">:</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;ipe&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;scr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;ipe&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;gmice&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;scr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;gmice&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;ccf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;scr&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;ccf&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">strec_results</span><span class="p">[</span><span class="s1">&#39;TectonicRegion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Subduction&#39;</span><span class="p">:</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;ipe&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;subduction&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;ipe&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;gmice&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;subduction&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;gmice&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;ccf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;subduction&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;ccf&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">strec_results</span><span class="p">[</span><span class="s1">&#39;TectonicRegion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Volcanic&#39;</span><span class="p">:</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;ipe&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;volcanic&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;ipe&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;gmice&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;volcanic&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;gmice&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">gmmdict</span><span class="p">[</span><span class="s1">&#39;ccf&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="s1">&#39;volcanic&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+            <span class="s1">&#39;ccf&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">gmmdict</span><span class="p">,</span> <span class="n">strec_results</span></div>
 
 
 <div class="viewcode-block" id="get_probs"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.probs.html#shakemap.utils.probs.get_probs">[docs]</a><span class="k">def</span> <span class="nf">get_probs</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
@@ -124,7 +159,8 @@
 <span class="sd">            type.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        dict: Probabilities for each earthquake type, with fields:</span>
+<span class="sd">        (dict, dict):</span>
+<span class="sd">            Probabilities for each earthquake type, with fields:</span>
 <span class="sd">              - acr Probability that the earthquake is in an active region.</span>
 <span class="sd">              - acr_X Probability that the earthquake is in a depth layer of</span>
 <span class="sd">                ACR, starting from the top.</span>
@@ -142,6 +178,7 @@
 <span class="sd">              - interface Probability that the earthquake is on the interface.</span>
 <span class="sd">              - intraslab Probability that the earthquake is in the slab below</span>
 <span class="sd">                interface.</span>
+<span class="sd">            STREC results</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">selector</span> <span class="o">=</span> <span class="n">SubductionSelector</span><span class="p">()</span>

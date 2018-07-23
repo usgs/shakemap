@@ -35,7 +35,7 @@
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="c1"># vim: tabstop=4 shiftwidth=4 softtabstop=4</span>
 <span class="c1">#</span>
-<span class="c1"># Copyright (C) 2012-2017 GEM Foundation</span>
+<span class="c1"># Copyright (C) 2012-2018 GEM Foundation</span>
 <span class="c1">#</span>
 <span class="c1"># OpenQuake is free software: you can redistribute it and/or modify it</span>
 <span class="c1"># under the terms of the GNU Affero General Public License as published</span>
@@ -55,29 +55,17 @@
 <span class="sd">different kinds of :class:`ground shaking intensity models</span>
 <span class="sd">&lt;GroundShakingIntensityModel&gt;`.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
-
 <span class="kn">import</span> <span class="nn">abc</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">import</span> <span class="nn">functools</span>
-<span class="kn">import</span> <span class="nn">contextlib</span>
-
-<span class="kn">import</span> <span class="nn">scipy.stats</span>
 <span class="kn">from</span> <span class="nn">scipy.special</span> <span class="k">import</span> <span class="n">ndtr</span>
 <span class="kn">import</span> <span class="nn">numpy</span>
 
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span> <span class="k">as</span> <span class="n">imt_module</span>
-<span class="kn">from</span> <span class="nn">openquake.hazardlib.calc.filters</span> <span class="k">import</span> <span class="n">IntegrationDistance</span><span class="p">,</span> <span class="n">get_distances</span>
 <span class="kn">from</span> <span class="nn">openquake.baselib.general</span> <span class="k">import</span> <span class="ne">DeprecationWarning</span>
-<span class="kn">from</span> <span class="nn">openquake.baselib.python3compat</span> <span class="k">import</span> <span class="n">with_metaclass</span>
-
-
-<span class="k">class</span> <span class="nc">NonInstantiableError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Raised when a non instantiable GSIM is called</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span> <span class="k">as</span> <span class="n">imt_module</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.contexts</span> <span class="k">import</span> <span class="o">*</span>  <span class="c1"># for backward compatibility</span>
 
 
 <span class="k">class</span> <span class="nc">NotVerifiedWarning</span><span class="p">(</span><span class="ne">UserWarning</span><span class="p">):</span>
@@ -101,21 +89,16 @@
 
 <span class="k">class</span> <span class="nc">MetaGSIM</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Metaclass controlling the instantiation mechanism.  A subclass with</span>
-<span class="sd">    instantiable=False will raise a NonInstantiableError when directly</span>
-<span class="sd">    instantiated. A GroundShakingIntensityModel subclass with an</span>
+<span class="sd">    Metaclass controlling the instantiation mechanism.</span>
+<span class="sd">    A GroundShakingIntensityModel subclass with an</span>
 <span class="sd">    attribute deprecated=True will print a deprecation warning when</span>
 <span class="sd">    instantiated. A subclass with an attribute non_verified=True will</span>
 <span class="sd">    print a UserWarning.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="n">deprecated</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">non_verified</span> <span class="o">=</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">cls</span><span class="o">.</span><span class="n">instantiable</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">NonInstantiableError</span><span class="p">(</span>
-                <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> cannot be directly instantiated in this context&#39;</span> <span class="o">%</span> <span class="bp">cls</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">cls</span><span class="o">.</span><span class="n">deprecated</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is deprecated - use </span><span class="si">%s</span><span class="s1"> instead&#39;</span> <span class="o">%</span> <span class="p">(</span>
                 <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">__base__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
@@ -124,180 +107,13 @@
             <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not independently verified - the user is liable &#39;</span>
                    <span class="s1">&#39;for their application&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="bp">cls</span><span class="o">.</span><span class="vm">__name__</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">NotVerifiedWarning</span><span class="p">)</span>
-        <span class="bp">self</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">MetaGSIM</span><span class="p">,</span> <span class="bp">cls</span><span class="p">)</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__call__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
         <span class="k">return</span> <span class="bp">self</span>
 
-    <span class="c1"># NB: the idea is to use this context manager inside the oqtask</span>
-    <span class="c1"># decorator in the engine, so that GSIM classes cannot be directly</span>
-    <span class="c1"># instantiated in the workers; however, they can still be</span>
-    <span class="c1"># instantiated indirectly via __new__, so that unpickling works</span>
-    <span class="nd">@contextlib</span><span class="o">.</span><span class="n">contextmanager</span>
-    <span class="k">def</span> <span class="nf">forbid_instantiation</span><span class="p">(</span><span class="bp">cls</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Make the class and all its subclassed not directly instantiable</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">cls</span><span class="o">.</span><span class="n">instantiable</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">yield</span>
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="bp">cls</span><span class="o">.</span><span class="n">instantiable</span> <span class="o">=</span> <span class="kc">True</span>
-
-
-<span class="k">class</span> <span class="nc">ContextMaker</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A class to manage the creation of contexts for distances, sites, rupture.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">REQUIRES</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DISTANCES&#39;</span><span class="p">,</span> <span class="s1">&#39;SITES_PARAMETERS&#39;</span><span class="p">,</span> <span class="s1">&#39;RUPTURE_PARAMETERS&#39;</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gsims</span><span class="p">,</span> <span class="n">maximum_distance</span><span class="o">=</span><span class="n">IntegrationDistance</span><span class="p">(</span><span class="kc">None</span><span class="p">)):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">gsims</span> <span class="o">=</span> <span class="n">gsims</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">maximum_distance</span> <span class="o">=</span> <span class="n">maximum_distance</span>
-        <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES</span><span class="p">:</span>
-            <span class="n">reqset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">gsim</span> <span class="ow">in</span> <span class="n">gsims</span><span class="p">:</span>
-                <span class="n">reqset</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">getattr</span><span class="p">(</span><span class="n">gsim</span><span class="p">,</span> <span class="s1">&#39;REQUIRES_&#39;</span> <span class="o">+</span> <span class="n">req</span><span class="p">))</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;REQUIRES_&#39;</span> <span class="o">+</span> <span class="n">req</span><span class="p">,</span> <span class="n">reqset</span><span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">make_distances_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_collection</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="n">dist_dict</span><span class="o">=</span><span class="p">()):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create distances context object for given site collection and rupture.</span>
-
-<span class="sd">        :param site_collection:</span>
-<span class="sd">            Instance of :class:`openquake.hazardlib.site.SiteCollection`.</span>
-
-<span class="sd">        :param rupture:</span>
-<span class="sd">            Instance of</span>
-<span class="sd">            :class:`~openquake.hazardlib.source.rupture.Rupture` (or</span>
-<span class="sd">            subclass of</span>
-<span class="sd">            :class:</span>
-<span class="sd">            `~openquake.hazardlib.source.rupture.BaseProbabilisticRupture`).</span>
-
-<span class="sd">        :param dist_dict:</span>
-<span class="sd">             A dictionary of already computed distances, keyed by distance name</span>
-
-<span class="sd">        :returns:</span>
-<span class="sd">            Source to site distances as instance of :class:</span>
-<span class="sd">            `DistancesContext()`. Only those  values that are required by GSIM</span>
-<span class="sd">            are filled in this context.</span>
-
-<span class="sd">        :raises ValueError:</span>
-<span class="sd">            If any of declared required distance parameters is unknown.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dctx</span> <span class="o">=</span> <span class="n">DistancesContext</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_DISTANCES</span> <span class="o">|</span> <span class="nb">set</span><span class="p">([</span><span class="s1">&#39;rjb&#39;</span><span class="p">]):</span>
-            <span class="k">if</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">dist_dict</span><span class="p">:</span>  <span class="c1"># already computed distances</span>
-                <span class="n">distances</span> <span class="o">=</span> <span class="n">dist_dict</span><span class="p">[</span><span class="n">param</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">distances</span> <span class="o">=</span> <span class="n">get_distances</span><span class="p">(</span><span class="n">rupture</span><span class="p">,</span> <span class="n">site_collection</span><span class="o">.</span><span class="n">mesh</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="n">dctx</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">distances</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">dctx</span>
-
-    <span class="k">def</span> <span class="nf">make_sites_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_collection</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create context objects for given site collection</span>
-
-<span class="sd">        :param site_collection:</span>
-<span class="sd">            Instance of :class:`openquake.hazardlib.site.SiteCollection`.</span>
-
-<span class="sd">        :returns:</span>
-<span class="sd">            Site parameters as instance of :class:</span>
-<span class="sd">            `SitesContext()`. Only those  values that are required by GSIM</span>
-<span class="sd">            are filled in this context.</span>
-
-<span class="sd">        :raises ValueError:</span>
-<span class="sd">            If any of declared required site parameters is unknown.</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sctx</span> <span class="o">=</span> <span class="n">SitesContext</span><span class="p">()</span>
-        <span class="n">sctx</span><span class="o">.</span><span class="n">sites</span> <span class="o">=</span> <span class="n">site_collection</span>
-        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_SITES_PARAMETERS</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">site_collection</span><span class="p">,</span> <span class="n">param</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> requires unknown site parameter </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span>
-                                 <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">param</span><span class="p">))</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">sctx</span>
-
-    <span class="k">def</span> <span class="nf">make_rupture_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rupture</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create context object for given rupture.</span>
-
-<span class="sd">        :param rupture:</span>
-<span class="sd">            Instance of</span>
-<span class="sd">            :class:`openquake.hazardlib.source.rupture.Rupture` or subclass of</span>
-<span class="sd">            :class:`openquake.hazardlib.source.rupture.BaseProbabilisticRupture`</span>
-
-<span class="sd">        :returns:</span>
-<span class="sd">            Rupture parameters as instance of :class:</span>
-<span class="sd">            `RuptureContext()`. Only those  values that are required by GSIM</span>
-<span class="sd">            are filled in this context.</span>
-
-<span class="sd">        :raises ValueError:</span>
-<span class="sd">            If any of declared required rupture parameters is unknown.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rctx</span> <span class="o">=</span> <span class="n">RuptureContext</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRES_RUPTURE_PARAMETERS</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;mag&#39;</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">mag</span>
-            <span class="k">elif</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;strike&#39;</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">get_strike</span><span class="p">()</span>
-            <span class="k">elif</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;dip&#39;</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">get_dip</span><span class="p">()</span>
-            <span class="k">elif</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;rake&#39;</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">rake</span>
-            <span class="k">elif</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;ztor&#39;</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">get_top_edge_depth</span><span class="p">()</span>
-            <span class="k">elif</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;hypo_lon&#39;</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">hypocenter</span><span class="o">.</span><span class="n">longitude</span>
-            <span class="k">elif</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;hypo_lat&#39;</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">hypocenter</span><span class="o">.</span><span class="n">latitude</span>
-            <span class="k">elif</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;hypo_depth&#39;</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">hypocenter</span><span class="o">.</span><span class="n">depth</span>
-            <span class="k">elif</span> <span class="n">param</span> <span class="o">==</span> <span class="s1">&#39;width&#39;</span><span class="p">:</span>
-                <span class="n">value</span> <span class="o">=</span> <span class="n">rupture</span><span class="o">.</span><span class="n">surface</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> requires unknown rupture parameter </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span>
-                                 <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">param</span><span class="p">))</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="n">rctx</span><span class="p">,</span> <span class="n">param</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">rctx</span>
-
-    <span class="k">def</span> <span class="nf">make_contexts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_collection</span><span class="p">,</span> <span class="n">rupture</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Filter the site collection with respect to the rupture and</span>
-<span class="sd">        create context objects.</span>
-
-<span class="sd">        :param site_collection:</span>
-<span class="sd">            Instance of :class:`openquake.hazardlib.site.SiteCollection`.</span>
-
-<span class="sd">        :param rupture:</span>
-<span class="sd">            Instance of</span>
-<span class="sd">            :class:`openquake.hazardlib.source.rupture.Rupture` or subclass of</span>
-<span class="sd">            :class:`openquake.hazardlib.source.rupture.BaseProbabilisticRupture`</span>
-
-<span class="sd">        :returns:</span>
-<span class="sd">            Tuple of three items: sites context, rupture context and</span>
-<span class="sd">            distances context, that is, instances of</span>
-<span class="sd">            :class:`SitesContext`, :class:`RuptureContext` and</span>
-<span class="sd">            :class:`DistancesContext` in a specified order. Only those</span>
-<span class="sd">            values that are required by GSIM are filled in in</span>
-<span class="sd">            contexts.</span>
-
-<span class="sd">        :raises ValueError:</span>
-<span class="sd">            If any of declared required parameters (that includes site, rupture</span>
-<span class="sd">            and distance parameters) is unknown.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_rupture_context</span><span class="p">(</span><span class="n">rupture</span><span class="p">)</span>
-        <span class="n">sites</span><span class="p">,</span> <span class="n">distances</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">maximum_distance</span><span class="o">.</span><span class="n">get_closest</span><span class="p">(</span>
-            <span class="n">site_collection</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">)</span>
-        <span class="n">sctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_sites_context</span><span class="p">(</span><span class="n">sites</span><span class="p">)</span>
-        <span class="n">dctx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">make_distances_context</span><span class="p">(</span><span class="n">sites</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="p">{</span><span class="s1">&#39;rjb&#39;</span><span class="p">:</span> <span class="n">distances</span><span class="p">})</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">)</span>
-
 
 <span class="nd">@functools</span><span class="o">.</span><span class="n">total_ordering</span>
-<span class="k">class</span> <span class="nc">GroundShakingIntensityModel</span><span class="p">(</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">MetaGSIM</span><span class="p">)):</span>
+<span class="k">class</span> <span class="nc">GroundShakingIntensityModel</span><span class="p">(</span><span class="n">metaclass</span><span class="o">=</span><span class="n">MetaGSIM</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Base class for all the ground shaking intensity models.</span>
 
@@ -356,7 +172,7 @@
     <span class="c1">#:     for more detailed description of dip and rake.</span>
     <span class="c1">#: ``ztor``</span>
     <span class="c1">#:     Depth of rupture&#39;s top edge in km. See</span>
-    <span class="c1">#:     :meth:`~openquake.hazardlib.geo.surface.base.BaseQuadrilateralSurface.get_top_edge_depth`.</span>
+    <span class="c1">#:     :meth:`~openquake.hazardlib.geo.surface.base.BaseSurface.get_top_edge_depth`.</span>
     <span class="c1">#:</span>
     <span class="c1">#: These parameters are available from the :class:`RuptureContext` object</span>
     <span class="c1">#: attributes with same names.</span>
@@ -367,25 +183,29 @@
     <span class="c1">#:</span>
     <span class="c1">#: ``rrup``</span>
     <span class="c1">#:     Closest distance to rupture surface.  See</span>
-    <span class="c1">#:     :meth:`~openquake.hazardlib.geo.surface.base.BaseQuadrilateralSurface.get_min_distance`.</span>
+    <span class="c1">#:     :meth:`~openquake.hazardlib.geo.surface.base.BaseSurface.get_min_distance`.</span>
     <span class="c1">#: ``rjb``</span>
     <span class="c1">#:     Distance to rupture&#39;s surface projection. See</span>
-    <span class="c1">#:     :meth:`~openquake.hazardlib.geo.surface.base.BaseQuadrilateralSurface.get_joyner_boore_distance`.</span>
+    <span class="c1">#:     :meth:`~openquake.hazardlib.geo.surface.base.BaseSurface.get_joyner_boore_distance`.</span>
     <span class="c1">#: ``rx``</span>
     <span class="c1">#:     Perpendicular distance to rupture top edge projection.</span>
-    <span class="c1">#:     See :meth:`~openquake.hazardlib.geo.surface.base.BaseQuadrilateralSurface.get_rx_distance`.</span>
+    <span class="c1">#:     See :meth:`~openquake.hazardlib.geo.surface.base.BaseSurface.get_rx_distance`.</span>
     <span class="c1">#: ``ry0``</span>
     <span class="c1">#:     Horizontal distance off the end of the rupture measured parallel to</span>
     <span class="c1">#      strike. See:</span>
-    <span class="c1">#:     See :meth:`~openquake.hazardlib.geo.surface.base.BaseQuadrilateralSurface.get_ry0_distance`.</span>
+    <span class="c1">#:     See :meth:`~openquake.hazardlib.geo.surface.base.BaseSurface.get_ry0_distance`.</span>
     <span class="c1">#: ``rcdpp``</span>
     <span class="c1">#:     Direct point parameter for directivity effect centered on the site- and earthquake-specific</span>
     <span class="c1">#      average DPP used. See:</span>
     <span class="c1">#:     See :meth:`~openquake.hazardlib.source.rupture.ParametricProbabilisticRupture.get_dppvalue`.</span>
+    <span class="c1">#: ``rvolc``</span>
+    <span class="c1">#:     Source to site distance passing through surface projection of volcanic zone</span>
     <span class="c1">#:</span>
     <span class="c1">#: All the distances are available from the :class:`DistancesContext`</span>
     <span class="c1">#: object attributes with same names. Values are in kilometers.</span>
     <span class="n">REQUIRES_DISTANCES</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">abstractproperty</span><span class="p">()</span>
+
+    <span class="n">minimum_distance</span> <span class="o">=</span> <span class="mi">0</span>  <span class="c1"># can be set by the engine</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">get_mean_and_stddevs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">):</span>
@@ -396,12 +216,14 @@
 <span class="sd">        Method must be implemented by subclasses.</span>
 
 <span class="sd">        :param sites:</span>
-<span class="sd">            Instance of :class:`SitesContext` with parameters of sites</span>
+<span class="sd">            Instance of :class:`openquake.hazardlib.site.SiteCollection`</span>
+<span class="sd">            with parameters of sites</span>
 <span class="sd">            collection assigned to respective values as numpy arrays.</span>
 <span class="sd">            Only those attributes that are listed in class&#39;</span>
 <span class="sd">            :attr:`REQUIRES_SITES_PARAMETERS` set are available.</span>
 <span class="sd">        :param rup:</span>
-<span class="sd">            Instance of :class:`RuptureContext` with parameters of a rupture</span>
+<span class="sd">            Instance of :class:`openquake.hazardlib.source.rupture.BaseRupture`</span>
+<span class="sd">            with parameters of a rupture</span>
 <span class="sd">            assigned to respective values. Only those attributes that are</span>
 <span class="sd">            listed in class&#39; :attr:`REQUIRES_RUPTURE_PARAMETERS` set are</span>
 <span class="sd">            available.</span>
@@ -521,78 +343,57 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">_truncnorm_sf</span><span class="p">(</span><span class="n">truncation_level</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">disaggregate_poe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">iml</span><span class="p">,</span>
-                         <span class="n">truncation_level</span><span class="p">,</span> <span class="n">n_epsilons</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">disaggregate_pne</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="n">sctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">iml</span><span class="p">,</span>
+                         <span class="n">truncnorm</span><span class="p">,</span> <span class="n">epsilons</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Disaggregate (separate) PoE of ``iml`` in different contributions</span>
-<span class="sd">        each coming from ``n_epsilons`` distribution bins.</span>
-
-<span class="sd">        If ``truncation_level = 3``, ``n_epsilons = 3``, bin edges are</span>
-<span class="sd">        ``-3 .. -1``, ``-1 .. +1`` and ``+1 .. +3``.</span>
-
-<span class="sd">        :param n_epsilons:</span>
-<span class="sd">            Integer number of bins to split truncated Gaussian distribution to.</span>
+<span class="sd">        each coming from ``epsilons`` distribution bins.</span>
 
 <span class="sd">        Other parameters are the same as for :meth:`get_poes`, with</span>
-<span class="sd">        differences that ``iml`` is only one single intensity level</span>
-<span class="sd">        and ``truncation_level`` is required to be positive.</span>
+<span class="sd">        differences that ``truncation_level`` is required to be positive.</span>
 
 <span class="sd">        :returns:</span>
 <span class="sd">            Contribution to probability of exceedance of ``iml`` coming</span>
-<span class="sd">            from different sigma bands in a form of 1d numpy array with</span>
-<span class="sd">            ``n_epsilons`` floats between 0 and 1.</span>
+<span class="sd">            from different sigma bands in the form of a 2d numpy array of</span>
+<span class="sd">            probabilities with shape (n_sites, n_epsilons)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">truncation_level</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;truncation level must be positive&#39;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_check_imt</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
-
         <span class="c1"># compute mean and standard deviations</span>
-        <span class="n">mean</span><span class="p">,</span> <span class="p">[</span><span class="n">stddev</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">rctx</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
+        <span class="n">mean</span><span class="p">,</span> <span class="p">[</span><span class="n">stddev</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sctx</span><span class="p">,</span> <span class="n">rupture</span><span class="p">,</span> <span class="n">dctx</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
                                                    <span class="p">[</span><span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">TOTAL</span><span class="p">])</span>
 
         <span class="c1"># compute iml value with respect to standard (mean=0, std=1)</span>
         <span class="c1"># normal distributions</span>
-        <span class="n">iml</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_distribution_values</span><span class="p">(</span><span class="n">iml</span><span class="p">)</span>
-        <span class="n">standard_imls</span> <span class="o">=</span> <span class="p">(</span><span class="n">iml</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">stddev</span>
+        <span class="n">standard_imls</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">to_distribution_values</span><span class="p">(</span><span class="n">iml</span><span class="p">)</span> <span class="o">-</span> <span class="n">mean</span><span class="p">)</span> <span class="o">/</span> <span class="n">stddev</span>
 
-        <span class="n">distribution</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">stats</span><span class="o">.</span><span class="n">truncnorm</span><span class="p">(</span><span class="o">-</span> <span class="n">truncation_level</span><span class="p">,</span>
-                                             <span class="n">truncation_level</span><span class="p">)</span>
-        <span class="n">epsilons</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span> <span class="n">truncation_level</span><span class="p">,</span> <span class="n">truncation_level</span><span class="p">,</span>
-                                  <span class="n">n_epsilons</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="c1"># compute epsilon bins contributions</span>
-        <span class="n">contribution_by_bands</span> <span class="o">=</span> <span class="p">(</span><span class="n">distribution</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">epsilons</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span>
-                                 <span class="n">distribution</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">epsilons</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">contribution_by_bands</span> <span class="o">=</span> <span class="p">(</span><span class="n">truncnorm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">epsilons</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span> <span class="o">-</span>
+                                 <span class="n">truncnorm</span><span class="o">.</span><span class="n">cdf</span><span class="p">(</span><span class="n">epsilons</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
 
         <span class="c1"># take the minimum epsilon larger than standard_iml</span>
-        <span class="n">iml_bin_indices</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">epsilons</span><span class="p">,</span> <span class="n">standard_imls</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">([</span>
-            <span class="c1"># take full disaggregated distribution for the case of</span>
-            <span class="c1"># ``iml &lt;= mean - truncation_level * stddev``</span>
-            <span class="n">contribution_by_bands</span>
-            <span class="k">if</span> <span class="n">idx</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span>
-
-            <span class="c1"># take zeros if ``iml &gt;= mean + truncation_level * stddev``</span>
-            <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_epsilons</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">idx</span> <span class="o">&gt;=</span> <span class="n">n_epsilons</span> <span class="o">+</span> <span class="mi">1</span> <span class="k">else</span>
-
-            <span class="c1"># for other cases (when ``iml`` falls somewhere in the</span>
-            <span class="c1"># histogram):</span>
-            <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span>
-                <span class="c1"># take zeros for bins that are on the left hand side</span>
-                <span class="c1"># from the bin ``iml`` falls into,</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">idx</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
-                <span class="c1"># ... area of the portion of the bin containing ``iml``</span>
-                <span class="c1"># (the portion is limited on the left hand side by</span>
-                <span class="c1"># ``iml`` and on the right hand side by the bin edge),</span>
-                <span class="p">[</span><span class="n">distribution</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">standard_imls</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="o">-</span>
-                 <span class="n">contribution_by_bands</span><span class="p">[</span><span class="n">idx</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()],</span>
-                <span class="c1"># ... and all bins on the right go unchanged.</span>
-                <span class="n">contribution_by_bands</span><span class="p">[</span><span class="n">idx</span><span class="p">:]</span>
-            <span class="p">))</span>
-
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">iml_bin_indices</span><span class="p">)</span>
-        <span class="p">])</span>
+        <span class="n">bins</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">epsilons</span><span class="p">,</span> <span class="n">standard_imls</span><span class="p">)</span>
+        <span class="n">poe_by_site</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">n_epsilons</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">epsilons</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">lvl</span><span class="p">,</span> <span class="nb">bin</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">standard_imls</span><span class="p">,</span> <span class="n">bins</span><span class="p">):</span>  <span class="c1"># one per site</span>
+            <span class="k">if</span> <span class="nb">bin</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">poe_by_site</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">contribution_by_bands</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">bin</span> <span class="o">&gt;</span> <span class="n">n_epsilons</span><span class="p">:</span>
+                <span class="n">poe_by_site</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">n_epsilons</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># for other cases (when ``lvl`` falls somewhere in the</span>
+                <span class="c1"># histogram):</span>
+                <span class="n">poe</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span>
+                    <span class="c1"># take zeros for bins that are on the left hand side</span>
+                    <span class="c1"># from the bin ``lvl`` falls into,</span>
+                    <span class="n">numpy</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">bin</span> <span class="o">-</span> <span class="mi">1</span><span class="p">),</span>
+                    <span class="c1"># ... area of the portion of the bin containing ``lvl``</span>
+                    <span class="c1"># (the portion is limited on the left hand side by</span>
+                    <span class="c1"># ``lvl`` and on the right hand side by the bin edge),</span>
+                    <span class="p">[</span><span class="n">truncnorm</span><span class="o">.</span><span class="n">sf</span><span class="p">(</span><span class="n">lvl</span><span class="p">)</span> <span class="o">-</span> <span class="n">contribution_by_bands</span><span class="p">[</span><span class="nb">bin</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">()],</span>
+                    <span class="c1"># ... and all bins on the right go unchanged.</span>
+                    <span class="n">contribution_by_bands</span><span class="p">[</span><span class="nb">bin</span><span class="p">:]])</span>
+                <span class="n">poe_by_site</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">poe</span><span class="p">)</span>
+        <span class="n">poes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">poe_by_site</span><span class="p">)</span>  <span class="c1"># shape (n_sites, n_epsilons)</span>
+        <span class="k">return</span> <span class="n">rupture</span><span class="o">.</span><span class="n">get_probability_no_exceedance</span><span class="p">(</span><span class="n">poes</span><span class="p">)</span>
 
     <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
     <span class="k">def</span> <span class="nf">to_distribution_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
@@ -741,7 +542,10 @@
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns numpy array of natural logarithms of ``values``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">)</span>
+            <span class="c1"># avoid RuntimeWarning: divide by zero encountered in log</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">to_imt_unit_values</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -768,78 +572,6 @@
 <span class="sd">        Returns numpy array of ``values`` without any conversion.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
-
-
-<span class="k">class</span> <span class="nc">BaseContext</span><span class="p">(</span><span class="n">with_metaclass</span><span class="p">(</span><span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">)):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Base class for context object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return True if ``other`` has same attributes with same values.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slots_</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">_slots_</span><span class="p">:</span>
-                <span class="n">self_other</span> <span class="o">=</span> <span class="p">[</span>
-                    <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span>
-                        <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="o">==</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                    <span class="p">)</span>
-                    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_slots_</span>
-                <span class="p">]</span>
-                <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">all</span><span class="p">(</span><span class="n">self_other</span><span class="p">)</span>
-
-        <span class="k">return</span> <span class="kc">False</span>
-
-
-<span class="k">class</span> <span class="nc">SitesContext</span><span class="p">(</span><span class="n">BaseContext</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Sites calculation context for ground shaking intensity models.</span>
-
-<span class="sd">    Instances of this class are passed into</span>
-<span class="sd">    :meth:`GroundShakingIntensityModel.get_mean_and_stddevs`. They are</span>
-<span class="sd">    intended to represent relevant features of the sites collection.</span>
-<span class="sd">    Every GSIM class is required to declare what :attr:`sites parameters</span>
-<span class="sd">    &lt;GroundShakingIntensityModel.REQUIRES_SITES_PARAMETERS&gt;` does it need.</span>
-<span class="sd">    Only those required parameters are made available in a result context</span>
-<span class="sd">    object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_slots_</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">,</span> <span class="s1">&#39;vs30measured&#39;</span><span class="p">,</span> <span class="s1">&#39;z1pt0&#39;</span><span class="p">,</span> <span class="s1">&#39;z2pt5&#39;</span><span class="p">,</span> <span class="s1">&#39;backarc&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;lons&#39;</span><span class="p">,</span> <span class="s1">&#39;lats&#39;</span><span class="p">)</span>
-
-
-<span class="k">class</span> <span class="nc">DistancesContext</span><span class="p">(</span><span class="n">BaseContext</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Distances context for ground shaking intensity models.</span>
-
-<span class="sd">    Instances of this class are passed into</span>
-<span class="sd">    :meth:`GroundShakingIntensityModel.get_mean_and_stddevs`. They are</span>
-<span class="sd">    intended to represent relevant distances between sites from the collection</span>
-<span class="sd">    and the rupture. Every GSIM class is required to declare what</span>
-<span class="sd">    :attr:`distance measures &lt;GroundShakingIntensityModel.REQUIRES_DISTANCES&gt;`</span>
-<span class="sd">    does it need. Only those required values are calculated and made available</span>
-<span class="sd">    in a result context object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_slots_</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rx&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">,</span> <span class="s1">&#39;rhypo&#39;</span><span class="p">,</span> <span class="s1">&#39;repi&#39;</span><span class="p">,</span> <span class="s1">&#39;ry0&#39;</span><span class="p">,</span> <span class="s1">&#39;rcdpp&#39;</span><span class="p">,</span>
-               <span class="s1">&#39;azimuth&#39;</span><span class="p">,</span> <span class="s1">&#39;hanging_wall&#39;</span><span class="p">)</span>
-
-
-<span class="k">class</span> <span class="nc">RuptureContext</span><span class="p">(</span><span class="n">BaseContext</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Rupture calculation context for ground shaking intensity models.</span>
-
-<span class="sd">    Instances of this class are passed into</span>
-<span class="sd">    :meth:`GroundShakingIntensityModel.get_mean_and_stddevs`. They are</span>
-<span class="sd">    intended to represent relevant features of a single rupture. Every</span>
-<span class="sd">    GSIM class is required to declare what :attr:`rupture parameters</span>
-<span class="sd">    &lt;GroundShakingIntensityModel.REQUIRES_RUPTURE_PARAMETERS&gt;` does it need.</span>
-<span class="sd">    Only those required parameters are made available in a result context</span>
-<span class="sd">    object.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_slots_</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="s1">&#39;mag&#39;</span><span class="p">,</span> <span class="s1">&#39;strike&#39;</span><span class="p">,</span> <span class="s1">&#39;dip&#39;</span><span class="p">,</span> <span class="s1">&#39;rake&#39;</span><span class="p">,</span> <span class="s1">&#39;ztor&#39;</span><span class="p">,</span> <span class="s1">&#39;hypo_lon&#39;</span><span class="p">,</span> <span class="s1">&#39;hypo_lat&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;hypo_depth&#39;</span><span class="p">,</span> <span class="s1">&#39;width&#39;</span><span class="p">,</span> <span class="s1">&#39;hypo_loc&#39;</span>
-    <span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">CoeffsTable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -946,20 +678,46 @@
 <span class="sd">    Traceback (most recent call last):</span>
 <span class="sd">        ...</span>
 <span class="sd">    KeyError: SA(period=0.01, damping=5)</span>
+
+<span class="sd">    It is also possible to instantiate a table from a tuple of dictionaries,</span>
+<span class="sd">    corresponding to the SA coefficients and non-SA coefficients:</span>
+
+<span class="sd">    &gt;&gt;&gt; coeffs = {imt.SA(0.1): {&quot;a&quot;: 1.0, &quot;b&quot;: 2.0},</span>
+<span class="sd">    ...           imt.SA(1.0): {&quot;a&quot;: 3.0, &quot;b&quot;: 4.0},</span>
+<span class="sd">    ...           imt.PGA(): {&quot;a&quot;: 0.1, &quot;b&quot;: 1.0},</span>
+<span class="sd">    ...           imt.PGV(): {&quot;a&quot;: 0.5, &quot;b&quot;: 10.0}}</span>
+<span class="sd">    &gt;&gt;&gt; ct = CoeffsTable(sa_damping=5, table=coeffs)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">if</span> <span class="s1">&#39;table&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;CoeffsTable requires &quot;table&quot; kwarg&#39;</span><span class="p">)</span>
-        <span class="n">table</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;table&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">sa_damping</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;sa_damping&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s1">&#39;CoeffsTable got unexpected kwargs: </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_setup_table_from_str</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="n">sa_damping</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">table</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">imt_module</span><span class="o">.</span><span class="n">SA</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;CoeffsTable cannot be constructed with inputs &quot;</span>
+                            <span class="s2">&quot;of the form &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">table</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_setup_table_from_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table</span><span class="p">,</span> <span class="n">sa_damping</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Builds the input tables from a string definition</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span>
         <span class="n">header</span> <span class="o">=</span> <span class="n">table</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">header</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;IMT&quot;</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;first column in a table must be IMT&#39;</span><span class="p">)</span>
         <span class="n">coeff_names</span> <span class="o">=</span> <span class="n">header</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">non_sa_coeffs</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">table</span><span class="p">:</span>
             <span class="n">row</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
             <span class="n">imt_name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
@@ -969,7 +727,7 @@
             <span class="n">imt_coeffs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">coeff_names</span><span class="p">,</span> <span class="nb">map</span><span class="p">(</span><span class="nb">float</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:])))</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">sa_period</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">imt_name</span><span class="p">)</span>
-            <span class="k">except</span><span class="p">:</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">imt_module</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">):</span>
                     <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;unknown IMT </span><span class="si">%r</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">imt_name</span><span class="p">)</span>
                 <span class="n">imt</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">imt_module</span><span class="p">,</span> <span class="n">imt_name</span><span class="p">)()</span>
@@ -1023,8 +781,7 @@
         <span class="n">min_above</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sa_coeffs</span><span class="p">[</span><span class="n">min_above</span><span class="p">]</span>
         <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span>
             <span class="p">(</span><span class="n">co</span><span class="p">,</span> <span class="p">(</span><span class="n">min_above</span><span class="p">[</span><span class="n">co</span><span class="p">]</span> <span class="o">-</span> <span class="n">max_below</span><span class="p">[</span><span class="n">co</span><span class="p">])</span> <span class="o">*</span> <span class="n">ratio</span> <span class="o">+</span> <span class="n">max_below</span><span class="p">[</span><span class="n">co</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">co</span> <span class="ow">in</span> <span class="n">max_below</span>
-        <span class="p">)</span>
+            <span class="k">for</span> <span class="n">co</span> <span class="ow">in</span> <span class="n">max_below</span><span class="p">)</span>
 </pre></div>
 
           </div>

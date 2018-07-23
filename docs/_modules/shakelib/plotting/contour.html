@@ -41,9 +41,10 @@
 <span class="kn">from</span> <span class="nn">scipy.ndimage.filters</span> <span class="k">import</span> <span class="n">median_filter</span>
 <span class="kn">from</span> <span class="nn">skimage</span> <span class="k">import</span> <span class="n">measure</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
 
 
-<div class="viewcode-block" id="contour"><a class="viewcode-back" href="../../../shakelib/shakelib.plotting.contour.html#shakelib.plotting.contour.contour">[docs]</a><span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">):</span>
+<div class="viewcode-block" id="contour"><a class="viewcode-back" href="../../../shakelib/shakelib.plotting.contour.html#shakelib.plotting.contour.contour">[docs]</a><span class="k">def</span> <span class="nf">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">filter_size</span><span class="p">,</span> <span class="n">gmice</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Generate contours of a specific IMT and return as a Shapely</span>
 <span class="sd">    MultiLineString object.</span>
@@ -68,6 +69,8 @@
 <span class="sd">        NotImplementedError -- if the user attempts to contour a data file</span>
 <span class="sd">            with sets of points rather than grids.</span>
 <span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+    <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
+
     <span class="n">intensity_colormap</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
     <span class="n">imtdict</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">component</span><span class="p">)</span>
     <span class="n">gridobj</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
@@ -128,10 +131,21 @@
                 <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="n">units</span>
             <span class="p">}</span>
             <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
-                <span class="n">color_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">intensity_colormap</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">cval</span><span class="p">))</span>
-                <span class="n">color_rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
-                    <span class="n">color_array</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-                <span class="n">props</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;#</span><span class="si">%02x%02x%02x</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">color_rgb</span><span class="p">)</span>
+                <span class="k">pass</span>
+            <span class="k">elif</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+                <span class="n">lcval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">cval</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lcval</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">cval</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">gmice</span><span class="p">:</span>
+                <span class="n">mmival</span> <span class="o">=</span> <span class="n">gmice</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">lcval</span><span class="p">]),</span> <span class="n">oqimt</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+                <span class="n">mmival</span> <span class="o">=</span> <span class="n">cval</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">mmival</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">color_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">intensity_colormap</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">mmival</span><span class="p">))</span>
+            <span class="n">color_rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">color_array</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+            <span class="n">props</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;#</span><span class="si">%02x%02x%02x</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">color_rgb</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
                 <span class="k">if</span> <span class="p">(</span><span class="n">cval</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
                     <span class="n">props</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">4</span>
                 <span class="k">else</span><span class="p">:</span>

@@ -21,6 +21,7 @@ Submodules
    shakemap.coremods.raster
    shakemap.coremods.rupture
    shakemap.coremods.select
+   shakemap.coremods.sleep
    shakemap.coremods.stations
    shakemap.coremods.transfer
    shakemap.coremods.xtestimage

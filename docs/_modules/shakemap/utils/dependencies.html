@@ -293,8 +293,8 @@
             <span class="n">fp_exists</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">fp</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
             <span class="c1"># If a file is optional and does not exist, we don&#39;t want to</span>
             <span class="c1"># force the system to make it. (E.g., we don&#39;t want to force</span>
-            <span class="c1"># &#39;select&#39; to run if model_zc.conf isn&#39;t already there -- that&#39;s</span>
-            <span class="c1"># the user&#39;s choice.</span>
+            <span class="c1"># &#39;select&#39; to run if model_select.conf isn&#39;t already there --</span>
+            <span class="c1"># that&#39;s the user&#39;s choice.</span>
             <span class="k">if</span> <span class="n">fp</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">fp_exists</span><span class="p">:</span>
                 <span class="k">continue</span>
             <span class="n">parent_cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__findCmd</span><span class="p">(</span><span class="n">fp</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>

@@ -1315,7 +1315,8 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown station </span><span class="si">%s</span><span class="s1"> in stationlist&#39;</span> <span class="o">%</span>
                                  <span class="p">(</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]))</span>
-            <span class="n">sdf</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndf</span><span class="p">)</span><span class="o">.</span><span class="n">df</span>
+            <span class="n">dfx</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ndf</span><span class="p">)</span>
+            <span class="n">sdf</span> <span class="o">=</span> <span class="n">dfx</span><span class="o">.</span><span class="n">df</span>
             <span class="n">six</span> <span class="o">=</span> <span class="n">sta_ix</span><span class="p">[</span><span class="n">ndf</span><span class="p">][</span><span class="n">station</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]]</span>
             <span class="c1">#</span>
             <span class="c1"># Set the &#39;intensity&#39;, &#39;pga&#39;, and &#39;pga&#39; peak properties</span>
@@ -1343,6 +1344,10 @@
                     <span class="n">_round_float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">sdf</span><span class="p">[</span><span class="s1">&#39;PGV&#39;</span><span class="p">][</span><span class="n">six</span><span class="p">]),</span> <span class="mi">4</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;pgv&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;null&#39;</span>
+            <span class="c1">#</span>
+            <span class="c1"># Add vs30</span>
+            <span class="c1">#</span>
+            <span class="n">station</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;vs30&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_round_float</span><span class="p">(</span><span class="n">dfx</span><span class="o">.</span><span class="n">sx</span><span class="o">.</span><span class="n">vs30</span><span class="p">[</span><span class="n">six</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
             <span class="c1">#</span>
             <span class="c1"># Add the predictions so we can plot residuals</span>
             <span class="c1">#</span>

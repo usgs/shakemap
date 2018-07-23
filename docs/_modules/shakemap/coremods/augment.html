@@ -172,17 +172,17 @@
         <span class="n">shake_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">extent_config</span><span class="p">)</span>
         <span class="c1">#</span>
         <span class="c1"># this is the event specific model.conf (may not be present)</span>
-        <span class="c1"># prefer model.conf to model_zc.conf</span>
+        <span class="c1"># prefer model.conf to model_select.conf</span>
         <span class="c1">#</span>
         <span class="n">event_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model.conf&#39;</span><span class="p">)</span>
-        <span class="n">event_config_zc_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model_zc.conf&#39;</span><span class="p">)</span>
+        <span class="n">event_config_zc_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model_select.conf&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">event_config_file</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Found an event specific model.conf file.&#39;</span><span class="p">)</span>
             <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">event_config_file</span><span class="p">,</span>
                                      <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
             <span class="n">shake_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">event_config</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">event_config_zc_file</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Found an event specific model_zc file.&#39;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Found an event specific model_select file.&#39;</span><span class="p">)</span>
             <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">event_config_zc_file</span><span class="p">,</span>
                                      <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
             <span class="n">shake_config</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">event_config</span><span class="p">)</span>

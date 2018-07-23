@@ -135,7 +135,7 @@ with their event IDs) and their associated subdirectories:</p>
             <span class="n">event</span><span class="o">.</span><span class="n">xml</span>
             <span class="o">*</span><span class="n">_dat</span><span class="o">.</span><span class="n">xml</span>
             <span class="o">*</span><span class="n">_fault</span><span class="o">.</span><span class="n">txt</span> <span class="p">(</span><span class="ow">or</span> <span class="n">rupture</span><span class="o">.</span><span class="n">json</span><span class="p">)</span>
-            <span class="n">model</span><span class="o">.</span><span class="n">conf</span> <span class="p">(</span><span class="ow">or</span> <span class="n">model_zc</span><span class="o">.</span><span class="n">conf</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">conf</span> <span class="p">(</span><span class="ow">or</span> <span class="n">model_select</span><span class="o">.</span><span class="n">conf</span><span class="p">)</span>
             <span class="n">products</span><span class="o">/</span>
                 <span class="n">shake_result</span><span class="o">.</span><span class="n">hdf</span>
                 <span class="o">...</span>
@@ -216,9 +216,10 @@ calling <strong>shake</strong> with the <strong>–force</strong> option.</p>
 <p>Below is a description of many of the modules available to <strong>shake</strong>.
 They are ordered in more or less the order they would be called. The
 module <strong>select</strong> would be run first if the operator wanted to have
-the ShakeMap system determine the GMPE set to use based on the
+the ShakeMap system determine the GMPE set, IPE, GMICE, or cross-
+correlation functions to use based on the
 event’s location and depth. Many operators will have a fixed
-configuration for their GMPEs, and will therefore not use <strong>select</strong>.
+configuration for their regions, and will therefore not use <strong>select</strong>.
 The operator will then typically run <strong>assemble</strong> (or possibly
 <strong>augment</strong>) to
 create (or update) the <em>shake_data.hdf</em> input file,
@@ -234,15 +235,22 @@ within,
 and proximity to, a set of predefined tectonic regions and user-defined
 geographic areas. The GMPE set, and the
 selection of that GMPE set for use in processing, are written to
-<em>model_zc.conf</em> in the event’s <em>current</em> directory.</p>
+<em>model_select.conf</em> in the event’s <em>current</em> directory. Similarly,
+the configuration may select an intensity prediction equation module
+(IPE), a ground-motion to intensity conversion equation module
+(GMICE), and a cross-correlation function (CCF) for the region,
+and these, too, will be written to <em>model_select.conf</em>. Any modules
+that are not specified for a particular region will default back to
+the modules set in the global <em>model.conf</em>.</p>
 <p>The behavior of <strong>select</strong> is controlled by the <em>select.conf</em>
 configuration file. See the documentation in <em>select.conf</em> for more on
 customizing <strong>select</strong>.</p>
 <p>The tectonic regions, and additional geographic layers, that the event
 may fall within are defined by the STREC configuration. See the STREC
 documentation for information on adding additional layers, then use
-<em>select.conf</em> to customize the GMPE sets that the new layers will use.</p>
-<p>The process by which sm_select builds a GMPE set is somewhat complicated.
+<em>select.conf</em> to customize the ground motion modules that the new
+layers will use.</p>
+<p>The process by which <strong>select</strong> builds a GMPE set is somewhat complicated.
 STREC reports the tectonic region the earthquake lies within, as well
 as the distance to the closest polygon of the other tectonic region
 types. For example, for an earthquake in California STREC would report
@@ -277,7 +285,7 @@ earthquake’s location.</p>
 distance from,
 any number of user-defined geographic layers. If the earthquake is
 within a layer, that layer’s
-parameters (as configured in <em>select.conf</em>) replace the any or all
+parameters (as configured in <em>select.conf</em>) replace any or all
 of the parameters of the corresponding tectonic regions, and the
 calculation of a weighted GMPE set proceeds as before. For example,
 the layer section of <em>select.conf</em> might contain:</p>
@@ -291,12 +299,15 @@ the layer section of <em>select.conf</em> might contain:</p>
             <span class="n">gmpe</span> <span class="o">=</span> <span class="n">Special_California_GMPE</span>
             <span class="n">min_depth</span> <span class="o">=</span> <span class="o">-</span><span class="n">Inf</span>
             <span class="n">max_depth</span> <span class="o">=</span> <span class="n">Inf</span>
+            <span class="n">ipe</span> <span class="o">=</span> <span class="n">Allen2012</span>
+            <span class="n">gmice</span> <span class="o">=</span> <span class="n">WRGW12</span>
 </pre></div>
 </div>
 <p>If an earthquake falls within the ‘california’ layer, the tectonc regions
 ‘scr’ and ‘acr’ would have their horizontal buffers reset to 25 km and,
 in addition, the ‘acr’ region would have its GMPE selection reset to the
-GMPE set ‘Special_California_GMPE’ for earthquakes of all depths.</p>
+GMPE set ‘Special_California_GMPE’ for earthquakes of all depths. Similarly,
+the IPE would be set to “Allen2012” and the GMICE to “WGRW12”.</p>
 <p>If the
 earthquake is not inside a custom geographic layer, but within the horizontal
 buffer distance of one, the
@@ -308,7 +319,7 @@ above).</p>
 <p>Unlike the tectonic regions, the geographic layers consider only the
 nearest layer. If an earthquake falls
 within more than one layer (possible if layers are nested), the first one
-encountered in the <em>select.conf</em> is used and any other(s) will be ignored.</p>
+encountered in <em>select.conf</em> is used and any other(s) will be ignored.</p>
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.select.html#module-shakemap.coremods.select" title="shakemap.coremods.select"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.select()</span></code></a> for the module’s API
 documentation.</p>
 </div>
@@ -316,7 +327,9 @@ documentation.</p>
 <h4>2.2.2.3.2. dyfi<a class="headerlink" href="#dyfi" title="Permalink to this headline">¶</a></h4>
 <p>The <strong>dyfi</strong> module queries ComCat for any “Did You Feel It?” data
 associated with an event and writes that data to a file in the event’s
-<em>current</em> directory.</p>
+<em>current</em> directory. The event ID must be an ID that the ComCat system
+recognizes, thus the use of event IDs other than those produced by
+NEIC or the US regional networks is unlikely to produce results.</p>
 <p>See <a class="reference internal" href="../apidoc/shakemap.coremods.dyfi.html#module-shakemap.coremods.dyfi" title="shakemap.coremods.dyfi"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.dyfi()</span></code></a> for the module’s API
 documentation.</p>
 </div>
@@ -332,13 +345,13 @@ data structure. <strong>sm_assemble</strong> then reads the configuration files<
 </div>
 <p>and assembles them into a single configuration. It then reads and
 incorporates</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">data_dir</span><span class="o">&gt;/&lt;</span><span class="n">evnt_id</span><span class="o">&gt;/</span><span class="n">current</span><span class="o">&gt;/</span><span class="n">model</span><span class="o">.</span><span class="n">conf</span> <span class="p">(</span><span class="ow">or</span> <span class="n">model_zc</span><span class="o">.</span><span class="n">conf</span><span class="p">)</span><span class="o">.</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">data_dir</span><span class="o">&gt;/&lt;</span><span class="n">evnt_id</span><span class="o">&gt;/</span><span class="n">current</span><span class="o">&gt;/</span><span class="n">model</span><span class="o">.</span><span class="n">conf</span> <span class="p">(</span><span class="ow">or</span> <span class="n">model_select</span><span class="o">.</span><span class="n">conf</span><span class="p">)</span><span class="o">.</span>
 </pre></div>
 </div>
 <p>Any parameter set in the event-specific <em>model.conf</em> will override
 parameters set in the other configuration files. Note: if both
-<em>model.conf</em> and <em>model_zc.conf</em> exist in the event directory,
-<em>model.conf</em> will be processed and <em>model_zc.conf</em> will be ignored.</p>
+<em>model.conf</em> and <em>model_select.conf</em> exist in the event directory,
+<em>model.conf</em> will be processed and <em>model_select.conf</em> will be ignored.</p>
 <p><strong>assemble</strong> then reads any files with a <em>_dat.xml</em> extension
 and assembles them into a station list. See ??? for a description
 of the data file format. Similarly, <strong>assmeble</strong> will read a
@@ -380,7 +393,7 @@ If <em>exven.xml</em> exists in the event’s <em>current</em> directory, its da
 replace the data in the existing <em>shake_data.hdf</em>.</p>
 <p>The configuration data in <em>shake_data.hdf</em> is used as a starting point,
 and any configuration data from the system configuration files or the
-event’s <em>model.conf</em> (or <em>model_zc.conf</em>) will then be added to it. Where
+event’s <em>model.conf</em> (or <em>model_select.conf</em>) will then be added to it. Where
 there are conflicts, the system configuration parameters will override
 those found in <em>shake_data.hdf</em>. The event-specific configuration
 parameters from the local system retain the highest priority.</p>
@@ -408,11 +421,11 @@ interpolated ShakeMap. Depending upon the settings found in <em>model.conf</em>,
 the interpolation product may be a grid or a set of points. See
 <em>model.conf</em> for additional options and documentation. The <em>model.conf</em>
 file in the user’s current profile (i.e., <em>INSTALL_DIR/config/model.conf</em>)
-will be read first, and then if <em>model.conf</em> or <em>model_zc.conf</em> exists
+will be read first, and then if <em>model.conf</em> or <em>model_select.conf</em> exists
 in the event’s <em>current</em> directory, then the parameters set therein will
 override those in the profile’s <em>model.conf</em>. If both <em>model.conf</em> and
-<em>model_zc.conf</em> exist in the event’s <em>current</em> directory, <em>model.conf</em>
-will be read and <em>model_zc.conf</em> will be ignored. <strong>model</strong> also reads
+<em>model_select.conf</em> exist in the event’s <em>current</em> directory, <em>model.conf</em>
+will be read and <em>model_select.conf</em> will be ignored. <strong>model</strong> also reads
 the configuration files <em>gmpe_sets.conf</em> and <em>modules.conf</em>, which
 reside in the current profile’s <em>INSTALL_DIR/config</em> directory. See
 the documentation within those files for more information.</p>
