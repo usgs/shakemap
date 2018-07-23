@@ -65,6 +65,8 @@
 <span class="kn">from</span> <span class="nn">descartes</span> <span class="k">import</span> <span class="n">PolygonPatch</span>
 <span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="k">import</span> <span class="n">gaussian_filter</span>
 
+<span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">imt</span>
+
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">mapio.gmt</span> <span class="k">import</span> <span class="n">GMTGrid</span>
 <span class="kn">from</span> <span class="nn">impactutils.colors.cpalette</span> <span class="k">import</span> <span class="n">ColorPalette</span>
@@ -79,6 +81,7 @@
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">path_macro_sub</span>
 <span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="k">import</span> <span class="n">HistoricTime</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">get_object_from_config</span>
 
 
 <span class="n">CITY_COLS</span> <span class="o">=</span> <span class="mi">2</span>
@@ -130,8 +133,9 @@
 
     <span class="n">command_name</span> <span class="o">=</span> <span class="s1">&#39;mapping&#39;</span>
     <span class="n">targets</span> <span class="o">=</span> <span class="p">[</span><span class="sa">r</span><span class="s1">&#39;products/intensity\.jpg&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;products/intensity\.pdf&#39;</span><span class="p">,</span>
-               <span class="sa">r</span><span class="s1">&#39;products/.*_contour\.jpg&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;products/.*_contour\.pdf&#39;</span><span class="p">,</span>
-               <span class="sa">r</span><span class="s1">&#39;products/psa.*\.jpg&#39;</span><span class="p">]</span>
+               <span class="sa">r</span><span class="s1">&#39;products/pga\.jpg&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;products/pga\.pdf&#39;</span><span class="p">,</span>
+               <span class="sa">r</span><span class="s1">&#39;products/pgv\.jpg&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;products/pgv\.pdf&#39;</span><span class="p">,</span>
+               <span class="sa">r</span><span class="s1">&#39;products/psa.*p.*\.jpg&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;products/psa.*p.*\.pdf&#39;</span><span class="p">]</span>
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;products/shake_result.hdf&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)]</span>
     <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;products.conf&#39;</span><span class="p">]</span>
 
@@ -172,7 +176,8 @@
     <span class="n">contents</span><span class="p">[</span><span class="s1">&#39;psa[PERIOD]Map&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;PSA[PERIOD] Map&#39;</span><span class="p">,</span>
                                   <span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">mapping_page</span><span class="p">,</span>
                                   <span class="s1">&#39;caption&#39;</span><span class="p">:</span> <span class="n">psacap</span><span class="p">,</span>
-                                  <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span> <span class="s1">&#39;psa[0-9][0-9].jpg&#39;</span><span class="p">,</span>
+                                  <span class="s1">&#39;formats&#39;</span><span class="p">:</span> <span class="p">[{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span>
+                                               <span class="s1">&#39;psa[0-9]p[0-9].jpg&#39;</span><span class="p">,</span>
                                                <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;image/jpeg&#39;</span><span class="p">},</span>
                                               <span class="p">{</span><span class="s1">&#39;filename&#39;</span><span class="p">:</span>
                                                <span class="s1">&#39;psa[0-9]p[0-9].pdf&#39;</span><span class="p">,</span>
@@ -240,14 +245,14 @@
                             <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;operator&#39;</span><span class="p">])</span>
 
         <span class="n">imtlist</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getIMTs</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">imtype</span> <span class="ow">in</span> <span class="n">imtlist</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Drawing intensity map...&#39;</span><span class="p">)</span>
                 <span class="n">intensity_map</span> <span class="o">=</span> <span class="n">mapmaker</span><span class="o">.</span><span class="n">drawIntensityMap</span><span class="p">(</span><span class="n">datadir</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created intensity map </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">intensity_map</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Drawing </span><span class="si">%s</span><span class="s1"> contour map...&#39;</span> <span class="o">%</span> <span class="n">imt</span><span class="p">)</span>
-                <span class="n">contour_file</span> <span class="o">=</span> <span class="n">mapmaker</span><span class="o">.</span><span class="n">drawContourMap</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">datadir</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Drawing </span><span class="si">%s</span><span class="s1"> contour map...&#39;</span> <span class="o">%</span> <span class="n">imtype</span><span class="p">)</span>
+                <span class="n">contour_file</span> <span class="o">=</span> <span class="n">mapmaker</span><span class="o">.</span><span class="n">drawContourMap</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">datadir</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Created contour map </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">contour_file</span><span class="p">)</span>
 
         <span class="c1">#######################################################################</span>
@@ -1089,11 +1094,13 @@
         <span class="n">eventid</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">eventid</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_se&#39;</span><span class="p">):</span>
             <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">hlon</span><span class="p">,</span> <span class="n">hlat</span><span class="p">)</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="s1">&#39;SCENARIO&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="s1">&#39;SCENARIO&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span>
                      <span class="n">zorder</span><span class="o">=</span><span class="n">SCENARIO_ZORDER</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
-                     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span>
+                     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span>
                      <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
-                     <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+                     <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                     <span class="n">path_effects</span><span class="o">=</span><span class="p">[</span><span class="n">path_effects</span><span class="o">.</span><span class="n">Stroke</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                   <span class="n">foreground</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)])</span>
 
         <span class="c1"># save plot to file</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
@@ -1158,13 +1165,13 @@
         <span class="n">correction</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="k">if</span> <span class="n">n</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="k">else</span> <span class="o">-</span><span class="mf">0.5</span>
         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">n</span> <span class="o">/</span> <span class="n">precision</span> <span class="o">+</span> <span class="n">correction</span><span class="p">)</span> <span class="o">*</span> <span class="n">precision</span></div>
 
-<div class="viewcode-block" id="MapMaker.drawContourMap"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.drawContourMap">[docs]</a>    <span class="k">def</span> <span class="nf">drawContourMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">outfolder</span><span class="p">):</span>
+<div class="viewcode-block" id="MapMaker.drawContourMap"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.mapping.html#shakemap.coremods.mapping.MapMaker.drawContourMap">[docs]</a>    <span class="k">def</span> <span class="nf">drawContourMap</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">imtype</span><span class="p">,</span> <span class="n">outfolder</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Render IMT data as contours over topography, with oceans, coastlines,</span>
 <span class="sd">        etc.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            imt (str):</span>
+<span class="sd">            imtype (str):</span>
 <span class="sd">                IMT that is being drawn on the map (&#39;MMI&#39;, &#39;PGV&#39;,</span>
 <span class="sd">                &#39;PGA&#39;, &#39;SA(x.y)&#39;).</span>
 <span class="sd">            outfolder (str):</span>
@@ -1181,8 +1188,8 @@
         <span class="c1"># get the geodict for the topo file</span>
         <span class="n">topodict</span> <span class="o">=</span> <span class="n">GMTGrid</span><span class="o">.</span><span class="n">getFileGeoDict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">topofile</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
         <span class="c1"># get the geodict for the ShakeMap</span>
-        <span class="n">comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="n">imt</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">imtdict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">comp</span><span class="p">)</span>
+        <span class="n">comp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="n">imtype</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">imtdict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getIMTGrids</span><span class="p">(</span><span class="n">imtype</span><span class="p">,</span> <span class="n">comp</span><span class="p">)</span>
         <span class="n">imtgrid</span> <span class="o">=</span> <span class="n">imtdict</span><span class="p">[</span><span class="s1">&#39;mean&#39;</span><span class="p">]</span>
         <span class="n">smdict</span> <span class="o">=</span> <span class="n">imtgrid</span><span class="o">.</span><span class="n">getGeoDict</span><span class="p">()</span>
         <span class="c1"># get a geodict that is aligned with topo, but inside shakemap</span>
@@ -1205,9 +1212,9 @@
         <span class="n">imtdata</span> <span class="o">=</span> <span class="n">imtgrid</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="c1"># convert units if necessary</span>
-        <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
             <span class="k">pass</span>
-        <span class="k">elif</span> <span class="n">imt</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
             <span class="n">imtdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">imtdata</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">imtdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">imtdata</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
@@ -1231,9 +1238,9 @@
         <span class="n">pimt</span> <span class="o">=</span> <span class="n">gaussian_filter</span><span class="p">(</span><span class="n">pimt</span><span class="p">,</span> <span class="mf">5.0</span><span class="p">)</span>
         <span class="n">dmin</span> <span class="o">=</span> <span class="n">pimt</span><span class="o">.</span><span class="n">min</span><span class="p">()</span>
         <span class="n">dmax</span> <span class="o">=</span> <span class="n">pimt</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">imt</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+        <span class="n">mmimap</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
             <span class="n">levels</span> <span class="o">=</span> <span class="n">getContourLevels</span><span class="p">(</span><span class="n">dmin</span><span class="p">,</span> <span class="n">dmax</span><span class="p">,</span> <span class="n">itype</span><span class="o">=</span><span class="s1">&#39;linear&#39;</span><span class="p">)</span>
-            <span class="n">mmimap</span> <span class="o">=</span> <span class="n">ColorPalette</span><span class="o">.</span><span class="n">fromPreset</span><span class="p">(</span><span class="s1">&#39;mmi&#39;</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">levels</span><span class="p">:</span>
                 <span class="c1"># First, draw contours at half unit locations</span>
@@ -1283,17 +1290,44 @@
                              <span class="n">path_effects</span><span class="o">.</span><span class="n">Normal</span><span class="p">()])</span>
 
         <span class="k">else</span><span class="p">:</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getConfig</span><span class="p">()</span>
+            <span class="n">gmice</span> <span class="o">=</span> <span class="n">get_object_from_config</span><span class="p">(</span><span class="s1">&#39;gmice&#39;</span><span class="p">,</span> <span class="s1">&#39;modeling&#39;</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
+            <span class="n">gmice_imts</span> <span class="o">=</span> <span class="n">gmice</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span>
+            <span class="n">gmice_pers</span> <span class="o">=</span> <span class="n">gmice</span><span class="o">.</span><span class="n">DEFINED_FOR_SA_PERIODS</span>
+            <span class="n">oqimt</span> <span class="o">=</span> <span class="n">imt</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">oqimt</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">gmice_imts</span><span class="p">))</span> \
+               <span class="ow">or</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">oqimt</span><span class="p">,</span> <span class="n">imt</span><span class="o">.</span><span class="n">SA</span><span class="p">)</span> <span class="ow">and</span>
+                   <span class="n">oqimt</span><span class="o">.</span><span class="n">period</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gmice_pers</span><span class="p">):</span>
+                <span class="n">my_gmice</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">my_gmice</span> <span class="o">=</span> <span class="n">gmice</span>
+
             <span class="n">levels</span> <span class="o">=</span> <span class="n">getContourLevels</span><span class="p">(</span><span class="n">dmin</span><span class="p">,</span> <span class="n">dmax</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">my_gmice</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">imtype</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+                    <span class="n">lnlevels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">levels</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">lnlevels</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">levels</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+                <span class="n">mmi_levels</span> <span class="o">=</span> <span class="n">my_gmice</span><span class="o">.</span><span class="n">getMIfromGM</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lnlevels</span><span class="p">),</span>
+                                                  <span class="n">oqimt</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">colors</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">ml</span> <span class="ow">in</span> <span class="n">mmi_levels</span><span class="p">:</span>
+                    <span class="n">color_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mmimap</span><span class="o">.</span><span class="n">getDataColor</span><span class="p">(</span><span class="n">ml</span><span class="p">))</span>
+                    <span class="n">color_rgb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span>
+                        <span class="n">color_array</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">*</span> <span class="mi">255</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                    <span class="n">colors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;#</span><span class="si">%02x%02x%02x</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">color_rgb</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">colors</span> <span class="o">=</span> <span class="s1">&#39;w&#39;</span>
 
             <span class="c1"># Show dashed contours everywhere</span>
-            <span class="n">m</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">pimt</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span>
+            <span class="n">m</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">pimt</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
                       <span class="n">linestyles</span><span class="o">=</span><span class="s1">&#39;dashed&#39;</span><span class="p">,</span>
                       <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                       <span class="n">levels</span><span class="o">=</span><span class="n">levels</span><span class="p">,</span>
                       <span class="n">zorder</span><span class="o">=</span><span class="n">DASHED_CONTOUR_ZORDER</span><span class="p">)</span>
 
             <span class="c1"># Solid contours on land</span>
-            <span class="n">cs</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">pimt</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="s1">&#39;w&#39;</span><span class="p">,</span>
+            <span class="n">cs</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">contour</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">flipud</span><span class="p">(</span><span class="n">pimt</span><span class="p">),</span> <span class="n">colors</span><span class="o">=</span><span class="n">colors</span><span class="p">,</span>
                            <span class="n">cmap</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
                            <span class="n">levels</span><span class="o">=</span><span class="n">levels</span><span class="p">,</span>
                            <span class="n">zorder</span><span class="o">=</span><span class="n">CONTOUR_ZORDER</span><span class="p">)</span>
@@ -1327,7 +1361,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawGraticules</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
 
         <span class="c1"># draw filled symbols for MMI and instrumented measures</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_drawStations</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">imt</span><span class="o">=</span><span class="n">imt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drawStations</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">fill</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">imt</span><span class="o">=</span><span class="n">imtype</span><span class="p">)</span>
 
         <span class="c1"># draw map scale</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_drawMapScale</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">gd</span><span class="p">)</span>
@@ -1359,7 +1393,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cities</span><span class="o">.</span><span class="n">renderToMap</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">ax</span><span class="p">,</span> <span class="n">zorder</span><span class="o">=</span><span class="n">CITIES_ZORDER</span><span class="p">)</span>
 
         <span class="c1"># draw title and supertitle</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_drawTitle</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_drawTitle</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
 
         <span class="c1"># if event is a scenario, make watermark of the word scenario</span>
         <span class="c1"># diagonally across map</span>
@@ -1367,14 +1401,16 @@
         <span class="n">eventid</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">][</span><span class="s1">&#39;event_id&#39;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">eventid</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_se&#39;</span><span class="p">):</span>
             <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">m</span><span class="p">(</span><span class="n">hlon</span><span class="p">,</span> <span class="n">hlat</span><span class="p">)</span>
-            <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="s1">&#39;SCENARIO&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">64</span><span class="p">,</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">,</span> <span class="s1">&#39;SCENARIO&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">72</span><span class="p">,</span>
                      <span class="n">zorder</span><span class="o">=</span><span class="n">SCENARIO_ZORDER</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">45</span><span class="p">,</span>
-                     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;red&#39;</span><span class="p">,</span>
+                     <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;grey&#39;</span><span class="p">,</span>
                      <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
-                     <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">)</span>
+                     <span class="n">verticalalignment</span><span class="o">=</span><span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                     <span class="n">path_effects</span><span class="o">=</span><span class="p">[</span><span class="n">path_effects</span><span class="o">.</span><span class="n">Stroke</span><span class="p">(</span><span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                                   <span class="n">foreground</span><span class="o">=</span><span class="s1">&#39;black&#39;</span><span class="p">)])</span>
 
         <span class="c1"># save plot to file</span>
-        <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imt</span><span class="p">)</span>
+        <span class="n">fileimt</span> <span class="o">=</span> <span class="n">oq_to_file</span><span class="p">(</span><span class="n">imtype</span><span class="p">)</span>
         <span class="n">plt</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
         <span class="n">outfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">outfolder</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">_contour.pdf&#39;</span> <span class="o">%</span>
                                <span class="p">(</span><span class="n">fileimt</span><span class="p">))</span>

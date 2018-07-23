@@ -65,10 +65,10 @@ select.conf
 
 Config options for GMPE selection, which are used by
 the `select` module. Note that if/when the `select` module runs, it
-creates the file `model_zc.conf` in the event's _current_ directory,
+creates the file `model_select.conf` in the event's _current_ directory,
 which overrides the GMPE set in the `model.conf` file located in the
 global config directory, but the config settings in an event-specific
-`model.conf` take precedence over the settings in `model_zc.conf`.
+`model.conf` take precedence over the settings in `model_select.conf`.
 
 
 products.conf

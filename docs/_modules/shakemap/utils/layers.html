@@ -81,6 +81,8 @@
         <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;x1&#39;</span><span class="p">,</span> <span class="s1">&#39;x2&#39;</span><span class="p">,</span> <span class="s1">&#39;p1&#39;</span><span class="p">,</span> <span class="s1">&#39;p2&#39;</span><span class="p">,</span> <span class="s1">&#39;p_kagan_default&#39;</span><span class="p">,</span>
                      <span class="s1">&#39;default_slab_depth&#39;</span><span class="p">):</span>
             <span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">mydict</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="k">elif</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;ipe&#39;</span><span class="p">,</span> <span class="s1">&#39;gmice&#39;</span><span class="p">,</span> <span class="s1">&#39;ccf&#39;</span><span class="p">):</span>
+            <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">ValidateError</span><span class="p">(</span><span class="s1">&#39;Invalid entry in config: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">))</span>
     <span class="k">return</span></div>
@@ -197,7 +199,7 @@
     <span class="n">inside_layer_name</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="k">if</span> <span class="s1">&#39;layers&#39;</span> <span class="ow">in</span> <span class="n">config</span> <span class="ow">and</span> <span class="s1">&#39;layer_dir&#39;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">]:</span>
         <span class="n">layer_dir</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="s1">&#39;layer_dir&#39;</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">layer_dir</span> <span class="ow">and</span> <span class="n">layer_dir</span> <span class="o">!=</span> <span class="s1">&#39;None&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">layer_dir</span><span class="p">:</span>
             <span class="n">geo_layers</span> <span class="o">=</span> <span class="n">get_layer_distances</span><span class="p">(</span><span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">layer_dir</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">geo_layers</span> <span class="o">=</span> <span class="p">{}</span>
@@ -221,7 +223,7 @@
         <span class="k">for</span> <span class="n">region</span><span class="p">,</span> <span class="n">rdict</span> <span class="ow">in</span> <span class="n">layer_config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">region</span> <span class="o">==</span> <span class="s1">&#39;horizontal_buffer&#39;</span><span class="p">:</span>
                 <span class="k">continue</span>
-            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="n">region</span><span class="p">]</span> <span class="o">=</span> <span class="n">rdict</span>
+            <span class="n">config</span><span class="p">[</span><span class="s1">&#39;tectonic_regions&#39;</span><span class="p">][</span><span class="n">region</span><span class="p">]</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">rdict</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">config</span></div>
 </pre></div>
 

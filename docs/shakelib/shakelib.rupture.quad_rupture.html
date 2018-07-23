@@ -138,7 +138,8 @@ rectangles (km).</li>
 <li><strong>dips</strong> (<em>array</em>) – Array of dips for each of rectangle (degrees).</li>
 <li><strong>origin</strong> (<a class="reference internal" href="shakelib.rupture.origin.html#shakelib.rupture.origin.Origin" title="shakelib.rupture.origin.Origin"><em>Origin</em></a>) – Reference to a ShakeMap origin object.</li>
 <li><strong>strike</strong> (<em>array</em>) – If None then strike is computed from verticies of
-top edge of each quadrilateral. If a scalar, then all
+top edge of each quadrilateral. If the array has only a
+single value, then all
 quadrilaterals are constructed assuming this strike direction.
 If an array with the same length as the trace coordinates then
 it specifies the strike for each quadrilateral.</li>
@@ -151,7 +152,12 @@ came from (publication style reference, etc.).</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">QuadRupture instance.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">QuadRupture instance.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ShakeLibException</span></code> – if the input arrays are not all the same
+length, or if the strike array is not length 1 or the same
+length as the input arrays.</p>
 </td>
 </tr>
 </tbody>
@@ -179,7 +185,8 @@ object.</td>
 <dl class="classmethod">
 <dt id="shakelib.rupture.quad_rupture.QuadRupture.fromOrientation">
 <em class="property">classmethod </em><code class="descname">fromOrientation</code><span class="sig-paren">(</span><em>px</em>, <em>py</em>, <em>pz</em>, <em>dx</em>, <em>dy</em>, <em>length</em>, <em>width</em>, <em>strike</em>, <em>dip</em>, <em>origin</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/quad_rupture.html#QuadRupture.fromOrientation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.quad_rupture.QuadRupture.fromOrientation" title="Permalink to this definition">¶</a></dt>
-<dd><p>Create a QuadRupture instance from a known point, shape, and orientation.</p>
+<dd><p>Create a QuadRupture instance from a known point, shape, and
+orientation.</p>
 <p>A point is defined as a set of latitude, longitude, and depth, which
 is located in the corner between the tail of the vector pointing in
 the strike direction and the dip direction (nearest to the surface).
@@ -223,7 +230,8 @@ p4———————-p3</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>px</strong> (<em>array</em>) – Array or list of longitudes (floats) of the known point.</li>
+<li><strong>px</strong> (<em>array</em>) – Array or list of longitudes (floats) of the known
+point.</li>
 <li><strong>py</strong> (<em>array</em>) – Array or list of latitudes (floats) of the known point.</li>
 <li><strong>pz</strong> (<em>array</em>) – Array or list of depths (floats) of the known point.</li>
 <li><strong>dx</strong> (<em>array</em>) – Array or list of distances (floats), in the strike
@@ -242,7 +250,11 @@ dip direction.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">QuadRupture instance.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">QuadRupture instance.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ShakeLibException</span></code> – if the lengths of the points arrays are not
+all equal.</p>
 </td>
 </tr>
 </tbody>
@@ -289,12 +301,13 @@ came from (publication style reference, etc.)</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><dl class="docutils">
-<dt>QuadRupture object, where the rupture is modeled as a series of</dt>
-<dd><p class="first last">trapezoids.</p>
-</dd>
-</dl>
-</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">QuadRupture object, where the rupture is modeled as a series of
+trapezoids.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first last"><code class="xref py py-exc docutils literal notranslate"><span class="pre">ShakeLibException</span></code> – if the lengths of the inptu arrays are not
+all equal, or if the length of the group_index is not the
+same as the arrays (if group_index is supplied)..</p>
 </td>
 </tr>
 </tbody>

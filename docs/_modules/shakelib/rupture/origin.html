@@ -111,7 +111,7 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">missing</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s1">&#39;Input event dictionary is missing the following &#39;</span>
-                           <span class="s1">&#39;required keys: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)))</span>
+                           <span class="s1">&#39;required keys: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing</span><span class="p">)))</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Check some types, ranges, and defaults</span>
@@ -147,11 +147,7 @@
 
         <span class="c1"># What about rake?</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;rake&#39;</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;mech&#39;</span><span class="p">):</span>
-                <span class="n">mech</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">mech</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAKEDICT</span><span class="p">[</span><span class="n">mech</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAKEDICT</span><span class="p">[</span><span class="s1">&#39;ALL&#39;</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="n">constants</span><span class="o">.</span><span class="n">RAKEDICT</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">mech</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">rake</span> <span class="o">=</span> <span class="mf">0.0</span>
@@ -420,6 +416,9 @@
 
     <span class="k">if</span> <span class="s1">&#39;mech&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
         <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;mech&#39;</span><span class="p">]</span>
+    <span class="c1"># Older files may have &quot;type&quot; instead of &quot;mech&quot;</span>
+    <span class="k">if</span> <span class="s1">&#39;type&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
+        <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
     <span class="k">if</span> <span class="s1">&#39;reference&#39;</span> <span class="ow">in</span> <span class="n">xmldict</span><span class="p">:</span>
         <span class="n">eqdict</span><span class="p">[</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">xmldict</span><span class="p">[</span><span class="s1">&#39;reference&#39;</span><span class="p">]</span>
 

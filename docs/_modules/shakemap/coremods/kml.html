@@ -303,7 +303,8 @@
     <span class="k">if</span> <span class="s1">&#39;MMI&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">imts</span><span class="p">:</span>
         <span class="k">return</span>
     <span class="n">component</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">getComponents</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">DEFAULT_FILTER_SIZE</span><span class="p">)</span>
+    <span class="n">line_strings</span> <span class="o">=</span> <span class="n">contour</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">,</span> <span class="n">component</span><span class="p">,</span> <span class="n">DEFAULT_FILTER_SIZE</span><span class="p">,</span>
+                           <span class="kc">None</span><span class="p">)</span>
 
     <span class="c1"># make a folder for the contours</span>
     <span class="n">folder</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="s1">&#39;Folder&#39;</span><span class="p">)</span>

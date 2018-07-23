@@ -228,7 +228,7 @@
         <span class="c1"># Sort out ps2ff parameters</span>
         <span class="c1"># ----------------------------</span>
         <span class="n">origin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_origin</span>
-        <span class="n">mech</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mech</span>
+        <span class="n">mech</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s1">&#39;mech&#39;</span><span class="p">,</span> <span class="s1">&#39;ALL&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s1">&#39;_tectonic_region&#39;</span><span class="p">):</span>
             <span class="n">mscale</span> <span class="o">=</span> <span class="n">MagScaling</span><span class="o">.</span><span class="n">WC94</span>
             <span class="n">smech</span> <span class="o">=</span> <span class="n">Mechanism</span><span class="o">.</span><span class="n">A</span>

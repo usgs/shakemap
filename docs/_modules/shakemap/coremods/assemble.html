@@ -75,7 +75,7 @@
     <span class="n">dependencies</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;event.xml&#39;</span><span class="p">,</span> <span class="kc">True</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;*_dat.xml&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
                     <span class="p">(</span><span class="s1">&#39;*_fault.txt&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;rupture.json&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
                     <span class="p">(</span><span class="s1">&#39;source.txt&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;model.conf&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
-                    <span class="p">(</span><span class="s1">&#39;model_zc.conf&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]</span>
+                    <span class="p">(</span><span class="s1">&#39;model_select.conf&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)]</span>
     <span class="n">configs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;gmpe_sets.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;model.conf&#39;</span><span class="p">,</span> <span class="s1">&#39;modules.conf&#39;</span><span class="p">]</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eventid</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -159,10 +159,10 @@
 
         <span class="c1">#</span>
         <span class="c1"># this is the event specific model.conf (may not be present)</span>
-        <span class="c1"># prefer model.conf to model_zc.conf</span>
+        <span class="c1"># prefer model.conf to model_select.conf</span>
         <span class="c1">#</span>
         <span class="n">event_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model.conf&#39;</span><span class="p">)</span>
-        <span class="n">event_config_zc_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model_zc.conf&#39;</span><span class="p">)</span>
+        <span class="n">event_config_zc_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">datadir</span><span class="p">,</span> <span class="s1">&#39;model_select.conf&#39;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">event_config_file</span><span class="p">):</span>
             <span class="n">event_config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">event_config_file</span><span class="p">,</span>
                                      <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>

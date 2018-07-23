@@ -126,7 +126,7 @@ with their event IDs) and their associated subdirectories::
                 event.xml
                 *_dat.xml
                 *_fault.txt (or rupture.json)
-                model.conf (or model_zc.conf)
+                model.conf (or model_select.conf)
                 products/
                     shake_result.hdf
                     ...
@@ -211,9 +211,10 @@ shake Modules
 Below is a description of many of the modules available to **shake**.
 They are ordered in more or less the order they would be called. The
 module **select** would be run first if the operator wanted to have
-the ShakeMap system determine the GMPE set to use based on the
+the ShakeMap system determine the GMPE set, IPE, GMICE, or cross-
+correlation functions to use based on the
 event's location and depth. Many operators will have a fixed
-configuration for their GMPEs, and will therefore not use **select**.
+configuration for their regions, and will therefore not use **select**.
 The operator will then typically run **assemble** (or possibly
 **augment**) to
 create (or update) the *shake_data.hdf* input file,
@@ -231,7 +232,13 @@ within,
 and proximity to, a set of predefined tectonic regions and user-defined
 geographic areas. The GMPE set, and the
 selection of that GMPE set for use in processing, are written to
-*model_zc.conf* in the event's *current* directory.
+*model_select.conf* in the event's *current* directory. Similarly,
+the configuration may select an intensity prediction equation module
+(IPE), a ground-motion to intensity conversion equation module
+(GMICE), and a cross-correlation function (CCF) for the region,
+and these, too, will be written to *model_select.conf*. Any modules
+that are not specified for a particular region will default back to
+the modules set in the global *model.conf*.
 
 The behavior of **select** is controlled by the *select.conf*
 configuration file. See the documentation in *select.conf* for more on
@@ -240,9 +247,10 @@ customizing **select**.
 The tectonic regions, and additional geographic layers, that the event
 may fall within are defined by the STREC configuration. See the STREC
 documentation for information on adding additional layers, then use
-*select.conf* to customize the GMPE sets that the new layers will use.
+*select.conf* to customize the ground motion modules that the new
+layers will use.
 
-The process by which sm_select builds a GMPE set is somewhat complicated.
+The process by which **select** builds a GMPE set is somewhat complicated.
 STREC reports the tectonic region the earthquake lies within, as well
 as the distance to the closest polygon of the other tectonic region
 types. For example, for an earthquake in California STREC would report
@@ -280,7 +288,7 @@ earthquake's location.
 distance from,
 any number of user-defined geographic layers. If the earthquake is
 within a layer, that layer's
-parameters (as configured in *select.conf*) replace the any or all
+parameters (as configured in *select.conf*) replace any or all
 of the parameters of the corresponding tectonic regions, and the
 calculation of a weighted GMPE set proceeds as before. For example,
 the layer section of *select.conf* might contain:
@@ -297,11 +305,14 @@ the layer section of *select.conf* might contain:
                 gmpe = Special_California_GMPE
                 min_depth = -Inf
                 max_depth = Inf
+                ipe = Allen2012
+                gmice = WRGW12
 
 If an earthquake falls within the 'california' layer, the tectonc regions
 'scr' and 'acr' would have their horizontal buffers reset to 25 km and,
 in addition, the 'acr' region would have its GMPE selection reset to the
-GMPE set 'Special_California_GMPE' for earthquakes of all depths.
+GMPE set 'Special_California_GMPE' for earthquakes of all depths. Similarly,
+the IPE would be set to "Allen2012" and the GMICE to "WGRW12".
 
 If the
 earthquake is not inside a custom geographic layer, but within the horizontal
@@ -315,7 +326,7 @@ above).
 Unlike the tectonic regions, the geographic layers consider only the
 nearest layer. If an earthquake falls
 within more than one layer (possible if layers are nested), the first one
-encountered in the *select.conf* is used and any other(s) will be ignored.
+encountered in *select.conf* is used and any other(s) will be ignored.
 
 See :meth:`shakemap.coremods.select` for the module's API
 documentation.
@@ -325,7 +336,9 @@ dyfi
 
 The **dyfi** module queries ComCat for any "Did You Feel It?" data 
 associated with an event and writes that data to a file in the event's
-*current* directory. 
+*current* directory. The event ID must be an ID that the ComCat system
+recognizes, thus the use of event IDs other than those produced by 
+NEIC or the US regional networks is unlikely to produce results.
 
 See :meth:`shakemap.coremods.dyfi` for the module's API
 documentation.
@@ -349,12 +362,12 @@ incorporates
 
 .. code-block:: python
 
-    <data_dir>/<evnt_id>/current>/model.conf (or model_zc.conf).
+    <data_dir>/<evnt_id>/current>/model.conf (or model_select.conf).
 
 Any parameter set in the event-specific *model.conf* will override
 parameters set in the other configuration files. Note: if both
-*model.conf* and *model_zc.conf* exist in the event directory,
-*model.conf* will be processed and *model_zc.conf* will be ignored.
+*model.conf* and *model_select.conf* exist in the event directory,
+*model.conf* will be processed and *model_select.conf* will be ignored.
 
 **assemble** then reads any files with a *_dat.xml* extension
 and assembles them into a station list. See ??? for a description
@@ -407,7 +420,7 @@ replace the data in the existing *shake_data.hdf*.
 
 The configuration data in *shake_data.hdf* is used as a starting point,
 and any configuration data from the system configuration files or the
-event's *model.conf* (or *model_zc.conf*) will then be added to it. Where
+event's *model.conf* (or *model_select.conf*) will then be added to it. Where
 there are conflicts, the system configuration parameters will override
 those found in *shake_data.hdf*. The event-specific configuration
 parameters from the local system retain the highest priority.
@@ -440,11 +453,11 @@ interpolated ShakeMap. Depending upon the settings found in *model.conf*,
 the interpolation product may be a grid or a set of points. See
 *model.conf* for additional options and documentation. The *model.conf*
 file in the user's current profile (i.e., *INSTALL_DIR/config/model.conf*)
-will be read first, and then if *model.conf* or *model_zc.conf* exists
+will be read first, and then if *model.conf* or *model_select.conf* exists
 in the event's *current* directory, then the parameters set therein will
 override those in the profile's *model.conf*. If both *model.conf* and
-*model_zc.conf* exist in the event's *current* directory, *model.conf*
-will be read and *model_zc.conf* will be ignored. **model** also reads
+*model_select.conf* exist in the event's *current* directory, *model.conf*
+will be read and *model_select.conf* will be ignored. **model** also reads
 the configuration files *gmpe_sets.conf* and *modules.conf*, which
 reside in the current profile's *INSTALL_DIR/config* directory. See
 the documentation within those files for more information.

@@ -17,7 +17,7 @@
     <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="shakemap.coremods.stations" href="shakemap.coremods.stations.html" />
+    <link rel="next" title="shakemap.coremods.sleep" href="shakemap.coremods.sleep.html" />
     <link rel="prev" title="shakemap.coremods.rupture" href="shakemap.coremods.rupture.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
@@ -40,7 +40,7 @@
 <dt id="shakemap.coremods.select.SelectModule">
 <em class="property">class </em><code class="descclassname">shakemap.coremods.select.</code><code class="descname">SelectModule</code><span class="sig-paren">(</span><em>eventid</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/select.html#SelectModule"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.select.SelectModule" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference internal" href="shakemap.coremods.base.html#shakemap.coremods.base.CoreModule" title="shakemap.coremods.base.CoreModule"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakemap.coremods.base.CoreModule</span></code></a></p>
-<p>select - Parse STREC output, make a GMPE set, create model_zc.conf.</p>
+<p>select - Parse STREC output, make a GMPE set, create model_select.conf.</p>
 <p>Instantiate a CoreModule class with an event ID.</p>
 <dl class="attribute">
 <dt id="shakemap.coremods.select.SelectModule.command_name">
@@ -49,7 +49,7 @@
 
 <dl class="attribute">
 <dt id="shakemap.coremods.select.SelectModule.targets">
-<code class="descname">targets</code><em class="property"> = ['model_zc\\.conf']</em><a class="headerlink" href="#shakemap.coremods.select.SelectModule.targets" title="Permalink to this definition">¶</a></dt>
+<code class="descname">targets</code><em class="property"> = ['model_select\\.conf']</em><a class="headerlink" href="#shakemap.coremods.select.SelectModule.targets" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="attribute">
@@ -67,7 +67,7 @@
 <code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/coremods/select.html#SelectModule.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.coremods.select.SelectModule.execute" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parses the output of STREC in accordance with the
 configuration file, creates a new GMPE set specific to the event,
-and writes model_zc.conf in the event’s ‘current’ directory.</p>
+and writes model_select.conf in the event’s ‘current’ directory.</p>
 <p>Configuration file: select.conf</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -134,6 +134,7 @@ and writes model_zc.conf in the event’s ‘current’ directory.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.raster.html">shakemap.coremods.raster</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.rupture.html">shakemap.coremods.rupture</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.coremods.select</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.sleep.html">shakemap.coremods.sleep</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.stations.html">shakemap.coremods.stations</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.transfer.html">shakemap.coremods.transfer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.coremods.xtestimage.html">shakemap.coremods.xtestimage</a></li>
