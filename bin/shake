@@ -23,6 +23,7 @@ from shakemap.utils.config import (
     get_configspec,
     config_error)
 from shakemap.utils.dependencies import CommandDatabase
+from shakelib.rupture.origin import read_event_file
 
 
 def _get_config():
@@ -96,14 +97,26 @@ def _format_error_info(exception, eventid):
              and stack trace.
 
     """
+    # try to get the basic earthquake info - if it fails, move on.
+    eqinfo = 'Not available'
+    install_path, data_path = get_config_paths()
+    datadir = os.path.join(data_path, eventid, 'current')
+    if os.path.isdir(datadir):
+        datafile = os.path.join(datadir, 'event.xml')
+        if os.path.isfile(datafile):
+            edict = read_event_file(datafile)
+            mag = edict['mag']
+            loc = edict['locstring']
+            eqinfo = 'M%.1f %s' % (mag,loc)
+    
     stringio = io.StringIO()
     ex_type, ex, tb = sys.exc_info()
     traceback.print_tb(tb, file=stringio)
     stack_trace = stringio.getvalue()
     stringio.close()
     hostname = socket.gethostname()
-    fmt = '\nHost: %s\nEvent ID: %s\nException: %s\nStack Trace: %s'
-    error_msg = fmt % (hostname, eventid, str(exception), stack_trace)
+    fmt = '\nEarthquake: %s\nHost: %s\nEvent ID: %s\nException: %s\nStack Trace: %s'
+    error_msg = fmt % (eqinfo,hostname, eventid, str(exception), stack_trace)
     return error_msg
 
 
@@ -244,7 +257,7 @@ def main(args):
 
     except Exception as e:
         error_msg = _format_error_info(e, args.eventid)
-        logger.error(error_msg)  # should get sent by email and logged
+        logger.critical(error_msg)  # should get sent by email and logged
         sys.exit(1)
 
 

@@ -53,6 +53,12 @@ def test_shake():
     clear_files(event_path)
     assert not cp.returncode
 
+    # run an event with the exception module, which also generates
+    # an exception.  See what happens...
+    cp = subprocess.run([program, 'nc72282711', 'exception'], shell=False)
+    clear_files(event_path)
+    assert cp.returncode
+
 
 ########################################################################
 # main program
