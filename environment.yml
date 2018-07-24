@@ -1,12 +1,10 @@
 name: shakemap
 channels:
 - conda-forge
-- defaults
 dependencies:
 - amptools
 - basemap
 - cartopy
-- configobj
 - defusedxml
 - descartes
 - docutils
@@ -36,3 +34,5 @@ dependencies:
 - strec
 - versioneer
 - kealib=1.4.7
+- pip:
+    - configobj
