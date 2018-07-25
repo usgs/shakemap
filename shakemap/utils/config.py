@@ -123,6 +123,42 @@ def get_config_paths():
     return (install, data)
 
 
+def path_macro_sub(s, ip='', dp='', gp='', ei=''):
+    """
+    Replace macros with current paths:
+
+    - <INSTALL_DIR> is replaced with the contents of ip
+    - <DATA_DIR> is replaced with the contents of dp
+    - <GLOBAL_DATA> is replaced with the contents of gp
+    - <EVENT_ID> is replaced with the contents of ei
+
+    e.g., path_macro_sub("<INSTALL_DIR>/<DATA_DIR>", "hello", "world")
+    would return "hello/world". It is not an error if the original string
+    does not contain one or any of the substitution strings.
+
+    Args:
+        s (str):
+            The string into which the replacements are made.
+        ip (str):
+            The string with which to replace <INSTALL_DIR>.
+        dp (str):
+            The string with which to replace <DATA_DIR>.
+        gp (str):
+            The string with which to replace <GLOBAL_DATA>.
+        ei (str):
+            The string with which to replace <EVENT_ID>.
+
+    Returns:
+        str: A new string with the sub-string replacements.
+    """
+
+    s = s.replace('<INSTALL_DIR>', ip)
+    s = s.replace('<DATA_DIR>', dp)
+    s = s.replace('<GLOBAL_DATA>', gp)
+    s = s.replace('<EVENT_ID>', ei)
+    return s
+
+
 def get_custom_validator():
     """
     Returns a validator suitable for validating the ShakeMap config
@@ -373,7 +409,8 @@ def extent_list(value):
 def file_type(value):
     """
     Checks to see if value is a valid file or an empty string.
-    Raises a ValidateError exception on failure.
+    Raises a ValidateError exception on failure. Does macro substitution
+    of <INSTALL_DIR>, <DATA_DIR>, and <GLOBAL_DATA_DIR>.
 
     Args:
         value (str): A string representing the path to a file.
@@ -384,6 +421,9 @@ def file_type(value):
     """
     if not value or value == 'None':
         return ''
+    ip, dp = get_config_paths()
+    gp = os.path.join(os.path.expanduser('~'), 'shakemap_data')
+    value = path_macro_sub(value, ip=ip, dp=dp, gp=gp)
     if not os.path.isfile(value):
         logging.error("file '%s' is not a valid file" % value)
         raise ValidateError(value)
@@ -393,7 +433,8 @@ def file_type(value):
 def directory_type(value):
     """
     Checks to see if value is a valid directory or an empty string.
-    Raises a ValidateError exception on failure.
+    Raises a ValidateError exception on failure. Does macro substitution
+    of <INSTALL_DIR>, <DATA_DIR>, and <GLOBAL_DATA_DIR>.
 
     Args:
         value (str): A string representing the path to a directory.
@@ -404,6 +445,9 @@ def directory_type(value):
     """
     if not value or value == 'None':
         return ''
+    ip, dp = get_config_paths()
+    gp = os.path.join(os.path.expanduser('~'), 'shakemap_data')
+    value = path_macro_sub(value, ip=ip, dp=dp, gp=gp)
     if not os.path.isdir(value):
         raise ValidateError(value)
     return value

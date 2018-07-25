@@ -97,7 +97,7 @@ def main(args):
         logger.info('No action on product type %s' % args.type)
         sys.exit(0)
 
-    if args.status != 'UPDATE':
+    if args.status not in ['UPDATE', 'DELETE']:
         logger.info('No action on status %s' % args.status)
         sys.exit(0)
 
@@ -119,6 +119,14 @@ def main(args):
 
     if args.preferred_eventsource in ('pt', 'at', 'dr'):
         logger.info('Undesirable eventsource: %s' % args.preferred_eventsource)
+        sys.exit(0)
+
+    if args.status == 'DELETE':
+        event = {'id': args.preferred_eventid,
+                 'netid': args.preferred_eventsource}
+        queue.send_queue('cancel', event, config['port'])
+        logger.info('Sending cancel event %s to queue.' %
+                    args.preferred_eventid)
         sys.exit(0)
 
     if not args.preferred_eventtime or not args.preferred_latitude \

@@ -24,10 +24,10 @@ from shakemap.utils.config import (get_config_paths,
                                    config_error,
                                    check_config,
                                    get_configspec,
-                                   get_logging_config)
+                                   get_logging_config,
+                                   path_macro_sub)
 from shakemap.utils.amps import AmplitudeHandler
 import shakemap.utils.queue as queue
-from shakemap.utils.utils import path_macro_sub
 
 
 class AssembleModule(CoreModule):
@@ -151,23 +151,12 @@ class AssembleModule(CoreModule):
 
         check_config(global_config, self.logger)
 
-        #
-        # The vs30 file may have macros in it
-        #
-        vs30file = global_config['data']['vs30file']
         global_data_path = os.path.join(os.path.expanduser('~'),
                                         'shakemap_data')
-        if vs30file:
-            vs30file = path_macro_sub(vs30file, ip=install_path,
-                                      dp=data_path, gp=global_data_path,
-                                      ei=self._eventid)
-            if not os.path.isfile(vs30file):
-                raise FileNotFoundError("vs30 file '%s' is not a valid file" %
-                                        vs30file)
-            global_config['data']['vs30file'] = vs30file
         #
         # If there is a prediction_location->file file, then we need
-        # to expand any macros
+        # to expand any macros; this could have the event ID, so we
+        # can't just use the file_type handler in the configspec
         #
         if 'file' in global_config['interp']['prediction_location']:
             loc_file = global_config['interp']['prediction_location']['file']

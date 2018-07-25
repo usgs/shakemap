@@ -43,9 +43,11 @@ from shakelib.rupture.point_rupture import PointRupture
 from shakelib.rupture.factory import rupture_from_dict_and_origin
 from shakelib.utils.imt_string import oq_to_file
 from shakelib.plotting.contour import getContourLevels
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import (get_config_paths,
+                                   get_configspec,
+                                   get_custom_validator,
+                                   config_error)
 from .base import CoreModule
-from shakemap.utils.utils import path_macro_sub
 from impactutils.time.ancient_time import HistoricTime
 from shakemap.utils.utils import get_object_from_config
 
@@ -174,10 +176,12 @@ class MappingModule(CoreModule):
 
         # get the path to the products.conf file, load the config
         config_file = os.path.join(install_path, 'config', 'products.conf')
-        config = ConfigObj(config_file)
-
-        global_data_path = os.path.join(os.path.expanduser('~'),
-                                        'shakemap_data')
+        spec_file = get_configspec('products')
+        validator = get_custom_validator()
+        config = ConfigObj(config_file, configspec=spec_file)
+        results = config.validate(validator)
+        if not isinstance(results, bool) or not results:
+            config_error(config, results)
 
         # create contour files
         self.logger.debug('Mapping...')
@@ -185,27 +189,13 @@ class MappingModule(CoreModule):
         # get all of the pieces needed for the mapmaker
         layerdict = {}
         layers = config['products']['mapping']['layers']
-        layerdict['coast'] = path_macro_sub(
-            layers['coasts'], ip=install_path, dp=data_path,
-            gp=global_data_path)
-        layerdict['ocean'] = path_macro_sub(
-            layers['oceans'], ip=install_path, dp=data_path,
-            gp=global_data_path)
-        layerdict['lake'] = path_macro_sub(
-            layers['lakes'], ip=install_path, dp=data_path,
-            gp=global_data_path)
-        layerdict['country'] = path_macro_sub(
-            layers['countries'], ip=install_path, dp=data_path,
-            gp=global_data_path)
-        layerdict['state'] = path_macro_sub(
-            layers['states'], ip=install_path, dp=data_path,
-            gp=global_data_path)
-        topofile = path_macro_sub(
-            layers['topography'], ip=install_path, dp=data_path,
-            gp=global_data_path)
-        cities = path_macro_sub(
-            layers['cities'], ip=install_path, dp=data_path,
-            gp=global_data_path)
+        layerdict['coast'] = layers['coasts']
+        layerdict['ocean'] = layers['oceans']
+        layerdict['lake'] = layers['lakes']
+        layerdict['country'] = layers['countries']
+        layerdict['state'] = layers['states']
+        topofile = layers['topography']
+        cities = layers['cities']
         mapmaker = MapMaker(container, topofile, layerdict, cities,
                             self.logger,
                             config['products']['mapping']['operator'])

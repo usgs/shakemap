@@ -24,8 +24,8 @@ from shakemap.utils.config import (get_config_paths,
                                    config_error,
                                    check_config,
                                    get_configspec,
-                                   get_logging_config)
-from shakemap.utils.utils import path_macro_sub
+                                   get_logging_config,
+                                   path_macro_sub)
 
 
 class AugmentModule(CoreModule):
@@ -159,20 +159,9 @@ class AugmentModule(CoreModule):
         if not results or isinstance(results, dict):
             config_error(shake_config, results)
         check_config(shake_config, self.logger)
-        #
-        # The vs30 file may have macros in it
-        #
-        vs30file = shake_config['data']['vs30file']
+
         global_data_path = os.path.join(os.path.expanduser('~'),
                                         'shakemap_data')
-        if vs30file:
-            vs30file = path_macro_sub(vs30file, ip=install_path,
-                                      dp=data_path, gp=global_data_path,
-                                      ei=self._eventid)
-            if not os.path.isfile(vs30file):
-                raise FileNotFoundError('vs30 file "%s" is not a '
-                                        'valid file' % vs30file)
-            shake_config['data']['vs30file'] = vs30file
         #
         # If there is a prediction_location->file file, then we need
         # to expand any macros

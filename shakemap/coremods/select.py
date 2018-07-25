@@ -80,7 +80,9 @@ class SelectModule(CoreModule):
         # validate it
         # ---------------------------------------------------------------------
         config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
-        validate_config(config, install_path)
+        global_data_path = os.path.join(os.path.expanduser('~'),
+                                        'shakemap_data')
+        validate_config(config, install_path, data_path, global_data_path)
 
         # ---------------------------------------------------------------------
         # Search through all custom regions, and the first one that we are

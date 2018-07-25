@@ -10,7 +10,7 @@
 [modeling]
     gmpe=active_crustal_nshmp2014_100
 [data]
-    vs30file = /xkzzxkzzk/zxzxxk/zxzxczxkkz
+    vs30file = /xkzzxkzzk/zxzxxk/zxzxczxkkz.vs30
 [interp]
 
     [[prediction_location]]

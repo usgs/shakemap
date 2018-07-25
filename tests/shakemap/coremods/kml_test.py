@@ -9,10 +9,12 @@ from xml.dom import minidom
 
 import configobj
 
-from shakemap.utils.config import get_config_paths
+from shakemap.utils.config import (get_config_paths,
+                                   get_configspec,
+                                   get_custom_validator,
+                                   config_error)
 from shakemap.coremods.kml import (create_kmz)
 from shakelib.utils.containers import ShakeMapOutputContainer
-from shakemap.utils.utils import path_macro_sub
 
 
 def test_create_kmz():
@@ -23,14 +25,18 @@ def test_create_kmz():
                              'northridge', 'shake_result.hdf')
         container = ShakeMapOutputContainer.load(cfile)
         install_path, data_path = get_config_paths()
-        global_data_path = os.path.join(os.path.expanduser('~'),
-                                        'shakemap_data')
+
         product_config_file = os.path.join(
             install_path, 'config', 'products.conf')
-        pconfig = configobj.ConfigObj(product_config_file)
+        spec_file = get_configspec('products')
+        validator = get_custom_validator()
+        pconfig = configobj.ConfigObj(product_config_file,
+                                      configspec=spec_file)
+        results = pconfig.validate(validator)
+        if not isinstance(results, bool) or not results:
+            config_error(pconfig, results)
         oceanfile = pconfig['products']['mapping']['layers']['lowres_oceans']
-        oceanfile = path_macro_sub(oceanfile, install_path, data_path,
-                                   global_data_path)
+
         logger = logging.getLogger(__name__)
         kmzfile = create_kmz(container, tempdir, oceanfile, logger)
         myzip = zipfile.ZipFile(kmzfile, mode='r')
