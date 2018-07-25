@@ -101,9 +101,46 @@ env_file=environment.yml
 echo "Activate base virtual environment"
 conda activate base
 
+# Remove existing shakemap environment if it exists
+conda remove -y -n $VENV --all
+
 # Create a conda virtual environment
 echo "Creating the $VENV virtual environment:"
-conda env create -f $env_file --force
+# conda env create -f $env_file --force
+conda create -y --force -n $VENV -c conda-forge python=3.5 \
+      amptools \
+      basemap \
+      cartopy \
+      defusedxml \
+      descartes \
+      docutils \
+      configobj \
+      fiona \
+      gdal \
+      h5py \
+      impactutils \
+      libcomcat \
+      lockfile \
+      mapio \
+      matplotlib \
+      numexpr \
+      numpy \
+      obspy \
+      openquake.engine \
+      pandas \
+      ps2ff \
+      psutil \
+      pyproj \
+      pytest \
+      pytest-cov \
+      python-daemon \
+      pytest-faulthandler \
+      scikit-image \
+      scipy \
+      shapely \
+      strec \
+      versioneer 
+
 
 # Bail out at this point if the conda create command fails.
 # Clean up zip files we've downloaded
