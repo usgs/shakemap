@@ -9,11 +9,15 @@ import logging
 # third party imports
 from shakelib.utils.containers import ShakeMapOutputContainer
 from configobj import ConfigObj
+from validate import Validator
 from impactutils.transfer.factory import get_sender_class
 
 # local imports
 from .base import CoreModule
-from shakemap.utils.config import get_config_paths, get_data_path
+from shakemap.utils.config import (get_config_paths,
+                                   get_data_path,
+                                   config_error)
+from shakemap.utils.macros import get_macros
 
 TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
@@ -75,7 +79,10 @@ class TransferModule(CoreModule):
 
         # get the config information for transfer
         config = ConfigObj(transfer_conf, configspec=configspec)
-
+        results = config.validate(Validator())
+        if not isinstance(results, bool) or not results:
+            config_error(config, results)
+        
         # get the output container with all the things in it
         datafile = os.path.join(products_dir, 'shake_result.hdf')
         if not os.path.isfile(datafile):
@@ -116,6 +123,10 @@ class TransferModule(CoreModule):
 
 
 def _transfer(config, info, pdl_dir, products_dir, cancel=False):
+
+    # get the macros that may be in the email sender config
+    macros = get_macros(info)
+    
     properties, product_properties = _get_properties(info)
 
     # get the config information:
@@ -146,6 +157,25 @@ def _transfer(config, info, pdl_dir, products_dir, cancel=False):
                         properties=params,
                         local_directory=pdl_dir,
                         product_properties=product_properties)
+                elif transfer_method == 'email':
+                    # replace macro strings with actual strings
+                    for pkey,param in params.items():
+                        for macro, replacement in macros.items():
+                            if isinstance(param,str):
+                                param = param.replace('[%s]' % macro,replacement)
+                                params[pkey] = param
+                                
+                    # get full path to all file attachments
+                    attachments = []
+                    for lfile in params['attachments']:
+                        fullfile = os.path.join(products_dir,lfile)
+                        if not os.path.isfile(fullfile):
+                            logging.warn('%s does not exist.' % fullfile)
+                        attachments.append(fullfile)
+
+                    # construct an instance of the EmailSender
+                    sender = sender_class(properties=params,
+                                          local_files=attachments)
                 else:
                     cancelfile = CANCEL_FILES[transfer_method]
                     sender = sender_class(properties=params,
