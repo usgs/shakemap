@@ -10,7 +10,7 @@
 [modeling]
     gmpe=active_crustal_nshmp2014_100
 [data]
-    vs30file = <DATA_DIR>/<EVENT_ID>/vs30.grd
+    vs30file = <INSTALL_DIR>/data/vs30/CA_vs30.grd
 [interp]
     [[prediction_location]]
         #-----------------------------------------------------------------------

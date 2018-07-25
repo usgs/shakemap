@@ -161,39 +161,3 @@ def query_yes_no(question, default="yes"):
         else:
             sys.stdout.write("Please respond with 'yes' or 'no' "
                              "(or 'y' or 'n').\n")
-
-
-def path_macro_sub(s, ip='', dp='', gp='', ei=''):
-    """
-    Replace macros with current paths:
-
-    - <INSTALL_DIR> is replaced with the contents of ip
-    - <DATA_DIR> is replaced with the contents of dp
-    - <GLOBAL_DATA> is replaced with the contents of gp
-    - <EVENT_ID> is replaced with the contents of ei
-
-    e.g., path_macro_sub("<INSTALL_DIR>/<DATA_DIR>", "hello", "world")
-    would return "hello/world". It is not an error if the original string
-    does not contain one or any of the substitution strings.
-
-    Args:
-        s (str):
-            The string into which the replacements are made.
-        ip (str):
-            The string with which to replace <INSTALL_DIR>.
-        dp (str):
-            The string with which to replace <DATA_DIR>.
-        gp (str):
-            The string with which to replace <GLOBAL_DATA>.
-        ei (str):
-            The string with which to replace <EVENT_ID>.
-
-    Returns:
-        str: A new string with the sub-string replacements.
-    """
-
-    s = s.replace('<INSTALL_DIR>', ip)
-    s = s.replace('<DATA_DIR>', dp)
-    s = s.replace('<GLOBAL_DATA>', gp)
-    s = s.replace('<EVENT_ID>', ei)
-    return s

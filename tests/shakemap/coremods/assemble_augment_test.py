@@ -142,7 +142,7 @@ def test_assemble_augment():
                            'model_select.conf.bad1': 'model_select.conf'})
     try:
         amod = AssembleModule('nc72282711', comment='Test comment.')
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(RuntimeError):
             amod.execute()
     finally:
         clear_files(event_path)
@@ -175,10 +175,8 @@ def test_assemble_augment():
     #
     # Try some bad config files
     #
-    data_file = os.path.join(datapath, 'nc72282711',
-                             'current', 'shake_data.hdf')
-    set_files(event_path, {'event.xml': 'event.xml'})
     try:
+        set_files(event_path, {'event.xml': 'event.xml'})
         assemble = AssembleModule('nc72282711', comment='Test comment.')
         assemble.execute()
         # Should fail validation
@@ -189,22 +187,26 @@ def test_assemble_augment():
         clear_files(event_path)
 
         # Should fail vs30 filename check
+        set_files(event_path, {'event.xml': 'event.xml'})
+        assemble = AssembleModule('nc72282711', comment='Test comment.')
+        assemble.execute()
         set_files(event_path, {'event.xml': 'event.xml',
                                'model_select.conf.bad1': 'model_select.conf'})
         augment = AugmentModule('nc72282711', comment='Test comment.')
-        with pytest.raises(FileNotFoundError):
+        with pytest.raises(RuntimeError):
             augment.execute()
         clear_files(event_path)
 
         # Should fail prediction locations filename check
+        set_files(event_path, {'event.xml': 'event.xml'})
+        assemble = AssembleModule('nc72282711', comment='Test comment.')
+        assemble.execute()
         set_files(event_path, {'event.xml': 'event.xml',
                                'model_select.conf.bad2': 'model_select.conf'})
         augment = AugmentModule('nc72282711', comment='Test comment.')
         with pytest.raises(FileNotFoundError):
             augment.execute()
     finally:
-        if os.path.isfile(data_file):
-            os.remove(data_file)
         clear_files(event_path)
 
     #

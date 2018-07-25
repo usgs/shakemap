@@ -67,8 +67,9 @@ def test_layers():
     # Test the updates to the config based on being in a layer (or not)
     #
     install_path, data_path = get_config_paths()
+    global_data_path = os.path.join(os.path.expanduser('~'), 'shakemap_data')
     config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
-    validate_config(config, install_path)
+    validate_config(config, install_path, data_path, global_data_path)
     # Taiwan
     elon = 121.0
     elat = 22.5
@@ -78,7 +79,7 @@ def test_layers():
         ['active_crustal_taiwan', 'active_crustal_taiwan_deep']
 
     config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
-    validate_config(config, install_path)
+    validate_config(config, install_path, data_path, global_data_path)
     # Induced
     elon = -97.5
     elat = 36.5
@@ -89,7 +90,7 @@ def test_layers():
          'stable_continental_deep']
 
     config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
-    validate_config(config, install_path)
+    validate_config(config, install_path, data_path, global_data_path)
     # Not in a layer
     elon = -77.5
     elat = 36.5

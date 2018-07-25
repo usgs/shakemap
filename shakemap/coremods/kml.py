@@ -17,8 +17,11 @@ import numpy as np
 
 # local imports
 from .base import CoreModule
-from shakemap.utils.config import get_config_paths, get_logging_config
-from shakemap.utils.utils import path_macro_sub
+from shakemap.utils.config import (get_config_paths,
+                                   get_logging_config,
+                                   get_configspec,
+                                   get_custom_validator,
+                                   config_error)
 from shakelib.plotting.contour import contour
 from impactutils.colors.cpalette import ColorPalette
 from mapio.grid2d import Grid2D
@@ -95,9 +98,6 @@ class KMLModule(CoreModule):
         if not os.path.isfile(datafile):
             raise FileNotFoundError('%s does not exist.' % datafile)
 
-        global_data_path = os.path.join(os.path.expanduser('~'),
-                                        'shakemap_data')
-
         # Open the ShakeMapOutputContainer and extract the data
         container = ShakeMapOutputContainer.load(datafile)
 
@@ -108,10 +108,14 @@ class KMLModule(CoreModule):
         # find the low res ocean vector dataset
         product_config_file = os.path.join(
             install_path, 'config', 'products.conf')
-        pconfig = configobj.ConfigObj(product_config_file)
+        spec_file = get_configspec('products')
+        validator = get_custom_validator()
+        pconfig = configobj.ConfigObj(product_config_file,
+                                      configspec=spec_file)
+        results = pconfig.validate(validator)
+        if not isinstance(results, bool) or not results:
+            config_error(pconfig, results)
         oceanfile = pconfig['products']['mapping']['layers']['lowres_oceans']
-        oceanfile = path_macro_sub(oceanfile, ip=install_path, dp=data_path,
-                                   gp=global_data_path)
 
         # call create_kmz function
         create_kmz(container, datadir, oceanfile, self.logger)

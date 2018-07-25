@@ -14,9 +14,10 @@ homedir = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_probs():
-    install_path, config_path = get_config_paths()
+    install_path, data_path = get_config_paths()
+    global_data_path = os.path.join(os.path.expanduser('~'), 'shakemap_data')
     config = ConfigObj(os.path.join(install_path, 'config', 'select.conf'))
-    validate_config(config, install_path)
+    validate_config(config, install_path, data_path, global_data_path)
 
     #
     # Real event: M 6.9 - 151km SSW of Kokopo, Papua New Guinea

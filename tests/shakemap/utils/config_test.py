@@ -10,9 +10,6 @@ from validate import ValidateError
 
 import shakemap.utils.config as config
 
-homedir = os.path.dirname(os.path.abspath(__file__))
-shakedir = os.path.abspath(os.path.join(homedir, '..', '..'))
-
 
 def test_config():
 
@@ -42,6 +39,7 @@ def test_config():
     myinstall, mydata = config.get_config_paths()
 
     myspec = config.get_configspec()
+    myprodspec = config.get_configspec('products')
     myvalid = config.get_custom_validator()
 
     c1 = ConfigObj(os.path.join(mydatapath, "model.conf"),
@@ -53,7 +51,7 @@ def test_config():
     c4 = ConfigObj(os.path.join(mydatapath, "northridge_model.conf"),
                    configspec=myspec)
     c5 = ConfigObj(os.path.join(mydatapath, "products.conf"),
-                   configspec=myspec)
+                   configspec=myprodspec)
     c1.merge(c2)
     c1.merge(c3)
     c1.merge(c4)
