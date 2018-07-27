@@ -152,8 +152,13 @@ def rupture_from_dict(d):
     """
     validate_json(d)
 
-    d['metadata']['time'] = HistoricTime.strptime(d['metadata']['time'],
-                                                  constants.TIMEFMT)
+    try:
+        d['metadata']['time'] = HistoricTime.strptime(d['metadata']['time'],
+                                                      constants.TIMEFMT)
+    except ValueError:
+        d['metadata']['time'] = HistoricTime.strptime(d['metadata']['time'],
+                                                      constants.ALT_TIMEFMT)
+
     origin = Origin(d['metadata'])
 
     # What type of rupture is this?

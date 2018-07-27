@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 # stdlib imports
-import json
 
 # third party imports
 from mapio.grid2d import Grid2D
@@ -14,7 +13,7 @@ from shakelib.rupture.factory import (rupture_from_dict,
                                       rupture_from_dict_and_origin)
 from shakelib.rupture.origin import Origin
 from shakelib.station import StationList
-import shakemap.utils.queue as queue
+from shakelib.rupture import constants
 
 GROUPS = {'imt': 'imts'}
 
@@ -353,7 +352,7 @@ class ShakeMapOutputContainer(ShakeMapContainer):
             out = out + "    locstring: %s\n" % rupt_obj._origin.locstring
             out = out + "    magnitude: %.1f\n" % rupt_obj._origin.mag
             out = out + "    time: %s\n" % \
-                rupt_obj._origin.time.strftime(queue.TIMEFMT)
+                rupt_obj._origin.time.strftime(constants.TIMEFMT)
         except AttributeError:
             out = out + "Rupture: None\n"
         try:

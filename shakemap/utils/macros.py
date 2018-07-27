@@ -4,15 +4,19 @@
 # stdlib imports
 from datetime import datetime
 
-TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
+from shakelib.rupture import constants
+
 DATE_STR_FMT = '%b %m, %Y'
 TIME_OF_DAY_FMT = '%H:%M:%S'
 
+
 def get_macros(info):
-    """Return a dictionary containing macros that can be used in shakemail text.
+    """Return a dictionary containing macros that can be used in shakemail
+    text.
 
     Args:
-        info (dict): Dictionary returned from ShakeMapOutputContainer.getMetadata().
+        info (dict): Dictionary returned from
+            ShakeMapOutputContainer.getMetadata().
     Returns:
         dict: Dictionary containing following fields:
               - MAG Event magnitude.
@@ -33,10 +37,14 @@ def get_macros(info):
     macros['LON'] = info['input']['event_information']['longitude']
     macros['DEP'] = info['input']['event_information']['depth']
     macros['DATETIME'] = info['input']['event_information']['origin_time']
-    dtime = datetime.strptime(macros['DATETIME'],TIMEFMT)
+    try:
+        dtime = datetime.strptime(macros['DATETIME'], constants.TIMEFMT)
+    except ValueError:
+        dtime = datetime.strptime(macros['DATETIME'], constants.ALT_TIMEFMT)
     macros['DATE'] = dtime.strftime(DATE_STR_FMT)
     macros['TIME'] = dtime.strftime(TIME_OF_DAY_FMT)
-    macros['EVENTID'] = macros['DEP'] = info['input']['event_information']['event_id']
+    macros['EVENTID'] = macros['DEP'] = \
+        info['input']['event_information']['event_id']
     if 'netid' in info['input']['event_information']:
         macros['NETID'] = info['input']['event_information']['netid']
     else:

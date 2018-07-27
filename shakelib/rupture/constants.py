@@ -21,4 +21,6 @@ DEFAULT_ZTOR = 0.0
 
 ORIGIN_REQUIRED_KEYS = ['id', 'netid', 'network', 'lat', 'lon', 'depth',
                         'locstring', 'mag', 'time']
-TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
+# Times can have either integer or floating point (preferred) seconds
+TIMEFMT = '%Y-%m-%dT%H:%M:%S.%fZ'
+ALT_TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'

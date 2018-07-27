@@ -3,17 +3,16 @@ import os.path
 from datetime import datetime
 
 # third party imports
-from shakelib.utils.containers import ShakeMapOutputContainer
 from configobj import ConfigObj
 
 
 # local imports
+from shakelib.utils.containers import ShakeMapOutputContainer
 from .base import CoreModule
 from .transfer import _transfer
 from shakemap.utils.config import get_config_paths, get_data_path
 from shakemap.utils.amps import AmplitudeHandler
-
-TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
+from shakelib.rupture import constants
 
 
 class CancelModule(CoreModule):
@@ -76,7 +75,7 @@ class CancelModule(CoreModule):
         cancelfile = os.path.join(datadir, 'CANCEL')
         with open(cancelfile, 'wt') as cfile:
             cfile.write('Event cancelled at %s\n' %
-                        datetime.utcnow().strftime(TIMEFMT))
+                        datetime.utcnow().strftime(constants.TIMEFMT))
 
         # delete the event from the database
         handler = AmplitudeHandler(install_path, data_path)

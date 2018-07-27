@@ -9,7 +9,7 @@ import numpy as np
 
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.amps import AmplitudeHandler, timestr_to_timestamp
-import shakemap.utils.queue as queue
+from shakelib.rupture import constants
 
 
 def test_amps():
@@ -30,7 +30,7 @@ def test_amps():
                  'netid': 'ci',
                  'network': '',
                  'time': datetime(2018, 3, 7, 18, 5, 0).strftime(
-                    queue.TIMEFMT),
+                    constants.TIMEFMT),
                  'lat': 35.487,
                  'lon': -120.027,
                  'depth': 8.0,
@@ -93,7 +93,7 @@ def test_amps():
                   'netid': 'ci',
                   'network': '',
                   'time': datetime(2000, 1, 1, 0, 0, 1).strftime(
-                     queue.TIMEFMT),
+                     constants.TIMEFMT),
                   'lat': 37.487,
                   'lon': -122.027,
                   'depth': 8.0,

@@ -15,7 +15,6 @@ from strec.tensor import fill_tensor_from_components
 from impactutils.time.ancient_time import HistoricTime
 from shakelib.utils.exception import ShakeLibException
 from shakelib.rupture import constants
-import shakemap.utils.queue as queue
 
 
 class Origin(object):
@@ -241,7 +240,7 @@ def write_event_file(event, xmlfile):
         root.attrib['lon'] = '%.4f' % event['lon']
         root.attrib['depth'] = '%.1f' % event['depth']
         root.attrib['mag'] = '%.1f' % event['mag']
-        root.attrib['time'] = event['time'].strftime(queue.ALT_TIMEFMT)
+        root.attrib['time'] = event['time'].strftime(constants.ALT_TIMEFMT)
         root.attrib['locstring'] = event['locstring']
         if 'mech' in event:
             root.attrib['mech'] = event['mech']
@@ -364,15 +363,29 @@ def read_event_file(eventxml):
         # product code
         pass
 
-    try:
-        eqdict['time'] = HistoricTime.strptime(xmldict['time'], queue.TIMEFMT)
-    except ValueError:
+    # Support old event file date/times
+    if 'time' in xmldict:
         try:
             eqdict['time'] = HistoricTime.strptime(xmldict['time'],
-                                                   queue.ALT_TIMEFMT)
+                                                   constants.TIMEFMT)
         except ValueError:
-            raise ValueError("Couldn't convert %s to HistoricTime" %
-                             xmldict['time'])
+            try:
+                eqdict['time'] = HistoricTime.strptime(xmldict['time'],
+                                                       constants.ALT_TIMEFMT)
+            except ValueError:
+                raise ValueError("Couldn't convert %s to HistoricTime" %
+                                 xmldict['time'])
+    else:
+        if 'year' not in xmldict or 'month' not in xmldict or \
+           'day' not in xmldict or 'hour' not in xmldict or \
+           'minute' not in xmldict or 'second' not in xmldict:
+            raise ValueError("Missing date/time elements in event file.")
+        eqdict['time'] = HistoricTime.datetime(xmldict['year'],
+                                               xmldict['month'],
+                                               xmldict['day'],
+                                               xmldict['hour'],
+                                               xmldict['minute'],
+                                               xmldict['second'])
 
     eqdict['lat'] = float(xmldict['lat'])
     eqdict['lon'] = float(xmldict['lon'])
