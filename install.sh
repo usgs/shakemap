@@ -20,9 +20,7 @@ fi
 
 source $prof
 
-# echo "Path:"
-# echo $PATH
-
+# Name of virtual environment
 VENV=shakemap
 
 
@@ -122,8 +120,8 @@ conda remove -y -n $VENV --all
 # Create a conda virtual environment
 echo "Creating the $VENV virtual environment:"
 # conda env create -f $env_file --force
-conda create -y --force -n $VENV \
-      -c file://$channel \
+conda create -y --override-channels -n $VENV \
+      -c file://$PWD/$channel \
       python=3.5 \
       amptools \
       basemap \
