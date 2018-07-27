@@ -14,6 +14,7 @@ from mapio.shake import ShakeGrid
 from .base import CoreModule
 from shakemap.utils.config import get_config_paths
 import shakemap
+from shakelib.rupture import constants
 
 # historically, we only had the component we are now calling
 # 'GREATER_OF_TWO_HORIZONTAL'.
@@ -21,8 +22,6 @@ import shakemap
 # additional layers of information and different components (RotD50, etc.)
 # we'll hard code this here until grid.xml files experience their heat death.
 COMPONENT = 'GREATER_OF_TWO_HORIZONTAL'
-
-TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def _oq_to_gridxml(oqimt):
@@ -173,8 +172,12 @@ class GridXMLModule(CoreModule):
             event_dict['depth'] = float(event_info['depth'])
             event_dict['lat'] = float(event_info['latitude'])
             event_dict['lon'] = float(event_info['longitude'])
-            event_dict['event_timestamp'] = datetime.strptime(
-                event_info['origin_time'], TIMEFMT)
+            try:
+                event_dict['event_timestamp'] = datetime.strptime(
+                    event_info['origin_time'], constants.TIMEFMT)
+            except ValueError:
+                event_dict['event_timestamp'] = datetime.strptime(
+                    event_info['origin_time'], constants.ALT_TIMEFMT)
             event_dict['event_description'] = event_info['location']
             event_dict['event_network'] = \
                 info['input']['event_information']['eventsource']
@@ -187,7 +190,13 @@ class GridXMLModule(CoreModule):
                 info['processing']['shakemap_versions']['map_version']
             shake_dict['code_version'] = shakemap.__version__
             ptime = info['processing']['shakemap_versions']['process_time']
-            shake_dict['process_timestamp'] = datetime.strptime(ptime, TIMEFMT)
+            try:
+                shake_dict['process_timestamp'] = datetime.strptime(
+                    ptime, constants.TIMEFMT)
+            except ValueError:
+                shake_dict['process_timestamp'] = datetime.strptime(
+                    ptime, constants.ALT_TIMEFMT)
+
             shake_dict['shakemap_originator'] = \
                 config['system']['source_network']
             shake_dict['map_status'] = config['system']['map_status']

@@ -13,7 +13,7 @@ import pytest
 from shakelib.rupture.origin import Origin
 from shakelib.rupture.origin import write_event_file
 from impactutils.time.ancient_time import HistoricTime
-import shakemap.utils.queue as queue
+from shakelib.rupture import constants
 
 
 def test_origin():
@@ -177,7 +177,7 @@ reference="Smith, et al. (2019)"
     event['depth'] = 19.0
     event['mag'] = 7.9
     event['time'] = HistoricTime.strptime('2008-05-12T06:28:01.0Z',
-                                          queue.TIMEFMT)
+                                          constants.TIMEFMT)
     event['locstring'] = "EASTERN SICHUAN, CHINA"
     event['mech'] = 'RS'
     event['reference'] = "Smith, et al. (2019)"

@@ -16,7 +16,7 @@ import numpy as np
 from openquake.hazardlib.geo.geodetic import geodetic_distance
 
 # local libraries
-import shakemap.utils.queue as queue
+from shakelib.rupture import constants
 
 # define all of the tables as dictionaries
 EVENT = OrderedDict([('id', 'INTEGER PRIMARY KEY'),
@@ -56,9 +56,6 @@ TABLES = {'event': EVENT,
           'station': STATION,
           'channel': CHANNEL,
           'pgm': PGM}
-
-# 2018-03-21T21:19:16.625Z
-TIMEFMT = '%Y-%m-%dT%H:%M:%S'
 
 # database file name
 DBFILE = 'amps.db'
@@ -231,7 +228,7 @@ class AmplitudeHandler(object):
         event['mag'] = event['magnitude']
         del event['magnitude']
         event['time'] = datetime.fromtimestamp(event['time']).\
-            strftime(queue.TIMEFMT)
+            strftime(constants.TIMEFMT)
         if event['repeats']:
             event['repeats'] = json.loads(event['repeats'])
         return event
@@ -605,8 +602,14 @@ class AmplitudeHandler(object):
                 time_dict['msec'] = int(child.get('value'))
         if has_pgm:
             pgmtime_str = reference.find('PGMTime').text
-            pgmdate = datetime.strptime(pgmtime_str[0:19], TIMEFMT).\
-                replace(tzinfo=timezone.utc)
+            try:
+                tfmt = constants.TIMEFMT.replace('Z', '')
+                pgmdate = datetime.strptime(
+                    pgmtime_str[0:19], tfmt).replace(tzinfo=timezone.utc)
+            except ValueError:
+                tfmt = constants.ALT_TIMEFMT.replace('Z', '')
+                pgmdate = datetime.strptime(
+                    pgmtime_str[0:19], tfmt).replace(tzinfo=timezone.utc)
             pgmtime = int(dt_to_timestamp(pgmdate))
         else:
             if not len(time_dict):
@@ -871,8 +874,12 @@ def dt_to_timestamp(dt):
 
 
 def timestr_to_timestamp(timestr):
-    timestamp = int(datetime.strptime(timestr, queue.TIMEFMT).
-                    replace(tzinfo=timezone.utc).timestamp())
+    try:
+        timestamp = int(datetime.strptime(timestr, constants.TIMEFMT).
+                        replace(tzinfo=timezone.utc).timestamp())
+    except ValueError:
+        timestamp = int(datetime.strptime(timestr, constants.ALT_TIMEFMT).
+                        replace(tzinfo=timezone.utc).timestamp())
     return timestamp
 
 

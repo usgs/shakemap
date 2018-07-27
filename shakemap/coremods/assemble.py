@@ -27,7 +27,7 @@ from shakemap.utils.config import (get_config_paths,
                                    get_logging_config,
                                    path_macro_sub)
 from shakemap.utils.amps import AmplitudeHandler
-import shakemap.utils.queue as queue
+from shakelib.rupture import constants
 
 
 class AssembleModule(CoreModule):
@@ -259,7 +259,7 @@ class AssembleModule(CoreModule):
             event = {'id': self._eventid,
                      'netid': origin.netid,
                      'network': origin.network,
-                     'time': origin.time.strftime(queue.TIMEFMT),
+                     'time': origin.time.strftime(constants.TIMEFMT),
                      'lat': origin.lat,
                      'lon': origin.lon,
                      'depth': origin.depth,

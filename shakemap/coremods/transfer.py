@@ -18,8 +18,7 @@ from shakemap.utils.config import (get_config_paths,
                                    get_data_path,
                                    config_error)
 from shakemap.utils.macros import get_macros
-
-TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
+from shakelib.rupture import constants
 
 NO_TRANSFER = 'NO_TRANSFER'
 
@@ -82,7 +81,7 @@ class TransferModule(CoreModule):
         results = config.validate(Validator())
         if not isinstance(results, bool) or not results:
             config_error(config, results)
-        
+
         # get the output container with all the things in it
         datafile = os.path.join(products_dir, 'shake_result.hdf')
         if not os.path.isfile(datafile):
@@ -126,7 +125,7 @@ def _transfer(config, info, pdl_dir, products_dir, cancel=False):
 
     # get the macros that may be in the email sender config
     macros = get_macros(info)
-    
+
     properties, product_properties = _get_properties(info)
 
     # get the config information:
@@ -159,16 +158,17 @@ def _transfer(config, info, pdl_dir, products_dir, cancel=False):
                         product_properties=product_properties)
                 elif transfer_method == 'email':
                     # replace macro strings with actual strings
-                    for pkey,param in params.items():
+                    for pkey, param in params.items():
                         for macro, replacement in macros.items():
-                            if isinstance(param,str):
-                                param = param.replace('[%s]' % macro,replacement)
+                            if isinstance(param, str):
+                                param = param.replace('[%s]' % macro,
+                                                      replacement)
                                 params[pkey] = param
-                                
+
                     # get full path to all file attachments
                     attachments = []
                     for lfile in params['attachments']:
-                        fullfile = os.path.join(products_dir,lfile)
+                        fullfile = os.path.join(products_dir, lfile)
                         if not os.path.isfile(fullfile):
                             logging.warn('%s does not exist.' % fullfile)
                         attachments.append(fullfile)
@@ -226,7 +226,12 @@ def _get_properties(info):
     properties['latitude'] = float(origin['latitude'])
     properties['longitude'] = float(origin['longitude'])
     properties['depth'] = float(origin['depth'])
-    properties['eventtime'] = datetime.strptime(origin['origin_time'], TIMEFMT)
+    try:
+        properties['eventtime'] = datetime.strptime(origin['origin_time'],
+                                                    constants.TIMEFMT)
+    except ValueError:
+        properties['eventtime'] = datetime.strptime(origin['origin_time'],
+                                                    constants.ALT_TIMEFMT)
 
     product_properties['event-type'] = origin['event_type']
     product_properties['event-description'] = origin['event_description']

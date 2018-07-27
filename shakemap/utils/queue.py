@@ -16,10 +16,9 @@ from shapely.geometry import (Polygon,
 
 from shakemap.utils.config import (config_error,
                                    get_configspec)
+from shakelib.rupture import constants
 
 MAX_SIZE = 4096
-TIMEFMT = '%Y-%m-%dT%H:%M:%S.%fZ'
-ALT_TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def send_queue(command, data, port=9755):
@@ -195,8 +194,12 @@ def event_too_old_or_in_future(event, config):
     """
 
     current_time = time.time()
-    event_time = datetime.strptime(event['time'], TIMEFMT).\
-        replace(tzinfo=timezone.utc).timestamp()
+    try:
+        event_time = datetime.strptime(event['time'], constants.TIMEFMT).\
+            replace(tzinfo=timezone.utc).timestamp()
+    except ValueError:
+        event_time = datetime.strptime(event['time'], constants.ALT_TIMEFMT).\
+            replace(tzinfo=timezone.utc).timestamp()
     if config['old_event_age'] >= 0 and \
        event_time + config['old_event_age'] < current_time:
         return True

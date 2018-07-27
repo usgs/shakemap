@@ -15,6 +15,7 @@ from shapely.geometry import Polygon
 
 import shakemap.utils.queue as queue
 from shakemap.utils.config import get_config_paths
+from shakelib.rupture import constants
 
 
 def get_dummy_logger(name):
@@ -99,22 +100,22 @@ def test_event_too_old_or_in_future():
 
     delta = timedelta(days=180)
     dt_past = dt - delta
-    event = {'time': dt_past.strftime(queue.TIMEFMT)}
+    event = {'time': dt_past.strftime(constants.TIMEFMT)}
     assert queue.event_too_old_or_in_future(event, config) is False
 
     delta = timedelta(days=400)
     dt_past = dt - delta
-    event = {'time': dt_past.strftime(queue.TIMEFMT)}
+    event = {'time': dt_past.strftime(constants.TIMEFMT)}
     assert queue.event_too_old_or_in_future(event, config) is True
 
     delta = timedelta(minutes=4)
     dt_future = dt + delta
-    event = {'time': dt_future.strftime(queue.TIMEFMT)}
+    event = {'time': dt_future.strftime(constants.TIMEFMT)}
     assert queue.event_too_old_or_in_future(event, config) is False
 
     delta = timedelta(minutes=10)
     dt_future = dt + delta
-    event = {'time': dt_future.strftime(queue.TIMEFMT)}
+    event = {'time': dt_future.strftime(constants.TIMEFMT)}
     assert queue.event_too_old_or_in_future(event, config) is True
 
 

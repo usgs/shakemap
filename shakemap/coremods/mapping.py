@@ -50,6 +50,7 @@ from shakemap.utils.config import (get_config_paths,
 from .base import CoreModule
 from impactutils.time.ancient_time import HistoricTime
 from shakemap.utils.utils import get_object_from_config
+from shakelib.rupture import constants
 
 
 CITY_COLS = 2
@@ -777,8 +778,12 @@ class MapMaker(object):
         hlat = origin.lat
         edict = self.container.getMetadata()['input']['event_information']
         eloc = edict['event_description']
-        etime = datetime.strptime(
-            edict['origin_time'], '%Y-%m-%dT%H:%M:%SZ')
+        try:
+            etime = datetime.strptime(edict['origin_time'],
+                                      constants.TIMEFMT)
+        except ValueError:
+            etime = datetime.strptime(edict['origin_time'],
+                                      constants.ALT_TIMEFMT)
         timestr = etime.strftime('%b %d, %Y %H:%M:%S')
         mag = origin.mag
         if hlon < 0:
