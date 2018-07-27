@@ -175,7 +175,8 @@ def contour_to_files(container, output_dir, logger,
         'properties': {
             'value': 'float',
             'units': 'str',
-            'color': 'str'
+            'color': 'str',
+            'weight': 'int'
         }
     }
     mmi_schema = {
