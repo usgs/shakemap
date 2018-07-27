@@ -5,10 +5,14 @@ if [ "$unamestr" == 'Linux' ]; then
     prof=~/.bashrc
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh
     matplotlibdir=~/.config/matplotlib
+    channel_url=ftp://ftpext.usgs.gov/pub/cr/co/golden/emthompson/shakemap-linux.tar
+    channel=shakemap-linux
 elif [ "$unamestr" == 'FreeBSD' ] || [ "$unamestr" == 'Darwin' ]; then
     prof=~/.bash_profile
     mini_conda_url=https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
     matplotlibdir=~/.matplotlib
+    channel_url=ftp://ftpext.usgs.gov/pub/cr/co/golden/emthompson/shakemap-osx.tar
+    channel=shakemap-osx
 else
     echo "Unsupported environment. Exiting."
     exit
@@ -16,9 +20,7 @@ fi
 
 source $prof
 
-# echo "Path:"
-# echo $PATH
-
+# Name of virtual environment
 VENV=shakemap
 
 
@@ -63,7 +65,7 @@ if [ $? -ne 0 ]; then
 
     # if curl fails, bow out gracefully
     if [ $? -ne 0 ];then
-        echo "Failed to create download miniconda installer shell script. Exiting."
+        echo "Failed to download miniconda installer shell script. Exiting."
         exit 1
     fi
     
@@ -82,10 +84,21 @@ else
     echo "conda detected, installing $VENV environment..."
 fi
 
-# echo "PATH:"
-# echo $PATH
-# echo ""
+# Download frozen channel
+echo "Downloading shakemap channel..."
+curl $channel_url -o $channel.tar
+# if curl fails, bow out gracefully
+if [ $? -ne 0 ];then
+    echo "Failed to download channel. Exiting."
+    exit 1
+fi
 
+# Un tar the channel
+tar -xvf $channel.tar
+if [ $? -ne 0 ];then
+    echo "Failed to extract channel. Exiting."
+    exit 1
+fi
 
 # Choose an environment file based on platform
 # only add this line if it does not already exist
@@ -107,7 +120,9 @@ conda remove -y -n $VENV --all
 # Create a conda virtual environment
 echo "Creating the $VENV virtual environment:"
 # conda env create -f $env_file --force
-conda create -y --force -n $VENV -c conda-forge python=3.5 \
+conda create -y --override-channels -n $VENV \
+      -c file://$PWD/$channel \
+      python=3.5 \
       amptools \
       basemap \
       cartopy \
