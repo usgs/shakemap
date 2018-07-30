@@ -14,7 +14,8 @@ from openquake.hazardlib import imt
 
 # local imports
 from .base import CoreModule
-from shakemap.utils.config import get_config_paths, get_logging_config
+from shakemap.utils.config import get_config_paths
+from shakemap.utils.logging import get_logging_config
 from shakelib.plotting.contour import contour
 from shakemap.utils.utils import get_object_from_config
 from shakelib.utils.containers import ShakeMapOutputContainer

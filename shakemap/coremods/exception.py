@@ -9,7 +9,7 @@ import logging
 
 # local imports
 from .base import CoreModule
-from shakemap.utils.config import get_logging_config
+from shakemap.utils.logging import get_logging_config
 
 
 class ExceptionModule(CoreModule):
