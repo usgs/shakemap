@@ -518,16 +518,16 @@ def check_profile_config(config):
         data_exists = os.path.isdir(config['profiles'][profile]['data_path'])
         delete_profile = False
         if not data_exists:
-            logging.error('Data path for profile %s does not exist.' % profile)
+            logging.warn('Data path for profile %s does not exist.' % profile)
             delete_profile = True
         install_exists = os.path.isdir(
             config['profiles'][profile]['install_path'])
         if not install_exists:
-            logging.error(
+            logging.warn(
                 'Install path for profile %s does not exist.' % profile)
             delete_profile = True
         if delete_profile:
-            logging.error('    Deleting profile %s.' % profile)
+            logging.warn('    Deleting profile %s.' % profile)
             del config['profiles'][profile]
             config.write()
     return config
