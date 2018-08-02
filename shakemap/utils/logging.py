@@ -102,23 +102,45 @@ def get_logger(eventid, log_option=None, log_file=None):
                                      "not found" % eventid)
         event_log_file = os.path.join(event_log_dir, 'shake.log')
         config['handlers']['event_file']['filename'] = event_log_file
+
         if log_option == 'debug':
             config['handlers']['event_file']['level'] = logging.DEBUG
         elif log_option == 'quiet':
             config['handlers']['event_file']['level'] = logging.ERROR
+        elif 'level' in config['handlers']['event_file'] and \
+             config['handlers']['event_file']['level'] in LOG_LEVELS:
+            config['handlers']['event_file']['level'] = \
+                LOG_LEVELS[config['handlers']['event_file']['level']]
+        else:
+            config['handlers']['event_file']['level'] = logging.INFO
         global_log_dir = os.path.join(install_path, 'logs')
+
         if not os.path.isdir(global_log_dir):
             os.makedirs(global_log_dir, exist_ok=True)
         global_log_file = os.path.join(global_log_dir, 'shake.log')
         config['handlers']['global_file']['filename'] = global_log_file
+
         if log_option == 'debug':
             config['handlers']['global_file']['level'] = logging.DEBUG
         elif log_option == 'quiet':
             config['handlers']['global_file']['level'] = logging.ERROR
+        elif 'level' in config['handlers']['global_file'] and \
+             config['handlers']['global_file']['level'] in LOG_LEVELS:
+            config['handlers']['global_file']['level'] = \
+                LOG_LEVELS[config['handlers']['global_file']['level']]
+        else:
+            config['handlers']['global_file']['level'] = logging.INFO
+
         if log_option == 'debug':
             config['loggers']['']['level'] = logging.DEBUG
         elif log_option == 'quiet':
             config['loggers']['']['level'] = logging.ERROR
+        elif 'level' in config['loggers'][''] and \
+             config['loggers']['']['level'] in LOG_LEVELS:
+            config['loggers']['']['level'] = \
+                LOG_LEVELS[config['loggers']['']['level']]
+        else:
+            config['loggers']['']['level'] = logging.INFO
 
         logging.config.dictConfig(config)
 
@@ -191,3 +213,80 @@ def _clean_log_dict(config):
         for key, value in handler.items():
             if key not in req_fields:
                 del handler[key]
+
+
+def get_generic_logger(logfile=None, format=None, datefmt=None, level=None):
+    """Returns a generic logging configuration dictionary that may be used
+    by programs like receive_amps and receive_origins to create a logger.
+    If the format and/or the  datefmt are not specified, they will be taken
+    from the config in the operator's logging.conf. If logfile is not
+    specified, the configuration will be for a stream handler. If level
+    is not specified, it will be logging.INFO.
+
+    Args:
+        logfile:
+            The path to the file to receive the logging information. This
+            will be a TimedRotatingFilehandler that will reset at midnight
+            every night. If logfile is not specified, a StreamHandler will
+            be configured.
+        format:
+            The format string for the logging messages. If it is not
+            supplied, the string from the current profile's logging.conf
+            will be used.
+        datefmt:
+            The format string for the logging date/time. If it is not
+            supplied, the string from the current profile's logging.conf
+            will be used.
+        level:
+            The logging level. If not specified, it will be 'INFO'. Other
+            valid choices are 'DEBUG', 'WARNING', or 'ERROR'.
+
+    Returns:
+        logger: A logger suitable for logging messages.
+    """
+    if format is None or datefmt is None:
+        config = get_logging_config()
+    if format is None:
+        format = config['formatters']['standard']['format']
+    if datefmt is None:
+        datefmt = config['formatters']['standard']['datefmt']
+
+    if logfile is None:
+        handler = 'logging.StreamHandler'
+    else:
+        handler = 'logging.handlers.TimedRotatingFilehandler'
+
+    if level is None:
+        level = 'INFO'
+
+    log_cfg = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'standard': {
+                'format': format,
+                'datefmt': datefmt,
+            },
+        },
+        'handlers': {
+            'default': {
+                'level': 'INFO',
+                'formatter': 'standard',
+                'class': handler,
+                'when': 'midnight'
+            },
+        },
+        'loggers': {
+            '': {
+                'handlers': ['default'],
+                'level': level,
+                'propagate': True
+            },
+        }
+    }
+
+    if logfile:
+        log_cfg['handlers']['default']['filename'] = logfile
+    logging.config.dictConfig(log_cfg)
+    logger = logging.getLogger()
+    return logger
