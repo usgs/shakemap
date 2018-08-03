@@ -23,10 +23,18 @@ source $prof
 # Name of virtual environment
 VENV=shakemap
 
+# Is the reset flag set? If not, use the frozen conda channel to install.
+# Otherwise, try to install from conda forge.
+reset=0
+while getopts r FLAG; do
+  case $FLAG in
+    r)
+        reset=1
+        
+      ;;
+  esac
+done
 
-# this is an experiment to see if we can get away without the platform specific
-# environment files.
-reset=1
 
 # create a matplotlibrc file with the non-interactive backend "Agg" in it.
 if [ ! -d "$matplotlibdir" ]; then
@@ -84,20 +92,24 @@ else
     echo "conda detected, installing $VENV environment..."
 fi
 
-# Download frozen channel
-echo "Downloading shakemap channel..."
-curl $channel_url -o $channel.tar
-# if curl fails, bow out gracefully
-if [ $? -ne 0 ];then
-    echo "Failed to download channel. Exiting."
-    exit 1
-fi
+if [ $reset == 0 ]; then
+    # Download frozen channel
+    echo "Downloading shakemap channel..."
+    curl $channel_url -o $channel.tar
+    # if curl fails, bow out gracefully
+    if [ $? -ne 0 ];then
+	echo "Failed to download channel. Exiting."
+	exit 1
+    fi
 
-# Un tar the channel
-tar -xvf $channel.tar
-if [ $? -ne 0 ];then
-    echo "Failed to extract channel. Exiting."
-    exit 1
+    # Un tar the channel
+    tar -xvf $channel.tar
+    if [ $? -ne 0 ];then
+	echo "Failed to extract channel. Exiting."
+	exit 1
+    fi
+else
+    echo "Installing packages from conda-forge"
 fi
 
 # Choose an environment file based on platform
@@ -117,44 +129,52 @@ conda activate base
 # Remove existing shakemap environment if it exists
 conda remove -y -n $VENV --all
 
+
+# Package list:
+package_list='
+      python=3.5
+      amptools
+      basemap
+      cartopy
+      defusedxml
+      descartes
+      docutils
+      configobj
+      fiona
+      gdal
+      h5py
+      impactutils
+      libcomcat
+      lockfile
+      mapio
+      matplotlib
+      numexpr
+      numpy
+      obspy
+      openquake.engine
+      pandas
+      ps2ff
+      psutil
+      pyproj
+      pytest
+      pytest-cov
+      python-daemon
+      pytest-faulthandler
+      scikit-image
+      scipy
+      shapely
+      strec
+      versioneer 
+'
+
 # Create a conda virtual environment
 echo "Creating the $VENV virtual environment:"
-# conda env create -f $env_file --force
-conda create -y --override-channels -n $VENV \
-      -c file://$PWD/$channel \
-      python=3.5 \
-      amptools \
-      basemap \
-      cartopy \
-      defusedxml \
-      descartes \
-      docutils \
-      configobj \
-      fiona \
-      gdal \
-      h5py \
-      impactutils \
-      libcomcat \
-      lockfile \
-      mapio \
-      matplotlib \
-      numexpr \
-      numpy \
-      obspy \
-      openquake.engine \
-      pandas \
-      ps2ff \
-      psutil \
-      pyproj \
-      pytest \
-      pytest-cov \
-      python-daemon \
-      pytest-faulthandler \
-      scikit-image \
-      scipy \
-      shapely \
-      strec \
-      versioneer 
+if [ $reset == 0 ]; then
+    conda create -y --override-channels -n $VENV \
+          -c file://$PWD/$channel $package_list
+else
+    conda create -y -n $VENV -c conda-forge $package_list
+fi
 
 
 # Bail out at this point if the conda create command fails.
