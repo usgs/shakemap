@@ -24,8 +24,8 @@ from shakemap.utils.config import (get_config_paths,
                                    config_error,
                                    check_config,
                                    get_configspec,
-                                   get_logging_config,
                                    path_macro_sub)
+from shakemap.utils.logging import get_logging_config
 
 
 class AugmentModule(CoreModule):

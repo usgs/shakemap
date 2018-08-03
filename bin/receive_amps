@@ -5,38 +5,11 @@ import argparse
 import os.path
 import sys
 import glob
-import logging
 
 # local imports
 from shakemap.utils.config import get_config_paths
 from shakemap.utils.amps import AmplitudeHandler
-
-LOG_CFG = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format': '%(levelname)s -- %(asctime)s -- '
-                      '%(module)s.%(funcName)s -- %(message)s',
-            'datefmt': '%Y-%m-%d %H:%M:%S',
-        },
-    },
-    'handlers': {
-        'default': {
-            'level': 'INFO',
-            'formatter': 'standard',
-            'class': 'logging.handlers.TimedRotatingFileHandler',
-            'when': 'midnight',
-        },
-    },
-    'loggers': {
-        '': {
-            'handlers': ['default'],
-            'level': 'INFO',
-            'propagate': True
-        },
-    }
-}
+from shakemap.utils.logging import get_generic_logger
 
 LOGFILE = 'amps.log'
 
@@ -69,10 +42,7 @@ def main(args):
 
     # set up a daily rotating file handler logger
     logfile = os.path.join(install_path, 'logs', LOGFILE)
-    log_cfg = LOG_CFG.copy()
-    log_cfg['handlers']['default']['filename'] = logfile
-    logging.config.dictConfig(log_cfg)
-    logger = logging.getLogger()
+    logger = get_generic_logger(logfile=logfile)
 
     logger.info('Parsing input directory %s' % args.directory)
 

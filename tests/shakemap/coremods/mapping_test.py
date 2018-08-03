@@ -18,8 +18,8 @@ from shakemap.coremods.model import ModelModule
 from shakelib.utils.containers import ShakeMapOutputContainer
 from shakemap.utils.config import (get_configspec,
                                    get_custom_validator,
-                                   config_error,
-                                   get_logger)
+                                   config_error)
+from shakemap.utils.logging import get_logger
 from impactutils.time.ancient_time import HistoricTime
 from shakelib.rupture.factory import get_rupture
 from shakelib.rupture.origin import Origin

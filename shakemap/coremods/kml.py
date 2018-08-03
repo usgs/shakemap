@@ -18,10 +18,10 @@ import numpy as np
 # local imports
 from .base import CoreModule
 from shakemap.utils.config import (get_config_paths,
-                                   get_logging_config,
                                    get_configspec,
                                    get_custom_validator,
                                    config_error)
+from shakemap.utils.logging import get_logging_config
 from shakelib.plotting.contour import contour
 from impactutils.colors.cpalette import ColorPalette
 from mapio.grid2d import Grid2D
