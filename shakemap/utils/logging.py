@@ -60,7 +60,7 @@ def get_logger(eventid, log_option=None, log_file=None):
     install_path, data_path = get_config_paths()
     config = get_logging_config()
     if log_file is None:
-        format = config['formatters']['standard']['format']
+        fmt = config['formatters']['standard']['format']
         datefmt = config['formatters']['standard']['datefmt']
         # create a console handler, with verbosity setting chosen by user
         if log_option == 'debug':
@@ -74,7 +74,7 @@ def get_logger(eventid, log_option=None, log_file=None):
             'version': 1,
             'formatters': {
                 'standard': {
-                    'format': format,
+                    'format': fmt,
                     'datefmt': datefmt
                 }
             },
@@ -166,7 +166,7 @@ def get_logging_config():
         dict: Dictionary suitable for use with logging.config.dictConfig().
     """
 
-    install_path, data_path = get_config_paths()
+    install_path, _ = get_config_paths()
     conf_file = os.path.join(install_path, 'config', 'logging.conf')
     spec_file = get_configspec(config='logging')
     log_config = ConfigObj(conf_file,
@@ -207,18 +207,18 @@ def _clean_log_dict(config):
         dict: Dictionary suitable for use with logging.config.dictConfig().
 
     """
-    for handlerkey, handler in config['handlers'].items():
+    for handler in config['handlers'].values():
         myclass = handler['class']
         req_fields = REQ_FIELDS[myclass]
-        for key, value in handler.items():
+        for key in handler.keys():
             if key not in req_fields:
                 del handler[key]
 
 
-def get_generic_logger(logfile=None, format=None, datefmt=None, level=None):
+def get_generic_logger(logfile=None, fmt=None, datefmt=None, level=None):
     """Returns a generic logging configuration dictionary that may be used
     by programs like receive_amps and receive_origins to create a logger.
-    If the format and/or the  datefmt are not specified, they will be taken
+    If the fmt and/or the  datefmt are not specified, they will be taken
     from the config in the operator's logging.conf. If logfile is not
     specified, the configuration will be for a stream handler. If level
     is not specified, it will be logging.INFO.
@@ -229,7 +229,7 @@ def get_generic_logger(logfile=None, format=None, datefmt=None, level=None):
             will be a TimedRotatingFilehandler that will reset at midnight
             every night. If logfile is not specified, a StreamHandler will
             be configured.
-        format:
+        fmt:
             The format string for the logging messages. If it is not
             supplied, the string from the current profile's logging.conf
             will be used.
@@ -244,10 +244,10 @@ def get_generic_logger(logfile=None, format=None, datefmt=None, level=None):
     Returns:
         logger: A logger suitable for logging messages.
     """
-    if format is None or datefmt is None:
+    if fmt is None or datefmt is None:
         config = get_logging_config()
-    if format is None:
-        format = config['formatters']['standard']['format']
+    if fmt is None:
+        fmt = config['formatters']['standard']['format']
     if datefmt is None:
         datefmt = config['formatters']['standard']['datefmt']
 
@@ -264,7 +264,7 @@ def get_generic_logger(logfile=None, format=None, datefmt=None, level=None):
         'disable_existing_loggers': False,
         'formatters': {
             'standard': {
-                'format': format,
+                'format': fmt,
                 'datefmt': datefmt,
             },
         },
