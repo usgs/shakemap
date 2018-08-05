@@ -116,6 +116,8 @@ def contour(container, imtype, component, filter_size, gmice):
                     props['weight'] = 4
                 else:
                     props['weight'] = 2
+            else:
+                props['weight'] = 4
             line_strings.append(
                 {
                     'geometry': mapping(mls),

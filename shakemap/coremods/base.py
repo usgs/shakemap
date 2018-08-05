@@ -12,7 +12,8 @@ from collections import OrderedDict
 from lxml import etree
 
 # local imports
-from shakemap.utils.config import get_logging_config, get_config_paths
+from shakemap.utils.config import get_config_paths
+from shakemap.utils.logging import get_logging_config
 
 
 class CoreModule(ABC):

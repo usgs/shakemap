@@ -17,11 +17,10 @@ from validate import Validator
 import shlex
 
 # local imports
-from shakemap.utils.config import (
-    get_config_paths,
-    get_logger,
-    get_configspec,
-    config_error)
+from shakemap.utils.config import (get_config_paths,
+                                   get_configspec,
+                                   config_error)
+from shakemap.utils.logging import get_logger
 from shakemap.utils.dependencies import CommandDatabase
 from shakelib.rupture.origin import read_event_file
 
@@ -107,16 +106,17 @@ def _format_error_info(exception, eventid):
             edict = read_event_file(datafile)
             mag = edict['mag']
             loc = edict['locstring']
-            eqinfo = 'M%.1f %s' % (mag,loc)
-    
+            eqinfo = 'M%.1f %s' % (mag, loc)
+
     stringio = io.StringIO()
     ex_type, ex, tb = sys.exc_info()
     traceback.print_tb(tb, file=stringio)
     stack_trace = stringio.getvalue()
     stringio.close()
     hostname = socket.gethostname()
-    fmt = '\nEarthquake: %s\nHost: %s\nEvent ID: %s\nException: %s\nStack Trace: %s'
-    error_msg = fmt % (eqinfo,hostname, eventid, str(exception), stack_trace)
+    fmt = ('\nEarthquake: %s\nHost: %s\nEvent ID: %s\nException: %s\n'
+           'Stack Trace: %s')
+    error_msg = fmt % (eqinfo, hostname, eventid, str(exception), stack_trace)
     return error_msg
 
 

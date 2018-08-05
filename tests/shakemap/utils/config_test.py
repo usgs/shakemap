@@ -9,6 +9,7 @@ from configobj import ConfigObj
 from validate import ValidateError
 
 import shakemap.utils.config as config
+from shakemap.utils.logging import get_logger
 
 
 def test_config():
@@ -20,17 +21,16 @@ def test_config():
     log_file = os.path.join(data_dir, 'nc72282711', 'shake.log')
     if os.path.isfile(log_file):
         os.remove(log_file)
-    logger = config.get_logger('nc72282711', log_file=True,
-                               log_option='debug')
+    logger = get_logger('nc72282711', log_file=True, log_option='debug')
     logger.debug('xyxyxyzz')
     with open(log_file, 'r') as log_fd:
         line = log_fd.readline()
         assert 'xyxyxyzz' in line
     os.remove(log_file)
 
-    logger = config.get_logger('nc72282711', log_option='quiet')
-    logger = config.get_logger('nc72282711')
-    logger = config.get_logger('nc72282711', log_option='debug')
+    logger = get_logger('nc72282711', log_option='quiet')
+    logger = get_logger('nc72282711')
+    logger = get_logger('nc72282711', log_option='debug')
 
     #
     # Some stuff we just call and see if it bombs out
