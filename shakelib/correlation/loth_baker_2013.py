@@ -3,6 +3,9 @@ from scipy.interpolate import RectBivariateSpline
 import numexpr as ne
 import itertools as it
 
+from shakelib.correlation.ccf_base import CrossCorrelationBase
+
+# Periods that apply to the axes in the cross-correlation tables
 Tlist = np.array([0.01, 0.1, 0.2, 0.5, 1, 2, 5, 7.5, 10.0001])
 
 # Table II. Short range coregionalization matrix, B1
@@ -45,7 +48,7 @@ B3 = np.array([
 ])
 
 
-class LothBaker2013(object):
+class LothBaker2013(CrossCorrelationBase):
     """
     Created by Christophe Loth, 12/18/2012
     Pythonized and vectorized by C. Bruce Worden, 3/15/2017
@@ -55,7 +58,7 @@ class LothBaker2013(object):
     The function is strictly empirical, fitted over the range the range
     0.01s <= t1, t2 <= 10s
 
-    Documentation is provided in the following document:
+    Documentation is provided in the following paper:
     Loth, C., and Baker, J. W. (2013). “A spatial cross-correlation model of
     ground motion spectral accelerations at multiple periods.”
     Earthquake Engineering & Structural Dynamics, 42, 397-417.
@@ -67,7 +70,7 @@ class LothBaker2013(object):
 
         Args:
             periods (numpy.array): An array of periods that will be requested
-                from the function. Values must be [0.01 -> 10.0], and must me
+                from the function. Values must be [0.01 -> 10.0], and must be
                 sorted from smallest to largest.
 
         Returns:
@@ -119,7 +122,7 @@ class LothBaker2013(object):
         # Verify the validity of input arguments
         if np.any(h < 0):
             raise ValueError('The separation distance must be positive')
-        if np.shape(ix1) != np.shape(ix2) or np.shape(ix1) != np.shape(h):
+        if np.shape(ix1) != np.shape(ix2) != np.shape(h):
             raise ValueError(
                 'The input arguments must all have the same dimensions')
 
@@ -131,10 +134,12 @@ class LothBaker2013(object):
         b1 = self.b1[ix1, ix2]  # noqa
         b2 = self.b2[ix1, ix2]  # noqa
         b3 = self.b3[ix1, ix2]  # noqa
+        afact = -3.0 / 20.0  # noqa
+        bfact = -3.0 / 70.0  # noqa
         #
         # Compute the correlation coefficient (Equation 42)
         #
         rho = ne.evaluate(
-            "b1 * exp(-3 * h / 20) + b2 * exp(-3 * h / 70) + (h == 0) * b3")
+            "b1 * exp(h * afact) + b2 * exp(h * bfact) + (h == 0) * b3")
 
         return rho
