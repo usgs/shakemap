@@ -1,7 +1,9 @@
 import numpy as np
 
+from shakelib.correlation.ccf_base import CrossCorrelationBase
 
-class DummyCorrelation(object):
+
+class DummyCorrelation(CrossCorrelationBase):
     """
     Simplified correlation module for testing purposes. Should not be used
     in productions runs as it does not produce valid correlations.
