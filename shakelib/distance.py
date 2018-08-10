@@ -128,6 +128,8 @@ class Distance(object):
             ddict = get_distance(list(requires), lat, lon, dep, self._rupture)
         for method in requires:
             (context.__dict__)[method] = ddict[method]
+            if method in ('rrup', 'rjb'):
+                (context.__dict__)[method + '_var'] = ddict[method + '_var']
 
         return context
 
@@ -225,10 +227,12 @@ def get_distance(methods, lat, lon, dep, rupture, dx=0.5):
     # -------------------------------------------------------------------------
     gc2_distances = set(['rx', 'ry', 'ry0', 'U', 'T'])
     if 'rrup' in methods:
-        distdict['rrup'] = rupture.computeRrup(lon, lat, dep)
+        distdict['rrup'], distdict['rrup_var'] = rupture.computeRrup(lon, lat,
+                                                                     dep)
 
     if 'rjb' in methods:
-        distdict['rjb'] = rupture.computeRjb(lon, lat, dep)
+        distdict['rjb'], distdict['rjb_var'] = rupture.computeRjb(lon, lat,
+                                                                  dep)
 
     # If any of the GC2-related distances are requested, may as well do all
     if len(set(methods).intersection(gc2_distances)) > 0:

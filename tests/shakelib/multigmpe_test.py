@@ -63,6 +63,8 @@ def test_basic():
 
     dctx.rjb = np.logspace(1, np.log10(800), 100)
     dctx.rrup = dctx.rjb
+    dctx.rjb_var = None
+    dctx.rrup_var = None
     dctx.rhypo = dctx.rjb
     dctx.rx = dctx.rjb
     dctx.ry0 = dctx.rjb
@@ -79,7 +81,7 @@ def test_basic():
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
 
     np.testing.assert_allclose(lmean_ask14, lmean_mgmpe)
-    np.testing.assert_allclose(sd_ask14, sd_mgmpe)
+    np.testing.assert_allclose(sd_ask14, [sd_mgmpe[0]])
 
     # Two similar GMPEs, both with site terms
     CY14 = ChiouYoungs2014()
@@ -206,6 +208,8 @@ def test_from_config_set_of_sets():
 
     dctx.rjb = np.logspace(1, np.log10(800), 100)
     dctx.rrup = dctx.rjb
+    dctx.rjb_var = None
+    dctx.rrup_var = None
     dctx.rhypo = dctx.rjb
     dctx.rx = dctx.rjb
     dctx.ry0 = dctx.rjb
@@ -218,20 +222,24 @@ def test_from_config_set_of_sets():
     sctx = MultiGMPE.set_sites_depth_parameters(sctx, ASK14)
     sctx_rock = MultiGMPE.set_sites_depth_parameters(sctx_rock, ASK14)
 
-    lmean_ask14, dummy = ASK14.get_mean_and_stddevs(
+    lmean_ask14, lsd_ask14 = ASK14.get_mean_and_stddevs(
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
     lmean_ask14_rock, dummy = ASK14.get_mean_and_stddevs(
         sctx_rock, rctx, dctx, IMT, [const.StdDev.TOTAL])
-    lmean_c03, dummy = C03.get_mean_and_stddevs(
+
+    lmean_c03, lsd_c03 = C03.get_mean_and_stddevs(
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
     bk17 = BooreKishida2017(C03.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT,
                             const.IMC.RotD50)
     lmean_c03 = bk17.convertAmps(IMT, lmean_c03, dctx.rrup, rctx.mag)
-    lmean_pea11, dummy = Pea11.get_mean_and_stddevs(
+    lsd_c03 = bk17.convertSigmas(IMT, lsd_c03[0])
+
+    lmean_pea11, lsd_pea11 = Pea11.get_mean_and_stddevs(
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
     bk17 = BooreKishida2017(Pea11.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT,
                             const.IMC.RotD50)
     lmean_pea11 = bk17.convertAmps(IMT, lmean_pea11, dctx.rrup, rctx.mag)
+    lsd_pea11 = bk17.convertSigmas(IMT, lsd_pea11[0])
 
     lmean_acr = copy.copy(lmean_ask14)
     lamp = lmean_ask14 - lmean_ask14_rock
@@ -242,6 +250,19 @@ def test_from_config_set_of_sets():
     lmean, sd = test.get_mean_and_stddevs(
         sctx, rctx, dctx, IMT, [const.StdDev.TOTAL])
     np.testing.assert_allclose(lmean_target, lmean)
+
+    # Do the stddev
+    lnsd2_scr = (0.5 * ((lmean_c03 + lamp)**2 + lsd_c03**2) +
+                 0.5 * ((lmean_pea11 + lamp)**2 + lsd_pea11**2))
+    lnsd2_scr[dctx.rjb > 500] = \
+        ((lmean_pea11 + lamp)**2 + lsd_pea11**2)[dctx.rjb > 500]
+    lnsd2_scr = np.sqrt(lnsd2_scr - lmean_scr**2)
+    lnsd2_acr = 1.0 * (lmean_ask14**2 + lsd_ask14[0]**2)
+    lnsd2_acr = np.sqrt(lnsd2_acr - lmean_acr**2)
+    lnsd2 = (0.8 * (lmean_acr**2 + lnsd2_acr**2) +
+             0.2 * (lmean_scr**2 + lnsd2_scr**2))
+    lnsd2 = np.sqrt(lnsd2 - lmean_target**2)
+    np.testing.assert_allclose(lnsd2, sd[0])
 
 
 def test_from_config_set_of_gmpes():
@@ -296,6 +317,8 @@ def test_from_config_set_of_gmpes():
 
     dctx.rjb = np.logspace(1, np.log10(800), 100)
     dctx.rrup = dctx.rjb
+    dctx.rjb_var = None
+    dctx.rrup_var = None
     dctx.rhypo = dctx.rjb
     dctx.rx = dctx.rjb
     dctx.ry0 = dctx.rjb
@@ -392,6 +415,8 @@ def test_from_config_set_of_sets_3_sec():
 
     dctx.rjb = np.logspace(1, np.log10(800), 100)
     dctx.rrup = dctx.rjb
+    dctx.rjb_var = None
+    dctx.rrup_var = None
     dctx.rhypo = dctx.rjb
     dctx.rx = dctx.rjb
     dctx.ry0 = dctx.rjb
@@ -476,6 +501,8 @@ def test_from_config_single_gmpe():
 
     dctx.rjb = np.logspace(1, np.log10(800), 100)
     dctx.rrup = dctx.rjb
+    dctx.rjb_var = None
+    dctx.rrup_var = None
     dctx.rhypo = dctx.rjb
     dctx.rx = dctx.rjb
     dctx.ry0 = dctx.rjb
@@ -516,6 +543,8 @@ def test_nga_w2_m8():
 
     dctx.rjb = np.logspace(0, np.log10(300), 100)
     dctx.rrup = dctx.rjb  # b/c ztor = 0
+    dctx.rjb_var = None
+    dctx.rrup_var = None
     dctx.rx = dctx.rjb  # doesn't matter b/c vertical
     dctx.ry0 = dctx.rjb  # doesn't matter
 
@@ -770,6 +799,8 @@ def test_nga_w2_m6():
 
     dctx.rjb = np.logspace(0, np.log10(300), 100)
     dctx.rrup = np.sqrt(dctx.rjb**2 + rctx.ztor**2)  # ztor = 3.0
+    dctx.rjb_var = None
+    dctx.rrup_var = None
     dctx.rx = dctx.rjb  # doesn't matter b/c vertical
     dctx.ry0 = dctx.rjb  # doesn't matter
 
@@ -1018,6 +1049,8 @@ def test_multigmpe_get_site_factors():
 
     dctx.rjb = np.array([300.0])
     dctx.rrup = dctx.rjb
+    dctx.rjb_var = None
+    dctx.rrup_var = None
     dctx.rx = dctx.rjb
     dctx.ry0 = dctx.rjb
 
@@ -1423,6 +1456,8 @@ def test_multigmpe_exceptions():
 
     dctx.rjb = np.logspace(1, np.log10(800), 100)
     dctx.rrup = dctx.rjb
+    dctx.rjb_var = None
+    dctx.rrup_var = None
     dctx.rhypo = dctx.rjb
     dctx.rx = dctx.rjb
     dctx.ry0 = dctx.rjb

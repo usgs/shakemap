@@ -37,7 +37,52 @@ class MultiGMPE(GMPE):
     def get_mean_and_stddevs(self, sites, rup, dists, imt, stddev_types):
         """
         See superclass `method <http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs>`__.
+
+        Unlike the superclass method, the stddev list returned by this
+        function will have twice as many arrays as are requested in
+        stddev_types: The first set will include the standard deviation
+        inflation due to the point-source to finite fault conversion (if
+        any), and the second set will not include this inflation. In the
+        case where a finite rupture is provided (and, thus, no point-source
+        to finite rupture adjustments are made) the two sets of stddev
+        arrays will be identical. Thus, if::
+
+            stddev_types = [const.StdDev.TOTAL, const.StdDev.INTRA_EVENT,
+                            const.StdDev.INTER_EVENT]
+
+        the returned stddev list will contain six arrays: the first three
+        will include the point-source inflation, and the second three will
+        not.
         """  # noqa
+
+        # ---------------------------------------------------------------------
+        # Sort out shapes of sites and dists elements
+        # Need to turn all 2D arrays into 1D arrays because of
+        # inconsistencies in how arrays are handled in OpenQuake.
+        # ---------------------------------------------------------------------
+        shapes = []
+        for k, v in sites.__dict__.items():
+            if k == '_slots_':
+                continue
+            if (k is not 'lons') and (k is not 'lats'):
+                shapes.append(v.shape)
+                sites.__dict__[k] = np.reshape(sites.__dict__[k], (-1,))
+        for k, v in dists.__dict__.items():
+            if k == '_slots_':
+                continue
+            if (k is not 'lons') and (k is not 'lats') and v is not None:
+                shapes.append(v.shape)
+                dists.__dict__[k] = np.reshape(dists.__dict__[k], (-1,))
+        shapeset = set(shapes)
+        if len(shapeset) != 1:
+            raise Exception(
+                'All sites and dists elements must have same shape.')
+        else:
+            orig_shape = list(shapeset)[0]
+
+        sd_avail = self.DEFINED_FOR_STANDARD_DEVIATION_TYPES
+        if not sd_avail.issuperset(set(stddev_types)):
+            raise Exception("Requested an unavailable stddev_type.")
 
         # Evaluate MultiGMPE:
         lnmu, lnsd = self.__get_mean_and_stddevs(
@@ -54,6 +99,23 @@ class MultiGMPE(GMPE):
                 lnsd[i][dists.rjb > dist_cutoff] = \
                     lnsd_large[i][dists.rjb > dist_cutoff]
 
+        # Undo reshapes of inputs
+        for k, v in dists.__dict__.items():
+            if k == '_slots_':
+                continue
+            if (k is not 'lons') and (k is not 'lats') and v is not None:
+                dists.__dict__[k] = np.reshape(dists.__dict__[k], orig_shape)
+        for k, v in sites.__dict__.items():
+            if k == '_slots_':
+                continue
+            if (k is not 'lons') and (k is not 'lats'):
+                sites.__dict__[k] = np.reshape(sites.__dict__[k], orig_shape)
+
+        # Reshape output
+        lnmu = np.reshape(lnmu, orig_shape)
+        for i in range(len(lnsd)):
+            lnsd[i] = np.reshape(lnsd[i], orig_shape)
+
         return lnmu, lnsd
 
     def __get_mean_and_stddevs(self, sites, rup, dists, imt, stddev_types,
@@ -68,57 +130,16 @@ class MultiGMPE(GMPE):
             wts = self.WEIGHTS_LARGE_DISTANCE
 
         # ---------------------------------------------------------------------
-        # Sort out shapes of sites and dists elements
-        # ---------------------------------------------------------------------
-
-        shapes = []
-        for k, v in sites.__dict__.items():
-            if k == '_slots_':
-                continue
-            if (k is not 'lons') and (k is not 'lats'):
-                shapes.append(v.shape)
-        for k, v in dists.__dict__.items():
-            if k == '_slots_':
-                continue
-            if (k is not 'lons') and (k is not 'lats'):
-                shapes.append(v.shape)
-
-        shapeset = set(shapes)
-        if len(shapeset) != 1:
-            raise Exception(
-                'All sites and dists elements must have same shape.')
-        else:
-            orig_shape = list(shapeset)[0]
-
-        # Need to turn all 2D arrays into 1D arrays because of
-        # inconsistencies in how arrays are handled in OpenQuake.
-        for k, v in dists.__dict__.items():
-            if k == '_slots_':
-                continue
-            if (k is not 'lons') and (k is not 'lats'):
-                dists.__dict__[k] = np.reshape(dists.__dict__[k], (-1,))
-        for k, v in sites.__dict__.items():
-            if k == '_slots_':
-                continue
-            if (k is not 'lons') and (k is not 'lats'):
-                sites.__dict__[k] = np.reshape(sites.__dict__[k], (-1,))
-
-        # ---------------------------------------------------------------------
         # These are arrays to hold the weighted combination of the GMPEs
         # ---------------------------------------------------------------------
         lnmu = np.zeros_like(sites.vs30)
-        sd_avail = self.DEFINED_FOR_STANDARD_DEVIATION_TYPES
-        if not sd_avail.issuperset(set(stddev_types)):
-            raise Exception("Requested an unavailable stddev_type.")
+        lnsd2 = [np.zeros_like(sites.vs30)
+                 for a in range(2 * len(stddev_types))]
 
-        lnsd2 = [np.zeros_like(sites.vs30) for a in stddev_types]
-
-        for i in range(len(self.GMPES)):
+        for i, gmpe in enumerate(self.GMPES):
             # -----------------------------------------------------------------
             # Loop over GMPE list
             # -----------------------------------------------------------------
-
-            gmpe = self.GMPES[i]
 
             sites = MultiGMPE.set_sites_depth_parameters(sites, gmpe)
 
@@ -128,58 +149,76 @@ class MultiGMPE(GMPE):
 
             gmpe_imts = [imt.__name__ for imt in
                          gmpe.DEFINED_FOR_INTENSITY_MEASURE_TYPES]
-            if (isinstance(imt, PGV)) and ("PGV" not in gmpe_imts):
+
+            if not isinstance(gmpe, MultiGMPE) and \
+                    (isinstance(imt, PGV)) and ("PGV" not in gmpe_imts):
+                timt = SA(1.0)
+            else:
+                timt = imt
+
+            lmean, lsd = gmpe.get_mean_and_stddevs(sites, rup, dists, timt,
+                                                   stddev_types)
+
+            if not isinstance(gmpe, MultiGMPE):
                 # -------------------------------------------------------------
                 # If IMT is PGV and PGV is not given by the GMPE, then
                 # convert from PSA10.
                 # -------------------------------------------------------------
-                if self.HAS_SITE[i] is True:
-                    psa10, psa10sd = gmpe.get_mean_and_stddevs(
-                        sites, rup, dists, SA(1.0), stddev_types)
-                else:
+                if (isinstance(imt, PGV)) and ("PGV" not in gmpe_imts):
+                    nh82 = NewmarkHall1982()
+                    lmean = nh82.convertAmps('PSA10', 'PGV', lmean)
+                    # Put the extra sigma from NH82 into intra event and total
+                    for j, stddev_type in enumerate(stddev_types):
+                        if stddev_type == const.StdDev.INTER_EVENT:
+                            continue
+                        lsd[j] = nh82.convertSigmas('PSA10', 'PGV', lsd[j])
+
+                # -------------------------------------------------------------
+                # -------------------------------------------------------------
+                if self.HAS_SITE[i] is False:
                     lamps = self.get_site_factors(
-                        sites, rup, dists, SA(1.0), default=True)
-                    psa10, psa10sd = gmpe.get_mean_and_stddevs(
-                        sites, rup, dists, SA(1.0), stddev_types)
-                    psa10 = psa10 + lamps
-                nh82 = NewmarkHall1982()
-                lmean = nh82.convertAmps('PSA10', 'PGV', psa10)
-                # Put the extra sigma from NH82 into intra event and total
-                lsd = []
-                for j in range(len(lnsd2)):
-                    if stddev_types[j] == const.StdDev.INTER_EVENT:
-                        lsd.append(psa10sd[j])
-                        continue
-                    lsd.append(nh82.convertSigmas('PSA10', 'PGV', psa10sd[j]))
-            else:
-                if self.HAS_SITE[i] is True:
-                    lmean, lsd = gmpe.get_mean_and_stddevs(
-                        sites, rup, dists, imt, stddev_types)
-                else:
-                    lamps = self.get_site_factors(
-                        sites, rup, dists, imt, default=True)
-                    lmean, lsd = gmpe.get_mean_and_stddevs(
-                        sites, rup, dists, imt, stddev_types)
+                        sites, rup, dists, timt, default=True)
                     lmean = lmean + lamps
 
-            # -----------------------------------------------------------------
-            # Convertions due to component definition
-            # -----------------------------------------------------------------
+                # -------------------------------------------------------------
+                # Convertions due to component definition
+                # -------------------------------------------------------------
+                imc_in = gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
+                imc_out = self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
+                if imc_in != imc_out:
+                    bk17 = BooreKishida2017(imc_in, imc_out)
+                    lmean = bk17.convertAmps(imt, lmean, dists.rrup, rup.mag)
+                    #
+                    # The extra sigma from the component conversion appears to
+                    # apply to the total sigma, so the question arises as to
+                    # how to apportion it between the intra- and inter-event
+                    # sigma. Here we assume it all enters as intra-event sigma.
+                    #
+                    for j, stddev_type in enumerate(stddev_types):
+                        if stddev_type == const.StdDev.INTER_EVENT:
+                            continue
+                        lsd[j] = bk17.convertSigmas(imt, lsd[j])
 
-            imc_in = gmpe.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
-            imc_out = self.DEFINED_FOR_INTENSITY_MEASURE_COMPONENT
-            bk17 = BooreKishida2017(imc_in, imc_out)
-            lmean = bk17.convertAmps(imt, lmean, dists.rrup, rup.mag)
+                # -------------------------------------------------------------
+                # We may need to inflate the standard deviations to account for
+                # the point-source to finite rupture conversion.
+                # -------------------------------------------------------------
+                lsd_new = self.inflatePSSigma(gmpe, lmean, lsd, sites, rup,
+                                              dists, timt, stddev_types)
+                for sd in lsd:
+                    lsd_new.append(sd)
+                lsd = lsd_new
+
+            # End: if GMPE is not MultiGMPE
+            else:
+                for a in list(lsd):
+                    lsd.append(a)
             #
-            # The extra sigma from the component conversion appears to
-            # apply to the total sigma, so the question arises as to
-            # how to apportion it between the intra- and inter-event
-            # sigma. Here we assume it all enters as intra-event sigma.
+            # At this point lsd will have 2 * len(stddev_types) entries, the
+            # first group will have the point-source to finite rupture
+            # inflation (if any), and the second set will not; in cases where
+            # a finite rupture is used, the two sets will be identical
             #
-            for j in range(len(lnsd2)):
-                if stddev_types[j] == const.StdDev.INTER_EVENT:
-                    continue
-                lsd[j] = bk17.convertSigmas(imt, lsd[j])
 
             # -----------------------------------------------------------------
             # Compute weighted mean and sd
@@ -188,33 +227,16 @@ class MultiGMPE(GMPE):
             lnmu = lnmu + wts[i] * lmean
 
             # Note: the lnsd2 calculation isn't complete until we drop out of
-            # this loop and substract lnmu**2
+            # this loop and subtract lnmu**2
             # For an explanation of this method, see:
             # https://stats.stackexchange.com/questions/16608/what-is-the-variance-of-the-weighted-mixture-of-two-gaussians  # noqa
-            for j in range(len(lnsd2)):
-                lnsd2[j] = lnsd2[j] + wts[i] * (lmean**2 + lsd[j]**2)
+            for j, sd2 in enumerate(lnsd2):
+                lnsd2[j] = sd2 + wts[i] * (lmean**2 + lsd[j]**2)
 
-        for j in range(len(lnsd2)):
-            lnsd2[j] = lnsd2[j] - lnmu**2
+        for j, sd2 in enumerate(lnsd2):
+            lnsd2[j] = sd2 - lnmu**2
 
         lnsd = [np.sqrt(a) for a in lnsd2]
-
-        # Undo reshapes of inputs
-        for k, v in dists.__dict__.items():
-            if k == '_slots_':
-                continue
-            if (k is not 'lons') and (k is not 'lats'):
-                dists.__dict__[k] = np.reshape(dists.__dict__[k], orig_shape)
-        for k, v in sites.__dict__.items():
-            if k == '_slots_':
-                continue
-            if (k is not 'lons') and (k is not 'lats'):
-                sites.__dict__[k] = np.reshape(sites.__dict__[k], orig_shape)
-
-        # Reshape output
-        lnmu = np.reshape(lnmu, orig_shape)
-        for i in range(len(lnsd)):
-            lnsd[i] = np.reshape(lnsd[i], orig_shape)
 
         return lnmu, lnsd
 
@@ -641,7 +663,7 @@ class MultiGMPE(GMPE):
         # ---------------------------------------------------------------------
 
         ref_sites = copy.deepcopy(sites)
-        ref_sites.vs30 = np.ones_like(sites.vs30) * self.REFERENCE_VS30
+        ref_sites.vs30 = np.full_like(sites.vs30, self.REFERENCE_VS30)
 
         # ---------------------------------------------------------------------
         # If default True, construct new MultiGMPE with default GMPE/weights
@@ -731,6 +753,79 @@ class MultiGMPE(GMPE):
                 gmpe_dict['gmpes'].append(str(self.GMPES[i]))
 
         return gmpe_dict
+
+    def inflatePSSigma(self, gmpe, lmean, lsd, sites, rup, dists, imt,
+                       stddev_types):
+        """
+        If the point-source to finite-fault factors are used, we need to
+        inflate the intra-event and total standard deviations. We do this
+        by standard propagation of error techniques: taking the (numerical)
+        derivative of the GMPE (as a function of distance) squared times the
+        additional variance from the conversion, added
+        to the variance of the GMPE (then taking the square root). We do
+        this separately for each of Rrup and Rjb and sum the results.
+        If Rrup and Rjb are calculated from a finite rupture model, their
+        variance arrays will be "None" and lsd will remain unchanged.
+        Otherwise the error inflation will be applied. Normally one or the
+        other of Rrup/Rjb will not be used and so that term will be zero; in
+        some cases both may be used and both may result in non-zero
+        derivatives.
+
+        Args:
+            gmpe:
+                The GMPE to use for the calculations. Must be a base GMPE and
+                not a GMPE set, otherwise no action is taken.
+            lmean:
+                The mean values returned by the "normal" evaluation of the
+                GMPE.
+            lsd:
+                The standard deviations returned by the "normal" evaluation
+                of the GMPE.
+            sites:
+                The sites context required by the GMPE.
+            rup:
+                The rupture context required by the GMPE.
+            dists:
+                The distance context required by the GMPE.
+            imt:
+                The intensity measure type being evaluated.
+            stddev_types:
+                The list of stddev types found in lsd.
+
+        Returns:
+            list: A list of arrays of inflated standard deviations
+            corresponding to the elements of lsd.
+        """
+        new_sd = []
+        delta_distance = 0.01
+        delta_var = [0, 0]
+        for i, dtype in enumerate(('rrup', 'rjb')):
+            # Skip dtype if the gmpe does not require it
+            if dtype not in gmpe.REQUIRES_DISTANCES:
+                continue
+            # Skip dtype if it has not been subject to a point-source to
+            # finite rupture conversion
+            dvar = getattr(dists, dtype + '_var', None)
+            if dvar is None:
+                continue
+            # Add a small amound to the rupture distance (rrup or rjb)
+            # and re-evaluate the GMPE
+            rup_dist = getattr(dists, dtype)
+            rup_dist += delta_distance
+            tmean, tsd = gmpe.get_mean_and_stddevs(sites, rup, dists, imt,
+                                                   stddev_types)
+            # Find the derivative w.r.t. the rupture distance
+            dm_dr = (lmean - tmean) / delta_distance
+            # The additional variance is (dm/dr)^2 * dvar
+            delta_var[i] = dm_dr**2 * dvar
+            # Put the rupture distance back to what it was
+            rup_dist -= delta_distance
+        for i, stdtype in enumerate(stddev_types):
+            if stdtype == const.StdDev.INTER_EVENT:
+                new_sd.append(lsd[i].copy())
+                continue
+            new_sd.append(np.sqrt(lsd[i]**2 + delta_var[0] + delta_var[1]))
+        return new_sd
 
 
 def filter_gmpe_list(gmpes, wts, imt):
