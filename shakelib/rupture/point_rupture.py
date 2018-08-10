@@ -128,7 +128,7 @@ class PointRupture(Rupture):
         PointRupture."""
         return self._origin.depth
 
-    def computeRjb(self, lon, lat, depth, var=False):
+    def computeRjb(self, lon, lat, depth):
         """
         Convert point-distances to Joyner-Boore distances based on magnitude.
 
@@ -136,17 +136,14 @@ class PointRupture(Rupture):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
-            var (bool): Also return variance of prediction.
 
         Returns:
-            If var is True then this returns a tuple of two arrays: first, the
-                predicted Rjb values, and second an array of the variance of
-                those predictions. If var is False then just the first element
-                of the tuple is returned.
+            tuple: A tuple of two arrays: first, the predicted Rjb values,
+            and second an array of the variance of those predictions.
         """
-        return self._computeRdist('Rjb', lon, lat, depth, var)
+        return self._computeRdist('Rjb', lon, lat, depth)
 
-    def computeRrup(self, lon, lat, depth, var=False):
+    def computeRrup(self, lon, lat, depth):
         """
         Convert point-distances to rupture distances based on magnitude.
 
@@ -154,17 +151,14 @@ class PointRupture(Rupture):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
-            var (bool): Also return variance of prediction.
 
         Returns:
-            If var is True then this returns a tuple of two arrays: first, the
-                predicted Rrup, and second an array of the variance of
-                those predictions. If var is False then just the first element
-                of the tuple is returned.
+            tuple: A tuple of two arrays: first, the predicted Rrup, and
+            second an array of the variance of those predictions.
         """
-        return self._computeRdist('Rrup', lon, lat, depth, var)
+        return self._computeRdist('Rrup', lon, lat, depth)
 
-    def _computeRdist(self, rtype, lon, lat, depth, var):
+    def _computeRdist(self, rtype, lon, lat, depth):
         """
         Helper function to actually do the approximate fault distance
         computations.
@@ -174,14 +168,12 @@ class PointRupture(Rupture):
             lon (array): Numpy array of longitudes.
             lat (array): Numpy array of latitudes.
             depth (array): Numpy array of depths (km; positive down).
-            var (bool): Also return variance of prediction.
 
         Returns:
-            If var is True then this returns a tuple of two arrays: first, the
-                predicted approximate fault distance values (either Rjb or
-                Rrup, depending on the 'type' argument), and second an array of
-                the variance of those predictions. If var is False then just
-                the first element of the tuple is returned.
+            tuple: A tuple of two arrays: first, the predicted approximate
+            fault distance values (either Rjb or Rrup, depending on the
+            'type' argument), and second an array of the variance of those
+            predictions.
         """
         if rtype == 'Rjb':
             dtype = DistType.Rjb
@@ -250,12 +242,9 @@ class PointRupture(Rupture):
         mags = np.full_like(repis, origin.mag)
 
         r_hat = p2f.r2r(repis, mags)
+        r_var = p2f.var(repis, mags)
 
-        if var is True:
-            r_var = p2f.var(repis, mags)
-            return (r_hat, r_var)
-        else:
-            return r_hat
+        return (r_hat, r_var)
 
     def computeGC2(self, lon, lat, depth):
         """

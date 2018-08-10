@@ -197,12 +197,16 @@ class ModelModule(CoreModule):
         # ------------------------------------------------------------------
         # Do the bias for all of the input and output IMTs. Hold on
         # to some of the products that will be used for the interpolation.
+        # The "raw" values are the stddevs that have not been inflated by
+        # the additional sigma (if any) of the point-source to finite
+        # rupture approximation.
         # ------------------------------------------------------------------
         self.nominal_bias = {}
-        self.bias_num = {}   # The numerator term of the bias
-        self.bias_den = {}   # The denominator of the bias (w/o the tau term)
-        self.psd = {}        # phi of the output points
-        self.tsd = {}        # tau of the output points
+        self.bias_num = {}  # The numerator term of the bias
+        self.bias_den = {}  # The denominator of the bias (w/o the tau term)
+        self.psd_raw = {}   # raw phi (intra-event stddev) of the output points
+        self.psd = {}       # phi (intra-event stddev) of the output points
+        self.tsd = {}       # tau (inter-event stddev) of the output points
 
         #
         # These are arrays (keyed by IMT) of the station data that will be
@@ -587,6 +591,10 @@ class ModelModule(CoreModule):
             dd = get_distance(['rrup'], df['lat'], df['lon'],
                               df['depth'], self.rupture_obj)
             df['rrup'] = dd['rrup']
+            if dd['rrup_var'] is not None:
+                df['rrup_var'] = dd['rrup_var']
+            else:
+                df['rrup_var'] = np.zeros_like(dd['rrup'])
 
     def _deriveIMTsFromMMI(self):
         """
@@ -894,10 +902,13 @@ class ModelModule(CoreModule):
         if self.total_sd_only:
             self.psd[imtstr] = np.sqrt(
                 pout_sd[0]**2 - SM_CONSTS['default_stddev_inter']**2)
+            self.psd_raw[imtstr] = np.sqrt(
+                pout_sd[3]**2 - SM_CONSTS['default_stddev_inter']**2)
             self.tsd[imtstr] = np.full_like(
                 self.psd[imtstr], SM_CONSTS['default_stddev_inter'])
         else:
             self.psd[imtstr] = pout_sd[2]
+            self.psd_raw[imtstr] = pout_sd[5]
             self.tsd[imtstr] = pout_sd[1]
         pout_sd2 = np.power(self.psd[imtstr], 2.0)
         #
@@ -910,6 +921,8 @@ class ModelModule(CoreModule):
         pout_mean += out_bias.reshape(pout_mean.shape)
         self.psd[imtstr] = np.sqrt(self.psd[imtstr]**2 + out_bias_var)
         pout_sd2 += out_bias_var.reshape(pout_sd2.shape)
+        self.psd_raw[imtstr] = np.sqrt(self.psd_raw[imtstr]**2 +
+                                       out_bias_var.reshape(pout_sd2.shape))
         #
         # Unbias the station residuals and compute the
         # new phi that includes the variance of the bias
@@ -1055,8 +1068,8 @@ class ModelModule(CoreModule):
         #
         # Get the map grade
         #
-        mean_rat, mygrade = _get_map_grade(self.do_grid, self.outsd, self.psd,
-                                           moutgrid)
+        mean_rat, mygrade = _get_map_grade(self.do_grid, self.outsd,
+                                           self.psd_raw, moutgrid)
         # ------------------------------------------------------------------
         # This is the metadata for creating info.json
         # ------------------------------------------------------------------
@@ -1254,10 +1267,16 @@ class ModelModule(CoreModule):
             dx = getattr(self, ndf).dx
             for dm in get_distance_measures():
                 dm_arr = getattr(dx, dm, None)
-                if dm_arr is None:
-                    continue
-                else:
+                if dm_arr is not None:
                     dist_dict[ndf][dm] = dm_arr
+                else:
+                    continue
+                if dm in ('rrup', 'rjb'):
+                    dm_var = getattr(dx, dm + '_var', None)
+                    if dm_var is not None:
+                        dist_dict[ndf][dm + '_var'] = dm_var
+                    else:
+                        dist_dict[ndf][dm + '_var'] = np.zeros_like(dm_arr)
         #
         # Get the index for each station ID
         #
@@ -1409,6 +1428,8 @@ class ModelModule(CoreModule):
             #
             station['properties']['distance'] = \
                 _round_float(sdf['rrup'][six], 3)
+            station['properties']['distance_stddev'] = \
+                _round_float(np.sqrt(sdf['rrup_var'][six]), 3)
             #
             # Set the specific distances properties
             #
@@ -1466,6 +1487,15 @@ class ModelModule(CoreModule):
                 continue
             dm_arr_2d = Grid2D(dm_arr.copy(), gdict)
             oc.setGrid('distance_' + dm, dm_arr_2d, metadata=dist_metadata)
+            if dm in ('rrup', 'rjb'):
+                dm_var = getattr(self.dx_out, dm + '_var', None)
+                if dm_var is None:
+                    dm_var = np.zeros_like(dm_arr)
+                dm_std = np.sqrt(dm_var)
+                dm_std_2d = Grid2D(dm_std.copy(), gdict)
+                oc.setGrid('distance_' + dm + '_stddev', dm_std_2d,
+                           metadata=dist_metadata)
+
         #
         # Output the data and uncertainty grids
         #
@@ -1509,6 +1539,13 @@ class ModelModule(CoreModule):
                 continue
             oc.setArray('distance_' + dm, dm_arr.copy().flatten(),
                         metadata=distance_metadata)
+            if dm in ('rrup', 'rjb'):
+                dm_var = getattr(self.dx_out, dm + '_var', None)
+                if dm_var is None:
+                    dm_var = np.zeros_like(dm_arr)
+                oc.setArray('distance_' + dm + '_stddev',
+                            np.sqrt(dm_var).copy().flatten(),
+                            metadata=distance_metadata)
         #
         # Store the IMTs
         #
