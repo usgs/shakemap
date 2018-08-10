@@ -20,6 +20,7 @@ from shakemap.utils.config import get_config_paths
 import shakemap.utils.queue as queue
 from shakelib.rupture.origin import write_event_file
 from shakemap.utils.amps import AmplitudeHandler
+from shakelib.rupture import constants
 
 MEMORY_UPDATE_TIME = 0
 ASSOCIATE_UPDATE_TIME = 0
@@ -143,10 +144,10 @@ def write_event_xml(data_path, event, logger):
     """
     ttemp = event['time']
     try:
-        dt = datetime.strptime(event['time'], queue.TIMEFMT)
+        dt = datetime.strptime(event['time'], constants.TIMEFMT)
     except ValueError:
         try:
-            dt = datetime.strptime(event['time'], queue.ALT_TIMEFMT)
+            dt = datetime.strptime(event['time'], constants.ALT_TIMEFMT)
         except ValueError:
             logger.error("Can't parse input time %s" % event['time'])
             return
@@ -212,10 +213,10 @@ def process_origin(event, action, handler, data_path, logger, config,
         #
         replist = None
         try:
-            dt = datetime.strptime(event['time'], queue.TIMEFMT)
+            dt = datetime.strptime(event['time'], constants.TIMEFMT)
         except ValueError:
             try:
-                dt = datetime.strptime(event['time'], queue.ALT_TIMEFMT)
+                dt = datetime.strptime(event['time'], constants.ALT_TIMEFMT)
             except ValueError:
                 logger.error("Can't parse input time %s" % event['time'])
                 return

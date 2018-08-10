@@ -30,9 +30,9 @@ from shakelib.rupture.factory import (
 )
 from shakelib.utils.utils import get_extent
 from impactutils.time.ancient_time import HistoricTime
+from shakelib.rupture import constants
 
 KM2SEC = 3600.0/111  # seconds per kilometer
-TIMEFMT = '%Y-%m-%dT%H:%M:%SZ'
 
 
 def get_parser():
@@ -41,8 +41,9 @@ def get_parser():
     This program takes one required file, a tarball of one or more ShakeMap 3.5
     event directories.  To create this file, run a command like this:
 
-    find . -maxdepth 3 -name "*_dat.xml" -o -name "*_fault.txt" -o -name "source.txt"
-    -o -name "info.json" -o -name "*.conf" | tar -czvf ~/sm35_inputs.tgz -T -
+    find . -maxdepth 3 -name "*_dat.xml" -o -name "*_fault.txt" -o -name
+    "source.txt" -o -name "info.json" -o -name "*.conf" | tar -czvf
+    ~/sm35_inputs.tgz -T -
 
     This program takes a subset of the ShakeMap 3.5 input data and the
     info.json file and uses those files to create the corresponding ShakeMap 4
@@ -65,10 +66,10 @@ def get_parser():
                  GEM equivalent (see -m).
                - outlier max_deviation and max_mag values will be converted.
 
-    NOTE: if the -b option is used without -s, ShakeMap 4 will create a model.conf
-    file for the event that does not specify a GMPE. To use a GMPE other than the
-    default when running the event, make sure you update each event's model.conf
-    file to include your chosen GMPE.
+    NOTE: if the -b option is used without -s, ShakeMap 4 will create a
+    model.conf file for the event that does not specify a GMPE. To use a GMPE
+    other than the default when running the event, make sure you update each
+    event's model.conf file to include your chosen GMPE.
 
     '''
     parser = argparse.ArgumentParser(
@@ -82,7 +83,7 @@ does not prepend eventid'''
                         default=False, help=hlptxt)
     hlptxt2 = '''Ignore previous bounds/resolution settings discovered
 in input data.'''
-    hlptxt3 = '''Ignore previous ground motion conversion settings discovered 
+    hlptxt3 = '''Ignore previous ground motion conversion settings discovered
 in input data.'''
     parser.add_argument('-b', '--skip-bounds', action='store_true',
                         default=False, help=hlptxt2)
@@ -97,8 +98,8 @@ def _extract_file(member, tarball, filename, event_dir):
     datafile_object = tarball.extractfile(member)
     try:
         data = datafile_object.read().decode('utf-8')
-    except:
-        x = 1
+    except Exception as e:
+        raise e
     datafile_object.close()
     datafile = os.path.join(event_dir, filename)
     with open(datafile, 'wt') as dfile:
@@ -393,7 +394,7 @@ def parse_info(event_dir, tarball, member, netid, networks,
     edict = {}
     edict['id'] = jsondict['input']['event_information']['event_id']
     timestring = jsondict['input']['event_information']['origin_time']
-    edict['time'] = HistoricTime.strptime(timestring, TIMEFMT)
+    edict['time'] = HistoricTime.strptime(timestring, constants.ALT_TIMEFMT)
     edict['netid'] = netid
     if netid in networks:
         edict['network'] = networks[netid]

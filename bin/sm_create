@@ -19,8 +19,8 @@ from shakemap.utils.config import get_config_paths
 from shakelib.rupture.origin import write_event_file, Origin
 from shakelib.rupture.factory import text_to_json, rupture_from_dict_and_origin
 from shakemap.utils.utils import get_network_name, migrate_gmpe, set_gmpe
+from shakelib.rupture import constants
 
-TIMEFMT1 = '%Y-%m-%dT%H:%M:%S.%fZ'
 TIMEFMT2 = '%Y-%m-%dT%H:%M:%S'
 KM2SEC = 3600.0/111  # seconds per kilometer
 
@@ -100,7 +100,7 @@ def _get_event_dictionary(detail, source):
                 'depth': float(origin['depth']),
                 'mag': float(origin['magnitude']),
                 'time': datetime.datetime.strptime(
-                    origin['eventtime'], TIMEFMT1),
+                    origin['eventtime'], constants.TIMEFMT),
                 'locstring': detail.location
             }
         except ValueError:
@@ -183,7 +183,7 @@ def main(args):
             detail = get_event_by_id(args.eventid)
         except Exception as e:
             print('Unable to connect to ComCat server. '
-                  'Please try again later. "%s"')
+                  'Please try again later. "%s"' % str(e))
             sys.exit(1)
         # get input data
         edict = _get_event_dictionary(detail, args.source)
