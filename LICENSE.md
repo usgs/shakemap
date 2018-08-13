@@ -41,6 +41,18 @@ all uses of the work, to the fullest extent permitted by applicable law.
 When using or citing the work, you should not imply endorsement by the
 author or the affirmer.
 
+### Runtime language
+
+- [Python](https://docs.python.org/3/license.html#psf-license-agreement-for-python-release)
+
+### Runtime libraries
+
+ShakeMap has a large number of dependencies that are installed -- either
+directly or indirectly -- by the installation script. These dependencies have a
+variety of individual licenses.  See the installed packages for their license
+terms. By including these packages in the installation, we make no
+representations as to their legal availability for any particular use.
+
 
 
 [1]: https://creativecommons.org/publicdomain/zero/1.0/legalcode

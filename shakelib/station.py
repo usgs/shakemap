@@ -505,6 +505,7 @@ class StationList(object):
             the IMTs found in the dictionary..
         """
 
+        assert isinstance(instrumented, bool)
         columns = list(TABLES['station'].keys())
         dstr = ', '.join(columns)
         self.cursor.execute(
