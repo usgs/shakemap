@@ -709,15 +709,19 @@ class MultiGMPE(GMPE):
             An OQ sites context with the depth parameters set for the
             requested GMPE.
         """
+        if gmpe == 'MultiGMPE()':
+            return sites
 
         sites = Sites._addDepthParameters(sites)
 
-        if gmpe == 'AbrahamsonEtAl2014()':
+        if gmpe == 'AbrahamsonEtAl2014()' or \
+           gmpe == 'AbrahamsonEtAl2014RegJPN()':
             sites.z1pt0 = sites.z1pt0_ask14_cal
         if gmpe == 'ChiouYoungs2014()':
             # Also BooreEtAl2014() if using subclass with depth parameter
             sites.z1pt0 = sites.z1pt0_cy14_cal
-        if gmpe == 'CampbellBozorgnia2014()':
+        if gmpe == 'CampbellBozorgnia2014()' or \
+           gmpe == 'CampbellBozorgnia2014JapanSite()':
             sites.z2pt5 = sites.z2pt5_cb14_cal
         if gmpe == 'ChiouYoungs2008()':
             sites.z1pt0 = sites.z1pt0_cy08
