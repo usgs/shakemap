@@ -43,6 +43,8 @@ from shakemap.utils.utils import get_object_from_config
 from shakemap._version import get_versions
 from shakemap.utils.generic_amp import get_generic_amp_factors
 
+from shakelib.directivity.rowshandel2013 import Rowshandel2013
+
 #
 # TODO: Some constants; these should maybe be in a configuration
 # or in a constants module or be GMICE-specific.
@@ -423,14 +425,18 @@ class ModelModule(CoreModule):
             self.N = np.max(self.lats)
             self.smnx = np.size(self.lons)
             self.smny = 1
-            dist_obj_out = Distance(self.default_gmpe, self.lons, self.lats,
-                                    self.depths, self.rupture_obj)
+            dist_obj_out = Distance(
+                self.default_gmpe, self.lons, self.lats,
+                self.depths, self.rupture_obj
+            )
 
-            self.sites_obj_out = Sites.fromBounds(self.W, self.E, self.S,
-                                                  self.N, self.smdx, self.smdy,
-                                                  defaultVs30=self.vs30default,
-                                                  vs30File=self.vs30_file,
-                                                  padding=True, resample=True)
+            self.sites_obj_out = Sites.fromBounds(
+                self.W, self.E, self.S,
+                self.N, self.smdx, self.smdy,
+                defaultVs30=self.vs30default,
+                vs30File=self.vs30_file,
+                padding=True, resample=True
+            )
 
             self.sx_out = self.sites_obj_out.getSitesContext(
                 {'lats': self.lats,
@@ -445,18 +451,25 @@ class ModelModule(CoreModule):
             #
             self.do_grid = True
 
+            dx = self.config['interp']['prediction_location']['xres']
+            print(dx)
+
             if self.config['interp']['prediction_location']['extent']:
                 self.W, self.S, self.E, self.N = \
                     self.config['interp']['prediction_location']['extent']
             else:
-                self.W, self.E, self.S, self.N = get_extent(self.rupture_obj,
-                                                            config=self.config)
+                self.W, self.E, self.S, self.N = get_extent(
+                    self.rupture_obj,
+                    config=self.config
+                )
 
-            self.sites_obj_out = Sites.fromBounds(self.W, self.E, self.S,
-                                                  self.N, self.smdx, self.smdy,
-                                                  defaultVs30=self.vs30default,
-                                                  vs30File=self.vs30_file,
-                                                  padding=True, resample=True)
+            self.sites_obj_out = Sites.fromBounds(
+                self.W, self.E, self.S,
+                self.N, self.smdx, self.smdy,
+                defaultVs30=self.vs30default,
+                vs30File=self.vs30_file,
+                padding=True, resample=True
+            )
             self.smnx, self.smny = self.sites_obj_out.getNxNy()
             self.sx_out = self.sites_obj_out.getSitesContext()
             #
@@ -1669,6 +1682,25 @@ class ModelModule(CoreModule):
             gafs = get_generic_amp_factors(sx, str(oqimt))
             if gafs is not None:
                 mean += gafs
+
+        # Check config
+        do_dir = get_object_from_config('directivity', 'modeling', self.config)
+        # Is the rupture not a point source?
+        rup = self.rupture_obj
+        rup_ok = not isinstance(rup, 'PointRupture')
+
+        if do_dir:
+            dir_period = 1.0
+            R13 = Rowshandel2013.fromSites(
+                rup._origin, rup, sx,
+                dx=1.0,
+                T=dir_period,
+                a_weight=0.5,
+                mtype=1
+            )
+            fd = R13.getFd()[0]
+
+
 
         return mean, stddevs
 
