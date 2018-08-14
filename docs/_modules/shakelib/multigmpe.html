@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
@@ -71,7 +71,52 @@
 <div class="viewcode-block" id="MultiGMPE.get_mean_and_stddevs"><a class="viewcode-back" href="../../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE.get_mean_and_stddevs">[docs]</a>    <span class="k">def</span> <span class="nf">get_mean_and_stddevs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        See superclass `method &lt;http://docs.openquake.org/oq-hazardlib/master/gsim/index.html#openquake.hazardlib.gsim.base.GroundShakingIntensityModel.get_mean_and_stddevs&gt;`__.</span>
+
+<span class="sd">        Unlike the superclass method, the stddev list returned by this</span>
+<span class="sd">        function will have twice as many arrays as are requested in</span>
+<span class="sd">        stddev_types: The first set will include the standard deviation</span>
+<span class="sd">        inflation due to the point-source to finite fault conversion (if</span>
+<span class="sd">        any), and the second set will not include this inflation. In the</span>
+<span class="sd">        case where a finite rupture is provided (and, thus, no point-source</span>
+<span class="sd">        to finite rupture adjustments are made) the two sets of stddev</span>
+<span class="sd">        arrays will be identical. Thus, if::</span>
+
+<span class="sd">            stddev_types = [const.StdDev.TOTAL, const.StdDev.INTRA_EVENT,</span>
+<span class="sd">                            const.StdDev.INTER_EVENT]</span>
+
+<span class="sd">        the returned stddev list will contain six arrays: the first three</span>
+<span class="sd">        will include the point-source inflation, and the second three will</span>
+<span class="sd">        not.</span>
 <span class="sd">        &quot;&quot;&quot;</span>  <span class="c1"># noqa</span>
+
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="c1"># Sort out shapes of sites and dists elements</span>
+        <span class="c1"># Need to turn all 2D arrays into 1D arrays because of</span>
+        <span class="c1"># inconsistencies in how arrays are handled in OpenQuake.</span>
+        <span class="c1"># ---------------------------------------------------------------------</span>
+        <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
+                <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+                <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
+        <span class="n">shapeset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapeset</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
+                <span class="s1">&#39;All sites and dists elements must have same shape.&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">orig_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">shapeset</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="n">sd_avail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">sd_avail</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">stddev_types</span><span class="p">)):</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Requested an unavailable stddev_type.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Evaluate MultiGMPE:</span>
         <span class="n">lnmu</span><span class="p">,</span> <span class="n">lnsd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_mean_and_stddevs</span><span class="p">(</span>
@@ -88,6 +133,23 @@
                 <span class="n">lnsd</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">dists</span><span class="o">.</span><span class="n">rjb</span> <span class="o">&gt;</span> <span class="n">dist_cutoff</span><span class="p">]</span> <span class="o">=</span> \
                     <span class="n">lnsd_large</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">dists</span><span class="o">.</span><span class="n">rjb</span> <span class="o">&gt;</span> <span class="n">dist_cutoff</span><span class="p">]</span>
 
+        <span class="c1"># Undo reshapes of inputs</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
+                <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
+
+        <span class="c1"># Reshape output</span>
+        <span class="n">lnmu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">lnmu</span><span class="p">,</span> <span class="n">orig_shape</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lnsd</span><span class="p">)):</span>
+            <span class="n">lnsd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">lnsd</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">lnmu</span><span class="p">,</span> <span class="n">lnsd</span></div>
 
     <span class="k">def</span> <span class="nf">__get_mean_and_stddevs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">,</span>
@@ -102,57 +164,16 @@
             <span class="n">wts</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">WEIGHTS_LARGE_DISTANCE</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
-        <span class="c1"># Sort out shapes of sites and dists elements</span>
-        <span class="c1"># ---------------------------------------------------------------------</span>
-
-        <span class="n">shapes</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
-                <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
-                <span class="n">shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
-
-        <span class="n">shapeset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">shapes</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">shapeset</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span>
-                <span class="s1">&#39;All sites and dists elements must have same shape.&#39;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">orig_shape</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">shapeset</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-
-        <span class="c1"># Need to turn all 2D arrays into 1D arrays because of</span>
-        <span class="c1"># inconsistencies in how arrays are handled in OpenQuake.</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
-                <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
-                <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,))</span>
-
-        <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># These are arrays to hold the weighted combination of the GMPEs</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="n">lnmu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
-        <span class="n">sd_avail</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_STANDARD_DEVIATION_TYPES</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">sd_avail</span><span class="o">.</span><span class="n">issuperset</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">stddev_types</span><span class="p">)):</span>
-            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;Requested an unavailable stddev_type.&quot;</span><span class="p">)</span>
+        <span class="n">lnsd2</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
+                 <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">stddev_types</span><span class="p">))]</span>
 
-        <span class="n">lnsd2</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">stddev_types</span><span class="p">]</span>
-
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">gmpe</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span><span class="p">):</span>
             <span class="c1"># -----------------------------------------------------------------</span>
             <span class="c1"># Loop over GMPE list</span>
             <span class="c1"># -----------------------------------------------------------------</span>
-
-            <span class="n">gmpe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
 
             <span class="n">sites</span> <span class="o">=</span> <span class="n">MultiGMPE</span><span class="o">.</span><span class="n">set_sites_depth_parameters</span><span class="p">(</span><span class="n">sites</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">)</span>
 
@@ -162,58 +183,76 @@
 
             <span class="n">gmpe_imts</span> <span class="o">=</span> <span class="p">[</span><span class="n">imt</span><span class="o">.</span><span class="vm">__name__</span> <span class="k">for</span> <span class="n">imt</span> <span class="ow">in</span>
                          <span class="n">gmpe</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_TYPES</span><span class="p">]</span>
-            <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">PGV</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;PGV&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gmpe_imts</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">MultiGMPE</span><span class="p">)</span> <span class="ow">and</span> \
+                    <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">PGV</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;PGV&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gmpe_imts</span><span class="p">):</span>
+                <span class="n">timt</span> <span class="o">=</span> <span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">timt</span> <span class="o">=</span> <span class="n">imt</span>
+
+            <span class="n">lmean</span><span class="p">,</span> <span class="n">lsd</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">timt</span><span class="p">,</span>
+                                                   <span class="n">stddev_types</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">MultiGMPE</span><span class="p">):</span>
                 <span class="c1"># -------------------------------------------------------------</span>
                 <span class="c1"># If IMT is PGV and PGV is not given by the GMPE, then</span>
                 <span class="c1"># convert from PSA10.</span>
                 <span class="c1"># -------------------------------------------------------------</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">HAS_SITE</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="n">psa10</span><span class="p">,</span> <span class="n">psa10sd</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
-                        <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">stddev_types</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">PGV</span><span class="p">))</span> <span class="ow">and</span> <span class="p">(</span><span class="s2">&quot;PGV&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gmpe_imts</span><span class="p">):</span>
+                    <span class="n">nh82</span> <span class="o">=</span> <span class="n">NewmarkHall1982</span><span class="p">()</span>
+                    <span class="n">lmean</span> <span class="o">=</span> <span class="n">nh82</span><span class="o">.</span><span class="n">convertAmps</span><span class="p">(</span><span class="s1">&#39;PSA10&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="n">lmean</span><span class="p">)</span>
+                    <span class="c1"># Put the extra sigma from NH82 into intra event and total</span>
+                    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">stddev_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stddev_types</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">stddev_type</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">nh82</span><span class="o">.</span><span class="n">convertSigmas</span><span class="p">(</span><span class="s1">&#39;PSA10&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+                <span class="c1"># -------------------------------------------------------------</span>
+                <span class="c1"># -------------------------------------------------------------</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">HAS_SITE</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
                     <span class="n">lamps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_factors</span><span class="p">(</span>
-                        <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                    <span class="n">psa10</span><span class="p">,</span> <span class="n">psa10sd</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
-                        <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">SA</span><span class="p">(</span><span class="mf">1.0</span><span class="p">),</span> <span class="n">stddev_types</span><span class="p">)</span>
-                    <span class="n">psa10</span> <span class="o">=</span> <span class="n">psa10</span> <span class="o">+</span> <span class="n">lamps</span>
-                <span class="n">nh82</span> <span class="o">=</span> <span class="n">NewmarkHall1982</span><span class="p">()</span>
-                <span class="n">lmean</span> <span class="o">=</span> <span class="n">nh82</span><span class="o">.</span><span class="n">convertAmps</span><span class="p">(</span><span class="s1">&#39;PSA10&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="n">psa10</span><span class="p">)</span>
-                <span class="c1"># Put the extra sigma from NH82 into intra event and total</span>
-                <span class="n">lsd</span> <span class="o">=</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lnsd2</span><span class="p">)):</span>
-                    <span class="k">if</span> <span class="n">stddev_types</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">:</span>
-                        <span class="n">lsd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">psa10sd</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
-                        <span class="k">continue</span>
-                    <span class="n">lsd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">nh82</span><span class="o">.</span><span class="n">convertSigmas</span><span class="p">(</span><span class="s1">&#39;PSA10&#39;</span><span class="p">,</span> <span class="s1">&#39;PGV&#39;</span><span class="p">,</span> <span class="n">psa10sd</span><span class="p">[</span><span class="n">j</span><span class="p">]))</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">HAS_SITE</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-                    <span class="n">lmean</span><span class="p">,</span> <span class="n">lsd</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
-                        <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">lamps</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_site_factors</span><span class="p">(</span>
-                        <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                    <span class="n">lmean</span><span class="p">,</span> <span class="n">lsd</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span>
-                        <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
+                        <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">timt</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                     <span class="n">lmean</span> <span class="o">=</span> <span class="n">lmean</span> <span class="o">+</span> <span class="n">lamps</span>
 
-            <span class="c1"># -----------------------------------------------------------------</span>
-            <span class="c1"># Convertions due to component definition</span>
-            <span class="c1"># -----------------------------------------------------------------</span>
+                <span class="c1"># -------------------------------------------------------------</span>
+                <span class="c1"># Convertions due to component definition</span>
+                <span class="c1"># -------------------------------------------------------------</span>
+                <span class="n">imc_in</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span>
+                <span class="n">imc_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span>
+                <span class="k">if</span> <span class="n">imc_in</span> <span class="o">!=</span> <span class="n">imc_out</span><span class="p">:</span>
+                    <span class="n">bk17</span> <span class="o">=</span> <span class="n">BooreKishida2017</span><span class="p">(</span><span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">)</span>
+                    <span class="n">lmean</span> <span class="o">=</span> <span class="n">bk17</span><span class="o">.</span><span class="n">convertAmps</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">lmean</span><span class="p">,</span> <span class="n">dists</span><span class="o">.</span><span class="n">rrup</span><span class="p">,</span> <span class="n">rup</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
+                    <span class="c1">#</span>
+                    <span class="c1"># The extra sigma from the component conversion appears to</span>
+                    <span class="c1"># apply to the total sigma, so the question arises as to</span>
+                    <span class="c1"># how to apportion it between the intra- and inter-event</span>
+                    <span class="c1"># sigma. Here we assume it all enters as intra-event sigma.</span>
+                    <span class="c1">#</span>
+                    <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">stddev_type</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stddev_types</span><span class="p">):</span>
+                        <span class="k">if</span> <span class="n">stddev_type</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">bk17</span><span class="o">.</span><span class="n">convertSigmas</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
 
-            <span class="n">imc_in</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span>
-            <span class="n">imc_out</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">DEFINED_FOR_INTENSITY_MEASURE_COMPONENT</span>
-            <span class="n">bk17</span> <span class="o">=</span> <span class="n">BooreKishida2017</span><span class="p">(</span><span class="n">imc_in</span><span class="p">,</span> <span class="n">imc_out</span><span class="p">)</span>
-            <span class="n">lmean</span> <span class="o">=</span> <span class="n">bk17</span><span class="o">.</span><span class="n">convertAmps</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">lmean</span><span class="p">,</span> <span class="n">dists</span><span class="o">.</span><span class="n">rrup</span><span class="p">,</span> <span class="n">rup</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
+                <span class="c1"># -------------------------------------------------------------</span>
+                <span class="c1"># We may need to inflate the standard deviations to account for</span>
+                <span class="c1"># the point-source to finite rupture conversion.</span>
+                <span class="c1"># -------------------------------------------------------------</span>
+                <span class="n">lsd_new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inflatePSSigma</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">lmean</span><span class="p">,</span> <span class="n">lsd</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span>
+                                              <span class="n">dists</span><span class="p">,</span> <span class="n">timt</span><span class="p">,</span> <span class="n">stddev_types</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">sd</span> <span class="ow">in</span> <span class="n">lsd</span><span class="p">:</span>
+                    <span class="n">lsd_new</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sd</span><span class="p">)</span>
+                <span class="n">lsd</span> <span class="o">=</span> <span class="n">lsd_new</span>
+
+            <span class="c1"># End: if GMPE is not MultiGMPE</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">lsd</span><span class="p">):</span>
+                    <span class="n">lsd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
             <span class="c1">#</span>
-            <span class="c1"># The extra sigma from the component conversion appears to</span>
-            <span class="c1"># apply to the total sigma, so the question arises as to</span>
-            <span class="c1"># how to apportion it between the intra- and inter-event</span>
-            <span class="c1"># sigma. Here we assume it all enters as intra-event sigma.</span>
+            <span class="c1"># At this point lsd will have 2 * len(stddev_types) entries, the</span>
+            <span class="c1"># first group will have the point-source to finite rupture</span>
+            <span class="c1"># inflation (if any), and the second set will not; in cases where</span>
+            <span class="c1"># a finite rupture is used, the two sets will be identical</span>
             <span class="c1">#</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lnsd2</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="n">stddev_types</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">:</span>
-                    <span class="k">continue</span>
-                <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">bk17</span><span class="o">.</span><span class="n">convertSigmas</span><span class="p">(</span><span class="n">imt</span><span class="p">,</span> <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
 
             <span class="c1"># -----------------------------------------------------------------</span>
             <span class="c1"># Compute weighted mean and sd</span>
@@ -222,33 +261,16 @@
             <span class="n">lnmu</span> <span class="o">=</span> <span class="n">lnmu</span> <span class="o">+</span> <span class="n">wts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">lmean</span>
 
             <span class="c1"># Note: the lnsd2 calculation isn&#39;t complete until we drop out of</span>
-            <span class="c1"># this loop and substract lnmu**2</span>
+            <span class="c1"># this loop and subtract lnmu**2</span>
             <span class="c1"># For an explanation of this method, see:</span>
             <span class="c1"># https://stats.stackexchange.com/questions/16608/what-is-the-variance-of-the-weighted-mixture-of-two-gaussians  # noqa</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lnsd2</span><span class="p">)):</span>
-                <span class="n">lnsd2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">lnsd2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">+</span> <span class="n">wts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">lmean</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">sd2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lnsd2</span><span class="p">):</span>
+                <span class="n">lnsd2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sd2</span> <span class="o">+</span> <span class="n">wts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">lmean</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">lsd</span><span class="p">[</span><span class="n">j</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lnsd2</span><span class="p">)):</span>
-            <span class="n">lnsd2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">lnsd2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">-</span> <span class="n">lnmu</span><span class="o">**</span><span class="mi">2</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">sd2</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lnsd2</span><span class="p">):</span>
+            <span class="n">lnsd2</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">sd2</span> <span class="o">-</span> <span class="n">lnmu</span><span class="o">**</span><span class="mi">2</span>
 
         <span class="n">lnsd</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">lnsd2</span><span class="p">]</span>
-
-        <span class="c1"># Undo reshapes of inputs</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
-                <span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">dists</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;_slots_&#39;</span><span class="p">:</span>
-                <span class="k">continue</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lons&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">k</span> <span class="ow">is</span> <span class="ow">not</span> <span class="s1">&#39;lats&#39;</span><span class="p">):</span>
-                <span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">[</span><span class="n">k</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
-
-        <span class="c1"># Reshape output</span>
-        <span class="n">lnmu</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">lnmu</span><span class="p">,</span> <span class="n">orig_shape</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lnsd</span><span class="p">)):</span>
-            <span class="n">lnsd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">lnsd</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">orig_shape</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">lnmu</span><span class="p">,</span> <span class="n">lnsd</span>
 
@@ -675,7 +697,7 @@
         <span class="c1"># ---------------------------------------------------------------------</span>
 
         <span class="n">ref_sites</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">sites</span><span class="p">)</span>
-        <span class="n">ref_sites</span><span class="o">.</span><span class="n">vs30</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">REFERENCE_VS30</span>
+        <span class="n">ref_sites</span><span class="o">.</span><span class="n">vs30</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">REFERENCE_VS30</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># If default True, construct new MultiGMPE with default GMPE/weights</span>
@@ -721,15 +743,19 @@
 <span class="sd">            An OQ sites context with the depth parameters set for the</span>
 <span class="sd">            requested GMPE.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;MultiGMPE()&#39;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">sites</span>
 
         <span class="n">sites</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_addDepthParameters</span><span class="p">(</span><span class="n">sites</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014()&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014()&#39;</span> <span class="ow">or</span> \
+           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014RegJPN()&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_ask14_cal</span>
         <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;ChiouYoungs2014()&#39;</span><span class="p">:</span>
             <span class="c1"># Also BooreEtAl2014() if using subclass with depth parameter</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_cy14_cal</span>
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2014()&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2014()&#39;</span> <span class="ow">or</span> \
+           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2014JapanSite()&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5_cb14_cal</span>
         <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;ChiouYoungs2008()&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_cy08</span>
@@ -764,7 +790,80 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">gmpe_dict</span><span class="p">[</span><span class="s1">&#39;gmpes&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">GMPES</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span>
 
-        <span class="k">return</span> <span class="n">gmpe_dict</span></div></div>
+        <span class="k">return</span> <span class="n">gmpe_dict</span></div>
+
+<div class="viewcode-block" id="MultiGMPE.inflatePSSigma"><a class="viewcode-back" href="../../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.MultiGMPE.inflatePSSigma">[docs]</a>    <span class="k">def</span> <span class="nf">inflatePSSigma</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">gmpe</span><span class="p">,</span> <span class="n">lmean</span><span class="p">,</span> <span class="n">lsd</span><span class="p">,</span> <span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
+                       <span class="n">stddev_types</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If the point-source to finite-fault factors are used, we need to</span>
+<span class="sd">        inflate the intra-event and total standard deviations. We do this</span>
+<span class="sd">        by standard propagation of error techniques: taking the (numerical)</span>
+<span class="sd">        derivative of the GMPE (as a function of distance) squared times the</span>
+<span class="sd">        additional variance from the conversion, added</span>
+<span class="sd">        to the variance of the GMPE (then taking the square root). We do</span>
+<span class="sd">        this separately for each of Rrup and Rjb and sum the results.</span>
+<span class="sd">        If Rrup and Rjb are calculated from a finite rupture model, their</span>
+<span class="sd">        variance arrays will be &quot;None&quot; and lsd will remain unchanged.</span>
+<span class="sd">        Otherwise the error inflation will be applied. Normally one or the</span>
+<span class="sd">        other of Rrup/Rjb will not be used and so that term will be zero; in</span>
+<span class="sd">        some cases both may be used and both may result in non-zero</span>
+<span class="sd">        derivatives.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            gmpe:</span>
+<span class="sd">                The GMPE to use for the calculations. Must be a base GMPE and</span>
+<span class="sd">                not a GMPE set, otherwise no action is taken.</span>
+<span class="sd">            lmean:</span>
+<span class="sd">                The mean values returned by the &quot;normal&quot; evaluation of the</span>
+<span class="sd">                GMPE.</span>
+<span class="sd">            lsd:</span>
+<span class="sd">                The standard deviations returned by the &quot;normal&quot; evaluation</span>
+<span class="sd">                of the GMPE.</span>
+<span class="sd">            sites:</span>
+<span class="sd">                The sites context required by the GMPE.</span>
+<span class="sd">            rup:</span>
+<span class="sd">                The rupture context required by the GMPE.</span>
+<span class="sd">            dists:</span>
+<span class="sd">                The distance context required by the GMPE.</span>
+<span class="sd">            imt:</span>
+<span class="sd">                The intensity measure type being evaluated.</span>
+<span class="sd">            stddev_types:</span>
+<span class="sd">                The list of stddev types found in lsd.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            list: A list of arrays of inflated standard deviations</span>
+<span class="sd">            corresponding to the elements of lsd.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_sd</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">delta_distance</span> <span class="o">=</span> <span class="mf">0.01</span>
+        <span class="n">delta_var</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">dtype</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">((</span><span class="s1">&#39;rrup&#39;</span><span class="p">,</span> <span class="s1">&#39;rjb&#39;</span><span class="p">)):</span>
+            <span class="c1"># Skip dtype if the gmpe does not require it</span>
+            <span class="k">if</span> <span class="n">dtype</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">REQUIRES_DISTANCES</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># Skip dtype if it has not been subject to a point-source to</span>
+            <span class="c1"># finite rupture conversion</span>
+            <span class="n">dvar</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">+</span> <span class="s1">&#39;_var&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dvar</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="c1"># Add a small amound to the rupture distance (rrup or rjb)</span>
+            <span class="c1"># and re-evaluate the GMPE</span>
+            <span class="n">rup_dist</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dists</span><span class="p">,</span> <span class="n">dtype</span><span class="p">)</span>
+            <span class="n">rup_dist</span> <span class="o">+=</span> <span class="n">delta_distance</span>
+            <span class="n">tmean</span><span class="p">,</span> <span class="n">tsd</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">get_mean_and_stddevs</span><span class="p">(</span><span class="n">sites</span><span class="p">,</span> <span class="n">rup</span><span class="p">,</span> <span class="n">dists</span><span class="p">,</span> <span class="n">imt</span><span class="p">,</span>
+                                                   <span class="n">stddev_types</span><span class="p">)</span>
+            <span class="c1"># Find the derivative w.r.t. the rupture distance</span>
+            <span class="n">dm_dr</span> <span class="o">=</span> <span class="p">(</span><span class="n">lmean</span> <span class="o">-</span> <span class="n">tmean</span><span class="p">)</span> <span class="o">/</span> <span class="n">delta_distance</span>
+            <span class="c1"># The additional variance is (dm/dr)^2 * dvar</span>
+            <span class="n">delta_var</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">dm_dr</span><span class="o">**</span><span class="mi">2</span> <span class="o">*</span> <span class="n">dvar</span>
+            <span class="c1"># Put the rupture distance back to what it was</span>
+            <span class="n">rup_dist</span> <span class="o">-=</span> <span class="n">delta_distance</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">stdtype</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">stddev_types</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">stdtype</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">:</span>
+                <span class="n">new_sd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">lsd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+                <span class="k">continue</span>
+            <span class="n">new_sd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">lsd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">delta_var</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">delta_var</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="k">return</span> <span class="n">new_sd</span></div></div>
 
 
 <div class="viewcode-block" id="filter_gmpe_list"><a class="viewcode-back" href="../../shakelib/shakelib.multigmpe.html#shakelib.multigmpe.filter_gmpe_list">[docs]</a><span class="k">def</span> <span class="nf">filter_gmpe_list</span><span class="p">(</span><span class="n">gmpes</span><span class="p">,</span> <span class="n">wts</span><span class="p">,</span> <span class="n">imt</span><span class="p">):</span>

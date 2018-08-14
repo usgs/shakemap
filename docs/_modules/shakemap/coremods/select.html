@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -114,7 +114,9 @@
         <span class="c1"># validate it</span>
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;select.conf&#39;</span><span class="p">))</span>
-        <span class="n">validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">install_path</span><span class="p">)</span>
+        <span class="n">global_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span>
+                                        <span class="s1">&#39;shakemap_data&#39;</span><span class="p">)</span>
+        <span class="n">validate_config</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">install_path</span><span class="p">,</span> <span class="n">data_path</span><span class="p">,</span> <span class="n">global_data_path</span><span class="p">)</span>
 
         <span class="c1"># ---------------------------------------------------------------------</span>
         <span class="c1"># Search through all custom regions, and the first one that we are</span>

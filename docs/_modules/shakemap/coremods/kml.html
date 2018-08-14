@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -51,8 +51,11 @@
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span> <span class="n">get_logging_config</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">path_macro_sub</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_config_paths</span><span class="p">,</span>
+                                   <span class="n">get_configspec</span><span class="p">,</span>
+                                   <span class="n">get_custom_validator</span><span class="p">,</span>
+                                   <span class="n">config_error</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.logging</span> <span class="k">import</span> <span class="n">get_logging_config</span>
 <span class="kn">from</span> <span class="nn">shakelib.plotting.contour</span> <span class="k">import</span> <span class="n">contour</span>
 <span class="kn">from</span> <span class="nn">impactutils.colors.cpalette</span> <span class="k">import</span> <span class="n">ColorPalette</span>
 <span class="kn">from</span> <span class="nn">mapio.grid2d</span> <span class="k">import</span> <span class="n">Grid2D</span>
@@ -129,9 +132,6 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">datafile</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">datafile</span><span class="p">)</span>
 
-        <span class="n">global_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span>
-                                        <span class="s1">&#39;shakemap_data&#39;</span><span class="p">)</span>
-
         <span class="c1"># Open the ShakeMapOutputContainer and extract the data</span>
         <span class="n">container</span> <span class="o">=</span> <span class="n">ShakeMapOutputContainer</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">datafile</span><span class="p">)</span>
 
@@ -142,10 +142,14 @@
         <span class="c1"># find the low res ocean vector dataset</span>
         <span class="n">product_config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
             <span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
-        <span class="n">pconfig</span> <span class="o">=</span> <span class="n">configobj</span><span class="o">.</span><span class="n">ConfigObj</span><span class="p">(</span><span class="n">product_config_file</span><span class="p">)</span>
+        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">(</span><span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
+        <span class="n">pconfig</span> <span class="o">=</span> <span class="n">configobj</span><span class="o">.</span><span class="n">ConfigObj</span><span class="p">(</span><span class="n">product_config_file</span><span class="p">,</span>
+                                      <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">pconfig</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">config_error</span><span class="p">(</span><span class="n">pconfig</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
         <span class="n">oceanfile</span> <span class="o">=</span> <span class="n">pconfig</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">][</span><span class="s1">&#39;lowres_oceans&#39;</span><span class="p">]</span>
-        <span class="n">oceanfile</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span><span class="n">oceanfile</span><span class="p">,</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
-                                   <span class="n">gp</span><span class="o">=</span><span class="n">global_data_path</span><span class="p">)</span>
 
         <span class="c1"># call create_kmz function</span>
         <span class="n">create_kmz</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">datadir</span><span class="p">,</span> <span class="n">oceanfile</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>

@@ -7,20 +7,19 @@ Data Formats
 About the HDF5 File Format
 ==========================
 
-HDF5 files are an efficient and flexible way to store large sets of 
-structured data.  HDF stands for Hierachical Data Format and is an 
-open-source project . The data 
-model consists of two types of objects: groups and datasets. Groups
-may contain datasets or other groups (along with associated metadata).
-Datasets may contain multidimensional arrays of data (along with
-accompanying metadata). Groups may be thought of as directories or
-folders, and datasets as files. The metadata associated with each object
-allows HDF5 files to be self describing. Data is stored in binary,
-making the files smaller and more efficient to read and write than 
-text-based formats (such as XML). For almost all uses
-a user will access the file through an API (bindings are available
-for many languages), making the details of file structure and layout 
-not relevant.
+HDF5 files are an efficient and flexible way to store large sets of
+structured data.  HDF stands for Hierarchical Data Format and is an
+open-source project . The data model consists of two types of objects:
+groups and datasets. Groups may contain datasets or other groups
+(along with associated metadata).  Datasets may contain
+multidimensional arrays of data (along with accompanying
+metadata). Groups may be thought of as directories or folders, and
+datasets as files. The metadata associated with each object allows
+HDF5 files to be self describing. Data is stored in binary, making the
+files smaller and more efficient to read and write than text-based
+formats (such as XML). For almost all uses a user will access the file
+through an API (bindings are available for many languages), making the
+details of file structure and layout not relevant.
 
 For more information on HDF5 see the 
 `HDF5 support page <https://support.hdfgroup.org/HDF5/>`_.
@@ -79,8 +78,8 @@ For example, a Python *config* dictionary consisting of the following informatio
         'depth': 34.0,
     }
 
-would be stored as a JSON string in a dataset called ``__config__``,
-under a group called ``__dictionaries__``. In languages that support
+would be stored as a JSON string in a dataset called ``config``,
+under a group called ``dictionaries``. In languages that support
 JSON, these strings can be easily converted into a data
 structure. Developers can access these properties using the
 `ShakeMapInputContainer interface
@@ -91,11 +90,13 @@ structure. Developers can access these properties using the
 +-----------------------+----------------------------+-------------+----------------------------------------------+
 | Name                  | Location                   | Python Type | Contents                                     |
 +=======================+============================+=============+==============================================+
-| config                | /dictionaries/config       | dictionary  | ShakeMap configuration                       |
+| config                | /dictionaries/config       | JSON string | ShakeMap configuration                       |
 +-----------------------+----------------------------+-------------+----------------------------------------------+
-| info.json             | /dictionaries/info.json    | string      | ShakeMap metadata in JSON format             |
+| info.json             | /dictionaries/info.json    | JSON string | ShakeMap metadata                            |
 +-----------------------+----------------------------+-------------+----------------------------------------------+
-| stations_dict         | /dictionaries/stations_dict| string      | Dictionary representation of the finite fault|
+| stations_dict         | /dictionaries/stations_dict| JSON string | Dictionary representation of observed data   |
++-----------------------+----------------------------+-------------+----------------------------------------------+
+| rupture               | /dictionaries/rupture      | JSON string | Dictionary representation of fault rupture   |
 +-----------------------+----------------------------+-------------+----------------------------------------------+
 
 It also will contain a number of grids, which, when read with the HDFContainer getGrid() method, return

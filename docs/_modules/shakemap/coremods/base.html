@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -46,7 +46,8 @@
 <span class="kn">from</span> <span class="nn">lxml</span> <span class="k">import</span> <span class="n">etree</span>
 
 <span class="c1"># local imports</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_logging_config</span><span class="p">,</span> <span class="n">get_config_paths</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.logging</span> <span class="k">import</span> <span class="n">get_logging_config</span>
 
 
 <div class="viewcode-block" id="CoreModule"><a class="viewcode-back" href="../../../apidoc/shakemap.coremods.base.html#shakemap.coremods.base.CoreModule">[docs]</a><span class="k">class</span> <span class="nc">CoreModule</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>

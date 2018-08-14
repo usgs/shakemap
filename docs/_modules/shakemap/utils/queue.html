@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -50,10 +50,9 @@
 
 <span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">config_error</span><span class="p">,</span>
                                    <span class="n">get_configspec</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
 
 <span class="n">MAX_SIZE</span> <span class="o">=</span> <span class="mi">4096</span>
-<span class="n">TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%S.</span><span class="si">%f</span><span class="s1">Z&#39;</span>
-<span class="n">ALT_TIMEFMT</span> <span class="o">=</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span>
 
 
 <div class="viewcode-block" id="send_queue"><a class="viewcode-back" href="../../../apidoc/shakemap.utils.queue.html#shakemap.utils.queue.send_queue">[docs]</a><span class="k">def</span> <span class="nf">send_queue</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">port</span><span class="o">=</span><span class="mi">9755</span><span class="p">):</span>
@@ -229,8 +228,12 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">current_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-    <span class="n">event_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">TIMEFMT</span><span class="p">)</span><span class="o">.</span>\
-        <span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">event_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span><span class="o">.</span>\
+            <span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">event_time</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;time&#39;</span><span class="p">],</span> <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span><span class="o">.</span>\
+            <span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="n">timezone</span><span class="o">.</span><span class="n">utc</span><span class="p">)</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;old_event_age&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span> <span class="ow">and</span> \
        <span class="n">event_time</span> <span class="o">+</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;old_event_age&#39;</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">current_time</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>

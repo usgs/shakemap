@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -49,7 +49,7 @@ of the authoritative ID.</p>
 </div></blockquote>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">sm_create</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">f</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="n">SOURCE</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">e</span> <span class="n">NETID</span> <span class="n">TIME</span> <span class="n">LON</span> <span class="n">LAT</span> <span class="n">DEP</span> <span class="n">MAG</span> <span class="n">LOCSTR</span><span class="p">]</span>
-                 <span class="p">[</span><span class="o">-</span><span class="n">b</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span><span class="p">]</span>
+                 <span class="p">[</span><span class="o">--</span><span class="n">network</span> <span class="n">NETWORK</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">n</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span><span class="p">]</span>
                  <span class="n">eventid</span>
 </pre></div>
 </div>
@@ -80,6 +80,9 @@ of the authoritative ID.</p>
 <tr><td class="option-group">
 <kbd>-e, --event</kbd></td>
 <td>Specify the event parameters (locstr should be in quotes)</td></tr>
+<tr><td class="option-group">
+<kbd>--network</kbd></td>
+<td>Specify network name to be filled in event.xml file</td></tr>
 <tr><td class="option-group" colspan="2">
 <kbd>-b, --skip-bounds</kbd></td>
 </tr>
