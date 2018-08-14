@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -288,7 +288,7 @@ horizontal top/bottom edges.</p>
 
 <dl class="method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.computeRrup">
-<code class="descname">computeRrup</code><span class="sig-paren">(</span><em>lon</em>, <em>lat</em>, <em>depth</em>, <em>var=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.computeRrup" title="Permalink to this definition">¶</a></dt>
+<code class="descname">computeRrup</code><span class="sig-paren">(</span><em>lon</em>, <em>lat</em>, <em>depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.computeRrup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.computeRrup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing rupture distance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -298,15 +298,13 @@ horizontal top/bottom edges.</p>
 <li><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</li>
 <li><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</li>
 <li><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</li>
-<li><strong>var</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also return variance of prediction. Unused, and
-will raise an exception if not False.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Rupture distance (km).</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A tuple of an array of rupture distance (km), and None.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
 </td>
 </tr>
 </tbody>
@@ -315,7 +313,7 @@ will raise an exception if not False.</li>
 
 <dl class="method">
 <dt id="shakelib.rupture.edge_rupture.EdgeRupture.computeRjb">
-<code class="descname">computeRjb</code><span class="sig-paren">(</span><em>lon</em>, <em>lat</em>, <em>depth</em>, <em>var=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.computeRjb" title="Permalink to this definition">¶</a></dt>
+<code class="descname">computeRjb</code><span class="sig-paren">(</span><em>lon</em>, <em>lat</em>, <em>depth</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/rupture/edge_rupture.html#EdgeRupture.computeRjb"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.rupture.edge_rupture.EdgeRupture.computeRjb" title="Permalink to this definition">¶</a></dt>
 <dd><p>Method for computing Joyner-Boore distance.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -325,15 +323,13 @@ will raise an exception if not False.</li>
 <li><strong>lon</strong> (<em>array</em>) – Numpy array of longitudes.</li>
 <li><strong>lat</strong> (<em>array</em>) – Numpy array of latitudes.</li>
 <li><strong>depth</strong> (<em>array</em>) – Numpy array of depths (km; positive down).</li>
-<li><strong>var</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/functions.html#bool" title="(in Python v3.6)"><em>bool</em></a>) – Also return variance of prediction. Unused, and
-will raise an exception if not False.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Joyner-Boore distance (km).</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A tuple of an array of Joyner-Boore distance (km), and None.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">array</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#tuple" title="(in Python v3.6)">tuple</a></p>
 </td>
 </tr>
 </tbody>

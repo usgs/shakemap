@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
@@ -181,13 +181,14 @@
         <span class="c1"># Total and intra-event uncertanty are inflated by the uncertainty</span>
         <span class="c1"># of the conversion; inter-event uncertainty is not.</span>
         <span class="c1">#</span>
+        <span class="n">ntypes</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">stddev_types</span><span class="p">)</span>
         <span class="n">nsd</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sdev</span><span class="p">)</span>
         <span class="n">mmi_sd</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">nsd</span>
         <span class="n">gm2mi_var</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gmice</span><span class="o">.</span><span class="n">getGM2MIsd</span><span class="p">()[</span><span class="bp">self</span><span class="o">.</span><span class="n">imt</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
         <span class="n">dmda</span> <span class="o">*=</span> <span class="n">dmda</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">nsd</span><span class="p">):</span>
             <span class="n">gm_var_in_mmi</span> <span class="o">=</span> <span class="n">dmda</span> <span class="o">*</span> <span class="n">sdev</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">**</span><span class="mi">2</span>
-            <span class="k">if</span> <span class="n">stddev_types</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">stddev_types</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="n">ntypes</span><span class="p">]</span> <span class="o">==</span> <span class="n">const</span><span class="o">.</span><span class="n">StdDev</span><span class="o">.</span><span class="n">INTER_EVENT</span><span class="p">:</span>
                 <span class="n">mmi_sd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">gm_var_in_mmi</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">mmi_sd</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">gm2mi_var</span> <span class="o">+</span> <span class="n">gm_var_in_mmi</span><span class="p">)</span>

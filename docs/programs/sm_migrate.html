@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -39,8 +39,9 @@
 <blockquote>
 <div><p>This program takes one required file, a tarball of one or more ShakeMap 3.5
 event directories.  To create this file, run a command like this:</p>
-<p>find . -maxdepth 3 -name “<em>_dat.xml” -o -name “*_fault.txt” -o -name “source.txt”
--o -name “info.json” -o -name “</em>.conf” | tar -czvf ~/sm35_inputs.tgz -T -</p>
+<p>find . -maxdepth 3 -name “<em>_dat.xml” -o -name “*_fault.txt” -o -name
+“source.txt” -o -name “info.json” -o -name “</em>.conf” | tar -czvf
+~/sm35_inputs.tgz -T -</p>
 <p>This program takes a subset of the ShakeMap 3.5 input data and the
 info.json file and uses those files to create the corresponding ShakeMap 4
 input data.</p>
@@ -71,10 +72,10 @@ GEM equivalent (see -m).</li>
 </ul>
 </dd>
 </dl>
-<p>NOTE: if the -b option is used without -s, ShakeMap 4 will create a model.conf
-file for the event that does not specify a GMPE. To use a GMPE other than the
-default when running the event, make sure you update each event’s model.conf
-file to include your chosen GMPE.</p>
+<p>NOTE: if the -b option is used without -s, ShakeMap 4 will create a
+model.conf file for the event that does not specify a GMPE. To use a GMPE
+other than the default when running the event, make sure you update each
+event’s model.conf file to include your chosen GMPE.</p>
 </div></blockquote>
 </p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">sm_migrate</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">i</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">m</span> <span class="n">MIGRATE_FILE</span><span class="p">]</span> <span class="n">tarfile</span>

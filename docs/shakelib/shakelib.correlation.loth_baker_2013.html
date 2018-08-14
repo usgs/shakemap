@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -18,7 +18,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="shakelib.directivity" href="shakelib.directivity.html" />
-    <link rel="prev" title="shakelib.correlation.goda_atkinson_2010" href="shakelib.correlation.goda_atkinson_2010.html" />
+    <link rel="prev" title="shakelib.correlation.dummy" href="shakelib.correlation.dummy.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
@@ -38,14 +38,14 @@
 <dl class="class">
 <dt id="shakelib.correlation.loth_baker_2013.LothBaker2013">
 <em class="property">class </em><code class="descclassname">shakelib.correlation.loth_baker_2013.</code><code class="descname">LothBaker2013</code><span class="sig-paren">(</span><em>periods</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakelib/correlation/loth_baker_2013.html#LothBaker2013"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakelib.correlation.loth_baker_2013.LothBaker2013" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="http://docs.python.org/3.5/library/functions.html#object" title="(in Python v3.6)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference internal" href="shakelib.correlation.ccf_base.html#shakelib.correlation.ccf_base.CrossCorrelationBase" title="shakelib.correlation.ccf_base.CrossCorrelationBase"><code class="xref py py-class docutils literal notranslate"><span class="pre">shakelib.correlation.ccf_base.CrossCorrelationBase</span></code></a></p>
 <p>Created by Christophe Loth, 12/18/2012
 Pythonized and vectorized by C. Bruce Worden, 3/15/2017
 Compute the spatial correlation of epsilons for the NGA ground motion
 models</p>
 <p>The function is strictly empirical, fitted over the range the range
 0.01s &lt;= t1, t2 &lt;= 10s</p>
-<p>Documentation is provided in the following document:
+<p>Documentation is provided in the following paper:
 Loth, C., and Baker, J. W. (2013). “A spatial cross-correlation model of
 ground motion spectral accelerations at multiple periods.”
 Earthquake Engineering &amp; Structural Dynamics, 42, 397-417.</p>
@@ -55,7 +55,7 @@ Earthquake Engineering &amp; Structural Dynamics, 42, 397-417.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>periods</strong> (<em>numpy.array</em>) – An array of periods that will be requested
-from the function. Values must be [0.01 -&gt; 10.0], and must me
+from the function. Values must be [0.01 -&gt; 10.0], and must be
 sorted from smallest to largest.</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">An instance of <a class="reference internal" href="#shakelib.correlation.loth_baker_2013.LothBaker2013" title="shakelib.correlation.loth_baker_2013.LothBaker2013"><code class="xref py py-class docutils literal notranslate"><span class="pre">LothBaker2013</span></code></a>.</td>
@@ -128,10 +128,8 @@ will have the same shape as the inputs.</p>
 <li class="toctree-l1 current"><a class="reference internal" href="shakelib.html">ShakeLib API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="shakelib.conversions.html">shakelib.conversions</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="shakelib.correlation.html">shakelib.correlation</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.baker_jayaram_2008.html">shakelib.correlation.baker_jayaram_2008</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.boore_2003.html">shakelib.correlation.boore_2003</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.ccf_base.html">shakelib.correlation.ccf_base</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.dummy.html">shakelib.correlation.dummy</a></li>
-<li class="toctree-l3"><a class="reference internal" href="shakelib.correlation.goda_atkinson_2010.html">shakelib.correlation.goda_atkinson_2010</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">shakelib.correlation.loth_baker_2013</a></li>
 </ul>
 </li>

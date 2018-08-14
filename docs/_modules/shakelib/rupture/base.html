@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -250,7 +250,7 @@
         <span class="k">return</span> <span class="n">repi</span></div>
 
 <div class="viewcode-block" id="Rupture.computeRjb"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.computeRjb">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">computeRjb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">def</span> <span class="nf">computeRjb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for computing Joyner-Boore distance.</span>
 
@@ -258,8 +258,6 @@
 <span class="sd">            lon (array): Numpy array of longitudes.</span>
 <span class="sd">            lat (array): Numpy array of latitudes.</span>
 <span class="sd">            depth (array): Numpy array of depths (km; positive down).</span>
-<span class="sd">            var (bool): Also return variance of prediction. Only meaningful</span>
-<span class="sd">                for the PointRupture subclass.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">           array: Joyner-Boore distance (km).</span>
@@ -268,7 +266,7 @@
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="Rupture.computeRrup"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.base.html#shakelib.rupture.base.Rupture.computeRrup">[docs]</a>    <span class="nd">@abstractmethod</span>
-    <span class="k">def</span> <span class="nf">computeRrup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="k">def</span> <span class="nf">computeRrup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method for computing rupture distance.</span>
 
@@ -276,8 +274,6 @@
 <span class="sd">            lon (array): Numpy array of longitudes.</span>
 <span class="sd">            lat (array): Numpy array of latitudes.</span>
 <span class="sd">            depth (array): Numpy array of depths (km; positive down).</span>
-<span class="sd">            var (bool): Also return variance of prediction. Only meaningful</span>
-<span class="sd">                for the PointRupture subclass.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">           array: Rupture distance (km).</span>

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -186,8 +186,13 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">validate_json</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
-    <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
-                                                  <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
+                                                      <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">HistoricTime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">][</span><span class="s1">&#39;time&#39;</span><span class="p">],</span>
+                                                      <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
+
     <span class="n">origin</span> <span class="o">=</span> <span class="n">Origin</span><span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="s1">&#39;metadata&#39;</span><span class="p">])</span>
 
     <span class="c1"># What type of rupture is this?</span>

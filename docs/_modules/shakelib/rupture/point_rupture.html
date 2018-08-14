@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -162,7 +162,7 @@
 <span class="sd">        PointRupture.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_origin</span><span class="o">.</span><span class="n">depth</span>
 
-<div class="viewcode-block" id="PointRupture.computeRjb"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.point_rupture.html#shakelib.rupture.point_rupture.PointRupture.computeRjb">[docs]</a>    <span class="k">def</span> <span class="nf">computeRjb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PointRupture.computeRjb"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.point_rupture.html#shakelib.rupture.point_rupture.PointRupture.computeRjb">[docs]</a>    <span class="k">def</span> <span class="nf">computeRjb</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert point-distances to Joyner-Boore distances based on magnitude.</span>
 
@@ -170,17 +170,14 @@
 <span class="sd">            lon (array): Numpy array of longitudes.</span>
 <span class="sd">            lat (array): Numpy array of latitudes.</span>
 <span class="sd">            depth (array): Numpy array of depths (km; positive down).</span>
-<span class="sd">            var (bool): Also return variance of prediction.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            If var is True then this returns a tuple of two arrays: first, the</span>
-<span class="sd">                predicted Rjb values, and second an array of the variance of</span>
-<span class="sd">                those predictions. If var is False then just the first element</span>
-<span class="sd">                of the tuple is returned.</span>
+<span class="sd">            tuple: A tuple of two arrays: first, the predicted Rjb values,</span>
+<span class="sd">            and second an array of the variance of those predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_computeRdist</span><span class="p">(</span><span class="s1">&#39;Rjb&#39;</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_computeRdist</span><span class="p">(</span><span class="s1">&#39;Rjb&#39;</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="PointRupture.computeRrup"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.point_rupture.html#shakelib.rupture.point_rupture.PointRupture.computeRrup">[docs]</a>    <span class="k">def</span> <span class="nf">computeRrup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="PointRupture.computeRrup"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.point_rupture.html#shakelib.rupture.point_rupture.PointRupture.computeRrup">[docs]</a>    <span class="k">def</span> <span class="nf">computeRrup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Convert point-distances to rupture distances based on magnitude.</span>
 
@@ -188,17 +185,14 @@
 <span class="sd">            lon (array): Numpy array of longitudes.</span>
 <span class="sd">            lat (array): Numpy array of latitudes.</span>
 <span class="sd">            depth (array): Numpy array of depths (km; positive down).</span>
-<span class="sd">            var (bool): Also return variance of prediction.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            If var is True then this returns a tuple of two arrays: first, the</span>
-<span class="sd">                predicted Rrup, and second an array of the variance of</span>
-<span class="sd">                those predictions. If var is False then just the first element</span>
-<span class="sd">                of the tuple is returned.</span>
+<span class="sd">            tuple: A tuple of two arrays: first, the predicted Rrup, and</span>
+<span class="sd">            second an array of the variance of those predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_computeRdist</span><span class="p">(</span><span class="s1">&#39;Rrup&#39;</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_computeRdist</span><span class="p">(</span><span class="s1">&#39;Rrup&#39;</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_computeRdist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rtype</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">var</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_computeRdist</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rtype</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper function to actually do the approximate fault distance</span>
 <span class="sd">        computations.</span>
@@ -208,14 +202,12 @@
 <span class="sd">            lon (array): Numpy array of longitudes.</span>
 <span class="sd">            lat (array): Numpy array of latitudes.</span>
 <span class="sd">            depth (array): Numpy array of depths (km; positive down).</span>
-<span class="sd">            var (bool): Also return variance of prediction.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            If var is True then this returns a tuple of two arrays: first, the</span>
-<span class="sd">                predicted approximate fault distance values (either Rjb or</span>
-<span class="sd">                Rrup, depending on the &#39;type&#39; argument), and second an array of</span>
-<span class="sd">                the variance of those predictions. If var is False then just</span>
-<span class="sd">                the first element of the tuple is returned.</span>
+<span class="sd">            tuple: A tuple of two arrays: first, the predicted approximate</span>
+<span class="sd">            fault distance values (either Rjb or Rrup, depending on the</span>
+<span class="sd">            &#39;type&#39; argument), and second an array of the variance of those</span>
+<span class="sd">            predictions.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">rtype</span> <span class="o">==</span> <span class="s1">&#39;Rjb&#39;</span><span class="p">:</span>
             <span class="n">dtype</span> <span class="o">=</span> <span class="n">DistType</span><span class="o">.</span><span class="n">Rjb</span>
@@ -284,12 +276,9 @@
         <span class="n">mags</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span><span class="p">)</span>
 
         <span class="n">r_hat</span> <span class="o">=</span> <span class="n">p2f</span><span class="o">.</span><span class="n">r2r</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">mags</span><span class="p">)</span>
+        <span class="n">r_var</span> <span class="o">=</span> <span class="n">p2f</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">mags</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">var</span> <span class="ow">is</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">r_var</span> <span class="o">=</span> <span class="n">p2f</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">repis</span><span class="p">,</span> <span class="n">mags</span><span class="p">)</span>
-            <span class="k">return</span> <span class="p">(</span><span class="n">r_hat</span><span class="p">,</span> <span class="n">r_var</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">r_hat</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">r_hat</span><span class="p">,</span> <span class="n">r_var</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PointRupture.computeGC2"><a class="viewcode-back" href="../../../shakelib/shakelib.rupture.point_rupture.html#shakelib.rupture.point_rupture.PointRupture.computeGC2">[docs]</a>    <span class="k">def</span> <span class="nf">computeGC2</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">depth</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>

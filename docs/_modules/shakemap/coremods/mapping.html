@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -77,11 +77,14 @@
 <span class="kn">from</span> <span class="nn">shakelib.rupture.factory</span> <span class="k">import</span> <span class="n">rupture_from_dict_and_origin</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.imt_string</span> <span class="k">import</span> <span class="n">oq_to_file</span>
 <span class="kn">from</span> <span class="nn">shakelib.plotting.contour</span> <span class="k">import</span> <span class="n">getContourLevels</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="p">(</span><span class="n">get_config_paths</span><span class="p">,</span>
+                                   <span class="n">get_configspec</span><span class="p">,</span>
+                                   <span class="n">get_custom_validator</span><span class="p">,</span>
+                                   <span class="n">config_error</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">path_macro_sub</span>
 <span class="kn">from</span> <span class="nn">impactutils.time.ancient_time</span> <span class="k">import</span> <span class="n">HistoricTime</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">get_object_from_config</span>
+<span class="kn">from</span> <span class="nn">shakelib.rupture</span> <span class="k">import</span> <span class="n">constants</span>
 
 
 <span class="n">CITY_COLS</span> <span class="o">=</span> <span class="mi">2</span>
@@ -208,10 +211,12 @@
 
         <span class="c1"># get the path to the products.conf file, load the config</span>
         <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">install_path</span><span class="p">,</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span> <span class="s1">&#39;products.conf&#39;</span><span class="p">)</span>
-        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
-
-        <span class="n">global_data_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s1">&#39;~&#39;</span><span class="p">),</span>
-                                        <span class="s1">&#39;shakemap_data&#39;</span><span class="p">)</span>
+        <span class="n">spec_file</span> <span class="o">=</span> <span class="n">get_configspec</span><span class="p">(</span><span class="s1">&#39;products&#39;</span><span class="p">)</span>
+        <span class="n">validator</span> <span class="o">=</span> <span class="n">get_custom_validator</span><span class="p">()</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigObj</span><span class="p">(</span><span class="n">config_file</span><span class="p">,</span> <span class="n">configspec</span><span class="o">=</span><span class="n">spec_file</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">validator</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">results</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+            <span class="n">config_error</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
 
         <span class="c1"># create contour files</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Mapping...&#39;</span><span class="p">)</span>
@@ -219,27 +224,13 @@
         <span class="c1"># get all of the pieces needed for the mapmaker</span>
         <span class="n">layerdict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">layers</span> <span class="o">=</span> <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;layers&#39;</span><span class="p">]</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;coast&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
-            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;coasts&#39;</span><span class="p">],</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
-            <span class="n">gp</span><span class="o">=</span><span class="n">global_data_path</span><span class="p">)</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;ocean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
-            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;oceans&#39;</span><span class="p">],</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
-            <span class="n">gp</span><span class="o">=</span><span class="n">global_data_path</span><span class="p">)</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;lake&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
-            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;lakes&#39;</span><span class="p">],</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
-            <span class="n">gp</span><span class="o">=</span><span class="n">global_data_path</span><span class="p">)</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
-            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;countries&#39;</span><span class="p">],</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
-            <span class="n">gp</span><span class="o">=</span><span class="n">global_data_path</span><span class="p">)</span>
-        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
-            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;states&#39;</span><span class="p">],</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
-            <span class="n">gp</span><span class="o">=</span><span class="n">global_data_path</span><span class="p">)</span>
-        <span class="n">topofile</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
-            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">],</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
-            <span class="n">gp</span><span class="o">=</span><span class="n">global_data_path</span><span class="p">)</span>
-        <span class="n">cities</span> <span class="o">=</span> <span class="n">path_macro_sub</span><span class="p">(</span>
-            <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;cities&#39;</span><span class="p">],</span> <span class="n">ip</span><span class="o">=</span><span class="n">install_path</span><span class="p">,</span> <span class="n">dp</span><span class="o">=</span><span class="n">data_path</span><span class="p">,</span>
-            <span class="n">gp</span><span class="o">=</span><span class="n">global_data_path</span><span class="p">)</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;coast&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;coasts&#39;</span><span class="p">]</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;ocean&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;oceans&#39;</span><span class="p">]</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;lake&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;lakes&#39;</span><span class="p">]</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;country&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;countries&#39;</span><span class="p">]</span>
+        <span class="n">layerdict</span><span class="p">[</span><span class="s1">&#39;state&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;states&#39;</span><span class="p">]</span>
+        <span class="n">topofile</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;topography&#39;</span><span class="p">]</span>
+        <span class="n">cities</span> <span class="o">=</span> <span class="n">layers</span><span class="p">[</span><span class="s1">&#39;cities&#39;</span><span class="p">]</span>
         <span class="n">mapmaker</span> <span class="o">=</span> <span class="n">MapMaker</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">topofile</span><span class="p">,</span> <span class="n">layerdict</span><span class="p">,</span> <span class="n">cities</span><span class="p">,</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
                             <span class="n">config</span><span class="p">[</span><span class="s1">&#39;products&#39;</span><span class="p">][</span><span class="s1">&#39;mapping&#39;</span><span class="p">][</span><span class="s1">&#39;operator&#39;</span><span class="p">])</span>
@@ -821,8 +812,12 @@
         <span class="n">hlat</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">lat</span>
         <span class="n">edict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">container</span><span class="o">.</span><span class="n">getMetadata</span><span class="p">()[</span><span class="s1">&#39;input&#39;</span><span class="p">][</span><span class="s1">&#39;event_information&#39;</span><span class="p">]</span>
         <span class="n">eloc</span> <span class="o">=</span> <span class="n">edict</span><span class="p">[</span><span class="s1">&#39;event_description&#39;</span><span class="p">]</span>
-        <span class="n">etime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span>
-            <span class="n">edict</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span> <span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">T%H:%M:%SZ&#39;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">etime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">edict</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span>
+                                      <span class="n">constants</span><span class="o">.</span><span class="n">TIMEFMT</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="n">etime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">edict</span><span class="p">[</span><span class="s1">&#39;origin_time&#39;</span><span class="p">],</span>
+                                      <span class="n">constants</span><span class="o">.</span><span class="n">ALT_TIMEFMT</span><span class="p">)</span>
         <span class="n">timestr</span> <span class="o">=</span> <span class="n">etime</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%b </span><span class="si">%d</span><span class="s1">, %Y %H:%M:%S&#39;</span><span class="p">)</span>
         <span class="n">mag</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">mag</span>
         <span class="k">if</span> <span class="n">hlon</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>

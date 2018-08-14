@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -48,7 +48,8 @@
 
 <span class="c1"># local imports</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="k">import</span> <span class="n">CoreModule</span>
-<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span><span class="p">,</span> <span class="n">get_logging_config</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.config</span> <span class="k">import</span> <span class="n">get_config_paths</span>
+<span class="kn">from</span> <span class="nn">shakemap.utils.logging</span> <span class="k">import</span> <span class="n">get_logging_config</span>
 <span class="kn">from</span> <span class="nn">shakelib.plotting.contour</span> <span class="k">import</span> <span class="n">contour</span>
 <span class="kn">from</span> <span class="nn">shakemap.utils.utils</span> <span class="k">import</span> <span class="n">get_object_from_config</span>
 <span class="kn">from</span> <span class="nn">shakelib.utils.containers</span> <span class="k">import</span> <span class="n">ShakeMapOutputContainer</span>
@@ -209,7 +210,8 @@
         <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
             <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="s1">&#39;float&#39;</span><span class="p">,</span>
             <span class="s1">&#39;units&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span>
+            <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="s1">&#39;str&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;weight&#39;</span><span class="p">:</span> <span class="s1">&#39;int&#39;</span>
         <span class="p">}</span>
     <span class="p">}</span>
     <span class="n">mmi_schema</span> <span class="o">=</span> <span class="p">{</span>

@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -95,6 +95,42 @@ and the data directory.</p>
 <li>FileNotFoundError – if the profile file can’t be found.</li>
 <li>ValueError – If the correct profile can’t be foun in profiles.conf.</li>
 </ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="shakemap.utils.config.path_macro_sub">
+<code class="descclassname">shakemap.utils.config.</code><code class="descname">path_macro_sub</code><span class="sig-paren">(</span><em>s</em>, <em>ip=''</em>, <em>dp=''</em>, <em>gp=''</em>, <em>ei=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#path_macro_sub"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.path_macro_sub" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replace macros with current paths:</p>
+<ul class="simple">
+<li>&lt;INSTALL_DIR&gt; is replaced with the contents of ip</li>
+<li>&lt;DATA_DIR&gt; is replaced with the contents of dp</li>
+<li>&lt;GLOBAL_DATA&gt; is replaced with the contents of gp</li>
+<li>&lt;EVENT_ID&gt; is replaced with the contents of ei</li>
+</ul>
+<p>e.g., path_macro_sub(“&lt;INSTALL_DIR&gt;/&lt;DATA_DIR&gt;”, “hello”, “world”)
+would return “hello/world”. It is not an error if the original string
+does not contain one or any of the substitution strings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>s</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string into which the replacements are made.</li>
+<li><strong>ip</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string with which to replace &lt;INSTALL_DIR&gt;.</li>
+<li><strong>dp</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string with which to replace &lt;DATA_DIR&gt;.</li>
+<li><strong>gp</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string with which to replace &lt;GLOBAL_DATA&gt;.</li>
+<li><strong>ei</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – The string with which to replace &lt;EVENT_ID&gt;.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">A new string with the sub-string replacements.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)">str</a></p>
 </td>
 </tr>
 </tbody>
@@ -264,7 +300,8 @@ coordinates.</td>
 <dt id="shakemap.utils.config.file_type">
 <code class="descclassname">shakemap.utils.config.</code><code class="descname">file_type</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#file_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.file_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if value is a valid file or an empty string.
-Raises a ValidateError exception on failure.</p>
+Raises a ValidateError exception on failure. Does macro substitution
+of &lt;INSTALL_DIR&gt;, &lt;DATA_DIR&gt;, and &lt;GLOBAL_DATA_DIR&gt;.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -283,7 +320,8 @@ Raises a ValidateError exception on failure.</p>
 <dt id="shakemap.utils.config.directory_type">
 <code class="descclassname">shakemap.utils.config.</code><code class="descname">directory_type</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#directory_type"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.directory_type" title="Permalink to this definition">¶</a></dt>
 <dd><p>Checks to see if value is a valid directory or an empty string.
-Raises a ValidateError exception on failure.</p>
+Raises a ValidateError exception on failure. Does macro substitution
+of &lt;INSTALL_DIR&gt;, &lt;DATA_DIR&gt;, and &lt;GLOBAL_DATA_DIR&gt;.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -363,49 +401,6 @@ ValidateError if the input can’t be converted to a float.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="shakemap.utils.config.get_logger">
-<code class="descclassname">shakemap.utils.config.</code><code class="descname">get_logger</code><span class="sig-paren">(</span><em>eventid</em>, <em>log_option=None</em>, <em>log_file=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_logger"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.get_logger" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return the logger instance for ShakeMap.  Only use once!</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>eventid</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – Event ID.</li>
-<li><strong>log_option</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#str" title="(in Python v3.6)"><em>str</em></a>) – One of ‘log’,’quiet’, ‘debug’, or None.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">logging Logger instance.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Logger</p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="shakemap.utils.config.get_logging_config">
-<code class="descclassname">shakemap.utils.config.</code><code class="descname">get_logging_config</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#get_logging_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.get_logging_config" title="Permalink to this definition">¶</a></dt>
-<dd><p>Extract logging configuration from logging.conf.</p>
-<p>See this URL for example of config.
-<a class="reference external" href="https://gist.github.com/st4lk/6287746">https://gist.github.com/st4lk/6287746</a></p>
-<p>See <a class="reference external" href="https://docs.python.org/3.5/library/logging.config.html">https://docs.python.org/3.5/library/logging.config.html</a></p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">Dictionary suitable for use with logging.config.dictConfig().</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
 <dt id="shakemap.utils.config.check_profile_config">
 <code class="descclassname">shakemap.utils.config.</code><code class="descname">check_profile_config</code><span class="sig-paren">(</span><em>config</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/config.html#check_profile_config"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.config.check_profile_config" title="Permalink to this definition">¶</a></dt>
 <dd><p>Validation checks on the profile config. At least one profile must exist
@@ -458,6 +453,8 @@ profile entry is removed.</p>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.dependencies.html">shakemap.utils.dependencies</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.generic_amp.html">shakemap.utils.generic_amp</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.macros.html">shakemap.utils.macros</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
 <li class="toctree-l3"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>

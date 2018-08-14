@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
+    <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
@@ -37,6 +37,9 @@
 <span class="kn">import</span> <span class="nn">numexpr</span> <span class="k">as</span> <span class="nn">ne</span>
 <span class="kn">import</span> <span class="nn">itertools</span> <span class="k">as</span> <span class="nn">it</span>
 
+<span class="kn">from</span> <span class="nn">shakelib.correlation.ccf_base</span> <span class="k">import</span> <span class="n">CrossCorrelationBase</span>
+
+<span class="c1"># Periods that apply to the axes in the cross-correlation tables</span>
 <span class="n">Tlist</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="mf">0.01</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mf">7.5</span><span class="p">,</span> <span class="mf">10.0001</span><span class="p">])</span>
 
 <span class="c1"># Table II. Short range coregionalization matrix, B1</span>
@@ -79,7 +82,7 @@
 <span class="p">])</span>
 
 
-<div class="viewcode-block" id="LothBaker2013"><a class="viewcode-back" href="../../../shakelib/shakelib.correlation.loth_baker_2013.html#shakelib.correlation.loth_baker_2013.LothBaker2013">[docs]</a><span class="k">class</span> <span class="nc">LothBaker2013</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="LothBaker2013"><a class="viewcode-back" href="../../../shakelib/shakelib.correlation.loth_baker_2013.html#shakelib.correlation.loth_baker_2013.LothBaker2013">[docs]</a><span class="k">class</span> <span class="nc">LothBaker2013</span><span class="p">(</span><span class="n">CrossCorrelationBase</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Created by Christophe Loth, 12/18/2012</span>
 <span class="sd">    Pythonized and vectorized by C. Bruce Worden, 3/15/2017</span>
@@ -89,7 +92,7 @@
 <span class="sd">    The function is strictly empirical, fitted over the range the range</span>
 <span class="sd">    0.01s &lt;= t1, t2 &lt;= 10s</span>
 
-<span class="sd">    Documentation is provided in the following document:</span>
+<span class="sd">    Documentation is provided in the following paper:</span>
 <span class="sd">    Loth, C., and Baker, J. W. (2013). “A spatial cross-correlation model of</span>
 <span class="sd">    ground motion spectral accelerations at multiple periods.”</span>
 <span class="sd">    Earthquake Engineering &amp; Structural Dynamics, 42, 397-417.</span>
@@ -101,7 +104,7 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            periods (numpy.array): An array of periods that will be requested</span>
-<span class="sd">                from the function. Values must be [0.01 -&gt; 10.0], and must me</span>
+<span class="sd">                from the function. Values must be [0.01 -&gt; 10.0], and must be</span>
 <span class="sd">                sorted from smallest to largest.</span>
 
 <span class="sd">        Returns:</span>
@@ -153,7 +156,7 @@
         <span class="c1"># Verify the validity of input arguments</span>
         <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">any</span><span class="p">(</span><span class="n">h</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;The separation distance must be positive&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ix1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ix2</span><span class="p">)</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ix1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">h</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ix1</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">ix2</span><span class="p">)</span> <span class="o">!=</span> <span class="n">np</span><span class="o">.</span><span class="n">shape</span><span class="p">(</span><span class="n">h</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s1">&#39;The input arguments must all have the same dimensions&#39;</span><span class="p">)</span>
 
@@ -165,11 +168,13 @@
         <span class="n">b1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b1</span><span class="p">[</span><span class="n">ix1</span><span class="p">,</span> <span class="n">ix2</span><span class="p">]</span>  <span class="c1"># noqa</span>
         <span class="n">b2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b2</span><span class="p">[</span><span class="n">ix1</span><span class="p">,</span> <span class="n">ix2</span><span class="p">]</span>  <span class="c1"># noqa</span>
         <span class="n">b3</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">b3</span><span class="p">[</span><span class="n">ix1</span><span class="p">,</span> <span class="n">ix2</span><span class="p">]</span>  <span class="c1"># noqa</span>
+        <span class="n">afact</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">20.0</span>  <span class="c1"># noqa</span>
+        <span class="n">bfact</span> <span class="o">=</span> <span class="o">-</span><span class="mf">3.0</span> <span class="o">/</span> <span class="mf">70.0</span>  <span class="c1"># noqa</span>
         <span class="c1">#</span>
         <span class="c1"># Compute the correlation coefficient (Equation 42)</span>
         <span class="c1">#</span>
         <span class="n">rho</span> <span class="o">=</span> <span class="n">ne</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
-            <span class="s2">&quot;b1 * exp(-3 * h / 20) + b2 * exp(-3 * h / 70) + (h == 0) * b3&quot;</span><span class="p">)</span>
+            <span class="s2">&quot;b1 * exp(h * afact) + b2 * exp(h * bfact) + (h == 0) * b3&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">rho</span></div></div>
 </pre></div>

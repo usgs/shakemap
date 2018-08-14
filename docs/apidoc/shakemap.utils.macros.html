@@ -1,0 +1,149 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>shakemap.utils.macros &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="shakemap.utils.probs" href="shakemap.utils.probs.html" />
+    <link rel="prev" title="shakemap.utils.logging" href="shakemap.utils.logging.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-shakemap.utils.macros">
+<span id="shakemap-utils-macros"></span><h1>shakemap.utils.macros<a class="headerlink" href="#module-shakemap.utils.macros" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="shakemap.utils.macros.get_macros">
+<code class="descclassname">shakemap.utils.macros.</code><code class="descname">get_macros</code><span class="sig-paren">(</span><em>info</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/shakemap/utils/macros.html#get_macros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#shakemap.utils.macros.get_macros" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a dictionary containing macros that can be used in shakemail
+text.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>info</strong> (<a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)"><em>dict</em></a>) – Dictionary returned from
+ShakeMapOutputContainer.getMetadata().</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="docutils">
+<dt>Dictionary containing following fields:</dt>
+<dd><ul class="first last simple">
+<li>MAG Event magnitude.</li>
+<li>LOC Location string.</li>
+<li>LAT Event latitude.</li>
+<li>LON Event longitude.</li>
+<li>DEP Event depth.</li>
+<li>DATETIME Event date/time (i.e., 2018-01-18T11:34:25.123456)</li>
+<li>DATE Event date (i.e., “Jan 31, 2018”)</li>
+<li>TIME Event time (i.e., “11:34:23”)</li>
+<li>EVENTID Earthquake event ID.</li>
+<li>NETID Earthquake network ID.</li>
+</ul>
+</dd>
+</dl>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python.org/3.5/library/stdtypes.html#dict" title="(in Python v3.6)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="shakemap.html">ShakeMap 4.0a API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="shakemap.coremods.html">shakemap.coremods</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="shakemap.utils.html">shakemap.utils</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.amps.html">shakemap.utils.amps</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.config.html">shakemap.utils.config</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.dependencies.html">shakemap.utils.dependencies</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.generic_amp.html">shakemap.utils.generic_amp</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.layers.html">shakemap.utils.layers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.logging.html">shakemap.utils.logging</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">shakemap.utils.macros</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.probs.html">shakemap.utils.probs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.queue.html">shakemap.utils.queue</a></li>
+<li class="toctree-l3"><a class="reference internal" href="shakemap.utils.utils.html">shakemap.utils.utils</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
