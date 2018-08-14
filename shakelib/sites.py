@@ -203,7 +203,7 @@ class Sites(object):
             sctx.lats = self._lats.copy()
             sctx.lons = self._lons.copy()
             if rock_vs30 is not None:
-                sctx.vs30 = np.ones_like(self._Vs30.getData()) * rock_vs30
+                sctx.vs30 = np.full_like(self._Vs30.getData(), rock_vs30)
             else:
                 sctx.vs30 = self._Vs30.getData().copy()
 
@@ -288,9 +288,11 @@ class Sites(object):
         Returns: A sites context with the depth parameters set.
         """
         sctx.z1pt0_cy14_cal = Sites._z1pt0_from_vs30_cy14_cal(sctx.vs30)
+        sctx.z1pt0_cy14_jpn = Sites._z1pt0_from_vs30_cy14_jpn(sctx.vs30)
         sctx.z1pt0_ask14_cal = Sites._z1pt0_from_vs30_ask14_cal(sctx.vs30)
-        sctx.z2pt5_cb14_cal = Sites._z2pt5_from_vs30_cb14_cal(
-            sctx.vs30) / 1000.0
+        sctx.z1pt0_ask14_jpn = Sites._z1pt0_from_vs30_ask14_jpn(sctx.vs30)
+        sctx.z2pt5_cb14_cal = Sites._z2pt5_from_vs30_cb14_cal(sctx.vs30)
+        sctx.z2pt5_cb14_jpn = Sites._z2pt5_from_vs30_cb14_jpn(sctx.vs30)
         sctx.z1pt0_cy08 = Sites._z1pt0_from_vs30_cy08(sctx.vs30)
         sctx.z2pt5_cb07 = Sites._z2pt5_from_z1pt0_cb07(sctx.z1pt0_cy08)
 
@@ -311,6 +313,20 @@ class Sites(object):
         return z1
 
     @staticmethod
+    def _z1pt0_from_vs30_cy14_jpn(vs30):
+        """
+        Compute z1.0 using CY14 relationship for Japan.
+
+        Args:
+            vs30: Numpy array of Vs30 values in m/s.
+
+        Returns: Numpy array of z1.0 in m.
+        """
+        z1 = np.exp(-(5.23 / 2.0) *
+                    np.log((vs30**2.0 + 412.**2.0) / (1360**2.0 + 412.**2.0)))
+        return z1
+
+    @staticmethod
     def _z1pt0_from_vs30_ask14_cal(vs30):
         """
         Calculate z1.0 using ASK14 relationship for California.
@@ -327,6 +343,22 @@ class Sites(object):
         return z1
 
     @staticmethod
+    def _z1pt0_from_vs30_ask14_jpn(vs30):
+        """
+        Calculate z1.0 using ASK14 relationship for Japan.
+
+        Args:
+            vs30: Numpy array of Vs30 values in m/s.
+
+        Returns: Numpy array of z1.0 in m.
+
+        """
+        # ASK14 define units as km, but implemented as m in OQ
+        z1 = np.exp(-(5.32 / 2.0) *
+                    np.log((vs30**2.0 + 412.**2) / (1360**2.0 + 412.**2)))
+        return z1
+
+    @staticmethod
     def _z2pt5_from_vs30_cb14_cal(vs30):
         """
         Calculate z2.5 using CB14 relationship for California.
@@ -337,7 +369,21 @@ class Sites(object):
         Returns: Numpy array of z2.5 in m. *NOTE*: OQ's CampbellBozorgnia2014
             class expects z2.5 to be in km!
         """
-        z2p5 = 1000 * np.exp(7.089 - 1.144 * np.log(vs30))
+        z2p5 = np.exp(7.089 - 1.144 * np.log(vs30))
+        return z2p5
+
+    @staticmethod
+    def _z2pt5_from_vs30_cb14_jpn(vs30):
+        """
+        Calculate z2.5 using CB14 relationship for Japan.
+
+        Args:
+            vs30: Numpy array of Vs30 values in m/s.
+
+        Returns: Numpy array of z2.5 in m. *NOTE*: OQ's CampbellBozorgnia2014
+            class expects z2.5 to be in km!
+        """
+        z2p5 = np.exp(5.359 - 1.102 * np.log(vs30))
         return z2p5
 
     @staticmethod
