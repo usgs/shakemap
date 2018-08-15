@@ -7,6 +7,9 @@ import logging
 import numpy as np
 
 from openquake.hazardlib.gsim.base import GMPE
+from openquake.hazardlib.gsim.boore_2014 import BooreEtAl2014
+from openquake.hazardlib.gsim.campbell_bozorgnia_2014 import (
+                                                CampbellBozorgnia2014)
 from openquake.hazardlib.imt import PGA, PGV, SA
 from openquake.hazardlib import const
 
@@ -715,18 +718,29 @@ class MultiGMPE(GMPE):
         sites = Sites._addDepthParameters(sites)
 
         if gmpe == 'AbrahamsonEtAl2014()' or \
-           gmpe == 'AbrahamsonEtAl2014RegJPN()':
+           gmpe == 'AbrahamsonEtAl2014RegTWN()' or \
+           gmpe == 'AbrahamsonEtAl2014RegCHN()':
             sites.z1pt0 = sites.z1pt0_ask14_cal
-        if gmpe == 'ChiouYoungs2014()':
-            # Also BooreEtAl2014() if using subclass with depth parameter
+        if gmpe == 'AbrahamsonEtAl2014RegJPN()':
+            sites.z1pt0 = sites.z1pt0_ask14_jpn
+        if gmpe == 'ChiouYoungs2014()' or \
+           isinstance(gmpe, BooreEtAl2014):
             sites.z1pt0 = sites.z1pt0_cy14_cal
-        if gmpe == 'CampbellBozorgnia2014()' or \
-           gmpe == 'CampbellBozorgnia2014JapanSite()':
-            sites.z2pt5 = sites.z2pt5_cb14_cal
-        if gmpe == 'ChiouYoungs2008()':
+        if isinstance(gmpe, CampbellBozorgnia2014):
+            if gmpe == 'CampbellBozorgnia2014JapanSite()' or \
+               gmpe == 'CampbellBozorgnia2014HighQJapanSite()' or \
+               gmpe == 'CampbellBozorgnia2014LowQJapanSite()':
+                sites.z2pt5 = sites.z2pt5_cb14_jpn
+            else:
+                sites.z2pt5 = sites.z2pt5_cb14_cal
+        if gmpe == 'ChiouYoungs2008()' or \
+           gmpe == 'Bradley20i3()' or \
+           gmpe == 'Bradley2013Volc()':
             sites.z1pt0 = sites.z1pt0_cy08
         if gmpe == 'CampbellBozorgnia2008()':
             sites.z2pt5 = sites.z2pt5_cb07
+        if gmpe == 'AbrahamsonSilva2008()':
+            sites.z1pt0 = gmpe._compute_median_z1pt0(sites.vs30)
 
         return sites
 
