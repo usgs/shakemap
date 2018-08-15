@@ -161,6 +161,7 @@ def _get_dyfi_dataframe(detail_or_url):
 
     df['netid'] = 'DYFI'
     df['source'] = "USGS (Did You Feel It?)"
+    df.columns = df.columns.str.upper()
     return (df, '')
 
 

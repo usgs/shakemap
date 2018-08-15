@@ -13,12 +13,14 @@ import warnings
 from libcomcat.search import get_event_by_id
 from configobj import ConfigObj
 from impactutils.time.ancient_time import HistoricTime
+from amptools.table import dataframe_to_xml
 
 # local imports
 from shakemap.utils.config import get_config_paths
 from shakelib.rupture.origin import write_event_file, Origin
 from shakelib.rupture.factory import text_to_json, rupture_from_dict_and_origin
 from shakemap.utils.utils import get_network_name, migrate_gmpe, set_gmpe
+from shakemap.coremods.dyfi import _get_dyfi_dataframe
 from shakelib.rupture import constants
 
 TIMEFMT2 = '%Y-%m-%dT%H:%M:%S'
@@ -213,9 +215,18 @@ def main(args):
     if detail is not None:
         # if this event has a shakemap, then we have more to do
         if not detail.hasProduct('shakemap'):
-            print('Event %s has no ShakeMap product. '
-                  'Creating a basic ShakeMap.'
-                  % detail.id)
+            if not detail.hasProduct('dyfi'):
+                print('Event %s has no ShakeMap product. '
+                      'Creating a basic ShakeMap.'
+                      % detail.id)
+            else:
+                print('Event %s has no ShakeMap product, but does have DYFI. '
+                      'Downloading that data.'
+                      % detail.id)
+                dataframe, msg = _get_dyfi_dataframe(detail)
+                data_file = os.path.join(event_dir, '%s_dat.xml' % eventid)
+                reference = 'USGS Did You Feel It? System'
+                dataframe_to_xml(dataframe, data_file, reference)
         else:
             if args.source:
                 source = args.source
