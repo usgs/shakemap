@@ -50,6 +50,21 @@ def test_select():
         else:
             os.remove(conf_file)
 
+    # Northridge, with moment tensor file
+    conf_file = os.path.join(datapath, 'northridge2', 'current',
+                             'model_select.conf')
+    if os.path.isfile(conf_file):
+        os.remove(conf_file)
+    try:
+        smod = SelectModule('northridge2')
+        smod.execute()
+    finally:
+        if not os.path.isfile(conf_file):
+            print('select failed!')
+            assert False
+        else:
+            os.remove(conf_file)
+
 
 if __name__ == '__main__':
     os.environ['CALLED_FROM_PYTEST'] = 'True'

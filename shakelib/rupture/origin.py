@@ -413,6 +413,15 @@ def read_moment_quakeml(momentfile):
     Returns:
         dict: Empty if momentfile is somehow not valid, or:
               - moment:
+                  - T:
+                    - azimuth
+                    - plunge
+                  - N:
+                    - azimuth
+                    - plunge
+                  - P:
+                    - azimuth
+                    - plunge
                   - NP1:
                     - strike: float
                     - dip: float
@@ -474,6 +483,12 @@ def read_moment_quakeml(momentfile):
         params['NP2'] = {'strike': plane2.strike,
                          'dip': plane2.dip,
                          'rake': plane2.rake}
+        params['T'] = {'azimuth': focal.principal_axes.t_axis.azimuth,
+                       'plunge': focal.principal_axes.t_axis.plunge}
+        params['N'] = {'azimuth': focal.principal_axes.n_axis.azimuth,
+                       'plunge': focal.principal_axes.n_axis.plunge}
+        params['P'] = {'azimuth': focal.principal_axes.p_axis.azimuth,
+                       'plunge': focal.principal_axes.p_axis.plunge}
 
     moment = {'moment': params}
     return moment

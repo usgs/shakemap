@@ -16,7 +16,8 @@ from openquake.hazardlib.geo.geodetic import azimuth
 from mapio.geodict import GeoDict
 import matplotlib.pyplot as plt
 from obspy.core.event import Catalog, FocalMechanism, Event
-from obspy.core.event.source import NodalPlane, NodalPlanes
+from obspy.core.event.source import (NodalPlane, NodalPlanes,
+                                     Axis, PrincipalAxes)
 
 from shakelib.rupture.origin import Origin, read_moment_quakeml
 from shakelib.rupture.quad_rupture import QuadRupture
@@ -1096,7 +1097,14 @@ def test_with_quakeml():
     np1 = NodalPlane(strike=259, dip=74, rake=10)
     np2 = NodalPlane(strike=166, dip=80, rake=164)
     nodal_planes = NodalPlanes(nodal_plane_1=np1, nodal_plane_2=np2)
-    focal = FocalMechanism(nodal_planes=nodal_planes)
+    taxis = Axis(plunge=40, azimuth=70)
+    naxis = Axis(plunge=50, azimuth=80)
+    paxis = Axis(plunge=60, azimuth=90)
+    paxes = PrincipalAxes(t_axis=taxis,
+                          n_axis=naxis,
+                          p_axis=paxis)
+    focal = FocalMechanism(nodal_planes=nodal_planes,
+                           principal_axes=paxes)
     event = Event(focal_mechanisms=[focal])
     catalog = Catalog(events=[event])
     event_text = '''<shakemap-data code_version="4.0" map_version="1">

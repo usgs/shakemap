@@ -1,0 +1,7 @@
+# This is a comment line
+mech=RS
+#zone=intraslab
+#region=CEUS
+#mag=3.0
+#depth=8.9
+description=Northridge Median
