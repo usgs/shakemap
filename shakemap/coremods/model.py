@@ -110,14 +110,17 @@ class ModelModule(CoreModule):
         # ---------------------------------------------------------------------
         self._setInputContainer()
         self.config = self.ic.getConfig()
+
         # ---------------------------------------------------------------------
         # Clear away results from previous runs
         # ---------------------------------------------------------------------
         self._clearProducts()
+
         # ---------------------------------------------------------------------
         # Retrieve a bunch of config options and set them as attributes
         # ---------------------------------------------------------------------
         self._setConfigOptions()
+
         # ---------------------------------------------------------------------
         # Instantiate the gmpe, gmice, and ipe
         # Here we make a placeholder gmpe so that we can make the
@@ -135,6 +138,7 @@ class ModelModule(CoreModule):
             self.ipe = VirtualIPE.fromFuncs(ipe_gmpe, self.gmice)
         else:
             self.ipe = get_object_from_config('ipe', 'modeling', self.config)
+
         # ---------------------------------------------------------------------
         # Get the rupture object and rupture context
         # ---------------------------------------------------------------------
@@ -146,11 +150,13 @@ class ModelModule(CoreModule):
         # TODO: figure out how to not have to do this
         if self.rx.rake is None:
             self.rx.rake = 0
+
         # ---------------------------------------------------------------------
         # The output locations: either a grid or a list of points
         # ---------------------------------------------------------------------
         self.logger.debug('Setting output params...')
         self._setOutputParams()
+
         # ---------------------------------------------------------------------
         # If the gmpe doesn't break down its stardard deviation into
         # within- and between-event terms, we need to handle things
@@ -165,6 +171,27 @@ class ModelModule(CoreModule):
             self.stddev_types = [oqconst.StdDev.TOTAL,
                                  oqconst.StdDev.INTER_EVENT,
                                  oqconst.StdDev.INTRA_EVENT]
+
+        # ---------------------------------------------------------------------
+        # Are we going to include directivity?
+        # ---------------------------------------------------------------------
+        # Config option?
+        dir_conf = self.config['modeling']['directivity']
+
+        # Is the rupture not a point source?
+        rup_check = not isinstance(self.rupture_obj, PointRupture)
+
+        if dir_conf and rup_check:
+            self.do_directivity = True
+            # The following attribute will be used to store a list of tuples,
+            # where each tuple will contain the result of the directivity model
+            # the associated distance context. The distance context is needed
+            # within the _gmas function for figuring out which of the results
+            # should be used when combining it with the GMPE result.
+            self.dir_results = []
+        else:
+            self.do_directivity = False
+
         # ---------------------------------------------------------------------
         # Station data: Create DataFrame(s) with the input data:
         # df1 for instrumented data
@@ -172,20 +199,24 @@ class ModelModule(CoreModule):
         # ---------------------------------------------------------------------
         self.logger.debug('Setting data frames...')
         self._setDataFrames()
+
         # ---------------------------------------------------------------------
         # Add the predictions, etc. to the data frames
         # ---------------------------------------------------------------------
         self.logger.debug('Populating data frames...')
         self._populateDataFrames()
+
         # ---------------------------------------------------------------------
         # Try to make all the derived IMTs possible from MMI (if we have MMI)
         # ---------------------------------------------------------------------
         self._deriveIMTsFromMMI()
         # ---------------------------------------------------------------------
+
         # ---------------------------------------------------------------------
         self._deriveMMIFromIMTs()
 
         self.logger.debug('Getting combined IMTs')
+
         # ---------------------------------------------------------------------
         # Get the combined set of input and output IMTs, their periods,
         # and an index dictionary, then make the cross-correlation function
@@ -200,6 +231,7 @@ class ModelModule(CoreModule):
                                           self.config, self.imt_per)
 
         self.logger.debug('Doing bias')
+
         # ---------------------------------------------------------------------
         # Do the bias for all of the input and output IMTs. Hold on
         # to some of the products that will be used for the interpolation.
@@ -234,7 +266,7 @@ class ModelModule(CoreModule):
 
         self._computeBias()
 
-        self._computeDirectivity()
+        self._computeDirectivityPredictionLocations()
 
         # ---------------------------------------------------------------------
         # Now do the MVN with the intra-event residuals
@@ -535,9 +567,9 @@ class ModelModule(CoreModule):
         for dfid in self.dataframes:
             dfn = getattr(self, dfid)
             df = dfn.df
-            #
+            # -----------------------------------------------------------------
             # Get the sites and distance contexts
-            #
+            # -----------------------------------------------------------------
             df['depth'] = np.zeros_like(df['lon'])
             lldict = {
                 'lons': df['lon'],
@@ -549,9 +581,32 @@ class ModelModule(CoreModule):
                 df['depth'], self.rupture_obj
             )
             dfn.dx = dist_obj.getDistanceContext()
-            #
+
+            # -----------------------------------------------------------------
+            # Are we doing directivity?
+            # -----------------------------------------------------------------
+            if self.do_directivity is True:
+                self.logger.info('Directivity for %s...' % dfid)
+                time1 = time.time()
+                dir_df = Rowshandel2013(
+                    self.rupture_obj._origin, self.rupture_obj,
+                    df['lat'].reshape((1, -1)),
+                    df['lon'].reshape((1, -1)),
+                    df['depth'].reshape((1, -1)),
+                    dx=1.0,
+                    T=Rowshandel2013.getPeriods(),
+                    a_weight=0.5,
+                    mtype=1
+                )
+                self.dir_results.append((dir_df, dfn.dx))
+                directivity_time = time.time() - time1
+                self.logger.debug(
+                    'Directivity %s evaluation time: %f sec'
+                    % (dfid, directivity_time))
+
+            # -----------------------------------------------------------------
             # Do the predictions and other bookkeeping for each IMT
-            #
+            # -----------------------------------------------------------------
             for imtstr in dfn.imts:
                 oqimt = imt.from_string(imtstr)
                 gmpe = None
@@ -596,9 +651,8 @@ class ModelModule(CoreModule):
                                       (imtstr, np.sum(flagged)))
                     df[imtstr + '_outliers'] = flagged
                 else:
-                    df[imtstr + '_outliers'] = np.full(df[imtstr].shape,
-                                                       False,
-                                                       dtype=np.bool)
+                    df[imtstr + '_outliers'] = np.full(
+                        df[imtstr].shape, False, dtype=np.bool)
                 #
                 # If uncertainty hasn't been set for MMI, give it
                 # the default value
@@ -882,36 +936,31 @@ class ModelModule(CoreModule):
                 % (imtstr, self.nominal_bias[imtstr], np.sqrt(nom_variance),
                    np.size(sta_lons_rad_dl), bias_time))
 
-    def _computeDirectivity(self):
+    def _computeDirectivityPredictionLocations(self):
         """
         Figure out if we need the directivity factors, and if so, pre-calculate
         them. These will be used later in _computeMVN.
         """
-
-        # Check config
-        do_dir = self.config['modeling']['directivity']
-
-        # Is the rupture not a point source?
-        rup = self.rupture_obj
-        rup_ok = not isinstance(rup, PointRupture)
-
-        if do_dir and rup_ok:
-            # -----------------------------------------------------------------
-            # For prediction locations
-            # -----------------------------------------------------------------
+        if self.do_directivity is True:
+            self.logger.info('Directivity for prediction locations...')
+            time1 = time.time()
 
             # Precompute directivity at all periods
-            self.directivity_out = Rowshandel2013(
-                rup._origin, rup,
-                self.lats, self.lons, np.zeros_like(self.lons),
+            dir_out = Rowshandel2013(
+                self.rupture_obj._origin, self.rupture_obj,
+                self.lats.reshape((1, -1)),
+                self.lons.reshape((1, -1)),
+                np.zeros_like((len(self.lats), 1)),
                 dx=1.0,
                 T=Rowshandel2013.getPeriods(),
                 a_weight=0.5,
                 mtype=1
             )
-            # -----------------------------------------------------------------
-            # For stations
-            # -----------------------------------------------------------------
+            self.dir_results.append((dir_out, self.dx_out))
+            directivity_time = time.time() - time1
+            self.logger.debug(
+                'Directivity prediction evaluation time: %f sec'
+                % directivity_time)
         else:
             self.directivity = None
 
@@ -924,6 +973,7 @@ class ModelModule(CoreModule):
         # Get the index of the (pesudo-) period of the output IMT
         #
         outperiod_ix = self.imt_per_ix[imtstr]
+
         #
         # Get the predictions at the output points
         #
@@ -933,6 +983,7 @@ class ModelModule(CoreModule):
             gmpe = MultiGMPE.from_config(self.config, filter_imt=oqimt)
         pout_mean, pout_sd = self._gmas(
             gmpe, self.sx_out, self.dx_out, oqimt, self.apply_gafs)
+
         if self.do_grid:
             #
             # Fill the grids for the regression plots
@@ -954,6 +1005,7 @@ class ModelModule(CoreModule):
             self.outgrid[imtstr] = pout_mean
             self.outsd[imtstr] = pout_sd[0]
             return
+
         #
         # Get an array of the within-event standard deviations for the
         # output IMT at the output points
@@ -970,6 +1022,7 @@ class ModelModule(CoreModule):
             self.psd_raw[imtstr] = pout_sd[5]
             self.tsd[imtstr] = pout_sd[1]
         pout_sd2 = np.power(self.psd[imtstr], 2.0)
+
         #
         # Bias the predictions, and add the residual variance to
         # phi
@@ -980,8 +1033,9 @@ class ModelModule(CoreModule):
         pout_mean += out_bias.reshape(pout_mean.shape)
         self.psd[imtstr] = np.sqrt(self.psd[imtstr]**2 + out_bias_var)
         pout_sd2 += out_bias_var.reshape(pout_sd2.shape)
-        self.psd_raw[imtstr] = np.sqrt(self.psd_raw[imtstr]**2 +
-                                       out_bias_var.reshape(pout_sd2.shape))
+        self.psd_raw[imtstr] = np.sqrt(
+            self.psd_raw[imtstr]**2 + out_bias_var.reshape(pout_sd2.shape))
+
         #
         # Unbias the station residuals and compute the
         # new phi that includes the variance of the bias
@@ -994,6 +1048,7 @@ class ModelModule(CoreModule):
             self.sta_resids[imtstr][i, 0] -= in_bias
             self.sta_phi[imtstr][i, 0] = np.sqrt(
                 self.sta_phi[imtstr][i, 0]**2 + in_bias_var)
+
         #
         # Update the omega factors to account for the bias and the
         # new value of phi
@@ -1002,6 +1057,7 @@ class ModelModule(CoreModule):
             self.sta_phi[imtstr]**2 + self.sta_sig_extra[imtstr]**2)
         corr_adj22 = corr_adj * corr_adj.T
         np.fill_diagonal(corr_adj22, 1.0)
+
         #
         # Re-build the covariance matrix of the residuals with
         # the full set of data
@@ -1014,6 +1070,7 @@ class ModelModule(CoreModule):
         t1_22 = np.tile(self.sta_period_ix[imtstr], (1, d22_cols))
         t2_22 = np.tile(self.sta_period_ix[imtstr].T, (d22_rows, 1))
         corr22 = self.ccf.getCorrelation(t1_22, t2_22, dist22)
+
         #
         # Rebuild sigma22_inv now that we have updated phi and
         # the correlation adjustment factors
@@ -1021,6 +1078,7 @@ class ModelModule(CoreModule):
         sigma22 = corr22 * corr_adj22 * \
             (self.sta_phi[imtstr] * self.sta_phi[imtstr].T)
         sigma22inv = np.linalg.pinv(sigma22)
+
         #
         # Now do the MVN itself...
         #
@@ -1102,6 +1160,7 @@ class ModelModule(CoreModule):
         # We only need to make the mask for one IMT, then we can
         # apply it to all of the other grids.
         refimt = list(self.imt_out_set)[0]
+
         #
         # Don't know what to do about this warning; hopefully someone
         # will fix maskoceans()
@@ -1127,8 +1186,8 @@ class ModelModule(CoreModule):
         #
         # Get the map grade
         #
-        mean_rat, mygrade = _get_map_grade(self.do_grid, self.outsd,
-                                           self.psd_raw, moutgrid)
+        mean_rat, mygrade = _get_map_grade(
+            self.do_grid, self.outsd, self.psd_raw, moutgrid)
         # ---------------------------------------------------------------------
         # This is the metadata for creating info.json
         # ---------------------------------------------------------------------
@@ -1313,6 +1372,7 @@ class ModelModule(CoreModule):
                     ((1.0 / sdf[myimt + '_pred_tau']**2) +
                      self.bias_den[myimt])
                 sdf[myimt + '_bias'] = mybias.flatten()
+
         # ---------------------------------------------------------------------
         # Add the station data. The stationlist object has the original
         # data and produces a GeoJSON object (a dictionary, really), but
@@ -1768,12 +1828,20 @@ class ModelModule(CoreModule):
             imt_ok = False
 
         # Did we calculate directivity?
-        calc_dir = self.directivity is not None
+        calc_dir = self.do_directivity
 
-        do_dir = imt_ok and calc_dir
+        if calc_dir and imt_ok:
+            # Use distance context to figure out which directivity result
+            # we need to use.
+            all_fd = None
+            for dirdf, tmpdx in self.dir_results:
+                if dx == tmpdx:
+                    all_fd = dirdf.getFd()
+                    break
+            if all_fd is None:
+                raise RuntimeError(
+                    "Failed to detect dataframe for directivity calculation.")
 
-        if do_dir:
-            all_fd = self.directivity.getFd()
             # Does oqimt match any of those periods?
             if tper in row_pers:
                 fd = all_fd[row_pers.index(tper)]
@@ -1789,9 +1857,9 @@ class ModelModule(CoreModule):
                 fd = fd_below + (np.log(tper) - x1) * \
                     (fd_above - fd_below)/(x2 - x1)
             if isinstance(oqimt, imt.MMI):
-                mean += fd
+                mean *= np.exp(fd.reshape(mean.shape))
             else:
-                mean *= np.exp(fd)
+                mean += fd.reshape(mean.shape)
 
         return mean, stddevs
 
