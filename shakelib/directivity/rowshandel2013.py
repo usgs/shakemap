@@ -566,6 +566,13 @@ class Rowshandel2013(object):
         self._WP = np.exp(-(np.log10(period / Tp) *
                             np.log10(period / Tp)) / (2 * sig * sig))
 
+    @classmethod
+    def getPeriods(cls):
+        """
+        Returns a list of the periods for which the model is defined.
+        """
+        return cls.__periods
+
 
 def _get_quad_slip_ds_ss(q, rake, cp, p):
     """

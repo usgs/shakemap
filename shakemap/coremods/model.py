@@ -60,9 +60,11 @@ from shakelib.directivity.rowshandel2013 import Rowshandel2013
 #                       It is only used when the GMPEs don't provide a
 #                       breakdown of the uncertainty terms.
 #
-SM_CONSTS = {'default_mmi_stddev': 0.3,
-             'min_mmi_convert': 4.0,
-             'default_stddev_inter': 0.35}
+SM_CONSTS = {
+    'default_mmi_stddev': 0.3,
+    'min_mmi_convert': 4.0,
+    'default_stddev_inter': 0.35
+}
 
 
 class DataFrame:
@@ -88,8 +90,10 @@ class ModelModule(CoreModule):
     contents['shakemapHDF'] = {
         'title': 'Comprehensive ShakeMap HDF Data File',
         'caption': 'HDF file containing all ShakeMap results.',
-        'formats': [{'filename': 'shake_result.hdf',
-                     'type': 'application/x-bag'}]
+        'formats': [{
+            'filename': 'shake_result.hdf',
+            'type': 'application/x-bag'
+        }]
     }
 
     def execute(self):
@@ -101,25 +105,25 @@ class ModelModule(CoreModule):
             FileNotFoundError: When the the shake_data HDF file does not exist.
         """
         self.logger.debug('Starting model...')
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Make the input container and extract the config
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self._setInputContainer()
         self.config = self.ic.getConfig()
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Clear away results from previous runs
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self._clearProducts()
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Retrieve a bunch of config options and set them as attributes
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self._setConfigOptions()
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Instantiate the gmpe, gmice, and ipe
         # Here we make a placeholder gmpe so that we can make the
         # rupture and distance contexts; later we'll make the
         # IMT-specific gmpes
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.default_gmpe = MultiGMPE.from_config(self.config)
 
         self.gmice = get_object_from_config('gmice', 'modeling', self.config)
@@ -131,9 +135,9 @@ class ModelModule(CoreModule):
             self.ipe = VirtualIPE.fromFuncs(ipe_gmpe, self.gmice)
         else:
             self.ipe = get_object_from_config('ipe', 'modeling', self.config)
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Get the rupture object and rupture context
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.rupture_obj = self.ic.getRuptureObject()
         if 'mechanism' in self.config['modeling']:
             self.rupture_obj._origin.setMechanism(
@@ -142,16 +146,16 @@ class ModelModule(CoreModule):
         # TODO: figure out how to not have to do this
         if self.rx.rake is None:
             self.rx.rake = 0
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # The output locations: either a grid or a list of points
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.logger.debug('Setting output params...')
         self._setOutputParams()
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # If the gmpe doesn't break down its stardard deviation into
         # within- and between-event terms, we need to handle things
         # somewhat differently.
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         gmpe_sd_types = self.default_gmpe.DEFINED_FOR_STANDARD_DEVIATION_TYPES
         if len(gmpe_sd_types) == 1:
             self.total_sd_only = True
@@ -161,31 +165,31 @@ class ModelModule(CoreModule):
             self.stddev_types = [oqconst.StdDev.TOTAL,
                                  oqconst.StdDev.INTER_EVENT,
                                  oqconst.StdDev.INTRA_EVENT]
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Station data: Create DataFrame(s) with the input data:
         # df1 for instrumented data
         # df2 for non-instrumented data
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.logger.debug('Setting data frames...')
         self._setDataFrames()
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Add the predictions, etc. to the data frames
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.logger.debug('Populating data frames...')
         self._populateDataFrames()
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Try to make all the derived IMTs possible from MMI (if we have MMI)
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self._deriveIMTsFromMMI()
-        # ------------------------------------------------------------------
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self._deriveMMIFromIMTs()
 
         self.logger.debug('Getting combined IMTs')
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Get the combined set of input and output IMTs, their periods,
         # and an index dictionary, then make the cross-correlation function
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.combined_imt_set = self.imt_out_set.copy()
         for ndf in self.dataframes:
             self.combined_imt_set |= getattr(self, ndf).imts
@@ -196,13 +200,13 @@ class ModelModule(CoreModule):
                                           self.config, self.imt_per)
 
         self.logger.debug('Doing bias')
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Do the bias for all of the input and output IMTs. Hold on
         # to some of the products that will be used for the interpolation.
         # The "raw" values are the stddevs that have not been inflated by
         # the additional sigma (if any) of the point-source to finite
         # rupture approximation.
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.nominal_bias = {}
         self.bias_num = {}  # The numerator term of the bias
         self.bias_den = {}  # The denominator of the bias (w/o the tau term)
@@ -230,9 +234,11 @@ class ModelModule(CoreModule):
 
         self._computeBias()
 
-        # ------------------------------------------------------------------
+        self._computeDirectivity()
+
+        # ---------------------------------------------------------------------
         # Now do the MVN with the intra-event residuals
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.outgrid = {}   # Holds the interpolated output arrays keyed by IMT
         self.outsd = {}     # Holds the standard deviation arrays keyed by IMT
 
@@ -245,21 +251,25 @@ class ModelModule(CoreModule):
         self.soilsd = {}
 
         self.logger.debug('Doing MVN...')
-        with cf.ThreadPoolExecutor(max_workers=self.max_workers) as ex:
-            ex.map(self._computeMVN, self.imt_out_set)
-#        self._computeMVN()
+        if self.max_workers > 0:
+            with cf.ThreadPoolExecutor(max_workers=self.max_workers) as ex:
+                ex.map(self._computeMVN, self.imt_out_set)
+        else:
+            for imt_str in self.imt_out_set:
+                self._computeMVN(imt_str)
 
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Output the data and metadata
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         product_path = os.path.join(self.datadir, 'products')
         if not os.path.isdir(product_path):
             os.mkdir(product_path)
         oc = ShakeMapOutputContainer.create(os.path.join(
             product_path, 'shake_result.hdf'))
-        # ------------------------------------------------------------------
+
+        # ---------------------------------------------------------------------
         # Might as well stick the whole config in the result
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         oc.setConfig(self.config)
 
         #
@@ -275,22 +285,22 @@ class ModelModule(CoreModule):
         info = self._getInfo(moutgrid)
         oc.setDictionary('info.json', info)
 
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Add the rupture JSON as a text string
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         oc.setRupture(self.rupture_obj)
 
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Fill the station dictionary for stationlist.json and add it to
         # the output container
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         sjdict = self._fillStationJSON()
         oc.setStationDict(sjdict)
 
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Add the output grids or points to the output; include some
         # metadata.
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         if self.do_grid:
             self._storeGriddedData(oc)
         else:
@@ -301,9 +311,9 @@ class ModelModule(CoreModule):
 
         oc.close()
         self.ic.close()
-    # ------------------------------------------------------------------
+    # -------------------------------------------------------------------------
     # End execute()
-    # ------------------------------------------------------------------
+    # -------------------------------------------------------------------------
 
     def _setInputContainer(self):
         """
@@ -350,41 +360,41 @@ class ModelModule(CoreModule):
         Returns:
             nothing
         """
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Processing parameters
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.max_workers = self.config['system']['max_workers']
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Do we apply the generic amplification factors?
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.apply_gafs = self.config['modeling']['apply_generic_amp_factors']
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Bias parameters
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.do_bias = self.config['modeling']['bias']['do_bias']
         self.bias_max_range = self.config['modeling']['bias']['max_range']
         self.bias_max_mag = self.config['modeling']['bias']['max_mag']
         self.bias_max_dsigma = \
             self.config['modeling']['bias']['max_delta_sigma']
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Outlier parameters
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.do_outliers = self.config['data']['outlier']['do_outliers']
         self.outlier_deviation_level = \
             self.config['data']['outlier']['max_deviation']
         self.outlier_max_mag = self.config['data']['outlier']['max_mag']
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # These are the IMTs we want to make
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.imt_out_set = set(self.config['interp']['imt_list'])
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # The x and y resolution of the output grid
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.smdx = self.config['interp']['prediction_location']['xres']
         self.smdy = self.config['interp']['prediction_location']['yres']
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Get the Vs30 file name
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         self.vs30default = self.config['data']['vs30default']
         self.vs30_file = self.config['data']['vs30file']
         if not self.vs30_file:
@@ -438,9 +448,10 @@ class ModelModule(CoreModule):
                 padding=True, resample=True
             )
 
-            self.sx_out = self.sites_obj_out.getSitesContext(
-                {'lats': self.lats,
-                 'lons': self.lons})
+            self.sx_out = self.sites_obj_out.getSitesContext({
+                'lats': self.lats,
+                'lons': self.lons
+            })
             # Replace the Vs30 from the grid (or default) with the Vs30
             # provided with the site list.
             if np.any(self.vs30 > 0):
@@ -450,9 +461,6 @@ class ModelModule(CoreModule):
             # GRID: Figure out the grid parameters and get output points
             #
             self.do_grid = True
-
-            dx = self.config['interp']['prediction_location']['xres']
-            print(dx)
 
             if self.config['interp']['prediction_location']['extent']:
                 self.W, self.S, self.E, self.N = \
@@ -531,10 +539,15 @@ class ModelModule(CoreModule):
             # Get the sites and distance contexts
             #
             df['depth'] = np.zeros_like(df['lon'])
-            lldict = {'lons': df['lon'], 'lats': df['lat']}
+            lldict = {
+                'lons': df['lon'],
+                'lats': df['lat']
+            }
             dfn.sx = self.sites_obj_out.getSitesContext(lldict)
-            dist_obj = Distance(self.default_gmpe, df['lon'], df['lat'],
-                                df['depth'], self.rupture_obj)
+            dist_obj = Distance(
+                self.default_gmpe, df['lon'], df['lat'],
+                df['depth'], self.rupture_obj
+            )
             dfn.dx = dist_obj.getDistanceContext()
             #
             # Do the predictions and other bookkeeping for each IMT
@@ -562,10 +575,10 @@ class ModelModule(CoreModule):
                 #
                 df[imtstr + '_residual'] = \
                     df[imtstr] - df[imtstr + '_pred']
-                # ----------------------------------------------------------
+                # -------------------------------------------------------------
                 # Do the outlier flagging if we have a fault, or we don't
                 # have a fault but the event magnitude is under the limit
-                # ----------------------------------------------------------
+                # -------------------------------------------------------------
                 if self.do_outliers and \
                         (not isinstance(self.rupture_obj, PointRupture) or
                          self.rx.mag <= self.outlier_max_mag):
@@ -869,6 +882,39 @@ class ModelModule(CoreModule):
                 % (imtstr, self.nominal_bias[imtstr], np.sqrt(nom_variance),
                    np.size(sta_lons_rad_dl), bias_time))
 
+    def _computeDirectivity(self):
+        """
+        Figure out if we need the directivity factors, and if so, pre-calculate
+        them. These will be used later in _computeMVN.
+        """
+
+        # Check config
+        do_dir = self.config['modeling']['directivity']
+
+        # Is the rupture not a point source?
+        rup = self.rupture_obj
+        rup_ok = not isinstance(rup, PointRupture)
+
+        if do_dir and rup_ok:
+            # -----------------------------------------------------------------
+            # For prediction locations
+            # -----------------------------------------------------------------
+
+            # Precompute directivity at all periods
+            self.directivity_out = Rowshandel2013(
+                rup._origin, rup,
+                self.lats, self.lons, np.zeros_like(self.lons),
+                dx=1.0,
+                T=Rowshandel2013.getPeriods(),
+                a_weight=0.5,
+                mtype=1
+            )
+            # -----------------------------------------------------------------
+            # For stations
+            # -----------------------------------------------------------------
+        else:
+            self.directivity = None
+
     def _computeMVN(self, imtstr):
         """
         Do the MVN computations
@@ -1083,9 +1129,9 @@ class ModelModule(CoreModule):
         #
         mean_rat, mygrade = _get_map_grade(self.do_grid, self.outsd,
                                            self.psd_raw, moutgrid)
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # This is the metadata for creating info.json
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         ip = 'input'
         ei = 'event_information'
         op = 'output'
@@ -1256,9 +1302,9 @@ class ModelModule(CoreModule):
         sjdict = {}
         if self.stations is None:
             return sjdict
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Compute a bias for all the IMTs in the data frames
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         for ndf in self.dataframes:
             sdf = getattr(self, ndf).df
             imts = getattr(self, ndf).imts
@@ -1267,15 +1313,18 @@ class ModelModule(CoreModule):
                     ((1.0 / sdf[myimt + '_pred_tau']**2) +
                      self.bias_den[myimt])
                 sdf[myimt + '_bias'] = mybias.flatten()
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         # Add the station data. The stationlist object has the original
         # data and produces a GeoJSON object (a dictionary, really), but
         # we need to add peak values and flagging that has been done here.
-        # ------------------------------------------------------------------
+        # ---------------------------------------------------------------------
         #
         # First make a dictionary of distances
         #
-        dist_dict = {'df1': {}, 'df2': {}}
+        dist_dict = {
+            'df1': {},
+            'df2': {}
+        }
         for ndf in self.dataframes:
             dx = getattr(self, ndf).dx
             for dm in get_distance_measures():
@@ -1294,7 +1343,10 @@ class ModelModule(CoreModule):
         # Get the index for each station ID
         #
         sjdict = self.stations.getGeoJson()
-        sta_ix = {'df1': {}, 'df2': {}}
+        sta_ix = {
+            'df1': {},
+            'df2': {}
+        }
         for ndf in self.dataframes:
             sdf = getattr(self, ndf).df
             sta_ix[ndf] = dict(zip(sdf['id'], range(len(sdf['id']))))
@@ -1517,13 +1569,17 @@ class ModelModule(CoreModule):
             # set the data grid
             mean_grid = Grid2D(value, gdict)
             mean_layername, units, digits = _get_layer_info(key)
-            mean_metadata = {'units': units,
-                             'digits': digits}
+            mean_metadata = {
+                'units': units,
+                'digits': digits
+            }
 
             # set the uncertainty grid
             std_layername, units, digits = _get_layer_info(key + '_sd')
-            std_metadata = {'units': units,
-                            'digits': digits}
+            std_metadata = {
+                'units': units,
+                'digits': digits
+            }
             std_grid = Grid2D(self.outsd[key], gdict.copy())
             oc.setIMTGrids(key,
                            mean_grid, mean_metadata,
@@ -1537,15 +1593,19 @@ class ModelModule(CoreModule):
         #
         # Store the Vs30
         #
-        vs30_metadata = {'units': 'm/s',
-                         'digits': 4}
+        vs30_metadata = {
+            'units': 'm/s',
+            'digits': 4
+        }
         oc.setArray('vs30', self.sx_out.vs30.flatten(),
                     metadata=vs30_metadata)
         #
         # Store the distances
         #
-        distance_metadata = {'units': 'km',
-                             'digits': 4}
+        distance_metadata = {
+            'units': 'km',
+            'digits': 4
+        }
         for dm in get_distance_measures():
             dm_arr = getattr(self.dx_out, dm, None)
             if dm_arr is None:
@@ -1568,12 +1628,16 @@ class ModelModule(CoreModule):
         for key, value in self.outgrid.items():
             # set the data grid
             mean_layername, units, digits = _get_layer_info(key)
-            mean_metadata = {'units': units,
-                             'digits': digits}
+            mean_metadata = {
+                'units': units,
+                'digits': digits
+            }
             # set the uncertainty grid
             std_layername, units, digits = _get_layer_info(key + '_sd')
-            std_metadata = {'units': units,
-                            'digits': digits}
+            std_metadata = {
+                'units': units,
+                'digits': digits
+            }
             oc.setIMTArrays(key, self.sx_out.lons.flatten(),
                             self.sx_out.lats.flatten(),
                             ascii_ids, value.flatten(), mean_metadata,
@@ -1664,9 +1728,9 @@ class ModelModule(CoreModule):
         else:
             pe = gmpe
 
-            # -------------------------------------------------------------------------
+            # --------------------------------------------------------------------
             # Describe the MultiGMPE
-            # -------------------------------------------------------------------------
+            # --------------------------------------------------------------------
             if not hasattr(self, '_info'):
                 self._info = {
                     'multigmpe': {}
@@ -1678,29 +1742,56 @@ class ModelModule(CoreModule):
             copy.deepcopy(dx), oqimt,
             self.stddev_types)
 
+        # Include generic amp factors?
         if apply_gafs:
             gafs = get_generic_amp_factors(sx, str(oqimt))
             if gafs is not None:
                 mean += gafs
 
-        # Check config
-        do_dir = get_object_from_config('directivity', 'modeling', self.config)
-        # Is the rupture not a point source?
-        rup = self.rupture_obj
-        rup_ok = not isinstance(rup, 'PointRupture')
+        # Does directivity apply to this imt?
+        row_pers = Rowshandel2013.getPeriods()
+
+        if isinstance(oqimt, imt.PGA):
+            imt_ok = False
+        elif isinstance(oqimt, imt.PGV) or isinstance(oqimt, imt.MMI):
+            tper = 1.0
+            imt_ok = True
+        elif isinstance(oqimt, imt.SA):
+            tper = oqimt.period
+            min_per = np.min(row_pers)
+            max_per = np.max(row_pers)
+            if (tper >= min_per) and (tper <= max_per):
+                imt_ok = True
+            else:
+                imt_ok = False
+        else:
+            imt_ok = False
+
+        # Did we calculate directivity?
+        calc_dir = self.directivity is not None
+
+        do_dir = imt_ok and calc_dir
 
         if do_dir:
-            dir_period = 1.0
-            R13 = Rowshandel2013.fromSites(
-                rup._origin, rup, sx,
-                dx=1.0,
-                T=dir_period,
-                a_weight=0.5,
-                mtype=1
-            )
-            fd = R13.getFd()[0]
-
-
+            all_fd = self.directivity.getFd()
+            # Does oqimt match any of those periods?
+            if tper in row_pers:
+                fd = all_fd[row_pers.index(tper)]
+            else:
+                # Log(period) interpolation.
+                apers = np.array(row_pers)
+                per_below = np.max(apers[apers < tper])
+                per_above = np.min(apers[apers > tper])
+                fd_below = all_fd[row_pers.index(per_below)]
+                fd_above = all_fd[row_pers.index(per_above)]
+                x1 = np.log(per_below)
+                x2 = np.log(per_above)
+                fd = fd_below + (np.log(tper) - x1) * \
+                    (fd_above - fd_below)/(x2 - x1)
+            if isinstance(oqimt, imt.MMI):
+                mean += fd
+            else:
+                mean *= np.exp(fd)
 
         return mean, stddevs
 
