@@ -155,8 +155,12 @@ def get_probs(origin, config):
     else:
         eid = origin.id
 
+    tensor_params = None
+    if hasattr(origin, 'moment'):
+        tensor_params = origin.moment
+
     strec_results = selector.getSubductionType(
-        lat, lon, depth, eid, tensor_params=None)
+        lat, lon, depth, eid, tensor_params=tensor_params)
 
     region_probs = get_region_probs(eid, depth, strec_results, config)
     in_subduction = strec_results['TectonicRegion'] == 'Subduction'
