@@ -237,7 +237,7 @@
             <span class="n">sctx</span><span class="o">.</span><span class="n">lats</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lats</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="n">sctx</span><span class="o">.</span><span class="n">lons</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_lons</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">rock_vs30</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">sctx</span><span class="o">.</span><span class="n">vs30</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Vs30</span><span class="o">.</span><span class="n">getData</span><span class="p">())</span> <span class="o">*</span> <span class="n">rock_vs30</span>
+                <span class="n">sctx</span><span class="o">.</span><span class="n">vs30</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">full_like</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_Vs30</span><span class="o">.</span><span class="n">getData</span><span class="p">(),</span> <span class="n">rock_vs30</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">sctx</span><span class="o">.</span><span class="n">vs30</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Vs30</span><span class="o">.</span><span class="n">getData</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
@@ -322,9 +322,11 @@
 <span class="sd">        Returns: A sites context with the depth parameters set.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">sctx</span><span class="o">.</span><span class="n">z1pt0_cy14_cal</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_z1pt0_from_vs30_cy14_cal</span><span class="p">(</span><span class="n">sctx</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
+        <span class="n">sctx</span><span class="o">.</span><span class="n">z1pt0_cy14_jpn</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_z1pt0_from_vs30_cy14_jpn</span><span class="p">(</span><span class="n">sctx</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
         <span class="n">sctx</span><span class="o">.</span><span class="n">z1pt0_ask14_cal</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_z1pt0_from_vs30_ask14_cal</span><span class="p">(</span><span class="n">sctx</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
-        <span class="n">sctx</span><span class="o">.</span><span class="n">z2pt5_cb14_cal</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_z2pt5_from_vs30_cb14_cal</span><span class="p">(</span>
-            <span class="n">sctx</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1000.0</span>
+        <span class="n">sctx</span><span class="o">.</span><span class="n">z1pt0_ask14_jpn</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_z1pt0_from_vs30_ask14_jpn</span><span class="p">(</span><span class="n">sctx</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
+        <span class="n">sctx</span><span class="o">.</span><span class="n">z2pt5_cb14_cal</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_z2pt5_from_vs30_cb14_cal</span><span class="p">(</span><span class="n">sctx</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
+        <span class="n">sctx</span><span class="o">.</span><span class="n">z2pt5_cb14_jpn</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_z2pt5_from_vs30_cb14_jpn</span><span class="p">(</span><span class="n">sctx</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
         <span class="n">sctx</span><span class="o">.</span><span class="n">z1pt0_cy08</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_z1pt0_from_vs30_cy08</span><span class="p">(</span><span class="n">sctx</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
         <span class="n">sctx</span><span class="o">.</span><span class="n">z2pt5_cb07</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_z2pt5_from_z1pt0_cb07</span><span class="p">(</span><span class="n">sctx</span><span class="o">.</span><span class="n">z1pt0_cy08</span><span class="p">)</span>
 
@@ -345,6 +347,20 @@
         <span class="k">return</span> <span class="n">z1</span>
 
     <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_z1pt0_from_vs30_cy14_jpn</span><span class="p">(</span><span class="n">vs30</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute z1.0 using CY14 relationship for Japan.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            vs30: Numpy array of Vs30 values in m/s.</span>
+
+<span class="sd">        Returns: Numpy array of z1.0 in m.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">z1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mf">5.23</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="n">vs30</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">412.</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1360</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">412.</span><span class="o">**</span><span class="mf">2.0</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">z1</span>
+
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_z1pt0_from_vs30_ask14_cal</span><span class="p">(</span><span class="n">vs30</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate z1.0 using ASK14 relationship for California.</span>
@@ -361,6 +377,22 @@
         <span class="k">return</span> <span class="n">z1</span>
 
     <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_z1pt0_from_vs30_ask14_jpn</span><span class="p">(</span><span class="n">vs30</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate z1.0 using ASK14 relationship for Japan.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            vs30: Numpy array of Vs30 values in m/s.</span>
+
+<span class="sd">        Returns: Numpy array of z1.0 in m.</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># ASK14 define units as km, but implemented as m in OQ</span>
+        <span class="n">z1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">(</span><span class="mf">5.32</span> <span class="o">/</span> <span class="mf">2.0</span><span class="p">)</span> <span class="o">*</span>
+                    <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">((</span><span class="n">vs30</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">412.</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1360</span><span class="o">**</span><span class="mf">2.0</span> <span class="o">+</span> <span class="mf">412.</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">z1</span>
+
+    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_z2pt5_from_vs30_cb14_cal</span><span class="p">(</span><span class="n">vs30</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Calculate z2.5 using CB14 relationship for California.</span>
@@ -371,7 +403,21 @@
 <span class="sd">        Returns: Numpy array of z2.5 in m. *NOTE*: OQ&#39;s CampbellBozorgnia2014</span>
 <span class="sd">            class expects z2.5 to be in km!</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">z2p5</span> <span class="o">=</span> <span class="mi">1000</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">7.089</span> <span class="o">-</span> <span class="mf">1.144</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vs30</span><span class="p">))</span>
+        <span class="n">z2p5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">7.089</span> <span class="o">-</span> <span class="mf">1.144</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vs30</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">z2p5</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_z2pt5_from_vs30_cb14_jpn</span><span class="p">(</span><span class="n">vs30</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate z2.5 using CB14 relationship for Japan.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            vs30: Numpy array of Vs30 values in m/s.</span>
+
+<span class="sd">        Returns: Numpy array of z2.5 in m. *NOTE*: OQ&#39;s CampbellBozorgnia2014</span>
+<span class="sd">            class expects z2.5 to be in km!</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">z2p5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="mf">5.359</span> <span class="o">-</span> <span class="mf">1.102</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">vs30</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">z2p5</span>
 
     <span class="nd">@staticmethod</span>

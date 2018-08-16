@@ -189,8 +189,12 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">eid</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">id</span>
 
+    <span class="n">tensor_params</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">origin</span><span class="p">,</span> <span class="s1">&#39;moment&#39;</span><span class="p">):</span>
+        <span class="n">tensor_params</span> <span class="o">=</span> <span class="n">origin</span><span class="o">.</span><span class="n">moment</span>
+
     <span class="n">strec_results</span> <span class="o">=</span> <span class="n">selector</span><span class="o">.</span><span class="n">getSubductionType</span><span class="p">(</span>
-        <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">eid</span><span class="p">,</span> <span class="n">tensor_params</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">eid</span><span class="p">,</span> <span class="n">tensor_params</span><span class="o">=</span><span class="n">tensor_params</span><span class="p">)</span>
 
     <span class="n">region_probs</span> <span class="o">=</span> <span class="n">get_region_probs</span><span class="p">(</span><span class="n">eid</span><span class="p">,</span> <span class="n">depth</span><span class="p">,</span> <span class="n">strec_results</span><span class="p">,</span> <span class="n">config</span><span class="p">)</span>
     <span class="n">in_subduction</span> <span class="o">=</span> <span class="n">strec_results</span><span class="p">[</span><span class="s1">&#39;TectonicRegion&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;Subduction&#39;</span>

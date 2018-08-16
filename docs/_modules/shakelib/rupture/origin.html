@@ -447,6 +447,15 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: Empty if momentfile is somehow not valid, or:</span>
 <span class="sd">              - moment:</span>
+<span class="sd">                  - T:</span>
+<span class="sd">                    - azimuth</span>
+<span class="sd">                    - plunge</span>
+<span class="sd">                  - N:</span>
+<span class="sd">                    - azimuth</span>
+<span class="sd">                    - plunge</span>
+<span class="sd">                  - P:</span>
+<span class="sd">                    - azimuth</span>
+<span class="sd">                    - plunge</span>
 <span class="sd">                  - NP1:</span>
 <span class="sd">                    - strike: float</span>
 <span class="sd">                    - dip: float</span>
@@ -508,6 +517,12 @@
         <span class="n">params</span><span class="p">[</span><span class="s1">&#39;NP2&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;strike&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">strike</span><span class="p">,</span>
                          <span class="s1">&#39;dip&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">dip</span><span class="p">,</span>
                          <span class="s1">&#39;rake&#39;</span><span class="p">:</span> <span class="n">plane2</span><span class="o">.</span><span class="n">rake</span><span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;T&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+                       <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">t_axis</span><span class="o">.</span><span class="n">plunge</span><span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;N&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+                       <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">n_axis</span><span class="o">.</span><span class="n">plunge</span><span class="p">}</span>
+        <span class="n">params</span><span class="p">[</span><span class="s1">&#39;P&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;azimuth&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">azimuth</span><span class="p">,</span>
+                       <span class="s1">&#39;plunge&#39;</span><span class="p">:</span> <span class="n">focal</span><span class="o">.</span><span class="n">principal_axes</span><span class="o">.</span><span class="n">p_axis</span><span class="o">.</span><span class="n">plunge</span><span class="p">}</span>
 
     <span class="n">moment</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;moment&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">}</span>
     <span class="k">return</span> <span class="n">moment</span></div>
