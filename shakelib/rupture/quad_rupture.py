@@ -133,8 +133,8 @@ class QuadRupture(Rupture):
         # dot product
         sxdd = ddn.dot(s0sx)
 
-        # get width of quad
-        w = utils.get_quad_width(quad)
+        # get width of quad (convert from km to m)
+        w = utils.get_quad_width(quad)*1000
 
         # Get weights for top and bottom edge depths
         N = utils.get_quad_normal(quad)
@@ -173,7 +173,7 @@ class QuadRupture(Rupture):
         wsum = 0.0
         for quad in self._quadrilaterals:
             wsum = wsum + utils.get_quad_width(quad)
-        mwidth = (wsum / len(self._quadrilaterals)) / 1000.0
+        mwidth = (wsum / len(self._quadrilaterals))
         return mwidth
 
     def getArea(self):
@@ -747,7 +747,7 @@ class QuadRupture(Rupture):
         widths = np.zeros(nquad)
         for i in range(nquad):
             q = self._quadrilaterals[i]
-            widths[i] = utils.get_quad_width(q) / 1000.0
+            widths[i] = utils.get_quad_width(q)
         return widths
 
     def getIndividualTopLengths(self):

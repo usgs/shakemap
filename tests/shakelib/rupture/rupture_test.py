@@ -418,7 +418,7 @@ def test_QuadRupture():
     np.testing.assert_allclose(rupj.lats, rupt.lats, atol=1e-5)
     np.testing.assert_allclose(rupj.lons, rupt.lons, atol=1e-5)
     np.testing.assert_allclose(rupj._depth, rupt._depth, atol=1e-5)
-    np.testing.assert_allclose(rupt.getArea(), 2391282.2653900268, atol=1e-5)
+    np.testing.assert_allclose(rupt.getArea(), 2391.2822653900268, atol=1e-5)
 
     target = np.array(
         [29.51528,  29.3376,  29.3376,  29.51528005,
