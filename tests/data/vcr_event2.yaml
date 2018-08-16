@@ -1,0 +1,1234 @@
+interactions:
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [earthquake.usgs.gov]
+      User-Agent: [Python-urllib/3.5]
+    method: GET
+    uri: https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&includedeleted=false&includesuperseded=false&eventid=ci14745580
+  response:
+    body: {string: '{"type":"Feature","properties":{"mag":5.72,"place":"8km ESE of
+        Ocotillo, CA","time":1276576018240,"updated":1493230261552,"tz":null,"url":"https://earthquake.usgs.gov/earthquakes/eventpage/ci14745580","felt":38686,"cdi":7.7,"mmi":7.8,"alert":"green","status":"reviewed","tsunami":0,"sig":1273,"net":"ci","code":"14745580","ids":",atlas20100615042658,ci10159042,ci14745580,choy20100615042658,gcmtc201006150426a,usp000he04,iscgem14771060,","sources":",atlas,ci,ci,choy,gcmt,us,iscgem,","types":",associate,dyfi,focal-mechanism,general-text,impact-text,losspager,moment-tensor,moment-tensor,moment-tensor,nearby-cities,origin,phase-data,poster,shakemap,trump-shakemap,","nst":45,"dmin":0.05832,"rms":0.2,"gap":71,"magType":"mw","type":"earthquake","title":"M
+        5.7 - 8km ESE of Ocotillo, CA","products":{"associate":[{"indexid":"139291982","indexTime":1492719509799,"id":"urn:usgs-product:admin:associate:ci10159042_ci14745580:1492719507570","type":"associate","code":"ci10159042_ci14745580","source":"admin","updateTime":1492719507570,"status":"UPDATE","properties":{"eventsource":"ci","eventsourcecode":"10159042","othereventsource":"ci","othereventsourcecode":"14745580","pdl-client-version":"Version
+        1.10.1 2016-04-07"},"preferredWeight":1,"contents":{"":{"contentType":"1","lastModified":1492719507000,"length":35,"bytes":"multiple
+        event ids from same source"}}},{"indexid":"139291972","indexTime":1492719509321,"id":"urn:usgs-product:admin:associate:atlas20100615042658_ci14745580:1492719507498","type":"associate","code":"atlas20100615042658_ci14745580","source":"admin","updateTime":1492719507498,"status":"UPDATE","properties":{"eventsource":"atlas","eventsourcecode":"20100615042658","othereventsource":"ci","othereventsourcecode":"14745580","pdl-client-version":"Version
+        1.10.1 2016-04-07"},"preferredWeight":1,"contents":{"":{"contentType":"1","lastModified":1492719507000,"length":35,"bytes":"multiple
+        event ids from same source"}}}],"dyfi":[{"indexid":"47210012","indexTime":1422409422552,"id":"urn:usgs-product:us:dyfi:ci14745580:1422409416028","type":"dyfi","code":"ci14745580","source":"us","updateTime":1422409416028,"status":"UPDATE","properties":{"depth":"6.9","eventsource":"ci","eventsourcecode":"14745580","eventtime":"2010-06-15T04:26:58.000Z","latitude":"32.6978","longitude":"-115.9235","magnitude":"5.7","maxmmi":"7.7","num-responses":"38686","numResp":"38686"},"preferredWeight":51,"contents":{"cdi_geo.txt":{"contentType":"text/plain","lastModified":1422409415000,"length":33425,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/cdi_geo.txt"},"cdi_geo.xml":{"contentType":"application/octet-stream","lastModified":1422409415000,"length":88457,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/cdi_geo.xml"},"cdi_zip.txt":{"contentType":"text/plain","lastModified":1422409415000,"length":40727,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/cdi_zip.txt"},"cdi_zip.xml":{"contentType":"application/octet-stream","lastModified":1422409415000,"length":163820,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/cdi_zip.xml"},"ci14745580_ciim.jpg":{"contentType":"image/jpeg","lastModified":1422409415000,"length":127513,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_ciim.jpg"},"ci14745580_ciim.pdf":{"contentType":"application/octet-stream","lastModified":1422409415000,"length":406340,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_ciim.pdf"},"ci14745580_ciim.ps":{"contentType":"application/postscript","lastModified":1422409415000,"length":729557,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_ciim.ps"},"ci14745580_ciim_geo.jpg":{"contentType":"image/jpeg","lastModified":1422409415000,"length":115571,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_ciim_geo.jpg"},"ci14745580_ciim_geo.pdf":{"contentType":"application/octet-stream","lastModified":1422409415000,"length":282272,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_ciim_geo.pdf"},"ci14745580_ciim_geo.ps":{"contentType":"application/postscript","lastModified":1422409415000,"length":511616,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_ciim_geo.ps"},"ci14745580_ciim_geo_imap.html":{"contentType":"text/html","lastModified":1422409415000,"length":99679,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_ciim_geo_imap.html"},"ci14745580_ciim_imap.html":{"contentType":"text/html","lastModified":1422409415000,"length":267855,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_ciim_imap.html"},"ci14745580_dyfimap.kmz":{"contentType":"application/octet-stream","lastModified":1422409415000,"length":1120,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_dyfimap.kmz"},"ci14745580_dyfiraw.kmz":{"contentType":"application/octet-stream","lastModified":1422409415000,"length":343153,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_dyfiraw.kmz"},"ci14745580_plot_atten.jpg":{"contentType":"image/jpeg","lastModified":1422409415000,"length":74181,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_plot_atten.jpg"},"ci14745580_plot_atten.ps":{"contentType":"application/postscript","lastModified":1422409415000,"length":65772,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_plot_atten.ps"},"ci14745580_plot_numresp.jpg":{"contentType":"image/jpeg","lastModified":1422409415000,"length":44001,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_plot_numresp.jpg"},"ci14745580_plot_numresp.ps":{"contentType":"application/postscript","lastModified":1422409415000,"length":30079,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/ci14745580_plot_numresp.ps"},"contents.xml":{"contentType":"application/octet-stream","lastModified":1422409415000,"length":3060,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/contents.xml"},"dyfi.kmz":{"contentType":"application/octet-stream","lastModified":1422409415000,"length":1151,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/dyfi.kmz"},"dyfi_geo.kmz":{"contentType":"application/octet-stream","lastModified":1422409415000,"length":25715,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/dyfi_geo.kmz"},"dyfi_zip.kmz":{"contentType":"application/octet-stream","lastModified":1422409415000,"length":210486,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/dyfi_zip.kmz"},"event_data.xml":{"contentType":"application/octet-stream","lastModified":1422409415000,"length":2916,"url":"https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/event_data.xml"}}}],"focal-mechanism":[{"indexid":"42258201","indexTime":1417563428032,"id":"urn:usgs-product:us:focal-mechanism:pde20100615042658480_5_B_US:1415324501091","type":"focal-mechanism","code":"pde20100615042658480_5_B_US","source":"us","updateTime":1415324501091,"status":"UPDATE","properties":{"beachball-source":"US","derived-depth":"8","evaluation-status":"reviewed","eventParametersPublicID":"quakeml:US.anss.org/eventParameters/pde20100615042658480_5/1415324501091","eventsource":"us","eventsourcecode":"p000he04","nodal-plane-1-dip":"80","nodal-plane-1-rake":"5","nodal-plane-1-strike":"35","nodal-plane-2-dip":"85","nodal-plane-2-rake":"170","nodal-plane-2-strike":"304","quakeml-publicid":"quakeml:us.anss.org/focalMechanism/pde20100615042658480_5/B/US","review-status":"reviewed","scalar-moment":"25000000000000","sourcetime-duration":"6.0","sourcetime-type":"UNKNOWN"},"preferredWeight":6,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1417563091000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/focal-mechanism/pde20100615042658480_5_B_US/us/1415324501091/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1415324501000,"length":1908,"url":"https://earthquake.usgs.gov/archive/product/focal-mechanism/pde20100615042658480_5_B_US/us/1415324501091/quakeml.xml"}}},{"indexid":"105317442","indexTime":1478744976279,"id":"urn:usgs-product:us:focal-mechanism:gcmtC201006150426A:1478744975684","type":"focal-mechanism","code":"gcmtC201006150426A","source":"us","updateTime":1478744975684,"status":"UPDATE","properties":{"evaluation-status":"reviewed","eventParametersPublicID":"quakeml:us.anss.org/eventParameters/C201006150426A","eventsource":"gcmt","eventsourcecode":"c201006150426a","n-axis-azimuth":"172","n-axis-plunge":"81","nodal-plane-1-dip":"83","nodal-plane-1-rake":"-6","nodal-plane-1-strike":"39","nodal-plane-2-dip":"84","nodal-plane-2-rake":"-173","nodal-plane-2-strike":"129","p-axis-azimuth":"354","p-axis-plunge":"9","quakeml-publicid":"quakeml:us.anss.org/focalmechanism/C201006150426A/Mwc","review-status":"reviewed","t-axis-azimuth":"264","t-axis-plunge":"0"},"preferredWeight":1,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1478744975000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/focal-mechanism/gcmtC201006150426A/us/1478744975684/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1478744975000,"length":2262,"url":"https://earthquake.usgs.gov/archive/product/focal-mechanism/gcmtC201006150426A/us/1478744975684/quakeml.xml"}}},{"indexid":"57329022","indexTime":1435684998059,"id":"urn:usgs-product:us:focal-mechanism:choy20100615042658:1435683543711","type":"focal-mechanism","code":"choy20100615042658","source":"us","updateTime":1435683543711,"status":"UPDATE","properties":{"beachball-source":"us","evaluation-status":"preliminary","eventParametersPublicID":"quakeml:us.anss.org/eventparameters/10002l37/1435063121","eventsource":"choy","eventsourcecode":"20100615042658","nodal-plane-1-dip":"80","nodal-plane-1-rake":"5","nodal-plane-1-strike":"35","nodal-plane-2-dip":"85","nodal-plane-2-rake":"170","nodal-plane-2-strike":"304","quakeml-publicid":"choy20100615042658","review-status":"automatic"},"preferredWeight":1,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1435684804000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/focal-mechanism/choy20100615042658/us/1435683543711/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1435683543000,"length":2776,"url":"https://earthquake.usgs.gov/archive/product/focal-mechanism/choy20100615042658/us/1435683543711/quakeml.xml"}}}],"general-text":[{"indexid":"72034132","indexTime":1455049723103,"id":"urn:usgs-product:admin:general-text:usp000he04-1455049666520:1455049722277","type":"general-text","code":"usp000he04-1455049666520","source":"admin","updateTime":1455049722277,"status":"UPDATE","properties":{"eventsource":"us","eventsourcecode":"p000he04","review-status":"Reviewed"},"preferredWeight":1,"contents":{"":{"contentType":"1","lastModified":1455049722000,"length":1640,"bytes":"<h2>Tectonic
+        Summary</h2>\n\n<p>\nA M5.7 aftershock to the M7.2 April, 4th 2010 Easter
+        Sunday mainshock, called El Mayor-Cucapah earthquake, occurred at 9:27 pm
+        (Western Standard Time) on June 14th, about 5 miles southeast of the Imperial
+        County community of Ocotillo, at the US Mexico border. This aftershock was
+        the largest so far of the M7.2 El Mayor-Cucapah sequence. This aftershock
+        was located within the large cluster of aftershocks at the northwest end of
+        the ongoing aftershock sequence. The M5.7 event was followed by its own vigorous
+        aftershock sequence, with four M4+ and 35 M3 to M4 events, during the first
+        12 hours.\n</p>\n<p>\nThe M5.7 June 14th event probably occurred on a northwest
+        striking fault that follows the trend of the Elsinore fault in this region.
+        The Elsinore fault is more than 110 miles long, and extends into the Orange
+        County and Los Angeles area as the Whittier fault. The Elsinore fault is capable
+        of a major earthquake that would significantly affect the large metropolitan
+        areas of southern California. The Elsinore fault has not hosted a major earthquake
+        in more than 100 years.\n</p>\n<p>\nThe occurrence of this aftershock and
+        its own aftershock sequence, and the M4.9 earthquake that occurred along the
+        San Jacinto fault on June 12th 2010 demonstrate that the earthquake activity
+        in the region remains at an elevated level. The San Jacinto fault is known
+        as the most active earthquake fault in southern California. Caltech and USGS
+        seismologist continue to monitor the on going earthquake activity using the
+        Caltech/USGS Southern California Seismic Network and a GPS network of more
+        than 100 stations.\n</p>\n"}}}],"impact-text":[{"indexid":"42258191","indexTime":1417563427981,"id":"urn:usgs-product:us:impact-text:usp000he04:1415324501091","type":"impact-text","code":"usp000he04","source":"us","updateTime":1415324501091,"status":"UPDATE","properties":{"eventParametersPublicID":"quakeml:US.anss.org/eventParameters/pde20100615042658480_5/1415324501091","eventsource":"us","eventsourcecode":"p000he04"},"preferredWeight":6,"contents":{"":{"contentType":"text/plain","lastModified":1415324501000,"length":654,"bytes":"Some
+        buildings slightly damaged (VII) at Ocotillo. Felt (V) at Calipatria, Campo,
+        El Centro, Holtville and Jacumba and (IV) in the Anza-Brawley-San Diego area.
+        Felt throughout Imperial, Los Angeles, Orange, Riverside and San Diego Counties
+        and in parts of Kern, San Bernardino, Santa Barbara and Ventura Counties.
+        Felt (V) at El Sauzal and (IV) at Ensenada, Mexicali, Rosarito, Tecate and
+        Tijuana, Baja California. Felt in much of northern Baja California. Felt (III)
+        at San Luis Rio Colorado, Sonora. Also felt at Puerto Penasco. Felt (III)
+        at Somerton and Yuma; (II) at Parker, Phoenix, Tucson and Wellton, Arizona.
+        Felt widely in southwestern Arizona."}}}],"losspager":[{"indexid":"135353162","indexTime":1486566953833,"id":"urn:usgs-product:us:losspager:ci10159042:1486566937224","type":"losspager","code":"ci10159042","source":"us","updateTime":1486566937224,"status":"UPDATE","properties":{"alertlevel":"green","depth":"5.4","eventsource":"ci","eventsourcecode":"10159042","eventtime":"2010-06-15T04:26:58.000Z","latitude":"32.7002","longitude":"-115.921","magnitude":"5.7","maxmmi":"6.0"},"preferredWeight":51,"contents":{"alertecon.pdf":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":11287,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/alertecon.pdf"},"alertecon.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":15140,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/alertecon.png"},"alertecon_small.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":8501,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/alertecon_small.png"},"alertecon_smaller.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":4665,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/alertecon_smaller.png"},"alertfatal.pdf":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":9964,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/alertfatal.pdf"},"alertfatal.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":14366,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/alertfatal.png"},"alertfatal_small.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":8003,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/alertfatal_small.png"},"alertfatal_smaller.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":4426,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/alertfatal_smaller.png"},"alertsponge.pdf":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":7762,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/alertsponge.pdf"},"alertsponge.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":35074,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/alertsponge.png"},"alertsponge_small.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":6254,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/alertsponge_small.png"},"contents.xml":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":909,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/contents.xml"},"empfat.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":44878,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/empfat.png"},"emphist.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":51706,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/emphist.png"},"empprob.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":28978,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/empprob.png"},"expolegend.pdf":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":124636,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/expolegend.pdf"},"expolegend.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":69801,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/expolegend.png"},"exposure.pdf":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":93787,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/exposure.pdf"},"exposure.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":104768,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/exposure.png"},"exposure.xml":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":26870,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/exposure.xml"},"exposure_small.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":89301,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/exposure_small.png"},"grid.xml":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":8464720,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/grid.xml"},"historical_events.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":129833,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/historical_events.png"},"location.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":15512,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/location.png"},"onepager.pdf":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":435403,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/onepager.pdf"},"pager.xml":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":39810,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/pager.xml"},"pagerexpo.kmz":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":99918,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/pagerexpo.kmz"},"semi_inventory.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":121495,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/semi_inventory.png"},"temp.png":{"contentType":"application/octet-stream","lastModified":1486566936000,"length":145158,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci10159042/us/1486566937224/temp.png"}}},{"indexid":"135124062","indexTime":1486523059748,"id":"urn:usgs-product:us:losspager:ci14745580:1486523043518","type":"losspager","code":"ci14745580","source":"us","updateTime":1486523043518,"status":"UPDATE","properties":{"alertlevel":"green","depth":"8.76","eventsource":"ci","eventsourcecode":"14745580","eventtime":"2010-06-15T04:26:58.000Z","latitude":"32.705","longitude":"-115.911","magnitude":"5.7","maxmmi":"6.0"},"preferredWeight":51,"contents":{"alertecon.pdf":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":11287,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/alertecon.pdf"},"alertecon.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":15140,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/alertecon.png"},"alertecon_small.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":8501,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/alertecon_small.png"},"alertecon_smaller.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":4665,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/alertecon_smaller.png"},"alertfatal.pdf":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":9964,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/alertfatal.pdf"},"alertfatal.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":14366,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/alertfatal.png"},"alertfatal_small.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":8003,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/alertfatal_small.png"},"alertfatal_smaller.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":4426,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/alertfatal_smaller.png"},"alertsponge.pdf":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":7762,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/alertsponge.pdf"},"alertsponge.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":35074,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/alertsponge.png"},"alertsponge_small.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":6254,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/alertsponge_small.png"},"contents.xml":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":909,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/contents.xml"},"empfat.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":44878,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/empfat.png"},"emphist.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":51706,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/emphist.png"},"empprob.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":28691,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/empprob.png"},"expolegend.pdf":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":124613,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/expolegend.pdf"},"expolegend.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":69803,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/expolegend.png"},"exposure.pdf":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":95534,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/exposure.pdf"},"exposure.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":107790,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/exposure.png"},"exposure.xml":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":26540,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/exposure.xml"},"exposure_small.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":91678,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/exposure_small.png"},"grid.xml":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":8583073,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/grid.xml"},"historical_events.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":129762,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/historical_events.png"},"history.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":82653,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/history.png"},"location.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":15512,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/location.png"},"onepager.pdf":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":437305,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/onepager.pdf"},"pager.xml":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":39727,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/pager.xml"},"pagerexpo.kmz":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":102978,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/pagerexpo.kmz"},"semi_inventory.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":121495,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/semi_inventory.png"},"temp.png":{"contentType":"application/octet-stream","lastModified":1486523042000,"length":145128,"url":"https://earthquake.usgs.gov/archive/product/losspager/ci14745580/us/1486523043518/temp.png"}}}],"moment-tensor":[{"indexid":"42258231","indexTime":1417563428190,"id":"urn:usgs-product:us:moment-tensor:pde20100615042658480_5_C_GCMT:1415324501091","type":"moment-tensor","code":"pde20100615042658480_5_C_GCMT","source":"us","updateTime":1415324501091,"status":"UPDATE","properties":{"beachball-source":"LD","beachball-type":"Mwc","derived-depth":"13.4","derived-eventtime":"2010-06-15T04:27:01.400Z","derived-latitude":"32.66","derived-longitude":"-115.98","evaluation-status":"reviewed","eventParametersPublicID":"quakeml:US.anss.org/eventParameters/pde20100615042658480_5/1415324501091","eventsource":"us","eventsourcecode":"p000he04","n-axis-azimuth":"172","n-axis-length":"-168000000000000000","n-axis-plunge":"81","nodal-plane-1-dip":"83","nodal-plane-1-rake":"-6","nodal-plane-1-strike":"39","nodal-plane-2-dip":"84","nodal-plane-2-rake":"-173","nodal-plane-2-strike":"129","p-axis-azimuth":"354","p-axis-length":"-546000000000000000","p-axis-plunge":"9","quakeml-publicid":"quakeml:us.anss.org/focalMechanism/pde20100615042658480_5/C/GCMT","review-status":"reviewed","scalar-moment":"630000000000000000","sourcetime-duration":"3.8","sourcetime-type":"UNKNOWN","t-axis-azimuth":"264","t-axis-length":"714000000000000000","t-axis-plunge":"0","tensor-mpp":"700000000000000000","tensor-mrp":"-2000000000000000","tensor-mrr":"-177000000000000000","tensor-mrt":"-59000000000000000","tensor-mtp":"-130000000000000000","tensor-mtt":"-523000000000000000"},"preferredWeight":6,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1417563091000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/moment-tensor/pde20100615042658480_5_C_GCMT/us/1415324501091/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1415324501000,"length":3558,"url":"https://earthquake.usgs.gov/archive/product/moment-tensor/pde20100615042658480_5_C_GCMT/us/1415324501091/quakeml.xml"}}},{"indexid":"42258211","indexTime":1417563428085,"id":"urn:usgs-product:us:moment-tensor:pde20100615042658480_5_C_WCMT:1415324501091","type":"moment-tensor","code":"pde20100615042658480_5_C_WCMT","source":"us","updateTime":1415324501091,"status":"UPDATE","properties":{"beachball-source":"US","beachball-type":"Mww","derived-depth":"15","derived-eventtime":"2010-06-15T04:26:58.000Z","derived-latitude":"32.70","derived-longitude":"-115.92","evaluation-status":"reviewed","eventParametersPublicID":"quakeml:US.anss.org/eventParameters/pde20100615042658480_5/1415324501091","eventsource":"us","eventsourcecode":"p000he04","n-axis-azimuth":"129","n-axis-length":"-85000000000000000","n-axis-plunge":"84","nodal-plane-1-dip":"84","nodal-plane-1-rake":"0","nodal-plane-1-strike":"41","nodal-plane-2-dip":"89","nodal-plane-2-rake":"174","nodal-plane-2-strike":"311","p-axis-azimuth":"356","p-axis-length":"-394000000000000000","p-axis-plunge":"3","quakeml-publicid":"quakeml:us.anss.org/focalMechanism/pde20100615042658480_5/C/WCMT","review-status":"reviewed","scalar-moment":"440000000000000000","t-axis-azimuth":"266","t-axis-length":"479000000000000000","t-axis-plunge":"3","tensor-mpp":"473000000000000000","tensor-mrp":"37000000000000000","tensor-mrr":"-83000000000000000","tensor-mrt":"-22000000000000000","tensor-mtp":"-55000000000000000","tensor-mtt":"-389000000000000000"},"preferredWeight":6,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1417563091000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/moment-tensor/pde20100615042658480_5_C_WCMT/us/1415324501091/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1415324501000,"length":2697,"url":"https://earthquake.usgs.gov/archive/product/moment-tensor/pde20100615042658480_5_C_WCMT/us/1415324501091/quakeml.xml"}}},{"indexid":"42258221","indexTime":1417563428126,"id":"urn:usgs-product:us:moment-tensor:pde20100615042658480_5_M_US:1415324501091","type":"moment-tensor","code":"pde20100615042658480_5_M_US","source":"us","updateTime":1415324501091,"status":"UPDATE","properties":{"beachball-source":"US","beachball-type":"Mwb","derived-depth":"15","evaluation-status":"reviewed","eventParametersPublicID":"quakeml:US.anss.org/eventParameters/pde20100615042658480_5/1415324501091","eventsource":"us","eventsourcecode":"p000he04","n-axis-azimuth":"248","n-axis-length":"-69000000000000000","n-axis-plunge":"70","nodal-plane-1-dip":"82","nodal-plane-1-rake":"18","nodal-plane-1-strike":"226","nodal-plane-2-dip":"72","nodal-plane-2-rake":"172","nodal-plane-2-strike":"133","p-axis-azimuth":"358","p-axis-length":"-514000000000000000","p-axis-plunge":"6","quakeml-publicid":"quakeml:us.anss.org/focalMechanism/pde20100615042658480_5/M/US","review-status":"reviewed","scalar-moment":"550000000000000000","t-axis-azimuth":"90","t-axis-length":"583000000000000000","t-axis-plunge":"17","tensor-mpp":"521000000000000000","tensor-mrp":"-192000000000000000","tensor-mrr":"-14000000000000000","tensor-mrt":"-54000000000000000","tensor-mtp":"-8000000000000000","tensor-mtt":"-507000000000000000"},"preferredWeight":6,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1417563091000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/moment-tensor/pde20100615042658480_5_M_US/us/1415324501091/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1415324501000,"length":2515,"url":"https://earthquake.usgs.gov/archive/product/moment-tensor/pde20100615042658480_5_M_US/us/1415324501091/quakeml.xml"}}}],"nearby-cities":[{"indexid":"84548532","indexTime":1457596445085,"id":"urn:usgs-product:ci:nearby-cities:ci14745580:1457596444406","type":"nearby-cities","code":"ci14745580","source":"ci","updateTime":1457596444406,"status":"UPDATE","properties":{"eventsource":"ci","eventsourcecode":"14745580"},"preferredWeight":6,"contents":{"nearby-cities.json":{"contentType":"application/json","lastModified":1457596443000,"length":955,"url":"https://earthquake.usgs.gov/archive/product/nearby-cities/ci14745580/ci/1457596444406/nearby-cities.json"}}}],"origin":[{"indexid":"84548542","indexTime":1457596445700,"id":"urn:usgs-product:ci:origin:ci14745580:1457596443240","type":"origin","code":"ci14745580","source":"ci","updateTime":1457596443240,"status":"UPDATE","properties":{"azimuthal-gap":"71","depth":"8.756","depth-type":"from
+        location","evaluation-status":"final","event-type":"earthquake","eventParametersPublicID":"quakeml:service.scedc.caltech.edu/fdsnws/event/1/query?eventid=14745580","eventsource":"ci","eventsourcecode":"14745580","eventtime":"2010-06-15T04:26:58.240Z","horizontal-error":"0.41","latitude":"32.705","longitude":"-115.9113333","magnitude":"5.72","magnitude-num-stations-used":"7","magnitude-source":"CI","magnitude-type":"mw","minimum-distance":"0.05832","num-phases-used":"52","num-stations-used":"45","origin-source":"CI","quakeml-magnitude-publicid":"quakeml:service.scedc.caltech.edu/fdsnws/event/1/query?magnitudeid=5599819","quakeml-origin-publicid":"quakeml:service.scedc.caltech.edu/fdsnws/event/1/query?originid=104557837","quakeml-publicid":"quakeml:service.scedc.caltech.edu/fdsnws/event/1/query?eventid=14745580","review-status":"reviewed","standard-error":"0.2","title":"8km
+        ESE of Ocotillo, CA","version":"8","vertical-error":"0.83"},"preferredWeight":156,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1457596445000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/origin/ci14745580/ci/1457596443240/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1457596443000,"length":3001,"url":"https://earthquake.usgs.gov/archive/product/origin/ci14745580/ci/1457596443240/quakeml.xml"}}},{"indexid":"42258171","indexTime":1417563427878,"id":"urn:usgs-product:us:origin:usp000he04:1415324501091","type":"origin","code":"usp000he04","source":"us","updateTime":1415324501091,"status":"UPDATE","properties":{"azimuthal-gap":"23.5","depth":"5.4","evaluation-status":"reviewed","event-type":"earthquake","eventParametersPublicID":"quakeml:US.anss.org/eventParameters/pde20100615042658480_5/1415324501091","eventsource":"us","eventsourcecode":"p000he04","eventtime":"2010-06-15T04:26:58.480Z","latitude":"32.700","longitude":"-115.921","magnitude":"5.8","magnitude-source":"US","magnitude-type":"mwb","num-stations-used":"440","origin-source":"PAS","quakeml-publicid":"quakeml:US.anss.org/event/pde20100615042658480_5","review-status":"reviewed"},"preferredWeight":6,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1417563091000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/origin/usp000he04/us/1415324501091/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1415324501000,"length":1828,"url":"https://earthquake.usgs.gov/archive/product/origin/usp000he04/us/1415324501091/quakeml.xml"}}},{"indexid":"105317432","indexTime":1478744976010,"id":"urn:usgs-product:us:origin:gcmtC201006150426A:1478744975684","type":"origin","code":"gcmtC201006150426A","source":"us","updateTime":1478744975684,"status":"UPDATE","properties":{"depth":"5.4","evaluation-status":"preliminary","event-type":"earthquake","eventParametersPublicID":"quakeml:us.anss.org/eventParameters/C201006150426A","eventsource":"gcmt","eventsourcecode":"c201006150426a","eventtime":"2010-06-15T04:26:58.000Z","latitude":"32.7000","longitude":"-115.9200","magnitude":"5.80","magnitude-type":"mwc","quakeml-magnitude-publicid":"quakeml:us.anss.org/magnitude/gcmt/Mwc","quakeml-origin-publicid":"quakeml:us.anss.org/origin/PDEW20100615042658","quakeml-publicid":"quakeml:gcmt.anss.org/event/C201006150426A","review-status":"automatic"},"preferredWeight":1,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1478744975000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/origin/gcmtC201006150426A/us/1478744975684/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1478744975000,"length":2262,"url":"https://earthquake.usgs.gov/archive/product/origin/gcmtC201006150426A/us/1478744975684/quakeml.xml"}}},{"indexid":"57329012","indexTime":1435684997952,"id":"urn:usgs-product:us:origin:choy20100615042658:1435683543711","type":"origin","code":"choy20100615042658","source":"us","updateTime":1435683543711,"status":"UPDATE","properties":{"depth":"8","depth-type":"from
+        modeling of broad-band P waveforms","evaluation-status":"reviewed","event-type":"earthquake","eventParametersPublicID":"quakeml:us.anss.org/eventparameters/10002l37/1435063121","eventsource":"choy","eventsourcecode":"20100615042658","eventtime":"2010-06-15T04:26:58.500Z","latitude":"32.7000","longitude":"-115.9200","magnitude":"6.00","magnitude-source":"us","magnitude-type":"me","origin-source":"us","quakeml-magnitude-publicid":"choy20100615042658","quakeml-origin-publicid":"choy20100615042658","quakeml-publicid":"choy20100615042658","review-status":"reviewed"},"preferredWeight":1,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1435684804000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/origin/choy20100615042658/us/1435683543711/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1435683543000,"length":2776,"url":"https://earthquake.usgs.gov/archive/product/origin/choy20100615042658/us/1435683543711/quakeml.xml"}}},{"indexid":"55340312","indexTime":1432144474005,"id":"urn:usgs-product:us:origin:iscgem14771060:1431543237000","type":"origin","code":"iscgem14771060","source":"us","updateTime":1431543237000,"status":"UPDATE","properties":{"depth":"15.0","evaluation-status":"preliminary","event-type":"earthquake","eventParametersPublicID":"quakeml:us.anss.org/eventParameters/14771060","eventsource":"iscgem","eventsourcecode":"14771060","eventtime":"2010-06-15T04:26:59.000Z","latitude":"32.6670","longitude":"-115.9270","magnitude":"5.8","magnitude-source":"iscgem","magnitude-type":"mw","origin-source":"iscgem","quakeml-magnitude-publicid":"quakeml:us.anss.org/magnitude/iscgem14771060/Mw","quakeml-origin-publicid":"quakeml:us.anss.org/origin/iscgem14771060","quakeml-publicid":"quakeml:atlas.anss.org/event/iscgem14771060","review-status":"automatic"},"preferredWeight":1,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1432144193000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/origin/iscgem14771060/us/1431543237000/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1431543237000,"length":1497,"url":"https://earthquake.usgs.gov/archive/product/origin/iscgem14771060/us/1431543237000/quakeml.xml"}}}],"phase-data":[{"indexid":"84548562","indexTime":1457596447273,"id":"urn:usgs-product:ci:phase-data:ci14745580:1457596443240","type":"phase-data","code":"ci14745580","source":"ci","updateTime":1457596443240,"status":"UPDATE","properties":{"azimuthal-gap":"71","depth":"8.756","depth-type":"from
+        location","evaluation-status":"final","event-type":"earthquake","eventParametersPublicID":"quakeml:service.scedc.caltech.edu/fdsnws/event/1/query?eventid=14745580","eventsource":"ci","eventsourcecode":"14745580","eventtime":"2010-06-15T04:26:58.240Z","horizontal-error":"0.41","latitude":"32.705","longitude":"-115.9113333","magnitude":"5.72","magnitude-num-stations-used":"7","magnitude-source":"CI","magnitude-type":"mw","minimum-distance":"0.05832","num-phases-used":"52","num-stations-used":"45","origin-source":"CI","quakeml-magnitude-publicid":"quakeml:service.scedc.caltech.edu/fdsnws/event/1/query?magnitudeid=5599819","quakeml-origin-publicid":"quakeml:service.scedc.caltech.edu/fdsnws/event/1/query?originid=104557837","quakeml-publicid":"quakeml:service.scedc.caltech.edu/fdsnws/event/1/query?eventid=14745580","review-status":"reviewed","standard-error":"0.2","title":"8km
+        ESE of Ocotillo, CA","version":"8","vertical-error":"0.83"},"preferredWeight":156,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1457596445000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/phase-data/ci14745580/ci/1457596443240/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1457596443000,"length":658252,"url":"https://earthquake.usgs.gov/archive/product/phase-data/ci14745580/ci/1457596443240/quakeml.xml"}}},{"indexid":"42258181","indexTime":1417563427949,"id":"urn:usgs-product:us:phase-data:usp000he04:1415324501091","type":"phase-data","code":"usp000he04","source":"us","updateTime":1415324501091,"status":"UPDATE","properties":{"azimuthal-gap":"23.5","depth":"5.4","evaluation-status":"reviewed","event-type":"earthquake","eventParametersPublicID":"quakeml:US.anss.org/eventParameters/pde20100615042658480_5/1415324501091","eventsource":"us","eventsourcecode":"p000he04","eventtime":"2010-06-15T04:26:58.480Z","latitude":"32.700","longitude":"-115.921","magnitude":"5.8","magnitude-source":"US","magnitude-type":"mwb","num-stations-used":"440","origin-source":"PAS","quakeml-publicid":"quakeml:US.anss.org/event/pde20100615042658480_5","review-status":"reviewed"},"preferredWeight":6,"contents":{"contents.xml":{"contentType":"application/xml","lastModified":1417563091000,"length":195,"url":"https://earthquake.usgs.gov/archive/product/phase-data/usp000he04/us/1415324501091/contents.xml"},"quakeml.xml":{"contentType":"application/xml","lastModified":1415324501000,"length":628681,"url":"https://earthquake.usgs.gov/archive/product/phase-data/usp000he04/us/1415324501091/quakeml.xml"}}}],"poster":[{"indexid":"93342052","indexTime":1462290242257,"id":"urn:usgs-product:us:poster:20100615:1462290226319","type":"poster","code":"20100615","source":"us","updateTime":1462290226319,"status":"UPDATE","properties":{"eventsource":"us","eventsourcecode":"p000he04"},"preferredWeight":6,"contents":{"Thumbs.db":{"contentType":"application/octet-stream","lastModified":1453229186000,"length":59904,"url":"https://earthquake.usgs.gov/archive/product/poster/20100615/us/1462290226319/Thumbs.db"},"contents.xml":{"contentType":"application/xml","lastModified":1452016894000,"length":427,"url":"https://earthquake.usgs.gov/archive/product/poster/20100615/us/1462290226319/contents.xml"},"poster.jpg":{"contentType":"image/jpeg","lastModified":1276886501000,"length":2666292,"url":"https://earthquake.usgs.gov/archive/product/poster/20100615/us/1462290226319/poster.jpg"},"poster.low.jpg":{"contentType":"image/jpeg","lastModified":1453229168000,"length":50855,"url":"https://earthquake.usgs.gov/archive/product/poster/20100615/us/1462290226319/poster.low.jpg"},"poster.medium.jpg":{"contentType":"image/jpeg","lastModified":1453229167000,"length":372446,"url":"https://earthquake.usgs.gov/archive/product/poster/20100615/us/1462290226319/poster.medium.jpg"},"poster.pdf":{"contentType":"application/pdf","lastModified":1276886471000,"length":12459968,"url":"https://earthquake.usgs.gov/archive/product/poster/20100615/us/1462290226319/poster.pdf"},"poster.small.jpg":{"contentType":"image/jpeg","lastModified":1453229168000,"length":105014,"url":"https://earthquake.usgs.gov/archive/product/poster/20100615/us/1462290226319/poster.small.jpg"}}}],"shakemap":[{"indexid":"139056272","indexTime":1492122314954,"id":"urn:usgs-product:atlas:shakemap:atlas20100615042658:1492011320926","type":"shakemap","code":"atlas20100615042658","source":"atlas","updateTime":1492011320926,"status":"UPDATE","properties":{"depth":"5.4","event-description":"SOUTHERN
+        CALIFORNIA","event-type":"ACTUAL","eventsource":"atlas","eventsourcecode":"20100615042658","eventtime":"2010-06-15T04:26:58.000Z","latitude":"32.7002","longitude":"-115.9213","magnitude":"5.7","map-status":"RELEASED","maximum-latitude":"34.384200","maximum-longitude":"-113.921300","maxmmi":"7.8","minimum-latitude":"31.016200","minimum-longitude":"-117.921300","overlayHeight":"394","overlayWidth":"468","process-timestamp":"2017-01-28T16:30:38.000Z","reviewstatus":"constrained","version":"1"},"preferredWeight":100000000,"contents":{"about_formats.html":{"contentType":"text/html","lastModified":1485621104000,"length":28824,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/about_formats.html"},"contents.xml":{"contentType":"application/xml","lastModified":1491924942000,"length":7662,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/contents.xml"},"download/20100615042658.kml":{"contentType":"application/vnd.google-earth.kml+xml","lastModified":1485621097000,"length":1034,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/20100615042658.kml"},"download/20100615042658.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1485621098000,"length":224089,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/20100615042658.kmz"},"download/cont_mi.json":{"contentType":"application/json","lastModified":1485621098000,"length":73080,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_mi.json"},"download/cont_mi.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1485621097000,"length":16773,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_mi.kmz"},"download/cont_pga.json":{"contentType":"application/json","lastModified":1485621098000,"length":12295,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_pga.json"},"download/cont_pga.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1485621097000,"length":3275,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_pga.kmz"},"download/cont_pgv.json":{"contentType":"application/json","lastModified":1485621098000,"length":10714,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_pgv.json"},"download/cont_pgv.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1485621097000,"length":2928,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_pgv.kmz"},"download/cont_psa03.json":{"contentType":"application/json","lastModified":1485621098000,"length":14171,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_psa03.json"},"download/cont_psa03.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1485621097000,"length":3687,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_psa03.kmz"},"download/cont_psa10.json":{"contentType":"application/json","lastModified":1485621098000,"length":8668,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_psa10.json"},"download/cont_psa10.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1485621097000,"length":2536,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_psa10.kmz"},"download/cont_psa30.json":{"contentType":"application/json","lastModified":1485621098000,"length":13480,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_psa30.json"},"download/cont_psa30.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1485621097000,"length":3580,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/cont_psa30.kmz"},"download/epicenter.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1485621097000,"length":1291,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/epicenter.kmz"},"download/event.txt":{"contentType":"text/plain","lastModified":1485621095000,"length":126,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/event.txt"},"download/grid.xml":{"contentType":"application/xml","lastModified":1485621095000,"length":1361558,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/grid.xml"},"download/hazus.zip":{"contentType":"application/zip","lastModified":1485621098000,"length":241338,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/hazus.zip"},"download/ii_overlay.png":{"contentType":"image/png","lastModified":1485621097000,"length":103679,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/ii_overlay.png"},"download/ii_thumbnail.jpg":{"contentType":"image/jpeg","lastModified":1485621095000,"length":4215,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/ii_thumbnail.jpg"},"download/info.json":{"contentType":"application/json","lastModified":1485621095000,"length":2276,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/info.json"},"download/intensity.jpg":{"contentType":"image/jpeg","lastModified":1485621095000,"length":123285,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/intensity.jpg"},"download/metadata.txt":{"contentType":"text/plain","lastModified":1485621096000,"length":33073,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/metadata.txt"},"download/mi_regr.png":{"contentType":"image/png","lastModified":1485621095000,"length":47446,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/mi_regr.png"},"download/overlay.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1485621097000,"length":104294,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/overlay.kmz"},"download/pga.jpg":{"contentType":"image/jpeg","lastModified":1485621095000,"length":106059,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/pga.jpg"},"download/pga_regr.png":{"contentType":"image/png","lastModified":1485621095000,"length":42525,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/pga_regr.png"},"download/pgv.jpg":{"contentType":"image/jpeg","lastModified":1485621095000,"length":105956,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/pgv.jpg"},"download/pgv_regr.png":{"contentType":"image/png","lastModified":1485621095000,"length":34337,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/pgv_regr.png"},"download/polygons_mi.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1485621098000,"length":39170,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/polygons_mi.kmz"},"download/psa03.jpg":{"contentType":"image/jpeg","lastModified":1485621095000,"length":105662,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/psa03.jpg"},"download/psa03_regr.png":{"contentType":"image/png","lastModified":1485621095000,"length":34077,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/psa03_regr.png"},"download/psa10.jpg":{"contentType":"image/jpeg","lastModified":1485621095000,"length":104883,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/psa10.jpg"},"download/psa10_regr.png":{"contentType":"image/png","lastModified":1485621095000,"length":33609,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/psa10_regr.png"},"download/psa30.jpg":{"contentType":"image/jpeg","lastModified":1485621095000,"length":105813,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/psa30.jpg"},"download/psa30_regr.png":{"contentType":"image/png","lastModified":1485621095000,"length":32860,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/psa30_regr.png"},"download/raster.zip":{"contentType":"application/zip","lastModified":1485621100000,"length":1443716,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/raster.zip"},"download/sd.jpg":{"contentType":"image/jpeg","lastModified":1485621095000,"length":75702,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/sd.jpg"},"download/shape.zip":{"contentType":"application/zip","lastModified":1485621098000,"length":1089649,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/shape.zip"},"download/stationlist.json":{"contentType":"application/json","lastModified":1485621105000,"length":487067,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/stationlist.json"},"download/stationlist.txt":{"contentType":"text/plain","lastModified":1485621104000,"length":54451,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/stationlist.txt"},"download/stationlist.xml":{"contentType":"application/xml","lastModified":1485621095000,"length":296750,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/stationlist.xml"},"download/stations.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1485621098000,"length":33695,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/stations.kmz"},"download/tvguide.txt":{"contentType":"text/plain","lastModified":1485621095000,"length":8766,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/tvguide.txt"},"download/tvmap.jpg":{"contentType":"image/jpeg","lastModified":1485621095000,"length":159483,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/tvmap.jpg"},"download/tvmap_bare.jpg":{"contentType":"image/jpeg","lastModified":1485621095000,"length":150553,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/tvmap_bare.jpg"},"download/uncertainty.xml.zip":{"contentType":"application/zip","lastModified":1491924941000,"length":172555,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/uncertainty.xml.zip"},"download/urat_pga.jpg":{"contentType":"image/jpeg","lastModified":1485621095000,"length":75702,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/download/urat_pga.jpg"},"intensity.html":{"contentType":"text/html","lastModified":1485621104000,"length":68273,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/intensity.html"},"origin_quakeml.xml":{"contentType":"application/xml","lastModified":1492011320000,"length":1475,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/origin_quakeml.xml"},"pga.html":{"contentType":"text/html","lastModified":1485621104000,"length":68065,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/pga.html"},"pgv.html":{"contentType":"text/html","lastModified":1485621104000,"length":68065,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/pgv.html"},"products.html":{"contentType":"text/html","lastModified":1485621104000,"length":18596,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/products.html"},"psa03.html":{"contentType":"text/html","lastModified":1485621104000,"length":69232,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/psa03.html"},"psa10.html":{"contentType":"text/html","lastModified":1485621104000,"length":69231,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/psa10.html"},"psa30.html":{"contentType":"text/html","lastModified":1485621104000,"length":69231,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/psa30.html"},"stationlist.html":{"contentType":"text/html","lastModified":1485621104000,"length":571796,"url":"https://earthquake.usgs.gov/archive/product/shakemap/atlas20100615042658/atlas/1492011320926/stationlist.html"}}},{"indexid":"135352032","indexTime":1486566715617,"id":"urn:usgs-product:ci:shakemap:ci10159042:1486566156256","type":"shakemap","code":"ci10159042","source":"ci","updateTime":1486566156256,"status":"UPDATE","properties":{"depth":"5.4","event-description":"7.8
+        km (4.8 mi) ESE of Ocotillo, CA","event-type":"ACTUAL","eventsource":"ci","eventsourcecode":"10159042","eventtime":"2010-06-15T04:26:58.000Z","latitude":"32.700200","longitude":"-115.921300","magnitude":"5.7","map-status":"RELEASED","maximum-latitude":"33.533533","maximum-longitude":"-114.671300","maxmmi":"7.66","minimum-latitude":"31.866866","minimum-longitude":"-117.171300","overlayHeight":"312","overlayWidth":"468","process-timestamp":"2017-02-08T15:00:08Z","version":"1"},"preferredWeight":231,"contents":{"about_formats.html":{"contentType":"text/html","lastModified":1486566154000,"length":28819,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/about_formats.html"},"contents.xml":{"contentType":"application/xml","lastModified":1486566155000,"length":7849,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/contents.xml"},"download/10159042.kml":{"contentType":"application/vnd.google-earth.kml+xml","lastModified":1486566149000,"length":1024,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/10159042.kml"},"download/10159042.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486566151000,"length":661142,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/10159042.kmz"},"download/cont_mi.json":{"contentType":"application/json","lastModified":1486566151000,"length":382611,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_mi.json"},"download/cont_mi.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486566150000,"length":71622,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_mi.kmz"},"download/cont_pga.json":{"contentType":"application/json","lastModified":1486566151000,"length":98504,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_pga.json"},"download/cont_pga.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486566150000,"length":18802,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_pga.kmz"},"download/cont_pgv.json":{"contentType":"application/json","lastModified":1486566151000,"length":91040,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_pgv.json"},"download/cont_pgv.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486566150000,"length":17478,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_pgv.kmz"},"download/cont_psa03.json":{"contentType":"application/json","lastModified":1486566151000,"length":256184,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_psa03.json"},"download/cont_psa03.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486566150000,"length":47562,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_psa03.kmz"},"download/cont_psa10.json":{"contentType":"application/json","lastModified":1486566151000,"length":115843,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_psa10.json"},"download/cont_psa10.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486566150000,"length":21968,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_psa10.kmz"},"download/cont_psa30.json":{"contentType":"application/json","lastModified":1486566151000,"length":148991,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_psa30.json"},"download/cont_psa30.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486566150000,"length":27972,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/cont_psa30.kmz"},"download/epicenter.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486566149000,"length":1254,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/epicenter.kmz"},"download/event.txt":{"contentType":"text/plain","lastModified":1486566127000,"length":123,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/event.txt"},"download/grid.xml":{"contentType":"application/xml","lastModified":1486566126000,"length":8464720,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/grid.xml"},"download/grid.xml.zip":{"contentType":"application/zip","lastModified":1486566148000,"length":2225310,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/grid.xml.zip"},"download/grid.xyz.zip":{"contentType":"application/zip","lastModified":1486566149000,"length":1605315,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/grid.xyz.zip"},"download/hazus.zip":{"contentType":"application/zip","lastModified":1486566151000,"length":3302136,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/hazus.zip"},"download/ii_overlay.png":{"contentType":"image/png","lastModified":1486566150000,"length":168805,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/ii_overlay.png"},"download/ii_thumbnail.jpg":{"contentType":"image/jpeg","lastModified":1486566127000,"length":6211,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/ii_thumbnail.jpg"},"download/info.json":{"contentType":"application/json","lastModified":1486566126000,"length":2244,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/info.json"},"download/intensity.jpg":{"contentType":"image/jpeg","lastModified":1486566126000,"length":165590,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/intensity.jpg"},"download/intensity.ps.zip":{"contentType":"application/zip","lastModified":1486566140000,"length":497946,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/intensity.ps.zip"},"download/intensity_poster.ps.zip":{"contentType":"application/zip","lastModified":1486566140000,"length":497956,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/intensity_poster.ps.zip"},"download/metadata.html":{"contentType":"text/html","lastModified":1486566149000,"length":44640,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/metadata.html"},"download/metadata.txt":{"contentType":"text/plain","lastModified":1486566149000,"length":32208,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/metadata.txt"},"download/metadata.xml":{"contentType":"application/xml","lastModified":1486566149000,"length":27612,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/metadata.xml"},"download/overlay.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486566150000,"length":169016,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/overlay.kmz"},"download/pga.jpg":{"contentType":"image/jpeg","lastModified":1486566127000,"length":144440,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/pga.jpg"},"download/pga.ps.zip":{"contentType":"application/zip","lastModified":1486566146000,"length":15163009,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/pga.ps.zip"},"download/pga_poster.ps.zip":{"contentType":"application/zip","lastModified":1486566129000,"length":15163019,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/pga_poster.ps.zip"},"download/pgv.jpg":{"contentType":"image/jpeg","lastModified":1486566127000,"length":143399,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/pgv.jpg"},"download/pgv.ps.zip":{"contentType":"application/zip","lastModified":1486566133000,"length":15162722,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/pgv.ps.zip"},"download/pgv_poster.ps.zip":{"contentType":"application/zip","lastModified":1486566140000,"length":15162733,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/pgv_poster.ps.zip"},"download/polygons_mi.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486566151000,"length":270426,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/polygons_mi.kmz"},"download/psa03.jpg":{"contentType":"image/jpeg","lastModified":1486566127000,"length":153941,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/psa03.jpg"},"download/psa03.ps.zip":{"contentType":"application/zip","lastModified":1486566144000,"length":15170214,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/psa03.ps.zip"},"download/psa10.jpg":{"contentType":"image/jpeg","lastModified":1486566127000,"length":144274,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/psa10.jpg"},"download/psa10.ps.zip":{"contentType":"application/zip","lastModified":1486566138000,"length":15163887,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/psa10.ps.zip"},"download/psa30.jpg":{"contentType":"image/jpeg","lastModified":1486566126000,"length":147306,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/psa30.jpg"},"download/psa30.ps.zip":{"contentType":"application/zip","lastModified":1486566142000,"length":15165348,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/psa30.ps.zip"},"download/raster.zip":{"contentType":"application/zip","lastModified":1486566153000,"length":4211231,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/raster.zip"},"download/rock_grid.xml.zip":{"contentType":"application/zip","lastModified":1486566146000,"length":888250,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/rock_grid.xml.zip"},"download/sd.jpg":{"contentType":"image/jpeg","lastModified":1486566126000,"length":73368,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/sd.jpg"},"download/shape.zip":{"contentType":"application/zip","lastModified":1486566151000,"length":8636215,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/shape.zip"},"download/stationlist.json":{"contentType":"application/json","lastModified":1486566154000,"length":42,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/stationlist.json"},"download/stationlist.txt":{"contentType":"text/plain","lastModified":1486566154000,"length":513,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/stationlist.txt"},"download/stationlist.xml":{"contentType":"application/xml","lastModified":1486566127000,"length":2133,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/stationlist.xml"},"download/tvguide.txt":{"contentType":"text/plain","lastModified":1486566127000,"length":8779,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/tvguide.txt"},"download/tvmap.jpg":{"contentType":"image/jpeg","lastModified":1486566126000,"length":248754,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/tvmap.jpg"},"download/tvmap.ps.zip":{"contentType":"application/zip","lastModified":1486566138000,"length":1136824,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/tvmap.ps.zip"},"download/tvmap_bare.jpg":{"contentType":"image/jpeg","lastModified":1486566127000,"length":235707,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/tvmap_bare.jpg"},"download/tvmap_bare.ps.zip":{"contentType":"application/zip","lastModified":1486566129000,"length":1131618,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/tvmap_bare.ps.zip"},"download/uncertainty.xml.zip":{"contentType":"application/zip","lastModified":1486566147000,"length":500524,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/uncertainty.xml.zip"},"download/urat_pga.jpg":{"contentType":"image/jpeg","lastModified":1486566126000,"length":73368,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/urat_pga.jpg"},"download/urat_pga.ps.zip":{"contentType":"application/zip","lastModified":1486566129000,"length":37629,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/download/urat_pga.ps.zip"},"intensity.html":{"contentType":"text/html","lastModified":1486566154000,"length":5480,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/intensity.html"},"pga.html":{"contentType":"text/html","lastModified":1486566154000,"length":5272,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/pga.html"},"pgv.html":{"contentType":"text/html","lastModified":1486566154000,"length":5272,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/pgv.html"},"products.html":{"contentType":"text/html","lastModified":1486566154000,"length":17962,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/products.html"},"psa03.html":{"contentType":"text/html","lastModified":1486566154000,"length":6439,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/psa03.html"},"psa10.html":{"contentType":"text/html","lastModified":1486566154000,"length":6438,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/psa10.html"},"psa30.html":{"contentType":"text/html","lastModified":1486566154000,"length":6438,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/psa30.html"},"stationlist.html":{"contentType":"text/html","lastModified":1486566154000,"length":1690,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci10159042/ci/1486566156256/stationlist.html"}}},{"indexid":"135121922","indexTime":1486522666164,"id":"urn:usgs-product:ci:shakemap:ci14745580:1486522540360","type":"shakemap","code":"ci14745580","source":"ci","updateTime":1486522540360,"status":"UPDATE","properties":{"depth":"8.76","event-description":"8.4
+        km (5.2 mi) ESE of Ocotillo, CA","event-type":"ACTUAL","eventsource":"ci","eventsourcecode":"14745580","eventtime":"2010-06-15T04:26:58.000Z","latitude":"32.705000","longitude":"-115.911300","magnitude":"5.7","map-status":"RELEASED","maximum-latitude":"33.538333","maximum-longitude":"-114.661300","maxmmi":"7.69","minimum-latitude":"31.871666","minimum-longitude":"-117.161300","overlayHeight":"312","overlayWidth":"468","process-timestamp":"2017-02-08T02:52:47Z","version":"2"},"preferredWeight":231,"contents":{"about_formats.html":{"contentType":"text/html","lastModified":1486522533000,"length":28819,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/about_formats.html"},"contents.xml":{"contentType":"application/xml","lastModified":1486522536000,"length":8064,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/contents.xml"},"download/14745580.kml":{"contentType":"application/vnd.google-earth.kml+xml","lastModified":1486522526000,"length":1024,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/14745580.kml"},"download/14745580.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486522528000,"length":649260,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/14745580.kmz"},"download/cont_mi.json":{"contentType":"application/json","lastModified":1486522528000,"length":368616,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_mi.json"},"download/cont_mi.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486522526000,"length":68985,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_mi.kmz"},"download/cont_pga.json":{"contentType":"application/json","lastModified":1486522528000,"length":87544,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_pga.json"},"download/cont_pga.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486522526000,"length":16909,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_pga.kmz"},"download/cont_pgv.json":{"contentType":"application/json","lastModified":1486522528000,"length":120408,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_pgv.json"},"download/cont_pgv.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486522527000,"length":22830,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_pgv.kmz"},"download/cont_psa03.json":{"contentType":"application/json","lastModified":1486522528000,"length":149159,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_psa03.json"},"download/cont_psa03.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486522527000,"length":28151,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_psa03.kmz"},"download/cont_psa10.json":{"contentType":"application/json","lastModified":1486522528000,"length":146791,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_psa10.json"},"download/cont_psa10.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486522527000,"length":27545,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_psa10.kmz"},"download/cont_psa30.json":{"contentType":"application/json","lastModified":1486522528000,"length":162822,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_psa30.json"},"download/cont_psa30.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486522527000,"length":30447,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/cont_psa30.kmz"},"download/epicenter.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486522526000,"length":1254,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/epicenter.kmz"},"download/event.txt":{"contentType":"text/plain","lastModified":1486522505000,"length":123,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/event.txt"},"download/grid.xml":{"contentType":"application/xml","lastModified":1486522504000,"length":8583073,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/grid.xml"},"download/grid.xml.zip":{"contentType":"application/zip","lastModified":1486522524000,"length":2322411,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/grid.xml.zip"},"download/grid.xyz.zip":{"contentType":"application/zip","lastModified":1486522525000,"length":1607043,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/grid.xyz.zip"},"download/hazus.zip":{"contentType":"application/zip","lastModified":1486522528000,"length":3036029,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/hazus.zip"},"download/ii_overlay.png":{"contentType":"image/png","lastModified":1486522527000,"length":171249,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/ii_overlay.png"},"download/ii_thumbnail.jpg":{"contentType":"image/jpeg","lastModified":1486522504000,"length":6276,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/ii_thumbnail.jpg"},"download/info.json":{"contentType":"application/json","lastModified":1486522504000,"length":2275,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/info.json"},"download/intensity.jpg":{"contentType":"image/jpeg","lastModified":1486522504000,"length":167600,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/intensity.jpg"},"download/intensity.ps.zip":{"contentType":"application/zip","lastModified":1486522517000,"length":500736,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/intensity.ps.zip"},"download/intensity_poster.ps.zip":{"contentType":"application/zip","lastModified":1486522517000,"length":500748,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/intensity_poster.ps.zip"},"download/metadata.html":{"contentType":"text/html","lastModified":1486522526000,"length":44640,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/metadata.html"},"download/metadata.txt":{"contentType":"text/plain","lastModified":1486522526000,"length":32208,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/metadata.txt"},"download/metadata.xml":{"contentType":"application/xml","lastModified":1486522526000,"length":27612,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/metadata.xml"},"download/overlay.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486522527000,"length":171506,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/overlay.kmz"},"download/pga.jpg":{"contentType":"image/jpeg","lastModified":1486522504000,"length":146544,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/pga.jpg"},"download/pga.ps.zip":{"contentType":"application/zip","lastModified":1486522522000,"length":15206413,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/pga.ps.zip"},"download/pga_poster.ps.zip":{"contentType":"application/zip","lastModified":1486522508000,"length":15206423,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/pga_poster.ps.zip"},"download/pgv.jpg":{"contentType":"image/jpeg","lastModified":1486522504000,"length":148008,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/pgv.jpg"},"download/pgv.ps.zip":{"contentType":"application/zip","lastModified":1486522513000,"length":15207881,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/pgv.ps.zip"},"download/pgv_poster.ps.zip":{"contentType":"application/zip","lastModified":1486522516000,"length":15207892,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/pgv_poster.ps.zip"},"download/polygons_mi.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486522528000,"length":243548,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/polygons_mi.kmz"},"download/psa03.jpg":{"contentType":"image/jpeg","lastModified":1486522504000,"length":149283,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/psa03.jpg"},"download/psa03.ps.zip":{"contentType":"application/zip","lastModified":1486522520000,"length":15209026,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/psa03.ps.zip"},"download/psa10.jpg":{"contentType":"image/jpeg","lastModified":1486522504000,"length":148411,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/psa10.jpg"},"download/psa10.ps.zip":{"contentType":"application/zip","lastModified":1486522514000,"length":15209021,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/psa10.ps.zip"},"download/psa30.jpg":{"contentType":"image/jpeg","lastModified":1486522504000,"length":149871,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/psa30.jpg"},"download/psa30.ps.zip":{"contentType":"application/zip","lastModified":1486522518000,"length":15210035,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/psa30.ps.zip"},"download/raster.zip":{"contentType":"application/zip","lastModified":1486522532000,"length":4736115,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/raster.zip"},"download/rock_grid.xml.zip":{"contentType":"application/zip","lastModified":1486522523000,"length":1076577,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/rock_grid.xml.zip"},"download/sd.jpg":{"contentType":"image/jpeg","lastModified":1486522504000,"length":97538,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/sd.jpg"},"download/shape.zip":{"contentType":"application/zip","lastModified":1486522528000,"length":8171659,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/shape.zip"},"download/stationlist.json":{"contentType":"application/json","lastModified":1486522534000,"length":357879,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/stationlist.json"},"download/stationlist.txt":{"contentType":"text/plain","lastModified":1486522533000,"length":51022,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/stationlist.txt"},"download/stationlist.xml":{"contentType":"application/xml","lastModified":1486522504000,"length":224910,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/stationlist.xml"},"download/stations.kmz":{"contentType":"application/vnd.google-earth.kmz","lastModified":1486522527000,"length":25190,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/stations.kmz"},"download/tvguide.txt":{"contentType":"text/plain","lastModified":1486522504000,"length":8779,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/tvguide.txt"},"download/tvmap.jpg":{"contentType":"image/jpeg","lastModified":1486522504000,"length":250153,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/tvmap.jpg"},"download/tvmap.ps.zip":{"contentType":"application/zip","lastModified":1486522515000,"length":1141617,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/tvmap.ps.zip"},"download/tvmap_bare.jpg":{"contentType":"image/jpeg","lastModified":1486522504000,"length":236843,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/tvmap_bare.jpg"},"download/tvmap_bare.ps.zip":{"contentType":"application/zip","lastModified":1486522511000,"length":1136612,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/tvmap_bare.ps.zip"},"download/uncertainty.xml.zip":{"contentType":"application/zip","lastModified":1486522523000,"length":723564,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/uncertainty.xml.zip"},"download/urat_pga.jpg":{"contentType":"image/jpeg","lastModified":1486522504000,"length":97538,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/urat_pga.jpg"},"download/urat_pga.ps.zip":{"contentType":"application/zip","lastModified":1486522511000,"length":116275,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/download/urat_pga.ps.zip"},"intensity.html":{"contentType":"text/html","lastModified":1486522533000,"length":15699,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/intensity.html"},"pga.html":{"contentType":"text/html","lastModified":1486522533000,"length":15491,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/pga.html"},"pgv.html":{"contentType":"text/html","lastModified":1486522533000,"length":15491,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/pgv.html"},"products.html":{"contentType":"text/html","lastModified":1486522533000,"length":17962,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/products.html"},"psa03.html":{"contentType":"text/html","lastModified":1486522533000,"length":16658,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/psa03.html"},"psa10.html":{"contentType":"text/html","lastModified":1486522533000,"length":16657,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/psa10.html"},"psa30.html":{"contentType":"text/html","lastModified":1486522533000,"length":16657,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/psa30.html"},"stationlist.html":{"contentType":"text/html","lastModified":1486522533000,"length":155851,"url":"https://earthquake.usgs.gov/archive/product/shakemap/ci14745580/ci/1486522540360/stationlist.html"}}}],"trump-shakemap":[{"indexid":"139056262","indexTime":1492122314953,"id":"urn:usgs-product:atlas:trump-shakemap:atlas20100615042658:1492122314535","type":"trump-shakemap","code":"atlas20100615042658","source":"atlas","updateTime":1492122314535,"status":"UPDATE","properties":{"eventsource":"atlas","eventsourcecode":"20100615042658","trump-code":"atlas20100615042658","trump-source":"atlas"},"preferredWeight":1,"contents":[]}]}},"geometry":{"type":"Point","coordinates":[-115.9113333,32.705,8.756]},"id":"ci14745580"}'}
+    headers:
+      Access-Control-Allow-Headers: ['accept,origin,authorization,content-type']
+      Access-Control-Allow-Methods: ['*']
+      Access-Control-Allow-Origin: ['*']
+      Cache-Control: ['public, max-age=86400']
+      Connection: [close, Transfer-Encoding]
+      Content-Type: [application/json]
+      Date: ['Thu, 16 Aug 2018 22:09:51 GMT']
+      Expires: ['Fri, 17 Aug 2018 22:09:51 GMT']
+      Last-Modified: ['Thu, 16 Aug 2018 20:51:37 GMT']
+      Server: [nginx]
+      Strict-Transport-Security: [max-age=31536000]
+      Vary: [Accept-Encoding]
+      X-Cache-Status: [HIT]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+- request:
+    body: null
+    headers:
+      Connection: [close]
+      Host: [earthquake.usgs.gov]
+      User-Agent: [Python-urllib/3.5]
+    method: GET
+    uri: https://earthquake.usgs.gov/archive/product/dyfi/ci14745580/us/1422409416028/cdi_geo.txt
+  response:
+    body: {string: '# Columns: ZIP/Location,CDI,No. of responses,Epicentral distance,Latitude,Longitude,Suspect?,City,State
+
+        "UTM:(11S 008 418 10000)",2.0,1,766,37.7182,-121.7075,0,"UTM:(11S 008 418
+        10000)",""
+
+        "UTM:(11S 008 421 10000)",1.0,1,789,37.9877,-121.7246,0,"UTM:(11S 008 421
+        10000)",""
+
+        "UTM:(11S 009 422 10000)",1.0,1,790,38.0820,-121.6168,0,"UTM:(11S 009 422
+        10000)",""
+
+        "UTM:(11S 016 393 10000)",1.0,1,538,35.5021,-120.6930,0,"UTM:(11S 016 393
+        10000)",""
+
+        "UTM:(11S 022 391 10000)",3.1,1,479,35.3404,-120.0257,0,"UTM:(11S 022 391
+        10000)",""
+
+        "UTM:(11S 023 381 10000)",2.5,2,415,34.4425,-119.8842,0,"UTM:(11S 023 381
+        10000)",""
+
+        "UTM:(11S 028 380 10000)",2.0,1,367,34.3640,-119.3379,0,"UTM:(11S 028 380
+        10000)",""
+
+        "UTM:(11S 029 378 10000)",1.0,1,348,34.1859,-119.2245,0,"UTM:(11S 029 378
+        10000)",""
+
+        "UTM:(11S 029 379 10000)",2.0,7,353,34.2760,-119.2268,0,"UTM:(11S 029 379
+        10000)",""
+
+        "UTM:(11S 030 377 10000)",2.0,1,335,34.0976,-119.1137,0,"UTM:(11S 030 377
+        10000)",""
+
+        "UTM:(11S 030 378 10000)",2.0,2,339,34.1878,-119.1160,0,"UTM:(11S 030 378
+        10000)",""
+
+        "UTM:(11S 030 391 10000)",1.0,1,419,35.3593,-119.1462,0,"UTM:(11S 030 391
+        10000)",""
+
+        "UTM:(11S 031 378 10000)",2.0,10,331,34.1895,-119.0076,0,"UTM:(11S 031 378
+        10000)",""
+
+        "UTM:(11S 031 379 10000)",2.0,4,336,34.2797,-119.0097,0,"UTM:(11S 031 379
+        10000)",""
+
+        "UTM:(11S 031 391 10000)",2.0,1,412,35.3611,-119.0361,0,"UTM:(11S 031 391
+        10000)",""
+
+        "UTM:(11S 032 376 10000)",3.4,1,312,34.0110,-118.8951,0,"UTM:(11S 032 376
+        10000)",""
+
+        "UTM:(11S 032 378 10000)",2.0,2,322,34.1913,-118.8991,0,"UTM:(11S 032 378
+        10000)",""
+
+        "UTM:(11S 032 379 10000)",2.2,1,327,34.2814,-118.9012,0,"UTM:(11S 032 379
+        10000)",""
+
+        "UTM:(11S 032 391 10000)",2.0,1,405,35.3629,-118.9262,0,"UTM:(11S 032 391
+        10000)",""
+
+        "UTM:(11S 033 376 10000)",2.0,3,303,34.0127,-118.7869,0,"UTM:(11S 033 376
+        10000)",""
+
+        "UTM:(11S 033 377 10000)",2.0,1,308,34.1028,-118.7887,0,"UTM:(11S 033 377
+        10000)",""
+
+        "UTM:(11S 033 378 10000)",2.0,6,314,34.1929,-118.7906,0,"UTM:(11S 033 378
+        10000)",""
+
+        "UTM:(11S 033 379 10000)",2.0,8,319,34.2831,-118.7926,0,"UTM:(11S 033 379
+        10000)",""
+
+        "UTM:(11S 034 376 10000)",2.2,1,295,34.0142,-118.6786,0,"UTM:(11S 034 376
+        10000)",""
+
+        "UTM:(11S 034 377 10000)",2.7,7,300,34.1043,-118.6804,0,"UTM:(11S 034 377
+        10000)",""
+
+        "UTM:(11S 034 378 10000)",2.3,24,305,34.1945,-118.6822,0,"UTM:(11S 034 378
+        10000)",""
+
+        "UTM:(11S 034 379 10000)",2.0,17,311,34.2846,-118.6840,0,"UTM:(11S 034 379
+        10000)",""
+
+        "UTM:(11S 034 389 10000)",3.1,1,377,35.1861,-118.7023,0,"UTM:(11S 034 389
+        10000)",""
+
+        "UTM:(11S 035 376 10000)",2.2,5,286,34.0156,-118.5703,0,"UTM:(11S 035 376
+        10000)",""
+
+        "UTM:(11S 035 377 10000)",2.0,2,291,34.1058,-118.5720,0,"UTM:(11S 035 377
+        10000)",""
+
+        "UTM:(11S 035 378 10000)",2.2,80,297,34.1959,-118.5737,0,"UTM:(11S 035 378
+        10000)",""
+
+        "UTM:(11S 035 379 10000)",2.1,19,303,34.2861,-118.5754,0,"UTM:(11S 035 379
+        10000)",""
+
+        "UTM:(11S 035 380 10000)",2.0,19,308,34.3762,-118.5770,0,"UTM:(11S 035 380
+        10000)",""
+
+        "UTM:(11S 035 381 10000)",2.0,9,315,34.4663,-118.5787,0,"UTM:(11S 035 381
+        10000)",""
+
+        "UTM:(11S 036 368 10000)",2.2,2,245,33.2956,-118.4500,0,"UTM:(11S 036 368
+        10000)",""
+
+        "UTM:(11S 036 369 10000)",2.0,1,248,33.3858,-118.4514,0,"UTM:(11S 036 369
+        10000)",""
+
+        "UTM:(11S 036 370 10000)",2.0,1,251,33.4760,-118.4530,0,"UTM:(11S 036 370
+        10000)",""
+
+        "UTM:(11S 036 373 10000)",2.0,2,263,33.7464,-118.4575,0,"UTM:(11S 036 373
+        10000)",""
+
+        "UTM:(11S 036 374 10000)",2.0,8,267,33.8366,-118.4590,0,"UTM:(11S 036 374
+        10000)",""
+
+        "UTM:(11S 036 375 10000)",2.2,81,272,33.9268,-118.4605,0,"UTM:(11S 036 375
+        10000)",""
+
+        "UTM:(11S 036 376 10000)",2.4,289,278,34.0170,-118.4621,0,"UTM:(11S 036 376
+        10000)",""
+
+        "UTM:(11S 036 377 10000)",2.4,22,283,34.1071,-118.4636,0,"UTM:(11S 036 377
+        10000)",""
+
+        "UTM:(11S 036 378 10000)",2.0,51,289,34.1972,-118.4651,0,"UTM:(11S 036 378
+        10000)",""
+
+        "UTM:(11S 036 379 10000)",2.0,21,294,34.2874,-118.4668,0,"UTM:(11S 036 379
+        10000)",""
+
+        "UTM:(11S 036 380 10000)",2.0,11,301,34.3775,-118.4683,0,"UTM:(11S 036 380
+        10000)",""
+
+        "UTM:(11S 036 381 10000)",2.0,13,307,34.4677,-118.4699,0,"UTM:(11S 036 381
+        10000)",""
+
+        "UTM:(11S 036 388 10000)",3.1,1,356,35.0987,-118.4811,0,"UTM:(11S 036 388
+        10000)",""
+
+        "UTM:(11S 037 369 10000)",2.6,6,238,33.3870,-118.3440,0,"UTM:(11S 037 369
+        10000)",""
+
+        "UTM:(11S 037 373 10000)",2.5,58,254,33.7477,-118.3495,0,"UTM:(11S 037 373
+        10000)",""
+
+        "UTM:(11S 037 374 10000)",2.5,286,259,33.8379,-118.3510,0,"UTM:(11S 037 374
+        10000)",""
+
+        "UTM:(11S 037 375 10000)",2.4,127,264,33.9280,-118.3524,0,"UTM:(11S 037 375
+        10000)",""
+
+        "UTM:(11S 037 376 10000)",2.4,124,269,34.0182,-118.3538,0,"UTM:(11S 037 376
+        10000)",""
+
+        "UTM:(11S 037 377 10000)",2.5,153,275,34.1084,-118.3552,0,"UTM:(11S 037 377
+        10000)",""
+
+        "UTM:(11S 037 378 10000)",2.0,87,280,34.1985,-118.3567,0,"UTM:(11S 037 378
+        10000)",""
+
+        "UTM:(11S 037 379 10000)",2.1,4,287,34.2887,-118.3581,0,"UTM:(11S 037 379
+        10000)",""
+
+        "UTM:(11S 037 380 10000)",2.0,1,293,34.3788,-118.3595,0,"UTM:(11S 037 380
+        10000)",""
+
+        "UTM:(11S 037 381 10000)",2.0,2,299,34.4690,-118.3610,0,"UTM:(11S 037 381
+        10000)",""
+
+        "UTM:(11S 037 390 10000)",3.1,1,365,35.2803,-118.3745,0,"UTM:(11S 037 390
+        10000)",""
+
+        "UTM:(11S 038 368 10000)",3.4,1,226,33.2980,-118.2352,0,"UTM:(11S 038 368
+        10000)",""
+
+        "UTM:(11S 038 373 10000)",2.9,48,245,33.7489,-118.2416,0,"UTM:(11S 038 373
+        10000)",""
+
+        "UTM:(11S 038 374 10000)",2.7,39,250,33.8390,-118.2429,0,"UTM:(11S 038 374
+        10000)",""
+
+        "UTM:(11S 038 375 10000)",2.9,39,255,33.9291,-118.2442,0,"UTM:(11S 038 375
+        10000)",""
+
+        "UTM:(11S 038 376 10000)",2.9,150,261,34.0194,-118.2455,0,"UTM:(11S 038 376
+        10000)",""
+
+        "UTM:(11S 038 377 10000)",2.4,135,266,34.1095,-118.2468,0,"UTM:(11S 038 377
+        10000)",""
+
+        "UTM:(11S 038 378 10000)",2.0,48,272,34.1997,-118.2481,0,"UTM:(11S 038 378
+        10000)",""
+
+        "UTM:(11S 038 379 10000)",2.0,3,279,34.2899,-118.2494,0,"UTM:(11S 038 379
+        10000)",""
+
+        "UTM:(11S 038 383 10000)",2.0,2,306,34.6504,-118.2549,0,"UTM:(11S 038 383
+        10000)",""
+
+        "UTM:(11S 039 373 10000)",2.7,232,236,33.7499,-118.1336,0,"UTM:(11S 039 373
+        10000)",""
+
+        "UTM:(11S 039 374 10000)",2.5,219,241,33.8400,-118.1349,0,"UTM:(11S 039 374
+        10000)",""
+
+        "UTM:(11S 039 375 10000)",2.8,88,247,33.9302,-118.1360,0,"UTM:(11S 039 375
+        10000)",""
+
+        "UTM:(11S 039 376 10000)",2.6,49,253,34.0204,-118.1372,0,"UTM:(11S 039 376
+        10000)",""
+
+        "UTM:(11S 039 377 10000)",2.2,126,258,34.1106,-118.1384,0,"UTM:(11S 039 377
+        10000)",""
+
+        "UTM:(11S 039 378 10000)",2.0,68,265,34.2007,-118.1396,0,"UTM:(11S 039 378
+        10000)",""
+
+        "UTM:(11S 039 381 10000)",2.7,1,284,34.4712,-118.1433,0,"UTM:(11S 039 381
+        10000)",""
+
+        "UTM:(11S 039 382 10000)",2.6,2,291,34.5614,-118.1446,0,"UTM:(11S 039 382
+        10000)",""
+
+        "UTM:(11S 039 383 10000)",2.1,3,299,34.6516,-118.1458,0,"UTM:(11S 039 383
+        10000)",""
+
+        "UTM:(11S 039 384 10000)",2.0,2,306,34.7417,-118.1470,0,"UTM:(11S 039 384
+        10000)",""
+
+        "UTM:(11S 039 385 10000)",2.0,2,313,34.8319,-118.1482,0,"UTM:(11S 039 385
+        10000)",""
+
+        "UTM:(11S 040 372 10000)",3.0,125,223,33.6607,-118.0246,0,"UTM:(11S 040 372
+        10000)",""
+
+        "UTM:(11S 040 373 10000)",2.9,225,228,33.7508,-118.0256,0,"UTM:(11S 040 373
+        10000)",""
+
+        "UTM:(11S 040 374 10000)",3.0,202,233,33.8409,-118.0268,0,"UTM:(11S 040 374
+        10000)",""
+
+        "UTM:(11S 040 375 10000)",2.8,115,239,33.9312,-118.0279,0,"UTM:(11S 040 375
+        10000)",""
+
+        "UTM:(11S 040 376 10000)",2.6,43,244,34.0213,-118.0289,0,"UTM:(11S 040 376
+        10000)",""
+
+        "UTM:(11S 040 377 10000)",2.1,54,251,34.1115,-118.0300,0,"UTM:(11S 040 377
+        10000)",""
+
+        "UTM:(11S 040 378 10000)",2.0,16,257,34.2017,-118.0311,0,"UTM:(11S 040 378
+        10000)",""
+
+        "UTM:(11S 040 382 10000)",2.0,2,284,34.5624,-118.0356,0,"UTM:(11S 040 382
+        10000)",""
+
+        "UTM:(11S 040 383 10000)",2.0,1,292,34.6525,-118.0367,0,"UTM:(11S 040 383
+        10000)",""
+
+        "UTM:(11S 040 384 10000)",2.0,1,299,34.7426,-118.0378,0,"UTM:(11S 040 384
+        10000)",""
+
+        "UTM:(11S 041 371 10000)",3.0,48,209,33.5713,-117.9158,0,"UTM:(11S 041 371
+        10000)",""
+
+        "UTM:(11S 041 372 10000)",3.2,460,214,33.6615,-117.9168,0,"UTM:(11S 041 372
+        10000)",""
+
+        "UTM:(11S 041 373 10000)",3.0,216,219,33.7516,-117.9177,0,"UTM:(11S 041 373
+        10000)",""
+
+        "UTM:(11S 041 374 10000)",2.9,239,225,33.8418,-117.9186,0,"UTM:(11S 041 374
+        10000)",""
+
+        "UTM:(11S 041 375 10000)",2.9,159,230,33.9320,-117.9196,0,"UTM:(11S 041 375
+        10000)",""
+
+        "UTM:(11S 041 376 10000)",2.4,60,237,34.0222,-117.9206,0,"UTM:(11S 041 376
+        10000)",""
+
+        "UTM:(11S 041 377 10000)",2.4,59,243,34.1124,-117.9216,0,"UTM:(11S 041 377
+        10000)",""
+
+        "UTM:(11S 041 381 10000)",2.2,1,270,34.4731,-117.9256,0,"UTM:(11S 041 381
+        10000)",""
+
+        "UTM:(11S 041 382 10000)",2.0,1,278,34.5632,-117.9266,0,"UTM:(11S 041 382
+        10000)",""
+
+        "UTM:(11S 041 388 10000)",1.0,1,325,35.1042,-117.9326,0,"UTM:(11S 041 388
+        10000)",""
+
+        "UTM:(11S 042 370 10000)",2.9,14,196,33.4818,-117.8072,0,"UTM:(11S 042 370
+        10000)",""
+
+        "UTM:(11S 042 371 10000)",3.4,88,200,33.5721,-117.8081,0,"UTM:(11S 042 371
+        10000)",""
+
+        "UTM:(11S 042 372 10000)",3.0,290,205,33.6623,-117.8089,0,"UTM:(11S 042 372
+        10000)",""
+
+        "UTM:(11S 042 373 10000)",2.7,207,211,33.7524,-117.8098,0,"UTM:(11S 042 373
+        10000)",""
+
+        "UTM:(11S 042 374 10000)",2.8,181,216,33.8426,-117.8106,0,"UTM:(11S 042 374
+        10000)",""
+
+        "UTM:(11S 042 375 10000)",2.7,60,222,33.9327,-117.8115,0,"UTM:(11S 042 375
+        10000)",""
+
+        "UTM:(11S 042 376 10000)",2.9,56,229,34.0229,-117.8123,0,"UTM:(11S 042 376
+        10000)",""
+
+        "UTM:(11S 042 377 10000)",2.4,75,235,34.1132,-117.8132,0,"UTM:(11S 042 377
+        10000)",""
+
+        "UTM:(11S 042 383 10000)",2.0,5,279,34.6542,-117.8185,0,"UTM:(11S 042 383
+        10000)",""
+
+        "UTM:(11S 043 370 10000)",3.3,253,187,33.4825,-117.6996,0,"UTM:(11S 043 370
+        10000)",""
+
+        "UTM:(11S 043 371 10000)",3.4,437,192,33.5727,-117.7003,0,"UTM:(11S 043 371
+        10000)",""
+
+        "UTM:(11S 043 372 10000)",3.4,233,197,33.6629,-117.7010,0,"UTM:(11S 043 372
+        10000)",""
+
+        "UTM:(11S 043 373 10000)",2.0,3,203,33.7531,-117.7018,0,"UTM:(11S 043 373
+        10000)",""
+
+        "UTM:(11S 043 374 10000)",2.9,44,208,33.8433,-117.7026,0,"UTM:(11S 043 374
+        10000)",""
+
+        "UTM:(11S 043 375 10000)",2.8,40,215,33.9334,-117.7033,0,"UTM:(11S 043 375
+        10000)",""
+
+        "UTM:(11S 043 376 10000)",2.7,70,221,34.0236,-117.7040,0,"UTM:(11S 043 376
+        10000)",""
+
+        "UTM:(11S 043 377 10000)",2.1,59,228,34.1138,-117.7047,0,"UTM:(11S 043 377
+        10000)",""
+
+        "UTM:(11S 044 369 10000)",3.4,83,173,33.3928,-117.5914,0,"UTM:(11S 044 369
+        10000)",""
+
+        "UTM:(11S 044 370 10000)",3.5,99,178,33.4830,-117.5920,0,"UTM:(11S 044 370
+        10000)",""
+
+        "UTM:(11S 044 371 10000)",3.5,160,183,33.5733,-117.5926,0,"UTM:(11S 044 371
+        10000)",""
+
+        "UTM:(11S 044 372 10000)",3.2,173,189,33.6634,-117.5932,0,"UTM:(11S 044 372
+        10000)",""
+
+        "UTM:(11S 044 373 10000)",3.0,4,194,33.7537,-117.5939,0,"UTM:(11S 044 373
+        10000)",""
+
+        "UTM:(11S 044 374 10000)",2.7,92,201,33.8439,-117.5944,0,"UTM:(11S 044 374
+        10000)",""
+
+        "UTM:(11S 044 375 10000)",2.7,46,207,33.9340,-117.5951,0,"UTM:(11S 044 375
+        10000)",""
+
+        "UTM:(11S 044 376 10000)",2.6,39,214,34.0241,-117.5958,0,"UTM:(11S 044 376
+        10000)",""
+
+        "UTM:(11S 044 377 10000)",2.3,103,221,34.1144,-117.5963,0,"UTM:(11S 044 377
+        10000)",""
+
+        "UTM:(11S 044 378 10000)",3.1,1,228,34.2045,-117.5969,0,"UTM:(11S 044 378
+        10000)",""
+
+        "UTM:(11S 044 380 10000)",2.0,4,243,34.3850,-117.5983,0,"UTM:(11S 044 380
+        10000)",""
+
+        "UTM:(11S 044 381 10000)",2.5,2,251,34.4751,-117.5989,0,"UTM:(11S 044 381
+        10000)",""
+
+        "UTM:(11S 044 387 10000)",2.0,1,300,35.0161,-117.6028,0,"UTM:(11S 044 387
+        10000)",""
+
+        "UTM:(11S 045 370 10000)",3.1,1,169,33.4835,-117.4844,0,"UTM:(11S 045 370
+        10000)",""
+
+        "UTM:(11S 045 372 10000)",3.3,2,180,33.6639,-117.4854,0,"UTM:(11S 045 372
+        10000)",""
+
+        "UTM:(11S 045 373 10000)",3.2,25,187,33.7541,-117.4858,0,"UTM:(11S 045 373
+        10000)",""
+
+        "UTM:(11S 045 374 10000)",2.7,16,193,33.8443,-117.4864,0,"UTM:(11S 045 374
+        10000)",""
+
+        "UTM:(11S 045 375 10000)",2.8,43,200,33.9345,-117.4869,0,"UTM:(11S 045 375
+        10000)",""
+
+        "UTM:(11S 045 376 10000)",3.0,19,207,34.0247,-117.4874,0,"UTM:(11S 045 376
+        10000)",""
+
+        "UTM:(11S 045 377 10000)",2.6,47,214,34.1149,-117.4879,0,"UTM:(11S 045 377
+        10000)",""
+
+        "UTM:(11S 045 378 10000)",2.0,2,221,34.2050,-117.4884,0,"UTM:(11S 045 378
+        10000)",""
+
+        "UTM:(11S 045 382 10000)",2.6,2,253,34.5658,-117.4905,0,"UTM:(11S 045 382
+        10000)",""
+
+        "UTM:(11S 046 366 10000)",3.3,44,143,33.1231,-117.3752,0,"UTM:(11S 046 366
+        10000)",""
+
+        "UTM:(11S 046 367 10000)",3.3,195,147,33.2134,-117.3756,0,"UTM:(11S 046 367
+        10000)",""
+
+        "UTM:(11S 046 368 10000)",3.1,1,151,33.3036,-117.3759,0,"UTM:(11S 046 368
+        10000)",""
+
+        "UTM:(11S 046 369 10000)",3.4,1,156,33.3937,-117.3764,0,"UTM:(11S 046 369
+        10000)",""
+
+        "UTM:(11S 046 370 10000)",3.8,1,161,33.4839,-117.3767,0,"UTM:(11S 046 370
+        10000)",""
+
+        "UTM:(11S 046 371 10000)",3.5,4,167,33.5741,-117.3771,0,"UTM:(11S 046 371
+        10000)",""
+
+        "UTM:(11S 046 372 10000)",2.9,36,172,33.6643,-117.3775,0,"UTM:(11S 046 372
+        10000)",""
+
+        "UTM:(11S 046 373 10000)",3.0,17,179,33.7545,-117.3779,0,"UTM:(11S 046 373
+        10000)",""
+
+        "UTM:(11S 046 374 10000)",2.6,8,186,33.8447,-117.3783,0,"UTM:(11S 046 374
+        10000)",""
+
+        "UTM:(11S 046 375 10000)",2.9,84,192,33.9348,-117.3787,0,"UTM:(11S 046 375
+        10000)",""
+
+        "UTM:(11S 046 376 10000)",2.7,35,200,34.0251,-117.3791,0,"UTM:(11S 046 376
+        10000)",""
+
+        "UTM:(11S 046 377 10000)",2.7,44,207,34.1153,-117.3795,0,"UTM:(11S 046 377
+        10000)",""
+
+        "UTM:(11S 046 378 10000)",2.6,16,215,34.2054,-117.3799,0,"UTM:(11S 046 378
+        10000)",""
+
+        "UTM:(11S 046 379 10000)",2.7,1,223,34.2956,-117.3803,0,"UTM:(11S 046 379
+        10000)",""
+
+        "UTM:(11S 046 380 10000)",2.0,5,231,34.3858,-117.3807,0,"UTM:(11S 046 380
+        10000)",""
+
+        "UTM:(11S 046 381 10000)",2.0,15,239,34.4759,-117.3811,0,"UTM:(11S 046 381
+        10000)",""
+
+        "UTM:(11S 046 382 10000)",2.3,5,247,34.5662,-117.3815,0,"UTM:(11S 046 382
+        10000)",""
+
+        "UTM:(11S 047 361 10000)",3.7,20,126,32.6724,-117.2666,0,"UTM:(11S 047 361
+        10000)",""
+
+        "UTM:(11S 047 362 10000)",3.7,415,126,32.7626,-117.2669,0,"UTM:(11S 047 362
+        10000)",""
+
+        "UTM:(11S 047 363 10000)",3.6,419,127,32.8528,-117.2672,0,"UTM:(11S 047 363
+        10000)",""
+
+        "UTM:(11S 047 364 10000)",3.6,234,128,32.9430,-117.2674,0,"UTM:(11S 047 364
+        10000)",""
+
+        "UTM:(11S 047 365 10000)",3.6,405,131,33.0332,-117.2677,0,"UTM:(11S 047 365
+        10000)",""
+
+        "UTM:(11S 047 366 10000)",3.5,379,134,33.1234,-117.2679,0,"UTM:(11S 047 366
+        10000)",""
+
+        "UTM:(11S 047 367 10000)",3.4,442,138,33.2136,-117.2682,0,"UTM:(11S 047 367
+        10000)",""
+
+        "UTM:(11S 047 368 10000)",3.5,53,142,33.3038,-117.2685,0,"UTM:(11S 047 368
+        10000)",""
+
+        "UTM:(11S 047 369 10000)",3.6,81,147,33.3940,-117.2688,0,"UTM:(11S 047 369
+        10000)",""
+
+        "UTM:(11S 047 370 10000)",2.4,9,153,33.4842,-117.2691,0,"UTM:(11S 047 370
+        10000)",""
+
+        "UTM:(11S 047 371 10000)",3.2,62,158,33.5744,-117.2694,0,"UTM:(11S 047 371
+        10000)",""
+
+        "UTM:(11S 047 372 10000)",3.1,55,165,33.6646,-117.2696,0,"UTM:(11S 047 372
+        10000)",""
+
+        "UTM:(11S 047 373 10000)",2.2,13,171,33.7548,-117.2699,0,"UTM:(11S 047 373
+        10000)",""
+
+        "UTM:(11S 047 374 10000)",3.1,12,178,33.8449,-117.2702,0,"UTM:(11S 047 374
+        10000)",""
+
+        "UTM:(11S 047 375 10000)",2.9,83,186,33.9352,-117.2704,0,"UTM:(11S 047 375
+        10000)",""
+
+        "UTM:(11S 047 376 10000)",3.0,64,193,34.0254,-117.2708,0,"UTM:(11S 047 376
+        10000)",""
+
+        "UTM:(11S 047 377 10000)",2.8,49,201,34.1155,-117.2711,0,"UTM:(11S 047 377
+        10000)",""
+
+        "UTM:(11S 047 378 10000)",2.2,17,209,34.2057,-117.2714,0,"UTM:(11S 047 378
+        10000)",""
+
+        "UTM:(11S 047 379 10000)",2.7,1,217,34.2959,-117.2716,0,"UTM:(11S 047 379
+        10000)",""
+
+        "UTM:(11S 047 380 10000)",2.0,8,225,34.3861,-117.2720,0,"UTM:(11S 047 380
+        10000)",""
+
+        "UTM:(11S 047 381 10000)",2.0,22,233,34.4763,-117.2722,0,"UTM:(11S 047 381
+        10000)",""
+
+        "UTM:(11S 047 382 10000)",3.3,2,242,34.5665,-117.2725,0,"UTM:(11S 047 382
+        10000)",""
+
+        "UTM:(11S 048 360 10000)",3.9,78,116,32.5823,-117.1598,0,"UTM:(11S 048 360
+        10000)",""
+
+        "UTM:(11S 048 361 10000)",4.0,286,116,32.6726,-117.1600,0,"UTM:(11S 048 361
+        10000)",""
+
+        "UTM:(11S 048 362 10000)",3.8,1079,116,32.7627,-117.1601,0,"UTM:(11S 048 362
+        10000)",""
+
+        "UTM:(11S 048 363 10000)",3.5,292,117,32.8529,-117.1602,0,"UTM:(11S 048 363
+        10000)",""
+
+        "UTM:(11S 048 364 10000)",3.6,441,119,32.9432,-117.1604,0,"UTM:(11S 048 364
+        10000)",""
+
+        "UTM:(11S 048 365 10000)",3.8,98,121,33.0333,-117.1606,0,"UTM:(11S 048 365
+        10000)",""
+
+        "UTM:(11S 048 366 10000)",3.4,260,125,33.1236,-117.1608,0,"UTM:(11S 048 366
+        10000)",""
+
+        "UTM:(11S 048 367 10000)",3.5,65,129,33.2138,-117.1609,0,"UTM:(11S 048 367
+        10000)",""
+
+        "UTM:(11S 048 368 10000)",3.9,57,133,33.3040,-117.1611,0,"UTM:(11S 048 368
+        10000)",""
+
+        "UTM:(11S 048 369 10000)",3.6,18,139,33.3941,-117.1612,0,"UTM:(11S 048 369
+        10000)",""
+
+        "UTM:(11S 048 370 10000)",3.4,87,144,33.4843,-117.1615,0,"UTM:(11S 048 370
+        10000)",""
+
+        "UTM:(11S 048 371 10000)",3.3,156,151,33.5746,-117.1616,0,"UTM:(11S 048 371
+        10000)",""
+
+        "UTM:(11S 048 372 10000)",3.2,55,157,33.6647,-117.1617,0,"UTM:(11S 048 372
+        10000)",""
+
+        "UTM:(11S 048 373 10000)",3.1,25,164,33.7550,-117.1619,0,"UTM:(11S 048 373
+        10000)",""
+
+        "UTM:(11S 048 374 10000)",3.1,25,171,33.8452,-117.1621,0,"UTM:(11S 048 374
+        10000)",""
+
+        "UTM:(11S 048 375 10000)",3.3,17,179,33.9353,-117.1623,0,"UTM:(11S 048 375
+        10000)",""
+
+        "UTM:(11S 048 376 10000)",2.6,66,187,34.0256,-117.1625,0,"UTM:(11S 048 376
+        10000)",""
+
+        "UTM:(11S 048 377 10000)",2.9,24,195,34.1157,-117.1627,0,"UTM:(11S 048 377
+        10000)",""
+
+        "UTM:(11S 048 378 10000)",2.2,5,203,34.2059,-117.1628,0,"UTM:(11S 048 378
+        10000)",""
+
+        "UTM:(11S 048 379 10000)",2.5,9,211,34.2961,-117.1629,0,"UTM:(11S 048 379
+        10000)",""
+
+        "UTM:(11S 048 380 10000)",2.0,4,219,34.3862,-117.1631,0,"UTM:(11S 048 380
+        10000)",""
+
+        "UTM:(11S 048 381 10000)",2.0,21,228,34.4764,-117.1633,0,"UTM:(11S 048 381
+        10000)",""
+
+        "UTM:(11S 048 382 10000)",2.3,2,237,34.5667,-117.1635,0,"UTM:(11S 048 382
+        10000)",""
+
+        "UTM:(11S 049 357 10000)",3.7,42,114,32.3118,-117.0531,0,"UTM:(11S 049 357
+        10000)",""
+
+        "UTM:(11S 049 359 10000)",4.1,244,108,32.4922,-117.0532,0,"UTM:(11S 049 359
+        10000)",""
+
+        "UTM:(11S 049 360 10000)",4.0,208,106,32.5825,-117.0532,0,"UTM:(11S 049 360
+        10000)",""
+
+        "UTM:(11S 049 361 10000)",4.0,345,106,32.6726,-117.0533,0,"UTM:(11S 049 361
+        10000)",""
+
+        "UTM:(11S 049 362 10000)",3.6,742,106,32.7629,-117.0533,0,"UTM:(11S 049 362
+        10000)",""
+
+        "UTM:(11S 049 363 10000)",3.7,203,107,32.8530,-117.0534,0,"UTM:(11S 049 363
+        10000)",""
+
+        "UTM:(11S 049 364 10000)",3.7,352,109,32.9432,-117.0534,0,"UTM:(11S 049 364
+        10000)",""
+
+        "UTM:(11S 049 365 10000)",3.7,281,112,33.0335,-117.0535,0,"UTM:(11S 049 365
+        10000)",""
+
+        "UTM:(11S 049 366 10000)",3.5,314,115,33.1236,-117.0536,0,"UTM:(11S 049 366
+        10000)",""
+
+        "UTM:(11S 049 367 10000)",3.6,55,120,33.2139,-117.0537,0,"UTM:(11S 049 367
+        10000)",""
+
+        "UTM:(11S 049 368 10000)",3.7,21,125,33.3041,-117.0537,0,"UTM:(11S 049 368
+        10000)",""
+
+        "UTM:(11S 049 369 10000)",3.4,1,131,33.3943,-117.0538,0,"UTM:(11S 049 369
+        10000)",""
+
+        "UTM:(11S 049 370 10000)",3.5,136,137,33.4845,-117.0538,0,"UTM:(11S 049 370
+        10000)",""
+
+        "UTM:(11S 049 371 10000)",3.2,24,143,33.5746,-117.0538,0,"UTM:(11S 049 371
+        10000)",""
+
+        "UTM:(11S 049 372 10000)",3.6,10,150,33.6649,-117.0539,0,"UTM:(11S 049 372
+        10000)",""
+
+        "UTM:(11S 049 373 10000)",3.3,52,157,33.7550,-117.0540,0,"UTM:(11S 049 373
+        10000)",""
+
+        "UTM:(11S 049 375 10000)",2.9,12,173,33.9355,-117.0540,0,"UTM:(11S 049 375
+        10000)",""
+
+        "UTM:(11S 049 376 10000)",2.6,26,181,34.0256,-117.0541,0,"UTM:(11S 049 376
+        10000)",""
+
+        "UTM:(11S 049 377 10000)",2.2,1,189,34.1158,-117.0542,0,"UTM:(11S 049 377
+        10000)",""
+
+        "UTM:(11S 049 378 10000)",3.4,1,197,34.2060,-117.0542,0,"UTM:(11S 049 378
+        10000)",""
+
+        "UTM:(11S 049 380 10000)",3.8,1,214,34.3864,-117.0543,0,"UTM:(11S 049 380
+        10000)",""
+
+        "UTM:(11S 049 385 10000)",2.0,1,259,34.8373,-117.0547,0,"UTM:(11S 049 385
+        10000)",""
+
+        "UTM:(11S 050 356 10000)",3.1,2,109,32.2216,-116.9469,0,"UTM:(11S 050 356
+        10000)",""
+
+        "UTM:(11S 050 360 10000)",3.8,34,97,32.5824,-116.9467,0,"UTM:(11S 050 360
+        10000)",""
+
+        "UTM:(11S 050 361 10000)",4.0,150,96,32.6727,-116.9467,0,"UTM:(11S 050 361
+        10000)",""
+
+        "UTM:(11S 050 362 10000)",3.9,379,96,32.7629,-116.9466,0,"UTM:(11S 050 362
+        10000)",""
+
+        "UTM:(11S 050 363 10000)",3.8,352,97,32.8530,-116.9466,0,"UTM:(11S 050 363
+        10000)",""
+
+        "UTM:(11S 050 364 10000)",3.5,12,99,32.9433,-116.9465,0,"UTM:(11S 050 364
+        10000)",""
+
+        "UTM:(11S 050 365 10000)",3.6,23,102,33.0335,-116.9464,0,"UTM:(11S 050 365
+        10000)",""
+
+        "UTM:(11S 050 366 10000)",3.8,3,106,33.1237,-116.9463,0,"UTM:(11S 050 366
+        10000)",""
+
+        "UTM:(11S 050 367 10000)",3.8,20,111,33.2139,-116.9463,0,"UTM:(11S 050 367
+        10000)",""
+
+        "UTM:(11S 050 368 10000)",3.7,13,117,33.3041,-116.9462,0,"UTM:(11S 050 368
+        10000)",""
+
+        "UTM:(11S 050 370 10000)",4.3,1,129,33.4844,-116.9462,0,"UTM:(11S 050 370
+        10000)",""
+
+        "UTM:(11S 050 371 10000)",3.2,9,136,33.5747,-116.9461,0,"UTM:(11S 050 371
+        10000)",""
+
+        "UTM:(11S 050 372 10000)",3.6,7,143,33.6649,-116.9460,0,"UTM:(11S 050 372
+        10000)",""
+
+        "UTM:(11S 050 373 10000)",3.5,181,151,33.7550,-116.9460,0,"UTM:(11S 050 373
+        10000)",""
+
+        "UTM:(11S 050 374 10000)",3.5,8,159,33.8453,-116.9460,0,"UTM:(11S 050 374
+        10000)",""
+
+        "UTM:(11S 050 375 10000)",2.8,31,167,33.9355,-116.9459,0,"UTM:(11S 050 375
+        10000)",""
+
+        "UTM:(11S 050 377 10000)",3.8,3,183,34.1158,-116.9458,0,"UTM:(11S 050 377
+        10000)",""
+
+        "UTM:(11S 050 378 10000)",3.0,2,192,34.2060,-116.9457,0,"UTM:(11S 050 378
+        10000)",""
+
+        "UTM:(11S 050 379 10000)",3.1,1,201,34.2962,-116.9457,0,"UTM:(11S 050 379
+        10000)",""
+
+        "UTM:(11S 050 380 10000)",2.0,1,210,34.3863,-116.9456,0,"UTM:(11S 050 380
+        10000)",""
+
+        "UTM:(11S 051 361 10000)",3.9,7,86,32.6726,-116.8400,0,"UTM:(11S 051 361 10000)",""
+
+        "UTM:(11S 051 362 10000)",3.9,40,86,32.7627,-116.8398,0,"UTM:(11S 051 362
+        10000)",""
+
+        "UTM:(11S 051 363 10000)",3.7,74,87,32.8529,-116.8397,0,"UTM:(11S 051 363
+        10000)",""
+
+        "UTM:(11S 051 364 10000)",4.1,7,90,32.9432,-116.8395,0,"UTM:(11S 051 364 10000)",""
+
+        "UTM:(11S 051 365 10000)",3.6,142,93,33.0333,-116.8393,0,"UTM:(11S 051 365
+        10000)",""
+
+        "UTM:(11S 051 366 10000)",3.4,4,98,33.1235,-116.8392,0,"UTM:(11S 051 366 10000)",""
+
+        "UTM:(11S 051 368 10000)",3.4,5,109,33.3040,-116.8389,0,"UTM:(11S 051 368
+        10000)",""
+
+        "UTM:(11S 051 369 10000)",3.8,3,115,33.3942,-116.8387,0,"UTM:(11S 051 369
+        10000)",""
+
+        "UTM:(11S 051 370 10000)",3.7,3,122,33.4844,-116.8385,0,"UTM:(11S 051 370
+        10000)",""
+
+        "UTM:(11S 051 371 10000)",2.0,2,129,33.5746,-116.8384,0,"UTM:(11S 051 371
+        10000)",""
+
+        "UTM:(11S 051 372 10000)",2.2,1,137,33.6647,-116.8382,0,"UTM:(11S 051 372
+        10000)",""
+
+        "UTM:(11S 051 373 10000)",3.7,6,145,33.7549,-116.8380,0,"UTM:(11S 051 373
+        10000)",""
+
+        "UTM:(11S 051 374 10000)",2.7,1,153,33.8452,-116.8379,0,"UTM:(11S 051 374
+        10000)",""
+
+        "UTM:(11S 051 375 10000)",2.6,6,161,33.9353,-116.8377,0,"UTM:(11S 051 375
+        10000)",""
+
+        "UTM:(11S 051 378 10000)",2.4,7,187,34.2059,-116.8371,0,"UTM:(11S 051 378
+        10000)",""
+
+        "UTM:(11S 051 379 10000)",2.6,6,196,34.2961,-116.8370,0,"UTM:(11S 051 379
+        10000)",""
+
+        "UTM:(11S 052 360 10000)",3.8,1,77,32.5822,-116.7336,0,"UTM:(11S 052 360 10000)",""
+
+        "UTM:(11S 052 361 10000)",4.2,8,76,32.6724,-116.7334,0,"UTM:(11S 052 361 10000)",""
+
+        "UTM:(11S 052 362 10000)",4.0,7,76,32.7626,-116.7331,0,"UTM:(11S 052 362 10000)",""
+
+        "UTM:(11S 052 363 10000)",3.8,55,78,32.8528,-116.7328,0,"UTM:(11S 052 363
+        10000)",""
+
+        "UTM:(11S 052 364 10000)",3.4,2,80,32.9430,-116.7325,0,"UTM:(11S 052 364 10000)",""
+
+        "UTM:(11S 052 365 10000)",3.8,19,84,33.0332,-116.7322,0,"UTM:(11S 052 365
+        10000)",""
+
+        "UTM:(11S 052 366 10000)",3.9,3,89,33.1234,-116.7320,0,"UTM:(11S 052 366 10000)",""
+
+        "UTM:(11S 052 367 10000)",2.1,1,95,33.2136,-116.7317,0,"UTM:(11S 052 367 10000)",""
+
+        "UTM:(11S 052 368 10000)",4.8,1,101,33.3038,-116.7314,0,"UTM:(11S 052 368
+        10000)",""
+
+        "UTM:(11S 052 369 10000)",3.4,2,108,33.3940,-116.7311,0,"UTM:(11S 052 369
+        10000)",""
+
+        "UTM:(11S 052 371 10000)",3.4,3,123,33.5744,-116.7306,0,"UTM:(11S 052 371
+        10000)",""
+
+        "UTM:(11S 052 373 10000)",3.1,10,139,33.7548,-116.7301,0,"UTM:(11S 052 373
+        10000)",""
+
+        "UTM:(11S 052 375 10000)",2.7,1,156,33.9352,-116.7294,0,"UTM:(11S 052 375
+        10000)",""
+
+        "UTM:(11S 053 352 10000)",4.0,92,114,31.8602,-116.6300,0,"UTM:(11S 053 352
+        10000)",""
+
+        "UTM:(11S 053 360 10000)",4.1,21,67,32.5819,-116.6270,0,"UTM:(11S 053 360
+        10000)",""
+
+        "UTM:(11S 053 361 10000)",3.8,2,66,32.6721,-116.6267,0,"UTM:(11S 053 361 10000)",""
+
+        "UTM:(11S 053 362 10000)",3.8,3,66,32.7623,-116.6263,0,"UTM:(11S 053 362 10000)",""
+
+        "UTM:(11S 053 363 10000)",4.0,8,68,32.8526,-116.6259,0,"UTM:(11S 053 363 10000)",""
+
+        "UTM:(11S 053 364 10000)",3.3,3,71,32.9427,-116.6256,0,"UTM:(11S 053 364 10000)",""
+
+        "UTM:(11S 053 365 10000)",4.2,16,75,33.0329,-116.6251,0,"UTM:(11S 053 365
+        10000)",""
+
+        "UTM:(11S 053 366 10000)",4.0,14,81,33.1232,-116.6248,0,"UTM:(11S 053 366
+        10000)",""
+
+        "UTM:(11S 053 369 10000)",2.2,1,101,33.3937,-116.6236,0,"UTM:(11S 053 369
+        10000)",""
+
+        "UTM:(11S 053 370 10000)",3.6,5,109,33.4839,-116.6232,0,"UTM:(11S 053 370
+        10000)",""
+
+        "UTM:(11S 053 371 10000)",3.4,6,117,33.5741,-116.6228,0,"UTM:(11S 053 371
+        10000)",""
+
+        "UTM:(11S 053 374 10000)",2.7,1,143,33.8447,-116.6217,0,"UTM:(11S 053 374
+        10000)",""
+
+        "UTM:(11S 053 376 10000)",2.4,2,161,34.0251,-116.6209,0,"UTM:(11S 053 376
+        10000)",""
+
+        "UTM:(11S 054 360 10000)",3.1,1,57,32.5815,-116.5205,0,"UTM:(11S 054 360 10000)",""
+
+        "UTM:(11S 054 361 10000)",4.7,9,56,32.6717,-116.5200,0,"UTM:(11S 054 361 10000)",""
+
+        "UTM:(11S 054 363 10000)",3.8,11,58,32.8521,-116.5190,0,"UTM:(11S 054 363
+        10000)",""
+
+        "UTM:(11S 054 365 10000)",4.8,1,67,33.0326,-116.5181,0,"UTM:(11S 054 365 10000)",""
+
+        "UTM:(11S 054 367 10000)",4.8,3,79,33.2130,-116.5171,0,"UTM:(11S 054 367 10000)",""
+
+        "UTM:(11S 054 373 10000)",3.2,30,129,33.7541,-116.5140,0,"UTM:(11S 054 373
+        10000)",""
+
+        "UTM:(11S 054 374 10000)",3.2,74,138,33.8443,-116.5136,0,"UTM:(11S 054 374
+        10000)",""
+
+        "UTM:(11S 054 375 10000)",2.8,26,147,33.9345,-116.5130,0,"UTM:(11S 054 375
+        10000)",""
+
+        "UTM:(11S 054 376 10000)",2.8,3,157,34.0246,-116.5126,0,"UTM:(11S 054 376
+        10000)",""
+
+        "UTM:(11S 054 377 10000)",2.5,4,166,34.1149,-116.5121,0,"UTM:(11S 054 377
+        10000)",""
+
+        "UTM:(11S 055 360 10000)",4.0,4,48,32.5811,-116.4139,0,"UTM:(11S 055 360 10000)",""
+
+        "UTM:(11S 055 361 10000)",4.1,2,46,32.6713,-116.4134,0,"UTM:(11S 055 361 10000)",""
+
+        "UTM:(11S 055 362 10000)",3.4,2,46,32.7614,-116.4128,0,"UTM:(11S 055 362 10000)",""
+
+        "UTM:(11S 055 363 10000)",4.8,1,49,32.8517,-116.4122,0,"UTM:(11S 055 363 10000)",""
+
+        "UTM:(11S 055 364 10000)",2.7,2,53,32.9419,-116.4116,0,"UTM:(11S 055 364 10000)",""
+
+        "UTM:(11S 055 365 10000)",5.4,1,59,33.0320,-116.4110,0,"UTM:(11S 055 365 10000)",""
+
+        "UTM:(11S 055 367 10000)",4.2,13,73,33.2125,-116.4098,0,"UTM:(11S 055 367
+        10000)",""
+
+        "UTM:(11S 055 368 10000)",3.9,12,81,33.3026,-116.4092,0,"UTM:(11S 055 368
+        10000)",""
+
+        "UTM:(11S 055 372 10000)",3.7,9,116,33.6634,-116.4068,0,"UTM:(11S 055 372
+        10000)",""
+
+        "UTM:(11S 055 373 10000)",3.5,83,125,33.7536,-116.4061,0,"UTM:(11S 055 373
+        10000)",""
+
+        "UTM:(11S 055 374 10000)",3.4,20,134,33.8439,-116.4055,0,"UTM:(11S 055 374
+        10000)",""
+
+        "UTM:(11S 055 375 10000)",3.6,7,144,33.9340,-116.4048,0,"UTM:(11S 055 375
+        10000)",""
+
+        "UTM:(11S 055 377 10000)",2.2,4,163,34.1144,-116.4036,0,"UTM:(11S 055 377
+        10000)",""
+
+        "UTM:(11S 056 361 10000)",3.8,5,36,32.6707,-116.3067,0,"UTM:(11S 056 361 10000)",""
+
+        "UTM:(11S 056 367 10000)",3.5,9,67,33.2119,-116.3025,0,"UTM:(11S 056 367 10000)",""
+
+        "UTM:(11S 056 371 10000)",3.3,2,103,33.5727,-116.2996,0,"UTM:(11S 056 371
+        10000)",""
+
+        "UTM:(11S 056 372 10000)",3.4,23,112,33.6629,-116.2989,0,"UTM:(11S 056 372
+        10000)",""
+
+        "UTM:(11S 056 373 10000)",3.3,72,122,33.7531,-116.2981,0,"UTM:(11S 056 373
+        10000)",""
+
+        "UTM:(11S 056 374 10000)",2.0,3,131,33.8432,-116.2974,0,"UTM:(11S 056 374
+        10000)",""
+
+        "UTM:(11S 056 377 10000)",2.0,8,160,34.1138,-116.2952,0,"UTM:(11S 056 377
+        10000)",""
+
+        "UTM:(11S 057 360 10000)",5.5,5,29,32.5799,-116.2009,0,"UTM:(11S 057 360 10000)",""
+
+        "UTM:(11S 057 361 10000)",5.7,2,27,32.6701,-116.2001,0,"UTM:(11S 057 361 10000)",""
+
+        "UTM:(11S 057 371 10000)",3.3,3,100,33.5720,-116.1919,0,"UTM:(11S 057 371
+        10000)",""
+
+        "UTM:(11S 057 372 10000)",3.3,16,110,33.6623,-116.1911,0,"UTM:(11S 057 372
+        10000)",""
+
+        "UTM:(11S 057 373 10000)",3.6,18,119,33.7524,-116.1902,0,"UTM:(11S 057 373
+        10000)",""
+
+        "UTM:(11S 057 377 10000)",2.7,1,159,34.1131,-116.1867,0,"UTM:(11S 057 377
+        10000)",""
+
+        "UTM:(11S 057 378 10000)",2.7,1,168,34.2033,-116.1859,0,"UTM:(11S 057 378
+        10000)",""
+
+        "UTM:(11S 058 366 10000)",4.3,1,49,33.1204,-116.0889,0,"UTM:(11S 058 366 10000)",""
+
+        "UTM:(11S 058 371 10000)",4.0,3,98,33.5713,-116.0841,0,"UTM:(11S 058 371 10000)",""
+
+        "UTM:(11S 058 377 10000)",2.7,21,157,34.1123,-116.0783,0,"UTM:(11S 058 377
+        10000)",""
+
+        "UTM:(11S 058 378 10000)",2.0,4,167,34.2026,-116.0773,0,"UTM:(11S 058 378
+        10000)",""
+
+        "UTM:(11S 059 340 10000)",3.3,2,213,30.7742,-116.0072,0,"UTM:(11S 059 340
+        10000)",""
+
+        "UTM:(11S 059 362 10000)",7.7,7,11,32.7588,-115.9858,0,"UTM:(11S 059 362 10000)",""
+
+        "UTM:(11S 059 368 10000)",4.4,11,67,33.2998,-115.9795,0,"UTM:(11S 059 368
+        10000)",""
+
+        "UTM:(11S 059 369 10000)",4.7,2,77,33.3901,-115.9785,0,"UTM:(11S 059 369 10000)",""
+
+        "UTM:(11S 059 370 10000)",3.1,1,87,33.4802,-115.9775,0,"UTM:(11S 059 370 10000)",""
+
+        "UTM:(11S 060 337 10000)",2.7,2,243,30.5027,-115.9058,0,"UTM:(11S 060 337
+        10000)",""
+
+        "UTM:(11S 060 368 10000)",4.3,1,67,33.2990,-115.8722,0,"UTM:(11S 060 368 10000)",""
+
+        "UTM:(11S 061 369 10000)",4.6,1,78,33.3881,-115.7635,0,"UTM:(11S 061 369 10000)",""
+
+        "UTM:(11S 062 362 10000)",5.7,2,25,32.7557,-115.6655,0,"UTM:(11S 062 362 10000)",""
+
+        "UTM:(11S 062 363 10000)",3.8,1,30,32.8460,-115.6642,0,"UTM:(11S 062 363 10000)",""
+
+        "UTM:(11S 063 361 10000)",6.0,1,34,32.6644,-115.5603,0,"UTM:(11S 063 361 10000)",""
+
+        "UTM:(11S 063 362 10000)",5.0,51,35,32.7546,-115.5589,0,"UTM:(11S 063 362
+        10000)",""
+
+        "UTM:(11S 063 363 10000)",4.5,24,38,32.8448,-115.5574,0,"UTM:(11S 063 363
+        10000)",""
+
+        "UTM:(11S 063 364 10000)",4.5,17,43,32.9350,-115.5559,0,"UTM:(11S 063 364
+        10000)",""
+
+        "UTM:(11S 063 365 10000)",4.6,9,50,33.0251,-115.5545,0,"UTM:(11S 063 365 10000)",""
+
+        "UTM:(11S 063 366 10000)",4.3,4,58,33.1153,-115.5530,0,"UTM:(11S 063 366 10000)",""
+
+        "UTM:(11S 063 367 10000)",4.1,1,66,33.2054,-115.5515,0,"UTM:(11S 063 367 10000)",""
+
+        "UTM:(11S 064 361 10000)",4.5,69,44,32.6632,-115.4537,0,"UTM:(11S 064 361
+        10000)",""
+
+        "UTM:(11S 064 364 10000)",4.9,2,52,32.9337,-115.4490,0,"UTM:(11S 064 364 10000)",""
+
+        "UTM:(11S 065 362 10000)",4.7,2,54,32.7520,-115.3454,0,"UTM:(11S 065 362 10000)",""
+
+        "UTM:(11S 065 363 10000)",4.5,6,57,32.8421,-115.3438,0,"UTM:(11S 065 363 10000)",""
+
+        "UTM:(11S 070 343 10000)",2.6,3,210,31.0308,-114.8521,0,"UTM:(11S 070 343
+        10000)",""
+
+        "UTM:(11S 070 359 10000)",3.2,5,106,32.4733,-114.8186,0,"UTM:(11S 070 359
+        10000)",""
+
+        "UTM:(11S 071 361 10000)",3.1,20,114,32.6517,-114.7077,0,"UTM:(11S 071 361
+        10000)",""
+
+        "UTM:(11S 071 362 10000)",3.4,25,114,32.7418,-114.7053,0,"UTM:(11S 071 362
+        10000)",""
+
+        "UTM:(11S 071 371 10000)",3.1,2,149,33.5530,-114.6841,0,"UTM:(11S 071 371
+        10000)",""
+
+        "UTM:(11S 071 372 10000)",2.8,3,156,33.6431,-114.6817,0,"UTM:(11S 071 372
+        10000)",""
+
+        "UTM:(11S 072 360 10000)",2.7,1,125,32.5596,-114.6035,0,"UTM:(11S 072 360
+        10000)",""
+
+        "UTM:(11S 072 361 10000)",3.0,47,124,32.6497,-114.6011,0,"UTM:(11S 072 361
+        10000)",""
+
+        "UTM:(11S 072 362 10000)",2.9,15,124,32.7399,-114.5987,0,"UTM:(11S 072 362
+        10000)",""
+
+        "UTM:(11S 072 372 10000)",3.0,21,163,33.6411,-114.5739,0,"UTM:(11S 072 372
+        10000)",""
+
+        "UTM:(11S 072 386 10000)",2.5,1,276,34.9025,-114.5375,0,"UTM:(11S 072 386
+        10000)",""
+
+        "UTM:(11S 072 389 10000)",2.0,1,303,35.1728,-114.5293,0,"UTM:(11S 072 389
+        10000)",""
+
+        "UTM:(11S 073 361 10000)",2.9,31,134,32.6476,-114.4946,0,"UTM:(11S 073 361
+        10000)",""
+
+        "UTM:(11S 073 365 10000)",3.4,1,139,33.0081,-114.4844,0,"UTM:(11S 073 365
+        10000)",""
+
+        "UTM:(11S 073 367 10000)",2.1,2,145,33.1883,-114.4793,0,"UTM:(11S 073 367
+        10000)",""
+
+        "UTM:(11S 073 372 10000)",2.7,1,171,33.6389,-114.4663,0,"UTM:(11S 073 372
+        10000)",""
+
+        "UTM:(11S 074 361 10000)",2.2,6,144,32.6454,-114.3880,0,"UTM:(11S 074 361
+        10000)",""
+
+        "UTM:(11S 074 362 10000)",3.1,1,144,32.7356,-114.3854,0,"UTM:(11S 074 362
+        10000)",""
+
+        "UTM:(11S 074 377 10000)",2.0,1,213,34.0871,-114.3446,0,"UTM:(11S 074 377
+        10000)",""
+
+        "UTM:(11S 074 378 10000)",2.0,1,220,34.1772,-114.3418,0,"UTM:(11S 074 378
+        10000)",""
+
+        "UTM:(11S 074 381 10000)",2.2,1,243,34.4475,-114.3332,0,"UTM:(11S 074 381
+        10000)",""
+
+        "UTM:(11S 075 378 10000)",3.1,2,227,34.1748,-114.2334,0,"UTM:(11S 075 378
+        10000)",""
+
+        "UTM:(11S 076 361 10000)",2.7,1,164,32.6409,-114.1750,0,"UTM:(11S 076 361
+        10000)",""
+
+        "UTM:(11S 076 379 10000)",2.7,1,241,34.2623,-114.1219,0,"UTM:(11S 076 379
+        10000)",""
+
+        "UTM:(11S 077 366 10000)",2.7,1,180,33.0888,-114.0537,0,"UTM:(11S 077 366
+        10000)",""
+
+        "UTM:(11S 077 375 10000)",2.7,1,221,33.8996,-114.0261,0,"UTM:(11S 077 375
+        10000)",""
+
+        "UTM:(11S 078 362 10000)",2.0,2,184,32.7259,-113.9591,0,"UTM:(11S 078 362
+        10000)",""
+
+        "UTM:(11S 092 372 10000)",1.0,1,341,33.5800,-112.4221,0,"UTM:(11S 092 372
+        10000)",""
+
+        "UTM:(11S 093 370 10000)",2.0,1,345,33.3962,-112.3244,0,"UTM:(11S 093 370
+        10000)",""
+
+        "UTM:(11S 093 371 10000)",2.0,1,347,33.4861,-112.3195,0,"UTM:(11S 093 371
+        10000)",""
+
+        "UTM:(11S 094 371 10000)",2.0,1,357,33.4821,-112.2123,0,"UTM:(11S 094 371
+        10000)",""
+
+        "UTM:(11S 095 371 10000)",2.5,3,366,33.4778,-112.1051,0,"UTM:(11S 095 371
+        10000)",""
+
+        "UTM:(11S 095 372 10000)",1.0,1,369,33.5677,-112.1000,0,"UTM:(11S 095 372
+        10000)",""
+
+        "UTM:(11S 096 369 10000)",2.0,1,371,33.2938,-112.0082,0,"UTM:(11S 096 369
+        10000)",""
+
+        "UTM:(11S 096 371 10000)",2.0,1,376,33.4736,-111.9978,0,"UTM:(11S 096 371
+        10000)",""
+
+        "UTM:(11S 097 370 10000)",2.7,1,383,33.3793,-111.8959,0,"UTM:(11S 097 370
+        10000)",""
+
+        "UTM:(11S 098 370 10000)",2.0,1,393,33.3748,-111.7888,0,"UTM:(11S 098 370
+        10000)",""
+
+        "UTM:(11S 099 370 10000)",2.7,1,403,33.3703,-111.6817,0,"UTM:(11S 099 370
+        10000)",""
+
+        "UTM:(11S 104 358 10000)",2.0,1,444,32.2692,-111.2173,0,"UTM:(11S 104 358
+        10000)",""
+
+        "UTM:(11S 106 357 10000)",2.2,1,465,32.1697,-111.0120,0,"UTM:(11S 106 357
+        10000)",""
+
+        "UTM:(11S 108 358 10000)",2.0,1,484,32.2492,-110.7950,0,"UTM:(11S 108 358
+        10000)",""
+
+        "UTM:(11S 113 355 10000)",2.0,1,537,31.9533,-110.2874,0,"UTM:(11S 113 355
+        10000)",""
+
+        "UTM:(11S 212 501 10000)",3.8,3,2052,43.4858,-96.9162,0,"UTM:(11S 212 501
+        10000)",""
+
+        "UTM:(11S 240 432 10000)",3.5,6,1913,37.0955,-95.6868,0,"UTM:(11S 240 432
+        10000)",""
+
+        "UTM:(11S 428 587 10000)",2.2,3,4366,42.0100,-68.0432,0,"UTM:(11S 428 587
+        10000)",""
+
+'}
+    headers:
+      Access-Control-Allow-Headers: ['accept,origin,authorization,content-type']
+      Access-Control-Allow-Methods: ['*']
+      Access-Control-Allow-Origin: ['*']
+      Cache-Control: [max-age=314855071]
+      Connection: [close]
+      Content-Length: ['33425']
+      Content-Type: [text/plain]
+      Date: ['Thu, 16 Aug 2018 22:09:52 GMT']
+      ETag: ['"8291-50dac7fe7ffc0"']
+      Expires: ['Tue, 08 Aug 2028 01:54:23 GMT']
+      Last-Modified: ['Wed, 28 Jan 2015 01:43:35 GMT']
+      Server: [nginx]
+      Strict-Transport-Security: [max-age=31536000]
+      Vary: [Accept-Encoding]
+      X-Cache-Status: [HIT]
+      X-Content-Type-Options: [nosniff]
+      X-Frame-Options: [SAMEORIGIN]
+      X-XSS-Protection: [1; mode=block]
+    status: {code: 200, message: OK}
+version: 1
