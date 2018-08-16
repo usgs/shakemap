@@ -1,0 +1,413 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>2.6. Output Data Formats &#8212; ShakeMap Documentation  documentation</title>
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="shortcut icon" href="../_static/northridge_points.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="2.7. Verification" href="tg_verification.html" />
+    <link rel="prev" title="2.5. Input Data Formats" href="tg_input_formats.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="output-data-formats">
+<span id="sec-output-formats-4"></span><h1>2.6. Output Data Formats<a class="headerlink" href="#output-data-formats" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="about-the-hdf5-file-format">
+<h2>2.6.1. About the HDF5 File Format<a class="headerlink" href="#about-the-hdf5-file-format" title="Permalink to this headline">¶</a></h2>
+<p>HDF5 files are an efficient and flexible way to store large sets of
+structured data.  HDF stands for Hierarchical Data Format and is an
+open-source project . The data model consists of two types of objects:
+groups and datasets. Groups may contain datasets or other groups
+(along with associated metadata).  Datasets may contain
+multidimensional arrays of data (along with accompanying
+metadata). Groups may be thought of as directories or folders, and
+datasets as files. The metadata associated with each object allows
+HDF5 files to be self describing. Data is stored in binary, making the
+files smaller and more efficient to read and write than text-based
+formats (such as XML). For almost all uses a user will access the file
+through an API (bindings are available for many languages), making the
+details of file structure and layout not relevant.</p>
+<p>For more information on HDF5 see the
+<a class="reference external" href="https://support.hdfgroup.org/HDF5/">HDF5 support page</a>.
+The Python interface, h5py, is documented on the
+<a class="reference external" href="http://www.h5py.org/">h5py web site</a>.</p>
+<p>For ShakeMap, the two main data files (<em>shake_data.hdf</em> and
+<em>shake_result.hdf</em>) are accessed through the methods of the
+shakelib classes <strong>ShakeMapInputContainer</strong> and <strong>ShakeMapOutputContainer</strong>.
+For documentation see the <a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">shakelib container module</a>.</p>
+</div>
+<div class="section" id="shake-data-hdf">
+<h2>2.6.2. shake_data.hdf<a class="headerlink" href="#shake-data-hdf" title="Permalink to this headline">¶</a></h2>
+<p><em>shake_data.hdf</em> is the input to the <strong>model</strong> module. It is built by
+bringing
+together the various ShakeMap configuration files (found in both the
+current profile’s <em>install/config</em> path, and in the event’s <em>current</em>
+directory. It also aggregates information from the event’s rupture file
+(if one exists), <em>event.xml</em>, and the data files – all found in the
+event’s <em>current</em> directory. <strong>shake_data.hdf</strong> is usually created
+with the <strong>assemble</strong> module (and possibly modified by <strong>augment</strong>).</p>
+<p>It is generally not necessary for operators to access this file other
+than through the interfaces of <strong>assemble</strong> and <strong>augment</strong>. For
+developers, the file
+is accessed through the shakelib ShakeMapInputContainer interface:
+<a class="reference external" href="https://usgs.github.io/shakemap/shakelib/shakelib.utils.containers.html">https://usgs.github.io/shakemap/shakelib/shakelib.utils.containers.html</a></p>
+</div>
+<div class="section" id="shake-result-hdf">
+<h2>2.6.3. shake_result.hdf<a class="headerlink" href="#shake-result-hdf" title="Permalink to this headline">¶</a></h2>
+<p>The primary output product of the <strong>model</strong> module is the HDF5 file
+<em>shake_result.hdf</em>. There are some differences depending on whether
+<strong>model</strong> produces output grids or lists of points.  HDF5 files
+consist of <em>Groups</em> or <em>DataSets</em>.  Groups can contain other groups
+or datasets, and can contain a dictionary-like set of <em>attributes</em>.
+Datasets consist of arrays holding data values, and
+metadata in the form of attributes.  A very good introduction to
+the HDF5 data format can be found
+here: <a class="reference external" href="https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf">https://support.hdfgroup.org/HDF5/Tutor/HDF5Intro.pdf</a></p>
+<p><em>shake_result.hdf</em> consists of a number of groups and datasets. Our
+implementation of HDF5 uses groups to contain Python dictionaries,
+strings, and numpy arrays.  Dictionaries are stored as JSON strings.
+For example, a Python <em>config</em> dictionary consisting of the following information:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">d</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="s1">&#39;config&#39;</span><span class="p">,</span>
+    <span class="s1">&#39;gmpe_set&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;Active_Crustal&#39;</span><span class="p">:</span> <span class="s1">&#39;Campbell2003&#39;</span>
+    <span class="p">},</span>
+    <span class="s1">&#39;depth&#39;</span><span class="p">:</span> <span class="mf">34.0</span><span class="p">,</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>would be stored as a JSON string in a dataset called <code class="docutils literal notranslate"><span class="pre">config</span></code>,
+under a group called <code class="docutils literal notranslate"><span class="pre">dictionaries</span></code>. In languages that support
+JSON, these strings can be easily converted into a data
+structure. Developers can access these properties using the
+ShakeMapInputContainer interface:
+<a class="reference external" href="https://usgs.github.io/shakemap/shakelib/shakelib.utils.containers.html">https://usgs.github.io/shakemap/shakelib/shakelib.utils.containers.html</a></p>
+<p><em>shake_result.hdf</em> contains the following metadata elements:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="25%" />
+<col width="12%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Location</th>
+<th class="head">Python Type</th>
+<th class="head">Contents</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>config</td>
+<td>/dictionaries/config</td>
+<td>JSON string</td>
+<td>ShakeMap configuration</td>
+</tr>
+<tr class="row-odd"><td>info.json</td>
+<td>/dictionaries/info.json</td>
+<td>JSON string</td>
+<td>ShakeMap metadata</td>
+</tr>
+<tr class="row-even"><td>stations_dict</td>
+<td>/dictionaries/stations_dict</td>
+<td>JSON string</td>
+<td>Dictionary representation of observed data</td>
+</tr>
+<tr class="row-odd"><td>rupture</td>
+<td>/dictionaries/rupture</td>
+<td>JSON string</td>
+<td>Dictionary representation of fault rupture</td>
+</tr>
+</tbody>
+</table>
+<p>It also will contain a number of grids, which, when read with the HDFContainer getGrid() method, return
+a Grid2D object which is a Python representation of a North-up 2D array of data, whose upper-left corner
+coordinate and cell dimensions are known.  The definition of this object can be found here:
+<a class="reference external" href="https://github.com/usgs/MapIO/blob/master/mapio/grid2d.py">https://github.com/usgs/MapIO/blob/master/mapio/grid2d.py</a></p>
+<p>Sampling of grids contained in the HDF:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="25%" />
+<col width="12%" />
+<col width="42%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head">Location</th>
+<th class="head">Python Type</th>
+<th class="head">Contents</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>vs30</td>
+<td>/grids/vs30</td>
+<td>Grid2D</td>
+<td>Vs30 values at output grid/points</td>
+</tr>
+<tr class="row-odd"><td>distance_rhypo</td>
+<td>/grids/distance_rhypo</td>
+<td>Grid2D</td>
+<td>Hypocentral distance</td>
+</tr>
+<tr class="row-even"><td>distance_rjb</td>
+<td>/grids/distance_rjb</td>
+<td>Grid2D</td>
+<td>RJB distance</td>
+</tr>
+</tbody>
+</table>
+<p>Each IMT dataset (MMI, PGA, etc.) is stored as a group containing two
+datasets, the mean values for each cell and the standard deviations.
+MMI data for the component ‘Larger’ will be stored under a group called
+<code class="docutils literal notranslate"><span class="pre">imt_MMI_GREATER_OF_TWO_HORIZONTAL</span></code>. The mean array will be stored as
+<code class="docutils literal notranslate"><span class="pre">mean</span></code>, and the standard deviation array will be stored as
+<code class="docutils literal notranslate"><span class="pre">std</span></code>.  All IMT grid datasets will be accompanied by a dictionary of
+attributes:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Attr name</th>
+<th class="head">Contents</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>units</td>
+<td>Physical units of IMT or standard deviation.</td>
+</tr>
+<tr class="row-odd"><td>digits</td>
+<td>Number of significant digits to use for the values.</td>
+</tr>
+<tr class="row-even"><td>xmin</td>
+<td>The eastern boundary of the grid (degrees longitude)</td>
+</tr>
+<tr class="row-odd"><td>xmax</td>
+<td>The eastern boundary of the grid (degrees longitude)</td>
+</tr>
+<tr class="row-even"><td>ymin</td>
+<td>The southern boundary of the grid (degrees latitude)</td>
+</tr>
+<tr class="row-odd"><td>ymax</td>
+<td>The northern boundary of the grid (degrees latitude)</td>
+</tr>
+<tr class="row-even"><td>nx</td>
+<td>The number of grid points in the x dimension</td>
+</tr>
+<tr class="row-odd"><td>ny</td>
+<td>The number of grid points in the y dimension</td>
+</tr>
+<tr class="row-even"><td>dx</td>
+<td>The grid interval in the x dimension</td>
+</tr>
+<tr class="row-odd"><td>dy</td>
+<td>The grid interval in the y dimension</td>
+</tr>
+</tbody>
+</table>
+<p>Sampling of IMTs in the HDF file:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="25%" />
+<col width="12%" />
+<col width="3%" />
+<col width="12%" />
+<col width="29%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Name</th>
+<th class="head" colspan="3">Location</th>
+<th class="head" colspan="2">Python Type | Contents</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>MMI Mean</td>
+<td colspan="3">/imts/MMI_GREATER_OF_TWO_HORIZONTAL/mean</td>
+<td colspan="2">Grid2D      | MMI Mean Values</td>
+</tr>
+<tr class="row-odd"><td>MMI Std</td>
+<td colspan="3">/imts/MMI_GREATER_OF_TWO_HORIZONTAL/std</td>
+<td colspan="2">Grid2D      | MMI Std</td>
+</tr>
+<tr class="row-even"><td>Sa(0.3) Mean</td>
+<td colspan="3">/imts/SA(0.3)_GREATER_OF_TWO_HORIZONTAL/mean</td>
+<td colspan="2">Grid2D      | SA(0.3) Mean Values</td>
+</tr>
+<tr class="row-odd"><td>Sa(0.3) Std</td>
+<td colspan="5">/imts/SA(0.3)_GREATER_OF_TWO_HORIZONTAL/std  | Grid2D      | SA(0.3) Std</td>
+</tr>
+</tbody>
+</table>
+<p>For datasets that are lists of points, the storage of IMTS is the same
+as for grids, except that the data are stored as one-dimensional arrays.
+Each IMT group wll also contains datasets <code class="docutils literal notranslate"><span class="pre">lons</span></code>, <code class="docutils literal notranslate"><span class="pre">lats</span></code>,
+and <code class="docutils literal notranslate"><span class="pre">ids</span></code>, which provide the coordinates of the points in longitude
+and latitude, and their IDs, respectively. For sets of points the metadata
+attributes are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="21%" />
+<col width="79%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Attr name</th>
+<th class="head">Contents</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>units</td>
+<td>Physical units of the IMT</td>
+</tr>
+<tr class="row-odd"><td>digits</td>
+<td>Number of significant digits to use for the values</td>
+</tr>
+</tbody>
+</table>
+<p>All <em>shake_result.hdf</em> files will have a group <code class="docutils literal notranslate"><span class="pre">file_data_type</span></code>
+which will have a single attribute <code class="docutils literal notranslate"><span class="pre">data_type</span></code> that will be one of
+‘points’ or ‘grid’. This way the user can distinguish between the two
+types of storage.</p>
+<p>For grid files, there will also be sets of regression curves stored
+as one-dimensional arrays. These
+will be labeled like <code class="docutils literal notranslate"><span class="pre">array_regression_&lt;IMT&gt;_&lt;site&gt;_&lt;type&gt;</span></code> Where
+<code class="docutils literal notranslate"><span class="pre">&lt;IMT&gt;</span></code> will be one of the output IMTs (e.g., <code class="docutils literal notranslate"><span class="pre">SA(3.0)</span></code>),
+<code class="docutils literal notranslate"><span class="pre">&lt;site&gt;</span></code> will be one of <code class="docutils literal notranslate"><span class="pre">rock</span></code> or <code class="docutils literal notranslate"><span class="pre">soil</span></code> (for which <code class="docutils literal notranslate"><span class="pre">rock</span></code>
+means a Vs30 of 760 m/s, and <code class="docutils literal notranslate"><span class="pre">soil</span></code> means a Vs30 of 180 m/s), and
+<code class="docutils literal notranslate"><span class="pre">&lt;type&gt;</span></code> is one of <code class="docutils literal notranslate"><span class="pre">mean</span></code> (for the mean values) or <code class="docutils literal notranslate"><span class="pre">sd</span></code> (for
+the standard deviations). All units are in natural log space (except
+for MMI). There will also be an array called
+<code class="docutils literal notranslate"><span class="pre">array_regression_distances</span></code> which will contain the distances
+(in km) corresponding to the points in the data arrays.</p>
+<p>Regardless of whether the file stores grids or arrays of points, it will
+also contain datasets of various distance parameters. These will be
+named <code class="docutils literal notranslate"><span class="pre">distance_*</span></code> where the wildcard will be replaced with  one of
+the typical
+source distance metrics (e.g., ‘rrup’ for rupture distance, ‘rjb’ for
+Joyner-Boore distance, ‘rhypo’ for hypocentral distance, ‘rx’, ‘ry0’,
+etc.)
+Similarly, the Vs30 data are found in a dataset named <code class="docutils literal notranslate"><span class="pre">vs30</span></code>.
+The metadata for distances and Vs30 consists of ‘units’ and ‘digits’.</p>
+<p>Dictionary datasets are stored as JSON strings.</p>
+<p>There will typically be multiple <em>IMT</em> (Intensity Measure Type) datasets
+(each containing the mean and standard deviation of the IMT). For instance
+‘PGA’, ‘PGV’, ‘MMI’, and various ‘SA(#num)’
+[where #num is the period as a floating point number; e.g.,
+‘SA(1.0)’].</p>
+<p>Python developers will likely want to access <em>shake_result.hdf</em> through
+the shakelib OutputContainer class:
+<a class="reference external" href="https://usgs.github.io/shakelib/shakelib.utils.container.html">https://usgs.github.io/shakelib/shakelib.utils.container.html</a>
+Also see, for example, the <em>contour</em> module [<a class="reference internal" href="../apidoc/shakemap.coremods.contour.html#module-shakemap.coremods.contour" title="shakemap.coremods.contour"><code class="xref py py-meth docutils literal notranslate"><span class="pre">shakemap.coremods.contour()</span></code></a>]
+for some basic access patterns.</p>
+<p>Matlab developers can use the function <em>read_shake_data.m</em>, which is included in
+the repository for ShakeMap here: <a class="reference external" href="https://github.com/usgs/shakemap/blob/master/contrib/read_shakemap_data.m">https://github.com/usgs/shakemap/blob/master/contrib/read_shakemap_data.m</a></p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<p class="logo">
+  <a href="../index.html">
+    <img class="logo" src="../_static/northridge_thumbnail_light_16x9.png" alt="Logo"/>
+    
+    <h1 class="logo logo-name">ShakeMap Documentation</h1>
+    
+  </a>
+</p>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="title_page.html">ShakeMap 4 Manual</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Table of Contents</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="tg_installation.html">2.1. Installation and Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html">2.2. Software Architecture</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_queue.html">2.3. Queueing Events</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_processing.html">2.4. Data Processing</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_input_formats.html">2.5. Input Data Formats</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">2.6. Output Data Formats</a><ul>
+<li class="toctree-l5"><a class="reference internal" href="#about-the-hdf5-file-format">2.6.1. About the HDF5 File Format</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shake-data-hdf">2.6.2. shake_data.hdf</a></li>
+<li class="toctree-l5"><a class="reference internal" href="#shake-result-hdf">2.6.3. shake_result.hdf</a></li>
+</ul>
+</li>
+<li class="toctree-l4"><a class="reference internal" href="tg_verification.html">2.7. Verification</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.8. Guidelines for Contributors</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>
+<li class="toctree-l3"><a class="reference internal" href="glossary.html">4. Glossary</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

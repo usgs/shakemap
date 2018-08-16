@@ -469,7 +469,7 @@ goes into detail on the way the model program works.
 
 **model** writes a file, *shake_result.hdf*, in the *products*
 subdirectory of the event's *current* directory.
-See :ref:`the formats section <sec-formats-4>`
+See :ref:`the formats section <sec-output-formats-4>`
 of this manual for more on the format and
 content of *shake_result.hdf*.
 
@@ -495,7 +495,7 @@ become deprecated in favor of the new *shake_result.hdf* file.
 See the products section of this manual for more on these files.
 Note that the use of these files is
 deprecated. System designers should extract the relevant information
-directly from *shake_result.hdf*. See :ref:`the formats section <sec-formats-4>`
+directly from *shake_result.hdf*. See :ref:`the formats section <sec-output-formats-4>`
 of this manual for more on
 using *shake_result.hdf*.
 

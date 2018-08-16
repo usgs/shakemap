@@ -16,7 +16,8 @@ outdated and are superseded by this current report.
    tg_architecture.rst
    tg_queue.rst
    tg_processing.rst
-   tg_formats.rst
+   tg_input_formats.rst
+   tg_output_formats.rst
    tg_verification.rst
    tg_contributing.rst
 

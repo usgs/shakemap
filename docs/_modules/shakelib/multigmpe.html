@@ -41,6 +41,9 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.base</span> <span class="k">import</span> <span class="n">GMPE</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.boore_2014</span> <span class="k">import</span> <span class="n">BooreEtAl2014</span>
+<span class="kn">from</span> <span class="nn">openquake.hazardlib.gsim.campbell_bozorgnia_2014</span> <span class="k">import</span> <span class="p">(</span>
+                                                <span class="n">CampbellBozorgnia2014</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib.imt</span> <span class="k">import</span> <span class="n">PGA</span><span class="p">,</span> <span class="n">PGV</span><span class="p">,</span> <span class="n">SA</span>
 <span class="kn">from</span> <span class="nn">openquake.hazardlib</span> <span class="k">import</span> <span class="n">const</span>
 
@@ -749,18 +752,29 @@
         <span class="n">sites</span> <span class="o">=</span> <span class="n">Sites</span><span class="o">.</span><span class="n">_addDepthParameters</span><span class="p">(</span><span class="n">sites</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014()&#39;</span> <span class="ow">or</span> \
-           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014RegJPN()&#39;</span><span class="p">:</span>
+           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014RegTWN()&#39;</span> <span class="ow">or</span> \
+           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014RegCHN()&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_ask14_cal</span>
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;ChiouYoungs2014()&#39;</span><span class="p">:</span>
-            <span class="c1"># Also BooreEtAl2014() if using subclass with depth parameter</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonEtAl2014RegJPN()&#39;</span><span class="p">:</span>
+            <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_ask14_jpn</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;ChiouYoungs2014()&#39;</span> <span class="ow">or</span> \
+           <span class="nb">isinstance</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">BooreEtAl2014</span><span class="p">):</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_cy14_cal</span>
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2014()&#39;</span> <span class="ow">or</span> \
-           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2014JapanSite()&#39;</span><span class="p">:</span>
-            <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5_cb14_cal</span>
-        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;ChiouYoungs2008()&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">gmpe</span><span class="p">,</span> <span class="n">CampbellBozorgnia2014</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2014JapanSite()&#39;</span> <span class="ow">or</span> \
+               <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2014HighQJapanSite()&#39;</span> <span class="ow">or</span> \
+               <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2014LowQJapanSite()&#39;</span><span class="p">:</span>
+                <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5_cb14_jpn</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5_cb14_cal</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;ChiouYoungs2008()&#39;</span> <span class="ow">or</span> \
+           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;Bradley20i3()&#39;</span> <span class="ow">or</span> \
+           <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;Bradley2013Volc()&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0_cy08</span>
         <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;CampbellBozorgnia2008()&#39;</span><span class="p">:</span>
             <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5</span> <span class="o">=</span> <span class="n">sites</span><span class="o">.</span><span class="n">z2pt5_cb07</span>
+        <span class="k">if</span> <span class="n">gmpe</span> <span class="o">==</span> <span class="s1">&#39;AbrahamsonSilva2008()&#39;</span><span class="p">:</span>
+            <span class="n">sites</span><span class="o">.</span><span class="n">z1pt0</span> <span class="o">=</span> <span class="n">gmpe</span><span class="o">.</span><span class="n">_compute_median_z1pt0</span><span class="p">(</span><span class="n">sites</span><span class="o">.</span><span class="n">vs30</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">sites</span></div>
 
