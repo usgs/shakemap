@@ -184,11 +184,19 @@ class ModelModule(CoreModule):
         if dir_conf and rup_check:
             self.do_directivity = True
             # The following attribute will be used to store a list of tuples,
-            # where each tuple will contain the result of the directivity model
-            # the associated distance context. The distance context is needed
+            # where each tuple will contain the 1) result of the directivity
+            # model (for the periods defined by Rowshandel2013) and 2) the
+            # associated distance context. The distance context is needed
             # within the _gmas function for figuring out which of the results
-            # should be used when combining it with the GMPE result.
+            # should be used when combining it with the GMPE result. We store
+            # the pre-defined period first and interpolate later because there
+            # is some optimization to doing it this way (some of the
+            # calculation is period independent).
             self.dir_results = []
+            # But if we want to save the results that were actually used for
+            # each IMT, so we use a dictionary. This uses keys that are
+            # the same ass self.outgrid.
+            self.dir_output = {}
         else:
             self.do_directivity = False
 
@@ -1628,7 +1636,7 @@ class ModelModule(CoreModule):
         for key, value in self.outgrid.items():
             # set the data grid
             mean_grid = Grid2D(value, gdict)
-            mean_layername, units, digits = _get_layer_info(key)
+            _, units, digits = _get_layer_info(key)
             mean_metadata = {
                 'units': units,
                 'digits': digits
@@ -1641,10 +1649,21 @@ class ModelModule(CoreModule):
                 'digits': digits
             }
             std_grid = Grid2D(self.outsd[key], gdict.copy())
-            oc.setIMTGrids(key,
-                           mean_grid, mean_metadata,
-                           std_grid, std_metadata,
-                           component)
+            oc.setIMTGrids(
+                key,
+                mean_grid,
+                mean_metadata,
+                std_grid,
+                std_metadata,
+                component)
+        #
+        # Directivity
+        #
+        if self.do_directivity is True:
+            for k, v in self.dir_output.items():
+                imtstr, _, _ = _get_layer_info(k)
+                dir_2d = Grid2D(v.copy(), gdict)
+                oc.setGrid(imtstr + '_directivity', dir_2d, metadata=None)
 
     def _storePointData(self, oc):
         """
@@ -1687,7 +1706,7 @@ class ModelModule(CoreModule):
         component = self.config['interp']['component']
         for key, value in self.outgrid.items():
             # set the data grid
-            mean_layername, units, digits = _get_layer_info(key)
+            _, units, digits = _get_layer_info(key)
             mean_metadata = {
                 'units': units,
                 'digits': digits
@@ -1856,10 +1875,15 @@ class ModelModule(CoreModule):
                 x2 = np.log(per_above)
                 fd = fd_below + (np.log(tper) - x1) * \
                     (fd_above - fd_below)/(x2 - x1)
+            # Reshape to match the mean
+            fd = fd.reshape(mean.shape)
+            # Store the interpolated grid
+            imtstr = str(oqimt)
+            self.dir_output[imtstr] = fd
             if isinstance(oqimt, imt.MMI):
-                mean *= np.exp(fd.reshape(mean.shape))
+                mean *= np.exp(fd)
             else:
-                mean += fd.reshape(mean.shape)
+                mean += fd
 
         return mean, stddevs
 
