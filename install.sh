@@ -164,6 +164,7 @@ package_list='
       scipy
       shapely
       strec
+      vcrpy
       versioneer 
 '
 
