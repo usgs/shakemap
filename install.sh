@@ -25,7 +25,7 @@ VENV=shakemap
 
 # Is the reset flag set? If not, use the frozen conda channel to install.
 # Otherwise, try to install from conda forge.
-reset=0
+reset=1
 while getopts r FLAG; do
   case $FLAG in
     r)
@@ -165,6 +165,7 @@ package_list='
       shapely
       strec
       versioneer 
+      vcrpy
 '
 
 # Create a conda virtual environment
