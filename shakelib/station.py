@@ -155,6 +155,20 @@ class StationList(object):
         db = sqlite3.connect(dbfile, timeout=15)
         self = cls(db)
         self._createTables()
+        self.addData(filelist)
+        return self
+
+    def addData(self, filelist):
+        """
+        Add data from XML or JSON files to the existing StationList.
+
+        Args:
+            filelist:
+                A list of ShakeMap XML or JSON input files.
+
+        Returns:
+            nothing: Nothing.
+        """
         jsonfiles = [x for x in filelist if x.endswith('.json')]
         xmlfiles = [x for x in filelist if x.endswith('.xml')]
         if len(jsonfiles):
@@ -175,7 +189,15 @@ class StationList(object):
         Returns:
             nothing: Nothing.
         """
-        self.addData(xmlfiles)
+        # Parse the xml into a dictionary
+        stationdict = {}
+        imtset = set()
+        for xmlfile in xmlfiles:
+            stationdict, ims = self._filter_station(xmlfile, stationdict)
+            imtset |= ims
+        # fill the database and create the object from it
+        self._loadFromDict(stationdict, imtset)
+        self._fixOrientations()
         return
 
     def _loadFromJSON(self, jsonfiles):
@@ -223,9 +245,9 @@ class StationList(object):
                 netid = feature['properties']['network']
                 code = sta_id.replace(netid + '.', '')
                 network = feature['properties']['source']
-                name = feature['properties']['name']
-                elev = None
-                vs30 = feature['properties']['vs30']
+                name = feature['properties'].get('name', None)
+                elev = feature['properties'].get('elev', None)
+                vs30 = feature['properties'].get('vs30', None)
                 stddev = 0
                 instrumented = int(netid.lower() not in CIIM_TUPLE)
 
@@ -233,8 +255,10 @@ class StationList(object):
                                      elev, vs30, stddev, instrumented))
 
                 if not instrumented:
-                    amplitude = feature['properties']['intensity']
-                    stddev = feature['properties']['intensity_stddev']
+                    amplitude = float(
+                        feature['properties'].get('intensity', np.nan))
+                    stddev = float(
+                        feature['properties'].get('intensity_stddev', np.nan))
                     flag = feature['properties']['intensity_flag']
                     if not flag or flag == '':
                         flag = '0'
@@ -337,7 +361,6 @@ class StationList(object):
         sta_rows = self.cursor.fetchall()
 
         for sta in sta_rows:
-            # print('doing station %s' % (str(sta[2])))
             if str(sta[2]).startswith(sta[1] + '.'):
                 myid = str(sta[2])
             else:
@@ -348,7 +371,7 @@ class StationList(object):
                 'properties': {
                     'code': str(sta[2]),
                     'name': sta[3],
-                    'instrumentType': 'UNK' if sta[8] is True else 'OBSERVED',
+                    'instrumentType': 'UNK' if sta[8] is 1 else 'OBSERVED',
                     'source': sta[1],
                     'network': sta[1],
                     'commType': 'UNK',
@@ -359,6 +382,8 @@ class StationList(object):
                     'pga': None,
                     'pgv': None,
                     'distance': None,
+                    'elev': sta[6],
+                    'vs30': sta[7],
                     'channels': []
                 },
                 'geometry': {
@@ -374,9 +399,19 @@ class StationList(object):
                 'AND a.imt_id = i.id' % (str(sta[0]))
             )
             amp_rows = self.cursor.fetchall()
+            if sta[8] is 0:
+                if len(amp_rows) != 1:
+                    logging.warn("Couldn't find intensity for MMI station.")
+                    continue
+                feature['properties']['intensity'] = amp_rows[0][0]
+                feature['properties']['intensity_stddev'] = amp_rows[0][4]
+                feature['properties']['intensity_flag'] = amp_rows[0][3]
+                feature['properties']['channels'] = []
+                jdict['features'].append(feature)
+                continue
+
             channels = {}
             for amp in amp_rows:
-                # print('doing channel %s imt %s' % (amp[2], amp[1]))
                 sd_string = 'ln_sigma'
                 if amp[2] not in channels:
                     channels[amp[2]] = {'name': amp[2], 'amplitudes': []}
@@ -411,29 +446,6 @@ class StationList(object):
             jdict['features'].append(feature)
 
         return jdict
-
-    def addData(self, xmlfiles):
-        """
-        Create a StationList object by reading one or more ShakeMap XML input
-        files.
-
-        Args:
-            xmlfiles (sequence of str):
-                Sequence of ShakeMap XML input files to read.
-        Returns:
-            :class:`StationList` object
-
-        """
-        # Parse the xml into a dictionary
-        stationdict = {}
-        imtset = set()
-        for xmlfile in xmlfiles:
-            stationdict, ims = self._filter_station(xmlfile, stationdict)
-            imtset |= ims
-        # fill the database and create the object from it
-        self._loadFromDict(stationdict, imtset)
-        self._fixOrientations()
-        return self
 
     def _loadFromDict(self, stationdict, imtset):
         """
@@ -914,6 +926,7 @@ class StationList(object):
                 if code.startswith(netid + '.'):
                     sta_id = code
                     code = code.replace(netid + '.', '')
+                    attributes['code'] = code
                 else:
                     sta_id = netid + '.' + code
 

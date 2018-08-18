@@ -82,8 +82,8 @@ class PlotRegr(CoreModule):
             raise FileNotFoundError('%s does not exist.' % datafile)
 
         # Open the ShakeMapOutputContainer and extract the data
-        ic = ShakeMapOutputContainer.load(datafile)
-        if ic.getDataType() != 'grid':
+        oc = ShakeMapOutputContainer.load(datafile)
+        if oc.getDataType() != 'grid':
             raise NotImplementedError('plotregr module can only operate on '
                                       'gridded data not sets of points')
 
@@ -95,18 +95,18 @@ class PlotRegr(CoreModule):
         soilgrid = {}
         rocksd = {}
         soilsd = {}
-        imtlist = ic.getIMTs('GREATER_OF_TWO_HORIZONTAL')
+        imtlist = oc.getIMTs('GREATER_OF_TWO_HORIZONTAL')
         for myimt in imtlist:
-            rockgrid[myimt], _ = ic.getArray(
+            rockgrid[myimt], _ = oc.getArray(
                 'regression_' + myimt + '_rock_mean')
-            soilgrid[myimt], _ = ic.getArray(
+            soilgrid[myimt], _ = oc.getArray(
                 'regression_' + myimt + '_soil_mean')
-            rocksd[myimt], _ = ic.getArray('regression_' + myimt + '_rock_sd')
-            soilsd[myimt], _ = ic.getArray('regression_' + myimt + '_soil_sd')
-        distances, _ = ic.getArray('regression_distances')
+            rocksd[myimt], _ = oc.getArray('regression_' + myimt + '_rock_sd')
+            soilsd[myimt], _ = oc.getArray('regression_' + myimt + '_soil_sd')
+        distances, _ = oc.getArray('regression_distances')
 
-        stations = ic.getStationDict()
-        ic.close()
+        stations = oc.getStationDict()
+        oc.close()
 
         #
         # Make plots
@@ -165,14 +165,14 @@ class PlotRegr(CoreModule):
                 else:
                     symbol = 'o'
                     if myimt == 'MMI':
-                        amp = (station['properties']['channels'][0]
-                               ['amplitudes'][0])
-                        if amp['flag'] == '' or amp['flag'] == '0':
-                            if amp['value'] != 'null':
-                                if isinstance(amp['value'], str):
-                                    value = float(amp['value'])
+                        amp = station['properties']['intensity']
+                        flag = station['properties']['intensity_flag']
+                        if flag == '' or flag == '0':
+                            if amp != 'null':
+                                if isinstance(amp, str):
+                                    value = float(amp)
                                 else:
-                                    value = amp['value']
+                                    value = amp
                                 plt.semilogx(dist, value, symbol + 'k',
                                              mfc='none')
                     else:

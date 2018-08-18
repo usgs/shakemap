@@ -176,6 +176,9 @@ class AssembleModule(CoreModule):
         datafiles = glob.glob(os.path.join(datadir, '*_dat.xml'))
         if os.path.isfile(os.path.join(datadir, 'stationlist.xml')):
             datafiles.append(os.path.join(datadir, 'stationlist.xml'))
+        datafiles += glob.glob(os.path.join(datadir, '*_dat.json'))
+        if os.path.isfile(os.path.join(datadir, 'stationlist.json')):
+            datafiles.append(os.path.join(datadir, 'stationlist.json'))
 
         self.logger.debug('Looking for rupture files...')
         # look for geojson versions of rupture files

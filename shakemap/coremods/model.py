@@ -293,7 +293,8 @@ class ModelModule(CoreModule):
         self.logger.debug('Doing MVN...')
         if self.max_workers > 0:
             with cf.ThreadPoolExecutor(max_workers=self.max_workers) as ex:
-                ex.map(self._computeMVN, self.imt_out_set)
+                results = ex.map(self._computeMVN, self.imt_out_set)
+                list(results)  # Check threads for possible exceptions, etc.
         else:
             for imt_str in self.imt_out_set:
                 self._computeMVN(imt_str)
@@ -555,7 +556,10 @@ class ModelModule(CoreModule):
             - df2 holds the non-instrumented data (MMI)
         """
         self.dataframes = []
-        self.stations = self.ic.getStationList()
+        try:
+            self.stations = self.ic.getStationList()
+        except AttributeError:
+            return
         if self.stations is None:
             return
         for dfid, val in (('df1', True), ('df2', False)):
@@ -1022,7 +1026,7 @@ class ModelModule(CoreModule):
             self.psd[imtstr] = np.sqrt(
                 pout_sd[0]**2 - SM_CONSTS['default_stddev_inter']**2)
             self.psd_raw[imtstr] = np.sqrt(
-                pout_sd[3]**2 - SM_CONSTS['default_stddev_inter']**2)
+                pout_sd[1]**2 - SM_CONSTS['default_stddev_inter']**2)
             self.tsd[imtstr] = np.full_like(
                 self.psd[imtstr], SM_CONSTS['default_stddev_inter'])
         else:
@@ -1366,9 +1370,9 @@ class ModelModule(CoreModule):
         """
         Get the station JSON dictionary and then add a bunch of stuff to it.
         """
+        if not hasattr(self, 'stations') or self.stations is None:
+            return {'features': []}
         sjdict = {}
-        if self.stations is None:
-            return sjdict
         # ---------------------------------------------------------------------
         # Compute a bias for all the IMTs in the data frames
         # ---------------------------------------------------------------------
