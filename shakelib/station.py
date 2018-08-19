@@ -5,6 +5,7 @@ import copy
 from collections import OrderedDict
 import re
 import logging
+import json
 
 # third party imports
 import numpy as np
@@ -99,43 +100,6 @@ class StationList(object):
         self.cursor.close()
         self.db.close()
 
-#    def _load_features(self, xmlfile):
-        # each station is a feature in a geojson file
-        #        tree = ET.parse(xmlfile)
-        #        root = tree.getroot()
-        #        imt_translate = {}
-        #        for sl in root.iter('stationlist'):
-        #            for station in sl:
-        #                feature = {'type':'Feature'}
-        #                netid = station.attrib['netid']
-        #                code = station.attrib['code']
-        #                feature['id'] = '%s.%s' % (netid,code)
-        #                lat = code = float(station.attrib['lat'])
-        #                lon = code = float(station.attrib['lon'])
-        #                feature['geometry'] = \
-        #                    {'type':'Point','coordinates':[lon,lat]}
-        #                properties = {}
-        #                properties['name'] = station.attrib['name']
-        #                properties['intensity_flag'] = station.attrib['']#??
-        #                properties['distance'] = \
-        #                    float(station.attrib['distance'])
-        #                properties['location'] = station.attrib['loc']
-        #                properties['code'] = station.attrib['code']
-        #                properties['commType'] = station.attrib['commtype']
-        #                properties['source'] = station.attrib['source']
-        #                properties['network'] = station.attrib['netid']
-        #                properties['instrumentType'] = \
-        #                    station.attrib['insttype']
-        #                properties['intensity'] = \
-        #                    float(station.attrib['intensity'])
-        #                channels = []
-        #                for comp in station:
-        #                    channel = {'name':comp.attrib['name']}
-        #                    for component in comp:
-        #                        pgmdict, imtset = self._getGroundMotions(
-        #                            component, imt_translate)
-#        pass
-
     @classmethod
     def loadFromSQL(cls, sql, dbfile=':memory:'):
         """
@@ -172,7 +136,48 @@ class StationList(object):
         return "\n".join(list(self.db.iterdump()))
 
     @classmethod
-    def loadFromXML(cls, xmlfiles, dbfile=':memory:'):
+    def loadFromFiles(cls, filelist, dbfile=':memory:'):
+        """
+        Create a StationList object by reading one or more ShakeMap XML or
+        JSON input files.
+
+        Args:
+            filelist (sequence of str):
+                Sequence of ShakeMap XML and/or JSON input files to read.
+            dbfile (str):
+                Path to a file into which to write the SQLite database.
+                The default is ':memory:' for an in-memory database.
+
+        Returns:
+            :class:`StationList` object
+        """
+        # Create the database and tables
+        db = sqlite3.connect(dbfile, timeout=15)
+        self = cls(db)
+        self._createTables()
+        self.addData(filelist)
+        return self
+
+    def addData(self, filelist):
+        """
+        Add data from XML or JSON files to the existing StationList.
+
+        Args:
+            filelist:
+                A list of ShakeMap XML or JSON input files.
+
+        Returns:
+            nothing: Nothing.
+        """
+        jsonfiles = [x for x in filelist if x.endswith('.json')]
+        xmlfiles = [x for x in filelist if x.endswith('.xml')]
+        if len(jsonfiles):
+            self._loadFromJSON(jsonfiles)
+        if len(xmlfiles):
+            self._loadFromXML(xmlfiles)
+        return self
+
+    def _loadFromXML(self, xmlfiles):
         """
         Create a StationList object by reading one or more ShakeMap XML input
         files.
@@ -180,19 +185,170 @@ class StationList(object):
         Args:
             xmlfiles (sequence of str):
                 Sequence of ShakeMap XML input files to read.
-            dbfile (str):
-                Path to a file into which to write the SQLite database.
-                The default is ':memory:' for an in-memory database.
 
         Returns:
-            :class:`StationList` object
-
+            nothing: Nothing.
         """
-        # Create the database and tables
-        db = sqlite3.connect(dbfile, timeout=15)
-        self = cls(db)
-        self._createTables()
-        return self.addData(xmlfiles)
+        # Parse the xml into a dictionary
+        stationdict = {}
+        imtset = set()
+        for xmlfile in xmlfiles:
+            stationdict, ims = self._filter_station(xmlfile, stationdict)
+            imtset |= ims
+        # fill the database and create the object from it
+        self._loadFromDict(stationdict, imtset)
+        self._fixOrientations()
+        return
+
+    def _loadFromJSON(self, jsonfiles):
+        """
+        Create a StationList object by reading one or more ShakeMap JSON
+        data files.
+
+        Args:
+            jsonfiles (sequence of str):
+                Sequence of ShakeMap JSON data files to read.
+
+        Returns:
+            nothing: Nothing.
+        """
+
+        #
+        # Get the station codes for all the stations in the db
+        #
+        query = 'SELECT id FROM station'
+        self.cursor.execute(query)
+        sta_set = set([z[0] for z in self.cursor.fetchall()])
+
+        orig_imt_set = self.getIMTtypes()
+        imt_set = orig_imt_set.copy()
+
+        amp_set = set()
+        station_rows = []
+        amp_rows = []
+        for jfile in jsonfiles:
+            jfp = open(jfile, 'r')
+            stas = json.load(jfp)
+            jfp.close()
+            if stas['type'] != 'FeatureCollection':
+                logging.warn('%s is not a ShakeMap JSON stationlist, skipping'
+                             % jfile)
+                continue
+            for feature in stas['features']:
+                sta_id = feature['id']
+                if sta_id in sta_set:
+                    continue
+                else:
+                    sta_set.add(sta_id)
+                lon = feature['geometry']['coordinates'][0]
+                lat = feature['geometry']['coordinates'][1]
+                netid = feature['properties']['network']
+                code = sta_id.replace(netid + '.', '')
+                network = feature['properties']['source']
+                name = feature['properties'].get('name', None)
+                elev = feature['properties'].get('elev', None)
+                vs30 = feature['properties'].get('vs30', None)
+                stddev = 0
+                instrumented = int(netid.lower() not in CIIM_TUPLE)
+
+                station_rows.append((sta_id, network, code, name, lat, lon,
+                                     elev, vs30, stddev, instrumented))
+
+                if not instrumented:
+                    amplitude = float(
+                        feature['properties'].get('intensity', np.nan))
+                    stddev = float(
+                        feature['properties'].get('intensity_stddev', np.nan))
+                    flag = feature['properties']['intensity_flag']
+                    if not flag or flag == '':
+                        flag = '0'
+                    amp_rows.append([sta_id, 'MMI', 'mmi', 'h',
+                                     amplitude, stddev, flag])
+                    imt_set.add('MMI')
+                    continue
+
+                #
+                # Collect the channel names for this station to see if we
+                # can resolve the orientation of any of the channels ending
+                # with "1" or "2".
+                #
+                chan_names = []
+                for comp in feature['properties']['channels']:
+                    chan_names.append(comp['name'])
+                orients = self._getOrientationSet(chan_names)
+                #
+                # Now insert the amps into the database
+                #
+                for ic, comp in enumerate(feature['properties']['channels']):
+                    original_channel = comp['name']
+                    orientation = orients[ic]
+                    for amp in comp['amplitudes']:
+                        imt_type = amp['name'].upper()
+                        imt_set.add(imt_type)
+                        amp_id = (sta_id + '.' + imt_type + '.' +
+                                  original_channel)
+                        if amp_id in amp_set:
+                            continue
+                        amp_set.add(amp_id)
+                        amplitude = amp['value']
+                        if 'ln_sigma' in amp:
+                            stddev = amp['ln_sigma']
+                        elif 'sigma' in amp:
+                            stddev = amp['sigma']
+                        else:
+                            stddev = 0
+                        flag = amp['flag']
+                        units = amp['units']
+                        if amplitude == 'null' or np.isnan(float(amplitude)):
+                            amplitude = 'NULL'
+                            flag = 'G'
+                        elif imt_type == 'MMI':
+                            pass
+                        elif imt_type == 'PGV':
+                            if units == 'cm/s':
+                                amplitude = np.log(amplitude)
+                            elif units == 'ln(cm/s)':
+                                pass
+                            else:
+                                raise ValueError('Unknown units %s in input'
+                                                 % units)
+                        else:
+                            if units == '%g':
+                                amplitude = np.log(amplitude / 100.0)
+                            elif units == 'ln(g)':
+                                pass
+                            else:
+                                raise ValueError('Unknown units %s in input'
+                                                 % units)
+                        amp_rows.append([sta_id, imt_type, original_channel,
+                                         orientation, amplitude, stddev, flag])
+
+        new_imts = imt_set - orig_imt_set
+        if any(new_imts):
+            self.cursor.executemany('INSERT INTO imt (imt_type) VALUES (?)',
+                                    zip(new_imts))
+            self.db.commit()
+        query = 'SELECT imt_type, id FROM imt'
+        self.cursor.execute(query)
+        imt_hash = dict(self.cursor.fetchall())
+
+        for row in amp_rows:
+            row[1] = imt_hash[row[1]]
+
+        self.cursor.executemany(
+            'INSERT INTO amp (station_id, imt_id, original_channel, '
+            'orientation, amp, stddev, flag) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            amp_rows
+        )
+        self.db.commit()
+        self.cursor.executemany(
+            'INSERT INTO station (id, network, code, name, lat, lon, '
+            'elev, vs30, stddev, instrumented) VALUES '
+            '(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', station_rows
+        )
+        self.db.commit()
+
+        return
 
     def getGeoJson(self):
         jdict = {'type': 'FeatureCollection',
@@ -205,7 +361,6 @@ class StationList(object):
         sta_rows = self.cursor.fetchall()
 
         for sta in sta_rows:
-            # print('doing station %s' % (str(sta[2])))
             if str(sta[2]).startswith(sta[1] + '.'):
                 myid = str(sta[2])
             else:
@@ -216,7 +371,7 @@ class StationList(object):
                 'properties': {
                     'code': str(sta[2]),
                     'name': sta[3],
-                    'instrumentType': 'UNK' if sta[8] is True else 'OBSERVED',
+                    'instrumentType': 'UNK' if sta[8] is 1 else 'OBSERVED',
                     'source': sta[1],
                     'network': sta[1],
                     'commType': 'UNK',
@@ -227,6 +382,8 @@ class StationList(object):
                     'pga': None,
                     'pgv': None,
                     'distance': None,
+                    'elev': sta[6],
+                    'vs30': sta[7],
                     'channels': []
                 },
                 'geometry': {
@@ -242,9 +399,19 @@ class StationList(object):
                 'AND a.imt_id = i.id' % (str(sta[0]))
             )
             amp_rows = self.cursor.fetchall()
+            if sta[8] is 0:
+                if len(amp_rows) != 1:
+                    logging.warn("Couldn't find intensity for MMI station.")
+                    continue
+                feature['properties']['intensity'] = amp_rows[0][0]
+                feature['properties']['intensity_stddev'] = amp_rows[0][4]
+                feature['properties']['intensity_flag'] = amp_rows[0][3]
+                feature['properties']['channels'] = []
+                jdict['features'].append(feature)
+                continue
+
             channels = {}
             for amp in amp_rows:
-                # print('doing channel %s imt %s' % (amp[2], amp[1]))
                 sd_string = 'ln_sigma'
                 if amp[2] not in channels:
                     channels[amp[2]] = {'name': amp[2], 'amplitudes': []}
@@ -279,28 +446,6 @@ class StationList(object):
             jdict['features'].append(feature)
 
         return jdict
-
-    def addData(self, xmlfiles):
-        """
-        Create a StationList object by reading one or more ShakeMap XML input
-        files.
-
-        Args:
-            xmlfiles (sequence of str):
-                Sequence of ShakeMap XML input files to read.
-        Returns:
-            :class:`StationList` object
-
-        """
-        # Parse the xml into a dictionary
-        stationdict = {}
-        imtset = set()
-        for xmlfile in xmlfiles:
-            stationdict, ims = self._filter_station(xmlfile, stationdict)
-            imtset |= ims
-        # fill the database and create the object from it
-        self._loadFromDict(stationdict, imtset)
-        return self
 
     def _loadFromDict(self, stationdict, imtset):
         """
@@ -481,7 +626,7 @@ class StationList(object):
 
         'id', 'network', 'code', 'name', 'lat', 'lon', 'elev', 'vs30',
         'stddev', 'instrumented', 'PGA', 'PGA_sd', 'PGV', 'PGA_sd',
-        'SA(0.3)', 'SA(0.3)_sd, 'SA(1.0)', 'SA(1.0)_sd, 'SA(3.0)',
+        'SA(0.3)', 'SA(0.3)_sd, 'SA(1.0)', 'SA(1.0)_sd', 'SA(3.0)',
         'SA(3.0)_sd'
 
         For the non-instrumented dictionary, the keys would be:
@@ -502,10 +647,15 @@ class StationList(object):
 
         Returns:
             dict, set: A dictionary of Numpy arrays, and a set specifying
-            the IMTs found in the dictionary..
+            the IMTs found in the dictionary.
+
+        Raises:
+            TypeError: if "instrumented" argument is not type bool.
         """
 
-        assert isinstance(instrumented, bool)
+        if not isinstance(instrumented, bool):
+            raise TypeError("getStationDictionary: the instrumented argument "
+                            "must be of type bool")
         columns = list(TABLES['station'].keys())
         dstr = ', '.join(columns)
         self.cursor.execute(
@@ -541,8 +691,8 @@ class StationList(object):
             'amp a, station s, imt i WHERE a.flag = "0" '
             'AND s.id = a.station_id '
             'AND a.imt_id = i.id '
-            'AND s.instrumented = %d AND a.orientation NOT IN ("Z", "U") '
-            'AND a.amp IS NOT NULL' % (instrumented)
+            'AND s.instrumented = ? AND a.orientation NOT IN ("Z", "U") '
+            'AND a.amp IS NOT NULL', (instrumented,)
         )
         amp_rows = self.cursor.fetchall()
 
@@ -563,8 +713,7 @@ class StationList(object):
 
         return df, myimts
 
-    @staticmethod
-    def _getOrientation(orig_channel, orient):
+    def _getOrientation(self, orig_channel, orient):
         """
         Return a character representing the orientation of a channel.
 
@@ -600,6 +749,66 @@ class StationList(object):
         else:
             orientation = 'U'  # this is unknown
         return orientation
+
+    def _getOrientationSet(self, chan_names):
+        """
+        Return a characters representing the orientation of a set of
+        channels from a single station.
+
+        Args:
+            chan_names (list):
+                List of strings representing the seed channels (e.g. 'HNZ').
+                The final character is assumed to be the (uppercase)
+                orientation.
+
+        Returns:
+            Character representing the channel orientation. One of 'N',
+            'E', 'Z', 'H' (for horizontal), or 'U' (for unknown).
+        """
+        if len(chan_names) == 3:
+            term_chars = [chan_names[0][-1], chan_names[1][-1],
+                          chan_names[2][-1]]
+            if '1' in term_chars and 'Z' in term_chars:
+                orientations = [(lambda x: 'V' if x == 'Z' else 'H')(x)
+                                for x in term_chars]
+                return orientations
+        orientations = []
+        for name in chan_names:
+            orientations.append(self._getOrientation(name, None))
+        return orientations
+
+    def _fixOrientations(self):
+        """
+        Look for stations with channels that have orientations "1", "2",
+        and "Z", and set the "1" and "2" channels to have horizontal
+        orientation.
+        """
+        sql = ("SELECT DISTINCT station_id, original_channel "
+               "FROM amp "
+               "WHERE orientation IN ('U', 'Z') "
+               "ORDER BY station_id")
+        self.cursor.execute(sql)
+        sta_rows = self.cursor.fetchall()
+        current_station_id = ''
+        channel_set = set()
+        for row in sta_rows:
+            station_id, channel = row
+            if station_id != current_station_id:
+                if len(channel_set) == 3:
+                    ochars = [x[-1] for x in channel_set]
+                    if '1' in ochars and '2' in ochars and 'Z' in ochars:
+                        hchans = [x for x in channel_set if x[-1] != 'Z']
+                        sql = ('UPDATE amp '
+                               'SET orientation = "H"'
+                               'WHERE station_id = ? '
+                               'AND original_channel IN (?, ?)')
+                        self.cursor.execute(sql, (current_station_id,
+                                                  hchans[0], hchans[1]))
+                        self.db.commit()
+                current_station_id = station_id
+                channel_set = set([channel])
+            channel_set.add(channel)
+        return
 
     @staticmethod
     def _getGroundMotions(comp, imt_translate):
@@ -717,6 +926,7 @@ class StationList(object):
                 if code.startswith(netid + '.'):
                     sta_id = code
                     code = code.replace(netid + '.', '')
+                    attributes['code'] = code
                 else:
                     sta_id = netid + '.' + code
 

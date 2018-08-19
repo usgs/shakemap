@@ -247,7 +247,7 @@ class ShakeMapInputContainer(ShakeMapContainer):
         # store the rupture object in the container
         container.setRupture(rupture)
 
-        if datafiles is not None:
+        if datafiles is not None and len(datafiles) > 0:
             container.setStationData(datafiles)
 
         container.setVersionHistory(version_history)
@@ -258,11 +258,11 @@ class ShakeMapInputContainer(ShakeMapContainer):
         Insert observed ground motion data into the container.
 
         Args:
-          datafiles (str): Path to an XML-formatted file containing ground
-              motion observations, (macroseismic or instrumented).
+          datafiles (str): Path to XML- or JSON-formatted files containing
+              ground motion observations, (macroseismic or instrumented).
 
         """
-        station = StationList.loadFromXML(datafiles)
+        station = StationList.loadFromFiles(datafiles)
         self.setStationList(station)
 
     def addStationData(self, datafiles):
@@ -270,12 +270,17 @@ class ShakeMapInputContainer(ShakeMapContainer):
         Add observed ground motion data into the container.
 
         Args:
-            datafiles (str): Path to an XML-formatted file containing ground
-                motion observations, (macroseismic or instrumented).
-
+            datafiles (sequence): Sequence of paths to XML- and/or
+                JSON-formatted files containing ground motion observations,
+                (macroseismic or instrumented).
         """
-        station = self.getStationList()
-        station.addData(datafiles)
+        if len(datafiles) == 0:
+            return
+        try:
+            station = self.getStationList()
+            station.addData(datafiles)
+        except AttributeError:
+            station = StationList.loadFromFiles(datafiles)
         self.setStationList(station)
 
     def updateRupture(self, eventxml=None, rupturefile=None):

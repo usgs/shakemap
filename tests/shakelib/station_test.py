@@ -4,6 +4,8 @@
 import os.path
 import pickle
 import sys
+import tempfile
+import json
 
 # third party modules
 import numpy as np
@@ -39,7 +41,7 @@ def test_station():
     dyfifile = os.path.join(datadir, 'ciim3_dat.xml')
     xmlfiles = [inputfile, dyfifile]
 
-    stations = StationList.loadFromXML(xmlfiles, ":memory:")
+    stations = StationList.loadFromFiles(xmlfiles, ":memory:")
 
     df1, _ = stations.getStationDictionary(instrumented=True)
     df2, _ = stations.getStationDictionary(instrumented=False)
@@ -120,7 +122,7 @@ def test_station2():
     inputfile = os.path.join(datadir, 'stationlist.xml')
     xmlfiles = [inputfile]
 
-    stations = StationList.loadFromXML(xmlfiles, ":memory:")
+    stations = StationList.loadFromFiles(xmlfiles, ":memory:")
 
     df1, _ = stations.getStationDictionary(instrumented=True)
     # Check Keys pressent
@@ -172,10 +174,7 @@ def test_station2():
 def test_station3():
 
     #
-    # Exercise the geojson code. Can't really compare it to anything
-    # because the ordering is scrambled by the hashes in the XML
-    # parsing stage. Once (if) we institute a loadFromJSON() method, we
-    # can do a comparison.
+    # Exercise the geojson code.
     #
     homedir = os.path.dirname(os.path.abspath(__file__))
 
@@ -187,9 +186,26 @@ def test_station3():
     inputfile = os.path.join(datadir, 'stationlist.xml')
     xmlfiles = [inputfile]
 
-    stations = StationList.loadFromXML(xmlfiles, ":memory:")
+    stations = StationList.loadFromFiles(xmlfiles, ":memory:")
 
-    myjson = stations.getGeoJson()  # noqa
+    myjson = stations.getGeoJson()
+
+    ofd = tempfile.NamedTemporaryFile(suffix='.json', delete=False)
+    jsonfile = ofd.name
+    ofd.write(json.dumps(myjson).encode())
+    ofd.close()
+
+    stations2 = StationList.loadFromFiles([jsonfile])
+
+    os.unlink(jsonfile)
+
+    df1, _ = stations.getStationDictionary(instrumented=True)
+    df2, _ = stations2.getStationDictionary(instrumented=True)
+    compare_dataframes(df1, df2)
+
+    df1, _ = stations.getStationDictionary(instrumented=False)
+    df2, _ = stations2.getStationDictionary(instrumented=False)
+    compare_dataframes(df1, df2)
 
 
 def test_station4():
@@ -203,7 +219,7 @@ def test_station4():
     dyfifile = os.path.join(datadir, 'dyfi_dat.xml')
     xmlfiles = [dyfifile]
 
-    stations = StationList.loadFromXML(xmlfiles, ":memory:")
+    stations = StationList.loadFromFiles(xmlfiles, ":memory:")
 
     df1, _ = stations.getStationDictionary(instrumented=True)  # noqa
     df2, _ = stations.getStationDictionary(instrumented=False)  # noqa
@@ -223,13 +239,13 @@ def test_station5():
     dyfifile = os.path.join(datadir, 'ciim3_dat.xml')
 
     xmlfiles = [inputfile, dyfifile]
-    stations1 = StationList.loadFromXML(xmlfiles, ":memory:")
+    stations1 = StationList.loadFromFiles(xmlfiles, ":memory:")
     #
     # Load the data more than once to exercise the code that handles
     # repeated entries.
     #
     xmlfiles = [inputfile, inputfile, dyfifile, dyfifile]
-    stations2 = StationList.loadFromXML(xmlfiles, ":memory:")
+    stations2 = StationList.loadFromFiles(xmlfiles, ":memory:")
 
     df1, _ = stations1.getStationDictionary(instrumented=True)
     df2, _ = stations2.getStationDictionary(instrumented=True)
