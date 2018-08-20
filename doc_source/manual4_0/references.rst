@@ -808,24 +808,27 @@ written prior to publication.)
 
 Worden, C.B., M.C. Gerstenberger, D.A. Rhoades, D.J. and Wald (2012). Probabilistic 
 relationships between ground-motion parameters and Modified Mercalli intensity in 
-California *Bull. Seism. Soc. Am.* 102(1), 204-221. DOI: 10.1785/0120110156.
+California *Bull. Seism. Soc. Am.* 102(1), 204-221. DOI: https://doi.org/10.1785/0120110156.
 \
 
 .. _worden2015:
 
 Worden, C.B., D.J. Wald, and E.M. Thompson (2015). Development of an Open-Source Hybrid 
-Global Vs30 Model, SSA Annual Meeting, Pasadena, CA. *Seis. Res. Lett.* 86(2B), 713. https://github.com/cbworden/earthquake-global_vs30.
-\
-
-.. _worden2016:
-
-C.B. Worden, M. Hearne, D.J. Wald, and M. Pagani (2016). Complimentary Components of OpenQuake and ShakeMap, *Proc. 16th World Conf. on Eq. Eng.*, Santiago.
+Global Vs30 Model, SSA Annual Meeting, Pasadena, CA. *Seis. Res. Lett.* 86(2B), 713. 
+https://github.com/usgs/earthquake-global_vs30
 \
 
 .. _worden2016b:
 
 Worden, C.B. and D.J. Wald (2016). ShakeMap Manual Online: technical manual, user's guide, and software guide, 
-U. S. Geological Survey. usgs.github.io/shakemap. DOI: 10.5066/F7D21VPQ.
+U. S. Geological Survey. usgs.github.io/shakemap. DOI: https://doi.org/10.5066/F7D21VPQ.
+\
+
+.. _worden2017:
+
+C.B. Worden, M. Hearne, D.J. Wald, M. Pagani, E.M. Thompson, S.A. Verros, G. Weatherill (2017).
+Complimentary Components of OpenQuake and ShakeMap, *Proc. 16th World Conf. on Eq. Eng.*,
+Santiago, Chile, January 9th to 13th, 2017.
 \
 
 .. _worden2017b:
@@ -838,7 +841,7 @@ U. S. Geological Survey. usgs.github.io/shakemap. DOI: XXX
 
 Worden, C.B., E.M. Thompson, J.W. Baker, B.A. Bradley, N. Luco, and D.J. Wald (2018). 
 Spatial and Spectral Interpolation of Ground Motion Intensity Measure Observations,
-*Bull. Seism. Soc. Am.* doi: https://doi.org/10.1785/0120170201
+*Bull. Seism. Soc. Am.* 108(2), 866-875. doi: https://doi.org/10.1785/0120170201
 \
 
 .. _yamakawa1998:

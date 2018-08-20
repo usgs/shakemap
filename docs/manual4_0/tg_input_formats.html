@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
@@ -36,14 +36,15 @@
   <div class="section" id="input-data-formats">
 <span id="sec-input-formats-4"></span><h1>2.5. Input Data Formats<a class="headerlink" href="#input-data-formats" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="event-xml-file">
-<h2>2.5.1. Event XML File<a class="headerlink" href="#event-xml-file" title="Permalink to this headline">¶</a></h2>
+<span id="subsec-event-xml-file"></span><h2>2.5.1. Event XML File<a class="headerlink" href="#event-xml-file" title="Permalink to this headline">¶</a></h2>
 <p>This file is <em>required</em>.</p>
 <p>The earthquake origin information is contained in a simple XML file
 called <em>event.xml</em> that is contained in the event’s <em>current</em>
 directory. An example file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">earthquake</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;us1000db5t&quot;</span> <span class="n">netid</span><span class="o">=</span><span class="s2">&quot;us&quot;</span> <span class="n">network</span><span class="o">=</span><span class="s2">&quot;USGS National Earthquake Information Center, PDE&quot;</span>
-<span class="n">lat</span><span class="o">=</span><span class="s2">&quot;38.7161&quot;</span> <span class="n">lon</span><span class="o">=</span><span class="s2">&quot;69.9779&quot;</span> <span class="n">depth</span><span class="o">=</span><span class="s2">&quot;5.0&quot;</span> <span class="n">mag</span><span class="o">=</span><span class="s2">&quot;5.7&quot;</span> <span class="n">time</span><span class="o">=</span><span class="s2">&quot;2018-03-29T22:54:12Z&quot;</span>
-<span class="n">locstring</span><span class="o">=</span><span class="s2">&quot;11km SE of Roghun, Tajikistan&quot;</span> <span class="n">mech</span><span class="o">=</span><span class="s2">&quot;SS&quot;</span> <span class="n">reference</span><span class="o">=</span><span class="s2">&quot;Smith, et. al. 2018&quot;</span><span class="o">/&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">earthquake</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;us1000db5t&quot;</span> <span class="n">netid</span><span class="o">=</span><span class="s2">&quot;us&quot;</span> <span class="n">lat</span><span class="o">=</span><span class="s2">&quot;38.7161&quot;</span> <span class="n">lon</span><span class="o">=</span><span class="s2">&quot;69.9779&quot;</span>
+<span class="n">depth</span><span class="o">=</span><span class="s2">&quot;5.0&quot;</span> <span class="n">mag</span><span class="o">=</span><span class="s2">&quot;5.7&quot;</span> <span class="n">locstring</span><span class="o">=</span><span class="s2">&quot;11km SE of Roghun, Tajikistan&quot;</span>
+<span class="n">network</span><span class="o">=</span><span class="s2">&quot;USGS National Earthquake Information Center, PDE&quot;</span>
+<span class="n">time</span><span class="o">=</span><span class="s2">&quot;2018-03-29T22:54:12Z&quot;</span> <span class="n">mech</span><span class="o">=</span><span class="s2">&quot;SS&quot;</span> <span class="n">reference</span><span class="o">=</span><span class="s2">&quot;Smith, et. al. 2018&quot;</span><span class="o">/&gt;</span>
 </pre></div>
 </div>
 <p>The attributes of the earthquake element are:</p>
@@ -59,15 +60,16 @@ directory. An example file:</p>
 </thead>
 <tbody valign="top">
 <tr class="row-even"><td>id</td>
-<td>A unique string, consisting of netid plus
-event ID.</td>
+<td>A string, consisting of the event ID. This should be
+be unique for the network code <strong>netid</strong> (see below).</td>
 </tr>
 <tr class="row-odd"><td>netid</td>
 <td>Usually a two character network code, but can be any
 string.</td>
 </tr>
 <tr class="row-even"><td>network</td>
-<td>Long description of the organization behind netid.</td>
+<td>Long description of the organization behind netid.
+This field is required, but may be the empty string</td>
 </tr>
 <tr class="row-odd"><td>lat</td>
 <td>Latitude at earthquake hypocenter.</td>
@@ -83,7 +85,7 @@ string.</td>
 </tr>
 <tr class="row-odd"><td>time</td>
 <td>Time of earthquake origin, always UTC in
-YYYY-MM-DDTHH:MM:SSZ format.</td>
+YYYY-MM-DDTHH:MM:SS.fZ format.</td>
 </tr>
 <tr class="row-even"><td>locstring</td>
 <td>String describing earthquake location.</td>
@@ -97,9 +99,12 @@ YYYY-MM-DDTHH:MM:SSZ format.</td>
 </tr>
 <tr class="row-odd"><td>productcode</td>
 <td>(optional) Used to distinguish between different
-ShakeMaps created for the same event (i.e., one map
+ShakeMaps created for the same event (e.g., one map
 showing the extent of shaking, and another zoomed
-into a city of interest.</td>
+into a city of interest). If the productcode is not
+supplied, it will be taken from the name of the
+data directory (which is also the “event_id” that is
+supplied to the <strong>shake</strong> program).</td>
 </tr>
 </tbody>
 </table>
@@ -119,78 +124,12 @@ documentation for details.</p>
 <p>These files are <em>optional</em>.</p>
 <p>To inform your ShakeMap with real data, either macroseismic intensity
 or instrumented accelerations and velocities, you may include any
-number of XML files ending in “<em>_dat.xml” in the event’s *current</em>
+number of XML files ending in “*_dat.xml” as well as one called
+“stationlist.xml” in the event’s <em>current</em>
 directory. These files consists of a number of <em>elements</em>, with
 defined <em>attributes</em>.</p>
-<p>The <em>earthquake</em> element (optional) has the following attributes:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="17%" />
-<col width="83%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Attribute</th>
-<th class="head">Description</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>id</td>
-<td>The event id.</td>
-</tr>
-<tr class="row-odd"><td>created</td>
-<td>File creation time (Unix epoch – seconds since Jan 1, 1970).</td>
-</tr>
-<tr class="row-even"><td>lat</td>
-<td>Latitude (in decimal degrees, negative in southern hemisphere).</td>
-</tr>
-<tr class="row-odd"><td>lon</td>
-<td>Longitude (in decimal degrees, negative in western hemisphere).</td>
-</tr>
-<tr class="row-even"><td>depth</td>
-<td>Depth in km, positive down</td>
-</tr>
-<tr class="row-odd"><td>locstring</td>
-<td>a free-form descriptive string of location relative to
-landmarks</td>
-</tr>
-<tr class="row-even"><td>mag</td>
-<td>Earthquake magnitude.</td>
-</tr>
-<tr class="row-odd"><td>type</td>
-<td>A string specifying the rupture type; the accepted types are
-RS, SS, NM, and ALL, for reverse slip, strike slip, normal,
-and unspecified ruptures, respectively.</td>
-</tr>
-<tr class="row-even"><td>year</td>
-<td>Year, 4 digit format.</td>
-</tr>
-<tr class="row-odd"><td>month</td>
-<td>Month, 1-12.</td>
-</tr>
-<tr class="row-even"><td>day</td>
-<td>Day, 1-31.</td>
-</tr>
-<tr class="row-odd"><td>hour</td>
-<td>Hour, 0-23.</td>
-</tr>
-<tr class="row-even"><td>minute</td>
-<td>Minute, 0-59.</td>
-</tr>
-<tr class="row-odd"><td>second</td>
-<td>Second, 0-59.</td>
-</tr>
-<tr class="row-even"><td>timezone</td>
-<td>Timezone abbreviation (i.e., GMT, PST, PDT).</td>
-</tr>
-</tbody>
-</table>
-<p>Example earthquake element:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">earthquake</span> <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;14000376&quot;</span> <span class="n">lat</span><span class="o">=</span><span class="s2">&quot;34.2722&quot;</span> <span class="n">lon</span><span class="o">=</span><span class="s2">&quot;-118.7530&quot;</span>
-<span class="n">mag</span><span class="o">=</span><span class="s2">&quot;3.6&quot;</span> <span class="n">year</span><span class="o">=</span><span class="s2">&quot;2003&quot;</span> <span class="n">month</span><span class="o">=</span><span class="s2">&quot;10&quot;</span> <span class="n">day</span><span class="o">=</span><span class="s2">&quot;29&quot;</span> <span class="n">hour</span><span class="o">=</span><span class="s2">&quot;23&quot;</span> <span class="n">minute</span><span class="o">=</span><span class="s2">&quot;44&quot;</span>
-<span class="n">second</span><span class="o">=</span><span class="s2">&quot;48&quot;</span> <span class="n">timezone</span><span class="o">=</span><span class="s2">&quot;GMT&quot;</span> <span class="n">depth</span><span class="o">=</span><span class="s2">&quot;13.81&quot;</span> <span class="n">locstring</span><span class="o">=</span><span class="s2">&quot;2.6 mi W of</span>
-<span class="n">Simi</span> <span class="n">Valley</span><span class="p">,</span> <span class="n">CA</span><span class="s2">&quot; created=&quot;</span><span class="mi">1069292035</span><span class="s2">&quot; /&gt;</span>
-</pre></div>
-</div>
+<p>The <em>earthquake</em> element (optional) is described above in the section
+<span class="xref std std-ref">_subsec-event-xml-file</span>.</p>
 <p>Following the earthquake element is the <em>stationlist</em> element, which
 has a <em>created</em> attribute, which is the same as the one in the
 earthquake element.</p>
@@ -256,26 +195,7 @@ each). These refer to peak acceleration, velocity, and 5%-damped
 pseduo-spectral acceleration (at 0.3, 1.0, and 3.0 sec period) values
 for the named channel at the named station. The acc, vel, psa03,
 psa10, and psa30 elements are empty but have the following attributes:</p>
-<table border="1" class="docutils">
-<colgroup>
-<col width="17%" />
-<col width="83%" />
-</colgroup>
-<thead valign="bottom">
-<tr class="row-odd"><th class="head">Attribute</th>
-<th class="head">Description</th>
-</tr>
-</thead>
-<tbody valign="top">
-<tr class="row-even"><td>value</td>
-<td>The amplitude value.</td>
-</tr>
-<tr class="row-odd"><td>flag</td>
-<td>Flag indicating problematic data (optional).</td>
-</tr>
-</tbody>
-</table>
-<p>The value attributes are expected to have units of:</p>
+<p>If the units are unspecifies, the value attributes are expected to have units of:</p>
 <table border="1" class="docutils">
 <colgroup>
 <col width="17%" />
@@ -287,11 +207,11 @@ psa10, and psa30 elements are empty but have the following attributes:</p>
 </tr>
 </thead>
 <tbody valign="top">
-<tr class="row-even"><td>acc</td>
+<tr class="row-even"><td>acc, pga</td>
 <td>%g (i.e., percent of the earth’s nominal gravitational
 acceleration).</td>
 </tr>
-<tr class="row-odd"><td>vel</td>
+<tr class="row-odd"><td>vel, pgv</td>
 <td>cm/s (centimeters per second).</td>
 </tr>
 <tr class="row-even"><td>psa</td>
@@ -299,6 +219,35 @@ acceleration).</td>
 </tr>
 </tbody>
 </table>
+<p>The <strong>units</strong> attribute may also be specified if the amplitudes are in
+logarithmic (natural) units:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="83%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">Attribute</th>
+<th class="head">Units Designator</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>acc, pga</td>
+<td>“ln(g)” (i.e., log of the earth’s nominal gravitational
+acceleration).</td>
+</tr>
+<tr class="row-odd"><td>vel, pgv</td>
+<td>“ln(cm/s)” (log of centimeters per second).</td>
+</tr>
+<tr class="row-even"><td>psa</td>
+<td>“ln(g)”.</td>
+</tr>
+</tbody>
+</table>
+<p>The operator may also specify a standard deviations for “observations” that are
+the mean of a distribution. This standard deviation is specified in natural
+logarithmic units regardless of the units of the amplitudes themselves. The
+standard deviations are specified with the <strong>ln_sigma</strong> attribute.</p>
 <p>The flag attribute indicates problematic data. Any value other than
 “0” (zero) or “” (i.e., an empty string) will cause ShakeMap to reject
 the amplitude (and, in fact, all the amplitudes of that type for that
@@ -322,7 +271,7 @@ following flags are currently defined:</p>
 <td>Manually flagged (in grind.conf) by the ShakeMap operator.</td>
 </tr>
 <tr class="row-even"><td>G</td>
-<td>Amplitude clipped or below the instrument noise threshold.</td>
+<td>Glitch. Amplitude clipped or below instrument noise threshold.</td>
 </tr>
 <tr class="row-odd"><td>I</td>
 <td>Incomplete (a data gap existed in the time window used to
@@ -393,27 +342,203 @@ commtype=&quot;DIG&quot; netid=”CI” loc=&quot;Hidden Hills, Valley Circle Dr
 </pre></div>
 </div>
 <p>Intensity data uses the same format of input XML as other ground
-motion data, but uses two new attributes to the station tag: the
-intensity attribute should be set to the decimal intensity for the
-“station;” the netid attribute should be set to “MMI,” “CIIM,” “DYFI,”
+motion data, but uses three new attributes to the station tag: the
+<strong>intensity</strong> attribute should be set to the decimal intensity for the
+“station;” the <strong>intensity_stddev</strong> should specify the standard deviation
+of the intensity observation; the <strong>intensity_flag</strong> should specify the
+flag (usually “0”) of the observation (see flag table, above). Also the
+netid attribute should be set to “MMI,” “CIIM,” “DYFI,”
 or “INTENSITY” (all four are currently equivalent). If netid is set to
 one of these values, any amplitude data (i.e., data enclosed in a comp
-tag) will be ignored and grind will use the mmi2pgm function to derive
+tag) will be ignored and <em>model</em> will use the configured GMICE to derive
 the ground motions. Likewise, if netid is not one of these values, the
 intensity attribute will be ignored and grind will compute intensity
-using the pgm2mmi function.</p>
+using the GMICE.</p>
 <p>Below is an example of a station tag that contains intensity information:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;station code=&quot;91042&quot; name=&quot;ZIP Code 91042 (Intensity VII, 38
 responses)&quot; insttype=&quot;USGS (Did You Feel It?)&quot; lat=&quot;34.282604&quot;
 lon=&quot;-118.237943&quot; source=&quot;USGS (Did You Feel It?)&quot; netid=&quot;CIIM&quot;
-commtype=&quot;USGS (Did You Feel It?)&quot; intensity=&quot;7.4&quot;&gt;
+commtype=&quot;USGS (Did You Feel It?)&quot; intensity=&quot;7.4&quot; intensity_stddev=&quot;0.3&quot;
+intensity_flag=&quot;0&quot;&gt;
 </pre></div>
 </div>
 <p>The earthquake and stationlist XML files are combined in the GeoJSON
 output file provided to the public.</p>
 </div>
+<div class="section" id="shakemap-json-data-file">
+<h2>2.5.4. ShakeMap JSON Data File<a class="headerlink" href="#shakemap-json-data-file" title="Permalink to this headline">¶</a></h2>
+<p>ShakeMap will also accept a ShakeMap-produced GeoJSON <em>stationlist.json</em>
+file as input (see <a class="reference internal" href="tg_output_formats.html#subsec-stationlist-geojson"><span class="std std-ref">Stationlist GeoJSON</span></a>). Additional
+JSON files of the form <em>*_dat.json</em> file may also be included in the input.</p>
+<p>The information contained in the JSON input files is similar to that in
+the XML input files (see above), but is structured differently:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
+  <span class="s2">&quot;features&quot;</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Point&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="mf">143.157196</span><span class="p">,</span>
+          <span class="mf">42.014999</span>
+        <span class="p">]</span>
+      <span class="p">},</span>
+      <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;II.ERM&quot;</span><span class="p">,</span>
+      <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;Erimo, Hidaka, Hokkaido, Japan&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;II.ERM&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pgv&quot;</span><span class="p">:</span> <span class="s2">&quot;null&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;commType&quot;</span><span class="p">:</span> <span class="s2">&quot;UNK&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;vs30&quot;</span><span class="p">:</span> <span class="mi">760</span><span class="p">,</span>
+        <span class="s2">&quot;intensity&quot;</span><span class="p">:</span> <span class="s2">&quot;null&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;network&quot;</span><span class="p">:</span> <span class="s2">&quot;II&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="mf">462.284</span><span class="p">,</span>
+        <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;II&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;channels&quot;</span><span class="p">:</span> <span class="p">[</span>
+          <span class="p">{</span>
+            <span class="s2">&quot;amplitudes&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0009</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pgv&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0056</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;cm/s&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0051</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0118</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0201</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;BHZ&quot;</span>
+          <span class="p">},</span>
+          <span class="p">{</span>
+            <span class="s2">&quot;amplitudes&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.001</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pgv&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0058</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;cm/s&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0069</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0146</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.026</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;BH2&quot;</span>
+          <span class="p">},</span>
+          <span class="p">{</span>
+            <span class="s2">&quot;amplitudes&quot;</span><span class="p">:</span> <span class="p">[</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0012</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pgv&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0073</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;cm/s&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0046</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0182</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">},</span>
+              <span class="p">{</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.0235</span><span class="p">,</span>
+                <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
+              <span class="p">}</span>
+            <span class="p">],</span>
+            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;BH1&quot;</span>
+          <span class="p">}</span>
+        <span class="p">],</span>
+        <span class="s2">&quot;station_type&quot;</span><span class="p">:</span> <span class="s2">&quot;seismic&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;intensity_flag&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;intensity_stddev&quot;</span><span class="p">:</span> <span class="s2">&quot;null&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;instrumentType&quot;</span><span class="p">:</span> <span class="s2">&quot;OBSERVED&quot;</span><span class="p">,</span>
+      <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="o">&lt;</span><span class="n">additional</span> <span class="s2">&quot;features&quot;</span> <span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">e</span><span class="o">.</span><span class="p">,</span> <span class="n">stations</span><span class="p">)</span><span class="o">&gt;</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Note that the names of the intensity measure types are lower case,
+and the spectral accelerations are of the form <em>sa(1.0)</em> where the
+number in paraentheses is the period. Additional fields may be present
+in the JSON file, but they will be ignored. Intensity observations
+should have a <strong>netid</strong> as specified for the XML files (see above),
+and should have a <strong>channels</strong> element that is an empty list
+(i.e., “channels: []”).</p>
+</div>
 <div class="section" id="source-text-file">
-<h2>2.5.4. Source Text File<a class="headerlink" href="#source-text-file" title="Permalink to this headline">¶</a></h2>
+<h2>2.5.5. Source Text File<a class="headerlink" href="#source-text-file" title="Permalink to this headline">¶</a></h2>
 <p>Because most ShakeMap installations automatically generate XML input
 files and write them to the input directory, manual changes made by
 the operator to the event.xml file will generally be overwritten by
@@ -431,7 +556,7 @@ etc.. Blank lines and lines beginning with ‘#’ (i.e., comments) are
 ignored.</p>
 </div>
 <div class="section" id="rupture-geojson-file">
-<h2>2.5.5. Rupture GeoJson File<a class="headerlink" href="#rupture-geojson-file" title="Permalink to this headline">¶</a></h2>
+<h2>2.5.6. Rupture GeoJson File<a class="headerlink" href="#rupture-geojson-file" title="Permalink to this headline">¶</a></h2>
 <p>This file is <em>optional</em>.</p>
 <p>Rupture (also known as finite fault) files are defined in ShakeMap 4
 as GeoJSON files, a standard format for representing geospatial
@@ -565,7 +690,7 @@ sub-polygon are horizontal, the distance calculations are much faster.</p>
 </div>
 </div>
 <div class="section" id="generic-amplification-factors">
-<h2>2.5.6. Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h2>
+<h2>2.5.7. Generic Amplification Factors<a class="headerlink" href="#generic-amplification-factors" title="Permalink to this headline">¶</a></h2>
 <p>The ShakeMap generic amplification factor facility supports the inclusion
 of linear amplifications that are not otherwise supported (by, for example,
 Vs30-based
@@ -648,433 +773,6 @@ and above the shortest and longest periods, respectively. If the interpolation
 between periods is undesirable, then grids matching the output IMTs should be
 provided. Etc.</p>
 </div>
-<div class="section" id="stationlist-geojson">
-<h2>2.5.7. Stationlist GeoJSON<a class="headerlink" href="#stationlist-geojson" title="Permalink to this headline">¶</a></h2>
-<p>The <em>stationlist.json</em> file is a GeoJSON file describing the seismic station and
-macroseismic data that comprised the input to the ShakeMap. In addition, the file
-will contain predicted values and uncertainties for the station location from the
-selected GMPE, as well as the computed bias. The file also contains distance metrics,
-and amplitudes converted from PGM to MMI or from MMI to PGM.</p>
-<p>To distinguish between seismic and macroseismic “stations”, each station feature has,
-within its <strong>properties</strong> section, and attribute <strong>station_type</strong>. The possible values are
-<strong>seismic</strong> (for seismic instruments) and <strong>macroseismic</strong> (for “Did You Feel It?” or other
-macroseismic observations.</p>
-<p>The file consists of a list of “features,” each representing one seismic station or
-macroseismic observation. A typical seismic station feature will have a structure
-like this:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;NC.J051&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="o">-</span><span class="mf">122.007835</span><span class="p">,</span>
-      <span class="mf">37.312901</span>
-    <span class="p">],</span>
-    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Point&quot;</span>
-  <span class="p">},</span>
-  <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;network&quot;</span><span class="p">:</span> <span class="s2">&quot;NC&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;intensity_flag&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;mmi_from_pgm&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="mf">0.89</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">3.75</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="mf">0.75</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">3.62</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="mf">0.82</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">3.19</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pgv&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="mf">0.63</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">3.43</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="mf">0.66</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">2.95</span>
-      <span class="p">}</span>
-    <span class="p">],</span>
-    <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="mf">104.211</span><span class="p">,</span>
-    <span class="s2">&quot;commType&quot;</span><span class="p">:</span> <span class="s2">&quot;UNK&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;intensity&quot;</span><span class="p">:</span> <span class="mf">3.4</span><span class="p">,</span>
-    <span class="s2">&quot;pgv&quot;</span><span class="p">:</span> <span class="mf">0.7679</span><span class="p">,</span>
-    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;NC&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;instrumentType&quot;</span><span class="p">:</span> <span class="s2">&quot;OBSERVED&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;station_type&quot;</span><span class="p">:</span> <span class="s2">&quot;seismic&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;NC.J051&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;So Tantau Av Cupertino&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;pga&quot;</span><span class="p">:</span> <span class="mf">0.4807</span><span class="p">,</span>
-    <span class="s2">&quot;intensity_stddev&quot;</span><span class="p">:</span> <span class="mf">0.63</span><span class="p">,</span>
-    <span class="s2">&quot;distances&quot;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="s2">&quot;ry0&quot;</span><span class="p">:</span> <span class="mf">103.951</span><span class="p">,</span>
-      <span class="s2">&quot;rrup&quot;</span><span class="p">:</span> <span class="mf">104.211</span><span class="p">,</span>
-      <span class="s2">&quot;rjb&quot;</span><span class="p">:</span> <span class="mf">104.208</span><span class="p">,</span>
-      <span class="s2">&quot;rx&quot;</span><span class="p">:</span> <span class="mf">9.298</span><span class="p">,</span>
-      <span class="s2">&quot;rhypo&quot;</span><span class="p">:</span> <span class="mf">104.433</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;channels&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;amplitudes&quot;</span><span class="p">:</span> <span class="p">[</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;cm/s&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pgv&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.7679</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.2444</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">1.1346</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.4807</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">1.1309</span>
-          <span class="p">}</span>
-        <span class="p">],</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;01.HNE&quot;</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;amplitudes&quot;</span><span class="p">:</span> <span class="p">[</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;cm/s&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pgv&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.329</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.2168</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.5174</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.2743</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.8392</span>
-          <span class="p">}</span>
-        <span class="p">],</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;01.HNZ&quot;</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;amplitudes&quot;</span><span class="p">:</span> <span class="p">[</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;cm/s&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pgv&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.5312</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.2124</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.7154</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.4429</span>
-          <span class="p">},</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">1.1233</span>
-          <span class="p">}</span>
-        <span class="p">],</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;01.HNN&quot;</span>
-      <span class="p">}</span>
-    <span class="p">],</span>
-    <span class="s2">&quot;predictions&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;cm/s&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.6356</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pgv&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_phi&quot;</span><span class="p">:</span> <span class="mf">0.5363</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.8747</span><span class="p">,</span>
-        <span class="s2">&quot;ln_bias&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.1347</span><span class="p">,</span>
-        <span class="s2">&quot;ln_tau&quot;</span><span class="p">:</span> <span class="mf">0.3412</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.7032</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_phi&quot;</span><span class="p">:</span> <span class="mf">0.5689</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">1.186</span><span class="p">,</span>
-        <span class="s2">&quot;ln_bias&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.7021</span><span class="p">,</span>
-        <span class="s2">&quot;ln_tau&quot;</span><span class="p">:</span> <span class="mf">0.4134</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.7337</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_phi&quot;</span><span class="p">:</span> <span class="mf">0.6198</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.1489</span><span class="p">,</span>
-        <span class="s2">&quot;ln_bias&quot;</span><span class="p">:</span> <span class="mf">0.4019</span><span class="p">,</span>
-        <span class="s2">&quot;ln_tau&quot;</span><span class="p">:</span> <span class="mf">0.3927</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.786</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_phi&quot;</span><span class="p">:</span> <span class="mf">0.6556</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">2.3163</span><span class="p">,</span>
-        <span class="s2">&quot;ln_bias&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.6296</span><span class="p">,</span>
-        <span class="s2">&quot;ln_tau&quot;</span><span class="p">:</span> <span class="mf">0.4335</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.7627</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_phi&quot;</span><span class="p">:</span> <span class="mf">0.6539</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">0.7873</span><span class="p">,</span>
-        <span class="s2">&quot;ln_bias&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.0214</span><span class="p">,</span>
-        <span class="s2">&quot;ln_tau&quot;</span><span class="p">:</span> <span class="mf">0.3925</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;tau&quot;</span><span class="p">:</span> <span class="mf">0.2178</span><span class="p">,</span>
-        <span class="s2">&quot;phi&quot;</span><span class="p">:</span> <span class="mf">0.717</span><span class="p">,</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;intensity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;bias&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.1209</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mmi&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">3.5145</span><span class="p">,</span>
-        <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="mf">0.7494</span>
-      <span class="p">}</span>
-    <span class="p">]</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The following features should be noted:</p>
-<ul class="simple">
-<li>The <strong>coordinates</strong> are given in longitude, latitude order.</li>
-<li>The units of the observed and predicted IMTs are provided; typically
-percent-g for accelerations and cm/s for velocity. The units of standard
-deviation and bias are in natural log units.</li>
-<li><strong>ln_tau</strong> is the lagarithm of the between-even standard deviarion, <strong>ln_phi</strong>
-is the logarithm of the within-even standard deviation, and <strong>ln_sigma</strong>
-is the logarithm of the total standard deviation.</li>
-<li>Standard deviations for MMI are linear and omit the ‘<a href="#id1"><span class="problematic" id="id2">ln_</span></a>’ prefix.</li>
-<li>If the <strong>flag</strong> attribute is “0” or the empty string, the amplitude is
-considered unflagged; any other value means the amplitude is flagged and
-therefore not included in the processing.</li>
-<li>The generic <strong>distance</strong> property is the same as <strong>rrup</strong> the rupture distance.</li>
-<li>The generic <strong>intensity</strong> property is the macroseismic intensity from the best
-available IMT.</li>
-<li>The <strong>mmi_from_pgm</strong> section contains the macroseismic intensity computed from
-the available IMTs (to the extent that the chosen GMICE is able to convert
-them).</li>
-<li>Floating point or integer values that cannot or were not determined will
-have the string value ‘null’.</li>
-</ul>
-<p>A typical macroseismic “station” feature will have the following structure:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
-  <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;DYFI.87&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Feature&quot;</span><span class="p">,</span>
-  <span class="s2">&quot;geometry&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;Point&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;coordinates&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="o">-</span><span class="mf">122.6963</span><span class="p">,</span>
-      <span class="mf">38.4474</span>
-    <span class="p">]</span>
-  <span class="p">},</span>
-  <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
-    <span class="s2">&quot;intensity&quot;</span><span class="p">:</span> <span class="mf">4.8</span><span class="p">,</span>
-    <span class="s2">&quot;predictions&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;intensity&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mmi&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="mf">1.0851</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">5.1036</span><span class="p">,</span>
-        <span class="s2">&quot;phi&quot;</span><span class="p">:</span> <span class="mf">0.9733</span><span class="p">,</span>
-        <span class="s2">&quot;tau&quot;</span><span class="p">:</span> <span class="mf">0.4796</span><span class="p">,</span>
-        <span class="s2">&quot;bias&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.4463</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_bias&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.1675</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">18.2415</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.7003</span><span class="p">,</span>
-        <span class="s2">&quot;ln_tau&quot;</span><span class="p">:</span> <span class="mf">0.3563</span><span class="p">,</span>
-        <span class="s2">&quot;ln_phi&quot;</span><span class="p">:</span> <span class="mf">0.6029</span><span class="p">,</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_bias&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.0512</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">6.0597</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.7585</span><span class="p">,</span>
-        <span class="s2">&quot;ln_tau&quot;</span><span class="p">:</span> <span class="mf">0.389</span><span class="p">,</span>
-        <span class="s2">&quot;ln_phi&quot;</span><span class="p">:</span> <span class="mf">0.6511</span><span class="p">,</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_bias&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.0083</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">1.0917</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.7376</span><span class="p">,</span>
-        <span class="s2">&quot;ln_tau&quot;</span><span class="p">:</span> <span class="mf">0.3964</span><span class="p">,</span>
-        <span class="s2">&quot;ln_phi&quot;</span><span class="p">:</span> <span class="mf">0.622</span><span class="p">,</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pgv&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_bias&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">0.0068</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">5.721</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.6437</span><span class="p">,</span>
-        <span class="s2">&quot;ln_tau&quot;</span><span class="p">:</span> <span class="mf">0.3495</span><span class="p">,</span>
-        <span class="s2">&quot;ln_phi&quot;</span><span class="p">:</span> <span class="mf">0.5406</span><span class="p">,</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;cm/s&quot;</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;ln_bias&quot;</span><span class="p">:</span> <span class="mf">0.0897</span><span class="p">,</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">7.5028</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.6602</span><span class="p">,</span>
-        <span class="s2">&quot;ln_tau&quot;</span><span class="p">:</span> <span class="mf">0.3775</span><span class="p">,</span>
-        <span class="s2">&quot;ln_phi&quot;</span><span class="p">:</span> <span class="mf">0.5416</span><span class="p">,</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
-      <span class="p">}</span>
-    <span class="p">],</span>
-    <span class="s2">&quot;distance&quot;</span><span class="p">:</span> <span class="mf">35.27</span><span class="p">,</span>
-    <span class="s2">&quot;pgv&quot;</span><span class="p">:</span> <span class="mf">4.5832</span><span class="p">,</span>
-    <span class="s2">&quot;pga&quot;</span><span class="p">:</span> <span class="mf">6.8063</span><span class="p">,</span>
-    <span class="s2">&quot;pgm_from_mmi&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">1.0441</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">1.4737</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(3.0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">4.7097</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">1.0822</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(1.0)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">4.5832</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.875</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pgv&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;cm/s&quot;</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">6.8063</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">0.8059</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;pga&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
-      <span class="p">},</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">14.9458</span><span class="p">,</span>
-        <span class="s2">&quot;ln_sigma&quot;</span><span class="p">:</span> <span class="mf">1.0131</span><span class="p">,</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;sa(0.3)&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;</span><span class="si">%g</span><span class="s2">&quot;</span>
-      <span class="p">}</span>
-    <span class="p">],</span>
-    <span class="s2">&quot;channels&quot;</span><span class="p">:</span> <span class="p">[</span>
-      <span class="p">{</span>
-        <span class="s2">&quot;amplitudes&quot;</span><span class="p">:</span> <span class="p">[</span>
-          <span class="p">{</span>
-            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mf">4.8</span><span class="p">,</span>
-            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mmi&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;flag&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;sigma&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-            <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;intensity&quot;</span>
-          <span class="p">}</span>
-        <span class="p">],</span>
-        <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;mmi&quot;</span>
-      <span class="p">}</span>
-    <span class="p">],</span>
-    <span class="s2">&quot;intensity_stddev&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
-    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;UTM:(10S 0526 4255 1000)&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;instrumentType&quot;</span><span class="p">:</span> <span class="s2">&quot;OBSERVED&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;commType&quot;</span><span class="p">:</span> <span class="s2">&quot;UNK&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;location&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;distances&quot;</span><span class="p">:</span> <span class="p">{</span>
-      <span class="s2">&quot;rrup&quot;</span><span class="p">:</span> <span class="mf">35.27</span><span class="p">,</span>
-      <span class="s2">&quot;ry0&quot;</span><span class="p">:</span> <span class="mf">20.571</span><span class="p">,</span>
-      <span class="s2">&quot;rjb&quot;</span><span class="p">:</span> <span class="mf">35.219</span><span class="p">,</span>
-      <span class="s2">&quot;rx&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mf">28.528</span><span class="p">,</span>
-      <span class="s2">&quot;rhypo&quot;</span><span class="p">:</span> <span class="mf">43.728</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;network&quot;</span><span class="p">:</span> <span class="s2">&quot;DYFI&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;intensity_flag&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;station_type&quot;</span><span class="p">:</span> <span class="s2">&quot;macroseismic&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;code&quot;</span><span class="p">:</span> <span class="s2">&quot;87&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;DYFI&quot;</span>
-  <span class="p">}</span>
-<span class="p">}</span>
-</pre></div>
-</div>
-<p>The attributes of the macroseismic station are similar to those of the
-seismic station (above), except:</p>
-<ul class="simple">
-<li>There will typically be only a single <strong>channel</strong> with a single <strong>amplitude</strong>
-element.</li>
-<li>The <strong>pgm_from_mmi</strong> section contains the output IMTs derived from MMI (to
-the extent that the GMICE will make those conversions).</li>
-<li>Small intensity values (i.e., those less than 4.0) are not converted to
-PGM (i.e., they will have the value ‘null’).</li>
-</ul>
-</div>
 </div>
 
 
@@ -1102,38 +800,41 @@ PGM (i.e., they will have the value ‘null’).</li>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="title_page.html">ShakeMap 4 Manual</a><ul class="current">
-<li class="toctree-l2 current"><a class="reference internal" href="index.html">Table of Contents</a><ul class="current">
-<li class="toctree-l3"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
-<li class="toctree-l3 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="tg_installation.html">2.1. Installation and Configuration</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_architecture.html">2.2. Software Architecture</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_queue.html">2.3. Queueing Events</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_processing.html">2.4. Data Processing</a></li>
-<li class="toctree-l4 current"><a class="current reference internal" href="#">2.5. Input Data Formats</a><ul>
-<li class="toctree-l5"><a class="reference internal" href="#event-xml-file">2.5.1. Event XML File</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#moment-xml-file">2.5.2. Moment XML File</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#shakemap-xml-data-file">2.5.3. ShakeMap XML Data File</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#source-text-file">2.5.4. Source Text File</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#rupture-geojson-file">2.5.5. Rupture GeoJson File</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#generic-amplification-factors">2.5.6. Generic Amplification Factors</a></li>
-<li class="toctree-l5"><a class="reference internal" href="#stationlist-geojson">2.5.7. Stationlist GeoJSON</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../sm4_index.html">ShakeMap v4 Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="title_page.html">ShakeMap 4 Manual</a><ul class="current">
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Table of Contents</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="introduction.html">1. Introduction</a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="technical_guide.html">2. Technical Guide</a><ul class="current">
+<li class="toctree-l5"><a class="reference internal" href="tg_installation.html">2.1. Installation and Configuration</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_architecture.html">2.2. Software Architecture</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_queue.html">2.3. Queueing Events</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_processing.html">2.4. Data Processing</a></li>
+<li class="toctree-l5 current"><a class="current reference internal" href="#">2.5. Input Data Formats</a><ul>
+<li class="toctree-l6"><a class="reference internal" href="#event-xml-file">2.5.1. Event XML File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#moment-xml-file">2.5.2. Moment XML File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#shakemap-xml-data-file">2.5.3. ShakeMap XML Data File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#shakemap-json-data-file">2.5.4. ShakeMap JSON Data File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#source-text-file">2.5.5. Source Text File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#rupture-geojson-file">2.5.6. Rupture GeoJson File</a></li>
+<li class="toctree-l6"><a class="reference internal" href="#generic-amplification-factors">2.5.7. Generic Amplification Factors</a></li>
 </ul>
 </li>
-<li class="toctree-l4"><a class="reference internal" href="tg_output_formats.html">2.6. Output Data Formats</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_verification.html">2.7. Verification</a></li>
-<li class="toctree-l4"><a class="reference internal" href="tg_contributing.html">2.8. Guidelines for Contributors</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_output_formats.html">2.6. Output Data Formats</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_verification.html">2.7. Verification</a></li>
+<li class="toctree-l5"><a class="reference internal" href="tg_contributing.html">2.8. Guidelines for Contributors</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>
-<li class="toctree-l3"><a class="reference internal" href="glossary.html">4. Glossary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="references.html">3. References &amp; Bibliography</a></li>
+<li class="toctree-l4"><a class="reference internal" href="glossary.html">4. Glossary</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../shakelib/shakelib.html">ShakeLib API</a></li>
+</ul>
+</li>
 </ul>
 
 

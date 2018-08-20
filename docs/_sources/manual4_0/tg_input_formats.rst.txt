@@ -4,6 +4,8 @@
 Input Data Formats
 ****************************
 
+.. _subsec-event-xml-file:
+
 Event XML File
 =============================
 
@@ -13,22 +15,24 @@ The earthquake origin information is contained in a simple XML file
 called *event.xml* that is contained in the event's *current*
 directory. An example file::
 
-  <earthquake id="us1000db5t" netid="us" network="USGS National Earthquake Information Center, PDE"
-  lat="38.7161" lon="69.9779" depth="5.0" mag="5.7" time="2018-03-29T22:54:12Z"
-  locstring="11km SE of Roghun, Tajikistan" mech="SS" reference="Smith, et. al. 2018"/>
+  <earthquake id="us1000db5t" netid="us" lat="38.7161" lon="69.9779"
+  depth="5.0" mag="5.7" locstring="11km SE of Roghun, Tajikistan"
+  network="USGS National Earthquake Information Center, PDE"
+  time="2018-03-29T22:54:12Z" mech="SS" reference="Smith, et. al. 2018"/>
 
 The attributes of the earthquake element are:
 
 +-----------------------+-------------------------------------------------------+
 | Field                 | Description                                           |
 +=======================+=======================================================+
-| id                    | A unique string, consisting of netid plus             |
-|                       | event ID.                                             |
+| id                    | A string, consisting of the event ID. This should be  |
+|                       | be unique for the network code **netid** (see below). |
 +-----------------------+-------------------------------------------------------+
 | netid                 | Usually a two character network code, but can be any  |
 |                       | string.                                               |
 +-----------------------+-------------------------------------------------------+
 | network               | Long description of the organization behind netid.    |
+|                       | This field is required, but may be the empty string   |
 +-----------------------+-------------------------------------------------------+
 | lat                   | Latitude at earthquake hypocenter.                    |
 +-----------------------+-------------------------------------------------------+
@@ -39,7 +43,7 @@ The attributes of the earthquake element are:
 | mag                   | Magnitude of earthquake.                              |
 +-----------------------+-------------------------------------------------------+
 | time                  | Time of earthquake origin, always UTC in              |
-|                       | YYYY-MM-DDTHH:MM:SSZ format.                          |
+|                       | YYYY-MM-DDTHH:MM:SS.fZ format.                        |
 +-----------------------+-------------------------------------------------------+
 | locstring             | String describing earthquake location.                |
 +-----------------------+-------------------------------------------------------+
@@ -49,9 +53,12 @@ The attributes of the earthquake element are:
 | reference             | (optional) Source for hypocenter information          |
 +-----------------------+-------------------------------------------------------+
 | productcode           | (optional) Used to distinguish between different      |
-|                       | ShakeMaps created for the same event (i.e., one map   |
+|                       | ShakeMaps created for the same event (e.g., one map   |
 |                       | showing the extent of shaking, and another zoomed     |
-|                       | into a city of interest.                              |
+|                       | into a city of interest). If the productcode is not   |
+|                       | supplied, it will be taken from the name of the       |
+|                       | data directory (which is also the "event_id" that is  |
+|                       | supplied to the **shake** program).                   |
 +-----------------------+-------------------------------------------------------+
 
 Moment XML File
@@ -74,55 +81,13 @@ These files are *optional*.
 
 To inform your ShakeMap with real data, either macroseismic intensity
 or instrumented accelerations and velocities, you may include any
-number of XML files ending in "*_dat.xml" in the event's *current*
+number of XML files ending in "\*_dat.xml" as well as one called
+"stationlist.xml" in the event's *current*
 directory. These files consists of a number of *elements*, with
 defined *attributes*.
 
-The *earthquake* element (optional) has the following attributes:
-
-+-------------+-----------------------------------------------------------------+
-| Attribute   | Description                                                     |
-+=============+=================================================================+
-| id          | The event id.                                                   |
-+-------------+-----------------------------------------------------------------+
-| created     | File creation time (Unix epoch -- seconds since Jan 1, 1970).   |
-+-------------+-----------------------------------------------------------------+
-| lat         | Latitude (in decimal degrees, negative in southern hemisphere). |
-+-------------+-----------------------------------------------------------------+
-| lon         | Longitude (in decimal degrees, negative in western hemisphere). |
-+-------------+-----------------------------------------------------------------+
-| depth       | Depth in km, positive down                                      |
-+-------------+-----------------------------------------------------------------+
-| locstring   | a free-form descriptive string of location relative to          |
-|             | landmarks                                                       |
-+-------------+-----------------------------------------------------------------+
-| mag         | Earthquake magnitude.                                           |
-+-------------+-----------------------------------------------------------------+
-| type        | A string specifying the rupture type; the accepted types are    |
-|             | RS, SS, NM, and ALL, for reverse slip, strike slip, normal,     |
-|             | and unspecified ruptures, respectively.                         |
-+-------------+-----------------------------------------------------------------+
-| year        | Year, 4 digit format.                                           |
-+-------------+-----------------------------------------------------------------+
-| month       | Month, 1-12.                                                    |
-+-------------+-----------------------------------------------------------------+
-| day         | Day, 1-31.                                                      |
-+-------------+-----------------------------------------------------------------+
-| hour        | Hour, 0-23.                                                     |
-+-------------+-----------------------------------------------------------------+
-| minute      | Minute, 0-59.                                                   |
-+-------------+-----------------------------------------------------------------+
-| second      | Second, 0-59.                                                   |
-+-------------+-----------------------------------------------------------------+
-| timezone    | Timezone abbreviation (i.e., GMT, PST, PDT).                    |
-+-------------+-----------------------------------------------------------------+
-
-Example earthquake element::
-  
-   <earthquake id="14000376" lat="34.2722" lon="-118.7530"
-   mag="3.6" year="2003" month="10" day="29" hour="23" minute="44"
-   second="48" timezone="GMT" depth="13.81" locstring="2.6 mi W of
-   Simi Valley, CA" created="1069292035" />
+The *earthquake* element (optional) is described above in the section
+:ref:`_subsec-event-xml-file`.
 
 Following the earthquake element is the *stationlist* element, which
 has a *created* attribute, which is the same as the one in the
@@ -180,19 +145,40 @@ psa10, and psa30 elements are empty but have the following attributes:
 +-------------+-----------------------------------------------------------------+
 | flag        | Flag indicating problematic data (optional).                    |
 +-------------+-----------------------------------------------------------------+
+| units       | (optional) See below.
++-------------+-----------------------------------------------------------------+
 
-The value attributes are expected to have units of:
+If the units are unspecifies, the value attributes are expected to have units of:
 
 +-------------+-----------------------------------------------------------------+
 | Attribute   | Units                                                           |
 +=============+=================================================================+
-| acc         | %g (i.e., percent of the earth’s nominal gravitational          |
+| acc, pga    | %g (i.e., percent of the earth’s nominal gravitational          |
 |             | acceleration).                                                  |
 +-------------+-----------------------------------------------------------------+
-| vel         | cm/s (centimeters per second).                                  |
+| vel, pgv    | cm/s (centimeters per second).                                  |
 +-------------+-----------------------------------------------------------------+
 | psa         | %g.                                                             |
 +-------------+-----------------------------------------------------------------+
+
+The **units** attribute may also be specified if the amplitudes are in
+logarithmic (natural) units:
+
++-------------+-----------------------------------------------------------------+
+| Attribute   | Units Designator                                                |
++=============+=================================================================+
+| acc, pga    | "ln(g)" (i.e., log of the earth’s nominal gravitational         |
+|             | acceleration).                                                  |
++-------------+-----------------------------------------------------------------+
+| vel, pgv    | "ln(cm/s)" (log of centimeters per second).                     |
++-------------+-----------------------------------------------------------------+
+| psa         | "ln(g)".                                                        |
++-------------+-----------------------------------------------------------------+
+
+The operator may also specify a standard deviations for "observations" that are
+the mean of a distribution. This standard deviation is specified in natural
+logarithmic units regardless of the units of the amplitudes themselves. The
+standard deviations are specified with the **ln_sigma** attribute.
 
 The flag attribute indicates problematic data. Any value other than
 “0” (zero) or “” (i.e., an empty string) will cause ShakeMap to reject
@@ -207,7 +193,7 @@ following flags are currently defined:
 +-------------+-----------------------------------------------------------------+
 | M           | Manually flagged (in grind.conf) by the ShakeMap operator.      |
 +-------------+-----------------------------------------------------------------+
-| G           | Amplitude clipped or below the instrument noise threshold.      |
+| G           | Glitch. Amplitude clipped or below instrument noise threshold.  |
 +-------------+-----------------------------------------------------------------+
 | I           | Incomplete (a data gap existed in the time window used to       |
 |             | calculate the amplitude).                                       |
@@ -276,26 +262,203 @@ An abbreviated example of a complete station data file::
   </stationlist>
 
 Intensity data uses the same format of input XML as other ground
-motion data, but uses two new attributes to the station tag: the
-intensity attribute should be set to the decimal intensity for the
-“station;” the netid attribute should be set to “MMI,” “CIIM,” “DYFI,”
+motion data, but uses three new attributes to the station tag: the
+**intensity** attribute should be set to the decimal intensity for the
+“station;” the **intensity_stddev** should specify the standard deviation
+of the intensity observation; the **intensity_flag** should specify the 
+flag (usually "0") of the observation (see flag table, above). Also the
+netid attribute should be set to “MMI,” “CIIM,” “DYFI,”
 or “INTENSITY” (all four are currently equivalent). If netid is set to
 one of these values, any amplitude data (i.e., data enclosed in a comp
-tag) will be ignored and grind will use the mmi2pgm function to derive
+tag) will be ignored and *model* will use the configured GMICE to derive
 the ground motions. Likewise, if netid is not one of these values, the
 intensity attribute will be ignored and grind will compute intensity
-using the pgm2mmi function.
+using the GMICE.
 
 Below is an example of a station tag that contains intensity information::
 
   <station code="91042" name="ZIP Code 91042 (Intensity VII, 38
   responses)" insttype="USGS (Did You Feel It?)" lat="34.282604"
   lon="-118.237943" source="USGS (Did You Feel It?)" netid="CIIM"
-  commtype="USGS (Did You Feel It?)" intensity="7.4">
+  commtype="USGS (Did You Feel It?)" intensity="7.4" intensity_stddev="0.3"
+  intensity_flag="0">
 
 The earthquake and stationlist XML files are combined in the GeoJSON
 output file provided to the public. 
 
+ShakeMap JSON Data File
+=======================
+
+ShakeMap will also accept a ShakeMap-produced GeoJSON *stationlist.json*
+file as input (see :ref:`subsec-stationlist-geojson`). Additional 
+JSON files of the form *\*_dat.json* file may also be included in the input.
+
+The information contained in the JSON input files is similar to that in
+the XML input files (see above), but is structured differently::
+
+    {
+      "type": "FeatureCollection",
+      "features": [
+        {
+          "geometry": {
+            "type": "Point",
+            "coordinates": [
+              143.157196,
+              42.014999
+            ]
+          },
+          "type": "Feature",
+          "id": "II.ERM",
+          "properties": {
+            "name": "Erimo, Hidaka, Hokkaido, Japan",
+            "code": "II.ERM",
+            "pgv": "null",
+            "commType": "UNK",
+            "vs30": 760,
+            "intensity": "null",
+            "network": "II",
+            "distance": 462.284,
+            "source": "II",
+            "channels": [
+              {
+                "amplitudes": [
+                  {
+                    "name": "sa(3.0)",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0009,
+                    "units": "%g"
+                  },
+                  {
+                    "name": "pgv",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0056,
+                    "units": "cm/s"
+                  },
+                  {
+                    "name": "sa(1.0)",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0051,
+                    "units": "%g"
+                  },
+                  {
+                    "name": "pga",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0118,
+                    "units": "%g"
+                  },
+                  {
+                    "name": "sa(0.3)",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0201,
+                    "units": "%g"
+                  }
+                ],
+                "name": "BHZ"
+              },
+              {
+                "amplitudes": [
+                  {
+                    "name": "sa(3.0)",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.001,
+                    "units": "%g"
+                  },
+                  {
+                    "name": "pgv",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0058,
+                    "units": "cm/s"
+                  },
+                  {
+                    "name": "sa(1.0)",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0069,
+                    "units": "%g"
+                  },
+                  {
+                    "name": "pga",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0146,
+                    "units": "%g"
+                  },
+                  {
+                    "name": "sa(0.3)",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.026,
+                    "units": "%g"
+                  }
+                ],
+                "name": "BH2"
+              },
+              {
+                "amplitudes": [
+                  {
+                    "name": "sa(3.0)",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0012,
+                    "units": "%g"
+                  },
+                  {
+                    "name": "pgv",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0073,
+                    "units": "cm/s"
+                  },
+                  {
+                    "name": "sa(1.0)",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0046,
+                    "units": "%g"
+                  },
+                  {
+                    "name": "pga",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0182,
+                    "units": "%g"
+                  },
+                  {
+                    "name": "sa(0.3)",
+                    "ln_sigma": 0,
+                    "flag": "0",
+                    "value": 0.0235,
+                    "units": "%g"
+                  }
+                ],
+                "name": "BH1"
+              }
+            ],
+            "station_type": "seismic",
+            "intensity_flag": "",
+            "location": "",
+            "intensity_stddev": "null",
+            "instrumentType": "OBSERVED",
+          }
+        },
+        <additional "features" (i.e., stations)>
+      ]
+    }
+
+Note that the names of the intensity measure types are lower case,
+and the spectral accelerations are of the form *sa(1.0)* where the
+number in paraentheses is the period. Additional fields may be present
+in the JSON file, but they will be ignored. Intensity observations
+should have a **netid** as specified for the XML files (see above),
+and should have a **channels** element that is an empty list
+(i.e., "channels: []").
 
 Source Text File
 ================
@@ -521,435 +684,4 @@ undesirable, the operator should include grids (e.g., of zeros) just below
 and above the shortest and longest periods, respectively. If the interpolation
 between periods is undesirable, then grids matching the output IMTs should be 
 provided. Etc.
-
-
-Stationlist GeoJSON
-=============================
-
-The *stationlist.json* file is a GeoJSON file describing the seismic station and
-macroseismic data that comprised the input to the ShakeMap. In addition, the file
-will contain predicted values and uncertainties for the station location from the 
-selected GMPE, as well as the computed bias. The file also contains distance metrics,
-and amplitudes converted from PGM to MMI or from MMI to PGM. 
-
-To distinguish between seismic and macroseismic "stations", each station feature has,
-within its **properties** section, and attribute **station_type**. The possible values are
-**seismic** (for seismic instruments) and **macroseismic** (for "Did You Feel It?" or other
-macroseismic observations.
-
-The file consists of a list of "features," each representing one seismic station or
-macroseismic observation. A typical seismic station feature will have a structure 
-like this::
-
-    {
-      "type": "Feature",
-      "id": "NC.J051",
-      "geometry": {
-        "coordinates": [
-          -122.007835,
-          37.312901
-        ],
-        "type": "Point"
-      },
-      "properties": {
-        "network": "NC",
-        "intensity_flag": "",
-        "mmi_from_pgm": [
-          {
-            "name": "sa(3.0)",
-            "sigma": 0.89,
-            "value": 3.75
-          },
-          {
-            "name": "sa(1.0)",
-            "sigma": 0.75,
-            "value": 3.62
-          },
-          {
-            "name": "sa(0.3)",
-            "sigma": 0.82,
-            "value": 3.19
-          },
-          {
-            "name": "pgv",
-            "sigma": 0.63,
-            "value": 3.43
-          },
-          {
-            "name": "pga",
-            "sigma": 0.66,
-            "value": 2.95
-          }
-        ],
-        "distance": 104.211,
-        "commType": "UNK",
-        "intensity": 3.4,
-        "pgv": 0.7679,
-        "source": "NC",
-        "instrumentType": "OBSERVED",
-        "station_type": "seismic",
-        "code": "NC.J051",
-        "name": "So Tantau Av Cupertino",
-        "pga": 0.4807,
-        "intensity_stddev": 0.63,
-        "distances": {
-          "ry0": 103.951,
-          "rrup": 104.211,
-          "rjb": 104.208,
-          "rx": 9.298,
-          "rhypo": 104.433
-        },
-        "location": "",
-        "channels": [
-          {
-            "amplitudes": [
-              {
-                "flag": "0",
-                "units": "cm/s",
-                "ln_sigma": 0,
-                "name": "pgv",
-                "value": 0.7679
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "sa(3.0)",
-                "value": 0.2444
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "sa(1.0)",
-                "value": 1.1346
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "pga",
-                "value": 0.4807
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "sa(0.3)",
-                "value": 1.1309
-              }
-            ],
-            "name": "01.HNE"
-          },
-          {
-            "amplitudes": [
-              {
-                "flag": "0",
-                "units": "cm/s",
-                "ln_sigma": 0,
-                "name": "pgv",
-                "value": 0.329
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "sa(3.0)",
-                "value": 0.2168
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "sa(1.0)",
-                "value": 0.5174
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "pga",
-                "value": 0.2743
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "sa(0.3)",
-                "value": 0.8392
-              }
-            ],
-            "name": "01.HNZ"
-          },
-          {
-            "amplitudes": [
-              {
-                "flag": "0",
-                "units": "cm/s",
-                "ln_sigma": 0,
-                "name": "pgv",
-                "value": 0.5312
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "sa(3.0)",
-                "value": 0.2124
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "sa(1.0)",
-                "value": 0.7154
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "pga",
-                "value": 0.4429
-              },
-              {
-                "flag": "0",
-                "units": "%g",
-                "ln_sigma": 0,
-                "name": "sa(0.3)",
-                "value": 1.1233
-              }
-            ],
-            "name": "01.HNN"
-          }
-        ],
-        "predictions": [
-          {
-            "units": "cm/s",
-            "ln_sigma": 0.6356,
-            "name": "pgv",
-            "ln_phi": 0.5363,
-            "value": 0.8747,
-            "ln_bias": -0.1347,
-            "ln_tau": 0.3412
-          },
-          {
-            "units": "%g",
-            "ln_sigma": 0.7032,
-            "name": "pga",
-            "ln_phi": 0.5689,
-            "value": 1.186,
-            "ln_bias": -0.7021,
-            "ln_tau": 0.4134
-          },
-          {
-            "units": "%g",
-            "ln_sigma": 0.7337,
-            "name": "sa(3.0)",
-            "ln_phi": 0.6198,
-            "value": 0.1489,
-            "ln_bias": 0.4019,
-            "ln_tau": 0.3927
-          },
-          {
-            "units": "%g",
-            "ln_sigma": 0.786,
-            "name": "sa(0.3)",
-            "ln_phi": 0.6556,
-            "value": 2.3163,
-            "ln_bias": -0.6296,
-            "ln_tau": 0.4335
-          },
-          {
-            "units": "%g",
-            "ln_sigma": 0.7627,
-            "name": "sa(1.0)",
-            "ln_phi": 0.6539,
-            "value": 0.7873,
-            "ln_bias": -0.0214,
-            "ln_tau": 0.3925
-          },
-          {
-            "tau": 0.2178,
-            "phi": 0.717,
-            "units": "intensity",
-            "bias": -0.1209,
-            "name": "mmi",
-            "value": 3.5145,
-            "sigma": 0.7494
-          }
-        ]
-      }
-    }
-
-
-The following features should be noted:
-
-- The **coordinates** are given in longitude, latitude order.
-- The units of the observed and predicted IMTs are provided; typically
-  percent-g for accelerations and cm/s for velocity. The units of standard
-  deviation and bias are in natural log units.
-- **ln_tau** is the lagarithm of the between-even standard deviarion, **ln_phi**
-  is the logarithm of the within-even standard deviation, and **ln_sigma**
-  is the logarithm of the total standard deviation.
-- Standard deviations for MMI are linear and omit the 'ln_' prefix.
-- If the **flag** attribute is "0" or the empty string, the amplitude is 
-  considered unflagged; any other value means the amplitude is flagged and
-  therefore not included in the processing.
-- The generic **distance** property is the same as **rrup** the rupture distance.
-- The generic **intensity** property is the macroseismic intensity from the best
-  available IMT.
-- The **mmi_from_pgm** section contains the macroseismic intensity computed from
-  the available IMTs (to the extent that the chosen GMICE is able to convert
-  them).
-- Floating point or integer values that cannot or were not determined will
-  have the string value 'null'.
-
-A typical macroseismic "station" feature will have the following structure::
-
-    {
-      "id": "DYFI.87",
-      "type": "Feature",
-      "geometry": {
-        "type": "Point",
-        "coordinates": [
-          -122.6963,
-          38.4474
-        ]
-      },
-      "properties": {
-        "intensity": 4.8,
-        "predictions": [
-          {
-            "units": "intensity",
-            "name": "mmi",
-            "sigma": 1.0851,
-            "value": 5.1036,
-            "phi": 0.9733,
-            "tau": 0.4796,
-            "bias": -0.4463
-          },
-          {
-            "name": "sa(0.3)",
-            "ln_bias": -0.1675,
-            "value": 18.2415,
-            "ln_sigma": 0.7003,
-            "ln_tau": 0.3563,
-            "ln_phi": 0.6029,
-            "units": "%g"
-          },
-          {
-            "name": "sa(1.0)",
-            "ln_bias": -0.0512,
-            "value": 6.0597,
-            "ln_sigma": 0.7585,
-            "ln_tau": 0.389,
-            "ln_phi": 0.6511,
-            "units": "%g"
-          },
-          {
-            "name": "sa(3.0)",
-            "ln_bias": -0.0083,
-            "value": 1.0917,
-            "ln_sigma": 0.7376,
-            "ln_tau": 0.3964,
-            "ln_phi": 0.622,
-            "units": "%g"
-          },
-          {
-            "name": "pgv",
-            "ln_bias": -0.0068,
-            "value": 5.721,
-            "ln_sigma": 0.6437,
-            "ln_tau": 0.3495,
-            "ln_phi": 0.5406,
-            "units": "cm/s"
-          },
-          {
-            "name": "pga",
-            "ln_bias": 0.0897,
-            "value": 7.5028,
-            "ln_sigma": 0.6602,
-            "ln_tau": 0.3775,
-            "ln_phi": 0.5416,
-            "units": "%g"
-          }
-        ],
-        "distance": 35.27,
-        "pgv": 4.5832,
-        "pga": 6.8063,
-        "pgm_from_mmi": [
-          {
-            "value": 1.0441,
-            "ln_sigma": 1.4737,
-            "name": "sa(3.0)",
-            "units": "%g"
-          },
-          {
-            "value": 4.7097,
-            "ln_sigma": 1.0822,
-            "name": "sa(1.0)",
-            "units": "%g"
-          },
-          {
-            "value": 4.5832,
-            "ln_sigma": 0.875,
-            "name": "pgv",
-            "units": "cm/s"
-          },
-          {
-            "value": 6.8063,
-            "ln_sigma": 0.8059,
-            "name": "pga",
-            "units": "%g"
-          },
-          {
-            "value": 14.9458,
-            "ln_sigma": 1.0131,
-            "name": "sa(0.3)",
-            "units": "%g"
-          }
-        ],
-        "channels": [
-          {
-            "amplitudes": [
-              {
-                "value": 4.8,
-                "name": "mmi",
-                "flag": "0",
-                "sigma": 0,
-                "units": "intensity"
-              }
-            ],
-            "name": "mmi"
-          }
-        ],
-        "intensity_stddev": 0.3,
-        "name": "UTM:(10S 0526 4255 1000)",
-        "instrumentType": "OBSERVED",
-        "commType": "UNK",
-        "location": "",
-        "distances": {
-          "rrup": 35.27,
-          "ry0": 20.571,
-          "rjb": 35.219,
-          "rx": -28.528,
-          "rhypo": 43.728
-        },
-        "network": "DYFI",
-        "intensity_flag": "",
-        "station_type": "macroseismic",
-        "code": "87",
-        "source": "DYFI"
-      }
-    }
-
-The attributes of the macroseismic station are similar to those of the
-seismic station (above), except:
-
-- There will typically be only a single **channel** with a single **amplitude**
-  element.
-- The **pgm_from_mmi** section contains the output IMTs derived from MMI (to 
-  the extent that the GMICE will make those conversions).
-- Small intensity values (i.e., those less than 4.0) are not converted to
-  PGM (i.e., they will have the value 'null').
 

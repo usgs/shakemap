@@ -224,3 +224,437 @@ Matlab developers can use the function *read_shake_data.m*, which is included in
 the repository for ShakeMap here: https://github.com/usgs/shakemap/blob/master/contrib/read_shakemap_data.m
 
 
+.. _subsec-stationlist-geojson:
+
+Stationlist GeoJSON
+=============================
+
+The *stationlist.json* file is a GeoJSON file describing the seismic station and
+macroseismic data that comprised the input to the ShakeMap. It is contained within
+*shake_result.hdf* and may be extracted into the *products* directory with the
+**stations** module. In addition to the input station data, the file
+will contain predicted values and uncertainties for the station location from the 
+selected GMPE, as well as the computed bias. The file also contains distance metrics,
+and amplitudes converted from PGM to MMI or from MMI to PGM. 
+
+To distinguish between seismic and macroseismic "stations", each station feature has,
+within its **properties** section, and attribute **station_type**. The possible values are
+**seismic** (for seismic instruments) and **macroseismic** (for "Did You Feel It?" or other
+macroseismic observations.
+
+The file consists of a list of "features," each representing one seismic station or
+macroseismic observation. A typical seismic station feature will have a structure 
+like this::
+
+    {
+      "type": "Feature",
+      "id": "NC.J051",
+      "geometry": {
+        "coordinates": [
+          -122.007835,
+          37.312901
+        ],
+        "type": "Point"
+      },
+      "properties": {
+        "network": "NC",
+        "intensity_flag": "",
+        "mmi_from_pgm": [
+          {
+            "name": "sa(3.0)",
+            "sigma": 0.89,
+            "value": 3.75
+          },
+          {
+            "name": "sa(1.0)",
+            "sigma": 0.75,
+            "value": 3.62
+          },
+          {
+            "name": "sa(0.3)",
+            "sigma": 0.82,
+            "value": 3.19
+          },
+          {
+            "name": "pgv",
+            "sigma": 0.63,
+            "value": 3.43
+          },
+          {
+            "name": "pga",
+            "sigma": 0.66,
+            "value": 2.95
+          }
+        ],
+        "distance": 104.211,
+        "commType": "UNK",
+        "intensity": 3.4,
+        "pgv": 0.7679,
+        "source": "NC",
+        "instrumentType": "OBSERVED",
+        "station_type": "seismic",
+        "code": "NC.J051",
+        "name": "So Tantau Av Cupertino",
+        "pga": 0.4807,
+        "intensity_stddev": 0.63,
+        "distances": {
+          "ry0": 103.951,
+          "rrup": 104.211,
+          "rjb": 104.208,
+          "rx": 9.298,
+          "rhypo": 104.433
+        },
+        "location": "",
+        "channels": [
+          {
+            "amplitudes": [
+              {
+                "flag": "0",
+                "units": "cm/s",
+                "ln_sigma": 0,
+                "name": "pgv",
+                "value": 0.7679
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "sa(3.0)",
+                "value": 0.2444
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "sa(1.0)",
+                "value": 1.1346
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "pga",
+                "value": 0.4807
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "sa(0.3)",
+                "value": 1.1309
+              }
+            ],
+            "name": "01.HNE"
+          },
+          {
+            "amplitudes": [
+              {
+                "flag": "0",
+                "units": "cm/s",
+                "ln_sigma": 0,
+                "name": "pgv",
+                "value": 0.329
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "sa(3.0)",
+                "value": 0.2168
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "sa(1.0)",
+                "value": 0.5174
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "pga",
+                "value": 0.2743
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "sa(0.3)",
+                "value": 0.8392
+              }
+            ],
+            "name": "01.HNZ"
+          },
+          {
+            "amplitudes": [
+              {
+                "flag": "0",
+                "units": "cm/s",
+                "ln_sigma": 0,
+                "name": "pgv",
+                "value": 0.5312
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "sa(3.0)",
+                "value": 0.2124
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "sa(1.0)",
+                "value": 0.7154
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "pga",
+                "value": 0.4429
+              },
+              {
+                "flag": "0",
+                "units": "%g",
+                "ln_sigma": 0,
+                "name": "sa(0.3)",
+                "value": 1.1233
+              }
+            ],
+            "name": "01.HNN"
+          }
+        ],
+        "predictions": [
+          {
+            "units": "cm/s",
+            "ln_sigma": 0.6356,
+            "name": "pgv",
+            "ln_phi": 0.5363,
+            "value": 0.8747,
+            "ln_bias": -0.1347,
+            "ln_tau": 0.3412
+          },
+          {
+            "units": "%g",
+            "ln_sigma": 0.7032,
+            "name": "pga",
+            "ln_phi": 0.5689,
+            "value": 1.186,
+            "ln_bias": -0.7021,
+            "ln_tau": 0.4134
+          },
+          {
+            "units": "%g",
+            "ln_sigma": 0.7337,
+            "name": "sa(3.0)",
+            "ln_phi": 0.6198,
+            "value": 0.1489,
+            "ln_bias": 0.4019,
+            "ln_tau": 0.3927
+          },
+          {
+            "units": "%g",
+            "ln_sigma": 0.786,
+            "name": "sa(0.3)",
+            "ln_phi": 0.6556,
+            "value": 2.3163,
+            "ln_bias": -0.6296,
+            "ln_tau": 0.4335
+          },
+          {
+            "units": "%g",
+            "ln_sigma": 0.7627,
+            "name": "sa(1.0)",
+            "ln_phi": 0.6539,
+            "value": 0.7873,
+            "ln_bias": -0.0214,
+            "ln_tau": 0.3925
+          },
+          {
+            "tau": 0.2178,
+            "phi": 0.717,
+            "units": "intensity",
+            "bias": -0.1209,
+            "name": "mmi",
+            "value": 3.5145,
+            "sigma": 0.7494
+          }
+        ]
+      }
+    }
+
+
+The following features should be noted:
+
+- The **coordinates** are given in longitude, latitude order.
+- The units of the observed and predicted IMTs are provided; typically
+  percent-g for accelerations and cm/s for velocity. The units of standard
+  deviation and bias are in natural log units.
+- **ln_tau** is the lagarithm of the between-even standard deviarion, **ln_phi**
+  is the logarithm of the within-even standard deviation, and **ln_sigma**
+  is the logarithm of the total standard deviation.
+- Standard deviations for MMI are linear and omit the 'ln_' prefix.
+- If the **flag** attribute is "0" or the empty string, the amplitude is 
+  considered unflagged; any other value means the amplitude is flagged and
+  therefore not included in the processing.
+- The generic **distance** property is the same as **rrup** the rupture distance.
+- The generic **intensity** property is the macroseismic intensity from the best
+  available IMT.
+- The **mmi_from_pgm** section contains the macroseismic intensity computed from
+  the available IMTs (to the extent that the chosen GMICE is able to convert
+  them).
+- Floating point or integer values that cannot or were not determined will
+  have the string value 'null'.
+
+A typical macroseismic "station" feature will have the following structure::
+
+    {
+      "id": "DYFI.87",
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -122.6963,
+          38.4474
+        ]
+      },
+      "properties": {
+        "intensity": 4.8,
+        "predictions": [
+          {
+            "units": "intensity",
+            "name": "mmi",
+            "sigma": 1.0851,
+            "value": 5.1036,
+            "phi": 0.9733,
+            "tau": 0.4796,
+            "bias": -0.4463
+          },
+          {
+            "name": "sa(0.3)",
+            "ln_bias": -0.1675,
+            "value": 18.2415,
+            "ln_sigma": 0.7003,
+            "ln_tau": 0.3563,
+            "ln_phi": 0.6029,
+            "units": "%g"
+          },
+          {
+            "name": "sa(1.0)",
+            "ln_bias": -0.0512,
+            "value": 6.0597,
+            "ln_sigma": 0.7585,
+            "ln_tau": 0.389,
+            "ln_phi": 0.6511,
+            "units": "%g"
+          },
+          {
+            "name": "sa(3.0)",
+            "ln_bias": -0.0083,
+            "value": 1.0917,
+            "ln_sigma": 0.7376,
+            "ln_tau": 0.3964,
+            "ln_phi": 0.622,
+            "units": "%g"
+          },
+          {
+            "name": "pgv",
+            "ln_bias": -0.0068,
+            "value": 5.721,
+            "ln_sigma": 0.6437,
+            "ln_tau": 0.3495,
+            "ln_phi": 0.5406,
+            "units": "cm/s"
+          },
+          {
+            "name": "pga",
+            "ln_bias": 0.0897,
+            "value": 7.5028,
+            "ln_sigma": 0.6602,
+            "ln_tau": 0.3775,
+            "ln_phi": 0.5416,
+            "units": "%g"
+          }
+        ],
+        "distance": 35.27,
+        "pgv": 4.5832,
+        "pga": 6.8063,
+        "pgm_from_mmi": [
+          {
+            "value": 1.0441,
+            "ln_sigma": 1.4737,
+            "name": "sa(3.0)",
+            "units": "%g"
+          },
+          {
+            "value": 4.7097,
+            "ln_sigma": 1.0822,
+            "name": "sa(1.0)",
+            "units": "%g"
+          },
+          {
+            "value": 4.5832,
+            "ln_sigma": 0.875,
+            "name": "pgv",
+            "units": "cm/s"
+          },
+          {
+            "value": 6.8063,
+            "ln_sigma": 0.8059,
+            "name": "pga",
+            "units": "%g"
+          },
+          {
+            "value": 14.9458,
+            "ln_sigma": 1.0131,
+            "name": "sa(0.3)",
+            "units": "%g"
+          }
+        ],
+        "channels": [
+          {
+            "amplitudes": [
+              {
+                "value": 4.8,
+                "name": "mmi",
+                "flag": "0",
+                "sigma": 0,
+                "units": "intensity"
+              }
+            ],
+            "name": "mmi"
+          }
+        ],
+        "intensity_stddev": 0.3,
+        "name": "UTM:(10S 0526 4255 1000)",
+        "instrumentType": "OBSERVED",
+        "commType": "UNK",
+        "location": "",
+        "distances": {
+          "rrup": 35.27,
+          "ry0": 20.571,
+          "rjb": 35.219,
+          "rx": -28.528,
+          "rhypo": 43.728
+        },
+        "network": "DYFI",
+        "intensity_flag": "",
+        "station_type": "macroseismic",
+        "code": "87",
+        "source": "DYFI"
+      }
+    }
+
+The attributes of the macroseismic station are similar to those of the
+seismic station (above), except:
+
+- There will typically be only a single **channel** with a single **amplitude**
+  element.
+- The **pgm_from_mmi** section contains the output IMTs derived from MMI (to 
+  the extent that the GMICE will make those conversions).
+- Small intensity values (i.e., those less than 4.0) are not converted to
+  PGM (i.e., they will have the value 'null').
+
