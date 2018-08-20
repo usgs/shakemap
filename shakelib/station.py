@@ -275,7 +275,7 @@ class StationList(object):
                 chan_names = []
                 for comp in feature['properties']['channels']:
                     chan_names.append(comp['name'])
-                orients = self._getOrientationSet(chan_names)
+                orients = _getOrientationSet(chan_names)
                 #
                 # Now insert the amps into the database
                 #
@@ -541,8 +541,7 @@ class StationList(object):
             for original_channel, cdict in comp_dict.items():
                 pgm_dict = cdict['amps']
                 orientation = cdict['attrs'].get('orientation', None)
-                orientation = self._getOrientation(original_channel,
-                                                   orientation)
+                orientation = _getOrientation(original_channel, orientation)
                 for imt_type, imt_dict in pgm_dict.items():
                     if (instrumented == 0) and (imt_type != 'MMI'):
                         continue
@@ -712,70 +711,6 @@ class StationList(object):
                 df[this_row[1] + '_sd'][rowidx] = stddev
 
         return df, myimts
-
-    def _getOrientation(self, orig_channel, orient):
-        """
-        Return a character representing the orientation of a channel.
-
-        Args:
-            orig_channel (string):
-                String representing the seed channel (e.g. 'HNZ'). The
-                final character is assumed to be the (uppercase) orientation.
-            orient (str or None):
-                Gives the orientation of the channel, overriding channel
-                codes that end in numbers. Must be one of 'h' (horizontal)
-                or 'v' (vertical), or None if the orientation has not been
-                explicitly specified in the "comp" element.
-
-        Returns:
-            Character representing the channel orientation. One of 'N',
-            'E', 'Z', 'H' (for horizontal), or 'U' (for unknown).
-        """
-        if orig_channel == 'mmi' or orig_channel == 'DERIVED':
-            orientation = 'H'           # mmi is arbitrarily horizontal
-        elif orig_channel[-1] in ('N', 'E', 'Z'):
-            orientation = orig_channel[-1]
-        elif orig_channel == "UNK":   # Channel is "UNK"; assume horizontal
-            orientation = 'H'
-        elif orig_channel == 'H1' or orig_channel == 'H2':
-            orientation = 'H'
-        elif orig_channel[-1].isdigit():
-            if orient == 'h':
-                orientation = 'H'
-            elif orient == 'v':
-                orientation = 'Z'
-            else:
-                orientation = 'U'
-        else:
-            orientation = 'U'  # this is unknown
-        return orientation
-
-    def _getOrientationSet(self, chan_names):
-        """
-        Return a characters representing the orientation of a set of
-        channels from a single station.
-
-        Args:
-            chan_names (list):
-                List of strings representing the seed channels (e.g. 'HNZ').
-                The final character is assumed to be the (uppercase)
-                orientation.
-
-        Returns:
-            Character representing the channel orientation. One of 'N',
-            'E', 'Z', 'H' (for horizontal), or 'U' (for unknown).
-        """
-        if len(chan_names) == 3:
-            term_chars = [chan_names[0][-1], chan_names[1][-1],
-                          chan_names[2][-1]]
-            if '1' in term_chars and 'Z' in term_chars:
-                orientations = [(lambda x: 'V' if x == 'Z' else 'H')(x)
-                                for x in term_chars]
-                return orientations
-        orientations = []
-        for name in chan_names:
-            orientations.append(self._getOrientation(name, None))
-        return orientations
 
     def _fixOrientations(self):
         """
@@ -992,3 +927,68 @@ def get_imt_period(imt):
 
     p = re.search(r'(?<=psa)\d+', imt)
     return float(p.group(0)[:-1] + '.' + p.group(0)[-1])
+
+
+def _getOrientation(orig_channel, orient):
+    """
+    Return a character representing the orientation of a channel.
+
+    Args:
+        orig_channel (string):
+            String representing the seed channel (e.g. 'HNZ'). The
+            final character is assumed to be the (uppercase) orientation.
+        orient (str or None):
+            Gives the orientation of the channel, overriding channel
+            codes that end in numbers. Must be one of 'h' (horizontal)
+            or 'v' (vertical), or None if the orientation has not been
+            explicitly specified in the "comp" element.
+
+    Returns:
+        Character representing the channel orientation. One of 'N',
+        'E', 'Z', 'H' (for horizontal), or 'U' (for unknown).
+    """
+    if orig_channel == 'mmi' or orig_channel == 'DERIVED':
+        orientation = 'H'           # mmi is arbitrarily horizontal
+    elif orig_channel[-1] in ('N', 'E', 'Z'):
+        orientation = orig_channel[-1]
+    elif orig_channel == "UNK":   # Channel is "UNK"; assume horizontal
+        orientation = 'H'
+    elif orig_channel == 'H1' or orig_channel == 'H2':
+        orientation = 'H'
+    elif orig_channel[-1].isdigit():
+        if orient == 'h':
+            orientation = 'H'
+        elif orient == 'v':
+            orientation = 'Z'
+        else:
+            orientation = 'U'
+    else:
+        orientation = 'U'  # this is unknown
+    return orientation
+
+
+def _getOrientationSet(chan_names):
+    """
+    Return a characters representing the orientation of a set of
+    channels from a single station.
+
+    Args:
+        chan_names (list):
+            List of strings representing the seed channels (e.g. 'HNZ').
+            The final character is assumed to be the (uppercase)
+            orientation.
+
+    Returns:
+        Character representing the channel orientation. One of 'N',
+        'E', 'Z', 'H' (for horizontal), or 'U' (for unknown).
+    """
+    if len(chan_names) == 3:
+        term_chars = [chan_names[0][-1], chan_names[1][-1], chan_names[2][-1]]
+        if '1' in term_chars and 'Z' in term_chars:
+            orientations = [(lambda x: 'V' if x == 'Z' else 'H')(x)
+                            for x in term_chars]
+            return orientations
+    orientations = []
+    for name in chan_names:
+        orientations.append(_getOrientation(name, None))
+    return orientations

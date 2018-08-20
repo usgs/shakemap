@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
-    <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script type="text/javascript" src="../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
@@ -39,6 +39,7 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span>
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">json</span>
 
 <span class="c1"># third party imports</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -133,43 +134,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
-<span class="c1">#    def _load_features(self, xmlfile):</span>
-        <span class="c1"># each station is a feature in a geojson file</span>
-        <span class="c1">#        tree = ET.parse(xmlfile)</span>
-        <span class="c1">#        root = tree.getroot()</span>
-        <span class="c1">#        imt_translate = {}</span>
-        <span class="c1">#        for sl in root.iter(&#39;stationlist&#39;):</span>
-        <span class="c1">#            for station in sl:</span>
-        <span class="c1">#                feature = {&#39;type&#39;:&#39;Feature&#39;}</span>
-        <span class="c1">#                netid = station.attrib[&#39;netid&#39;]</span>
-        <span class="c1">#                code = station.attrib[&#39;code&#39;]</span>
-        <span class="c1">#                feature[&#39;id&#39;] = &#39;%s.%s&#39; % (netid,code)</span>
-        <span class="c1">#                lat = code = float(station.attrib[&#39;lat&#39;])</span>
-        <span class="c1">#                lon = code = float(station.attrib[&#39;lon&#39;])</span>
-        <span class="c1">#                feature[&#39;geometry&#39;] = \</span>
-        <span class="c1">#                    {&#39;type&#39;:&#39;Point&#39;,&#39;coordinates&#39;:[lon,lat]}</span>
-        <span class="c1">#                properties = {}</span>
-        <span class="c1">#                properties[&#39;name&#39;] = station.attrib[&#39;name&#39;]</span>
-        <span class="c1">#                properties[&#39;intensity_flag&#39;] = station.attrib[&#39;&#39;]#??</span>
-        <span class="c1">#                properties[&#39;distance&#39;] = \</span>
-        <span class="c1">#                    float(station.attrib[&#39;distance&#39;])</span>
-        <span class="c1">#                properties[&#39;location&#39;] = station.attrib[&#39;loc&#39;]</span>
-        <span class="c1">#                properties[&#39;code&#39;] = station.attrib[&#39;code&#39;]</span>
-        <span class="c1">#                properties[&#39;commType&#39;] = station.attrib[&#39;commtype&#39;]</span>
-        <span class="c1">#                properties[&#39;source&#39;] = station.attrib[&#39;source&#39;]</span>
-        <span class="c1">#                properties[&#39;network&#39;] = station.attrib[&#39;netid&#39;]</span>
-        <span class="c1">#                properties[&#39;instrumentType&#39;] = \</span>
-        <span class="c1">#                    station.attrib[&#39;insttype&#39;]</span>
-        <span class="c1">#                properties[&#39;intensity&#39;] = \</span>
-        <span class="c1">#                    float(station.attrib[&#39;intensity&#39;])</span>
-        <span class="c1">#                channels = []</span>
-        <span class="c1">#                for comp in station:</span>
-        <span class="c1">#                    channel = {&#39;name&#39;:comp.attrib[&#39;name&#39;]}</span>
-        <span class="c1">#                    for component in comp:</span>
-        <span class="c1">#                        pgmdict, imtset = self._getGroundMotions(</span>
-        <span class="c1">#                            component, imt_translate)</span>
-<span class="c1">#        pass</span>
-
 <div class="viewcode-block" id="StationList.loadFromSQL"><a class="viewcode-back" href="../../shakelib/shakelib.station.html#shakelib.station.StationList.loadFromSQL">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">loadFromSQL</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">sql</span><span class="p">,</span> <span class="n">dbfile</span><span class="o">=</span><span class="s1">&#39;:memory:&#39;</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -205,8 +169,49 @@
 
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">iterdump</span><span class="p">()))</span></div>
 
-<div class="viewcode-block" id="StationList.loadFromXML"><a class="viewcode-back" href="../../shakelib/shakelib.station.html#shakelib.station.StationList.loadFromXML">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">loadFromXML</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">xmlfiles</span><span class="p">,</span> <span class="n">dbfile</span><span class="o">=</span><span class="s1">&#39;:memory:&#39;</span><span class="p">):</span>
+<div class="viewcode-block" id="StationList.loadFromFiles"><a class="viewcode-back" href="../../shakelib/shakelib.station.html#shakelib.station.StationList.loadFromFiles">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">loadFromFiles</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filelist</span><span class="p">,</span> <span class="n">dbfile</span><span class="o">=</span><span class="s1">&#39;:memory:&#39;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a StationList object by reading one or more ShakeMap XML or</span>
+<span class="sd">        JSON input files.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filelist (sequence of str):</span>
+<span class="sd">                Sequence of ShakeMap XML and/or JSON input files to read.</span>
+<span class="sd">            dbfile (str):</span>
+<span class="sd">                Path to a file into which to write the SQLite database.</span>
+<span class="sd">                The default is &#39;:memory:&#39; for an in-memory database.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            :class:`StationList` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Create the database and tables</span>
+        <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_createTables</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">addData</span><span class="p">(</span><span class="n">filelist</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="StationList.addData"><a class="viewcode-back" href="../../shakelib/shakelib.station.html#shakelib.station.StationList.addData">[docs]</a>    <span class="k">def</span> <span class="nf">addData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filelist</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add data from XML or JSON files to the existing StationList.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            filelist:</span>
+<span class="sd">                A list of ShakeMap XML or JSON input files.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            nothing: Nothing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">jsonfiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">filelist</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.json&#39;</span><span class="p">)]</span>
+        <span class="n">xmlfiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">filelist</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.xml&#39;</span><span class="p">)]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">jsonfiles</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loadFromJSON</span><span class="p">(</span><span class="n">jsonfiles</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xmlfiles</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_loadFromXML</span><span class="p">(</span><span class="n">xmlfiles</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+    <span class="k">def</span> <span class="nf">_loadFromXML</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmlfiles</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Create a StationList object by reading one or more ShakeMap XML input</span>
 <span class="sd">        files.</span>
@@ -214,19 +219,170 @@
 <span class="sd">        Args:</span>
 <span class="sd">            xmlfiles (sequence of str):</span>
 <span class="sd">                Sequence of ShakeMap XML input files to read.</span>
-<span class="sd">            dbfile (str):</span>
-<span class="sd">                Path to a file into which to write the SQLite database.</span>
-<span class="sd">                The default is &#39;:memory:&#39; for an in-memory database.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            :class:`StationList` object</span>
-
+<span class="sd">            nothing: Nothing.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Create the database and tables</span>
-        <span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">dbfile</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
-        <span class="bp">self</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">db</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_createTables</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">addData</span><span class="p">(</span><span class="n">xmlfiles</span><span class="p">)</span></div>
+        <span class="c1"># Parse the xml into a dictionary</span>
+        <span class="n">stationdict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">imtset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">xmlfile</span> <span class="ow">in</span> <span class="n">xmlfiles</span><span class="p">:</span>
+            <span class="n">stationdict</span><span class="p">,</span> <span class="n">ims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_station</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="n">stationdict</span><span class="p">)</span>
+            <span class="n">imtset</span> <span class="o">|=</span> <span class="n">ims</span>
+        <span class="c1"># fill the database and create the object from it</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_loadFromDict</span><span class="p">(</span><span class="n">stationdict</span><span class="p">,</span> <span class="n">imtset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_fixOrientations</span><span class="p">()</span>
+        <span class="k">return</span>
+
+    <span class="k">def</span> <span class="nf">_loadFromJSON</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">jsonfiles</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a StationList object by reading one or more ShakeMap JSON</span>
+<span class="sd">        data files.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            jsonfiles (sequence of str):</span>
+<span class="sd">                Sequence of ShakeMap JSON data files to read.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            nothing: Nothing.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1">#</span>
+        <span class="c1"># Get the station codes for all the stations in the db</span>
+        <span class="c1">#</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;SELECT id FROM station&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">sta_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">z</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">z</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()])</span>
+
+        <span class="n">orig_imt_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">getIMTtypes</span><span class="p">()</span>
+        <span class="n">imt_set</span> <span class="o">=</span> <span class="n">orig_imt_set</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="n">amp_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">station_rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">amp_rows</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">jfile</span> <span class="ow">in</span> <span class="n">jsonfiles</span><span class="p">:</span>
+            <span class="n">jfp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">jfile</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+            <span class="n">stas</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">jfp</span><span class="p">)</span>
+            <span class="n">jfp</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">stas</span><span class="p">[</span><span class="s1">&#39;type&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;FeatureCollection&#39;</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> is not a ShakeMap JSON stationlist, skipping&#39;</span>
+                             <span class="o">%</span> <span class="n">jfile</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">stas</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]:</span>
+                <span class="n">sta_id</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">sta_id</span> <span class="ow">in</span> <span class="n">sta_set</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">sta_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">sta_id</span><span class="p">)</span>
+                <span class="n">lon</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">lat</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+                <span class="n">netid</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;network&#39;</span><span class="p">]</span>
+                <span class="n">code</span> <span class="o">=</span> <span class="n">sta_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">netid</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">network</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;source&#39;</span><span class="p">]</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">elev</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;elev&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">vs30</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;vs30&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">stddev</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">instrumented</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">netid</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">CIIM_TUPLE</span><span class="p">)</span>
+
+                <span class="n">station_rows</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">sta_id</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">code</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span><span class="p">,</span>
+                                     <span class="n">elev</span><span class="p">,</span> <span class="n">vs30</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">instrumented</span><span class="p">))</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">instrumented</span><span class="p">:</span>
+                    <span class="n">amplitude</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+                        <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;intensity&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
+                    <span class="n">stddev</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span>
+                        <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;intensity_stddev&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">nan</span><span class="p">))</span>
+                    <span class="n">flag</span> <span class="o">=</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity_flag&#39;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">flag</span> <span class="ow">or</span> <span class="n">flag</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                        <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;0&#39;</span>
+                    <span class="n">amp_rows</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">sta_id</span><span class="p">,</span> <span class="s1">&#39;MMI&#39;</span><span class="p">,</span> <span class="s1">&#39;mmi&#39;</span><span class="p">,</span> <span class="s1">&#39;h&#39;</span><span class="p">,</span>
+                                     <span class="n">amplitude</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">flag</span><span class="p">])</span>
+                    <span class="n">imt_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="s1">&#39;MMI&#39;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+
+                <span class="c1">#</span>
+                <span class="c1"># Collect the channel names for this station to see if we</span>
+                <span class="c1"># can resolve the orientation of any of the channels ending</span>
+                <span class="c1"># with &quot;1&quot; or &quot;2&quot;.</span>
+                <span class="c1">#</span>
+                <span class="n">chan_names</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">comp</span> <span class="ow">in</span> <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]:</span>
+                    <span class="n">chan_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">comp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
+                <span class="n">orients</span> <span class="o">=</span> <span class="n">_getOrientationSet</span><span class="p">(</span><span class="n">chan_names</span><span class="p">)</span>
+                <span class="c1">#</span>
+                <span class="c1"># Now insert the amps into the database</span>
+                <span class="c1">#</span>
+                <span class="k">for</span> <span class="n">ic</span><span class="p">,</span> <span class="n">comp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]):</span>
+                    <span class="n">original_channel</span> <span class="o">=</span> <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span>
+                    <span class="n">orientation</span> <span class="o">=</span> <span class="n">orients</span><span class="p">[</span><span class="n">ic</span><span class="p">]</span>
+                    <span class="k">for</span> <span class="n">amp</span> <span class="ow">in</span> <span class="n">comp</span><span class="p">[</span><span class="s1">&#39;amplitudes&#39;</span><span class="p">]:</span>
+                        <span class="n">imt_type</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span>
+                        <span class="n">imt_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">imt_type</span><span class="p">)</span>
+                        <span class="n">amp_id</span> <span class="o">=</span> <span class="p">(</span><span class="n">sta_id</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">imt_type</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span>
+                                  <span class="n">original_channel</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">amp_id</span> <span class="ow">in</span> <span class="n">amp_set</span><span class="p">:</span>
+                            <span class="k">continue</span>
+                        <span class="n">amp_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">amp_id</span><span class="p">)</span>
+                        <span class="n">amplitude</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="s1">&#39;ln_sigma&#39;</span> <span class="ow">in</span> <span class="n">amp</span><span class="p">:</span>
+                            <span class="n">stddev</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;ln_sigma&#39;</span><span class="p">]</span>
+                        <span class="k">elif</span> <span class="s1">&#39;sigma&#39;</span> <span class="ow">in</span> <span class="n">amp</span><span class="p">:</span>
+                            <span class="n">stddev</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;sigma&#39;</span><span class="p">]</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">stddev</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="n">flag</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;flag&#39;</span><span class="p">]</span>
+                        <span class="n">units</span> <span class="o">=</span> <span class="n">amp</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="n">amplitude</span> <span class="o">==</span> <span class="s1">&#39;null&#39;</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">amplitude</span><span class="p">)):</span>
+                            <span class="n">amplitude</span> <span class="o">=</span> <span class="s1">&#39;NULL&#39;</span>
+                            <span class="n">flag</span> <span class="o">=</span> <span class="s1">&#39;G&#39;</span>
+                        <span class="k">elif</span> <span class="n">imt_type</span> <span class="o">==</span> <span class="s1">&#39;MMI&#39;</span><span class="p">:</span>
+                            <span class="k">pass</span>
+                        <span class="k">elif</span> <span class="n">imt_type</span> <span class="o">==</span> <span class="s1">&#39;PGV&#39;</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;cm/s&#39;</span><span class="p">:</span>
+                                <span class="n">amplitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amplitude</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;ln(cm/s)&#39;</span><span class="p">:</span>
+                                <span class="k">pass</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown units </span><span class="si">%s</span><span class="s1"> in input&#39;</span>
+                                                 <span class="o">%</span> <span class="n">units</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">if</span> <span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;</span><span class="si">%g</span><span class="s1">&#39;</span><span class="p">:</span>
+                                <span class="n">amplitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">amplitude</span> <span class="o">/</span> <span class="mf">100.0</span><span class="p">)</span>
+                            <span class="k">elif</span> <span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;ln(g)&#39;</span><span class="p">:</span>
+                                <span class="k">pass</span>
+                            <span class="k">else</span><span class="p">:</span>
+                                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Unknown units </span><span class="si">%s</span><span class="s1"> in input&#39;</span>
+                                                 <span class="o">%</span> <span class="n">units</span><span class="p">)</span>
+                        <span class="n">amp_rows</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">sta_id</span><span class="p">,</span> <span class="n">imt_type</span><span class="p">,</span> <span class="n">original_channel</span><span class="p">,</span>
+                                         <span class="n">orientation</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">,</span> <span class="n">stddev</span><span class="p">,</span> <span class="n">flag</span><span class="p">])</span>
+
+        <span class="n">new_imts</span> <span class="o">=</span> <span class="n">imt_set</span> <span class="o">-</span> <span class="n">orig_imt_set</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">new_imts</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span><span class="s1">&#39;INSERT INTO imt (imt_type) VALUES (?)&#39;</span><span class="p">,</span>
+                                    <span class="nb">zip</span><span class="p">(</span><span class="n">new_imts</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s1">&#39;SELECT imt_type, id FROM imt&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span>
+        <span class="n">imt_hash</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">())</span>
+
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">amp_rows</span><span class="p">:</span>
+            <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">imt_hash</span><span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
+            <span class="s1">&#39;INSERT INTO amp (station_id, imt_id, original_channel, &#39;</span>
+            <span class="s1">&#39;orientation, amp, stddev, flag) VALUES (?, ?, ?, ?, ?, ?, ?)&#39;</span><span class="p">,</span>
+            <span class="n">amp_rows</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">executemany</span><span class="p">(</span>
+            <span class="s1">&#39;INSERT INTO station (id, network, code, name, lat, lon, &#39;</span>
+            <span class="s1">&#39;elev, vs30, stddev, instrumented) VALUES &#39;</span>
+            <span class="s1">&#39;(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)&#39;</span><span class="p">,</span> <span class="n">station_rows</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+
+        <span class="k">return</span>
 
 <div class="viewcode-block" id="StationList.getGeoJson"><a class="viewcode-back" href="../../shakelib/shakelib.station.html#shakelib.station.StationList.getGeoJson">[docs]</a>    <span class="k">def</span> <span class="nf">getGeoJson</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">jdict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;FeatureCollection&#39;</span><span class="p">,</span>
@@ -239,7 +395,6 @@
         <span class="n">sta_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
 
         <span class="k">for</span> <span class="n">sta</span> <span class="ow">in</span> <span class="n">sta_rows</span><span class="p">:</span>
-            <span class="c1"># print(&#39;doing station %s&#39; % (str(sta[2])))</span>
             <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">):</span>
                 <span class="n">myid</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
             <span class="k">else</span><span class="p">:</span>
@@ -250,7 +405,7 @@
                 <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
                     <span class="s1">&#39;code&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>
                     <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>
-                    <span class="s1">&#39;instrumentType&#39;</span><span class="p">:</span> <span class="s1">&#39;UNK&#39;</span> <span class="k">if</span> <span class="n">sta</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">True</span> <span class="k">else</span> <span class="s1">&#39;OBSERVED&#39;</span><span class="p">,</span>
+                    <span class="s1">&#39;instrumentType&#39;</span><span class="p">:</span> <span class="s1">&#39;UNK&#39;</span> <span class="k">if</span> <span class="n">sta</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="ow">is</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;OBSERVED&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;source&#39;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                     <span class="s1">&#39;network&#39;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
                     <span class="s1">&#39;commType&#39;</span><span class="p">:</span> <span class="s1">&#39;UNK&#39;</span><span class="p">,</span>
@@ -261,6 +416,8 @@
                     <span class="s1">&#39;pga&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                     <span class="s1">&#39;pgv&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
                     <span class="s1">&#39;distance&#39;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span>
+                    <span class="s1">&#39;elev&#39;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">6</span><span class="p">],</span>
+                    <span class="s1">&#39;vs30&#39;</span><span class="p">:</span> <span class="n">sta</span><span class="p">[</span><span class="mi">7</span><span class="p">],</span>
                     <span class="s1">&#39;channels&#39;</span><span class="p">:</span> <span class="p">[]</span>
                 <span class="p">},</span>
                 <span class="s1">&#39;geometry&#39;</span><span class="p">:</span> <span class="p">{</span>
@@ -276,9 +433,19 @@
                 <span class="s1">&#39;AND a.imt_id = i.id&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">sta</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
             <span class="p">)</span>
             <span class="n">amp_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">sta</span><span class="p">[</span><span class="mi">8</span><span class="p">]</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">amp_rows</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Couldn&#39;t find intensity for MMI station.&quot;</span><span class="p">)</span>
+                    <span class="k">continue</span>
+                <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">amp_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity_stddev&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">amp_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">4</span><span class="p">]</span>
+                <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;intensity_flag&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">amp_rows</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">3</span><span class="p">]</span>
+                <span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">][</span><span class="s1">&#39;channels&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
+                <span class="k">continue</span>
+
             <span class="n">channels</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">for</span> <span class="n">amp</span> <span class="ow">in</span> <span class="n">amp_rows</span><span class="p">:</span>
-                <span class="c1"># print(&#39;doing channel %s imt %s&#39; % (amp[2], amp[1]))</span>
                 <span class="n">sd_string</span> <span class="o">=</span> <span class="s1">&#39;ln_sigma&#39;</span>
                 <span class="k">if</span> <span class="n">amp</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">channels</span><span class="p">:</span>
                     <span class="n">channels</span><span class="p">[</span><span class="n">amp</span><span class="p">[</span><span class="mi">2</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">amp</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="s1">&#39;amplitudes&#39;</span><span class="p">:</span> <span class="p">[]}</span>
@@ -313,28 +480,6 @@
             <span class="n">jdict</span><span class="p">[</span><span class="s1">&#39;features&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">jdict</span></div>
-
-<div class="viewcode-block" id="StationList.addData"><a class="viewcode-back" href="../../shakelib/shakelib.station.html#shakelib.station.StationList.addData">[docs]</a>    <span class="k">def</span> <span class="nf">addData</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">xmlfiles</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a StationList object by reading one or more ShakeMap XML input</span>
-<span class="sd">        files.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            xmlfiles (sequence of str):</span>
-<span class="sd">                Sequence of ShakeMap XML input files to read.</span>
-<span class="sd">        Returns:</span>
-<span class="sd">            :class:`StationList` object</span>
-
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># Parse the xml into a dictionary</span>
-        <span class="n">stationdict</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">imtset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">xmlfile</span> <span class="ow">in</span> <span class="n">xmlfiles</span><span class="p">:</span>
-            <span class="n">stationdict</span><span class="p">,</span> <span class="n">ims</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_station</span><span class="p">(</span><span class="n">xmlfile</span><span class="p">,</span> <span class="n">stationdict</span><span class="p">)</span>
-            <span class="n">imtset</span> <span class="o">|=</span> <span class="n">ims</span>
-        <span class="c1"># fill the database and create the object from it</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_loadFromDict</span><span class="p">(</span><span class="n">stationdict</span><span class="p">,</span> <span class="n">imtset</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span></div>
 
     <span class="k">def</span> <span class="nf">_loadFromDict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stationdict</span><span class="p">,</span> <span class="n">imtset</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
@@ -430,8 +575,7 @@
             <span class="k">for</span> <span class="n">original_channel</span><span class="p">,</span> <span class="n">cdict</span> <span class="ow">in</span> <span class="n">comp_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">pgm_dict</span> <span class="o">=</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;amps&#39;</span><span class="p">]</span>
                 <span class="n">orientation</span> <span class="o">=</span> <span class="n">cdict</span><span class="p">[</span><span class="s1">&#39;attrs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;orientation&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-                <span class="n">orientation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_getOrientation</span><span class="p">(</span><span class="n">original_channel</span><span class="p">,</span>
-                                                   <span class="n">orientation</span><span class="p">)</span>
+                <span class="n">orientation</span> <span class="o">=</span> <span class="n">_getOrientation</span><span class="p">(</span><span class="n">original_channel</span><span class="p">,</span> <span class="n">orientation</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">imt_type</span><span class="p">,</span> <span class="n">imt_dict</span> <span class="ow">in</span> <span class="n">pgm_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="k">if</span> <span class="p">(</span><span class="n">instrumented</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">imt_type</span> <span class="o">!=</span> <span class="s1">&#39;MMI&#39;</span><span class="p">):</span>
                         <span class="k">continue</span>
@@ -515,7 +659,7 @@
 
 <span class="sd">        &#39;id&#39;, &#39;network&#39;, &#39;code&#39;, &#39;name&#39;, &#39;lat&#39;, &#39;lon&#39;, &#39;elev&#39;, &#39;vs30&#39;,</span>
 <span class="sd">        &#39;stddev&#39;, &#39;instrumented&#39;, &#39;PGA&#39;, &#39;PGA_sd&#39;, &#39;PGV&#39;, &#39;PGA_sd&#39;,</span>
-<span class="sd">        &#39;SA(0.3)&#39;, &#39;SA(0.3)_sd, &#39;SA(1.0)&#39;, &#39;SA(1.0)_sd, &#39;SA(3.0)&#39;,</span>
+<span class="sd">        &#39;SA(0.3)&#39;, &#39;SA(0.3)_sd, &#39;SA(1.0)&#39;, &#39;SA(1.0)_sd&#39;, &#39;SA(3.0)&#39;,</span>
 <span class="sd">        &#39;SA(3.0)_sd&#39;</span>
 
 <span class="sd">        For the non-instrumented dictionary, the keys would be:</span>
@@ -536,10 +680,15 @@
 
 <span class="sd">        Returns:</span>
 <span class="sd">            dict, set: A dictionary of Numpy arrays, and a set specifying</span>
-<span class="sd">            the IMTs found in the dictionary..</span>
+<span class="sd">            the IMTs found in the dictionary.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            TypeError: if &quot;instrumented&quot; argument is not type bool.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instrumented</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">instrumented</span><span class="p">,</span> <span class="nb">bool</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;getStationDictionary: the instrumented argument &quot;</span>
+                            <span class="s2">&quot;must be of type bool&quot;</span><span class="p">)</span>
         <span class="n">columns</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">TABLES</span><span class="p">[</span><span class="s1">&#39;station&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">dstr</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span>
@@ -575,8 +724,8 @@
             <span class="s1">&#39;amp a, station s, imt i WHERE a.flag = &quot;0&quot; &#39;</span>
             <span class="s1">&#39;AND s.id = a.station_id &#39;</span>
             <span class="s1">&#39;AND a.imt_id = i.id &#39;</span>
-            <span class="s1">&#39;AND s.instrumented = </span><span class="si">%d</span><span class="s1"> AND a.orientation NOT IN (&quot;Z&quot;, &quot;U&quot;) &#39;</span>
-            <span class="s1">&#39;AND a.amp IS NOT NULL&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">instrumented</span><span class="p">)</span>
+            <span class="s1">&#39;AND s.instrumented = ? AND a.orientation NOT IN (&quot;Z&quot;, &quot;U&quot;) &#39;</span>
+            <span class="s1">&#39;AND a.amp IS NOT NULL&#39;</span><span class="p">,</span> <span class="p">(</span><span class="n">instrumented</span><span class="p">,)</span>
         <span class="p">)</span>
         <span class="n">amp_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
 
@@ -597,43 +746,38 @@
 
         <span class="k">return</span> <span class="n">df</span><span class="p">,</span> <span class="n">myimts</span></div>
 
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_getOrientation</span><span class="p">(</span><span class="n">orig_channel</span><span class="p">,</span> <span class="n">orient</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_fixOrientations</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Return a character representing the orientation of a channel.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            orig_channel (string):</span>
-<span class="sd">                String representing the seed channel (e.g. &#39;HNZ&#39;). The</span>
-<span class="sd">                final character is assumed to be the (uppercase) orientation.</span>
-<span class="sd">            orient (str or None):</span>
-<span class="sd">                Gives the orientation of the channel, overriding channel</span>
-<span class="sd">                codes that end in numbers. Must be one of &#39;h&#39; (horizontal)</span>
-<span class="sd">                or &#39;v&#39; (vertical), or None if the orientation has not been</span>
-<span class="sd">                explicitly specified in the &quot;comp&quot; element.</span>
-
-<span class="sd">        Returns:</span>
-<span class="sd">            Character representing the channel orientation. One of &#39;N&#39;,</span>
-<span class="sd">            &#39;E&#39;, &#39;Z&#39;, &#39;H&#39; (for horizontal), or &#39;U&#39; (for unknown).</span>
+<span class="sd">        Look for stations with channels that have orientations &quot;1&quot;, &quot;2&quot;,</span>
+<span class="sd">        and &quot;Z&quot;, and set the &quot;1&quot; and &quot;2&quot; channels to have horizontal</span>
+<span class="sd">        orientation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">orig_channel</span> <span class="o">==</span> <span class="s1">&#39;mmi&#39;</span> <span class="ow">or</span> <span class="n">orig_channel</span> <span class="o">==</span> <span class="s1">&#39;DERIVED&#39;</span><span class="p">:</span>
-            <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>           <span class="c1"># mmi is arbitrarily horizontal</span>
-        <span class="k">elif</span> <span class="n">orig_channel</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">):</span>
-            <span class="n">orientation</span> <span class="o">=</span> <span class="n">orig_channel</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="n">orig_channel</span> <span class="o">==</span> <span class="s2">&quot;UNK&quot;</span><span class="p">:</span>   <span class="c1"># Channel is &quot;UNK&quot;; assume horizontal</span>
-            <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
-        <span class="k">elif</span> <span class="n">orig_channel</span> <span class="o">==</span> <span class="s1">&#39;H1&#39;</span> <span class="ow">or</span> <span class="n">orig_channel</span> <span class="o">==</span> <span class="s1">&#39;H2&#39;</span><span class="p">:</span>
-            <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
-        <span class="k">elif</span> <span class="n">orig_channel</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">orient</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
-                <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
-            <span class="k">elif</span> <span class="n">orient</span> <span class="o">==</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span>
-                <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;Z&#39;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;U&#39;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;U&#39;</span>  <span class="c1"># this is unknown</span>
-        <span class="k">return</span> <span class="n">orientation</span>
+        <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;SELECT DISTINCT station_id, original_channel &quot;</span>
+               <span class="s2">&quot;FROM amp &quot;</span>
+               <span class="s2">&quot;WHERE orientation IN (&#39;U&#39;, &#39;Z&#39;) &quot;</span>
+               <span class="s2">&quot;ORDER BY station_id&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">)</span>
+        <span class="n">sta_rows</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+        <span class="n">current_station_id</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">channel_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">sta_rows</span><span class="p">:</span>
+            <span class="n">station_id</span><span class="p">,</span> <span class="n">channel</span> <span class="o">=</span> <span class="n">row</span>
+            <span class="k">if</span> <span class="n">station_id</span> <span class="o">!=</span> <span class="n">current_station_id</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">channel_set</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                    <span class="n">ochars</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">channel_set</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="s1">&#39;1&#39;</span> <span class="ow">in</span> <span class="n">ochars</span> <span class="ow">and</span> <span class="s1">&#39;2&#39;</span> <span class="ow">in</span> <span class="n">ochars</span> <span class="ow">and</span> <span class="s1">&#39;Z&#39;</span> <span class="ow">in</span> <span class="n">ochars</span><span class="p">:</span>
+                        <span class="n">hchans</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">channel_set</span> <span class="k">if</span> <span class="n">x</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s1">&#39;Z&#39;</span><span class="p">]</span>
+                        <span class="n">sql</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;UPDATE amp &#39;</span>
+                               <span class="s1">&#39;SET orientation = &quot;H&quot;&#39;</span>
+                               <span class="s1">&#39;WHERE station_id = ? &#39;</span>
+                               <span class="s1">&#39;AND original_channel IN (?, ?)&#39;</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">sql</span><span class="p">,</span> <span class="p">(</span><span class="n">current_station_id</span><span class="p">,</span>
+                                                  <span class="n">hchans</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">hchans</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">db</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+                <span class="n">current_station_id</span> <span class="o">=</span> <span class="n">station_id</span>
+                <span class="n">channel_set</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">channel</span><span class="p">])</span>
+            <span class="n">channel_set</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+        <span class="k">return</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">_getGroundMotions</span><span class="p">(</span><span class="n">comp</span><span class="p">,</span> <span class="n">imt_translate</span><span class="p">):</span>
@@ -751,6 +895,7 @@
                 <span class="k">if</span> <span class="n">code</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">netid</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">):</span>
                     <span class="n">sta_id</span> <span class="o">=</span> <span class="n">code</span>
                     <span class="n">code</span> <span class="o">=</span> <span class="n">code</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">netid</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                    <span class="n">attributes</span><span class="p">[</span><span class="s1">&#39;code&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">code</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">sta_id</span> <span class="o">=</span> <span class="n">netid</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">code</span>
 
@@ -816,6 +961,71 @@
 
     <span class="n">p</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(?&lt;=psa)\d+&#39;</span><span class="p">,</span> <span class="n">imt</span><span class="p">)</span>
     <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span></div>
+
+
+<span class="k">def</span> <span class="nf">_getOrientation</span><span class="p">(</span><span class="n">orig_channel</span><span class="p">,</span> <span class="n">orient</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a character representing the orientation of a channel.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        orig_channel (string):</span>
+<span class="sd">            String representing the seed channel (e.g. &#39;HNZ&#39;). The</span>
+<span class="sd">            final character is assumed to be the (uppercase) orientation.</span>
+<span class="sd">        orient (str or None):</span>
+<span class="sd">            Gives the orientation of the channel, overriding channel</span>
+<span class="sd">            codes that end in numbers. Must be one of &#39;h&#39; (horizontal)</span>
+<span class="sd">            or &#39;v&#39; (vertical), or None if the orientation has not been</span>
+<span class="sd">            explicitly specified in the &quot;comp&quot; element.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Character representing the channel orientation. One of &#39;N&#39;,</span>
+<span class="sd">        &#39;E&#39;, &#39;Z&#39;, &#39;H&#39; (for horizontal), or &#39;U&#39; (for unknown).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">orig_channel</span> <span class="o">==</span> <span class="s1">&#39;mmi&#39;</span> <span class="ow">or</span> <span class="n">orig_channel</span> <span class="o">==</span> <span class="s1">&#39;DERIVED&#39;</span><span class="p">:</span>
+        <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>           <span class="c1"># mmi is arbitrarily horizontal</span>
+    <span class="k">elif</span> <span class="n">orig_channel</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="s1">&#39;E&#39;</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">):</span>
+        <span class="n">orientation</span> <span class="o">=</span> <span class="n">orig_channel</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="k">elif</span> <span class="n">orig_channel</span> <span class="o">==</span> <span class="s2">&quot;UNK&quot;</span><span class="p">:</span>   <span class="c1"># Channel is &quot;UNK&quot;; assume horizontal</span>
+        <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
+    <span class="k">elif</span> <span class="n">orig_channel</span> <span class="o">==</span> <span class="s1">&#39;H1&#39;</span> <span class="ow">or</span> <span class="n">orig_channel</span> <span class="o">==</span> <span class="s1">&#39;H2&#39;</span><span class="p">:</span>
+        <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
+    <span class="k">elif</span> <span class="n">orig_channel</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">orient</span> <span class="o">==</span> <span class="s1">&#39;h&#39;</span><span class="p">:</span>
+            <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;H&#39;</span>
+        <span class="k">elif</span> <span class="n">orient</span> <span class="o">==</span> <span class="s1">&#39;v&#39;</span><span class="p">:</span>
+            <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;Z&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;U&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">orientation</span> <span class="o">=</span> <span class="s1">&#39;U&#39;</span>  <span class="c1"># this is unknown</span>
+    <span class="k">return</span> <span class="n">orientation</span>
+
+
+<span class="k">def</span> <span class="nf">_getOrientationSet</span><span class="p">(</span><span class="n">chan_names</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return a characters representing the orientation of a set of</span>
+<span class="sd">    channels from a single station.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        chan_names (list):</span>
+<span class="sd">            List of strings representing the seed channels (e.g. &#39;HNZ&#39;).</span>
+<span class="sd">            The final character is assumed to be the (uppercase)</span>
+<span class="sd">            orientation.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Character representing the channel orientation. One of &#39;N&#39;,</span>
+<span class="sd">        &#39;E&#39;, &#39;Z&#39;, &#39;H&#39; (for horizontal), or &#39;U&#39; (for unknown).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">chan_names</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">term_chars</span> <span class="o">=</span> <span class="p">[</span><span class="n">chan_names</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">chan_names</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">chan_names</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+        <span class="k">if</span> <span class="s1">&#39;1&#39;</span> <span class="ow">in</span> <span class="n">term_chars</span> <span class="ow">and</span> <span class="s1">&#39;Z&#39;</span> <span class="ow">in</span> <span class="n">term_chars</span><span class="p">:</span>
+            <span class="n">orientations</span> <span class="o">=</span> <span class="p">[(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s1">&#39;V&#39;</span> <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="s1">&#39;Z&#39;</span> <span class="k">else</span> <span class="s1">&#39;H&#39;</span><span class="p">)(</span><span class="n">x</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">term_chars</span><span class="p">]</span>
+            <span class="k">return</span> <span class="n">orientations</span>
+    <span class="n">orientations</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">chan_names</span><span class="p">:</span>
+        <span class="n">orientations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_getOrientation</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">orientations</span>
 </pre></div>
 
           </div>
@@ -842,10 +1052,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../manual3_5/index.html">ShakeMap 3.5 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../manual4_0/title_page.html">ShakeMap 4 Manual</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../programs/programs.html">ShakeMap 4.0a Command Line Interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../apidoc/shakemap.html">ShakeMap 4.0a API</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../shakelib/shakelib.html">ShakeLib API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../sm4_index.html">ShakeMap v4 Documentation</a></li>
 </ul>
 
 

@@ -10,16 +10,10 @@ ShakeMap Documentation
    :hidden:
 
    manual3_5/index.rst
-   manual4_0/title_page.rst
-   ShakeMap 4.0a Command Line Interface <programs/programs.rst>
-   ShakeMap 4.0a API <apidoc/shakemap.rst>
-   ShakeLib API <shakelib/shakelib.rst>
+   sm4_index.rst
 
 * :doc:`ShakeMap 3.5 Manual <manual3_5/index>`
-* :doc:`ShakeMap 4 Manual <manual4_0/title_page>`
-* :doc:`ShakeMap 4.0a Command Line Interface <programs/programs>`
-* :doc:`ShakeMap 4.0a API  <apidoc/shakemap>`
-* :doc:`ShakeLib API  <shakelib/shakelib>`
+* :doc:`ShakeMap v4 Documentation <sm4_index>`
 
 .. Indices and tables
 .. ==================
