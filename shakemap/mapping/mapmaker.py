@@ -1,11 +1,12 @@
 # stdlib imports
+from datetime import datetime
 
 # third party imports
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
-import matplotlib.patheffects as path_effects
 from matplotlib.colors import LightSource
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import cartopy.crs as ccrs  # projections
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
@@ -13,30 +14,30 @@ from cartopy.feature import ShapelyFeature
 import cartopy.feature as cfeature
 from cartopy.io.shapereader import Reader
 
-from mapio.gdal import GDALGrid
-from mapio.gmt import GMTGrid
-
 from shapely.geometry import shape as sShape
 from shapely.geometry import Polygon as sPolygon
 from shapely.geometry import GeometryCollection
 
 import pyproj
-
 import fiona
 
-
+# neic imports
+from mapio.gmt import GMTGrid
 from impactutils.mapping.mercatormap import MercatorMap
 from impactutils.mapping.city import Cities
 from impactutils.colors.cpalette import ColorPalette
 from impactutils.mapping.scalebar import draw_scale
 
+# local imports
+from shakelib.rupture.point_rupture import PointRupture
+from shakelib.rupture import constants
 
 # define some constants
 WATERCOLOR = '#7AA1DA'
 FIGWIDTH = 7.0
 FILTER_SMOOTH = 5.0
 XOFFSET = 4  # how many pixels between the city dot and the city text
-VERT_EXAG = 0.1  # what is the vertical exaggeration for hillshade
+VERT_EXAG = 0.001  # what is the vertical exaggeration for hillshade
 
 # define the zorder values for various map components
 # all of the zorder values for different plotted parameters
@@ -74,7 +75,149 @@ MMI_LABELS = {'1': 'I',
 DEG2KM = 111.191
 
 
-def get_draped(self, data, topodata, colormap):
+def draw_title(imt, container, operator):
+    """Draw the map title.
+    Args:
+        imt (str): IMT that is being drawn on the map ('MMI', 'PGV',
+            'PGA', 'SA(x.y)').
+        isContour (bool): If true, use input imt, otherwise use MMI.
+    """
+    # Add a title
+    edict = container.getMetadata()['input']['event_information']
+    hlon = float(edict['longitude'])
+    hlat = float(edict['latitude'])
+    eloc = edict['event_description']
+    try:
+        etime = datetime.strptime(edict['origin_time'],
+                                  constants.TIMEFMT)
+    except ValueError:
+        etime = datetime.strptime(edict['origin_time'],
+                                  constants.ALT_TIMEFMT)
+    timestr = etime.strftime('%b %d, %Y %H:%M:%S')
+    mag = float(edict['magnitude'])
+    if hlon < 0:
+        lonstr = 'W%.2f' % np.abs(hlon)
+    else:
+        lonstr = 'E%.2f' % hlon
+    if hlat < 0:
+        latstr = 'S%.2f' % np.abs(hlat)
+    else:
+        latstr = 'N%.2f' % hlat
+    dep = float(edict['depth'])
+    eid = edict['event_id']
+    fmt = ('%s ShakeMap (%s): %s\n %s UTC M%.1f %s %s '
+           'Depth: %.1fkm ID:%s')
+    tstr = fmt % (operator, imt, eloc, timestr, mag, latstr,
+                  lonstr, dep, eid)
+    plt.title(tstr, fontsize=10, verticalalignment='bottom')
+
+
+def draw_stations(ax, stations, imt, intensity_colormap, geoproj, fill=True):
+    """Draw station locations on the map.
+    Args:
+        ax (matplotlib Axes): Axes on which to draw stations.
+        fill (bool): Whether or not to fill symbols.
+        imt (str): One of ('MMI', 'PGA', 'PGV', or 'SA(x.x)')
+    """
+    dimt = imt.lower()
+
+    # get the locations and values of the MMI observations
+    mmi_dict = {
+        'lat': [],
+        'lon': [],
+        'mmi': []
+    }
+    inst_dict = {
+        'lat': [],
+        'lon': [],
+        'mmi': [],
+        dimt: []
+    }
+    # Get the locations and values of the observed/instrumented
+    # observations.
+    for feature in stations['features']:
+        lon, lat = feature['geometry']['coordinates']
+        net = feature['properties']['network'].lower()
+
+        # If the network matches one of these then it is an MMI
+        # observation
+        if net in ['dyfi', 'mmi', 'intensity', 'ciim']:
+            # Append data from MMI features
+            channel = feature['properties']['channels'][0]
+            for amplitude in channel['amplitudes']:
+                if amplitude['name'] != 'mmi':
+                    continue
+                mmi_dict['mmi'].append(float(amplitude['value']))
+                mmi_dict['lat'].append(lat)
+                mmi_dict['lon'].append(lon)
+        else:
+            # Otherwise, the feature is an instrument
+
+            # If dimt is MMI then we have to use the converted value
+            # from an instrumental value
+            try:
+                mmi_conv = float(feature['properties']['intensity'])
+            except ValueError:
+                mmi_conv = np.nan
+            if dimt == 'mmi':
+                inst_dict[dimt].append(mmi_conv)
+                inst_dict['lat'].append(lat)
+                inst_dict['lon'].append(lon)
+            else:
+                # Other IMTs are given in the channel for instruments
+                channel = feature['properties']['channels'][0]
+                for amplitude in channel['amplitudes']:
+                    if amplitude['name'] != dimt:
+                        continue
+                    if amplitude['value'] == 'null':
+                        continue
+                    inst_dict[dimt].append(float(amplitude['value']))
+                    inst_dict['lat'].append(lat)
+                    inst_dict['lon'].append(lon)
+                    # Add mmi also for the fill color of symbols
+                    inst_dict['mmi'].append(mmi_conv)
+
+    if fill:
+        # Fill the symbols with the color for the intensity
+        for i in range(len(mmi_dict['lat'])):
+            mlat = mmi_dict['lat'][i]
+            mlon = mmi_dict['lon'][i]
+            mmi = mmi_dict['mmi'][i]
+            mcolor = intensity_colormap.getDataColor(mmi)
+            ax.plot(mlon, mlat, 'o', markerfacecolor=mcolor,
+                    markeredgecolor='k', markersize=4, mew=0.5,
+                    zorder=STATIONS_ZORDER, transform=geoproj)
+
+        for i in range(len(inst_dict['lat'])):
+            mlat = inst_dict['lat'][i]
+            mlon = inst_dict['lon'][i]
+            #
+            # TODO: Make the fill color correspond to the mmi
+            # obtained from the IMT.
+            #
+            mmi = inst_dict['mmi'][i]
+            mcolor = intensity_colormap.getDataColor(mmi)
+            ax.plot(mlon, mlat, '^',
+                    markerfacecolor=mcolor, markeredgecolor='k',
+                    markersize=6, zorder=STATIONS_ZORDER, mew=0.5,
+                    transform=geoproj)
+    else:
+        # Do not fill symbols
+
+        # plot MMI as small circles
+        mmilat = mmi_dict['lat']
+        mmilon = mmi_dict['lon']
+        ax.plot(mmilon, mmilat, 'ko', fillstyle='none', mew=0.5,
+                markersize=4, zorder=STATIONS_ZORDER, transform=geoproj)
+
+        # plot MMI as slightly larger triangles
+        instlat = inst_dict['lat']
+        instlon = inst_dict['lon']
+        ax.plot(instlon, instlat, 'k^', fillstyle='none', mew=0.5,
+                markersize=6, zorder=STATIONS_ZORDER, transform=geoproj)
+
+
+def get_draped(data, topodata, colormap):
     """Get array of data "draped" on topography.
     Args:
         data (ndarray): 2D Numpy array.
@@ -130,162 +273,8 @@ def _clip_bounds(bbox, filename):
     return gc
 
 
-def _renderRow(row, ax, fontname=DEFAULT_FONT, fontsize=10, zorder=10,
-               shadow=False):
-    """Internal method to consistently render city names.
-    :param row:
-      pandas dataframe row.
-    :param ax:
-      Matplotlib Axes instance.
-    :param fontname:
-      String name of desired font.
-    :param fontsize:
-      Font size in points.
-    :param zorder:
-      Matplotlib plotting order - higher zorder is on top.
-    :param shadow:
-      Boolean indicating whether "drop-shadow" effect should be used.
-    :returns:
-      Matplotlib Text instance.
-    """
-    ha = 'left'
-    va = 'center'
-    if 'placement' in row.index:
-        if row['placement'].find('E') > -1:
-            ha = 'left'
-        if row['placement'].find('W') > -1:
-            ha = 'right'
-        else:
-            ha = 'center'
-        if row['placement'].find('N') > -1:
-            ha = 'top'
-        if row['placement'].find('S') > -1:
-            ha = 'bottom'
-        else:
-            ha = 'center'
-
-    data_x_offset = 0
-    tx = row['lon'] + data_x_offset
-    ty = row['lat']
-    if shadow:
-        th = ax.text(tx, ty, row['name'], fontname=fontname, color='black',
-                     fontsize=fontsize, ha=ha, va=va, zorder=zorder,
-                     transform=ccrs.Geodetic())
-        th.set_path_effects([path_effects.Stroke(linewidth=2.0,
-                                                 foreground='white'),
-                             path_effects.Normal()])
-    else:
-        th = ax.text(tx, ty, row['name'], fontname=fontname,
-                     fontsize=fontsize, ha=ha, va=va, zorder=zorder,
-                     transform=ccrs.Geodetic())
-
-    return th
-
-
-def _get_open_corner(popgrid, ax, filled_corner=None, need_bottom=True):
-    """Get the map corner (not already filled) with the lowest population.
-
-    :param popgrid:
-      Grid2D object containing population data.
-    :param ax:
-      Axes object filled by input population grid.
-    :param filled_corner:
-      String indicating which, if any, corners are already occupied.
-      One of ('ll','lr','ul','ur').
-    :param need_bottom:
-      Boolean indicating that one of the two lower corners should be preferred.
-    :returns:
-      Tuple of:
-         - Tuple of corner values in figure coordinates, used to place new
-           axes in a figure.
-        (left,bottom,width,height)
-         - String indicating which corner was selected.
-    """
-    # define all edges in AXES coordinates, then convert to figure coordinates.
-    ax_width = 0.14
-    ax_height = 0.14
-    ax_gap = 0.01
-    ax_leftleft = ax_gap
-    ax_rightleft = 1.0 - (ax_gap + ax_width)
-    ax_bottombottom = ax_gap
-    ax_topbottom = 1.0 - (ax_gap + ax_width)
-
-    axes2disp = ax.transAxes
-    disp2fig = ax.figure.transFigure.inverted()
-    # ll
-    leftleft, bottombottom = disp2fig.transform(
-        axes2disp.transform((ax_leftleft, ax_bottombottom)))
-    # lr
-    rightleft, bottombottom = disp2fig.transform(
-        axes2disp.transform((ax_rightleft, ax_bottombottom)))
-    # ur
-    rightleft, topbottom = disp2fig.transform(
-        axes2disp.transform((ax_rightleft, ax_topbottom)))
-    # right edge of the left bottom corner rectangle
-    leftright, bottombottom = disp2fig.transform(
-        axes2disp.transform((ax_leftleft+ax_width, ax_bottombottom)))
-    leftleft, bottomtop = disp2fig.transform(
-        axes2disp.transform((ax_leftleft, ax_bottombottom+ax_height)))
-    width = leftright - leftleft
-    height = bottomtop - bottombottom
-
-    # get info about population grid
-    popdata = popgrid.getData().copy()
-    i = np.where(np.isnan(popdata))
-    popdata[i] = 0
-    nrows, ncols = popdata.shape
-
-    ulpopsum = popdata[0:int(nrows/4), 0:int(ncols/4)].sum()
-    ulbounds = (leftleft, topbottom, width, height)
-
-    urpopsum = popdata[0:int(nrows/4), ncols - int(ncols/4):ncols-1].sum()
-    urbounds = (rightleft, topbottom, width, height)
-
-    llpopsum = popdata[nrows - int(nrows/4):nrows-1, 0:int(ncols/4)].sum()
-    llbounds = (leftleft, bottombottom, width, height)
-
-    lrpopsum = popdata[nrows - int(nrows/4):nrows-1,
-                       ncols - int(ncols/4):ncols-1].sum()
-    lrbounds = (rightleft, bottombottom, width, height)
-
-    if filled_corner == 'll' and need_bottom:
-        return lrbounds, 'lr'
-
-    if filled_corner == 'lr' and need_bottom:
-        return llbounds, 'll'
-
-    # get the index of the already filled corner
-    if filled_corner is not None:
-        corners = ['ll', 'lr', 'ul', 'ur']
-        cidx = corners.index(filled_corner)
-    else:
-        cidx = None
-
-    # get the population sums in each of the four corners
-    allsums = np.array([llpopsum, lrpopsum, ulpopsum, urpopsum])
-    isort = allsums.argsort()
-
-    if need_bottom:
-        i = np.where(isort <= 1)[0]
-        isort = isort[i]
-    if cidx is not None:
-        i = np.where(isort != cidx)[0]
-        isort = isort[i]
-
-    imin = isort[0]
-
-    if imin == 0:
-        return llbounds, 'll'
-    if imin == 1:
-        return lrbounds, 'lr'
-    if imin == 2:
-        return ulbounds, 'ul'
-    if imin == 3:
-        return urbounds, 'ur'
-
-
-def draw_intensity(container, topofile, oceanfile, oceangridfile, cityfile,
-                   basename, borderfile=None, is_scenario=False):
+def draw_intensity(container, topofile, oceanfile, basename, operator,
+                   borderfile=None, is_scenario=False):
     """Create a contour map showing MMI contours over greyscale population.
 
     :param shakegrid:
@@ -297,8 +286,6 @@ def draw_intensity(container, topofile, oceanfile, oceangridfile, cityfile,
       with fiona.
     :param oceangridfile:
       String path to file containing ocean grid data .
-    :param cityfile:
-      String path to file containing GeoNames cities data.
     :param basename:
       String path containing desired output PDF base name, i.e.,
       /home/pager/exposure.  ".pdf" and ".png" files will
@@ -321,12 +308,9 @@ def draw_intensity(container, topofile, oceanfile, oceangridfile, cityfile,
     gd = mmigrid.getGeoDict()
 
     # Retrieve the epicenter - this will get used on the map
-    center_lat = mmigrid.getEventDict()['lat']
-    center_lon = mmigrid.getEventDict()['lon']
-
-    # load the ocean grid file (has 1s in ocean, 0s over land)
-    # having this file saves us almost 30 seconds!
-    oceangrid = GDALGrid.load(oceangridfile, samplegeodict=gd, resample=True)
+    origin = container.getRuptureObject().getOrigin()
+    center_lat = origin.lat
+    center_lon = origin.lon
 
     # load the cities data, limit to cities within shakemap bounds
     allcities = Cities.fromDefault()
@@ -367,7 +351,8 @@ def draw_intensity(container, topofile, oceanfile, oceangridfile, cityfile,
 
     # Create the MercatorMap object, which holds a separate but identical
     # axes object used to determine collisions between city labels.
-    mmap = MercatorMap(bounds, figsize, cities, padding=0.5)
+    mmap = MercatorMap(bounds, figsize, cities, padding=0.5,
+                       dimensions=[0.1, 0.1, 0.8, 0.8])
     fig = mmap.figure
     ax = mmap.axes
     # this needs to be done here so that city label collision
@@ -406,11 +391,14 @@ def draw_intensity(container, topofile, oceanfile, oceangridfile, cityfile,
     mmimap = ColorPalette.fromPreset('mmi')
 
     # drape the intensity data over the topography
-    draped_hsv = get_draped(pmmigrid.getData(), ptopogrid.getData(), mmimap)
+    pmmi_data = pmmigrid.getData()
+    ptopo_data = ptopogrid.getData()
+    draped_hsv = get_draped(pmmi_data, ptopo_data, mmimap)
 
     # set the image extent to that of the data (do we need this?)
     img_extent = (proj_gd.xmin, proj_gd.xmax, proj_gd.ymin, proj_gd.ymax)
-    plt.imshow(draped_hsv, interpolation='none', zorder=IMG_ZORDER)
+    draped_img = plt.imshow(draped_hsv, origin='upper', extent=img_extent,
+                            zorder=IMG_ZORDER, interpolation='none')
 
     # draw 10m res coastlines
     ax.coastlines(resolution="10m", zorder=BORDER_ZORDER)
@@ -427,7 +415,7 @@ def draw_intensity(container, topofile, oceanfile, oceangridfile, cityfile,
     if borderfile is not None:
         borders = ShapelyFeature(Reader(borderfile).geometries(),
                                  ccrs.PlateCarree())
-        ax.add_feature(borders, zorder=COAST_ZORDER,
+        ax.add_feature(borders, zorder=BORDER_ZORDER,
                        edgecolor='black', linewidth=2, facecolor='none')
 
     # clip the ocean data to the shakemap
@@ -454,8 +442,13 @@ def draw_intensity(container, topofile, oceanfile, oceangridfile, cityfile,
     gymin = np.floor(ymin * 2) / 2
     gymax = np.ceil(ymax * 2) / 2
 
-    xlocs = np.linspace(gxmin, gxmax+0.5, num=5)
-    ylocs = np.linspace(gymin, gymax+0.5, num=5)
+    # shakemap way
+    ylocs = np.arange(np.ceil(gymin), np.floor(gymax) + 1, 1.0)
+    xlocs = np.arange(np.ceil(gxmin), np.floor(gxmax) + 1, 1.0)
+
+    # PAGER way
+    # xlocs = np.linspace(gxmin, gxmax+0.5, num=5)
+    # ylocs = np.linspace(gymin, gymax+0.5, num=5)
 
     gl.xlocator = mticker.FixedLocator(xlocs)
     gl.ylocator = mticker.FixedLocator(ylocs)
@@ -520,21 +513,52 @@ def draw_intensity(container, topofile, oceanfile, oceangridfile, cityfile,
                 transform=ccrs.Geodetic())
 
     # draw cities
-    mapcities = mmap.drawCities(shadow=True, zorder=CITIES_ZORDER)
+    mapcities = mmap.drawCities(shadow=False, zorder=CITIES_ZORDER)
+
+    # draw the station data on the map
+    stations = container.getStationDict()
+
+    draw_stations(ax, stations, 'MMI', mmimap, geoproj)
 
     # Draw the map scale in the unoccupied lower corner.
     corner = 'll'
-    draw_scale(ax, corner, pady=0.05, padx=0.05)
+    draw_scale(ax, corner, pady=0.05, padx=0.05, zorder=SCALE_ZORDER)
 
     # Draw the epicenter as a black star
     plt.sca(ax)
     plt.plot(center_lon, center_lat, 'k*', markersize=16,
              zorder=EPICENTER_ZORDER, transform=geoproj)
 
+    # draw the map title
+    draw_title('MMI', container, operator)
+
     if is_scenario:
         plt.text(center_lon, center_lat, 'SCENARIO', fontsize=64,
                  zorder=SCENARIO_ZORDER, transform=geoproj,
                  alpha=0.2, color='red', horizontalalignment='center')
+
+    # draw the rupture polygon(s) in black, if not point rupture
+    rupture = container.getRuptureObject()
+    if not isinstance(rupture, PointRupture):
+        lats = rupture.lats
+        lons = rupture.lons
+        ax.plot(lons, lats, 'k', lw=2, zorder=FAULT_ZORDER, transform=geoproj)
+
+    # divider = make_axes_locatable(ax)
+    # cax = divider.append_axes("bottom", size="5%",
+    #                           pad=0.05, map_projection=proj)
+    cax = fig.add_axes([0.1, 0.035, 0.8, 0.050])
+
+    # making up our own colorbar object here because the default
+    # pyplot functionality doesn't seem to do the job.
+
+    # sm = plt.cm.ScalarMappable(cmap=mmimap.cmap,
+    #                            norm=plt.Normalize(vmin=1, vmax=10))
+    # sm._A = []
+    # plt.colorbar(sm, orientation='horizontal',
+    #              shrink=0.8, fraction=0.05, cax=cax)
+    # plt.colorbar(draped_img, orientation='horizontal',
+    #              shrink=0.80, fraction=0.05, cax=cax)
 
     # create pdf and png output file names
     pdf_file = basename+'.pdf'
