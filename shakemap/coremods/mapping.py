@@ -845,13 +845,10 @@ class MapMaker(object):
             # observation
             if net in ['dyfi', 'mmi', 'intensity', 'ciim']:
                 # Append data from MMI features
-                channel = feature['properties']['channels'][0]
-                for amplitude in channel['amplitudes']:
-                    if amplitude['name'] != 'mmi':
-                        continue
-                    mmi_dict['mmi'].append(float(amplitude['value']))
-                    mmi_dict['lat'].append(lat)
-                    mmi_dict['lon'].append(lon)
+                amplitude = feature['properties']['intensity']
+                mmi_dict['mmi'].append(float(amplitude))
+                mmi_dict['lat'].append(lat)
+                mmi_dict['lon'].append(lon)
             else:
                 # Otherwise, the feature is an instrument
 
@@ -1061,7 +1058,7 @@ class MapMaker(object):
                      horizontalalignment='center',
                      verticalalignment='center',
                      path_effects=[path_effects.Stroke(linewidth=1,
-                                   foreground='black')])
+                                                       foreground='black')])
 
         # save plot to file
         plt.draw()
@@ -1368,7 +1365,7 @@ class MapMaker(object):
                      horizontalalignment='center',
                      verticalalignment='center',
                      path_effects=[path_effects.Stroke(linewidth=1,
-                                   foreground='black')])
+                                                       foreground='black')])
 
         # save plot to file
         fileimt = oq_to_file(imtype)
