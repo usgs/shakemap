@@ -55,7 +55,6 @@ def contour(container, imtype, component, filter_size, gmice):
         fgrid = median_filter(sgrid, size=int(filter_size))
     else:
         fgrid = sgrid
-#    fgrid = sgrid
 
     interval_type = 'log'
     if imtype == 'MMI':
