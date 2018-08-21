@@ -130,7 +130,7 @@ class ContourModule(CoreModule):
                             'size (in grid points) for smoothing the '
                             'grids before contouring. Must be a positive'
                             'integer (default=10; use 0 to disable '
-                            'filtering).', type=int)
+                            'filtering).', type=float)
         #
         # This line should be in any modules that overrides this
         # one. It will collect up everything after the current
