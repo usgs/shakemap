@@ -1236,6 +1236,7 @@ class ModelModule(CoreModule):
         info[ip][ei]['productsource'] = self.config['system']['source_network']
         info[ip][ei]['producttype'] = self.config['system']['product_type']
 
+        info[ip][ei]['event_ref'] = getattr(origin, 'reference', None)
         info[ip][ei]['fault_ref'] = self.rupture_obj.getReference()
         if 'df2' in self.dataframes:
             info[ip][ei]['intensity_observations'] = \
