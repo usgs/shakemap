@@ -52,7 +52,7 @@ def contour(container, imtype, component, filter_size, gmice):
         sgrid = np.exp(grid) * 100.0
         units = 'pctg'
     if filter_size > 0:
-        fgrid = median_filter(sgrid, size=filter_size)
+        fgrid = median_filter(sgrid, size=int(filter_size))
     else:
         fgrid = sgrid
 
@@ -80,13 +80,17 @@ def contour(container, imtype, component, filter_size, gmice):
         new_contours = []
         plot_contours = []
         for ic, coords in enumerate(contours):  # coords is a line segment
-            if len(coords) <= 20:  # skipping little contour islands?
-                continue
+            #
+            # This greatly reduces the number of points in the contours
+            # without changing their shape too much
+            #
+            coords = measure.approximate_polygon(coords, filter_size / 20)
 
             mylons = coords[:, 1] * lonspan / nlon + lonstart
             mylats = (nlat - coords[:, 0]) * latspan / nlat + latstart
-            contours[ic][:, 0] = mylons[:]
-            contours[ic][:, 1] = mylats[:]
+
+            contours[ic] = np.hstack((mylons[:].reshape((-1, 1)),
+                                      mylats[:].reshape((-1, 1))))
             plot_contours.append(contours[ic])
             new_contours.append(contours[ic].tolist())
 
