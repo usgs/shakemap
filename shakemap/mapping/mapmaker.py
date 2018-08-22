@@ -6,7 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 from matplotlib.colors import LightSource
-from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 import cartopy.crs as ccrs  # projections
 from cartopy.mpl.gridliner import LONGITUDE_FORMATTER, LATITUDE_FORMATTER
@@ -37,7 +36,7 @@ WATERCOLOR = '#7AA1DA'
 FIGWIDTH = 7.0
 FILTER_SMOOTH = 5.0
 XOFFSET = 4  # how many pixels between the city dot and the city text
-VERT_EXAG = 0.001  # what is the vertical exaggeration for hillshade
+VERT_EXAG = 0.1  # what is the vertical exaggeration for hillshade
 
 # define the zorder values for various map components
 # all of the zorder values for different plotted parameters
@@ -55,6 +54,7 @@ CITIES_ZORDER = 1200
 GRATICULE_ZORDER = 1200
 SCALE_ZORDER = 1500
 SCENARIO_ZORDER = 2000
+AXES_ZORDER = 3000
 
 # default font for cities
 # DEFAULT_FONT = 'DejaVu Sans'
@@ -229,6 +229,7 @@ def get_draped(data, topodata, colormap):
     maxvalue = colormap.vmax
     mmisc = data / maxvalue
     rgba_img = colormap.cmap(mmisc)
+
     rgb = np.squeeze(rgba_img[:, :, 0:3])
     # use lightsource class to make our shaded topography
     ls = LightSource(azdeg=135, altdeg=45)
@@ -237,8 +238,10 @@ def get_draped(data, topodata, colormap):
     ls2 = LightSource(azdeg=225, altdeg=45)
     intensity1 = ls1.hillshade(topodata, fraction=0.25,
                                vert_exag=VERT_EXAG)
+
     intensity2 = ls2.hillshade(topodata, fraction=0.25,
                                vert_exag=VERT_EXAG)
+
     intensity = intensity1 * 0.5 + intensity2 * 0.5
 
     draped_hsv = ls.blend_hsv(rgb, np.expand_dims(intensity, 2))
@@ -379,7 +382,11 @@ def draw_intensity(container, topofile, oceanfile, basename, operator,
 
     # get topo layer and project it
     topogrid = GMTGrid.load(topofile, samplegeodict=sampledict, resample=False)
-    ptopogrid = topogrid.project(projstr)
+
+    # resampling 32bit floats gives odd results... upcasting to 64bit
+    topogrid._data = topogrid._data.astype(np.float64)
+
+    ptopogrid = topogrid.project(projstr, method='nearest')
 
     # project the MMI data
     pmmigrid = mmigrid.project(projstr)
@@ -396,9 +403,11 @@ def draw_intensity(container, topofile, oceanfile, basename, operator,
     draped_hsv = get_draped(pmmi_data, ptopo_data, mmimap)
 
     # set the image extent to that of the data (do we need this?)
+    # set the axes border width
+    plt.sca(ax)
     img_extent = (proj_gd.xmin, proj_gd.xmax, proj_gd.ymin, proj_gd.ymax)
-    draped_img = plt.imshow(draped_hsv, origin='upper', extent=img_extent,
-                            zorder=IMG_ZORDER, interpolation='none')
+    plt.imshow(draped_hsv, origin='upper', extent=img_extent,
+               zorder=IMG_ZORDER, interpolation='none')
 
     # draw 10m res coastlines
     ax.coastlines(resolution="10m", zorder=BORDER_ZORDER)
@@ -544,21 +553,38 @@ def draw_intensity(container, topofile, oceanfile, basename, operator,
         lons = rupture.lons
         ax.plot(lons, lats, 'k', lw=2, zorder=FAULT_ZORDER, transform=geoproj)
 
-    # divider = make_axes_locatable(ax)
-    # cax = divider.append_axes("bottom", size="5%",
-    #                           pad=0.05, map_projection=proj)
-    cax = fig.add_axes([0.1, 0.035, 0.8, 0.050])
-
     # making up our own colorbar object here because the default
     # pyplot functionality doesn't seem to do the job.
+    cax = fig.add_axes([0.1, 0.035, 0.8, 0.050])
+    cax.get_yaxis().set_visible(False)
+    cax_xmin, cax_xmax = cax.get_xlim()
+    bottom, top = cax.get_ylim()
+    plt.xlim(cax_xmin, cax_xmax)
+    plt.ylim(bottom, top)
+    nsteps = 1000
+    left = 0
+    rights = np.arange(1/nsteps, 1+(1/nsteps), 1/nsteps)
+    mmis = np.linspace(1, 10, nsteps)
+    for mmi, right in zip(mmis, rights):
+        px = [left, right, right, left, left]
+        py = [top, top, bottom, bottom, top]
+        mmicolor = mmimap.getDataColor(mmi, color_format='hex')
+        left = right
+        plt.fill(px, py, mmicolor, ec=mmicolor)
 
-    # sm = plt.cm.ScalarMappable(cmap=mmimap.cmap,
-    #                            norm=plt.Normalize(vmin=1, vmax=10))
-    # sm._A = []
-    # plt.colorbar(sm, orientation='horizontal',
-    #              shrink=0.8, fraction=0.05, cax=cax)
-    # plt.colorbar(draped_img, orientation='horizontal',
-    #              shrink=0.80, fraction=0.05, cax=cax)
+    start_loc = (1/nsteps) - (1/nsteps)/2
+    end_loc = 1 - (1/nsteps)/2
+    locs = np.linspace(start_loc, end_loc, 10)
+    labels = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X']
+
+    plt.xticks(locs, labels)
+
+    # # make the map border thicker
+    # the left/top edges don't line up here
+    # plt.sca(ax)
+    # lw = 5.0
+    # ax.outline_patch.set_zorder(AXES_ZORDER)
+    # ax.outline_patch.set_linewidth(lw)
 
     # create pdf and png output file names
     pdf_file = basename+'.pdf'
