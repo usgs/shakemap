@@ -846,6 +846,8 @@ class MapMaker(object):
             if net in ['dyfi', 'mmi', 'intensity', 'ciim']:
                 # Append data from MMI features
                 amplitude = feature['properties']['intensity']
+                if amplitude == 'null':
+                    amplitude = 'nan'
                 mmi_dict['mmi'].append(float(amplitude))
                 mmi_dict['lat'].append(lat)
                 mmi_dict['lon'].append(lon)
