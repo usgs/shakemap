@@ -164,6 +164,16 @@ class MultiGMPE(GMPE):
 
             if not isinstance(gmpe, MultiGMPE):
                 # -------------------------------------------------------------
+                # We may need to inflate the standard deviations to account for
+                # the point-source to finite rupture conversion.
+                # -------------------------------------------------------------
+                lsd_new = self.inflatePSSigma(gmpe, lmean, lsd, sites, rup,
+                                              dists, timt, stddev_types)
+                for sd in lsd:
+                    lsd_new.append(sd)
+                lsd = lsd_new
+
+                # -------------------------------------------------------------
                 # If IMT is PGV and PGV is not given by the GMPE, then
                 # convert from PSA10.
                 # -------------------------------------------------------------
@@ -201,16 +211,6 @@ class MultiGMPE(GMPE):
                         if stddev_type == const.StdDev.INTER_EVENT:
                             continue
                         lsd[j] = bk17.convertSigmas(imt, lsd[j])
-
-                # -------------------------------------------------------------
-                # We may need to inflate the standard deviations to account for
-                # the point-source to finite rupture conversion.
-                # -------------------------------------------------------------
-                lsd_new = self.inflatePSSigma(gmpe, lmean, lsd, sites, rup,
-                                              dists, timt, stddev_types)
-                for sd in lsd:
-                    lsd_new.append(sd)
-                lsd = lsd_new
 
             # End: if GMPE is not MultiGMPE
             else:
