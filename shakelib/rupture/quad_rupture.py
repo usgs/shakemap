@@ -496,7 +496,7 @@ class QuadRupture(Rupture):
         dip = np.array(dip, dtype='d')
 
         # Get P1 and P2 (top horizontal points)
-        theta = np.rad2deg(np.arctan((dy * np.cos(np.deg2rad(dip))) / dx))
+        theta = np.rad2deg(np.arctan2(dy * np.cos(np.deg2rad(dip)), dx))
         P1_direction = strike + 180 + theta
         P1_distance = np.sqrt(dx**2 + (dy * np.cos(np.deg2rad(dip)))**2)
         P2_direction = strike
