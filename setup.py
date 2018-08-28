@@ -46,6 +46,7 @@ setup(name='shakemap',
           'bin/sm_migrate',
           'bin/sm_profile',
           'bin/sm_compare',
-          'bin/sm_queue'
+          'bin/sm_queue',
+          'bin/sm_rupture'
       ],
       )
